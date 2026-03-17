@@ -305,7 +305,7 @@ export default function App() {
     setJustSaved(false);
 
     try {
-      const res = await fetch("http://localhost:3001/api/copilot", {
+      const res = await fetch("https://clinical-edge-backend.onrender.com/api/copilot", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ question, mode }),

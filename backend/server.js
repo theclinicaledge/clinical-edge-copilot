@@ -155,7 +155,7 @@ app.post("/api/copilot", async (req, res) => {
   try {
     const selectedPrompt = mode === "quick" ? QUICK_SYSTEM_PROMPT : DEEP_SYSTEM_PROMPT;
     const message = await client.messages.create({
-      model: "claude-3-7-sonnet-20250219",
+      model: "claude-sonnet-4-6",
       max_tokens: 1400,
       system: selectedPrompt,
       messages: [{ role: "user", content: question.trim() }],

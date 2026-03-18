@@ -46,8 +46,8 @@ const URGENCY_STYLES = {
   LOW:      { color: "#86efac", bg: "rgba(34,197,94,0.10)",  border: "rgba(34,197,94,0.35)" },
 };
 
-const LS_HISTORY    = "clinical_edge_history";
-const LS_SAVED      = "clinical_edge_saved_cases";
+const LS_HISTORY = "clinical_edge_history";
+const LS_SAVED   = "clinical_edge_saved_cases";
 
 // ─── Helpers ─────────────────────────────────────────────────────────────────
 
@@ -158,12 +158,11 @@ function UrgencyBadge({ level }) {
   );
 }
 
-// SavedCaseRow — one row in the Saved Cases panel
 function SavedCaseRow({ sc, onReopen, onDelete, onCopy, onSaveNote }) {
-  const [expanded, setExpanded]   = useState(false);
-  const [editNote, setEditNote]   = useState(false);
-  const [noteText, setNoteText]   = useState(sc.note || "");
-  const [copied, setCopied]       = useState(false);
+  const [expanded, setExpanded] = useState(false);
+  const [editNote, setEditNote] = useState(false);
+  const [noteText, setNoteText] = useState(sc.note || "");
+  const [copied, setCopied]     = useState(false);
   const urgStyle = sc.urgencyLevel ? URGENCY_STYLES[sc.urgencyLevel] : null;
 
   const handleCopy = () => {
@@ -179,14 +178,10 @@ function SavedCaseRow({ sc, onReopen, onDelete, onCopy, onSaveNote }) {
 
   return (
     <div style={{ background: "rgba(255,255,255,0.02)", border: "1px solid rgba(59,130,246,0.14)", borderRadius: 10, marginBottom: 8, overflow: "hidden" }}>
-      {/* Row header */}
       <div style={{ padding: "12px 14px", display: "flex", gap: 10, alignItems: "flex-start" }}>
-        {/* Left: urgency dot + question */}
         <div style={{ flex: 1, minWidth: 0 }}>
           <div style={{ display: "flex", alignItems: "center", gap: 7, marginBottom: 4, flexWrap: "wrap" }}>
-            {urgStyle && (
-              <span style={{ width: 7, height: 7, borderRadius: "50%", background: urgStyle.color, flexShrink: 0, display: "inline-block" }} />
-            )}
+            {urgStyle && <span style={{ width: 7, height: 7, borderRadius: "50%", background: urgStyle.color, flexShrink: 0, display: "inline-block" }} />}
             <span style={{ fontSize: 10, fontWeight: 700, fontFamily: "'DM Mono', monospace", color: urgStyle ? urgStyle.color : "#5a8ab0", textTransform: "uppercase", letterSpacing: "0.8px" }}>
               {sc.urgencyLevel || "—"}
             </span>
@@ -206,26 +201,18 @@ function SavedCaseRow({ sc, onReopen, onDelete, onCopy, onSaveNote }) {
             </div>
           )}
         </div>
-        {/* Right: action buttons */}
         <div style={{ display: "flex", gap: 6, flexShrink: 0, alignItems: "center" }}>
-          <button onClick={() => setExpanded(!expanded)} title={expanded ? "Collapse" : "Expand"} style={iconBtnStyle("#3a6090")}>
-            {expanded ? "▲" : "▼"}
-          </button>
+          <button onClick={() => setExpanded(!expanded)} title={expanded ? "Collapse" : "Expand"} style={iconBtnStyle("#3a6090")}>{expanded ? "▲" : "▼"}</button>
           <button onClick={() => onReopen(sc.question)} title="Reopen in input" style={iconBtnStyle("#3b82f6")}>↩</button>
-          <button onClick={handleCopy} title="Copy response" style={iconBtnStyle(copied ? "#10b981" : "#3b82f6")}>
-            {copied ? "✓" : "⎘"}
-          </button>
+          <button onClick={handleCopy} title="Copy response" style={iconBtnStyle(copied ? "#10b981" : "#3b82f6")}>{copied ? "✓" : "⎘"}</button>
           <button onClick={() => { setEditNote(true); setExpanded(true); }} title="Add/edit note" style={iconBtnStyle("#f59e0b")}>✎</button>
           <button onClick={() => onDelete(sc.id)} title="Delete case" style={iconBtnStyle("#f43f5e")}>✕</button>
         </div>
       </div>
 
-      {/* Expanded: note editor */}
       {expanded && editNote && (
         <div style={{ padding: "0 14px 12px", borderTop: "1px solid rgba(59,130,246,0.08)" }}>
-          <div style={{ fontSize: 10, color: "#3a6090", fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.8px", marginBottom: 6, marginTop: 10, fontFamily: "'DM Mono', monospace" }}>
-            Personal Note
-          </div>
+          <div style={{ fontSize: 10, color: "#3a6090", fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.8px", marginBottom: 6, marginTop: 10, fontFamily: "'DM Mono', monospace" }}>Personal Note</div>
           <textarea
             value={noteText}
             onChange={(e) => setNoteText(e.target.value)}
@@ -240,12 +227,9 @@ function SavedCaseRow({ sc, onReopen, onDelete, onCopy, onSaveNote }) {
         </div>
       )}
 
-      {/* Expanded: response preview */}
       {expanded && !editNote && (
         <div style={{ padding: "0 14px 14px", borderTop: "1px solid rgba(59,130,246,0.08)" }}>
-          <div style={{ fontSize: 10, color: "#3a6090", fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.8px", marginTop: 12, marginBottom: 8, fontFamily: "'DM Mono', monospace" }}>
-            Saved Response
-          </div>
+          <div style={{ fontSize: 10, color: "#3a6090", fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.8px", marginTop: 12, marginBottom: 8, fontFamily: "'DM Mono', monospace" }}>Saved Response</div>
           <div style={{ fontSize: 12, color: "#6a8aaa", lineHeight: 1.7, whiteSpace: "pre-wrap", maxHeight: 260, overflowY: "auto", padding: "10px 12px", background: "rgba(0,0,0,0.2)", borderRadius: 7, border: "1px solid rgba(59,130,246,0.08)" }}>
             {sc.rawText}
           </div>
@@ -255,21 +239,11 @@ function SavedCaseRow({ sc, onReopen, onDelete, onCopy, onSaveNote }) {
   );
 }
 
-// tiny style helpers so JSX stays readable
 function iconBtnStyle(color) {
-  return {
-    background: "transparent", border: `1px solid ${color}40`,
-    color, borderRadius: 6, padding: "4px 7px",
-    fontSize: 13, cursor: "pointer", fontFamily: "inherit", lineHeight: 1,
-    transition: "all 0.15s",
-  };
+  return { background: "transparent", border: `1px solid ${color}40`, color, borderRadius: 6, padding: "4px 7px", fontSize: 13, cursor: "pointer", fontFamily: "inherit", lineHeight: 1, transition: "all 0.15s" };
 }
 function smallBtnStyle(bg, color, border = "none") {
-  return {
-    background: bg, color, border, borderRadius: 7,
-    padding: "6px 14px", fontSize: 12, fontWeight: 500,
-    cursor: "pointer", fontFamily: "inherit",
-  };
+  return { background: bg, color, border, borderRadius: 7, padding: "6px 14px", fontSize: 12, fontWeight: 500, cursor: "pointer", fontFamily: "inherit" };
 }
 
 // ─── Main App ─────────────────────────────────────────────────────────────────
@@ -288,7 +262,6 @@ export default function App() {
   const textareaRef = useRef(null);
   const outputRef   = useRef(null);
 
-  // Auto-resize textarea
   useEffect(() => {
     const el = textareaRef.current;
     if (!el) return;
@@ -311,9 +284,8 @@ export default function App() {
         body: JSON.stringify({ question, mode }),
       });
       const data = await res.json();
-      if (!res.ok) { setError(data.error || "Something went wrong."); return; }
+      if (!res.ok) { setError(data.error || "Unable to generate clinical guidance. Please try again."); return; }
 
-      // Update recent history (deduplicated)
       const updatedHistory = [question, ...history.filter((h) => h !== question)].slice(0, 8);
       setHistory(updatedHistory);
       lsSet(LS_HISTORY, updatedHistory);
@@ -323,7 +295,7 @@ export default function App() {
       setResult({ ...parsed, urgencyLevel: extractUrgencyLevel(data.response) });
       setTimeout(() => outputRef.current?.scrollIntoView({ behavior: "smooth", block: "start" }), 100);
     } catch {
-      setError("Cannot reach the server. Make sure the backend is running on port 3001.");
+      setError("Unable to generate clinical guidance. Please try again.");
     } finally {
       setLoading(false);
     }
@@ -333,22 +305,11 @@ export default function App() {
     if (e.key === "Enter" && (e.metaKey || e.ctrlKey)) handleSubmit();
   };
 
-  // ── Saved Cases actions ──
   const handleSaveCase = useCallback(() => {
     if (!result || !rawText) return;
-    // Avoid duplicate: same question + same rawText
     const isDup = savedCases.some((sc) => sc.question === question && sc.rawText === rawText);
     if (isDup) { setJustSaved(true); return; }
-
-    const newCase = {
-      id: generateId(),
-      question,
-      mode,
-      rawText,
-      urgencyLevel: result.urgencyLevel || null,
-      timestamp: Date.now(),
-      note: "",
-    };
+    const newCase = { id: generateId(), question, mode, rawText, urgencyLevel: result.urgencyLevel || null, timestamp: Date.now(), note: "" };
     const updated = [newCase, ...savedCases];
     setSavedCases(updated);
     lsSet(LS_SAVED, updated);
@@ -376,8 +337,6 @@ export default function App() {
     window.scrollTo({ top: 0, behavior: "smooth" });
   }, []);
 
-  const urgencyStyle = result?.urgencyLevel ? URGENCY_STYLES[result.urgencyLevel] : null;
-
   return (
     <div style={{ minHeight: "100vh", background: "linear-gradient(160deg, #060d1a 0%, #080f1e 50%, #060c18 100%)", color: "#c8d8ec", fontFamily: "'DM Sans', -apple-system, BlinkMacSystemFont, sans-serif", padding: "0 0 80px" }}>
       <style>{`
@@ -400,7 +359,7 @@ export default function App() {
         .spinner { width: 18px; height: 18px; border: 2px solid #1e3a6a; border-top-color: #3b82f6; border-radius: 50%; animation: spin 0.7s linear infinite; display: inline-block; }
       `}</style>
 
-      {/* ── Header ── */}
+      {/* Header */}
       <div style={{ borderBottom: "1px solid rgba(59,130,246,0.12)", padding: "18px 20px", background: "rgba(6,13,26,0.9)", backdropFilter: "blur(12px)", position: "sticky", top: 0, zIndex: 50 }}>
         <div style={{ maxWidth: 680, margin: "0 auto", display: "flex", alignItems: "center", gap: 12 }}>
           <div style={{ width: 34, height: 34, borderRadius: 8, background: "linear-gradient(135deg, #1d4ed8, #3b82f6)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 16, flexShrink: 0, boxShadow: "0 0 16px rgba(59,130,246,0.3)" }}>⚕</div>
@@ -412,7 +371,7 @@ export default function App() {
         </div>
       </div>
 
-      {/* ── Main ── */}
+      {/* Main */}
       <div style={{ maxWidth: 680, margin: "0 auto", padding: "36px 16px 0" }}>
 
         {/* Hero */}
@@ -486,7 +445,7 @@ export default function App() {
           </div>
         )}
 
-        {/* ── Saved Cases ── */}
+        {/* Saved Cases */}
         {savedCases.length > 0 && (
           <div style={{ marginBottom: 24 }}>
             <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 10 }}>
@@ -495,14 +454,7 @@ export default function App() {
               </div>
             </div>
             {savedCases.map((sc) => (
-              <SavedCaseRow
-                key={sc.id}
-                sc={sc}
-                onReopen={handleReopenCase}
-                onDelete={handleDeleteCase}
-                onCopy={handleCopyResponse}
-                onSaveNote={handleSaveNote}
-              />
+              <SavedCaseRow key={sc.id} sc={sc} onReopen={handleReopenCase} onDelete={handleDeleteCase} onCopy={handleCopyResponse} onSaveNote={handleSaveNote} />
             ))}
           </div>
         )}
@@ -524,7 +476,7 @@ export default function App() {
           </div>
         )}
 
-        {/* ── Response ── */}
+        {/* Response */}
         {result && (
           <div ref={outputRef} className="fade-up">
 
@@ -542,16 +494,10 @@ export default function App() {
 
             {/* Save Case action bar */}
             <div style={{ display: "flex", alignItems: "center", gap: 10, marginTop: 16, paddingTop: 16, borderTop: "1px solid rgba(59,130,246,0.08)", flexWrap: "wrap" }}>
-              <button
-                className="save-case-btn"
-                onClick={handleSaveCase}
-                disabled={justSaved}
-                style={{ background: justSaved ? "rgba(16,185,129,0.12)" : "rgba(16,185,129,0.08)", border: `1px solid ${justSaved ? "rgba(16,185,129,0.4)" : "rgba(16,185,129,0.25)"}`, color: justSaved ? "#10b981" : "#5aaa8a", borderRadius: 8, padding: "9px 18px", fontSize: 13, fontWeight: 600, cursor: justSaved ? "default" : "pointer", fontFamily: "inherit", display: "flex", alignItems: "center", gap: 7 }}>
+              <button className="save-case-btn" onClick={handleSaveCase} disabled={justSaved} style={{ background: justSaved ? "rgba(16,185,129,0.12)" : "rgba(16,185,129,0.08)", border: `1px solid ${justSaved ? "rgba(16,185,129,0.4)" : "rgba(16,185,129,0.25)"}`, color: justSaved ? "#10b981" : "#5aaa8a", borderRadius: 8, padding: "9px 18px", fontSize: 13, fontWeight: 600, cursor: justSaved ? "default" : "pointer", fontFamily: "inherit", display: "flex", alignItems: "center", gap: 7 }}>
                 {justSaved ? "✓ Case Saved" : "＋ Save Case"}
               </button>
-              <button
-                onClick={() => handleCopyResponse(rawText)}
-                style={{ background: "transparent", border: "1px solid rgba(59,130,246,0.2)", color: "#4a7aaa", borderRadius: 8, padding: "9px 18px", fontSize: 13, fontWeight: 500, cursor: "pointer", fontFamily: "inherit" }}>
+              <button onClick={() => handleCopyResponse(rawText)} style={{ background: "transparent", border: "1px solid rgba(59,130,246,0.2)", color: "#4a7aaa", borderRadius: 8, padding: "9px 18px", fontSize: 13, fontWeight: 500, cursor: "pointer", fontFamily: "inherit" }}>
                 Copy Response
               </button>
             </div>

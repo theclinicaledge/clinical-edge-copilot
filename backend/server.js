@@ -142,6 +142,7 @@ VOICE RULES:
 
 If asked something outside bedside nursing clinical reasoning: "I'm built specifically for bedside nursing clinical reasoning support. Give me a patient scenario, change in status, abnormal finding, or nursing concern and I'll think through it with you."`;
 
+// ── Streaming endpoint ────────────────────────────────────────────────────────
 app.post("/api/copilot", async (req, res) => {
   const { question, mode } = req.body;
 
@@ -152,21 +153,41 @@ app.post("/api/copilot", async (req, res) => {
     return res.status(400).json({ error: "Please describe the clinical situation in more detail." });
   }
 
+  const selectedPrompt = mode === "quick" ? QUICK_SYSTEM_PROMPT : DEEP_SYSTEM_PROMPT;
+
+  // Set SSE headers so the frontend can read chunks as they arrive
+  res.setHeader("Content-Type", "text/event-stream");
+  res.setHeader("Cache-Control", "no-cache");
+  res.setHeader("Connection", "keep-alive");
+  res.setHeader("X-Accel-Buffering", "no"); // disables Nginx buffering on Render
+
   try {
-    const selectedPrompt = mode === "quick" ? QUICK_SYSTEM_PROMPT : DEEP_SYSTEM_PROMPT;
-    const message = await client.messages.create({
+    const stream = await client.messages.stream({
       model: "claude-sonnet-4-6",
       max_tokens: 1400,
       system: selectedPrompt,
       messages: [{ role: "user", content: question.trim() }],
     });
 
-    res.json({ response: message.content[0].text });
+    for await (const chunk of stream) {
+      if (
+        chunk.type === "content_block_delta" &&
+        chunk.delta?.type === "text_delta" &&
+        chunk.delta?.text
+      ) {
+        // Send each text chunk as an SSE data event
+        res.write(`data: ${JSON.stringify({ text: chunk.delta.text })}\n\n`);
+      }
+    }
+
+    // Signal stream completion
+    res.write(`data: ${JSON.stringify({ done: true })}\n\n`);
+    res.end();
   } catch (error) {
     console.error("Anthropic API error:", error.message);
-    if (error.status === 401) return res.status(500).json({ error: "API key invalid. Check your .env file." });
-    if (error.status === 429) return res.status(500).json({ error: "Rate limit hit. Wait a moment and try again." });
-    res.status(500).json({ error: "Something went wrong. Please try again." });
+    // Send error as SSE event so frontend can handle it cleanly
+    res.write(`data: ${JSON.stringify({ error: "Unable to generate clinical guidance. Please try again." })}\n\n`);
+    res.end();
   }
 });
 

@@ -776,43 +776,6 @@ export default function App() {
           <span>Do not enter patient names, dates of birth, MRNs, or any identifying information. Describe the clinical situation only.</span>
         </div>
 
-        {/* Common Clinical Scenarios */}
-        <div style={{ marginBottom: 16 }}>
-          <div style={{
-            fontSize: 9,
-            color: "#7F99A5",
-            fontWeight: 700,
-            textTransform: "uppercase",
-            letterSpacing: "1.3px",
-            marginBottom: 10,
-            fontFamily: "'IBM Plex Mono', monospace",
-          }}>
-            Common Clinical Scenarios
-          </div>
-          <div style={{ display: "flex", flexWrap: "wrap", gap: 7 }}>
-            {STARTER_TEMPLATES.map((item) => (
-              <button
-                key={item.label}
-                className="chip"
-                onClick={() => setQuestion(item.prompt)}
-                style={{
-                  background: "transparent",
-                  border: "1px solid rgba(255,255,255,0.09)",
-                  color: "#7F99A5",
-                  padding: "7px 13px",
-                  borderRadius: 100,
-                  fontSize: 12,
-                  cursor: "pointer",
-                  textAlign: "left",
-                  transition: "all 0.15s",
-                }}
-              >
-                {item.label}
-              </button>
-            ))}
-          </div>
-        </div>
-
         {/* Mode toggle */}
         <div style={{ display: "flex", gap: 7, marginBottom: 14 }}>
           {[["deep", "Clinical Reasoning"], ["quick", "Quick Guidance"]].map(([val, label]) => (

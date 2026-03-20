@@ -404,7 +404,7 @@ export default function Landing({ onEnterApp }) {
           }}>
             Think through complex patients
             <br />
-            <span style={{ color: C.accent }}>like the nurse others rely on.</span>
+            <span style={{ color: C.accent, whiteSpace: "nowrap" }}>like the nurse others rely on.</span>
           </h1>
 
           {/* Subhead */}

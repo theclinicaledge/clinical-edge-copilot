@@ -1,5 +1,13 @@
 import { useState, useRef, useEffect, useCallback } from "react";
 
+// ─── API Config ───────────────────────────────────────────────────────────────
+
+const API_BASE =
+  import.meta.env.VITE_API_BASE_URL ||
+  (import.meta.env.PROD
+    ? "https://clinical-edge-backend.onrender.com"
+    : "http://localhost:3001");
+
 // ─── Constants ────────────────────────────────────────────────────────────────
 
 const EXAMPLES = [
@@ -480,7 +488,7 @@ export default function App() {
     let accumulated = "";
 
     try {
-      const res = await fetch("https://clinical-edge-backend.onrender.com/api/copilot", {
+      const res = await fetch(`${API_BASE}/api/copilot`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ question, mode }),

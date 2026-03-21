@@ -628,6 +628,288 @@ export default function Landing({ onEnterApp }) {
         </div>
       </section>
 
+      {/* ══ HOW IT HELPS YOU THINK ═══════════════════════════════════════════════ */}
+      <section style={{
+        padding: "84px clamp(20px, 6vw, 80px)",
+        maxWidth: 960,
+        margin: "0 auto",
+      }}>
+        <Fade style={{ textAlign: "center", marginBottom: 52 }}>
+          <Label>How It Helps You Think</Label>
+          <SectionHeading maxWidth={520}>
+            From uncertainty → structured clinical thinking.
+          </SectionHeading>
+          <p style={{
+            fontSize: "clamp(15px, 1.8vw, 17px)",
+            fontWeight: 400,
+            color: C.textSecondary,
+            lineHeight: 1.72,
+            margin: "20px auto 0",
+            maxWidth: 520,
+          }}>
+            Clinical Edge Copilot doesn't replace your judgment — it sharpens it. It helps you recognize patterns, organize your thinking, and act with clarity when it matters most.
+          </p>
+        </Fade>
+
+        <div style={{
+          display: "grid",
+          gridTemplateColumns: "repeat(auto-fit, minmax(268px, 1fr))",
+          gap: 16,
+        }}>
+          {[
+            {
+              n: "01",
+              title: "You describe what's happening.",
+              body: "Vitals, symptoms, changes — just like you'd explain it to another nurse.",
+            },
+            {
+              n: "02",
+              title: "It organizes the clinical picture.",
+              body: "Surfaces patterns, flags concerns, and highlights what actually matters.",
+            },
+            {
+              n: "03",
+              title: "You move with clarity.",
+              body: "What to assess next. What to watch. When to escalate.",
+            },
+          ].map((card, i) => (
+            <Fade key={card.n} delay={i * 80}>
+              <div style={{
+                background: C.card,
+                border: `1px solid ${C.border}`,
+                borderTop: `2px solid ${C.accent}`,
+                borderRadius: 14,
+                padding: "32px 30px",
+                boxShadow: "0 8px 32px rgba(0,0,0,0.22)",
+                height: "100%",
+                boxSizing: "border-box",
+              }}>
+                <div style={{
+                  fontFamily: "'IBM Plex Mono', monospace",
+                  fontSize: 10,
+                  fontWeight: 600,
+                  color: C.accent,
+                  opacity: 0.55,
+                  letterSpacing: "0.5px",
+                  marginBottom: 20,
+                }}>
+                  {card.n}
+                </div>
+                <div style={{
+                  fontSize: 16,
+                  fontWeight: 700,
+                  color: C.textPrimary,
+                  letterSpacing: "-0.3px",
+                  lineHeight: 1.35,
+                  marginBottom: 14,
+                }}>
+                  {card.title}
+                </div>
+                <div style={{
+                  fontSize: 14,
+                  color: C.textSecondary,
+                  lineHeight: 1.72,
+                }}>
+                  {card.body}
+                </div>
+              </div>
+            </Fade>
+          ))}
+        </div>
+      </section>
+
+      {/* ══ WHY THIS IS DIFFERENT ════════════════════════════════════════════════ */}
+      <section style={{
+        padding: "84px clamp(20px, 6vw, 80px)",
+        maxWidth: 960,
+        margin: "0 auto",
+      }}>
+        <Fade style={{ textAlign: "center", marginBottom: 52 }}>
+          <Label>Why This Is Different</Label>
+          <SectionHeading maxWidth={520}>
+            Not another AI tool telling you what to do.
+          </SectionHeading>
+          <p style={{
+            fontSize: "clamp(15px, 1.8vw, 17px)",
+            fontWeight: 400,
+            color: C.textSecondary,
+            lineHeight: 1.72,
+            margin: "20px auto 0",
+            maxWidth: 520,
+          }}>
+            Most tools give generic answers. Clinical Edge Copilot helps you think through the situation — like a second set of experienced clinical eyes.
+          </p>
+        </Fade>
+
+        <div style={{
+          display: "grid",
+          gridTemplateColumns: "repeat(auto-fit, minmax(268px, 1fr))",
+          gap: 16,
+        }}>
+          {[
+            {
+              n: "01",
+              title: "Not generic responses",
+              body: "Built around real clinical reasoning — not surface-level answers.",
+            },
+            {
+              n: "02",
+              title: "Not information overload",
+              body: "Highlights what matters instead of dumping everything.",
+            },
+            {
+              n: "03",
+              title: "Not replacing your judgment",
+              body: "Supports your thinking so you can make better decisions.",
+            },
+          ].map((card, i) => (
+            <Fade key={card.n} delay={i * 80}>
+              <div style={{
+                background: C.card,
+                border: `1px solid ${C.border}`,
+                borderTop: `2px solid ${C.accent}`,
+                borderRadius: 14,
+                padding: "32px 30px",
+                boxShadow: "0 8px 32px rgba(0,0,0,0.22)",
+                height: "100%",
+                boxSizing: "border-box",
+              }}>
+                <div style={{
+                  fontFamily: "'IBM Plex Mono', monospace",
+                  fontSize: 10,
+                  fontWeight: 600,
+                  color: C.accent,
+                  opacity: 0.55,
+                  letterSpacing: "0.5px",
+                  marginBottom: 20,
+                }}>
+                  {card.n}
+                </div>
+                <div style={{
+                  fontSize: 16,
+                  fontWeight: 700,
+                  color: C.textPrimary,
+                  letterSpacing: "-0.3px",
+                  lineHeight: 1.35,
+                  marginBottom: 14,
+                }}>
+                  {card.title}
+                </div>
+                <div style={{
+                  fontSize: 14,
+                  color: C.textSecondary,
+                  lineHeight: 1.72,
+                }}>
+                  {card.body}
+                </div>
+              </div>
+            </Fade>
+          ))}
+        </div>
+      </section>
+
+      {/* ══ BUILT FOR BEDSIDE NURSING ════════════════════════════════════════════ */}
+      <section style={{
+        padding: "84px clamp(20px, 6vw, 80px)",
+        maxWidth: 960,
+        margin: "0 auto",
+      }}>
+        <Fade style={{ textAlign: "center", marginBottom: 52 }}>
+          <Label>Built for the Reality of Bedside Nursing</Label>
+          <SectionHeading maxWidth={540}>
+            Designed for how nurses actually think on shift.
+          </SectionHeading>
+          <p style={{
+            fontSize: "clamp(15px, 1.8vw, 17px)",
+            fontWeight: 400,
+            color: C.textSecondary,
+            lineHeight: 1.72,
+            margin: "20px auto 0",
+            maxWidth: 520,
+          }}>
+            This isn't theory. It's built around real clinical scenarios — uncertainty, subtle changes, and the moments where clear thinking matters most.
+          </p>
+        </Fade>
+
+        <div style={{
+          display: "grid",
+          gridTemplateColumns: "repeat(auto-fit, minmax(268px, 1fr))",
+          gap: 16,
+        }}>
+          {[
+            {
+              n: "01",
+              title: "Grounded in real scenarios",
+              body: "Built around the situations nurses actually face — not textbook examples.",
+            },
+            {
+              n: "02",
+              title: "Focused on clinical reasoning",
+              body: "Not just answers — structured thinking that supports better decisions.",
+            },
+            {
+              n: "03",
+              title: "Respects your judgment",
+              body: "You're still the clinician. This helps you think more clearly under pressure.",
+            },
+          ].map((card, i) => (
+            <Fade key={card.n} delay={i * 80}>
+              <div style={{
+                background: C.card,
+                border: `1px solid ${C.border}`,
+                borderTop: `2px solid ${C.accent}`,
+                borderRadius: 14,
+                padding: "32px 30px",
+                boxShadow: "0 8px 32px rgba(0,0,0,0.22)",
+                height: "100%",
+                boxSizing: "border-box",
+              }}>
+                <div style={{
+                  fontFamily: "'IBM Plex Mono', monospace",
+                  fontSize: 10,
+                  fontWeight: 600,
+                  color: C.accent,
+                  opacity: 0.55,
+                  letterSpacing: "0.5px",
+                  marginBottom: 20,
+                }}>
+                  {card.n}
+                </div>
+                <div style={{
+                  fontSize: 16,
+                  fontWeight: 700,
+                  color: C.textPrimary,
+                  letterSpacing: "-0.3px",
+                  lineHeight: 1.35,
+                  marginBottom: 14,
+                }}>
+                  {card.title}
+                </div>
+                <div style={{
+                  fontSize: 14,
+                  color: C.textSecondary,
+                  lineHeight: 1.72,
+                }}>
+                  {card.body}
+                </div>
+              </div>
+            </Fade>
+          ))}
+        </div>
+
+        <Fade style={{ textAlign: "center", marginTop: 48 }}>
+          <p style={{
+            fontFamily: "'IBM Plex Mono', monospace",
+            fontSize: 13,
+            fontWeight: 500,
+            color: C.muted,
+            letterSpacing: "0.2px",
+          }}>
+            No noise. No fluff. Just better thinking at the bedside.
+          </p>
+        </Fade>
+      </section>
+
       {/* ══ PROBLEM ══════════════════════════════════════════════════════════════ */}
       <section style={{
         padding: "84px clamp(20px, 6vw, 80px)",

@@ -1383,6 +1383,73 @@ export default function Landing({ onEnterApp }) {
         </Fade>
       </section>
 
+      {/* ══ NEW FINAL CTA ════════════════════════════════════════════════════════ */}
+      <section style={{
+        padding: "84px clamp(20px, 6vw, 80px)",
+        maxWidth: 720,
+        margin: "0 auto",
+        textAlign: "center",
+        position: "relative",
+        overflow: "hidden",
+      }}>
+        {/* Ambient glow */}
+        <div style={{
+          position: "absolute",
+          top: "50%",
+          left: "50%",
+          transform: "translate(-50%, -50%)",
+          width: 600,
+          height: 380,
+          background: "radial-gradient(ellipse, rgba(0,194,209,0.06) 0%, transparent 65%)",
+          pointerEvents: "none",
+        }} />
+
+        <Fade style={{ position: "relative" }}>
+          <Label>Start Thinking Clearly on Shift</Label>
+          <h2 style={{
+            fontSize: "clamp(30px, 5vw, 54px)",
+            fontWeight: 800,
+            color: C.textPrimary,
+            letterSpacing: "-2px",
+            lineHeight: 1.07,
+            margin: "0 auto 22px",
+            maxWidth: 560,
+          }}>
+            Try it on a real patient scenario.
+          </h2>
+          <p style={{
+            fontSize: "clamp(15px, 1.8vw, 17px)",
+            color: C.textSecondary,
+            lineHeight: 1.72,
+            margin: "0 auto 48px",
+            maxWidth: 480,
+          }}>
+            See how Clinical Edge Copilot helps you organize your thinking, recognize patterns, and decide what to do next — in seconds.
+          </p>
+          <div style={{
+            display: "flex",
+            gap: 14,
+            justifyContent: "center",
+            flexWrap: "wrap",
+          }}>
+            <button
+              onClick={onEnterApp}
+              className="l-btn-primary"
+              style={{ ...btnPrimary, fontSize: 15, padding: "14px 34px", borderRadius: 11, boxShadow: "0 6px 30px rgba(0,194,209,0.22)" }}
+            >
+              Try a Patient Scenario
+            </button>
+            <button
+              onClick={onEnterApp}
+              className="l-btn-ghost"
+              style={{ ...btnGhost, fontSize: 15, padding: "14px 34px", borderRadius: 11 }}
+            >
+              Open Copilot
+            </button>
+          </div>
+        </Fade>
+      </section>
+
       {/* ══ FOOTER ═══════════════════════════════════════════════════════════════ */}
       <footer style={{
         borderTop: `1px solid ${C.border}`,

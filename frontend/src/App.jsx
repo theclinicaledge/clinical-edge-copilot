@@ -30,17 +30,12 @@ const STARTER_TEMPLATES = [
   { label: "Post-op concern",     prompt: "Post-op concern: pain, sedation, respiratory change, bleeding, vitals, or delayed recovery" },
 ];
 
-// Slightly softened accent colors — still distinct, better harmony with the navy/teal palette
 const SECTIONS = [
-  { name: "Most Likely Issue",              aliases: ["Most Likely Issue"],                                    accent: "#e05572", bg: "rgba(224,85,114,0.06)"  },
-  { name: "Urgency Summary",                aliases: ["Urgency Summary"],                                      accent: "#b57bee", bg: "rgba(181,123,238,0.06)" },
-  { name: "Clinical Pattern Recognition",   aliases: ["Clinical Pattern Recognition"],                         accent: "#4da3ff", bg: "rgba(77,163,255,0.06)"  },
-  { name: "Immediate Nursing Assessments",  aliases: ["Immediate Nursing Assessments"],                        accent: "#1FBF75", bg: "rgba(31,191,117,0.06)"  },
-  { name: "Possible Clinical Causes",       aliases: ["Possible Clinical Causes", "Possible Causes"],          accent: "#F2B94B", bg: "rgba(242,185,75,0.06)"  },
-  { name: "Common Nursing Actions",         aliases: ["Common Nursing Actions"],                               accent: "#7c83e0", bg: "rgba(124,131,224,0.06)" },
-  { name: "Notify Provider / Escalate If",  aliases: ["Notify Provider / Escalate If", "Notify Provider If"], accent: "#e07a3a", bg: "rgba(224,122,58,0.06)"  },
-  { name: "Clinical Insight",               aliases: ["Clinical Insight"],                                     accent: "#00C2D1", bg: "rgba(0,194,209,0.06)"   },
-  { name: "Safety Note",                    aliases: ["Safety Note"],                                          accent: "#7F99A5", bg: "rgba(127,153,165,0.05)" },
+  { name: "What this could be",   aliases: ["What this could be"],   accent: "#4da3ff", bg: "rgba(77,163,255,0.06)"  },
+  { name: "What concerns me most", aliases: ["What concerns me most"], accent: "#e05572", bg: "rgba(224,85,114,0.06)"  },
+  { name: "What I'd assess next",  aliases: ["What I'd assess next"],  accent: "#1FBF75", bg: "rgba(31,191,117,0.06)"  },
+  { name: "What I'd do right now", aliases: ["What I'd do right now"], accent: "#F2B94B", bg: "rgba(242,185,75,0.06)"  },
+  { name: "Closing",               aliases: ["Closing"],               accent: "#00C2D1", bg: "rgba(0,194,209,0.04)"   },
 ];
 
 const SECTION_CONFIG = {};
@@ -171,6 +166,29 @@ function smallBtnStyle(bg, color, border) {
 
 function SectionCard({ title, content }) {
   const cfg = SECTION_CONFIG[title] || { accent: "#4da3ff", bg: "rgba(77,163,255,0.06)" };
+
+  // Closing line — rendered as a plain italic sentence, no label, no bullets
+  if (title === "Closing") {
+    return (
+      <div style={{
+        borderLeft: "3px solid " + cfg.accent,
+        padding: "12px 18px",
+        marginTop: 6,
+        marginBottom: 4,
+      }}>
+        <p style={{
+          margin: 0,
+          fontSize: 14,
+          fontStyle: "italic",
+          color: "#7F99A5",
+          lineHeight: 1.75,
+        }}>
+          {content.trim()}
+        </p>
+      </div>
+    );
+  }
+
   const lines = content.split("\n").filter((l) => l.trim());
   return (
     <div style={{
@@ -461,6 +479,17 @@ export default function App() {
     el.style.height = "auto";
     el.style.height = Math.min(el.scrollHeight, 200) + "px";
   }, [question]);
+
+  // Load QuickStart prefill on mount
+  useEffect(() => {
+    try {
+      const prefill = localStorage.getItem("copilot_prefill");
+      if (prefill) {
+        setQuestion(prefill);
+        localStorage.removeItem("copilot_prefill");
+      }
+    } catch {}
+  }, []);
 
   // Rotate loading phase messages while loading
   useEffect(() => {

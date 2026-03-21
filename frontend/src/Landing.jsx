@@ -402,9 +402,9 @@ export default function Landing({ onEnterApp }) {
             letterSpacing: "-2.5px",
             margin: "0 0 28px",
           }}>
-            Think through complex patients
+            Less second-guessing.
             <br />
-            <span style={{ color: C.accent, whiteSpace: "nowrap" }}>like the nurse others rely on.</span>
+            <span style={{ color: C.accent, whiteSpace: "nowrap" }}>More clinical confidence.</span>
           </h1>
 
           {/* Subhead */}

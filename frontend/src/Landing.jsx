@@ -416,8 +416,7 @@ export default function Landing({ onEnterApp }) {
             margin: "0 auto 50px",
             maxWidth: 560,
           }}>
-            Clinical Edge Copilot helps you recognize patterns, anticipate
-            deterioration, and make better clinical decisions at the bedside.
+            When something doesn't add up, you don't need more information — you need better thinking. Clinical Edge Copilot helps you connect the dots in real time.
           </p>
 
           {/* CTAs */}
@@ -431,10 +430,10 @@ export default function Landing({ onEnterApp }) {
             }}
           >
             <button onClick={onEnterApp} className="l-btn-primary" style={{ ...btnPrimary, fontSize: 15, padding: "14px 34px", borderRadius: 11 }}>
-              Open Copilot
+              Try a Patient Scenario
             </button>
             <button onClick={scrollToDemo} className="l-btn-ghost" style={{ ...btnGhost, fontSize: 15, padding: "14px 34px", borderRadius: 11 }}>
-              Try a Scenario
+              See How It Thinks
             </button>
           </div>
         </div>

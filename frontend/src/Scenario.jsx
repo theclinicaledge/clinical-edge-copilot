@@ -116,6 +116,25 @@ const SCENARIOS = [
     ],
     closingLine: "The hardest patients to catch are the ones who were getting better. Don't let yesterday's labs talk you out of what you're seeing right now.",
   },
+  {
+    id: "03",
+    unit: "Cardiac Step-Down · Evening Shift · 7 PM",
+    stepOneTitle: "She says it's probably nothing.",
+    vitals: [
+      { label: "HR",      value: "94",       was: "was 72"    },
+      { label: "BP",      value: "148/88",   was: "was 118/74" },
+      { label: "RR",      value: "18",       was: null         },
+      { label: "SpO₂",   value: "95% RA",   was: "was 98%"    },
+      { label: "Temp",    value: "37.0°C",   was: null         },
+      { label: "Troponin","value": "neg ×1", was: "drawn 22h ago" },
+    ],
+    questions: [
+      "She says she feels fine now — does that change how urgently you act?",
+      "What two or three details in this picture concern you most, and why?",
+      "What would you do in the next 3 minutes before calling anyone?",
+    ],
+    closingLine: "Resolved chest pain in a high-risk woman is not reassuring. It's a reason to move faster.",
+  },
 ];
 
 // ─── Main Scenario Component ──────────────────────────────────────────────────
@@ -358,6 +377,26 @@ export default function Scenario({ onBack, onEnterApp }) {
                 </>
               )}
 
+              {/* ── Scenario 3 narrative ──────────────────────────────────── */}
+              {scenarioIndex === 2 && (
+                <>
+                  <p style={{ fontSize: 15, color: C.textSecondary, lineHeight: 1.82, margin: "0 0 18px" }}>
+                    You walk into Room 8 after seeing a tech note from 20 minutes ago: <em style={{ color: C.textPrimary }}>"Patient c/o chest discomfort, resolved."</em> <strong style={{ color: C.textPrimary }}>Mrs. Patel, 64F, admitted yesterday for hypertensive urgency.</strong> HTN, DM2, former smoker — quit 10 years ago. No known cardiac history. She was being transitioned from IV nicardipine to oral meds and doing well.
+                  </p>
+                  <p style={{ fontSize: 15, color: C.textSecondary, lineHeight: 1.82, margin: "0 0 18px" }}>
+                    She's sitting up, watching TV. Looks at you and waves.
+                  </p>
+                  <p style={{ fontSize: 15, color: C.textPrimary, fontWeight: 600, lineHeight: 1.82, margin: "0 0 24px" }}>
+                    "Oh, I'm fine now. It was probably just gas."
+                  </p>
+                  <p style={{ fontSize: 15, color: C.textSecondary, lineHeight: 1.82, margin: "0 0 28px" }}>
+                    You ask her to describe it. She pauses. <em style={{ color: C.textPrimary }}>"Pressure, like something sitting on my chest."</em> Lasted maybe 5–10 minutes. She mentions it went into her left shoulder — then quickly adds, "but it's gone now, really." She looks a little pale. When you lean in, there's a faint sheen of perspiration on her forehead.
+                    <br /><br />
+                    She says she had something similar about 6 months ago, never got it checked out.
+                  </p>
+                </>
+              )}
+
               {/* Vitals table — shared structure, scenario-specific data */}
               <div style={{
                 background: "rgba(255,255,255,0.02)", border: `1px solid ${C.border}`,
@@ -397,6 +436,11 @@ export default function Scenario({ onBack, onEnterApp }) {
               {scenarioIndex === 1 && (
                 <p style={{ fontSize: 14, color: C.textSecondary, lineHeight: 1.72, margin: 0 }}>
                   Yesterday's WBC: <strong style={{ color: C.textPrimary }}>9.8</strong> (improving). This morning's labs not yet resulted. Skin warm, no rash. Cap refill 3 seconds.
+                </p>
+              )}
+              {scenarioIndex === 2 && (
+                <p style={{ fontSize: 14, color: C.textSecondary, lineHeight: 1.72, margin: 0 }}>
+                  Tech-performed 12-lead on file — <strong style={{ color: C.textPrimary }}>"no obvious ST changes"</strong> per tech read. You haven't reviewed it yet. No current orders for troponin repeat. Skin slightly pale, mild diaphoresis on exam.
                 </p>
               )}
             </div>
@@ -541,6 +585,34 @@ export default function Scenario({ onBack, onEnterApp }) {
                   </CopilotBlock>
                 </>
               )}
+              {/* ── Scenario 3 Copilot blocks ─────────────────────────────── */}
+              {scenarioIndex === 2 && (
+                <>
+                  <CopilotBlock label="Pattern Recognition" accent="#4da3ff" bg="rgba(77,163,255,0.05)" border="rgba(77,163,255,0.18)">
+                    Classic atypical ACS presentation in a woman. <strong style={{ color: C.textPrimary }}>Pressure-quality chest discomfort with left shoulder radiation, diaphoresis, BP spike, HR trending up, SpO₂ drop</strong> — in a 64F with HTN, DM2, and a smoking history. Women frequently present with atypical symptoms, and "it resolved" does not rule out ACS. One negative troponin drawn 22 hours ago means nothing right now. The window for a first troponin to rise is 3–6 hours. You're outside that window and don't have a second value.
+                  </CopilotBlock>
+                  <CopilotBlock label="What Concerns Me Most" accent="#e05572" bg="rgba(224,85,114,0.05)" border="rgba(224,85,114,0.18)">
+                    Two things. First: the symptom description — pressure plus left shoulder radiation is a textbook anginal equivalent, regardless of how she's minimizing it. Second: <strong style={{ color: C.textPrimary }}>she's downplaying it.</strong> Patients who minimize chest pain are often the ones who waited too long once before. The 6-month history of similar symptoms that was never worked up should be treated as a prior event until proven otherwise.
+                  </CopilotBlock>
+                  <CopilotBlock label="Assess Next — In This Order" accent="#1FBF75" bg="rgba(31,191,117,0.05)" border="rgba(31,191,117,0.18)">
+                    <ol style={{ margin: 0, paddingLeft: 18, display: "flex", flexDirection: "column", gap: 8 }}>
+                      <li><strong style={{ color: C.textPrimary }}>Pull the 12-lead and read it yourself</strong> — don't rely on the tech's read; look for ST changes, T-wave inversions, new Q waves</li>
+                      <li>Full symptom characterization: onset, quality, radiation, duration, associated nausea/diaphoresis/dyspnea</li>
+                      <li>Skin exam: pallor, diaphoresis, cap refill — what do her hands and face look like right now?</li>
+                      <li>Confirm when last troponin was drawn — you need timing before you call</li>
+                    </ol>
+                  </CopilotBlock>
+                  <CopilotBlock label="Early Action Priorities" accent="#f59e0b" bg="rgba(245,158,11,0.05)" border="rgba(245,158,11,0.18)">
+                    <ul style={{ margin: 0, paddingLeft: 18, display: "flex", flexDirection: "column", gap: 8 }}>
+                      <li>Call provider now — lead with the clinical picture: <em>"64F with HTN/DM2, had 5–10 min of pressure-type chest pain with left shoulder radiation, now resolved, mild diaphoresis on exam, BP spiked to 148/88, SpO₂ down to 95%, last troponin was 22 hours ago."</em></li>
+                      <li>Repeat troponin and 12-lead stat — you need a current data point</li>
+                      <li>Aspirin 325mg — ask before giving, confirm no contraindication</li>
+                      <li>Keep her in bed, IV access confirmed, O2 if SpO₂ drops below 94%</li>
+                      <li>Nothing by mouth until provider evaluates in person</li>
+                    </ul>
+                  </CopilotBlock>
+                </>
+              )}
             </div>
 
             {/* The closing line */}
@@ -562,8 +634,8 @@ export default function Scenario({ onBack, onEnterApp }) {
                 ← Back
               </button>
 
-              {/* If on scenario 1, offer next scenario; if on scenario 2, go to app */}
-              {scenarioIndex === 0 ? (
+              {/* Chain: 01 → 02 → 03 → app */}
+              {scenarioIndex === 0 && (
                 <button
                   onClick={() => switchScenario(1)} style={btnPrimary}
                   onMouseEnter={e => e.currentTarget.style.opacity = "0.88"}
@@ -571,7 +643,17 @@ export default function Scenario({ onBack, onEnterApp }) {
                 >
                   Try Scenario 02 →
                 </button>
-              ) : (
+              )}
+              {scenarioIndex === 1 && (
+                <button
+                  onClick={() => switchScenario(2)} style={btnPrimary}
+                  onMouseEnter={e => e.currentTarget.style.opacity = "0.88"}
+                  onMouseLeave={e => e.currentTarget.style.opacity = "1"}
+                >
+                  Try Scenario 03 →
+                </button>
+              )}
+              {scenarioIndex === 2 && (
                 <button
                   onClick={onEnterApp} style={btnPrimary}
                   onMouseEnter={e => e.currentTarget.style.opacity = "0.88"}

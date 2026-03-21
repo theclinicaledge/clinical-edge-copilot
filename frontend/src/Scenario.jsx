@@ -48,7 +48,7 @@ function Label({ children, style }) {
   );
 }
 
-// ─── Copilot block (for structured response) ──────────────────────────────────
+// ─── Copilot block ────────────────────────────────────────────────────────────
 function CopilotBlock({ label, accent = C.accent, bg = "rgba(0,194,209,0.05)", border = "rgba(0,194,209,0.18)", children }) {
   return (
     <div style={{
@@ -76,9 +76,60 @@ function CopilotBlock({ label, accent = C.accent, bg = "rgba(0,194,209,0.05)", b
   );
 }
 
+// ─── Scenario Data ────────────────────────────────────────────────────────────
+const SCENARIOS = [
+  {
+    id: "01",
+    unit: "Med-Surg Step-Down · Night Shift · 3 AM",
+    stepOneTitle: "Something doesn't add up.",
+    vitals: [
+      { label: "HR",      value: "98",       was: "was 74"     },
+      { label: "BP",      value: "102/64",   was: "was 128/78" },
+      { label: "RR",      value: "18",       was: null         },
+      { label: "SpO₂",   value: "96% RA",   was: null         },
+      { label: "Temp",    value: "37.1°C",   was: null         },
+      { label: "UO (2h)", value: "18 mL/hr", was: null         },
+    ],
+    questions: [
+      "What stands out to you in that vitals trend since midnight?",
+      "What concerns you most — and why does the clean dressing almost make it harder, not easier?",
+      "What would you check or do in the next 5 minutes before you call anyone?",
+    ],
+    closingLine: "His numbers aren't critical yet. That's exactly why this is the moment to move — not wait.",
+  },
+  {
+    id: "02",
+    unit: "General Medicine Floor · Day Shift · 2 PM",
+    stepOneTitle: "He was getting better.",
+    vitals: [
+      { label: "HR",      value: "112",      was: "was 84"     },
+      { label: "BP",      value: "96/58",    was: "was 122/74" },
+      { label: "RR",      value: "22",       was: "was 16"     },
+      { label: "SpO₂",   value: "92% 2L",   was: "was 97% RA" },
+      { label: "Temp",    value: "38.8°C",   was: "was 37.1"   },
+      { label: "UO (2h)", value: "20 mL/hr", was: null         },
+    ],
+    questions: [
+      "He was improving — does that change how seriously you take these vitals right now?",
+      "What's the single most concerning change in this picture, and why?",
+      "Before you call the team, what would you want to have ready?",
+    ],
+    closingLine: "The hardest patients to catch are the ones who were getting better. Don't let yesterday's labs talk you out of what you're seeing right now.",
+  },
+];
+
 // ─── Main Scenario Component ──────────────────────────────────────────────────
 export default function Scenario({ onBack, onEnterApp }) {
+  const [scenarioIndex, setScenarioIndex] = useState(0);
   const [step, setStep] = useState(1);
+
+  const sc = SCENARIOS[scenarioIndex];
+
+  const switchScenario = (idx) => {
+    setScenarioIndex(idx);
+    setStep(1);
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  };
 
   const btnPrimary = {
     display: "inline-flex",
@@ -95,7 +146,7 @@ export default function Scenario({ onBack, onEnterApp }) {
     cursor: "pointer",
     letterSpacing: "-0.2px",
     boxShadow: "0 6px 24px rgba(0,194,209,0.2)",
-    transition: "opacity 0.18s ease, transform 0.18s ease",
+    transition: "opacity 0.18s ease",
   };
 
   const btnGhost = {
@@ -109,120 +160,97 @@ export default function Scenario({ onBack, onEnterApp }) {
     fontSize: 15,
     padding: "14px 34px",
     borderRadius: 11,
-    border: `1px solid rgba(255,255,255,0.12)`,
+    border: "1px solid rgba(255,255,255,0.12)",
     cursor: "pointer",
     letterSpacing: "-0.2px",
     transition: "border-color 0.18s ease, color 0.18s ease",
   };
 
   return (
-    <div style={{
-      minHeight: "100vh",
-      background: C.bg,
-      fontFamily: "'Inter', sans-serif",
-      color: C.textPrimary,
-    }}>
+    <div style={{ minHeight: "100vh", background: C.bg, fontFamily: "'Inter', sans-serif", color: C.textPrimary }}>
 
       {/* ── Nav ─────────────────────────────────────────────────────────────── */}
       <nav style={{
-        position: "sticky",
-        top: 0,
-        zIndex: 100,
-        display: "flex",
-        alignItems: "center",
-        justifyContent: "space-between",
-        padding: "0 clamp(20px, 5vw, 60px)",
-        height: 62,
+        position: "sticky", top: 0, zIndex: 100,
+        display: "flex", alignItems: "center", justifyContent: "space-between",
+        padding: "0 clamp(20px, 5vw, 60px)", height: 62,
         background: "rgba(11,31,42,0.88)",
-        backdropFilter: "blur(18px)",
-        WebkitBackdropFilter: "blur(18px)",
+        backdropFilter: "blur(18px)", WebkitBackdropFilter: "blur(18px)",
         borderBottom: `1px solid ${C.border}`,
       }}>
-        <button
-          onClick={onBack}
-          style={{
-            background: "none",
-            border: "none",
-            color: C.muted,
-            fontFamily: "'Inter', sans-serif",
-            fontSize: 13,
-            cursor: "pointer",
-            display: "flex",
-            alignItems: "center",
-            gap: 6,
-            padding: 0,
-            letterSpacing: "-0.1px",
-          }}
-        >
+        <button onClick={onBack} style={{
+          background: "none", border: "none", color: C.muted,
+          fontFamily: "'Inter', sans-serif", fontSize: 13, cursor: "pointer",
+          display: "flex", alignItems: "center", gap: 6, padding: 0,
+        }}>
           <span style={{ fontSize: 15 }}>←</span> Back
         </button>
-
         <div style={{ display: "flex", alignItems: "center", gap: 9 }}>
           <CELogo size={22} />
-          <span style={{
-            fontWeight: 700,
-            fontSize: 14,
-            letterSpacing: "-0.4px",
-            color: C.textPrimary,
-          }}>
+          <span style={{ fontWeight: 700, fontSize: 14, letterSpacing: "-0.4px", color: C.textPrimary }}>
             Clinical Edge Copilot
           </span>
         </div>
-
         <button onClick={onEnterApp} style={{
-          background: "none",
-          border: `1px solid ${C.borderAccent}`,
-          color: C.accent,
-          fontFamily: "'Inter', sans-serif",
-          fontSize: 12,
-          fontWeight: 600,
-          padding: "7px 16px",
-          borderRadius: 8,
-          cursor: "pointer",
-          letterSpacing: "-0.1px",
+          background: "none", border: `1px solid ${C.borderAccent}`,
+          color: C.accent, fontFamily: "'Inter', sans-serif",
+          fontSize: 12, fontWeight: 600, padding: "7px 16px",
+          borderRadius: 8, cursor: "pointer",
         }}>
           Open App
         </button>
       </nav>
 
       {/* ── Content ─────────────────────────────────────────────────────────── */}
-      <main style={{
-        maxWidth: 720,
-        margin: "0 auto",
-        padding: "60px clamp(20px, 5vw, 40px) 100px",
-      }}>
+      <main style={{ maxWidth: 720, margin: "0 auto", padding: "60px clamp(20px, 5vw, 40px) 100px" }}>
 
-        {/* Step indicator */}
-        <div style={{
-          display: "flex",
-          alignItems: "center",
-          gap: 8,
-          marginBottom: 40,
-        }}>
+        {/* ── Scenario selector ─────────────────────────────────────────────── */}
+        <div style={{ display: "flex", gap: 8, marginBottom: 36 }}>
+          {SCENARIOS.map((s, idx) => {
+            const active = scenarioIndex === idx;
+            return (
+              <button
+                key={s.id}
+                onClick={() => switchScenario(idx)}
+                style={{
+                  fontFamily: "'IBM Plex Mono', monospace",
+                  fontSize: 10,
+                  fontWeight: 600,
+                  letterSpacing: "0.8px",
+                  textTransform: "uppercase",
+                  padding: "8px 16px",
+                  borderRadius: 8,
+                  border: `1px solid ${active ? C.accent : C.subtle}`,
+                  background: active ? "rgba(0,194,209,0.1)" : "transparent",
+                  color: active ? C.accent : C.muted,
+                  cursor: "pointer",
+                  transition: "all 0.18s ease",
+                }}
+              >
+                Scenario {s.id}
+              </button>
+            );
+          })}
+        </div>
+
+        {/* ── Step indicator ────────────────────────────────────────────────── */}
+        <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 40 }}>
           {[1, 2, 3].map(n => (
             <div key={n} style={{ display: "flex", alignItems: "center", gap: 8 }}>
               <div style={{
-                width: 28,
-                height: 28,
-                borderRadius: "50%",
+                width: 28, height: 28, borderRadius: "50%",
                 background: step >= n ? C.accent : "transparent",
                 border: `1.5px solid ${step >= n ? C.accent : C.subtle}`,
-                display: "flex",
-                alignItems: "center",
-                justifyContent: "center",
-                fontFamily: "'IBM Plex Mono', monospace",
-                fontSize: 10,
-                fontWeight: 700,
+                display: "flex", alignItems: "center", justifyContent: "center",
+                fontFamily: "'IBM Plex Mono', monospace", fontSize: 10, fontWeight: 700,
                 color: step >= n ? "#0B1F2A" : C.subtle,
-                transition: "all 0.3s ease",
-                flexShrink: 0,
+                transition: "all 0.3s ease", flexShrink: 0,
               }}>
                 {n}
               </div>
               {n < 3 && (
                 <div style={{
-                  width: 32,
-                  height: 1.5,
+                  width: 32, height: 1.5,
                   background: step > n ? C.accent : C.subtle,
                   opacity: step > n ? 1 : 0.3,
                   transition: "all 0.3s ease",
@@ -231,101 +259,95 @@ export default function Scenario({ onBack, onEnterApp }) {
             </div>
           ))}
           <span style={{
-            fontFamily: "'IBM Plex Mono', monospace",
-            fontSize: 10,
-            color: C.muted,
-            letterSpacing: "0.5px",
-            marginLeft: 6,
+            fontFamily: "'IBM Plex Mono', monospace", fontSize: 10, color: C.muted,
+            letterSpacing: "0.5px", marginLeft: 6,
           }}>
             {step === 1 ? "The scenario" : step === 2 ? "Your thinking" : "Copilot analysis"}
           </span>
         </div>
 
-        {/* ── STEP 1: Scenario ──────────────────────────────────────────────── */}
+        {/* ══ STEP 1: Scenario ════════════════════════════════════════════════ */}
         {step === 1 && (
           <div>
             <Label>Patient Scenario</Label>
             <h1 style={{
-              fontSize: "clamp(24px, 4vw, 36px)",
-              fontWeight: 800,
-              color: C.textPrimary,
-              letterSpacing: "-1.2px",
-              lineHeight: 1.1,
+              fontSize: "clamp(24px, 4vw, 36px)", fontWeight: 800,
+              color: C.textPrimary, letterSpacing: "-1.2px", lineHeight: 1.1,
               margin: "0 0 32px",
             }}>
-              Something doesn't add up.
+              {sc.stepOneTitle}
             </h1>
 
             <div style={{
-              background: C.card,
-              border: `1px solid ${C.border}`,
-              borderRadius: 16,
-              padding: "32px 30px",
-              marginBottom: 32,
+              background: C.card, border: `1px solid ${C.border}`,
+              borderRadius: 16, padding: "32px 30px", marginBottom: 32,
             }}>
-              {/* Unit context badge */}
+              {/* Unit badge */}
               <div style={{
-                display: "inline-flex",
-                alignItems: "center",
-                gap: 8,
-                background: "rgba(0,194,209,0.08)",
-                border: `1px solid ${C.borderAccent}`,
-                borderRadius: 6,
-                padding: "6px 12px",
-                marginBottom: 24,
+                display: "inline-flex", alignItems: "center", gap: 8,
+                background: "rgba(0,194,209,0.08)", border: `1px solid ${C.borderAccent}`,
+                borderRadius: 6, padding: "6px 12px", marginBottom: 24,
               }}>
                 <div style={{ width: 6, height: 6, borderRadius: "50%", background: C.accent }} />
                 <span style={{
-                  fontFamily: "'IBM Plex Mono', monospace",
-                  fontSize: 10,
-                  color: C.accent,
-                  letterSpacing: "0.8px",
-                  textTransform: "uppercase",
+                  fontFamily: "'IBM Plex Mono', monospace", fontSize: 10,
+                  color: C.accent, letterSpacing: "0.8px", textTransform: "uppercase",
                 }}>
-                  Med-Surg Step-Down · Night Shift · 3 AM
+                  {sc.unit}
                 </span>
               </div>
 
-              <p style={{ fontSize: 15, color: C.textSecondary, lineHeight: 1.82, margin: "0 0 18px" }}>
-                You're doing routine rounding and walk into Room 14. <strong style={{ color: C.textPrimary }}>Mr. Okafor, 67M, POD #2 from elective right hemi-colectomy.</strong> Uncomplicated surgery, no real history except mild hypertension — controlled on one med. He was fine at midnight.
-              </p>
-              <p style={{ fontSize: 15, color: C.textSecondary, lineHeight: 1.82, margin: "0 0 18px" }}>
-                He's awake. Sitting up. Looks at you when you walk in.
-              </p>
-              <p style={{ fontSize: 15, color: C.textPrimary, fontWeight: 600, lineHeight: 1.82, margin: "0 0 24px" }}>
-                But something's off.
-              </p>
-              <p style={{ fontSize: 15, color: C.textSecondary, lineHeight: 1.82, margin: "0 0 28px" }}>
-                He's not distressed. He's not clutching his chest. He's not telling you anything is wrong. He just looks... pale. Quieter than earlier. When you ask how he's feeling he says <em style={{ color: C.textPrimary }}>"a little tired, probably just the surgery."</em>
-              </p>
+              {/* ── Scenario 1 narrative ──────────────────────────────────── */}
+              {scenarioIndex === 0 && (
+                <>
+                  <p style={{ fontSize: 15, color: C.textSecondary, lineHeight: 1.82, margin: "0 0 18px" }}>
+                    You're doing routine rounding and walk into Room 14. <strong style={{ color: C.textPrimary }}>Mr. Okafor, 67M, POD #2 from elective right hemi-colectomy.</strong> Uncomplicated surgery, no real history except mild hypertension — controlled on one med. He was fine at midnight.
+                  </p>
+                  <p style={{ fontSize: 15, color: C.textSecondary, lineHeight: 1.82, margin: "0 0 18px" }}>
+                    He's awake. Sitting up. Looks at you when you walk in.
+                  </p>
+                  <p style={{ fontSize: 15, color: C.textPrimary, fontWeight: 600, lineHeight: 1.82, margin: "0 0 24px" }}>
+                    But something's off.
+                  </p>
+                  <p style={{ fontSize: 15, color: C.textSecondary, lineHeight: 1.82, margin: "0 0 28px" }}>
+                    He's not distressed. He's not clutching his chest. He's not telling you anything is wrong. He just looks... pale. Quieter than earlier. When you ask how he's feeling he says <em style={{ color: C.textPrimary }}>"a little tired, probably just the surgery."</em>
+                  </p>
+                </>
+              )}
 
-              {/* Vitals table */}
+              {/* ── Scenario 2 narrative ──────────────────────────────────── */}
+              {scenarioIndex === 1 && (
+                <>
+                  <p style={{ fontSize: 15, color: C.textSecondary, lineHeight: 1.82, margin: "0 0 18px" }}>
+                    Your CNA pulls you aside during afternoon rounds. <strong style={{ color: C.textPrimary }}>Mr. Torres, 58M, admitted 3 days ago for community-acquired pneumonia.</strong> On IV ceftriaxone and azithromycin. Yesterday's WBC was 9.8 — down from 16.2 on admission. The team was talking about stepping him to oral antibiotics, maybe discharge tomorrow.
+                  </p>
+                  <p style={{ fontSize: 15, color: C.textSecondary, lineHeight: 1.82, margin: "0 0 18px" }}>
+                    He's awake. Answering questions. Nothing dramatic.
+                  </p>
+                  <p style={{ fontSize: 15, color: C.textPrimary, fontWeight: 600, lineHeight: 1.82, margin: "0 0 24px" }}>
+                    But he's not the same as this morning.
+                  </p>
+                  <p style={{ fontSize: 15, color: C.textSecondary, lineHeight: 1.82, margin: "0 0 28px" }}>
+                    His answers come slowly. He says he feels <em style={{ color: C.textPrimary }}>"just tired."</em> He ate breakfast but refused lunch — says his stomach feels off. New crackles on the right, worse than yesterday. No chest pain. No obvious source change.
+                    <br /><br />
+                    The labs said he was getting better. The team said so too. But you're standing in this room, and something has shifted.
+                  </p>
+                </>
+              )}
+
+              {/* Vitals table — shared structure, scenario-specific data */}
               <div style={{
-                background: "rgba(255,255,255,0.02)",
-                border: `1px solid ${C.border}`,
-                borderRadius: 10,
-                padding: "20px 22px",
-                marginBottom: 20,
+                background: "rgba(255,255,255,0.02)", border: `1px solid ${C.border}`,
+                borderRadius: 10, padding: "20px 22px", marginBottom: 20,
               }}>
                 <div style={{
-                  fontFamily: "'IBM Plex Mono', monospace",
-                  fontSize: 9,
-                  color: C.muted,
-                  textTransform: "uppercase",
-                  letterSpacing: "1px",
-                  marginBottom: 14,
+                  fontFamily: "'IBM Plex Mono', monospace", fontSize: 9, color: C.muted,
+                  textTransform: "uppercase", letterSpacing: "1px", marginBottom: 14,
                 }}>
                   Current Vitals
                 </div>
                 <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(130px, 1fr))", gap: "10px 24px" }}>
-                  {[
-                    { label: "HR", value: "98", was: "was 74" },
-                    { label: "BP", value: "102/64", was: "was 128/78" },
-                    { label: "RR", value: "18", was: null },
-                    { label: "SpO₂", value: "96% RA", was: null },
-                    { label: "Temp", value: "37.1°C", was: null },
-                    { label: "UO (2h)", value: "18 mL/hr", was: null },
-                  ].map(v => (
+                  {sc.vitals.map(v => (
                     <div key={v.label}>
                       <div style={{ fontFamily: "'IBM Plex Mono', monospace", fontSize: 9, color: C.muted, letterSpacing: "0.5px", marginBottom: 3 }}>
                         {v.label}
@@ -343,15 +365,22 @@ export default function Scenario({ onBack, onEnterApp }) {
                 </div>
               </div>
 
-              <p style={{ fontSize: 14, color: C.textSecondary, lineHeight: 1.72, margin: 0 }}>
-                Abdomen soft. Wound dressing clean and dry. Last Hgb <strong style={{ color: C.textPrimary }}>11.2 on POD #1.</strong>
-              </p>
+              {/* Scenario-specific footnote */}
+              {scenarioIndex === 0 && (
+                <p style={{ fontSize: 14, color: C.textSecondary, lineHeight: 1.72, margin: 0 }}>
+                  Abdomen soft. Wound dressing clean and dry. Last Hgb <strong style={{ color: C.textPrimary }}>11.2 on POD #1.</strong>
+                </p>
+              )}
+              {scenarioIndex === 1 && (
+                <p style={{ fontSize: 14, color: C.textSecondary, lineHeight: 1.72, margin: 0 }}>
+                  Yesterday's WBC: <strong style={{ color: C.textPrimary }}>9.8</strong> (improving). This morning's labs not yet resulted. Skin warm, no rash. Cap refill 3 seconds.
+                </p>
+              )}
             </div>
 
             <div style={{ display: "flex", justifyContent: "flex-end" }}>
               <button
-                onClick={() => setStep(2)}
-                style={btnPrimary}
+                onClick={() => setStep(2)} style={btnPrimary}
                 onMouseEnter={e => e.currentTarget.style.opacity = "0.88"}
                 onMouseLeave={e => e.currentTarget.style.opacity = "1"}
               >
@@ -361,16 +390,13 @@ export default function Scenario({ onBack, onEnterApp }) {
           </div>
         )}
 
-        {/* ── STEP 2: Reflection ────────────────────────────────────────────── */}
+        {/* ══ STEP 2: Reflection ══════════════════════════════════════════════ */}
         {step === 2 && (
           <div>
             <Label>Your Thinking</Label>
             <h1 style={{
-              fontSize: "clamp(24px, 4vw, 36px)",
-              fontWeight: 800,
-              color: C.textPrimary,
-              letterSpacing: "-1.2px",
-              lineHeight: 1.1,
+              fontSize: "clamp(24px, 4vw, 36px)", fontWeight: 800,
+              color: C.textPrimary, letterSpacing: "-1.2px", lineHeight: 1.1,
               margin: "0 0 12px",
             }}>
               What are you thinking?
@@ -380,43 +406,20 @@ export default function Scenario({ onBack, onEnterApp }) {
             </p>
 
             <div style={{ display: "flex", flexDirection: "column", gap: 14, marginBottom: 40 }}>
-              {[
-                {
-                  n: "01",
-                  q: "What stands out to you in that vitals trend since midnight?",
-                },
-                {
-                  n: "02",
-                  q: "What concerns you most — and why does the clean dressing almost make it harder, not easier?",
-                },
-                {
-                  n: "03",
-                  q: "What would you check or do in the next 5 minutes before you call anyone?",
-                },
-              ].map(item => (
-                <div key={item.n} style={{
-                  background: C.card,
-                  border: `1px solid ${C.border}`,
-                  borderLeft: `3px solid ${C.accent}`,
-                  borderRadius: 12,
-                  padding: "22px 24px",
-                  display: "flex",
-                  gap: 18,
-                  alignItems: "flex-start",
+              {sc.questions.map((q, i) => (
+                <div key={i} style={{
+                  background: C.card, border: `1px solid ${C.border}`,
+                  borderLeft: `3px solid ${C.accent}`, borderRadius: 12,
+                  padding: "22px 24px", display: "flex", gap: 18, alignItems: "flex-start",
                 }}>
                   <div style={{
-                    fontFamily: "'IBM Plex Mono', monospace",
-                    fontSize: 10,
-                    fontWeight: 600,
-                    color: C.accent,
-                    opacity: 0.6,
-                    flexShrink: 0,
-                    paddingTop: 2,
+                    fontFamily: "'IBM Plex Mono', monospace", fontSize: 10, fontWeight: 600,
+                    color: C.accent, opacity: 0.6, flexShrink: 0, paddingTop: 2,
                   }}>
-                    {item.n}
+                    {String(i + 1).padStart(2, "0")}
                   </div>
                   <p style={{ fontSize: 15, color: C.textPrimary, lineHeight: 1.65, margin: 0, fontWeight: 500 }}>
-                    {item.q}
+                    {q}
                   </p>
                 </div>
               ))}
@@ -424,16 +427,14 @@ export default function Scenario({ onBack, onEnterApp }) {
 
             <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", flexWrap: "wrap", gap: 12 }}>
               <button
-                onClick={() => setStep(1)}
-                style={btnGhost}
+                onClick={() => setStep(1)} style={btnGhost}
                 onMouseEnter={e => { e.currentTarget.style.borderColor = C.accent; e.currentTarget.style.color = C.textPrimary; }}
                 onMouseLeave={e => { e.currentTarget.style.borderColor = "rgba(255,255,255,0.12)"; e.currentTarget.style.color = C.textSecondary; }}
               >
                 ← Back
               </button>
               <button
-                onClick={() => setStep(3)}
-                style={btnPrimary}
+                onClick={() => setStep(3)} style={btnPrimary}
                 onMouseEnter={e => e.currentTarget.style.opacity = "0.88"}
                 onMouseLeave={e => e.currentTarget.style.opacity = "1"}
               >
@@ -443,16 +444,13 @@ export default function Scenario({ onBack, onEnterApp }) {
           </div>
         )}
 
-        {/* ── STEP 3: Copilot Response ──────────────────────────────────────── */}
+        {/* ══ STEP 3: Copilot Response ════════════════════════════════════════ */}
         {step === 3 && (
           <div>
             <Label>Copilot Analysis</Label>
             <h1 style={{
-              fontSize: "clamp(24px, 4vw, 36px)",
-              fontWeight: 800,
-              color: C.textPrimary,
-              letterSpacing: "-1.2px",
-              lineHeight: 1.1,
+              fontSize: "clamp(24px, 4vw, 36px)", fontWeight: 800,
+              color: C.textPrimary, letterSpacing: "-1.2px", lineHeight: 1.1,
               margin: "0 0 8px",
             }}>
               Here's how a sharp nurse reads this room.
@@ -461,89 +459,104 @@ export default function Scenario({ onBack, onEnterApp }) {
               Structured thinking — not a lecture.
             </p>
 
-            <div style={{ display: "flex", flexDirection: "column", gap: 0, marginBottom: 28 }}>
-              <CopilotBlock
-                label="Pattern Recognition"
-                accent="#4da3ff"
-                bg="rgba(77,163,255,0.05)"
-                border="rgba(77,163,255,0.18)"
-              >
-                This is a <strong style={{ color: C.textPrimary }}>slow bleed until proven otherwise.</strong> Nothing is screaming — that's the problem. HR up 24 points, MAP dropped, UO borderline, and a patient who's compensating quietly. Post-op abdominal surgery + these trends = internal hemorrhage stays on the differential until you've ruled it out. A clean wound dressing means nothing about what's happening inside.
-              </CopilotBlock>
+            <div style={{ marginBottom: 28 }}>
 
-              <CopilotBlock
-                label="What Concerns Me Most"
-                accent="#e05572"
-                bg="rgba(224,85,114,0.05)"
-                border="rgba(224,85,114,0.18)"
-              >
-                He's compensating. Not showing classic shock — <em>yet.</em> That's the window you're working in right now. Compensated hemorrhagic shock looks exactly like this: mild tachycardia, soft BP drop, low urine output, patient who feels "just tired." <strong style={{ color: C.textPrimary }}>The body is working hard not to show you how bad it is.</strong>
-              </CopilotBlock>
+              {/* ── Scenario 1 Copilot blocks ─────────────────────────────── */}
+              {scenarioIndex === 0 && (
+                <>
+                  <CopilotBlock label="Pattern Recognition" accent="#4da3ff" bg="rgba(77,163,255,0.05)" border="rgba(77,163,255,0.18)">
+                    This is a <strong style={{ color: C.textPrimary }}>slow bleed until proven otherwise.</strong> Nothing is screaming — that's the problem. HR up 24 points, MAP dropped, UO borderline, and a patient who's compensating quietly. Post-op abdominal surgery + these trends = internal hemorrhage stays on the differential until you've ruled it out. A clean wound dressing means nothing about what's happening inside.
+                  </CopilotBlock>
+                  <CopilotBlock label="What Concerns Me Most" accent="#e05572" bg="rgba(224,85,114,0.05)" border="rgba(224,85,114,0.18)">
+                    He's compensating. Not showing classic shock — <em>yet.</em> That's the window you're working in right now. Compensated hemorrhagic shock looks exactly like this: mild tachycardia, soft BP drop, low urine output, patient who feels "just tired." <strong style={{ color: C.textPrimary }}>The body is working hard not to show you how bad it is.</strong>
+                  </CopilotBlock>
+                  <CopilotBlock label="Assess Next — In This Order" accent="#1FBF75" bg="rgba(31,191,117,0.05)" border="rgba(31,191,117,0.18)">
+                    <ol style={{ margin: 0, paddingLeft: 18, display: "flex", flexDirection: "column", gap: 8 }}>
+                      <li>Lay hands on the abdomen — rigidity, distension, involuntary guarding?</li>
+                      <li>Check for bleeding not visible externally: Foley output color, drain output if present</li>
+                      <li>Orthostatic vitals if he can tolerate it — a significant drop confirms volume depletion</li>
+                      <li>Review the last two sets of vitals with fresh eyes — is this a trend or a snapshot?</li>
+                    </ol>
+                  </CopilotBlock>
+                  <CopilotBlock label="Early Action Priorities" accent="#f59e0b" bg="rgba(245,158,11,0.05)" border="rgba(245,158,11,0.18)">
+                    <ul style={{ margin: 0, paddingLeft: 18, display: "flex", flexDirection: "column", gap: 8 }}>
+                      <li>IV access — confirm patent, get a second large-bore if only one in</li>
+                      <li><strong style={{ color: C.textPrimary }}>Notify the surgical resident now,</strong> not when it's worse — lead with the trend: <em>"He was 128/78 at midnight, now 102/64, HR up to 98, UO dropping — I'm concerned."</em></li>
+                      <li>Type &amp; Screen on your radar if not done today</li>
+                      <li>Keep him flat, keep monitoring, don't leave the room until someone else is aware</li>
+                    </ul>
+                  </CopilotBlock>
+                </>
+              )}
 
-              <CopilotBlock
-                label="Assess Next — In This Order"
-                accent="#1FBF75"
-                bg="rgba(31,191,117,0.05)"
-                border="rgba(31,191,117,0.18)"
-              >
-                <ol style={{ margin: 0, paddingLeft: 18, display: "flex", flexDirection: "column", gap: 8 }}>
-                  <li>Lay hands on the abdomen — rigidity, distension, involuntary guarding?</li>
-                  <li>Check for bleeding not visible externally: Foley output color, drain output if present</li>
-                  <li>Orthostatic vitals if he can tolerate it — a significant drop confirms volume depletion</li>
-                  <li>Review the last two sets of vitals with fresh eyes — is this a trend or a snapshot?</li>
-                </ol>
-              </CopilotBlock>
-
-              <CopilotBlock
-                label="Early Action Priorities"
-                accent="#f59e0b"
-                bg="rgba(245,158,11,0.05)"
-                border="rgba(245,158,11,0.18)"
-              >
-                <ul style={{ margin: 0, paddingLeft: 18, display: "flex", flexDirection: "column", gap: 8 }}>
-                  <li>IV access — confirm patent, get a second large-bore if only one in</li>
-                  <li><strong style={{ color: C.textPrimary }}>Notify the surgical resident now,</strong> not when it's worse — lead with the trend: <em>"He was 128/78 at midnight, now 102/64, HR up to 98, UO dropping — I'm concerned."</em></li>
-                  <li>Type &amp; Screen on your radar if not done today</li>
-                  <li>Keep him flat, keep monitoring, don't leave the room until someone else is aware</li>
-                </ul>
-              </CopilotBlock>
+              {/* ── Scenario 2 Copilot blocks ─────────────────────────────── */}
+              {scenarioIndex === 1 && (
+                <>
+                  <CopilotBlock label="Pattern Recognition" accent="#4da3ff" bg="rgba(77,163,255,0.05)" border="rgba(77,163,255,0.18)">
+                    New fever, tachycardia, hypotension, worsening SpO₂, and a subtle mental status change — in a patient who was <strong style={{ color: C.textPrimary }}>improving.</strong> That pattern is sepsis physiology until proven otherwise. The pneumonia may be progressing, a new source may have developed, or this is treatment failure. The improving WBC from yesterday is now working against you — it'll create cognitive bias in anyone you call.
+                  </CopilotBlock>
+                  <CopilotBlock label="What Concerns Me Most" accent="#e05572" bg="rgba(224,85,114,0.05)" border="rgba(224,85,114,0.18)">
+                    The mental status change. <em>Subtle is dangerous.</em> A patient who "seems slow" or "just tired" in the context of fever, tachycardia, and hypotension is showing early signs of septic encephalopathy — that's organ dysfunction. That's not just infection. <strong style={{ color: C.textPrimary }}>That's sepsis.</strong> And the fact that yesterday's labs were reassuring makes this moment easier to miss and harder to escalate.
+                  </CopilotBlock>
+                  <CopilotBlock label="Assess Next — In This Order" accent="#1FBF75" bg="rgba(31,191,117,0.05)" border="rgba(31,191,117,0.18)">
+                    <ol style={{ margin: 0, paddingLeft: 18, display: "flex", flexDirection: "column", gap: 8 }}>
+                      <li>Full neuro check — GCS, orientation, compare directly to this morning's baseline</li>
+                      <li>Lung exam — new or worsening crackles, breath sounds changed since this AM?</li>
+                      <li>Skin: mottling, cap refill, temperature of extremities — perfusion clues</li>
+                      <li>Urine — output trend, color, clarity; any Foley UA pending or available?</li>
+                      <li>Review the vitals trend for the last 4 hours — when did the HR start climbing?</li>
+                    </ol>
+                  </CopilotBlock>
+                  <CopilotBlock label="Early Action Priorities" accent="#f59e0b" bg="rgba(245,158,11,0.05)" border="rgba(245,158,11,0.18)">
+                    <ul style={{ margin: 0, paddingLeft: 18, display: "flex", flexDirection: "column", gap: 8 }}>
+                      <li><strong style={{ color: C.textPrimary }}>Call the team now — lead with the trend:</strong> <em>"He was afebrile and 97% on room air yesterday. He's now 38.8, HR 112, BP 96/58, 92% on 2L, and his mental status has changed."</em></li>
+                      <li>Blood cultures × 2 STAT before any antibiotic changes — don't let them change the meds first</li>
+                      <li>Request lactate, repeat CBC/BMP, portable CXR</li>
+                      <li>Confirm large-bore IV access, fluid challenge is likely coming</li>
+                      <li>If team doesn't respond quickly — this is a rapid response conversation</li>
+                    </ul>
+                  </CopilotBlock>
+                </>
+              )}
             </div>
 
-            {/* The Line */}
-            <div style={{
-              borderTop: `1px solid ${C.border}`,
-              paddingTop: 24,
-              marginBottom: 40,
-            }}>
+            {/* The closing line */}
+            <div style={{ borderTop: `1px solid ${C.border}`, paddingTop: 24, marginBottom: 40 }}>
               <p style={{
-                fontFamily: "'IBM Plex Mono', monospace",
-                fontSize: 13,
-                fontWeight: 500,
-                color: C.accent,
-                lineHeight: 1.65,
-                margin: 0,
+                fontFamily: "'IBM Plex Mono', monospace", fontSize: 13, fontWeight: 500,
+                color: C.accent, lineHeight: 1.65, margin: 0,
               }}>
-                His numbers aren't critical yet. That's exactly why this is the moment to move — not wait.
+                {sc.closingLine}
               </p>
             </div>
 
             <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", flexWrap: "wrap", gap: 12 }}>
               <button
-                onClick={() => setStep(2)}
-                style={btnGhost}
+                onClick={() => setStep(2)} style={btnGhost}
                 onMouseEnter={e => { e.currentTarget.style.borderColor = C.accent; e.currentTarget.style.color = C.textPrimary; }}
                 onMouseLeave={e => { e.currentTarget.style.borderColor = "rgba(255,255,255,0.12)"; e.currentTarget.style.color = C.textSecondary; }}
               >
                 ← Back
               </button>
-              <button
-                onClick={onEnterApp}
-                style={btnPrimary}
-                onMouseEnter={e => e.currentTarget.style.opacity = "0.88"}
-                onMouseLeave={e => e.currentTarget.style.opacity = "1"}
-              >
-                Try it on your own patient →
-              </button>
+
+              {/* If on scenario 1, offer next scenario; if on scenario 2, go to app */}
+              {scenarioIndex === 0 ? (
+                <button
+                  onClick={() => switchScenario(1)} style={btnPrimary}
+                  onMouseEnter={e => e.currentTarget.style.opacity = "0.88"}
+                  onMouseLeave={e => e.currentTarget.style.opacity = "1"}
+                >
+                  Try Scenario 02 →
+                </button>
+              ) : (
+                <button
+                  onClick={onEnterApp} style={btnPrimary}
+                  onMouseEnter={e => e.currentTarget.style.opacity = "0.88"}
+                  onMouseLeave={e => e.currentTarget.style.opacity = "1"}
+                >
+                  Try it on your own patient →
+                </button>
+              )}
             </div>
           </div>
         )}

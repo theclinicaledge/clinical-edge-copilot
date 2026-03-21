@@ -204,6 +204,29 @@ export default function Scenario({ onBack, onEnterApp }) {
       {/* ── Content ─────────────────────────────────────────────────────────── */}
       <main style={{ maxWidth: 720, margin: "0 auto", padding: "60px clamp(20px, 5vw, 40px) 100px" }}>
 
+        {/* ── Credibility frame ─────────────────────────────────────────────── */}
+        <div style={{ marginBottom: 24 }}>
+          <div style={{
+            fontFamily: "'IBM Plex Mono', monospace",
+            fontSize: 10,
+            fontWeight: 500,
+            color: C.accent,
+            letterSpacing: "1.8px",
+            textTransform: "uppercase",
+            marginBottom: 8,
+          }}>
+            Real Shift Scenarios
+          </div>
+          <p style={{
+            fontSize: 13,
+            color: C.muted,
+            margin: 0,
+            letterSpacing: "-0.1px",
+          }}>
+            Built from common bedside deterioration patterns.
+          </p>
+        </div>
+
         {/* ── Scenario selector ─────────────────────────────────────────────── */}
         <div style={{ display: "flex", gap: 8, marginBottom: 36 }}>
           {SCENARIOS.map((s, idx) => {

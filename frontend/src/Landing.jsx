@@ -153,7 +153,7 @@ function Check() {
 }
 
 // ─── Main Landing Component ───────────────────────────────────────────────────
-export default function Landing({ onEnterApp }) {
+export default function Landing({ onEnterApp, onEnterScenario }) {
   const [scrolled, setScrolled] = useState(false);
   const demoRef = useRef(null);
 
@@ -429,7 +429,7 @@ export default function Landing({ onEnterApp }) {
               flexWrap: "wrap",
             }}
           >
-            <button onClick={onEnterApp} className="l-btn-primary" style={{ ...btnPrimary, fontSize: 15, padding: "14px 34px", borderRadius: 11 }}>
+            <button onClick={onEnterScenario} className="l-btn-primary" style={{ ...btnPrimary, fontSize: 15, padding: "14px 34px", borderRadius: 11 }}>
               Try a Patient Scenario
             </button>
             <button onClick={scrollToDemo} className="l-btn-ghost" style={{ ...btnGhost, fontSize: 15, padding: "14px 34px", borderRadius: 11 }}>
@@ -1433,7 +1433,7 @@ export default function Landing({ onEnterApp }) {
             flexWrap: "wrap",
           }}>
             <button
-              onClick={onEnterApp}
+              onClick={onEnterScenario}
               className="l-btn-primary"
               style={{ ...btnPrimary, fontSize: 15, padding: "14px 34px", borderRadius: 11, boxShadow: "0 6px 30px rgba(0,194,209,0.22)" }}
             >

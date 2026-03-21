@@ -538,6 +538,96 @@ export default function Landing({ onEnterApp }) {
         </div>
       </section>
 
+      {/* ══ REAL SHIFT MOMENTS ═══════════════════════════════════════════════════ */}
+      <section style={{
+        padding: "84px clamp(20px, 6vw, 80px)",
+        maxWidth: 960,
+        margin: "0 auto",
+      }}>
+        <Fade style={{ textAlign: "center", marginBottom: 52 }}>
+          <Label>Real Shift Moments</Label>
+          <SectionHeading maxWidth={480} style={{ margin: "0 auto 20px" }}>
+            The moment something feels off.
+          </SectionHeading>
+          <p style={{
+            fontSize: "clamp(15px, 1.8vw, 17px)",
+            fontWeight: 400,
+            color: C.textSecondary,
+            lineHeight: 1.72,
+            margin: "20px auto 0",
+            maxWidth: 480,
+          }}>
+            Vitals are changing. The patient looks different. You know you need to think clearly — fast.
+          </p>
+        </Fade>
+
+        <div style={{
+          display: "grid",
+          gridTemplateColumns: "repeat(auto-fit, minmax(268px, 1fr))",
+          gap: 16,
+        }}>
+          {[
+            {
+              n: "01",
+              title: "A subtle BP drop becomes a trend.",
+              body: "Not crashing. Not normal. You need to decide what matters now.",
+            },
+            {
+              n: "02",
+              title: "The patient looks worse before the numbers catch up.",
+              body: "Something changed. You feel it. Now you need to connect the dots.",
+            },
+            {
+              n: "03",
+              title: "You're not looking for more noise.",
+              body: "You need help sorting what's urgent, what to assess, and when to escalate.",
+            },
+          ].map((card, i) => (
+            <Fade key={card.n} delay={i * 80}>
+              <div style={{
+                background: C.card,
+                border: `1px solid ${C.border}`,
+                borderTop: `2px solid ${C.accent}`,
+                borderRadius: 14,
+                padding: "32px 30px",
+                boxShadow: "0 8px 32px rgba(0,0,0,0.22)",
+                height: "100%",
+                boxSizing: "border-box",
+              }}>
+                <div style={{
+                  fontFamily: "'IBM Plex Mono', monospace",
+                  fontSize: 10,
+                  fontWeight: 600,
+                  color: C.accent,
+                  opacity: 0.55,
+                  letterSpacing: "0.5px",
+                  marginBottom: 20,
+                }}>
+                  {card.n}
+                </div>
+                <div style={{
+                  fontSize: 16,
+                  fontWeight: 700,
+                  color: C.textPrimary,
+                  letterSpacing: "-0.3px",
+                  lineHeight: 1.35,
+                  marginBottom: 14,
+                }}>
+                  {card.title}
+                </div>
+                <div style={{
+                  fontSize: 14,
+                  color: C.textSecondary,
+                  lineHeight: 1.72,
+                }}>
+                  {card.body}
+                </div>
+              </div>
+            </Fade>
+          ))}
+        </div>
+      </section>
+
       {/* ══ PROBLEM ══════════════════════════════════════════════════════════════ */}
       <section style={{
         padding: "84px clamp(20px, 6vw, 80px)",

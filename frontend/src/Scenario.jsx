@@ -138,7 +138,7 @@ const SCENARIOS = [
 ];
 
 // ─── Main Scenario Component ──────────────────────────────────────────────────
-export default function Scenario({ onBack, onEnterApp }) {
+export default function Scenario({ onBack, onEnterApp, onQuickStart }) {
   const [scenarioIndex, setScenarioIndex] = useState(0);
   const [step, setStep] = useState(1);
 
@@ -655,7 +655,7 @@ export default function Scenario({ onBack, onEnterApp }) {
               )}
               {scenarioIndex === 2 && (
                 <button
-                  onClick={onEnterApp} style={btnPrimary}
+                  onClick={onQuickStart} style={btnPrimary}
                   onMouseEnter={e => e.currentTarget.style.opacity = "0.88"}
                   onMouseLeave={e => e.currentTarget.style.opacity = "1"}
                 >

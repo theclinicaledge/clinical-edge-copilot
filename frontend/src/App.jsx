@@ -917,6 +917,18 @@ export default function App() {
           </div>
         </div>
 
+        {/* Input trust line */}
+        <div style={{
+          fontSize: 11,
+          color: "#3A5566",
+          fontFamily: "'IBM Plex Mono', monospace",
+          letterSpacing: "0.2px",
+          marginBottom: 20,
+          marginTop: -8,
+        }}>
+          Built to support your clinical thinking — not replace it
+        </div>
+
         {/* Recent Cases */}
         {history.length > 0 && (
           <div style={{ marginBottom: 20 }}>
@@ -1063,6 +1075,25 @@ export default function App() {
         {result && !streaming && (
           <div ref={outputRef} className="fade-up">
 
+            {/* Response trust cue */}
+            <div style={{
+              display: "flex",
+              alignItems: "flex-start",
+              gap: 8,
+              background: "rgba(242,185,75,0.05)",
+              border: "1px solid rgba(242,185,75,0.15)",
+              borderRadius: 8,
+              padding: "9px 13px",
+              marginBottom: 14,
+              fontSize: 11,
+              color: "#7F99A5",
+              fontFamily: "'IBM Plex Mono', monospace",
+              lineHeight: 1.55,
+            }}>
+              <span style={{ color: "#F2B94B", flexShrink: 0 }}>⚠️</span>
+              <span>Structured clinical reasoning support — always confirm with your assessment and provider guidance</span>
+            </div>
+
             <UrgencyBadge level={result.urgencyLevel} />
 
             {result.urgent && (
@@ -1153,8 +1184,8 @@ export default function App() {
           lineHeight: 1.75,
           fontFamily: "'IBM Plex Mono', monospace",
         }}>
-          Clinical Edge Copilot provides clinical reasoning support and nursing education only.<br />
-          It does not replace institutional protocols, provider orders, or your clinical judgment.<br />
+          Your clinical judgment comes first — use this to organize thinking, not replace decision-making.<br />
+          Clinical Edge Copilot does not replace institutional protocols, provider orders, or your assessment.<br />
           Always escalate per your facility's policies.
         </div>
 

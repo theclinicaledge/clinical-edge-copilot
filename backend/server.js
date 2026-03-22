@@ -267,11 +267,11 @@ Never give medication doses, titration instructions, or definitive diagnoses.
 
 If asked something outside bedside nursing clinical reasoning: "I'm built specifically for bedside nursing clinical reasoning support. Give me a patient scenario, change in status, abnormal finding, or nursing concern and I'll think through it with you."`;
 
-const KNOWLEDGE_SYSTEM_PROMPT = `You are an experienced bedside nurse educator answering short, practical clinical questions for nurses.
+const QUICK_KNOWLEDGE_PROMPT = `You are an experienced bedside nurse educator answering short, practical clinical questions for nurses.
 Your job is to give a concise, high-yield explanation that helps the nurse understand the concept quickly and safely.
 This mode is for short knowledge questions, not full patient scenarios.
 
-VOICE:
+VOICE
 - Direct
 - Practical
 - Nurse-to-nurse
@@ -280,14 +280,13 @@ VOICE:
 - No long pharmacology lectures
 - No provider-style prescribing language
 
-GOAL:
+GOAL
 Help the nurse quickly understand:
 - what something is
 - why it matters clinically
 - what to watch for at the bedside
 
-OUTPUT STRUCTURE (always follow):
-After the four sections below, do NOT include an urgency line. This mode is educational, not scenario-based.
+OUTPUT STRUCTURE (always follow)
 
 **What this is**
 1–2 short sentences.
@@ -307,7 +306,7 @@ Include meal timing, monitoring, symptoms, or safety considerations when relevan
 One sentence only.
 Should feel like a practical nurse takeaway.
 
-RULES:
+RULES
 - Keep it concise
 - If the question is medication-related, explain class/action in plain language
 - If the question is about timing or duration, include onset/peak/duration only if clinically useful
@@ -316,19 +315,71 @@ RULES:
 - Do not prescribe
 - Do not say "give it" or "don't give it" unless there is clear bedside danger and it is framed as escalation/safety
 
-STYLE EXAMPLES:
-Instead of: "NPH is an intermediate-acting insulin with an onset..."
-Say: "NPH is intermediate-acting insulin. It is not long-acting, and it has a real peak."
+STYLE EXAMPLES
+Instead of:
+"NPH is an intermediate-acting insulin with an onset..."
+Say:
+"NPH is intermediate-acting insulin. It is not long-acting, and it has a real peak."
 
-Instead of: "Tamsulosin is an alpha-1 antagonist..."
-Say: "Tamsulosin relaxes smooth muscle to help with urine flow. It can also drop BP, especially when standing."
+Instead of:
+"Tamsulosin is an alpha-1 antagonist..."
+Say:
+"Tamsulosin relaxes smooth muscle to help with urine flow. It can also drop BP, especially when standing."
 
-Instead of: "Metoprolol is a beta-1 selective antagonist..."
-Say: "Metoprolol slows heart rate and lowers cardiac workload. That matters if the HR is already low."
+Instead of:
+"Metoprolol is a beta-1 selective antagonist..."
+Say:
+"Metoprolol slows heart rate and lowers cardiac workload. That matters if the HR is already low."
 
-FINAL RULE:
-This should feel like a strong bedside nurse giving the quick version another nurse actually needs on shift.
-Not an academic definition. Not a pharmacology lecture. Just the part that matters at the bedside.`;
+FINAL RULE
+This should feel like a strong bedside nurse giving the quick version another nurse actually needs on shift.`;
+
+// ── Input-based prompt routing ─────────────────────────────────────────────
+//
+// Priority order:
+//   A. Medication Safety Mode  → action-oriented med phrases → QUICK or DEEP
+//   B. Clinical Reasoning Mode → patient context / vitals / trends → QUICK or DEEP
+//   C. Quick Knowledge Mode    → short general question, no patient context → QUICK_KNOWLEDGE_PROMPT
+//   D. Default                 → Clinical Reasoning (QUICK or DEEP)
+//
+function detectPrompt(question, uiMode) {
+  const q = question.toLowerCase();
+  const basePrompt = uiMode === "quick" ? QUICK_SYSTEM_PROMPT : DEEP_SYSTEM_PROMPT;
+
+  // ── A. Medication Safety (highest priority) ───────────────────────────────
+  // Action-oriented phrases that signal a real-time give/hold decision
+  const medSafetyTriggers = [
+    "can i give", "should i give", "should i hold", "ok to give", "okay to give",
+    "is it safe to give", "safe to administer", "med due", "meds due",
+    "before scan", "before pet", "before procedure", "before surgery",
+    "hold the", "give the",
+  ];
+  if (medSafetyTriggers.some((t) => q.includes(t))) return basePrompt;
+
+  // ── B. Clinical Reasoning ─────────────────────────────────────────────────
+  // Patient-specific context: symptoms, vitals, trends, devices, diagnoses
+  const clinicalTriggers = [
+    "patient", " pt ", "pale", "hypotensive", "confused", "tachy", "brady",
+    "desatt", "urine output", "postop", "post-op", "post op",
+    "bp ", " hr ", "spo2", "o2 sat", "temperature", "temp ",
+    "respirat", "creatinine", "potassium", "sodium", "lactate",
+    "trending", "worsening", "deteriorat", "declining", "unstable",
+    "chest pain", "shortness of breath", " sob", "dyspnea",
+    "altered", "unresponsive", "diaphoretic", "distress",
+    "vitals", "drip", "infusion", "icu", "stepdown",
+    "intubat", "ventilat", "foley", "chest tube", "central line",
+  ];
+  if (clinicalTriggers.some((t) => q.includes(t))) return basePrompt;
+
+  // ── C. Quick Knowledge ────────────────────────────────────────────────────
+  // No patient context, no safety trigger → treat as a general knowledge question
+  // Guard against very long/ambiguous free-text falling through here
+  const wordCount = question.trim().split(/\s+/).length;
+  if (wordCount <= 25) return QUICK_KNOWLEDGE_PROMPT;
+
+  // ── D. Default → Clinical Reasoning ──────────────────────────────────────
+  return basePrompt;
+}
 
 // ── Streaming endpoint ────────────────────────────────────────────────────────
 app.post("/api/copilot", async (req, res) => {
@@ -341,7 +392,7 @@ app.post("/api/copilot", async (req, res) => {
     return res.status(400).json({ error: "Please describe the clinical situation in more detail." });
   }
 
-  const selectedPrompt = mode === "quick" ? QUICK_SYSTEM_PROMPT : mode === "knowledge" ? KNOWLEDGE_SYSTEM_PROMPT : DEEP_SYSTEM_PROMPT;
+  const selectedPrompt = detectPrompt(question.trim(), mode);
 
   // Set SSE headers so the frontend can read chunks as they arrive
   res.setHeader("Content-Type", "text/event-stream");

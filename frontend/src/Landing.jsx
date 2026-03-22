@@ -261,9 +261,15 @@ export default function Landing({ onEnterApp, onEnterScenario }) {
         }
         .l-nav-link:hover { color: #F8FBFC !important; }
 
+        .l-flow { display: flex; align-items: flex-start; gap: 0; width: 100%; }
+        .l-flow-arrow { flex-shrink: 0; align-self: center; color: #3A5566; font-size: 20px; padding: 0 6px; margin-bottom: 8px; line-height: 1; }
+        .l-flow-step { flex: 1; min-width: 0; }
+
         @media (max-width: 640px) {
           .l-hero-btns { flex-direction: column !important; }
           .l-hero-btns button { width: 100% !important; }
+          .l-flow { flex-direction: column !important; gap: 0 !important; }
+          .l-flow-arrow { transform: rotate(90deg); align-self: flex-start; margin-left: 22px; padding: 4px 0; margin-bottom: 0; }
         }
       `}</style>
 
@@ -540,72 +546,6 @@ export default function Landing({ onEnterApp, onEnterScenario }) {
         </div>
       </section>
 
-      {/* ══ WHAT MAKES THIS DIFFERENT ════════════════════════════════════════════ */}
-      <section style={{
-        padding: "84px clamp(20px, 6vw, 80px)",
-        maxWidth: 960,
-        margin: "0 auto",
-      }}>
-        <Fade style={{ textAlign: "center", marginBottom: 52 }}>
-          <Label>What Makes This Different</Label>
-          <SectionHeading maxWidth={560} style={{ margin: "0 auto 20px" }}>
-            Not another AI chatbot. Built for real clinical thinking.
-          </SectionHeading>
-        </Fade>
-
-        <div style={{
-          display: "grid",
-          gridTemplateColumns: "repeat(auto-fit, minmax(220px, 1fr))",
-          gap: 16,
-        }}>
-          {[
-            {
-              title: "Thinks like a nurse — not a textbook",
-              body: "Every response is shaped around how nurses actually reason at the bedside, not how AI typically writes clinical content.",
-            },
-            {
-              title: "Shows you what matters, not everything",
-              body: "Cuts through noise and surfaces the clinical patterns that actually need your attention right now.",
-            },
-            {
-              title: "Helps you connect the dots in real time",
-              body: "Brings together vitals, symptoms, trends, and context into a structured picture you can act on.",
-            },
-            {
-              title: "Built for real-world clinical decision-making",
-              body: "Not a research tool or differential generator. Built for the specific moments where clear thinking matters most.",
-            },
-          ].map((card, i) => (
-            <Fade key={card.title} delay={i * 80}>
-              <div style={{
-                background: C.card,
-                border: `1px solid ${C.border}`,
-                borderTop: `2px solid ${C.accent}`,
-                borderRadius: 14,
-                padding: "32px 28px",
-                boxShadow: "0 8px 32px rgba(0,0,0,0.22)",
-                height: "100%",
-                boxSizing: "border-box",
-              }}>
-                <div style={{
-                  fontSize: 15,
-                  fontWeight: 700,
-                  color: C.textPrimary,
-                  letterSpacing: "-0.3px",
-                  lineHeight: 1.35,
-                  marginBottom: 12,
-                }}>
-                  {card.title}
-                </div>
-                <div style={{ fontSize: 14, color: C.textSecondary, lineHeight: 1.72 }}>
-                  {card.body}
-                </div>
-              </div>
-            </Fade>
-          ))}
-        </div>
-      </section>
-
       {/* ══ SAFETY / GUARDRAILS ══════════════════════════════════════════════════ */}
       <section style={{
         padding: "84px clamp(20px, 6vw, 80px)",
@@ -663,6 +603,158 @@ export default function Landing({ onEnterApp, onEnterScenario }) {
                 ))}
               </div>
             </div>
+          </div>
+        </Fade>
+      </section>
+
+      {/* ══ WHY DIFFERENT (CONSOLIDATED) ════════════════════════════════════════ */}
+      <section style={{
+        padding: "84px clamp(20px, 6vw, 80px)",
+        maxWidth: 960,
+        margin: "0 auto",
+      }}>
+        <Fade style={{ textAlign: "center", marginBottom: 52 }}>
+          <Label>Why This Is Different</Label>
+          <SectionHeading maxWidth={560} style={{ margin: "0 auto 20px" }}>
+            Not another AI tool telling you what to do.
+          </SectionHeading>
+          <p style={{
+            fontSize: "clamp(15px, 1.8vw, 17px)",
+            fontWeight: 400,
+            color: C.textSecondary,
+            lineHeight: 1.72,
+            margin: "20px auto 0",
+            maxWidth: 520,
+          }}>
+            Helps you think through clinical situations — like a second set of experienced clinical eyes.
+          </p>
+        </Fade>
+
+        <div style={{
+          display: "grid",
+          gridTemplateColumns: "repeat(auto-fit, minmax(268px, 1fr))",
+          gap: 16,
+        }}>
+          {[
+            {
+              title: "Thinks like a nurse",
+              body: "Built around real bedside reasoning — not textbook answers or generic AI output.",
+            },
+            {
+              title: "Focuses on what matters",
+              body: "Cuts through noise and highlights the patterns you actually need to act on.",
+            },
+            {
+              title: "Supports your judgment",
+              body: "Organizes your thinking — without replacing your clinical decision-making.",
+            },
+          ].map((card, i) => (
+            <Fade key={card.title} delay={i * 80}>
+              <div style={{
+                background: C.card,
+                border: `1px solid ${C.border}`,
+                borderTop: `2px solid ${C.accent}`,
+                borderRadius: 14,
+                padding: "32px 28px",
+                boxShadow: "0 8px 32px rgba(0,0,0,0.22)",
+                height: "100%",
+                boxSizing: "border-box",
+              }}>
+                <div style={{
+                  fontSize: 16,
+                  fontWeight: 700,
+                  color: C.textPrimary,
+                  letterSpacing: "-0.3px",
+                  lineHeight: 1.35,
+                  marginBottom: 12,
+                }}>
+                  {card.title}
+                </div>
+                <div style={{ fontSize: 14, color: C.textSecondary, lineHeight: 1.72 }}>
+                  {card.body}
+                </div>
+              </div>
+            </Fade>
+          ))}
+        </div>
+      </section>
+
+      {/* ══ HOW IT THINKS ════════════════════════════════════════════════════════ */}
+      <section style={{
+        padding: "84px clamp(20px, 6vw, 80px)",
+        maxWidth: 960,
+        margin: "0 auto",
+      }}>
+        <Fade style={{ marginBottom: 52 }}>
+          <Label>How It Thinks</Label>
+          <SectionHeading maxWidth={360}>
+            How it thinks
+          </SectionHeading>
+          <p style={{
+            fontSize: "clamp(15px, 1.8vw, 17px)",
+            fontWeight: 400,
+            color: C.textSecondary,
+            lineHeight: 1.72,
+            margin: "16px 0 0",
+            maxWidth: 460,
+          }}>
+            From your input to structured guidance — in seconds.
+          </p>
+        </Fade>
+
+        <Fade delay={80}>
+          <div className="l-flow">
+            {[
+              { step: "01", label: "You input",           body: "Vitals, symptoms, concerns",                        accent: C.accent,   accentRgb: "0,194,209"   },
+              { step: "02", label: "Pattern recognition", body: "Identifies what's clinically concerning",           accent: "#4da3ff",  accentRgb: "77,163,255"  },
+              { step: "03", label: "Prioritization",      body: "Highlights what matters most",                     accent: "#F2B94B",  accentRgb: "242,185,75"  },
+              { step: "04", label: "Action framing",      body: "What to assess and do next",                       accent: "#1FBF75",  accentRgb: "31,191,117"  },
+            ].map((item, i) => (
+              <>
+                {i > 0 && (
+                  <div key={`arrow-${i}`} className="l-flow-arrow">›</div>
+                )}
+                <div key={item.step} className="l-flow-step" style={{
+                  borderTop: `3px solid ${item.accent}`,
+                  background: C.card,
+                  borderRadius: 12,
+                  padding: "24px 22px",
+                  border: `1px solid ${C.border}`,
+                  borderTopColor: item.accent,
+                  borderTopWidth: 3,
+                }}>
+                  <div style={{
+                    fontFamily: "'IBM Plex Mono', monospace",
+                    fontSize: 9,
+                    fontWeight: 700,
+                    color: item.accent,
+                    letterSpacing: "0.8px",
+                    textTransform: "uppercase",
+                    marginBottom: 12,
+                    opacity: 0.8,
+                  }}>
+                    {item.step}
+                  </div>
+                  <div style={{
+                    fontSize: 15,
+                    fontWeight: 700,
+                    color: C.textPrimary,
+                    letterSpacing: "-0.3px",
+                    lineHeight: 1.3,
+                    marginBottom: 8,
+                  }}>
+                    {item.label}
+                  </div>
+                  <div style={{
+                    fontSize: 13,
+                    color: C.textSecondary,
+                    lineHeight: 1.65,
+                  }}>
+                    {item.body}
+                  </div>
+                </div>
+              </>
+            ))}
           </div>
         </Fade>
       </section>
@@ -800,96 +892,6 @@ export default function Landing({ onEnterApp, onEnterScenario }) {
               n: "03",
               title: "You move with clarity.",
               body: "What to assess next. What to watch. When to escalate.",
-            },
-          ].map((card, i) => (
-            <Fade key={card.n} delay={i * 80}>
-              <div style={{
-                background: C.card,
-                border: `1px solid ${C.border}`,
-                borderTop: `2px solid ${C.accent}`,
-                borderRadius: 14,
-                padding: "32px 30px",
-                boxShadow: "0 8px 32px rgba(0,0,0,0.22)",
-                height: "100%",
-                boxSizing: "border-box",
-              }}>
-                <div style={{
-                  fontFamily: "'IBM Plex Mono', monospace",
-                  fontSize: 10,
-                  fontWeight: 600,
-                  color: C.accent,
-                  opacity: 0.55,
-                  letterSpacing: "0.5px",
-                  marginBottom: 20,
-                }}>
-                  {card.n}
-                </div>
-                <div style={{
-                  fontSize: 16,
-                  fontWeight: 700,
-                  color: C.textPrimary,
-                  letterSpacing: "-0.3px",
-                  lineHeight: 1.35,
-                  marginBottom: 14,
-                }}>
-                  {card.title}
-                </div>
-                <div style={{
-                  fontSize: 14,
-                  color: C.textSecondary,
-                  lineHeight: 1.72,
-                }}>
-                  {card.body}
-                </div>
-              </div>
-            </Fade>
-          ))}
-        </div>
-      </section>
-
-      {/* ══ WHY THIS IS DIFFERENT ════════════════════════════════════════════════ */}
-      <section style={{
-        padding: "84px clamp(20px, 6vw, 80px)",
-        maxWidth: 960,
-        margin: "0 auto",
-      }}>
-        <Fade style={{ textAlign: "center", marginBottom: 52 }}>
-          <Label>Why This Is Different</Label>
-          <SectionHeading maxWidth={520}>
-            Not another AI tool telling you what to do.
-          </SectionHeading>
-          <p style={{
-            fontSize: "clamp(15px, 1.8vw, 17px)",
-            fontWeight: 400,
-            color: C.textSecondary,
-            lineHeight: 1.72,
-            margin: "20px auto 0",
-            maxWidth: 520,
-          }}>
-            Most tools give generic answers. Clinical Edge Copilot helps you think through the situation — like a second set of experienced clinical eyes.
-          </p>
-        </Fade>
-
-        <div style={{
-          display: "grid",
-          gridTemplateColumns: "repeat(auto-fit, minmax(268px, 1fr))",
-          gap: 16,
-        }}>
-          {[
-            {
-              n: "01",
-              title: "Not generic responses",
-              body: "Built around real clinical reasoning — not surface-level answers.",
-            },
-            {
-              n: "02",
-              title: "Not information overload",
-              body: "Highlights what matters instead of dumping everything.",
-            },
-            {
-              n: "03",
-              title: "Not replacing your judgment",
-              body: "Supports your thinking so you can make better decisions.",
             },
           ].map((card, i) => (
             <Fade key={card.n} delay={i * 80}>
@@ -1231,152 +1233,6 @@ export default function Landing({ onEnterApp, onEnterScenario }) {
             </div>
           </div>
         </Fade>
-      </section>
-
-      {/* ══ HOW IT WORKS ═════════════════════════════════════════════════════════ */}
-      <section style={{
-        padding: "84px clamp(20px, 6vw, 80px)",
-        maxWidth: 960,
-        margin: "0 auto",
-      }}>
-        <Fade style={{ textAlign: "center", marginBottom: 54 }}>
-          <Label>How It Works</Label>
-          <SectionHeading maxWidth={440} style={{ margin: "0 auto" }}>
-            Three steps to better clinical thinking.
-          </SectionHeading>
-        </Fade>
-
-        <div style={{
-          display: "grid",
-          gridTemplateColumns: "repeat(auto-fit, minmax(250px, 1fr))",
-          gap: 16,
-        }}>
-          {[
-            {
-              step: "01",
-              title: "Enter a patient scenario",
-              body: "Describe what you're seeing — vitals, symptoms, labs, anything relevant. No special format required. Just speak clinically.",
-            },
-            {
-              step: "02",
-              title: "AI analyzes clinical patterns",
-              body: "The copilot identifies patterns, weighs differential causes, and maps your scenario to structured clinical reasoning frameworks.",
-            },
-            {
-              step: "03",
-              title: "Get structured reasoning",
-              body: "Nine consistent sections: pattern recognition, assessment priorities, possible causes, nursing actions, escalation criteria, and more.",
-            },
-          ].map((item, i) => (
-            <Fade key={item.step} delay={i * 80}>
-              <div className="l-step" style={{
-                background: C.card,
-                border: `1px solid ${C.border}`,
-                borderRadius: 16,
-                padding: "34px 30px",
-                height: "100%",
-                transition: "all 0.25s ease",
-              }}>
-                <div style={{
-                  fontFamily: "'IBM Plex Mono', monospace",
-                  fontSize: 32,
-                  fontWeight: 400,
-                  color: C.accent,
-                  opacity: 0.2,
-                  letterSpacing: "-1px",
-                  marginBottom: 24,
-                  lineHeight: 1,
-                }}>
-                  {item.step}
-                </div>
-                <div style={{
-                  fontSize: 17,
-                  fontWeight: 700,
-                  color: C.textPrimary,
-                  letterSpacing: "-0.4px",
-                  marginBottom: 12,
-                  lineHeight: 1.3,
-                }}>
-                  {item.title}
-                </div>
-                <div style={{ fontSize: 14, color: C.textSecondary, lineHeight: 1.72 }}>
-                  {item.body}
-                </div>
-              </div>
-            </Fade>
-          ))}
-        </div>
-      </section>
-
-      {/* ══ WHY DIFFERENT ════════════════════════════════════════════════════════ */}
-      <section style={{
-        padding: "84px clamp(20px, 6vw, 80px)",
-        maxWidth: 960,
-        margin: "0 auto",
-      }}>
-        <Fade style={{ marginBottom: 46 }}>
-          <Label>What Makes It Different</Label>
-          <SectionHeading maxWidth={380}>
-            Not just another AI tool.
-          </SectionHeading>
-        </Fade>
-
-        <div style={{
-          display: "grid",
-          gridTemplateColumns: "repeat(auto-fit, minmax(290px, 1fr))",
-          gap: 12,
-        }}>
-          {[
-            {
-              title: "Built for nurses",
-              body: "Every section, every phrase, every response is designed around how nurses actually think at the bedside — not how physicians chart or how AI typically responds.",
-            },
-            {
-              title: "Structured clinical reasoning",
-              body: "Nine consistent sections per response: pattern recognition, nursing assessments, possible causes, escalation criteria. No rambling. No ambiguity.",
-            },
-            {
-              title: "Focused on bedside decisions",
-              body: "Not a research tool. Not a differential generator. Built for the specific moment you're at the bedside and need a structured second opinion — fast.",
-            },
-            {
-              title: "Not generic AI responses",
-              body: "Built on clinical reasoning frameworks designed by a master's-prepared RN with critical care experience. Purpose-built clinical cognition — not a repurposed chatbot.",
-            },
-          ].map((item, i) => (
-            <Fade key={item.title} delay={i * 55}>
-              <div className="l-diff" style={{
-                background: "rgba(17,41,54,0.35)",
-                border: `1px solid ${C.border}`,
-                borderRadius: 14,
-                padding: "28px 26px",
-                transition: "all 0.25s ease",
-              }}>
-                <div style={{
-                  width: 7,
-                  height: 7,
-                  borderRadius: "50%",
-                  background: C.accent,
-                  opacity: 0.7,
-                  marginBottom: 20,
-                }} />
-                <div style={{
-                  fontSize: 16,
-                  fontWeight: 700,
-                  color: C.textPrimary,
-                  letterSpacing: "-0.3px",
-                  marginBottom: 10,
-                  lineHeight: 1.3,
-                }}>
-                  {item.title}
-                </div>
-                <div style={{ fontSize: 14, color: C.textSecondary, lineHeight: 1.72 }}>
-                  {item.body}
-                </div>
-              </div>
-            </Fade>
-          ))}
-        </div>
       </section>
 
       {/* ══ TRUST / SAFETY ═══════════════════════════════════════════════════════ */}

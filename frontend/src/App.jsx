@@ -31,16 +31,10 @@ const STARTER_TEMPLATES = [
 ];
 
 const SECTIONS = [
-  // ── Clinical Reasoning / Quick Guidance sections ──
   { name: "What this could be",   aliases: ["What this could be"],   accent: "#4da3ff", bg: "rgba(77,163,255,0.06)"  },
   { name: "What concerns me most", aliases: ["What concerns me most"], accent: "#e05572", bg: "rgba(224,85,114,0.06)"  },
   { name: "What I'd assess next",  aliases: ["What I'd assess next"],  accent: "#1FBF75", bg: "rgba(31,191,117,0.06)"  },
   { name: "What I'd do right now", aliases: ["What I'd do right now"], accent: "#F2B94B", bg: "rgba(242,185,75,0.06)"  },
-  // ── Quick Knowledge sections ──
-  { name: "What this is",   aliases: ["What this is"],   accent: "#4da3ff", bg: "rgba(77,163,255,0.06)"  },
-  { name: "Why it matters", aliases: ["Why it matters"], accent: "#F2B94B", bg: "rgba(242,185,75,0.06)"  },
-  { name: "At the bedside", aliases: ["At the bedside"], accent: "#1FBF75", bg: "rgba(31,191,117,0.06)"  },
-  // ── Shared ──
   { name: "Closing",               aliases: ["Closing"],               accent: "#00C2D1", bg: "rgba(0,194,209,0.04)"   },
 ];
 
@@ -365,7 +359,7 @@ function SavedCaseRow({ sc, onReopen, onDelete, onCopy, onSaveNote }) {
             </span>
             <span style={{ fontSize: 9, color: "#3A5566", fontFamily: "'IBM Plex Mono', monospace" }}>&middot;</span>
             <span style={{ fontSize: 9, color: "#4A6978", fontFamily: "'IBM Plex Mono', monospace", textTransform: "uppercase", letterSpacing: "0.5px" }}>
-              {sc.mode === "quick" ? "Quick" : sc.mode === "knowledge" ? "Knowledge" : "Clinical"}
+              {sc.mode === "quick" ? "Quick" : "Clinical"}
             </span>
             <span style={{ fontSize: 9, color: "#3A5566", fontFamily: "'IBM Plex Mono', monospace" }}>&middot;</span>
             <span style={{ fontSize: 9, color: "#4A6978" }}>{formatTimestamp(sc.timestamp)}</span>
@@ -821,7 +815,7 @@ export default function App() {
 
         {/* Mode toggle */}
         <div style={{ display: "flex", gap: 7, marginBottom: 14 }}>
-          {[["deep", "Clinical Reasoning"], ["quick", "Quick Guidance"], ["knowledge", "Quick Knowledge"]].map(([val, label]) => (
+          {[["deep", "Clinical Reasoning"], ["quick", "Quick Guidance"]].map(([val, label]) => (
             <button
               key={val}
               className={"mode-btn" + (mode === val ? " mode-active" : "")}

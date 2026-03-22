@@ -405,6 +405,8 @@ export default function Landing({ onEnterApp, onEnterScenario }) {
             Less second-guessing.
             <br />
             <span style={{ color: C.accent, whiteSpace: "nowrap" }}>More clinical confidence.</span>
+            <br />
+            When it matters most.
           </h1>
 
           {/* Subhead */}
@@ -414,9 +416,9 @@ export default function Landing({ onEnterApp, onEnterScenario }) {
             color: C.textSecondary,
             lineHeight: 1.72,
             margin: "0 auto 50px",
-            maxWidth: 560,
+            maxWidth: 580,
           }}>
-            When something doesn't add up, you don't need more information — you need better thinking. Clinical Edge Copilot helps you connect the dots in real time.
+            Clinical Edge Copilot helps nurses break down patient situations, medication questions, and clinical decisions — whether you're at the bedside, in clinic, or anywhere in between.
           </p>
 
           {/* CTAs */}
@@ -430,7 +432,7 @@ export default function Landing({ onEnterApp, onEnterScenario }) {
             }}
           >
             <button onClick={onEnterScenario} className="l-btn-primary" style={{ ...btnPrimary, fontSize: 15, padding: "14px 34px", borderRadius: 11 }}>
-              Try a Patient Scenario
+              Try a real scenario →
             </button>
             <button onClick={scrollToDemo} className="l-btn-ghost" style={{ ...btnGhost, fontSize: 15, padding: "14px 34px", borderRadius: 11 }}>
               See How It Thinks
@@ -536,6 +538,133 @@ export default function Landing({ onEnterApp, onEnterScenario }) {
             </div>
           </div>
         </div>
+      </section>
+
+      {/* ══ WHAT MAKES THIS DIFFERENT ════════════════════════════════════════════ */}
+      <section style={{
+        padding: "84px clamp(20px, 6vw, 80px)",
+        maxWidth: 960,
+        margin: "0 auto",
+      }}>
+        <Fade style={{ textAlign: "center", marginBottom: 52 }}>
+          <Label>What Makes This Different</Label>
+          <SectionHeading maxWidth={560} style={{ margin: "0 auto 20px" }}>
+            Not another AI chatbot. Built for real clinical thinking.
+          </SectionHeading>
+        </Fade>
+
+        <div style={{
+          display: "grid",
+          gridTemplateColumns: "repeat(auto-fit, minmax(220px, 1fr))",
+          gap: 16,
+        }}>
+          {[
+            {
+              title: "Thinks like a nurse — not a textbook",
+              body: "Every response is shaped around how nurses actually reason at the bedside, not how AI typically writes clinical content.",
+            },
+            {
+              title: "Shows you what matters, not everything",
+              body: "Cuts through noise and surfaces the clinical patterns that actually need your attention right now.",
+            },
+            {
+              title: "Helps you connect the dots in real time",
+              body: "Brings together vitals, symptoms, trends, and context into a structured picture you can act on.",
+            },
+            {
+              title: "Built for real-world clinical decision-making",
+              body: "Not a research tool or differential generator. Built for the specific moments where clear thinking matters most.",
+            },
+          ].map((card, i) => (
+            <Fade key={card.title} delay={i * 80}>
+              <div style={{
+                background: C.card,
+                border: `1px solid ${C.border}`,
+                borderTop: `2px solid ${C.accent}`,
+                borderRadius: 14,
+                padding: "32px 28px",
+                boxShadow: "0 8px 32px rgba(0,0,0,0.22)",
+                height: "100%",
+                boxSizing: "border-box",
+              }}>
+                <div style={{
+                  fontSize: 15,
+                  fontWeight: 700,
+                  color: C.textPrimary,
+                  letterSpacing: "-0.3px",
+                  lineHeight: 1.35,
+                  marginBottom: 12,
+                }}>
+                  {card.title}
+                </div>
+                <div style={{ fontSize: 14, color: C.textSecondary, lineHeight: 1.72 }}>
+                  {card.body}
+                </div>
+              </div>
+            </Fade>
+          ))}
+        </div>
+      </section>
+
+      {/* ══ SAFETY / GUARDRAILS ══════════════════════════════════════════════════ */}
+      <section style={{
+        padding: "84px clamp(20px, 6vw, 80px)",
+        maxWidth: 880,
+        margin: "0 auto",
+      }}>
+        <Fade>
+          <div style={{
+            background: "rgba(0,194,209,0.04)",
+            border: `1px solid rgba(0,194,209,0.22)`,
+            borderLeft: `4px solid ${C.accent}`,
+            borderRadius: 16,
+            padding: "52px clamp(28px, 5vw, 64px)",
+            position: "relative",
+            overflow: "hidden",
+          }}>
+            {/* Corner glow */}
+            <div style={{
+              position: "absolute",
+              top: -50,
+              right: -50,
+              width: 240,
+              height: 240,
+              background: "radial-gradient(circle, rgba(0,194,209,0.06) 0%, transparent 65%)",
+              pointerEvents: "none",
+            }} />
+
+            <div style={{ position: "relative" }}>
+              <Label>Designed with Clinical Guardrails</Label>
+              <h2 style={{
+                fontSize: "clamp(22px, 3vw, 36px)",
+                fontWeight: 800,
+                color: C.textPrimary,
+                letterSpacing: "-1px",
+                lineHeight: 1.15,
+                margin: "0 0 32px",
+                maxWidth: 520,
+              }}>
+                Designed with clinical guardrails — not generic AI.
+              </h2>
+
+              <div style={{ display: "flex", flexDirection: "column", gap: 18 }}>
+                {[
+                  "Does NOT diagnose or replace provider judgment",
+                  "Does NOT tell you to blindly give medications",
+                  "Emphasizes assessment, trends, and escalation",
+                  "Reinforces safe clinical decision-making at every step",
+                ].map((point) => (
+                  <div key={point} style={{ display: "flex", alignItems: "flex-start", gap: 14 }}>
+                    <Check />
+                    <span style={{ fontSize: 15, color: C.textSecondary, lineHeight: 1.65 }}>
+                      {point}
+                    </span>
+                  </div>
+                ))}
+              </div>
+            </div>
+          </div>
+        </Fade>
       </section>
 
       {/* ══ REAL SHIFT MOMENTS ═══════════════════════════════════════════════════ */}
@@ -994,9 +1123,20 @@ export default function Landing({ onEnterApp, onEnterScenario }) {
       }}>
         <Fade style={{ textAlign: "center", marginBottom: 48 }}>
           <Label>See It In Action</Label>
-          <SectionHeading maxWidth={480} style={{ margin: "0 auto" }}>
+          <SectionHeading maxWidth={480} style={{ margin: "0 auto 20px" }}>
             From bedside concern to structured clinical reasoning.
           </SectionHeading>
+          <p style={{
+            fontSize: "clamp(14px, 1.6vw, 16px)",
+            fontWeight: 500,
+            color: C.accent,
+            fontFamily: "'IBM Plex Mono', monospace",
+            letterSpacing: "0.2px",
+            margin: "16px auto 0",
+            maxWidth: 480,
+          }}>
+            This is what you get in seconds — not a Google rabbit hole.
+          </p>
         </Fade>
 
         <Fade delay={80}>
@@ -1480,7 +1620,7 @@ export default function Landing({ onEnterApp, onEnterScenario }) {
           margin: 0,
           fontFamily: "'IBM Plex Mono', monospace",
         }}>
-          Clinical Edge Copilot is a clinical reasoning support tool for registered nurses. It is not a diagnostic tool and does not replace clinical judgment. Always follow your institution's policies and escalate through appropriate channels.
+          Clinical Edge Copilot provides clinical reasoning support and nursing education only. It does not replace institutional protocols, provider orders, or clinical judgment.
         </p>
 
         <p style={{

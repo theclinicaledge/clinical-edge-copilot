@@ -1,0 +1,898 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Clinical Edge — Instagram Carousel</title>
+  <link
+    href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=IBM+Plex+Mono:wght@400;500;700&display=swap"
+    rel="stylesheet"
+  />
+  <style>
+    /* ─── Reset ─────────────────────────────────────────── */
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      background: #060e14;
+      font-family: 'Inter', -apple-system, sans-serif;
+      padding: 48px 32px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 56px;
+    }
+
+    /* ─── Slide wrapper — exactly 1080 × 1350 ───────────── */
+    .slide {
+      width: 1080px;
+      height: 1350px;
+      background: #0B1F2A;
+      position: relative;
+      overflow: hidden;
+      flex-shrink: 0;
+    }
+
+    /* ─── Slide index label (outside slide, for preview only) */
+    .slide-label {
+      width: 1080px;
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      margin-bottom: -40px;
+    }
+    .slide-label span {
+      font-family: 'IBM Plex Mono', monospace;
+      font-size: 11px;
+      font-weight: 500;
+      color: #3A5566;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+    }
+    .slide-label::after {
+      content: '';
+      flex: 1;
+      height: 1px;
+      background: rgba(255,255,255,0.04);
+    }
+
+    /* ─── Subtle background texture ─────────────────────── */
+    .slide::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background-image:
+        radial-gradient(circle, rgba(255,255,255,0.018) 1px, transparent 1px);
+      background-size: 36px 36px;
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    /* ─── Shared ambient glow ────────────────────────────── */
+    .glow-top {
+      position: absolute;
+      top: -80px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 1000px;
+      height: 680px;
+      background: radial-gradient(ellipse, rgba(0,194,209,0.10) 0%, transparent 62%);
+      pointer-events: none;
+    }
+    .glow-bottom-right {
+      position: absolute;
+      bottom: -60px;
+      right: -60px;
+      width: 420px;
+      height: 420px;
+      background: radial-gradient(circle, rgba(0,194,209,0.07) 0%, transparent 60%);
+      pointer-events: none;
+    }
+    .glow-center {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      width: 800px;
+      height: 600px;
+      background: radial-gradient(ellipse, rgba(0,194,209,0.08) 0%, transparent 62%);
+      pointer-events: none;
+    }
+    /* Top-left corner accent — adds visual density */
+    .glow-corner-tl {
+      position: absolute;
+      top: -60px;
+      left: -60px;
+      width: 300px;
+      height: 300px;
+      background: radial-gradient(circle, rgba(0,194,209,0.05) 0%, transparent 65%);
+      pointer-events: none;
+    }
+
+    /* ─── Footer / brand mark ────────────────────────────── */
+    .slide-footer {
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      height: 68px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 60px;
+      border-top: 1px solid rgba(255,255,255,0.06);
+      background: rgba(11,31,42,0.85);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      z-index: 2;
+    }
+    .footer-brand {
+      display: flex;
+      align-items: center;
+      gap: 9px;
+    }
+    .footer-dot {
+      width: 7px;
+      height: 7px;
+      border-radius: 50%;
+      background: #00C2D1;
+      box-shadow: 0 0 8px rgba(0,194,209,0.7);
+    }
+    .footer-name {
+      font-family: 'Inter', sans-serif;
+      font-size: 16px;
+      font-weight: 600;
+      color: #7F99A5;
+      letter-spacing: -0.1px;
+    }
+    .footer-handle {
+      font-family: 'IBM Plex Mono', monospace;
+      font-size: 14px;
+      font-weight: 500;
+      color: #7F99A5;
+      letter-spacing: 1.5px;
+      text-transform: uppercase;
+    }
+
+    /* ─── Slide number dot ───────────────────────────────── */
+    .slide-number {
+      position: absolute;
+      bottom: 25px;
+      left: 50%;
+      transform: translateX(-50%);
+      display: flex;
+      gap: 7px;
+    }
+    .slide-number .dot {
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+      background: rgba(255,255,255,0.12);
+    }
+    .slide-number .dot.active {
+      background: #00C2D1;
+      box-shadow: 0 0 6px rgba(0,194,209,0.5);
+    }
+
+    /* ─── Card component ─────────────────────────────────── */
+    .card {
+      background: #112936;
+      border: 1px solid rgba(255,255,255,0.07);
+      border-radius: 16px;
+      padding: 28px 32px;
+    }
+    .card.accent-left {
+      border-left: 3px solid #00C2D1;
+      background: rgba(0,194,209,0.04);
+      border-top: 1px solid rgba(0,194,209,0.12);
+      border-right: 1px solid rgba(0,194,209,0.08);
+      border-bottom: 1px solid rgba(0,194,209,0.08);
+    }
+    .card.red-left {
+      border-left: 3px solid #e05572;
+      background: rgba(224,85,114,0.04);
+      border-top: 1px solid rgba(224,85,114,0.12);
+      border-right: 1px solid rgba(224,85,114,0.08);
+      border-bottom: 1px solid rgba(224,85,114,0.08);
+    }
+    .card.green-left {
+      border-left: 3px solid #1FBF75;
+      background: rgba(31,191,117,0.04);
+      border-top: 1px solid rgba(31,191,117,0.12);
+      border-right: 1px solid rgba(31,191,117,0.08);
+      border-bottom: 1px solid rgba(31,191,117,0.08);
+    }
+    .card.yellow-left {
+      border-left: 3px solid #F2B94B;
+      background: rgba(242,185,75,0.04);
+      border-top: 1px solid rgba(242,185,75,0.12);
+      border-right: 1px solid rgba(242,185,75,0.08);
+      border-bottom: 1px solid rgba(242,185,75,0.08);
+    }
+    .card.blue-left {
+      border-left: 3px solid #4da3ff;
+      background: rgba(77,163,255,0.04);
+      border-top: 1px solid rgba(77,163,255,0.12);
+      border-right: 1px solid rgba(77,163,255,0.08);
+      border-bottom: 1px solid rgba(77,163,255,0.08);
+    }
+
+    /* ─── Typography utilities ───────────────────────────── */
+    .label {
+      font-family: 'IBM Plex Mono', monospace;
+      font-size: 13px;
+      font-weight: 700;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      color: #00C2D1;
+    }
+    .label.muted { color: #3A5566; }
+    .label.red   { color: #e05572; }
+    .label.green { color: #1FBF75; }
+    .label.yellow{ color: #F2B94B; }
+    .label.blue  { color: #4da3ff; }
+
+    h1 {
+      font-family: 'Inter', sans-serif;
+      font-size: 96px;
+      font-weight: 900;
+      line-height: 0.96;
+      letter-spacing: -3.5px;
+      color: #F8FBFC;
+    }
+    h2 {
+      font-family: 'Inter', sans-serif;
+      font-size: 64px;
+      font-weight: 800;
+      line-height: 1.05;
+      letter-spacing: -2.2px;
+      color: #F8FBFC;
+    }
+    h3 {
+      font-family: 'Inter', sans-serif;
+      font-size: 46px;
+      font-weight: 700;
+      line-height: 1.1;
+      letter-spacing: -1.4px;
+      color: #F8FBFC;
+    }
+    h4 {
+      font-family: 'Inter', sans-serif;
+      font-size: 26px;
+      font-weight: 700;
+      line-height: 1.25;
+      letter-spacing: -0.6px;
+      color: #F8FBFC;
+    }
+    p {
+      font-family: 'Inter', sans-serif;
+      font-size: 22px;
+      font-weight: 400;
+      line-height: 1.55;
+      color: #A8C1CC;
+    }
+    p.small {
+      font-size: 19px;
+      line-height: 1.55;
+      color: #7F99A5;
+    }
+    p.large {
+      font-size: 27px;
+      font-weight: 400;
+      line-height: 1.5;
+      color: #A8C1CC;
+    }
+    .accent-text { color: #00C2D1; }
+    .primary-text { color: #F8FBFC; }
+
+    /* ─── Divider ─────────────────────────────────────────── */
+    .divider {
+      width: 100%;
+      height: 1px;
+      background: rgba(255,255,255,0.06);
+    }
+
+    /* ─── Pill / badge ────────────────────────────────────── */
+    .badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 7px;
+      padding: 9px 20px;
+      border-radius: 100px;
+      background: rgba(0,194,209,0.08);
+      border: 1px solid rgba(0,194,209,0.2);
+      font-family: 'IBM Plex Mono', monospace;
+      font-size: 14px;
+      font-weight: 700;
+      letter-spacing: 1.5px;
+      text-transform: uppercase;
+      color: #00C2D1;
+    }
+    .badge.red {
+      background: rgba(224,85,114,0.08);
+      border-color: rgba(224,85,114,0.3);
+      color: #e05572;
+    }
+    .badge.yellow {
+      background: rgba(242,185,75,0.08);
+      border-color: rgba(242,185,75,0.3);
+      color: #F2B94B;
+    }
+
+    /* ─── Bullet list ─────────────────────────────────────── */
+    .bullet-list {
+      list-style: none;
+      display: flex;
+      flex-direction: column;
+      gap: 18px;
+    }
+    .bullet-list li {
+      display: flex;
+      align-items: flex-start;
+      gap: 14px;
+      font-family: 'Inter', sans-serif;
+      font-size: 21px;
+      font-weight: 400;
+      line-height: 1.5;
+      color: #A8C1CC;
+    }
+    .bullet-list li::before {
+      content: '';
+      display: block;
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+      background: #00C2D1;
+      box-shadow: 0 0 8px rgba(0,194,209,0.5);
+      flex-shrink: 0;
+      margin-top: 9px;
+    }
+    .bullet-list.red li::before { background: #e05572; box-shadow: 0 0 8px rgba(224,85,114,0.5); }
+    .bullet-list.green li::before { background: #1FBF75; box-shadow: 0 0 8px rgba(31,191,117,0.5); }
+
+    /* ─── Numbered step ───────────────────────────────────── */
+    .step {
+      display: flex;
+      align-items: flex-start;
+      gap: 22px;
+    }
+    .step-num {
+      width: 44px;
+      height: 44px;
+      border-radius: 50%;
+      background: rgba(0,194,209,0.1);
+      border: 1px solid rgba(0,194,209,0.3);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-family: 'IBM Plex Mono', monospace;
+      font-size: 14px;
+      font-weight: 700;
+      color: #00C2D1;
+      flex-shrink: 0;
+      box-shadow: 0 0 12px rgba(0,194,209,0.1);
+    }
+    .step-content { flex: 1; }
+    .step-content h4 { margin-bottom: 5px; }
+    .step-content p { font-size: 19px; }
+
+    /* ─── Scenario box ────────────────────────────────────── */
+    .scenario-box {
+      background: rgba(255,255,255,0.02);
+      border: 1px solid rgba(255,255,255,0.06);
+      border-radius: 14px;
+      padding: 28px 32px;
+    }
+
+    /* ─── Highlight quote ─────────────────────────────────── */
+    .quote-block {
+      border-left: 4px solid #00C2D1;
+      padding: 20px 28px;
+      background: rgba(0,194,209,0.04);
+      border-radius: 0 12px 12px 0;
+    }
+    .quote-block p {
+      font-size: 23px;
+      font-weight: 500;
+      line-height: 1.5;
+      color: #F8FBFC;
+      font-style: italic;
+    }
+
+    /* ─── CTA Button visual ───────────────────────────────── */
+    .cta-btn-visual {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+      padding: 20px 48px;
+      background: #00C2D1;
+      color: #0B1F2A;
+      font-family: 'Inter', sans-serif;
+      font-size: 20px;
+      font-weight: 700;
+      letter-spacing: -0.3px;
+      border-radius: 12px;
+      box-shadow: 0 6px 30px rgba(0,194,209,0.3), 0 0 0 1px rgba(0,194,209,0.15);
+    }
+
+    /* ─── Horizontal rule with icon ──────────────────────── */
+    .rule-label {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+    }
+    .rule-label::before, .rule-label::after {
+      content: '';
+      flex: 1;
+      height: 1px;
+      background: rgba(255,255,255,0.06);
+    }
+
+    /* ─── Content inner padding ──────────────────────────── */
+    .slide-content {
+      position: relative;
+      z-index: 1;
+      padding: 50px 60px 86px;
+      height: 100%;
+      display: flex;
+      flex-direction: column;
+    }
+
+  </style>
+</head>
+<body>
+
+  <!-- ═══════════════════════════════════════════════════════
+       SLIDE 1 — COVER
+  ══════════════════════════════════════════════════════════ -->
+  <div class="slide-label"><span>Slide 01 — Cover</span></div>
+  <div class="slide" id="slide-1">
+    <div class="glow-top"></div>
+    <div class="glow-bottom-right"></div>
+    <div class="glow-corner-tl"></div>
+
+    <div class="slide-content" style="justify-content: space-between;">
+
+      <!-- Top: brand + slide counter -->
+      <div style="display:flex; align-items:center; justify-content:space-between;">
+        <div class="badge">Clinical Edge</div>
+        <span class="label muted">01 / 05</span>
+      </div>
+
+      <!-- Center: main headline — tight, fills the frame -->
+      <div style="flex:1; display:flex; flex-direction:column; justify-content:center; gap:22px; padding: 32px 0 20px;">
+
+        <!-- Overline label -->
+        <div style="display:flex; align-items:center; gap:12px;">
+          <div style="width:32px; height:2px; background:#00C2D1; border-radius:2px; box-shadow:0 0 6px rgba(0,194,209,0.5);"></div>
+          <span class="label" style="font-size:15px; letter-spacing:2.5px;">
+            <!-- ✏️ EDITABLE: Overline topic tag -->
+            For Bedside Nurses
+          </span>
+        </div>
+
+        <!-- Headline -->
+        <h1>
+          <!-- ✏️ EDITABLE: Main cover headline -->
+          5 Signs Your Patient Is About <span class="accent-text">To Deteriorate</span>
+        </h1>
+
+        <!-- Sub-headline -->
+        <p class="large" style="max-width:840px;">
+          <!-- ✏️ EDITABLE: Sub-headline / value statement -->
+          What the vitals aren't telling you — and how to act before the rapid response team is called.
+        </p>
+
+        <!-- Decorative accent bar -->
+        <div style="display:flex; align-items:center; gap:14px; padding-top:4px;">
+          <div style="height:3px; width:80px; border-radius:3px; background:linear-gradient(90deg,#00C2D1,transparent);"></div>
+          <div style="height:3px; width:32px; border-radius:3px; background:rgba(0,194,209,0.2);"></div>
+        </div>
+      </div>
+
+      <!-- Bottom: swipe prompt -->
+      <div style="display:flex; align-items:center; gap:12px; padding-bottom:14px;">
+        <span class="label muted" style="font-size:14px;">Swipe to read</span>
+        <div style="display:flex; gap:6px; align-items:center;">
+          <div style="width:22px;height:1px;background:#3A5566;"></div>
+          <div style="width:6px;height:6px;border-radius:50%;background:#00C2D1;box-shadow:0 0 8px rgba(0,194,209,0.6);"></div>
+          <div style="width:8px;height:1px;background:#3A5566;"></div>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- Footer -->
+    <div class="slide-footer">
+      <div class="footer-brand">
+        <div class="footer-dot"></div>
+        <span class="footer-name">Clinical Edge Copilot</span>
+      </div>
+      <!-- ✏️ EDITABLE: Your Instagram handle -->
+      <span class="footer-handle">@clinicaledgeco</span>
+    </div>
+  </div>
+
+
+  <!-- ═══════════════════════════════════════════════════════
+       SLIDE 2 — PROBLEM / INSIGHT
+  ══════════════════════════════════════════════════════════ -->
+  <div class="slide-label"><span>Slide 02 — Problem / Insight</span></div>
+  <div class="slide" id="slide-2">
+    <div class="glow-top"></div>
+
+    <div class="slide-content" style="justify-content: space-between;">
+
+      <!-- Top bar -->
+      <div style="display:flex; align-items:center; justify-content:space-between;">
+        <div class="badge red">The Problem</div>
+        <span class="label muted">02 / 05</span>
+      </div>
+
+      <!-- Body -->
+      <div style="flex:1; display:flex; flex-direction:column; justify-content:center; gap:28px;">
+
+        <!-- Headline -->
+        <div style="display:flex; flex-direction:column; gap:14px;">
+          <h2 style="max-width:860px;">
+            <!-- ✏️ EDITABLE: Problem headline -->
+            Nurses catch it first. <span style="color:#e05572;">But rarely act fast enough.</span>
+          </h2>
+          <p style="max-width:780px;">
+            <!-- ✏️ EDITABLE: Problem body paragraph -->
+            Most rapid responses could have been called 30–60 minutes earlier. The signs were there — the confidence wasn't.
+          </p>
+        </div>
+
+        <div class="divider"></div>
+
+        <!-- Insight cards (2 column) -->
+        <div style="display:grid; grid-template-columns:1fr 1fr; gap:18px;">
+
+          <div class="card red-left" style="padding:24px 26px;">
+            <div class="label red" style="margin-bottom:10px;">Insight 01</div>
+            <h4 style="font-size:20px; margin-bottom:8px;">
+              <!-- ✏️ EDITABLE: Insight card 1 title -->
+              Subtle trends get dismissed
+            </h4>
+            <p class="small">
+              <!-- ✏️ EDITABLE: Insight card 1 body -->
+              A HR of 98 means nothing in isolation. Four readings trending up does.
+            </p>
+          </div>
+
+          <div class="card yellow-left" style="padding:24px 26px;">
+            <div class="label yellow" style="margin-bottom:10px;">Insight 02</div>
+            <h4 style="font-size:20px; margin-bottom:8px;">
+              <!-- ✏️ EDITABLE: Insight card 2 title -->
+              Charting ≠ clinical pattern recognition
+            </h4>
+            <p class="small">
+              <!-- ✏️ EDITABLE: Insight card 2 body -->
+              EHR systems record data. They don't synthesize it into risk.
+            </p>
+          </div>
+
+        </div>
+
+        <!-- Quote block -->
+        <div class="quote-block">
+          <p>
+            <!-- ✏️ EDITABLE: Pull quote / key insight -->
+            "Normal vitals don't rule out serious deterioration — clinical context always does."
+          </p>
+        </div>
+
+      </div>
+
+      <!-- Slide dots -->
+      <div class="slide-number">
+        <div class="dot"></div>
+        <div class="dot active"></div>
+        <div class="dot"></div>
+        <div class="dot"></div>
+        <div class="dot"></div>
+      </div>
+
+    </div>
+
+    <div class="slide-footer">
+      <div class="footer-brand">
+        <div class="footer-dot"></div>
+        <span class="footer-name">Clinical Edge Copilot</span>
+      </div>
+      <span class="footer-handle">@clinicaledgeco</span>
+    </div>
+  </div>
+
+
+  <!-- ═══════════════════════════════════════════════════════
+       SLIDE 3 — EDUCATIONAL CONTENT
+  ══════════════════════════════════════════════════════════ -->
+  <div class="slide-label"><span>Slide 03 — Educational Content</span></div>
+  <div class="slide" id="slide-3">
+    <div class="glow-top"></div>
+    <div class="glow-bottom-right"></div>
+
+    <div class="slide-content" style="justify-content: space-between;">
+
+      <!-- Top bar -->
+      <div style="display:flex; align-items:center; justify-content:space-between;">
+        <div class="badge">Key Signs</div>
+        <span class="label muted">03 / 05</span>
+      </div>
+
+      <!-- Headline -->
+      <div style="display:flex; flex-direction:column; gap:10px; padding-top:20px; padding-bottom:18px;">
+        <h3>
+          <!-- ✏️ EDITABLE: Section title -->
+          Early Warning Signals Most Nurses Miss
+        </h3>
+        <p>
+          <!-- ✏️ EDITABLE: Section subtitle -->
+          These don't always look dramatic at the bedside.
+        </p>
+      </div>
+
+      <!-- Step list -->
+      <div style="flex:1; display:flex; flex-direction:column; gap:20px;">
+
+        <div class="step">
+          <div class="step-num">01</div>
+          <div class="step-content">
+            <h4>
+              <!-- ✏️ EDITABLE: Step 1 title -->
+              Altered mental status before vitals change
+            </h4>
+            <p>
+              <!-- ✏️ EDITABLE: Step 1 body -->
+              Restlessness, confusion, or new agitation often precede objective deterioration by 30+ minutes.
+            </p>
+          </div>
+        </div>
+
+        <div class="divider"></div>
+
+        <div class="step">
+          <div class="step-num">02</div>
+          <div class="step-content">
+            <h4>
+              <!-- ✏️ EDITABLE: Step 2 title -->
+              Narrowing pulse pressure
+            </h4>
+            <p>
+              <!-- ✏️ EDITABLE: Step 2 body -->
+              A BP of 110/90 is different from 110/70. The difference matters more than the systolic alone.
+            </p>
+          </div>
+        </div>
+
+        <div class="divider"></div>
+
+        <div class="step">
+          <div class="step-num">03</div>
+          <div class="step-content">
+            <h4>
+              <!-- ✏️ EDITABLE: Step 3 title -->
+              Skin perfusion changes
+            </h4>
+            <p>
+              <!-- ✏️ EDITABLE: Step 3 body -->
+              Mottling, cool extremities, or prolonged cap refill (&gt;3 sec) signals redistributed circulation.
+            </p>
+          </div>
+        </div>
+
+        <div class="divider"></div>
+
+        <div class="step">
+          <div class="step-num">04</div>
+          <div class="step-content">
+            <h4>
+              <!-- ✏️ EDITABLE: Step 4 title -->
+              Increased work of breathing without low SpO₂
+            </h4>
+            <p>
+              <!-- ✏️ EDITABLE: Step 4 body -->
+              The patient compensating is maintaining O₂ — for now. Watch the effort, not just the number.
+            </p>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- Slide dots -->
+      <div class="slide-number">
+        <div class="dot"></div>
+        <div class="dot"></div>
+        <div class="dot active"></div>
+        <div class="dot"></div>
+        <div class="dot"></div>
+      </div>
+
+    </div>
+
+    <div class="slide-footer">
+      <div class="footer-brand">
+        <div class="footer-dot"></div>
+        <span class="footer-name">Clinical Edge Copilot</span>
+      </div>
+      <span class="footer-handle">@clinicaledgeco</span>
+    </div>
+  </div>
+
+
+  <!-- ═══════════════════════════════════════════════════════
+       SLIDE 4 — SCENARIO / EXAMPLE
+  ══════════════════════════════════════════════════════════ -->
+  <div class="slide-label"><span>Slide 04 — Scenario / Example</span></div>
+  <div class="slide" id="slide-4">
+    <div class="glow-center"></div>
+
+    <div class="slide-content" style="justify-content: space-between;">
+
+      <!-- Top bar -->
+      <div style="display:flex; align-items:center; justify-content:space-between;">
+        <div class="badge yellow">Real Scenario</div>
+        <span class="label muted">04 / 05</span>
+      </div>
+
+      <!-- Scenario block -->
+      <div style="flex:1; display:flex; flex-direction:column; justify-content:center; gap:22px;">
+
+        <div style="display:flex; flex-direction:column; gap:10px;">
+          <h3>What This Looks Like at the Bedside</h3>
+          <p>Here's how Clinical Edge Copilot reasons through a real case:</p>
+        </div>
+
+        <!-- Input scenario box -->
+        <div class="scenario-box">
+          <div class="label muted" style="margin-bottom:12px;">Nurse's Input</div>
+          <p style="font-size:19px; font-style:italic; color:#7F99A5; line-height:1.65;">
+            <!-- ✏️ EDITABLE: The scenario / clinical vignette input text -->
+            "67yo post-op day 1 abdominal surgery. HR 102, BP 104/88, RR 22, SpO2 95% on 2L NC. Patient says 'I just feel off.' Urine output 15 mL/hr past 2 hours. Temp 37.8."
+          </p>
+        </div>
+
+        <!-- AI response breakdown cards -->
+        <div style="display:flex; flex-direction:column; gap:14px;">
+
+          <div class="card red-left" style="padding:20px 26px; display:flex; align-items:flex-start; gap:16px;">
+            <div style="flex:1;">
+              <div class="label red" style="margin-bottom:6px;">Urgency Level</div>
+              <h4 style="font-size:20px;">
+                <!-- ✏️ EDITABLE: Urgency classification -->
+                HIGH — Early Sepsis Picture
+              </h4>
+            </div>
+          </div>
+
+          <div class="card accent-left" style="padding:20px 26px;">
+            <div class="label" style="margin-bottom:8px;">What This Could Be</div>
+            <p class="small" style="font-size:18px;">
+              <!-- ✏️ EDITABLE: Clinical reasoning output -->
+              Post-op sepsis / anastomotic leak. Compensated shock with narrowing pulse pressure (PP = 16), oliguria, and subjective complaint preceding objective collapse.
+            </p>
+          </div>
+
+          <div class="card green-left" style="padding:20px 26px;">
+            <div class="label green" style="margin-bottom:8px;">Next Action</div>
+            <p class="small" style="font-size:18px;">
+              <!-- ✏️ EDITABLE: Recommended action output -->
+              Notify surgical team now. Sepsis workup: lactate, CBC, BMP, blood cultures × 2. IV fluid bolus. Upgrade monitoring.
+            </p>
+          </div>
+
+        </div>
+
+      </div>
+
+      <!-- Slide dots -->
+      <div class="slide-number">
+        <div class="dot"></div>
+        <div class="dot"></div>
+        <div class="dot"></div>
+        <div class="dot active"></div>
+        <div class="dot"></div>
+      </div>
+
+    </div>
+
+    <div class="slide-footer">
+      <div class="footer-brand">
+        <div class="footer-dot"></div>
+        <span class="footer-name">Clinical Edge Copilot</span>
+      </div>
+      <span class="footer-handle">@clinicaledgeco</span>
+    </div>
+  </div>
+
+
+  <!-- ═══════════════════════════════════════════════════════
+       SLIDE 5 — CTA / FINAL TAKEAWAY
+  ══════════════════════════════════════════════════════════ -->
+  <div class="slide-label"><span>Slide 05 — CTA / Takeaway</span></div>
+  <div class="slide" id="slide-5">
+    <div class="glow-top"></div>
+    <div class="glow-bottom-right"></div>
+
+    <div class="slide-content" style="justify-content:space-between;">
+
+      <!-- Top bar -->
+      <div style="display:flex; align-items:center; justify-content:space-between;">
+        <div class="badge">Take Action</div>
+        <span class="label muted">05 / 05</span>
+      </div>
+
+      <!-- Center content -->
+      <div style="flex:1; display:flex; flex-direction:column; justify-content:center; gap:30px;">
+
+        <!-- Headline -->
+        <div style="display:flex; flex-direction:column; gap:14px;">
+          <h2>
+            <!-- ✏️ EDITABLE: CTA headline -->
+            Your instinct is a clinical signal. <span class="accent-text">Trust it — then act.</span>
+          </h2>
+          <p class="large" style="max-width:800px;">
+            <!-- ✏️ EDITABLE: CTA supporting message -->
+            Clinical Edge Copilot helps bedside nurses think through complex patient presentations — fast.
+          </p>
+        </div>
+
+        <div class="divider"></div>
+
+        <!-- Takeaway bullets -->
+        <ul class="bullet-list">
+          <li>
+            <!-- ✏️ EDITABLE: Takeaway 1 -->
+            Describe what you're seeing — get structured clinical reasoning in seconds
+          </li>
+          <li>
+            <!-- ✏️ EDITABLE: Takeaway 2 -->
+            Built by a master's-prepared critical care nurse, not a startup
+          </li>
+          <li>
+            <!-- ✏️ EDITABLE: Takeaway 3 -->
+            A support tool — not a replacement for your clinical judgment
+          </li>
+        </ul>
+
+        <!-- CTA visual button -->
+        <div style="display:flex; flex-direction:column; gap:16px; align-items:flex-start;">
+          <div class="cta-btn-visual">
+            <!-- ✏️ EDITABLE: Button label -->
+            Join the Waitlist — Free
+          </div>
+          <p class="small">
+            <!-- ✏️ EDITABLE: CTA sub-label / link/handle -->
+            Link in bio — or search Clinical Edge Copilot
+          </p>
+        </div>
+
+      </div>
+
+      <!-- Final slide dots -->
+      <div class="slide-number">
+        <div class="dot"></div>
+        <div class="dot"></div>
+        <div class="dot"></div>
+        <div class="dot"></div>
+        <div class="dot active"></div>
+      </div>
+
+    </div>
+
+    <div class="slide-footer">
+      <div class="footer-brand">
+        <div class="footer-dot"></div>
+        <span class="footer-name">Clinical Edge Copilot</span>
+      </div>
+      <span class="footer-handle">@clinicaledgeco</span>
+    </div>
+  </div>
+
+  <!-- ─── Bottom padding ──────────────────────────────────── -->
+  <div style="height:40px;"></div>
+
+</body>
+</html>

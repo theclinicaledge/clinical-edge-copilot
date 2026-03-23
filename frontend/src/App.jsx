@@ -781,7 +781,7 @@ export default function App() {
             lineHeight: 1.2,
             letterSpacing: "-0.5px",
           }}>
-            Think it through at the bedside.
+            Think clearly. Act with confidence.
           </h1>
           <p style={{ fontSize: 14, color: "#7F99A5", margin: 0, lineHeight: 1.6 }}>
             Structured clinical reasoning &mdash; nurse to nurse.

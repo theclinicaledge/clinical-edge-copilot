@@ -2,9 +2,39 @@
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+
+    <!-- Primary identity -->
+    <title>Clinical Edge Copilot</title>
+    <meta name="description" content="AI-powered clinical reasoning support for bedside nurses." />
+    <meta name="application-name" content="Clinical Edge Copilot" />
+
+    <!-- PWA manifest -->
+    <link rel="manifest" href="/manifest.json" />
+
+    <!-- Theme color — dark navy matches app background -->
+    <meta name="theme-color" content="#0b1929" />
+
+    <!-- Favicon -->
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>frontend</title>
+
+    <!-- ── Apple / iOS PWA ──────────────────────────────────────────────── -->
+    <!-- Makes Safari treat the installed app as a full-screen standalone app -->
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <!-- Black-translucent lets the dark nav bleed into the iOS status bar -->
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+    <meta name="apple-mobile-web-app-title" content="Copilot" />
+    <!-- Home screen icon for iOS (Safari ignores manifest icons) -->
+    <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
+
+    <!-- ── Microsoft / misc ─────────────────────────────────────────────── -->
+    <meta name="msapplication-TileColor" content="#0b1929" />
+    <meta name="msapplication-tap-highlight" content="no" />
+
+    <!-- ── Open Graph (useful when sharing the install link) ───────────── -->
+    <meta property="og:title" content="Clinical Edge Copilot" />
+    <meta property="og:description" content="AI-powered clinical reasoning support for bedside nurses." />
+    <meta property="og:type" content="website" />
   </head>
   <body>
     <div id="root"></div>

@@ -424,7 +424,20 @@ export default function Landing({ onEnterApp, onEnterScenario }) {
             margin: "0 auto 50px",
             maxWidth: 580,
           }}>
-            Clinical Edge Copilot helps nurses break down patient situations, medication questions, and clinical decisions — whether you're at the bedside, in clinic, or anywhere in between.
+            Clinical Edge Copilot helps you think through patient situations, medication questions, and clinical decisions — whether you're learning, practicing, or leading.
+          </p>
+
+          {/* Bridge line */}
+          <p className="l-h3-anim" style={{
+            fontSize: "clamp(13px, 1.5vw, 14px)",
+            fontWeight: 500,
+            color: C.muted,
+            fontFamily: "'IBM Plex Mono', monospace",
+            letterSpacing: "0.3px",
+            margin: "-32px auto 50px",
+            maxWidth: 480,
+          }}>
+            Built for how nurses actually think — not just what textbooks say.
           </p>
 
           {/* CTAs */}
@@ -614,7 +627,7 @@ export default function Landing({ onEnterApp, onEnterScenario }) {
         margin: "0 auto",
       }}>
         <Fade style={{ textAlign: "center", marginBottom: 52 }}>
-          <Label>Why This Is Different</Label>
+          <Label>This isn't another AI chatbot.</Label>
           <SectionHeading maxWidth={560} style={{ margin: "0 auto 20px" }}>
             Not another AI tool telling you what to do.
           </SectionHeading>
@@ -626,7 +639,7 @@ export default function Landing({ onEnterApp, onEnterScenario }) {
             margin: "20px auto 0",
             maxWidth: 520,
           }}>
-            Helps you think through clinical situations — like a second set of experienced clinical eyes.
+            Most tools give generic answers. Clinical Edge Copilot helps you break down what's actually happening — step by step, like an experienced nurse would.
           </p>
         </Fade>
 
@@ -638,15 +651,15 @@ export default function Landing({ onEnterApp, onEnterScenario }) {
           {[
             {
               title: "Thinks like a nurse",
-              body: "Built around real bedside reasoning — not textbook answers or generic AI output.",
+              body: "Every response follows real clinical reasoning — not textbook explanations or AI-generated fluff.",
             },
             {
-              title: "Focuses on what matters",
+              title: "Shows what matters",
               body: "Cuts through noise and highlights the patterns you actually need to act on.",
             },
             {
-              title: "Supports your judgment",
-              body: "Organizes your thinking — without replacing your clinical decision-making.",
+              title: "Helps you connect the dots",
+              body: "Vitals, symptoms, labs, and context — organized into a clear clinical picture.",
             },
           ].map((card, i) => (
             <Fade key={card.title} delay={i * 80}>
@@ -687,8 +700,8 @@ export default function Landing({ onEnterApp, onEnterScenario }) {
       }}>
         <Fade style={{ marginBottom: 52 }}>
           <Label>How It Thinks</Label>
-          <SectionHeading maxWidth={360}>
-            How it thinks
+          <SectionHeading maxWidth={480}>
+            How it breaks down a situation
           </SectionHeading>
           <p style={{
             fontSize: "clamp(15px, 1.8vw, 17px)",
@@ -698,17 +711,17 @@ export default function Landing({ onEnterApp, onEnterScenario }) {
             margin: "16px 0 0",
             maxWidth: 460,
           }}>
-            From your input to structured guidance — in seconds.
+            Not more information — better thinking.
           </p>
         </Fade>
 
         <Fade delay={80}>
           <div className="l-flow">
             {[
-              { step: "01", label: "You input",           body: "Vitals, symptoms, concerns",                        accent: C.accent,   accentRgb: "0,194,209"   },
-              { step: "02", label: "Pattern recognition", body: "Identifies what's clinically concerning",           accent: "#4da3ff",  accentRgb: "77,163,255"  },
-              { step: "03", label: "Prioritization",      body: "Highlights what matters most",                     accent: "#F2B94B",  accentRgb: "242,185,75"  },
-              { step: "04", label: "Action framing",      body: "What to assess and do next",                       accent: "#1FBF75",  accentRgb: "31,191,117"  },
+              { step: "01", label: "Recognizes the pattern",  body: "Identifies what's clinically concerning",    accent: C.accent,   accentRgb: "0,194,209"   },
+              { step: "02", label: "Prioritizes risk",       body: "Surfaces urgency and red flags first",        accent: "#4da3ff",  accentRgb: "77,163,255"  },
+              { step: "03", label: "Guides assessment",      body: "Shows what to check and why",                 accent: "#F2B94B",  accentRgb: "242,185,75"  },
+              { step: "04", label: "Suggests next steps",    body: "What to do, watch, and escalate",             accent: "#1FBF75",  accentRgb: "31,191,117"  },
             ].map((item, i) => (
               <>
                 {i > 0 && (
@@ -856,9 +869,9 @@ export default function Landing({ onEnterApp, onEnterScenario }) {
         margin: "0 auto",
       }}>
         <Fade style={{ textAlign: "center", marginBottom: 52 }}>
-          <Label>How It Helps You Think</Label>
+          <Label>It doesn't just answer — it organizes your thinking</Label>
           <SectionHeading maxWidth={520}>
-            From uncertainty → structured clinical thinking.
+            It doesn't just answer — it organizes your thinking.
           </SectionHeading>
           <p style={{
             fontSize: "clamp(15px, 1.8vw, 17px)",
@@ -866,9 +879,9 @@ export default function Landing({ onEnterApp, onEnterScenario }) {
             color: C.textSecondary,
             lineHeight: 1.72,
             margin: "20px auto 0",
-            maxWidth: 520,
+            maxWidth: 460,
           }}>
-            Clinical Edge Copilot doesn't replace your judgment — it sharpens it. It helps you recognize patterns, organize your thinking, and act with clarity when it matters most.
+            You don't need more information in a critical moment. You need clarity.
           </p>
         </Fade>
 
@@ -946,9 +959,9 @@ export default function Landing({ onEnterApp, onEnterScenario }) {
         margin: "0 auto",
       }}>
         <Fade style={{ textAlign: "center", marginBottom: 52 }}>
-          <Label>Built for the Reality of Bedside Nursing</Label>
+          <Label>Built for real clinical thinking</Label>
           <SectionHeading maxWidth={540}>
-            Designed for how nurses actually think on shift.
+            Built for wherever you are in your clinical journey.
           </SectionHeading>
           <p style={{
             fontSize: "clamp(15px, 1.8vw, 17px)",
@@ -958,7 +971,7 @@ export default function Landing({ onEnterApp, onEnterScenario }) {
             margin: "20px auto 0",
             maxWidth: 520,
           }}>
-            This isn't theory. It's built around real clinical scenarios — uncertainty, subtle changes, and the moments where clear thinking matters most.
+            Whether you're building your clinical eye or making fast decisions on a busy shift — structured thinking helps at every stage.
           </p>
         </Fade>
 
@@ -970,18 +983,18 @@ export default function Landing({ onEnterApp, onEnterScenario }) {
           {[
             {
               n: "01",
-              title: "Grounded in real scenarios",
-              body: "Built around the situations nurses actually face — not textbook examples.",
+              title: "For students building clinical judgment",
+              body: "Learn to recognize patterns, connect the dots, and understand the 'why' behind what you're seeing.",
             },
             {
               n: "02",
-              title: "Focused on clinical reasoning",
-              body: "Not just answers — structured thinking that supports better decisions.",
+              title: "For new grads gaining confidence",
+              body: "Stop second-guessing every assessment. Build structured thinking from your first real shifts.",
             },
             {
               n: "03",
-              title: "Respects your judgment",
-              body: "You're still the clinician. This helps you think more clearly under pressure.",
+              title: "For nurses making decisions in real time",
+              body: "When things are moving fast and you need clarity — not more noise.",
             },
           ].map((card, i) => (
             <Fade key={card.n} delay={i * 80}>
@@ -1036,7 +1049,7 @@ export default function Landing({ onEnterApp, onEnterScenario }) {
             color: C.muted,
             letterSpacing: "0.2px",
           }}>
-            No noise. No fluff. Just better thinking at the bedside.
+            No noise. No fluff. Just better thinking — at every stage.
           </p>
         </Fade>
       </section>
@@ -1137,7 +1150,7 @@ export default function Landing({ onEnterApp, onEnterScenario }) {
             margin: "16px auto 0",
             maxWidth: 480,
           }}>
-            This is what you get in seconds — not a Google rabbit hole.
+            What you get in seconds — not a Google rabbit hole.
           </p>
         </Fade>
 
@@ -1271,7 +1284,7 @@ export default function Landing({ onEnterApp, onEnterScenario }) {
             }} />
 
             <div style={{ position: "relative" }}>
-              <Label>Built for Clinical Reasoning — Not Diagnosis</Label>
+              <Label>Grounded in real clinical frameworks</Label>
 
               <h2 style={{
                 fontSize: "clamp(24px, 3.5vw, 40px)",
@@ -1294,15 +1307,14 @@ export default function Landing({ onEnterApp, onEnterScenario }) {
                 margin: "0 0 40px",
                 maxWidth: 540,
               }}>
-                Clinical Edge Copilot is designed to support how nurses think — not replace clinical judgment.
-                It does not diagnose. It does not prescribe. Instead, it helps you:
+                Responses are structured around real nursing assessment patterns and clinical reasoning — not generic AI outputs.
               </p>
 
               <div style={{ display: "flex", flexDirection: "column", gap: 18, marginBottom: 44 }}>
                 {[
-                  "Recognize patterns earlier — before they become crises",
-                  "Connect subtle changes across vitals, labs, and clinical presentation",
-                  "Think through what matters most for this patient right now",
+                  "Not a diagnosis tool",
+                  "Not a replacement for your judgment",
+                  "Not a shortcut",
                 ].map((point) => (
                   <div key={point} style={{ display: "flex", alignItems: "flex-start", gap: 14 }}>
                     <Check />
@@ -1316,12 +1328,13 @@ export default function Landing({ onEnterApp, onEnterScenario }) {
               <div style={{
                 paddingTop: 28,
                 borderTop: `1px solid ${C.border}`,
-                fontSize: 13,
-                color: C.muted,
-                lineHeight: 1.7,
+                fontSize: 15,
+                fontWeight: 600,
+                color: C.textSecondary,
+                lineHeight: 1.65,
                 maxWidth: 560,
               }}>
-                Every response is structured to guide assessment, prioritization, and escalation — not to replace the clinical judgment that only you, at the bedside, can provide.
+                A second set of clinical eyes when you need to think clearly.
               </div>
             </div>
           </div>
@@ -1329,57 +1342,6 @@ export default function Landing({ onEnterApp, onEnterScenario }) {
       </section>
 
       {/* ══ FINAL CTA ════════════════════════════════════════════════════════════ */}
-      <section style={{
-        padding: "84px clamp(20px, 6vw, 80px) 100px",
-        textAlign: "center",
-        position: "relative",
-        overflow: "hidden",
-      }}>
-        {/* Ambient glow */}
-        <div style={{
-          position: "absolute",
-          top: "50%",
-          left: "50%",
-          transform: "translate(-50%, -50%)",
-          width: 560,
-          height: 360,
-          background: "radial-gradient(ellipse, rgba(0,194,209,0.07) 0%, transparent 65%)",
-          pointerEvents: "none",
-        }} />
-
-        <Fade style={{ position: "relative" }}>
-          <Label>Get Started</Label>
-          <h2 style={{
-            fontSize: "clamp(34px, 5.5vw, 62px)",
-            fontWeight: 800,
-            color: C.textPrimary,
-            letterSpacing: "-2.5px",
-            lineHeight: 1.05,
-            margin: "0 auto 22px",
-            maxWidth: 580,
-          }}>
-            Start thinking at a higher clinical level.
-          </h2>
-          <p style={{
-            fontSize: 17,
-            color: C.muted,
-            lineHeight: 1.65,
-            margin: "0 auto 52px",
-            maxWidth: 400,
-          }}>
-            No setup. No login. Open the copilot and start reasoning through your next patient.
-          </p>
-          <button
-            onClick={onEnterApp}
-            className="l-btn-primary"
-            style={{ ...btnPrimary, fontSize: 16, padding: "16px 42px", borderRadius: 12, boxShadow: "0 6px 30px rgba(0,194,209,0.22)" }}
-          >
-            Open Copilot
-          </button>
-        </Fade>
-      </section>
-
-      {/* ══ NEW FINAL CTA ════════════════════════════════════════════════════════ */}
       <section style={{
         padding: "84px clamp(20px, 6vw, 80px)",
         maxWidth: 720,
@@ -1411,16 +1373,16 @@ export default function Landing({ onEnterApp, onEnterScenario }) {
             margin: "0 auto 22px",
             maxWidth: 560,
           }}>
-            Try it on a real patient scenario.
+            Think clearer. Move faster. Feel more confident.
           </h2>
           <p style={{
             fontSize: "clamp(15px, 1.8vw, 17px)",
             color: C.textSecondary,
             lineHeight: 1.72,
             margin: "0 auto 48px",
-            maxWidth: 480,
+            maxWidth: 440,
           }}>
-            See how Clinical Edge Copilot helps you organize your thinking, recognize patterns, and decide what to do next — in seconds.
+            Try a real scenario and see how it breaks it down.
           </p>
           <div style={{
             display: "flex",
@@ -1433,7 +1395,7 @@ export default function Landing({ onEnterApp, onEnterScenario }) {
               className="l-btn-primary"
               style={{ ...btnPrimary, fontSize: 15, padding: "14px 34px", borderRadius: 11, boxShadow: "0 6px 30px rgba(0,194,209,0.22)" }}
             >
-              Try a Patient Scenario
+              Try Clinical Edge Copilot
             </button>
             <button
               onClick={onEnterApp}

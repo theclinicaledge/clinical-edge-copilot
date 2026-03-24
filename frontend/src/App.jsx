@@ -52,6 +52,7 @@ const URGENCY_STYLES = {
 
 const LS_HISTORY = "clinical_edge_history";
 const LS_SAVED   = "clinical_edge_saved_cases";
+const LS_MODE    = "clinical_edge_mode";
 
 // Loading phase messages
 const LOADING_PHASES = [
@@ -463,14 +464,16 @@ export default function App() {
   const [loading, setLoading]           = useState(false);
   const [loadingPhase, setLoadingPhase] = useState(0);
   const [error, setError]               = useState(null);
-  const [mode, setMode]                 = useState("deep");
+  const [mode, setMode]                 = useState(() => lsGet(LS_MODE, "deep"));
   const [history, setHistory]           = useState(() => lsGet(LS_HISTORY, []));
   const [savedCases, setSavedCases]     = useState(() => lsGet(LS_SAVED, []));
   const [justSaved, setJustSaved]       = useState(false);
+  const [followUp, setFollowUp]         = useState("");
 
-  const textareaRef   = useRef(null);
-  const outputRef     = useRef(null);
-  const phaseTimerRef = useRef(null);
+  const textareaRef        = useRef(null);
+  const outputRef          = useRef(null);
+  const phaseTimerRef      = useRef(null);
+  const lastSubmittedRef   = useRef("");
 
   // Auto-resize textarea
   useEffect(() => {
@@ -479,6 +482,9 @@ export default function App() {
     el.style.height = "auto";
     el.style.height = Math.min(el.scrollHeight, 200) + "px";
   }, [question]);
+
+  // Persist selected mode across sessions
+  useEffect(() => { lsSet(LS_MODE, mode); }, [mode]);
 
   // Load QuickStart prefill on mount
   useEffect(() => {
@@ -504,8 +510,13 @@ export default function App() {
     return () => clearInterval(phaseTimerRef.current);
   }, [loading, streaming]);
 
-  const handleSubmit = async () => {
-    if (!question.trim() || loading || streaming) return;
+  // Core query runner — accepts an explicit query string so chips and
+  // follow-ups can call it directly without going through question state.
+  const runQuery = async (q) => {
+    if (!q.trim() || loading || streaming) return;
+    setQuestion(q);
+    setFollowUp("");
+    lastSubmittedRef.current = q;
     setLoading(true);
     setStreaming(false);
     setError(null);
@@ -520,7 +531,7 @@ export default function App() {
       const res = await fetch(`${API_BASE}/api/copilot`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ question, mode }),
+        body: JSON.stringify({ question: q, mode }),
       });
 
       if (!res.ok) {
@@ -566,9 +577,12 @@ export default function App() {
             setRawText(accumulated);
             const parsedResult = parseResponse(accumulated);
             setResult({ ...parsedResult, urgencyLevel: extractUrgencyLevel(accumulated) });
-            const updatedHistory = [question, ...history.filter((h) => h !== question)].slice(0, 8);
-            setHistory(updatedHistory);
-            lsSet(LS_HISTORY, updatedHistory);
+            // Save to recent cases — deduplicate, cap at 10, most-recent first
+            setHistory((prev) => {
+              const updated = [q, ...prev.filter((h) => h !== q)].slice(0, 10);
+              lsSet(LS_HISTORY, updated);
+              return updated;
+            });
             return;
           }
 
@@ -583,6 +597,14 @@ export default function App() {
       setLoading(false);
       setStreaming(false);
     }
+  };
+
+  const handleSubmit = () => runQuery(question);
+
+  const handleFollowUp = () => {
+    if (!followUp.trim()) return;
+    const combined = `Original situation: ${lastSubmittedRef.current}\n\nUpdate: ${followUp.trim()}`;
+    runQuery(combined);
   };
 
   const handleKey = (e) => {
@@ -946,7 +968,7 @@ export default function App() {
                 <button
                   key={i}
                   className="chip"
-                  onClick={() => setQuestion(item)}
+                  onClick={() => runQuery(item)}
                   style={{
                     background: "transparent",
                     border: "1px solid rgba(255,255,255,0.09)",
@@ -1168,6 +1190,69 @@ export default function App() {
               >
                 Copy Response
               </button>
+            </div>
+
+            {/* ── Continue Thinking ─────────────────────────────────────── */}
+            <div style={{
+              marginTop: 20,
+              background: "rgba(0,194,209,0.03)",
+              border: "1px solid rgba(0,194,209,0.10)",
+              borderRadius: 11,
+              padding: "14px 16px",
+            }}>
+              <div style={{
+                fontSize: 9,
+                fontWeight: 700,
+                textTransform: "uppercase",
+                letterSpacing: "1.3px",
+                color: "#00C2D1",
+                marginBottom: 10,
+                fontFamily: "'IBM Plex Mono', monospace",
+              }}>
+                Continue Thinking
+              </div>
+              <textarea
+                value={followUp}
+                onChange={(e) => setFollowUp(e.target.value)}
+                onKeyDown={(e) => { if (e.key === "Enter" && (e.metaKey || e.ctrlKey)) handleFollowUp(); }}
+                placeholder="Add an update — new vitals, lab result, or change in status..."
+                rows={2}
+                style={{
+                  width: "100%",
+                  background: "transparent",
+                  border: "none",
+                  borderBottom: "1px solid rgba(0,194,209,0.12)",
+                  color: "#F8FBFC",
+                  fontSize: 14,
+                  lineHeight: 1.6,
+                  resize: "none",
+                  fontFamily: "inherit",
+                  paddingBottom: 8,
+                  marginBottom: 10,
+                  display: "block",
+                  outline: "none",
+                }}
+              />
+              <div style={{ display: "flex", justifyContent: "flex-end" }}>
+                <button
+                  onClick={handleFollowUp}
+                  disabled={!followUp.trim()}
+                  style={{
+                    background: followUp.trim() ? "rgba(0,194,209,0.12)" : "transparent",
+                    border: "1px solid " + (followUp.trim() ? "rgba(0,194,209,0.35)" : "rgba(255,255,255,0.08)"),
+                    color: followUp.trim() ? "#00C2D1" : "#3A5566",
+                    borderRadius: 7,
+                    padding: "7px 16px",
+                    fontSize: 12,
+                    fontWeight: 600,
+                    cursor: followUp.trim() ? "pointer" : "not-allowed",
+                    fontFamily: "inherit",
+                    transition: "all 0.15s",
+                  }}
+                >
+                  Continue \u2192
+                </button>
+              </div>
             </div>
 
           </div>

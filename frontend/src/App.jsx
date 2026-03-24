@@ -1,4 +1,5 @@
 import { useState, useRef, useEffect, useCallback } from "react";
+import { track } from "@vercel/analytics";
 
 // ─── API Config ───────────────────────────────────────────────────────────────
 
@@ -517,6 +518,7 @@ export default function App() {
     setQuestion(q);
     setFollowUp("");
     lastSubmittedRef.current = q;
+    track("query_submitted", { mode });
     setLoading(true);
     setStreaming(false);
     setError(null);
@@ -536,6 +538,7 @@ export default function App() {
 
       if (!res.ok) {
         const data = await res.json().catch(() => ({}));
+        track("response_error", { reason: "http_error", status: res.status });
         setError(data.error || "High usage right now. Please try again in a moment.");
         setLoading(false);
         return;
@@ -566,12 +569,14 @@ export default function App() {
           try { parsed = JSON.parse(jsonStr); } catch { continue; }
 
           if (parsed.error) {
+            track("response_error", { reason: "api_error" });
             setError(parsed.error);
             setStreaming(false);
             return;
           }
 
           if (parsed.done) {
+            track("response_completed", { mode });
             setStreaming(false);
             setStreamBuffer("");
             setRawText(accumulated);
@@ -593,6 +598,7 @@ export default function App() {
         }
       }
     } catch {
+      track("response_error", { reason: "network_error" });
       setError("Connection issue — please try again.");
       setLoading(false);
       setStreaming(false);
@@ -603,6 +609,7 @@ export default function App() {
 
   const handleFollowUp = () => {
     if (!followUp.trim()) return;
+    track("continue_thinking_used", { mode });
     const combined = `Original situation: ${lastSubmittedRef.current}\n\nUpdate: ${followUp.trim()}`;
     runQuery(combined);
   };
@@ -841,7 +848,7 @@ export default function App() {
             <button
               key={val}
               className={"mode-btn" + (mode === val ? " mode-active" : "")}
-              onClick={() => setMode(val)}
+              onClick={() => { track("mode_selected", { mode: val }); setMode(val); }}
               style={{
                 padding: "7px 16px",
                 borderRadius: 8,
@@ -968,7 +975,7 @@ export default function App() {
                 <button
                   key={i}
                   className="chip"
-                  onClick={() => runQuery(item)}
+                  onClick={() => { track("recent_case_clicked"); runQuery(item); }}
                   style={{
                     background: "transparent",
                     border: "1px solid rgba(255,255,255,0.09)",

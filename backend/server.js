@@ -380,7 +380,7 @@ function detectPrompt(question, uiMode) {
   // No patient context, no safety trigger → treat as a general knowledge question
   // Guard against very long/ambiguous free-text falling through here
   const wordCount = question.trim().split(/\s+/).length;
-  if (wordCount <= 25) return QUICK_KNOWLEDGE_PROMPT;
+  if (uiMode !== "deep" && wordCount <= 25) return QUICK_KNOWLEDGE_PROMPT;
 
   // ── D. Default → Clinical Reasoning ──────────────────────────────────────
   return basePrompt;
@@ -398,6 +398,15 @@ app.post("/api/copilot", async (req, res) => {
   }
 
   const selectedPrompt = detectPrompt(question.trim(), mode);
+
+  // ── TEMPORARY DEBUG LOG ───────────────────────────────────────────────────
+  const promptName =
+    selectedPrompt === DEEP_SYSTEM_PROMPT  ? "DEEP_SYSTEM_PROMPT"  :
+    selectedPrompt === QUICK_SYSTEM_PROMPT ? "QUICK_SYSTEM_PROMPT" :
+    "QUICK_KNOWLEDGE_PROMPT";
+  console.log(`[DEBUG] mode="${mode}" → prompt=${promptName}`);
+  console.log(`[DEBUG] system[0:200]: ${selectedPrompt.slice(0, 200).replace(/\n/g, "↵")}`);
+  // ── END DEBUG ─────────────────────────────────────────────────────────────
 
   // Set SSE headers so the frontend can read chunks as they arrive
   res.setHeader("Content-Type", "text/event-stream");

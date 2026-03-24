@@ -465,7 +465,7 @@ export default function App() {
   const [loading, setLoading]           = useState(false);
   const [loadingPhase, setLoadingPhase] = useState(0);
   const [error, setError]               = useState(null);
-  const [mode, setMode]                 = useState(() => lsGet(LS_MODE, "deep"));
+  const [mode]                          = useState("deep");
   const [history, setHistory]           = useState(() => lsGet(LS_HISTORY, []));
   const [savedCases, setSavedCases]     = useState(() => lsGet(LS_SAVED, []));
   const [justSaved, setJustSaved]       = useState(false);
@@ -483,9 +483,6 @@ export default function App() {
     el.style.height = "auto";
     el.style.height = Math.min(el.scrollHeight, 200) + "px";
   }, [question]);
-
-  // Persist selected mode across sessions
-  useEffect(() => { lsSet(LS_MODE, mode); }, [mode]);
 
   // Load QuickStart prefill on mount
   useEffect(() => {
@@ -845,31 +842,6 @@ export default function App() {
           <span>Do not enter names, MRNs, dates of birth, SSNs, phone numbers, or any patient identifiers. Describe the clinical situation only.</span>
         </div>
 
-        {/* Mode toggle */}
-        <div style={{ display: "flex", gap: 7, marginBottom: 14 }}>
-          {[["deep", "Clinical Reasoning"], ["quick", "Quick Guidance"]].map(([val, label]) => (
-            <button
-              key={val}
-              className={"mode-btn" + (mode === val ? " mode-active" : "")}
-              onClick={() => { track("mode_selected", { mode: val }); setMode(val); }}
-              style={{
-                padding: "7px 16px",
-                borderRadius: 8,
-                border: mode === val ? "1px solid rgba(0,194,209,0.45)" : "1px solid rgba(255,255,255,0.09)",
-                background: mode === val ? "rgba(0,194,209,0.12)" : "transparent",
-                color: mode === val ? "#00C2D1" : "#7F99A5",
-                cursor: "pointer",
-                fontSize: 13,
-                fontWeight: 600,
-                transition: "all 0.15s",
-                letterSpacing: "-0.1px",
-              }}
-            >
-              {label}
-            </button>
-          ))}
-        </div>
-
         {/* Input card */}
         <div style={{
           background: "#112936",
@@ -944,7 +916,7 @@ export default function App() {
                 transition: "all 0.18s",
               }}
             >
-              {isActive ? <><span className="spinner" />Analyzing...</> : "Generate Clinical Guidance \u2192"}
+              {isActive ? <><span className="spinner" />Analyzing...</> : "Get Guidance \u2192"}
             </button>
           </div>
         </div>

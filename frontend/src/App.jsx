@@ -536,7 +536,7 @@ export default function App() {
 
       if (!res.ok) {
         const data = await res.json().catch(() => ({}));
-        setError(data.error || "Unable to generate clinical guidance. Please try again.");
+        setError(data.error || "High usage right now. Please try again in a moment.");
         setLoading(false);
         return;
       }
@@ -593,7 +593,7 @@ export default function App() {
         }
       }
     } catch {
-      setError("Unable to generate clinical guidance. Please try again.");
+      setError("Connection issue — please try again.");
       setLoading(false);
       setStreaming(false);
     }

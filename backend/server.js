@@ -469,9 +469,10 @@ app.post("/api/copilot", async (req, res) => {
     res.write(`data: ${JSON.stringify({ done: true })}\n\n`);
     res.end();
   } catch (error) {
-    console.error("Anthropic API error:", error.message);
-    // Send error as SSE event so frontend can handle it cleanly
-    res.write(`data: ${JSON.stringify({ error: "Unable to generate clinical guidance. Please try again." })}\n\n`);
+    console.error("[Clinical Edge] Anthropic API error:", error.status ?? "", error.message);
+    // SSE headers are already sent — respond with an error SSE event so the
+    // frontend can stop streaming and display the message cleanly.
+    res.write(`data: ${JSON.stringify({ error: "High usage right now. Please try again in a moment." })}\n\n`);
     res.end();
   }
 });

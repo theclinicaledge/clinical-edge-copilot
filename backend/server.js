@@ -475,13 +475,55 @@ function isExamStyle(question) {
   return false;
 }
 
+// ── Quick Knowledge detector ──────────────────────────────────────────────
+// Returns true when the input is clearly a short conceptual/factual question
+// with no clinical scenario context. Runs as Priority 1 — overrides mode
+// selection so deep-mode users still get sharp knowledge answers.
+function isQuickKnowledge(question) {
+  const q = question.toLowerCase().trim();
+  const wordCount = q.split(/\s+/).length;
+
+  // Knowledge questions are short — cap at 25 words
+  if (wordCount > 25) return false;
+
+  // Bail out if any clinical scenario indicators are present
+  // (these suggest a real patient situation, not a conceptual question)
+  const scenarioIndicators = [
+    "patient", " pt ", "my pt", "the pt",
+    "bp ", " hr ", "spo2", "o2 sat",
+    "trending", "worsening", "deteriorat", "unstable",
+    "chest pain", "shortness of breath", " sob",
+    "altered", "diaphoretic", "distress",
+    "postop", "post-op", "post op", "icu", "stepdown",
+    "just started", "right now", "currently", "tonight", "this morning",
+    "came back", "came in", "getting worse",
+  ];
+  if (scenarioIndicators.some((s) => q.includes(s))) return false;
+
+  // Must match a clear knowledge-question pattern
+  const knowledgePatterns = [
+    /^what (is|are|does|do)\b/,
+    /difference between/,
+    /^does .+\b(lower|raise|increase|decrease|cause|affect|reduce|drop|elevate|worsen|improve)\b/,
+    /^(how|why) does\b/,
+    /^when (is|do|does|should)\b/,
+    /^(what|which) (indicates?|means?|suggests?|causes?|happens?)\b/,
+    /^(define|explain)\b/,
+    /\b(indicate|mean|suggest|cause|stand for)\?*$/,
+    /^is .+ (normal|dangerous|safe|common|a sign|an indication)\b/,
+    /^(what|how) (do you|do nurses|should nurses|would you)\b/,
+  ];
+  return knowledgePatterns.some((p) => p.test(q));
+}
+
 // ── Input-based prompt routing ─────────────────────────────────────────────
 //
 // Priority order:
 //   0. Exam / NCLEX Style      → clearly structured exam question → EXAM_SYSTEM_PROMPT
+//   1. Quick Knowledge         → short conceptual question, no scenario → QUICK_KNOWLEDGE_PROMPT (mode override)
 //   A. Medication Safety Mode  → action-oriented med phrases → QUICK or DEEP
 //   B. Clinical Reasoning Mode → patient context / vitals / trends → QUICK or DEEP
-//   C. Quick Knowledge Mode    → short general question, no patient context → QUICK_KNOWLEDGE_PROMPT
+//   C. Quick Knowledge Fallback → short question in quick mode, no clinical context → QUICK_KNOWLEDGE_PROMPT
 //   D. Default                 → Clinical Reasoning (QUICK or DEEP)
 //
 function detectPrompt(question, uiMode) {
@@ -492,6 +534,13 @@ function detectPrompt(question, uiMode) {
   // Must run before other checks — an exam question containing "patient" or
   // a med name would otherwise be misrouted to clinical / med-safety prompts.
   if (isExamStyle(question)) return EXAM_SYSTEM_PROMPT;
+
+  // ── 1. Quick Knowledge (mode override) ───────────────────────────────────
+  // Clearly conceptual/factual questions with no scenario context always route
+  // to QUICK_KNOWLEDGE_PROMPT regardless of selected mode. Runs before
+  // clinical/med-safety checks so terms like "potassium" in a knowledge
+  // question don't get caught by clinical trigger matching.
+  if (isQuickKnowledge(question)) return QUICK_KNOWLEDGE_PROMPT;
 
   // ── A. Medication Safety (next priority) ─────────────────────────────────
   // Action-oriented phrases that signal a real-time give/hold decision
@@ -518,9 +567,9 @@ function detectPrompt(question, uiMode) {
   ];
   if (clinicalTriggers.some((t) => q.includes(t))) return basePrompt;
 
-  // ── C. Quick Knowledge ────────────────────────────────────────────────────
-  // No patient context, no safety trigger → treat as a general knowledge question
-  // Guard against very long/ambiguous free-text falling through here
+  // ── C. Quick Knowledge Fallback ───────────────────────────────────────────
+  // Short question in quick mode with no clinical context — treat as knowledge.
+  // Deep mode falls through to D so the user gets the richer reasoning prompt.
   const wordCount = question.trim().split(/\s+/).length;
   if (uiMode !== "deep" && wordCount <= 25) return QUICK_KNOWLEDGE_PROMPT;
 

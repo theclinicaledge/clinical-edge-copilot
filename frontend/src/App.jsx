@@ -658,7 +658,7 @@ export default function App() {
       background: "#0B1F2A",
       color: "#A8C1CC",
       fontFamily: "'Inter', -apple-system, BlinkMacSystemFont, sans-serif",
-      padding: "0 0 80px",
+      padding: "0 0 calc(80px + env(safe-area-inset-bottom))",
     }}>
       <style>{`
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap');
@@ -721,7 +721,10 @@ export default function App() {
       {/* ── Header ───────────────────────────────────────────────────────── */}
       <div style={{
         borderBottom: "1px solid rgba(255,255,255,0.07)",
-        padding: "0 20px",
+        paddingTop: "env(safe-area-inset-top)",
+        paddingLeft: "max(20px, env(safe-area-inset-left))",
+        paddingRight: "max(20px, env(safe-area-inset-right))",
+        paddingBottom: 0,
         background: "rgba(11,31,42,0.97)",
         backdropFilter: "blur(20px)",
         position: "sticky",

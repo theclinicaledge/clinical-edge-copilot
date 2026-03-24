@@ -278,15 +278,19 @@ export default function Landing({ onEnterApp, onEnterScenario }) {
         position: "fixed",
         top: 0, left: 0, right: 0,
         zIndex: 100,
-        height: 62,
-        display: "flex",
-        alignItems: "center",
-        padding: "0 clamp(20px, 5vw, 64px)",
+        paddingTop: "env(safe-area-inset-top)",
         background: scrolled ? "rgba(11,31,42,0.97)" : "rgba(11,31,42,0)",
         backdropFilter: scrolled ? "blur(20px)" : "none",
         borderBottom: scrolled ? `1px solid ${C.border}` : "1px solid transparent",
         transition: "all 0.3s ease",
       }}>
+        {/* Inner row — 62px visual height, safe area handled by outer nav */}
+        <div style={{
+          height: 62,
+          display: "flex",
+          alignItems: "center",
+          padding: "0 clamp(20px, 5vw, 64px)",
+        }}>
         {/* Logo */}
         <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
           <CELogo size={25} />
@@ -341,6 +345,7 @@ export default function Landing({ onEnterApp, onEnterScenario }) {
             Open App
           </button>
         </div>
+        </div>{/* end inner nav row */}
       </nav>
 
       {/* ══ HERO ═════════════════════════════════════════════════════════════════ */}
@@ -350,7 +355,7 @@ export default function Landing({ onEnterApp, onEnterScenario }) {
         flexDirection: "column",
         alignItems: "center",
         justifyContent: "center",
-        padding: "120px clamp(20px, 6vw, 80px) 80px",
+        padding: "calc(120px + env(safe-area-inset-top)) clamp(20px, 6vw, 80px) 80px",
         position: "relative",
         textAlign: "center",
         overflow: "hidden",

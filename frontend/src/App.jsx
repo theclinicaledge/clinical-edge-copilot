@@ -839,7 +839,7 @@ export default function App() {
             marginTop: 1,
             letterSpacing: 0,
           }}>&#9888;</span>
-          <span>Do not enter patient names, dates of birth, MRNs, or any identifying information. Describe the clinical situation only.</span>
+          <span>Do not enter names, MRNs, dates of birth, SSNs, phone numbers, or any patient identifiers. Describe the clinical situation only.</span>
         </div>
 
         {/* Mode toggle */}

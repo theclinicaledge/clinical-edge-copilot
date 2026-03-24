@@ -418,6 +418,28 @@ function detectPrompt(question, uiMode) {
   return basePrompt;
 }
 
+// ── Patient-identifier guardrail ──────────────────────────────────────────────
+// Lightweight pattern detection — catches the most common accidental PHI inputs.
+// Not a HIPAA-grade NLP system; targets obvious structural patterns only.
+const PHI_PATTERNS = [
+  { label: "SSN",         re: /\b\d{3}-\d{2}-\d{4}\b/ },
+  { label: "phone",       re: /\b(\+1[\s.-]?)?\(?\d{3}\)?[\s.-]\d{3}[\s.-]\d{4}\b/ },
+  { label: "email",       re: /\b[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}\b/ },
+  { label: "MRN",         re: /\b(MRN|mrn|Medical Record)[:\s#]*\d{5,10}\b/i },
+  { label: "DOB",         re: /\b(DOB|D\.O\.B\.|Date of Birth)[:\s]*\d{1,2}[\/\-]\d{1,2}[\/\-]\d{2,4}\b/i },
+  // Standalone date formats that look like birthdates: 01/15/1985, 1-15-85
+  { label: "date",        re: /\b\d{1,2}[\/\-]\d{1,2}[\/\-]\d{2,4}\b/ },
+  // Long standalone numeric strings that look like MRNs (6–10 digits not part of a clinical value)
+  { label: "numeric-ID",  re: /(?<![0-9])\d{7,10}(?![0-9mg/%])/ },
+];
+
+function containsPHI(text) {
+  for (const { label, re } of PHI_PATTERNS) {
+    if (re.test(text)) return label;
+  }
+  return null;
+}
+
 // ── Streaming endpoint ────────────────────────────────────────────────────────
 app.post("/api/copilot", async (req, res) => {
   const { question, mode } = req.body;
@@ -427,6 +449,16 @@ app.post("/api/copilot", async (req, res) => {
   }
   if (question.trim().length < 5) {
     return res.status(400).json({ error: "Please describe the clinical situation in more detail." });
+  }
+
+  // PHI guardrail — block before sending to Claude
+  const phiMatch = containsPHI(question);
+  if (phiMatch) {
+    console.warn(`[PHI-GUARD] Blocked input — detected pattern: ${phiMatch}`);
+    return res.status(400).json({
+      error: true,
+      message: "Remove patient identifiers and try again. Do not include names, MRNs, dates of birth, SSNs, phone numbers, or email addresses.",
+    });
   }
 
   const selectedPrompt = detectPrompt(question.trim(), mode);

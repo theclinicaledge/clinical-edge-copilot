@@ -539,7 +539,7 @@ export default function App() {
       if (!res.ok) {
         const data = await res.json().catch(() => ({}));
         track("response_error", { reason: "http_error", status: res.status });
-        setError(data.error || "High usage right now. Please try again in a moment.");
+        setError(data.message || (typeof data.error === "string" ? data.error : null) || "Something went wrong. Please try again.");
         setLoading(false);
         return;
       }
@@ -570,7 +570,7 @@ export default function App() {
 
           if (parsed.error) {
             track("response_error", { reason: "api_error" });
-            setError(parsed.error);
+            setError(parsed.message || (typeof parsed.error === "string" ? parsed.error : null) || "Something went wrong. Please try again.");
             setStreaming(false);
             return;
           }

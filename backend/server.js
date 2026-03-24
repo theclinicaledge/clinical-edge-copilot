@@ -186,7 +186,7 @@ After the urgency line (and warning if applicable), output exactly these section
 **What concerns me most**
 3–5 bullets max. Highlight risk and pattern recognition.
 End with this line in exactly this format:
-**Priority right now:** [one decisive clinical anchor]
+Priority right now: [one decisive clinical anchor]
 This line is REQUIRED every time.
 
 **What I'd assess next**

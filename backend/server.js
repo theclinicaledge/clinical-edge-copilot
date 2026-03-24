@@ -299,6 +299,56 @@ Should feel like:
 
 If asked something outside bedside nursing clinical reasoning: "I'm built specifically for bedside nursing clinical reasoning support. Give me a patient scenario, change in status, abnormal finding, or nursing concern and I'll think through it with you."`;
 
+const EXAM_SYSTEM_PROMPT = `You are an experienced bedside nurse helping a nursing student or new graduate work through an NCLEX-style or board exam question.
+
+Your job: help them understand WHY the correct answer is correct — not just what the letter is.
+
+Sound like a sharp nurse educator who thinks at the bedside. Not a test-prep robot. Not a textbook. A real nurse who has seen the clinical version of this scenario.
+
+URGENCY LINE (REQUIRED — do not skip):
+The very first line of every response must be exactly:
+Urgency Level: LOW
+
+Do NOT include the ⚠️ deterioration warning for exam questions.
+
+STRUCTURE — output all five sections using these exact bold headers, in this exact order:
+
+**What this could be**
+Open with: "Correct Answer: [letter] — [full answer text]"
+Then 1–2 sentences explaining the core clinical reasoning behind why this is correct.
+Focus on priority, safety, and how a real nurse would think — not just a rule or definition.
+For "select all that apply" questions, list every correct answer clearly.
+
+**What concerns me most**
+Begin this section with the subheader: Why this is correct:
+2–3 concise bullets unpacking the clinical logic.
+For priority questions: apply ABCDE or Maslow's hierarchy explicitly if it helps.
+For medication questions: explain what makes it safe or unsafe in this context.
+Stay sharp. No textbook definitions. No pharmacology lectures.
+
+**What I'd assess next**
+Begin this section with the subheader: Why not the others:
+One short line per wrong answer — why it is less correct or contraindicated in this context.
+Format each line as: [letter]: reason
+Keep it tight. One line per option is enough.
+
+**What I'd do right now**
+Begin this section with the subheader: How to approach this type of question:
+2–3 bullets. Name the clinical reasoning principle this question is testing.
+Help the student recognize this pattern on future questions.
+Examples: "assess before acting," "airway before pain," "safety before comfort," "least invasive first."
+
+**Closing**
+One sentence. The kind of thing a good preceptor would say after walking through this question together.
+
+VOICE RULES:
+- Concise — no lectures, no padding
+- Explain the reasoning, not just the answer
+- Sound like a nurse who has seen the real version of what this question is asking about
+- Do NOT say "your patient" as if this is a live bedside situation — keep it in exam context
+- Do NOT skip or rename any section headers
+- Do NOT add extra sections`;
+
 const QUICK_KNOWLEDGE_PROMPT = `You are an experienced bedside nurse educator answering short, practical clinical questions for nurses.
 Your job is to give a concise, high-yield explanation using the exact same response structure as every other Copilot response.
 
@@ -371,9 +421,38 @@ Say in **What this could be**:
 FINAL RULE
 Sound like a nurse who already knows this — giving the version that actually helps at the bedside.`;
 
+// ── Exam-style input detection ────────────────────────────────────────────────
+// Returns true only when the input is clearly structured as an NCLEX /
+// board-style question. Two independent signals fire this:
+//   1. Explicit exam keywords (nclex, SATA, "which of the following", etc.)
+//   2. Structured multiple-choice options — requires ≥2 of A./B./C./D. patterns
+//      so that incidental "Patient A." references do not false-positive.
+function isExamStyle(question) {
+  const q = question.toLowerCase();
+
+  const examKeywords = [
+    "nclex", "select all that apply", "sata",
+    "which answer is correct", "which of the following",
+    "which intervention is most appropriate", "which action should",
+    "which medication should the nurse", "which response by the nurse",
+    "the correct answer", "the best answer",
+    "the nurse should first", "the nurse should next",
+    "priority intervention", "which priority",
+    "exam question", "board question", "test question", "practice question",
+  ];
+  if (examKeywords.some((k) => q.includes(k))) return true;
+
+  // Multiple-choice structure: A. text / B. text etc. — require ≥2 distinct options
+  const mcMatches = question.match(/\b[A-D][.)]\s+\S/g) || [];
+  if (mcMatches.length >= 2) return true;
+
+  return false;
+}
+
 // ── Input-based prompt routing ─────────────────────────────────────────────
 //
 // Priority order:
+//   0. Exam / NCLEX Style      → clearly structured exam question → EXAM_SYSTEM_PROMPT
 //   A. Medication Safety Mode  → action-oriented med phrases → QUICK or DEEP
 //   B. Clinical Reasoning Mode → patient context / vitals / trends → QUICK or DEEP
 //   C. Quick Knowledge Mode    → short general question, no patient context → QUICK_KNOWLEDGE_PROMPT
@@ -383,7 +462,12 @@ function detectPrompt(question, uiMode) {
   const q = question.toLowerCase();
   const basePrompt = uiMode === "quick" ? QUICK_SYSTEM_PROMPT : DEEP_SYSTEM_PROMPT;
 
-  // ── A. Medication Safety (highest priority) ───────────────────────────────
+  // ── 0. Exam / NCLEX Style (highest priority) ──────────────────────────────
+  // Must run before other checks — an exam question containing "patient" or
+  // a med name would otherwise be misrouted to clinical / med-safety prompts.
+  if (isExamStyle(question)) return EXAM_SYSTEM_PROMPT;
+
+  // ── A. Medication Safety (next priority) ─────────────────────────────────
   // Action-oriented phrases that signal a real-time give/hold decision
   const medSafetyTriggers = [
     "can i give", "should i give", "should i hold", "ok to give", "okay to give",
@@ -467,6 +551,7 @@ app.post("/api/copilot", async (req, res) => {
   const promptName =
     selectedPrompt === DEEP_SYSTEM_PROMPT  ? "DEEP_SYSTEM_PROMPT"  :
     selectedPrompt === QUICK_SYSTEM_PROMPT ? "QUICK_SYSTEM_PROMPT" :
+    selectedPrompt === EXAM_SYSTEM_PROMPT  ? "EXAM_SYSTEM_PROMPT"  :
     "QUICK_KNOWLEDGE_PROMPT";
   console.log(`[DEBUG] mode="${mode}" → prompt=${promptName}`);
   console.log(`[DEBUG] system[0:200]: ${selectedPrompt.slice(0, 200).replace(/\n/g, "↵")}`);

@@ -564,6 +564,391 @@ export default function Landing({ onEnterApp, onEnterScenario }) {
         </div>
       </section>
 
+      {/* ══ WHAT YOU CAN ASK ════════════════════════════════════════════════════ */}
+      <section style={{
+        padding: "84px clamp(20px, 6vw, 80px)",
+        maxWidth: 1100,
+        margin: "0 auto",
+      }}>
+        <Fade>
+          <div style={{ textAlign: "center", marginBottom: 52 }}>
+            <Label>What You Can Ask Copilot</Label>
+            <h2 style={{
+              fontSize: "clamp(26px, 3.8vw, 44px)",
+              fontWeight: 800,
+              color: C.textPrimary,
+              letterSpacing: "-1.5px",
+              lineHeight: 1.1,
+              margin: "0 auto 18px",
+              maxWidth: 620,
+            }}>
+              One tool. Different kinds of nursing questions.
+            </h2>
+            <p style={{
+              fontSize: "clamp(14px, 1.6vw, 17px)",
+              color: C.textSecondary,
+              lineHeight: 1.65,
+              maxWidth: 560,
+              margin: "0 auto",
+            }}>
+              From real clinical situations to quick med questions to NCLEX-style reasoning — Copilot adapts to how nurses and students actually think.
+            </p>
+          </div>
+        </Fade>
+
+        {/* Responsive 2×2 grid */}
+        <style>{`
+          .ask-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 20px;
+          }
+          @media (max-width: 680px) {
+            .ask-grid { grid-template-columns: 1fr; }
+          }
+        `}</style>
+
+        <div className="ask-grid">
+
+          {/* ── Card 1: Clinical Reasoning ── */}
+          <Fade delay={60}>
+            <div style={{
+              background: C.card,
+              border: `1px solid rgba(255,255,255,0.07)`,
+              borderRadius: 16,
+              overflow: "hidden",
+            }}>
+              {/* Card header */}
+              <div style={{
+                padding: "14px 20px",
+                borderBottom: `1px solid ${C.border}`,
+                display: "flex",
+                alignItems: "center",
+                gap: 8,
+                background: "rgba(255,255,255,0.02)",
+              }}>
+                <span style={{
+                  fontFamily: "'IBM Plex Mono', monospace",
+                  fontSize: 9,
+                  fontWeight: 700,
+                  color: "#e05572",
+                  background: "rgba(224,85,114,0.1)",
+                  border: "1px solid rgba(224,85,114,0.22)",
+                  padding: "3px 9px",
+                  borderRadius: 5,
+                  textTransform: "uppercase",
+                  letterSpacing: "0.8px",
+                }}>
+                  Clinical Reasoning
+                </span>
+              </div>
+
+              <div style={{ padding: "20px 22px" }}>
+                {/* Scenario input */}
+                <div style={{
+                  fontSize: 12,
+                  color: "#2E4A5C",
+                  fontStyle: "italic",
+                  marginBottom: 16,
+                  padding: "10px 13px",
+                  background: "rgba(255,255,255,0.02)",
+                  border: `1px solid ${C.border}`,
+                  borderRadius: 8,
+                  lineHeight: 1.6,
+                }}>
+                  "Post-op day 2, HR climbing from 82 to 104 over 3 hours, patient says they feel 'off' but VS look okay otherwise..."
+                </div>
+
+                {/* Urgency badge */}
+                <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 14 }}>
+                  <span style={{
+                    fontFamily: "'IBM Plex Mono', monospace",
+                    fontSize: 9,
+                    fontWeight: 700,
+                    color: "#fbbf24",
+                    background: "rgba(251,191,36,0.1)",
+                    border: "1px solid rgba(251,191,36,0.25)",
+                    padding: "3px 9px",
+                    borderRadius: 5,
+                    textTransform: "uppercase",
+                    letterSpacing: "0.5px",
+                  }}>Urgency: MODERATE</span>
+                </div>
+
+                {/* Output preview */}
+                <div style={{ display: "flex", flexDirection: "column", gap: 7 }}>
+                  <MockCard label="What this could be" accent="#e05572" bg="rgba(224,85,114,0.05)" border="rgba(224,85,114,0.15)">
+                    Trending tachycardia in a post-op patient is occult bleeding or early sepsis until proven otherwise — "feels off" is a red flag.
+                  </MockCard>
+                  <MockCard label="Priority right now" accent="#4da3ff" bg="rgba(77,163,255,0.05)" border="rgba(77,163,255,0.15)">
+                    Trend matters more than the single value. Reassess perfusion, urine output, and pain — then loop in the provider early.
+                  </MockCard>
+                </div>
+              </div>
+
+              <div style={{
+                padding: "12px 22px",
+                borderTop: `1px solid ${C.border}`,
+                fontSize: 11,
+                color: C.muted,
+              }}>
+                Helps you catch subtle deterioration before it escalates
+              </div>
+            </div>
+          </Fade>
+
+          {/* ── Card 2: Quick Question ── */}
+          <Fade delay={120}>
+            <div style={{
+              background: C.card,
+              border: `1px solid rgba(255,255,255,0.07)`,
+              borderRadius: 16,
+              overflow: "hidden",
+            }}>
+              <div style={{
+                padding: "14px 20px",
+                borderBottom: `1px solid ${C.border}`,
+                display: "flex",
+                alignItems: "center",
+                gap: 8,
+                background: "rgba(255,255,255,0.02)",
+              }}>
+                <span style={{
+                  fontFamily: "'IBM Plex Mono', monospace",
+                  fontSize: 9,
+                  fontWeight: 700,
+                  color: C.accent,
+                  background: "rgba(0,194,209,0.08)",
+                  border: `1px solid rgba(0,194,209,0.2)`,
+                  padding: "3px 9px",
+                  borderRadius: 5,
+                  textTransform: "uppercase",
+                  letterSpacing: "0.8px",
+                }}>
+                  Quick Question
+                </span>
+              </div>
+
+              <div style={{ padding: "20px 22px" }}>
+                <div style={{
+                  fontSize: 12,
+                  color: "#2E4A5C",
+                  fontStyle: "italic",
+                  marginBottom: 16,
+                  padding: "10px 13px",
+                  background: "rgba(255,255,255,0.02)",
+                  border: `1px solid ${C.border}`,
+                  borderRadius: 8,
+                  lineHeight: 1.6,
+                }}>
+                  "Does furosemide lower potassium?"
+                </div>
+
+                <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 14 }}>
+                  <span style={{
+                    fontFamily: "'IBM Plex Mono', monospace",
+                    fontSize: 9,
+                    fontWeight: 700,
+                    color: "#86efac",
+                    background: "rgba(134,239,172,0.08)",
+                    border: "1px solid rgba(134,239,172,0.2)",
+                    padding: "3px 9px",
+                    borderRadius: 5,
+                    textTransform: "uppercase",
+                    letterSpacing: "0.5px",
+                  }}>Urgency: LOW</span>
+                </div>
+
+                <div style={{ display: "flex", flexDirection: "column", gap: 7 }}>
+                  <MockCard label="Direct Answer" accent={C.accent} bg="rgba(0,194,209,0.05)" border="rgba(0,194,209,0.15)">
+                    Yes — furosemide lowers potassium. It's a loop diuretic that increases urinary K⁺ loss.
+                  </MockCard>
+                  <MockCard label="What to watch" accent="#1FBF75" bg="rgba(31,191,117,0.05)" border="rgba(31,191,117,0.15)">
+                    Monitor for hypokalemia — weakness, cramps, arrhythmias. Check labs and review cardiac status.
+                  </MockCard>
+                </div>
+              </div>
+
+              <div style={{
+                padding: "12px 22px",
+                borderTop: `1px solid ${C.border}`,
+                fontSize: 11,
+                color: C.muted,
+              }}>
+                Fast, accurate answers for bedside knowledge gaps
+              </div>
+            </div>
+          </Fade>
+
+          {/* ── Card 3: NCLEX ── */}
+          <Fade delay={180}>
+            <div style={{
+              background: C.card,
+              border: `1px solid rgba(255,255,255,0.07)`,
+              borderRadius: 16,
+              overflow: "hidden",
+            }}>
+              <div style={{
+                padding: "14px 20px",
+                borderBottom: `1px solid ${C.border}`,
+                display: "flex",
+                alignItems: "center",
+                gap: 8,
+                background: "rgba(255,255,255,0.02)",
+              }}>
+                <span style={{
+                  fontFamily: "'IBM Plex Mono', monospace",
+                  fontSize: 9,
+                  fontWeight: 700,
+                  color: "#c084fc",
+                  background: "rgba(192,132,252,0.08)",
+                  border: "1px solid rgba(192,132,252,0.2)",
+                  padding: "3px 9px",
+                  borderRadius: 5,
+                  textTransform: "uppercase",
+                  letterSpacing: "0.8px",
+                }}>
+                  NCLEX
+                </span>
+              </div>
+
+              <div style={{ padding: "20px 22px" }}>
+                <div style={{
+                  fontSize: 12,
+                  color: "#2E4A5C",
+                  fontStyle: "italic",
+                  marginBottom: 16,
+                  padding: "10px 13px",
+                  background: "rgba(255,255,255,0.02)",
+                  border: `1px solid ${C.border}`,
+                  borderRadius: 8,
+                  lineHeight: 1.6,
+                }}>
+                  "A patient prescribed metoprolol has HR 48 and BP 102/64. What should the nurse do first? A) Give as ordered B) Hold and notify provider C) Recheck in 30 minutes D) Give half-dose"
+                </div>
+
+                <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 14 }}>
+                  <span style={{
+                    fontFamily: "'IBM Plex Mono', monospace",
+                    fontSize: 9,
+                    fontWeight: 700,
+                    color: "#86efac",
+                    background: "rgba(134,239,172,0.08)",
+                    border: "1px solid rgba(134,239,172,0.2)",
+                    padding: "3px 9px",
+                    borderRadius: 5,
+                    textTransform: "uppercase",
+                    letterSpacing: "0.5px",
+                  }}>Urgency: LOW</span>
+                </div>
+
+                <div style={{ display: "flex", flexDirection: "column", gap: 7 }}>
+                  <MockCard label="Correct Answer" accent="#c084fc" bg="rgba(192,132,252,0.05)" border="rgba(192,132,252,0.15)">
+                    C — Assess responsiveness first. You assess before you act — always establish unresponsiveness before starting CPR.
+                  </MockCard>
+                  <MockCard label="Why not the others" accent="#4da3ff" bg="rgba(77,163,255,0.05)" border="rgba(77,163,255,0.15)">
+                    A/D skip the assessment step. B is premature — confirm unresponsiveness + call for help first (ABCDE and CAB apply after).
+                  </MockCard>
+                </div>
+              </div>
+
+              <div style={{
+                padding: "12px 22px",
+                borderTop: `1px solid ${C.border}`,
+                fontSize: 11,
+                color: C.muted,
+              }}>
+                Builds clinical reasoning for boards and beyond
+              </div>
+            </div>
+          </Fade>
+
+          {/* ── Card 4: Escalation / What I'd Do Right Now ── */}
+          <Fade delay={240}>
+            <div style={{
+              background: C.card,
+              border: `1px solid rgba(255,255,255,0.07)`,
+              borderRadius: 16,
+              overflow: "hidden",
+            }}>
+              <div style={{
+                padding: "14px 20px",
+                borderBottom: `1px solid ${C.border}`,
+                display: "flex",
+                alignItems: "center",
+                gap: 8,
+                background: "rgba(255,255,255,0.02)",
+              }}>
+                <span style={{
+                  fontFamily: "'IBM Plex Mono', monospace",
+                  fontSize: 9,
+                  fontWeight: 700,
+                  color: "#fb923c",
+                  background: "rgba(251,146,60,0.08)",
+                  border: "1px solid rgba(251,146,60,0.2)",
+                  padding: "3px 9px",
+                  borderRadius: 5,
+                  textTransform: "uppercase",
+                  letterSpacing: "0.8px",
+                }}>
+                  What I'd Do Right Now
+                </span>
+              </div>
+
+              <div style={{ padding: "20px 22px" }}>
+                <div style={{
+                  fontSize: 12,
+                  color: "#2E4A5C",
+                  fontStyle: "italic",
+                  marginBottom: 16,
+                  padding: "10px 13px",
+                  background: "rgba(255,255,255,0.02)",
+                  border: `1px solid ${C.border}`,
+                  borderRadius: 8,
+                  lineHeight: 1.6,
+                }}>
+                  "SpO₂ dropped from 98% to 89% on room air over the last 30 min. Patient is awake but breathing faster and looks anxious."
+                </div>
+
+                <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 14 }}>
+                  <span style={{
+                    fontFamily: "'IBM Plex Mono', monospace",
+                    fontSize: 9,
+                    fontWeight: 700,
+                    color: "#fca5a5",
+                    background: "rgba(239,68,68,0.1)",
+                    border: "1px solid rgba(239,68,68,0.25)",
+                    padding: "3px 9px",
+                    borderRadius: 5,
+                    textTransform: "uppercase",
+                    letterSpacing: "0.5px",
+                  }}>Urgency: HIGH</span>
+                </div>
+
+                <div style={{ display: "flex", flexDirection: "column", gap: 7 }}>
+                  <MockCard label="Priority right now" accent="#fb923c" bg="rgba(251,146,60,0.05)" border="rgba(251,146,60,0.15)">
+                    Apply O₂ now, sit them up, full respiratory assessment — anxious + tachypnea + dropping sats = act first, ask questions second.
+                  </MockCard>
+                  <MockCard label="What I'd do right now" accent="#e05572" bg="rgba(224,85,114,0.05)" border="rgba(224,85,114,0.15)">
+                    O₂ via NC or NRB → listen to lung sounds → notify provider with full picture → anticipate ABG, CXR, and possible escalation.
+                  </MockCard>
+                </div>
+              </div>
+
+              <div style={{
+                padding: "12px 22px",
+                borderTop: `1px solid ${C.border}`,
+                fontSize: 11,
+                color: C.muted,
+              }}>
+                Gives you the next step when uncertainty is highest
+              </div>
+            </div>
+          </Fade>
+
+        </div>
+      </section>
+
       {/* ══ SAFETY / GUARDRAILS ══════════════════════════════════════════════════ */}
       <section style={{
         padding: "84px clamp(20px, 6vw, 80px)",

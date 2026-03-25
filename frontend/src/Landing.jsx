@@ -602,9 +602,19 @@ export default function Landing({ onEnterApp, onEnterScenario }) {
             display: grid;
             grid-template-columns: repeat(2, 1fr);
             gap: 20px;
+            align-items: start;
+          }
+          .ask-grid > * > div {
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+          }
+          .ask-grid > * > div > div:last-child {
+            margin-top: auto;
           }
           @media (max-width: 680px) {
             .ask-grid { grid-template-columns: 1fr; }
+            .ask-grid > * > div { height: auto; }
           }
         `}</style>
 
@@ -824,7 +834,7 @@ export default function Landing({ onEnterApp, onEnterScenario }) {
                   borderRadius: 8,
                   lineHeight: 1.6,
                 }}>
-                  "A patient prescribed metoprolol has HR 48 and BP 102/64. What should the nurse do first? A) Give as ordered B) Hold and notify provider C) Recheck in 30 minutes D) Give half-dose"
+                  "A patient with potassium 6.2 mEq/L has peaked T waves. Which medication should the nurse expect to give first? A) Furosemide B) Calcium gluconate C) Sodium bicarbonate D) Kayexalate"
                 </div>
 
                 <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 14 }}>
@@ -844,10 +854,10 @@ export default function Landing({ onEnterApp, onEnterScenario }) {
 
                 <div style={{ display: "flex", flexDirection: "column", gap: 7 }}>
                   <MockCard label="Correct Answer" accent="#c084fc" bg="rgba(192,132,252,0.05)" border="rgba(192,132,252,0.15)">
-                    C — Assess responsiveness first. You assess before you act — always establish unresponsiveness before starting CPR.
+                    B — Calcium gluconate stabilizes the myocardium first. Peaked T waves = cardiac instability risk. Protect the heart before lowering K⁺.
                   </MockCard>
                   <MockCard label="Why not the others" accent="#4da3ff" bg="rgba(77,163,255,0.05)" border="rgba(77,163,255,0.15)">
-                    A/D skip the assessment step. B is premature — confirm unresponsiveness + call for help first (ABCDE and CAB apply after).
+                    A/C/D may lower K⁺ but act too slowly — cardiac membrane stabilization is the immediate priority when EKG changes are present.
                   </MockCard>
                 </div>
               </div>

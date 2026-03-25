@@ -774,7 +774,7 @@ export default function Landing({ onEnterApp, onEnterScenario }) {
                     Yes — furosemide lowers potassium. It's a loop diuretic that increases urinary K⁺ loss.
                   </MockCard>
                   <MockCard label="What to watch" accent="#1FBF75" bg="rgba(31,191,117,0.05)" border="rgba(31,191,117,0.15)">
-                    Monitor for hypokalemia — weakness, cramps, arrhythmias. Check labs and review cardiac status.
+                    Monitor for hypokalemia — weakness, cramps, arrhythmias. Check labs and review cardiac status. Anticipate potassium repletion per provider order and continue monitoring trends.
                   </MockCard>
                 </div>
               </div>

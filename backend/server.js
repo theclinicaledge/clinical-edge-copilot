@@ -622,15 +622,16 @@ app.post("/api/copilot", async (req, res) => {
 
   const selectedPrompt = detectPrompt(question.trim(), mode);
 
-  // ── TEMPORARY DEBUG LOG ───────────────────────────────────────────────────
   const promptName =
     selectedPrompt === DEEP_SYSTEM_PROMPT  ? "DEEP_SYSTEM_PROMPT"  :
     selectedPrompt === QUICK_SYSTEM_PROMPT ? "QUICK_SYSTEM_PROMPT" :
     selectedPrompt === EXAM_SYSTEM_PROMPT  ? "EXAM_SYSTEM_PROMPT"  :
     "QUICK_KNOWLEDGE_PROMPT";
-  console.log(`[DEBUG] mode="${mode}" → prompt=${promptName}`);
-  console.log(`[DEBUG] system[0:200]: ${selectedPrompt.slice(0, 200).replace(/\n/g, "↵")}`);
-  // ── END DEBUG ─────────────────────────────────────────────────────────────
+
+  // ── VALIDATION-PHASE LOGGING (temporary — remove after soft launch) ────────
+  console.log(`[USER-QUESTION] ${question.trim()}`);
+  console.log(`[ROUTE] ${promptName}`);
+  // ── END VALIDATION LOGGING ─────────────────────────────────────────────────
 
   // Set SSE headers so the frontend can read chunks as they arrive
   res.setHeader("Content-Type", "text/event-stream");

@@ -271,6 +271,15 @@ export default function Landing({ onEnterApp, onEnterScenario }) {
           .l-flow { flex-direction: column !important; gap: 0 !important; }
           .l-flow-arrow { transform: rotate(90deg); align-self: flex-start; margin-left: 22px; padding: 4px 0; margin-bottom: 0; }
         }
+        @media (max-width: 480px) {
+          .l-hero-h1 {
+            font-size: clamp(28px, 8.5vw, 38px) !important;
+            letter-spacing: -1px !important;
+            line-height: 1.12 !important;
+          }
+          .l-hero-h1 .l-hero-accent { white-space: normal !important; }
+          .l-hero-wrap { padding-left: 1rem !important; padding-right: 1rem !important; }
+        }
       `}</style>
 
       {/* ══ NAV ══════════════════════════════════════════════════════════════════ */}
@@ -372,7 +381,7 @@ export default function Landing({ onEnterApp, onEnterScenario }) {
           pointerEvents: "none",
         }} />
 
-        <div style={{ maxWidth: 800, position: "relative" }}>
+        <div className="l-hero-wrap" style={{ maxWidth: 800, width: "100%", position: "relative" }}>
           {/* Eyebrow */}
           <div className="l-h1-anim" style={{ display: "flex", justifyContent: "center", marginBottom: 36 }}>
             <div style={{
@@ -405,7 +414,7 @@ export default function Landing({ onEnterApp, onEnterScenario }) {
           </div>
 
           {/* Headline */}
-          <h1 className="l-h2-anim" style={{
+          <h1 className="l-h2-anim l-hero-h1" style={{
             fontSize: "clamp(38px, 6.5vw, 70px)",
             fontWeight: 800,
             color: C.textPrimary,
@@ -415,7 +424,7 @@ export default function Landing({ onEnterApp, onEnterScenario }) {
           }}>
             Less second-guessing.
             <br />
-            <span style={{ color: C.accent, whiteSpace: "nowrap" }}>More clinical confidence.</span>
+            <span className="l-hero-accent" style={{ color: C.accent, whiteSpace: "nowrap" }}>More clinical confidence.</span>
             <br />
             When it matters most.
           </h1>

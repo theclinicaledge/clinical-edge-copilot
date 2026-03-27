@@ -373,6 +373,25 @@ VOICE RULES:
 const QUICK_KNOWLEDGE_PROMPT = `You are an experienced bedside nurse answering a short, practical clinical knowledge question.
 Your job: give a fast, clear, useful answer. No structure bloat. No forced sections. Just the right answer in the right amount of words.
 
+LANGUAGE HANDLING:
+Nurses ask questions in shorthand, abbreviations, and imperfect grammar. Handle it naturally.
+Common examples: abx = antibiotics, tx = treatment, dx = diagnosis, sx = symptoms, hx = history,
+st = ST (ECG), t wave / t abnormality = T-wave abnormality, lasix = furosemide, bb = beta blocker,
+hf/chf = heart failure, afib = atrial fibrillation, aki = acute kidney injury,
+sob = shortness of breath, wob = work of breathing, uo = urine output,
+cxr = chest x-ray, ecg/ekg = ECG, nc = nasal cannula, nrb = non-rebreather.
+Do NOT refuse to answer because of shorthand — interpret charitably and answer the real question.
+
+QUESTION TYPE RULES:
+1. YES/NO QUESTIONS — answer yes or no first when the question has a clear answer, then explain briefly.
+2. COMPARISON QUESTIONS ("is X same as Y", "difference between X and Y") — state clearly whether they are the same or different, then explain the distinction.
+3. PRACTICAL ACTION QUESTIONS ("should I give", "should I hold", "can I give after X") — answer in safe, nursing-scoped language. Use phrasing like:
+   - "Usually yes if still ordered and consistent with the treatment plan..."
+   - "Usually hold and clarify if the vital sign falls outside common hold parameters..."
+   - "Confirm the provider's plan rather than assuming..."
+   Do NOT say "give it" or "hold it" as a standalone directive.
+4. CONCEPTUAL QUESTIONS — lead with the direct factual answer, then clinical context.
+
 REQUIRED FORMAT (every response, no exceptions):
 
 Line 1 — always exactly:
@@ -384,10 +403,6 @@ Then answer using this structure:
 
 **What this could be**
 1–2 sentences. The direct answer. Lead with the fact, then the clinical context.
-Examples:
-- "Furosemide lowers potassium. It's a loop diuretic that increases urinary potassium loss — hypokalemia is a real risk."
-- "Bruits are vascular sounds; murmurs are cardiac sounds. Both indicate turbulence, but in different systems."
-- "A bruit suggests turbulent blood flow in an artery, usually from narrowing or atherosclerosis."
 
 **What concerns me most**
 3 bullets max. Why this matters clinically. What can go wrong. What to watch for.
@@ -407,17 +422,65 @@ One sentence. A sharp, memorable takeaway a nurse would actually remember.
 VOICE RULES
 - Nurse-to-nurse — not textbook, not academic
 - Lead with the answer, not a definition
-- No fluff, no filler, no disclaimers
+- No fluff, no filler, no excessive disclaimers
 - Explain meds by effect, not pharmacology class
 - No "it is important to note that..." or "please be aware that..."
 - Every line earns its place
 
 SAFETY RULES
 - Do not diagnose or prescribe
-- Do not say "give it" or "hold it" unless framing a clear safety concern
+- Do not issue standalone directives like "give it" or "hold it" — keep it nursing-scoped
 - Do not repeat information across sections
 
 STYLE EXAMPLES
+
+Question: "Is t abnormality same as st abnormality"
+**What this could be**
+No — T-wave abnormalities and ST abnormalities are not the same. They reflect different phases of the cardiac cycle and point to different concerns.
+
+**What concerns me most**
+- T-wave changes usually reflect repolarization abnormalities — ischemia, electrolyte issues, or strain
+- ST changes can suggest ischemia, injury, or pericarditis depending on elevation vs. depression and pattern
+- Both can appear together but interpreting them as the same thing can cause you to miss something important
+
+**What I'd assess next**
+- Is this a new finding or a known baseline?
+- Any symptoms: chest pain, dyspnea, palpitations, syncope?
+- Recent labs — potassium, magnesium, troponin?
+
+**What I'd do right now**
+- Flag new ECG changes to the provider — don't sit on them
+- Compare to an old ECG if available
+- Know your patient's baseline so you can identify what's actually changed
+
+**Closing**
+On an ECG, new is more important than abnormal — always compare.
+
+---
+
+Question: "Should I give abx after abscess is drained"
+**What this could be**
+Usually yes if antibiotics are still ordered and the treatment plan calls for them. Drainage treats the source, but antibiotics may still be needed depending on cellulitis, fever, size, or patient risk factors.
+
+**What concerns me most**
+- Drainage alone is not always enough — surrounding cellulitis, systemic signs, or immunocompromise usually warrant antibiotics
+- Assuming drainage ends treatment without confirming with the provider is unsafe
+- Antibiotic course and duration should come from the provider's plan
+
+**What I'd assess next**
+- Is there surrounding cellulitis, fever, or signs of spreading infection?
+- What does the provider's order say — is there a specific course documented?
+- Any signs of systemic infection: fever, tachycardia, elevated WBC?
+
+**What I'd do right now**
+- Follow the provider's plan — do not discontinue antibiotics without an order
+- If it's unclear whether antibiotics are still needed, confirm before skipping a dose
+- Document wound status, drainage, and any signs of improvement or worsening
+
+**Closing**
+Draining the abscess is treating the source — the provider decides if the antibiotics stay.
+
+---
 
 Question: "Does furosemide lower potassium?"
 **What this could be**
@@ -500,41 +563,123 @@ function isExamStyle(question) {
 // Returns true when the input is clearly a short conceptual/factual question
 // with no clinical scenario context. Runs as Priority 1 — overrides mode
 // selection so deep-mode users still get sharp knowledge answers.
+// Common nursing abbreviation normalizer — expands shorthand before routing/matching.
+// This does NOT replace the question sent to the model; it only helps routing decisions.
+function normalizeAbbreviations(q) {
+  return q
+    .replace(/\babx\b/g, "antibiotics")
+    .replace(/\btx\b/g, "treatment")
+    .replace(/\bdx\b/g, "diagnosis")
+    .replace(/\bhx\b/g, "history")
+    .replace(/\bsx\b/g, "symptoms")
+    .replace(/\bwob\b/g, "work of breathing")
+    .replace(/\bsob\b/g, "shortness of breath")
+    .replace(/\bcp\b/g, "chest pain")
+    .replace(/\bn\/v\b/g, "nausea vomiting")
+    .replace(/\ba&o\b|\baox\d\b|\bao\b/g, "alert oriented")
+    .replace(/\bloc\b/g, "level of consciousness")
+    .replace(/\bwnl\b/g, "within normal limits")
+    .replace(/\baki\b/g, "acute kidney injury")
+    .replace(/\bckd\b/g, "chronic kidney disease")
+    .replace(/\bchf\b|\bhf\b/g, "heart failure")
+    .replace(/\bafib\b/g, "atrial fibrillation")
+    .replace(/\brvr\b/g, "rapid ventricular rate")
+    .replace(/\bcopd\b/g, "chronic obstructive pulmonary disease")
+    .replace(/\becg\b|\bekg\b/g, "ecg")
+    .replace(/\bst\b/g, "st")   // keep as-is — ECG context handled by prompt
+    .replace(/\bt wave\b|\btwave\b|\bt abnormality\b/g, "t wave abnormality")
+    .replace(/\buo\b/g, "urine output")
+    .replace(/\bi&o\b/g, "intake output")
+    .replace(/\blasix\b/g, "furosemide")
+    .replace(/\bbb\b/g, "beta blocker")
+    .replace(/\bacei\b/g, "ace inhibitor")
+    .replace(/\barb\b/g, "arb")
+    .replace(/\bhfnc\b/g, "high flow nasal cannula")
+    .replace(/\bnc\b/g, "nasal cannula")
+    .replace(/\bnrb\b/g, "non rebreather mask")
+    .replace(/\bprbc\b/g, "packed red blood cells")
+    .replace(/\bptt\b/g, "partial thromboplastin time")
+    .replace(/\binr\b/g, "inr")
+    .replace(/\bbun\b/g, "blood urea nitrogen")
+    .replace(/\bcr\b|\bcreat\b|\bcrt\b/g, "creatinine")
+    .replace(/\babg\b/g, "arterial blood gas")
+    .replace(/\bvbg\b/g, "venous blood gas")
+    .replace(/\bcxr\b/g, "chest xray")
+    .replace(/\bd\/c\b/g, "discontinue")
+    .replace(/\bpo\b/g, "by mouth")
+    .replace(/\biv\b/g, "intravenous")
+    .replace(/\bnpo\b/g, "nothing by mouth")
+    .replace(/\bprn\b/g, "as needed")
+    .replace(/\bbid\b/g, "twice daily")
+    .replace(/\btid\b/g, "three times daily")
+    .replace(/\bqid\b/g, "four times daily")
+    .replace(/\bqhs\b/g, "at bedtime");
+}
+
 function isQuickKnowledge(question) {
   const q = question.toLowerCase().trim();
+  const qNorm = normalizeAbbreviations(q); // normalized copy for pattern matching only
   const wordCount = q.split(/\s+/).length;
 
-  // Knowledge questions are short — cap at 25 words
-  if (wordCount > 25) return false;
+  // Knowledge questions are short — cap at 35 words (raised from 25 for natural shorthand)
+  if (wordCount > 35) return false;
 
   // Bail out if any clinical scenario indicators are present
   // (these suggest a real patient situation, not a conceptual question)
   const scenarioIndicators = [
-    "patient", " pt ", "my pt", "the pt",
-    "bp ", " hr ", "spo2", "o2 sat",
+    " patient ", "my patient", "the patient",
+    " pt is ", "my pt", "the pt",
+    "spo2", "o2 sat",
     "trending", "worsening", "deteriorat", "unstable",
-    "chest pain", "shortness of breath", " sob",
+    "over the last", "over the past",
+    "looks worse", "more tired", "confused now",
+    "chest pain", "shortness of breath",
     "altered", "diaphoretic", "distress",
-    "postop", "post-op", "post op", "icu", "stepdown",
+    "postop", "post-op", "post op", "stepdown",
     "just started", "right now", "currently", "tonight", "this morning",
     "came back", "came in", "getting worse",
+    "just got", "just had", "just returned",
+    "in the icu", "in icu",
   ];
-  if (scenarioIndicators.some((s) => q.includes(s))) return false;
+  if (scenarioIndicators.some((s) => qNorm.includes(s))) return false;
 
   // Must match a clear knowledge-question pattern
   const knowledgePatterns = [
+    // What is / what are / what does
     /^what (is|are|does|do)\b/,
+    /^what('s| is) (a |an |the )?\w/,
+    /^what does .+ (mean|indicate|suggest|stand for)/,
+    // Comparison questions — "is X same as Y", "is X the same as Y"
+    /\bsame as\b/,
     /difference between/,
-    /^does .+\b(lower|raise|increase|decrease|cause|affect|reduce|drop|elevate|worsen|improve)\b/,
+    /^is .+ (same|different|the same|similar) (as|to|from)\b/,
+    // Does X affect Y
+    /^does .+\b(lower|raise|increase|decrease|cause|affect|reduce|drop|elevate|worsen|improve|change|impact)\b/,
+    // How / why does
     /^(how|why) does\b/,
-    /^when (is|do|does|should)\b/,
-    /^(what|which) (indicates?|means?|suggests?|causes?|happens?)\b/,
-    /^(define|explain)\b/,
+    /^(how|why) (do|would|should|is|are)\b/,
+    // When is / when should
+    /^when (is|do|does|should|would)\b/,
+    // Which indicates / what suggests
+    /^(what|which) (indicates?|means?|suggests?|causes?|happens?|signifies?)\b/,
+    // Define / explain
+    /^(define|explain|describe)\b/,
+    // Ends with indicate/mean/suggest/stand for
     /\b(indicate|mean|suggest|cause|stand for)\?*$/,
-    /^is .+ (normal|dangerous|safe|common|a sign|an indication)\b/,
-    /^(what|how) (do you|do nurses|should nurses|would you)\b/,
+    // Is X normal / dangerous / safe
+    /^is .+ (normal|dangerous|safe|common|a sign|an indication|okay|ok)\b/,
+    // What / how do nurses / should nurses
+    /^(what|how) (do you|do nurses|should nurses|would you|would a nurse)\b/,
+    // Should I give / hold — practical action questions (short, no scenario context)
+    /^(should|can|do) (i|we|a nurse) (give|hold|administer|start|stop|use|check)\b/,
+    // After X is drained/removed/done
+    /^(after|once) .+(drain|remov|complet|finish)/,
+    // Is it safe / okay to give
+    /^is it (safe|okay|ok|appropriate|fine) to (give|hold|administer|start)\b/,
+    // Why is / why are
+    /^why (is|are|do|does|would|can)\b/,
   ];
-  return knowledgePatterns.some((p) => p.test(q));
+  return knowledgePatterns.some((p) => p.test(qNorm));
 }
 
 // ── Input-based prompt routing ─────────────────────────────────────────────
@@ -669,16 +814,22 @@ app.post("/api/copilot", async (req, res) => {
       messages: [{ role: "user", content: question.trim() }],
     });
 
+    let fullResponse = "";
+
     for await (const chunk of stream) {
       if (
         chunk.type === "content_block_delta" &&
         chunk.delta?.type === "text_delta" &&
         chunk.delta?.text
       ) {
+        fullResponse += chunk.delta.text;
         // Send each text chunk as an SSE data event
         res.write(`data: ${JSON.stringify({ text: chunk.delta.text })}\n\n`);
       }
     }
+
+    // Log full response after stream completes (trim if extremely long)
+    console.log(`[AI-RESPONSE] ${fullResponse.length > 3000 ? fullResponse.slice(0, 3000) + "… [trimmed]" : fullResponse}`);
 
     // Signal stream completion
     res.write(`data: ${JSON.stringify({ done: true })}\n\n`);

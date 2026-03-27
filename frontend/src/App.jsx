@@ -800,46 +800,21 @@ export default function App() {
       <div style={{ maxWidth: 680, margin: "0 auto", padding: "36px 16px 0" }}>
 
         {/* Hero */}
-        <div style={{ textAlign: "center", marginBottom: 32 }}>
+        <div style={{ textAlign: "center", marginBottom: 28 }}>
           <h1 style={{
             fontFamily: "'Inter', sans-serif",
             fontWeight: 700,
             fontSize: "clamp(22px, 5vw, 30px)",
             color: "#F8FBFC",
-            margin: "0 0 10px",
+            margin: "0 0 8px",
             lineHeight: 1.2,
             letterSpacing: "-0.5px",
           }}>
-            Think clearly. Act with confidence.
+            Something feels off?
           </h1>
-          <p style={{ fontSize: 14, color: "#7F99A5", margin: 0, lineHeight: 1.6 }}>
-            Structured clinical reasoning &mdash; nurse to nurse.
+          <p style={{ fontSize: 15, color: "#7F99A5", margin: 0, lineHeight: 1.5, fontWeight: 500 }}>
+            Run it by Copilot.
           </p>
-        </div>
-
-        {/* Privacy notice */}
-        <div style={{
-          background: "rgba(242,185,75,0.05)",
-          border: "1px solid rgba(242,185,75,0.15)",
-          borderLeft: "3px solid rgba(242,185,75,0.4)",
-          borderRadius: 8,
-          padding: "10px 14px",
-          fontSize: 12,
-          color: "#A8966A",
-          marginBottom: 20,
-          display: "flex",
-          gap: 9,
-          alignItems: "flex-start",
-        }}>
-          <span style={{
-            fontFamily: "'IBM Plex Mono', monospace",
-            fontSize: 10,
-            color: "#F2B94B",
-            flexShrink: 0,
-            marginTop: 1,
-            letterSpacing: 0,
-          }}>&#9888;</span>
-          <span>Do not enter names, MRNs, dates of birth, SSNs, phone numbers, or any patient identifiers. Describe the clinical situation only.</span>
         </div>
 
         {/* Input card */}
@@ -849,23 +824,14 @@ export default function App() {
           borderRadius: 13,
           padding: "20px",
           boxShadow: "0 4px 24px rgba(0,0,0,0.25)",
-          marginBottom: 16,
+          marginBottom: 8,
         }}>
-          <div style={{
-            fontSize: 9,
-            fontWeight: 700,
-            textTransform: "uppercase",
-            letterSpacing: "1.3px",
-            color: "#7F99A5",
-            marginBottom: 10,
-            fontFamily: "'IBM Plex Mono', monospace",
-          }}>Clinical Situation</div>
           <textarea
             ref={textareaRef}
             value={question}
             onChange={(e) => setQuestion(e.target.value)}
             onKeyDown={handleKey}
-            placeholder="Describe what's happening with the patient..."
+            placeholder="Patient more lethargic than earlier…"
             rows={3}
             style={{
               width: "100%",
@@ -916,21 +882,45 @@ export default function App() {
                 transition: "all 0.18s",
               }}
             >
-              {isActive ? <><span className="spinner" />Analyzing...</> : "Get Guidance \u2192"}
+              {isActive ? <><span className="spinner" />Analyzing...</> : "Ask Copilot"}
             </button>
           </div>
         </div>
 
-        {/* Input trust line */}
+        {/* Helper line */}
         <div style={{
-          fontSize: 11,
-          color: "#3A5566",
-          fontFamily: "'IBM Plex Mono', monospace",
-          letterSpacing: "0.2px",
-          marginBottom: 20,
-          marginTop: -8,
+          fontSize: 13,
+          color: "#4F6D7A",
+          lineHeight: 1.5,
+          marginBottom: 12,
+          marginTop: 2,
         }}>
-          Built to support your clinical thinking — not replace it
+          Not sure how to phrase it? Just type what you're seeing.
+        </div>
+
+        {/* Privacy notice */}
+        <div style={{
+          background: "rgba(242,185,75,0.04)",
+          border: "1px solid rgba(242,185,75,0.12)",
+          borderLeft: "2px solid rgba(242,185,75,0.3)",
+          borderRadius: 7,
+          padding: "8px 12px",
+          fontSize: 12,
+          color: "#907A52",
+          marginBottom: 20,
+          display: "flex",
+          gap: 8,
+          alignItems: "flex-start",
+          opacity: 0.82,
+        }}>
+          <span style={{
+            fontFamily: "'IBM Plex Mono', monospace",
+            fontSize: 10,
+            color: "#C49A3C",
+            flexShrink: 0,
+            marginTop: 1,
+          }}>&#9888;</span>
+          <span>Do not enter names, MRNs, dates of birth, SSNs, phone numbers, or any patient identifiers. Describe the clinical situation only.</span>
         </div>
 
         {/* Recent Cases */}
@@ -1003,14 +993,10 @@ export default function App() {
         {/* Example pills */}
         <div style={{ marginBottom: 36 }}>
           <div style={{
-            fontSize: 9,
-            color: "#7F99A5",
-            fontWeight: 700,
-            textTransform: "uppercase",
-            letterSpacing: "1.3px",
+            fontSize: 13,
+            color: "#4F6D7A",
             marginBottom: 10,
-            fontFamily: "'IBM Plex Mono', monospace",
-          }}>Try an Example</div>
+          }}>Try this:</div>
           <div style={{ display: "flex", flexWrap: "wrap", gap: 7 }}>
             {EXAMPLES.map((ex) => (
               <button

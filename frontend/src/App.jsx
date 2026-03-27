@@ -810,10 +810,10 @@ export default function App() {
             lineHeight: 1.2,
             letterSpacing: "-0.5px",
           }}>
-            Something feels off?
+            Clinical reasoning support for nurses
           </h1>
           <p style={{ fontSize: 15, color: "#7F99A5", margin: 0, lineHeight: 1.5, fontWeight: 500 }}>
-            Run it by Copilot.
+            Describe the situation. Copilot helps you think it through.
           </p>
         </div>
 

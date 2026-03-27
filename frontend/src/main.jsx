@@ -192,10 +192,10 @@ function InstallBanner() {
 // ── Routing ─────────────────────────────────────────────────────────────────
 function getPage() {
   const hash = window.location.hash;
-  if (hash === '#/app') return 'app';
+  if (hash === '#/landing') return 'landing';
   if (hash === '#/scenario') return 'scenario';
   if (hash === '#/quickstart') return 'quickstart';
-  return 'landing';
+  return 'app';
 }
 
 function Root() {

@@ -777,21 +777,34 @@ export default function App() {
             </span>
           </div>
 
-          {/* Beta badge */}
-          <span style={{
-            marginLeft: "auto",
-            fontFamily: "'IBM Plex Mono', 'Courier New', monospace",
-            fontSize: 9,
-            fontWeight: 500,
-            color: "#4FD1C5",
-            border: "1px solid rgba(79,209,197,0.22)",
-            padding: "3px 9px",
-            borderRadius: 100,
-            letterSpacing: "1.2px",
-            textTransform: "uppercase",
-          }}>
-            Beta
-          </span>
+          {/* Beta badge + Learn more */}
+          <div style={{ marginLeft: "auto", display: "flex", alignItems: "center", gap: 12 }}>
+            <span style={{
+              fontFamily: "'IBM Plex Mono', 'Courier New', monospace",
+              fontSize: 9,
+              fontWeight: 500,
+              color: "#4FD1C5",
+              border: "1px solid rgba(79,209,197,0.22)",
+              padding: "3px 9px",
+              borderRadius: 100,
+              letterSpacing: "1.2px",
+              textTransform: "uppercase",
+            }}>
+              Beta
+            </span>
+            <a
+              href="/#/landing"
+              style={{
+                fontSize: 12,
+                color: "#7F99A5",
+                textDecoration: "none",
+                fontWeight: 400,
+                opacity: 0.8,
+              }}
+            >
+              Learn more
+            </a>
+          </div>
 
         </div>
       </div>

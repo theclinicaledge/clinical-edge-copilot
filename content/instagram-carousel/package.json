@@ -1,0 +1,11 @@
+{
+  "name": "instagram-carousel",
+  "version": "1.0.0",
+  "main": "export.js",
+  "scripts": {
+    "export": "node export.js"
+  },
+  "dependencies": {
+    "puppeteer": "^24.40.0"
+  }
+}

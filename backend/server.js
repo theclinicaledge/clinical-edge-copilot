@@ -2,12 +2,19 @@ require("dotenv").config();
 const express = require("express");
 const cors = require("cors");
 const Anthropic = require("@anthropic-ai/sdk");
+const fs = require("fs");
+const path = require("path");
 
 const app = express();
 app.use(cors());
 app.use(express.json());
 
 const client = new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY });
+
+// ── Log setup ─────────────────────────────────────────────────────────────────
+const LOG_DIR  = path.join(__dirname, "logs");
+const LOG_FILE = path.join(LOG_DIR, "responses.jsonl");
+fs.mkdirSync(LOG_DIR, { recursive: true });
 
 const QUICK_SYSTEM_PROMPT = `You are an experienced bedside nurse with 12–15 years across med-surg, stepdown, and ICU.
 
@@ -765,6 +772,35 @@ function containsPHI(text) {
   return null;
 }
 
+// ── Lightweight input redaction ───────────────────────────────────────────────
+// Secondary safety layer — PHI is already blocked upstream by containsPHI.
+// Scrubs residual structural patterns before writing to the log file.
+function redactInput(text) {
+  return text
+    .replace(/\b\d{3}-\d{2}-\d{4}\b/g, "[SSN]")
+    .replace(/\b(\+1[\s.-]?)?\(?\d{3}\)?[\s.-]\d{3}[\s.-]\d{4}\b/g, "[PHONE]")
+    .replace(/\b[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}\b/g, "[EMAIL]")
+    .replace(/\b(MRN|mrn|Medical Record)[:\s#]*\d{5,10}\b/gi, "[MRN]")
+    .replace(/\b(DOB|D\.O\.B\.|Date of Birth)[:\s]*\d{1,2}[\/\-]\d{1,2}[\/\-]\d{2,4}\b/gi, "[DOB]")
+    .replace(/\b\d{1,2}[\/\-]\d{1,2}[\/\-]\d{2,4}\b/g, "[DATE]")
+    .replace(/(?<![0-9])\d{7,10}(?![0-9mg/%])/g, "[ID]");
+}
+
+// ── Parse urgency from AI response ───────────────────────────────────────────
+function parseUrgency(response) {
+  const match = response.match(/^Urgency Level:\s*(HIGH|MODERATE|LOW)/m);
+  return match ? match[1] : null;
+}
+
+// ── Append one JSONL entry to the log file ────────────────────────────────────
+function appendLog(entry) {
+  try {
+    fs.appendFileSync(LOG_FILE, JSON.stringify(entry) + "\n", "utf8");
+  } catch (err) {
+    console.error("[LOG] Failed to write log entry:", err.message);
+  }
+}
+
 // ── Streaming endpoint ────────────────────────────────────────────────────────
 app.post("/api/copilot", async (req, res) => {
   const { question, mode } = req.body;
@@ -794,11 +830,8 @@ app.post("/api/copilot", async (req, res) => {
     selectedPrompt === EXAM_SYSTEM_PROMPT  ? "EXAM_SYSTEM_PROMPT"  :
     "QUICK_KNOWLEDGE_PROMPT";
 
-  // ── VALIDATION-PHASE LOGGING (temporary — remove after soft launch) ────────
-  console.log(`[TIMESTAMP] ${new Date().toISOString()}`);
-  console.log(`[USER-QUESTION] ${question.trim()}`);
-  console.log(`[ROUTE] ${promptName}`);
-  // ── END VALIDATION LOGGING ─────────────────────────────────────────────────
+  const requestTimestamp = new Date().toISOString();
+  console.log(`[REQUEST] ${requestTimestamp} | route=${promptName}`);
 
   // Set SSE headers so the frontend can read chunks as they arrive
   res.setHeader("Content-Type", "text/event-stream");
@@ -828,14 +861,30 @@ app.post("/api/copilot", async (req, res) => {
       }
     }
 
-    // Log full response after stream completes (trim if extremely long)
-    console.log(`[AI-RESPONSE] ${fullResponse.length > 3000 ? fullResponse.slice(0, 3000) + "… [trimmed]" : fullResponse}`);
+    appendLog({
+      timestamp:        requestTimestamp,
+      route:            promptName,
+      input_redacted:   redactInput(question.trim()),
+      urgency:          parseUrgency(fullResponse),
+      status:           "success",
+      response_preview: fullResponse.slice(0, 250),
+      response_length:  fullResponse.length,
+    });
 
     // Signal stream completion
     res.write(`data: ${JSON.stringify({ done: true })}\n\n`);
     res.end();
   } catch (error) {
     console.error("[Clinical Edge] Anthropic API error:", error.status ?? "", error.message);
+    appendLog({
+      timestamp:        requestTimestamp,
+      route:            promptName,
+      input_redacted:   redactInput(question.trim()),
+      urgency:          null,
+      status:           "error",
+      response_preview: null,
+      response_length:  0,
+    });
     // SSE headers are already sent — respond with an error SSE event so the
     // frontend can stop streaming and display the message cleanly.
     res.write(`data: ${JSON.stringify({ error: "High usage right now. Please try again in a moment." })}\n\n`);

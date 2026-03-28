@@ -20,6 +20,10 @@ my-video/.cache/
 my-video/.tmp/
 *.mp4
 
+# Backend logs — local only, never commit
+backend/logs/
+backend/logs/responses.jsonl
+
 # Generated / local-only
 node_modules/
 my-video/node_modules/

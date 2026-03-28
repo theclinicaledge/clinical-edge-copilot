@@ -7,6 +7,19 @@ Built by Mohamed, a master's-prepared RN with critical care experience.
 
 ---
 
+## Working Environment
+
+- **Safe local path:** `~/Code/clinical-edge-copilot-fixed` (full path: `/Users/mohamed/Code/clinical-edge-copilot-fixed`)
+- **Do NOT reference or use** the old Desktop or iCloud copy of this project
+- All work in Claude Code sessions must target this repo exclusively
+- Repo structure:
+  - `frontend/` — Vite/React app
+  - `backend/` — Node.js/Express server and prompt routing
+  - `content/` — content assets and workflows
+  - `my-video/` — Remotion video system
+
+---
+
 ## Tech Stack
 
 | Layer | Technology |
@@ -26,7 +39,30 @@ Built by Mohamed, a master's-prepared RN with critical care experience.
 - **Never redesign the UI** — dark navy premium aesthetic with electric blue accents is locked in
 - **Never simplify the product** — maintain full feature complexity
 - **Never remove previously built features** — every iteration must preserve all existing functionality
-- **Do not change the backend unless absolutely necessary**
+- **Backend is considered stable** — do not modify backend logic, routes, or API behavior unless explicitly instructed
+- **This document (`CLAUDE.md`) is the source of truth** for architecture, constraints, and behavior
+
+---
+
+## File Hygiene Rules
+
+- **Do not touch generated files** — includes `dist/`, `node_modules/`, and any Remotion render output
+- **Do not commit unless explicitly asked** — always wait for explicit commit instruction
+- **Do not change deployment config unless asked** — this includes `vite.config.js`, hosting config, environment variables, and any CI/CD files
+- **Do not create new files unless explicitly instructed**
+- **Do not restructure folders or move files without approval**
+- **Never make changes without first explaining what will be changed and why**
+- **Wait for explicit approval before modifying any files**
+- Before making any changes, always state which files will be modified
+
+---
+
+## Deployment Setup
+
+- Deployment is **not yet live**
+- Recommended build sequence: deploy app → launch landing page → collect waitlist signups
+- Frontend build: `cd frontend && npm run build` (output goes to `frontend/dist/` — do not touch)
+- Do not modify deployment-related config (Render, Railway, Vercel, Netlify, etc.) without explicit instruction
 
 ---
 
@@ -108,12 +144,9 @@ Supported actions: expand, edit note, reopen, copy, delete.
 ## What's Not Built Yet (Coming Soon)
 
 - Authentication / user accounts
-- Deployment (not yet live)
 - Payment / subscription layer
 - Landing page
 - 30-scenario test library
-
-Recommended build sequence: deploy app → launch landing page → collect waitlist signups.
 
 ---
 
@@ -122,4 +155,4 @@ Recommended build sequence: deploy app → launch landing page → collect waitl
 - Run frontend: `cd frontend && npm run dev`
 - Run backend: `cd backend && node server.js` (or `npm start`)
 - Both must be running simultaneously for the app to work
-- Test with realistic nursing scenarios — vague or single-value inputs often produce better outputs than overly clinical prompts
+- Test with realistic, context-rich nursing scenarios and avoid overfitting to minimal inputs

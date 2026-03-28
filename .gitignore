@@ -19,3 +19,15 @@ my-video/dist/
 my-video/.cache/
 my-video/.tmp/
 *.mp4
+
+# Generated / local-only
+node_modules/
+my-video/node_modules/
+my-video/out/
+my-video/dist/
+my-video/.cache/
+my-video/.tmp/
+content/instagram-carousel/node_modules/
+.claude/worktrees/
+*.mp4
+.DS_Store

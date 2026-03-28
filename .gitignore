@@ -31,3 +31,4 @@ content/instagram-carousel/node_modules/
 .claude/worktrees/
 *.mp4
 .DS_Store
+frontend/dist

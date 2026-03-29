@@ -36,3 +36,10 @@ content/instagram-carousel/node_modules/
 *.mp4
 .DS_Store
 frontend/dist
+
+# Carousel — generated and temporary files only
+# Source post-XX.html files are still tracked
+content/instagram-carousel/index.html
+content/instagram-carousel/exports/
+content/instagram-carousel/archive/
+content/instagram-carousel/*.png

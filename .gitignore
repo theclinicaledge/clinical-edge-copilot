@@ -43,3 +43,6 @@ content/instagram-carousel/index.html
 content/instagram-carousel/exports/
 content/instagram-carousel/archive/
 content/instagram-carousel/*.png
+backend/node_modules/
+frontend/node_modules/
+frontend/dist/

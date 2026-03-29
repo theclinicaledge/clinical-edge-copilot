@@ -1,12 +1,44 @@
 require("dotenv").config();
 const express = require("express");
 const cors = require("cors");
+const helmet = require("helmet");
+const rateLimit = require("express-rate-limit");
 const Anthropic = require("@anthropic-ai/sdk");
 const fs = require("fs");
 const path = require("path");
 
 const app = express();
-app.use(cors());
+
+// ── Allowed origins ───────────────────────────────────────────────────────────
+const ALLOWED_ORIGINS = [
+  "https://theclinicaledge.org",
+  "https://www.theclinicaledge.org",
+  "http://localhost:5173",
+];
+
+app.use(cors({
+  origin: (origin, callback) => {
+    // Allow requests with no origin header (e.g. Render health checks, curl)
+    if (!origin || ALLOWED_ORIGINS.includes(origin)) {
+      callback(null, true);
+    } else {
+      callback(new Error("Not allowed by CORS"));
+    }
+  },
+}));
+
+// ── Security headers ──────────────────────────────────────────────────────────
+app.use(helmet());
+
+// ── Rate limiting ─────────────────────────────────────────────────────────────
+const apiLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000,   // 15-minute window
+  max: 30,                     // 30 requests per window per IP
+  standardHeaders: true,       // Return rate limit info in RateLimit-* headers
+  legacyHeaders: false,
+  message: { error: "Too many requests. Please wait a few minutes and try again." },
+});
+
 app.use(express.json());
 
 const client = new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY });
@@ -802,7 +834,7 @@ function appendLog(entry) {
 }
 
 // ── Streaming endpoint ────────────────────────────────────────────────────────
-app.post("/api/copilot", async (req, res) => {
+app.post("/api/copilot", apiLimiter, async (req, res) => {
   const { question, mode } = req.body;
 
   if (!question || question.trim() === "") {
@@ -810,6 +842,9 @@ app.post("/api/copilot", async (req, res) => {
   }
   if (question.trim().length < 5) {
     return res.status(400).json({ error: "Please describe the clinical situation in more detail." });
+  }
+  if (question.trim().length > 5000) {
+    return res.status(400).json({ error: "Input is too long. Please shorten your clinical question and try again." });
   }
 
   // PHI guardrail — block before sending to Claude

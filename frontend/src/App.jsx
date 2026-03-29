@@ -667,6 +667,7 @@ export default function App() {
         ::-webkit-scrollbar { width: 4px; }
         ::-webkit-scrollbar-track { background: transparent; }
         ::-webkit-scrollbar-thumb { background: rgba(0,194,209,0.2); border-radius: 2px; }
+        .preview-scroll::-webkit-scrollbar { display: none; }
 
         .chip:hover {
           background: rgba(0,194,209,0.06) !important;
@@ -813,7 +814,7 @@ export default function App() {
       <div style={{ maxWidth: 680, margin: "0 auto", padding: "36px 16px 0" }}>
 
         {/* Hero */}
-        <div style={{ textAlign: "center", marginBottom: 28 }}>
+        <div style={{ textAlign: "center", marginBottom: 24 }}>
           <h1 style={{
             fontFamily: "'Inter', sans-serif",
             fontWeight: 700,
@@ -823,20 +824,60 @@ export default function App() {
             lineHeight: 1.2,
             letterSpacing: "-0.5px",
           }}>
-            Clinical reasoning support for nurses
+            Clinical reasoning support. Built for nurses.
           </h1>
-          <p style={{ fontSize: 15, color: "#7F99A5", margin: 0, lineHeight: 1.5, fontWeight: 500 }}>
+          <p style={{ fontSize: 15, color: "#A8C1CC", margin: "0 0 5px", lineHeight: 1.5, fontWeight: 500 }}>
             Describe the situation. Copilot helps you think it through.
           </p>
+          <p style={{ fontSize: 13, color: "#7F99A5", margin: 0, lineHeight: 1.5, fontWeight: 400 }}>
+            For real-world questions and practice scenarios. Not a diagnosis.
+          </p>
+        </div>
+
+        {/* Output preview block */}
+        <div
+          className="preview-scroll"
+          style={{
+            background: "rgba(255,255,255,0.015)",
+            border: "1px solid rgba(255,255,255,0.04)",
+            borderRadius: 8,
+            padding: "5px 12px",
+            marginBottom: 18,
+            display: "flex",
+            flexWrap: "nowrap",
+            alignItems: "center",
+            gap: "0 10px",
+            overflowX: "auto",
+            scrollbarWidth: "none",
+            msOverflowStyle: "none",
+          }}
+        >
+          <span style={{ fontSize: 11, color: "#4F6D7A", fontFamily: "'IBM Plex Mono', monospace", whiteSpace: "nowrap", flexShrink: 0, marginRight: 2 }}>
+            You'll get:
+          </span>
+          {["What this could be", "What matters most", "What to assess next", "What to do right now"].map((item) => (
+            <span key={item} style={{
+              fontSize: 11,
+              color: "#4F7A87",
+              background: "rgba(0,194,209,0.05)",
+              border: "1px solid rgba(0,194,209,0.10)",
+              borderRadius: 4,
+              padding: "2px 7px",
+              whiteSpace: "nowrap",
+              flexShrink: 0,
+            }}>
+              {item}
+            </span>
+          ))}
         </div>
 
         {/* Input card */}
         <div style={{
           background: "#112936",
-          border: "1px solid rgba(255,255,255,0.08)",
+          border: "1px solid rgba(255,255,255,0.11)",
           borderRadius: 13,
           padding: "20px",
-          boxShadow: "0 4px 24px rgba(0,0,0,0.25)",
+          boxShadow: "0 6px 28px rgba(0,0,0,0.30)",
           marginBottom: 8,
         }}>
           <textarea
@@ -844,7 +885,7 @@ export default function App() {
             value={question}
             onChange={(e) => setQuestion(e.target.value)}
             onKeyDown={handleKey}
-            placeholder="Patient more lethargic than earlier…"
+            placeholder="Patient more lethargic, HR climbing, unsure what to make of it..."
             rows={3}
             style={{
               width: "100%",
@@ -908,7 +949,7 @@ export default function App() {
           marginBottom: 12,
           marginTop: 2,
         }}>
-          Not sure how to phrase it? Just type what you're seeing.
+          Just describe the scenario in your own words.
         </div>
 
         {/* Privacy notice */}

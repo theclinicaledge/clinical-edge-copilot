@@ -714,6 +714,34 @@ export default function App() {
           0%, 100% { opacity: 0.8; }
           50% { opacity: 0; }
         }
+
+        /* ─── Mobile refinements (≤ 768px only) ──────────────── */
+        @media (max-width: 768px) {
+          /* 1: Hide preview strip — input is the first visible element */
+          .preview-scroll { display: none !important; }
+          /* Restore full top radius on input card when preview strip is hidden */
+          .input-card {
+            border-top-left-radius: 14px !important;
+            border-top-right-radius: 14px !important;
+          }
+          /* 2: Soften warning box — guidance tone, not alert tone */
+          .privacy-notice {
+            background: rgba(176,128,38,0.06) !important;
+            border: 1px solid rgba(233,186,75,0.14) !important;
+            border-radius: 10px !important;
+            padding: 12px 14px !important;
+            font-size: 13px !important;
+            line-height: 1.4 !important;
+            color: rgba(233,186,75,0.82) !important;
+          }
+          /* 3 + 4: Tighten hero spacing + pull input closer */
+          .main-container { padding: 28px 16px 0 !important; }
+          .hero { margin-bottom: 18px !important; }
+          .hero h1 { margin-bottom: 10px !important; }
+          /* 5: Reduce chip density — show max 3 per section */
+          .chips-recent button:nth-child(n+4) { display: none !important; }
+          .chips-try button:nth-child(n+4) { display: none !important; }
+        }
       `}</style>
 
       {/* ── Header ───────────────────────────────────────────────────────── */}
@@ -812,10 +840,10 @@ export default function App() {
       </div>
 
       {/* ── Main ─────────────────────────────────────────────────────────── */}
-      <div style={{ maxWidth: 680, margin: "0 auto", padding: "42px 16px 0" }}>
+      <div className="main-container" style={{ maxWidth: 680, margin: "0 auto", padding: "42px 16px 0" }}>
 
         {/* Hero */}
-        <div style={{ textAlign: "center", marginBottom: 26 }}>
+        <div className="hero" style={{ textAlign: "center", marginBottom: 26 }}>
           <h1 style={{
             fontFamily: "'Inter', sans-serif",
             fontWeight: 700,
@@ -882,7 +910,7 @@ export default function App() {
         </div>
 
         {/* Input card */}
-        <div style={{
+        <div className="input-card" style={{
           background: "#112936",
           border: "1px solid rgba(255,255,255,0.09)",
           borderTopLeftRadius: 0,
@@ -966,7 +994,7 @@ export default function App() {
         </div>
 
         {/* Privacy notice */}
-        <div style={{
+        <div className="privacy-notice" style={{
           background: "rgba(176,128,38,0.08)",
           border: "1px solid rgba(233,186,75,0.20)",
           borderRadius: 12,
@@ -1000,7 +1028,7 @@ export default function App() {
               marginBottom: 10,
               fontFamily: "'IBM Plex Mono', monospace",
             }}>Recent Cases</div>
-            <div style={{ display: "flex", flexWrap: "wrap", gap: 7 }}>
+            <div className="chips-recent" style={{ display: "flex", flexWrap: "wrap", gap: 7 }}>
               {history.map((item, i) => (
                 <button
                   key={i}
@@ -1072,7 +1100,7 @@ export default function App() {
             color: "rgba(168,188,198,0.62)",
             marginBottom: 10,
           }}>Try this:</div>
-          <div style={{ display: "flex", flexWrap: "wrap", gap: 7 }}>
+          <div className="chips-try" style={{ display: "flex", flexWrap: "wrap", gap: 7 }}>
             {EXAMPLES.map((ex) => (
               <button
                 key={ex}

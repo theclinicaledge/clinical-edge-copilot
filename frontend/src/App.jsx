@@ -738,6 +738,24 @@ export default function App() {
           .main-container { padding: 28px 16px 0 !important; }
           .hero { margin-bottom: 18px !important; }
           .hero h1 { margin-bottom: 10px !important; }
+          /* Bridge line — tighter rhythm, constrained width, smooth wrapping */
+          .hero p:first-of-type {
+            font-size: 15px !important;
+            line-height: 1.35 !important;
+            letter-spacing: -0.01em !important;
+            max-width: 320px !important;
+            margin: 0 auto 6px !important;
+            color: rgba(230,238,242,0.88) !important;
+          }
+          /* Subline — visually connected, pulled close to bridge line */
+          .hero p:last-of-type {
+            font-size: 13.5px !important;
+            line-height: 1.4 !important;
+            letter-spacing: -0.005em !important;
+            max-width: 320px !important;
+            margin: 0 auto 16px !important;
+            color: rgba(200,214,222,0.70) !important;
+          }
           /* 5: Reduce chip density — show max 3 per section */
           .chips-recent button:nth-child(n+4) { display: none !important; }
           .chips-try button:nth-child(n+4) { display: none !important; }

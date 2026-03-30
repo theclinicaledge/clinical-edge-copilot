@@ -652,11 +652,37 @@ function normalizeAbbreviations(q) {
     .replace(/\bbid\b/g, "twice daily")
     .replace(/\btid\b/g, "three times daily")
     .replace(/\bqid\b/g, "four times daily")
-    .replace(/\bqhs\b/g, "at bedtime");
+    .replace(/\bqhs\b/g, "at bedtime")
+    // ── Cardiac / ECG ─────────────────────────────────────────────────────────
+    .replace(/\bpvcs?\b/g, "premature ventricular contraction")
+    .replace(/\bpacs?\b/g, "premature atrial contraction")
+    .replace(/\bsvt\b/g, "supraventricular tachycardia")
+    .replace(/\bvtach\b/g, "ventricular tachycardia")
+    .replace(/\bvfib\b/g, "ventricular fibrillation")
+    .replace(/\bstemi\b/g, "st elevation myocardial infarction")
+    .replace(/\bnstemi\b/g, "non st elevation mi")
+    // ── Labs ──────────────────────────────────────────────────────────────────
+    .replace(/\bhgb\b/g, "hemoglobin")
+    .replace(/\bhct\b/g, "hematocrit")
+    .replace(/\bwbc\b/g, "white blood cell count")
+    .replace(/\bplts?\b/g, "platelets")
+    .replace(/\bgfr\b/g, "glomerular filtration rate")
+    .replace(/\blytes\b/g, "electrolytes")
+    // ── Respiratory ───────────────────────────────────────────────────────────
+    .replace(/\blpm\b/g, "liters per minute")
+    // ── Hemodynamic ───────────────────────────────────────────────────────────
+    .replace(/\bmap\b/g, "mean arterial pressure")
+    .replace(/\bcvp\b/g, "central venous pressure")
+    // ── Misc clinical ─────────────────────────────────────────────────────────
+    .replace(/\bgtts?\b/g, "drip")
+    .replace(/\bdvt\b/g, "deep vein thrombosis")
+    .replace(/\buti\b/g, "urinary tract infection")
+    .replace(/\bpe\b/g, "pulmonary embolism");
 }
 
 function isQuickKnowledge(question) {
-  const q = question.toLowerCase().trim();
+  // Normalize smart/curly apostrophes → straight apostrophe before any matching
+  const q = question.toLowerCase().trim().replace(/[\u2018\u2019]/g, "'");
   const qNorm = normalizeAbbreviations(q); // normalized copy for pattern matching only
   const wordCount = q.split(/\s+/).length;
 
@@ -673,14 +699,18 @@ function isQuickKnowledge(question) {
     "over the last", "over the past",
     "looks worse", "more tired", "confused now",
     "chest pain", "shortness of breath",
-    "altered", "diaphoretic", "distress",
+    "altered", "diaphoretic", "diaphoresis", "distress",
     "postop", "post-op", "post op", "stepdown",
     "just started", "right now", "currently", "tonight", "this morning",
     "came back", "came in", "getting worse",
     "just got", "just had", "just returned",
     "in the icu", "in icu",
+    "new onset",
   ];
-  if (scenarioIndicators.some((s) => qNorm.includes(s))) return false;
+  // Pad with spaces so " patient " also matches at the very start or end of the string
+  // e.g. "Patient is hypotensive, what does that mean" starts with "patient" — no leading space
+  const qPadded = " " + qNorm + " ";
+  if (scenarioIndicators.some((s) => qPadded.includes(s))) return false;
 
   // Must match a clear knowledge-question pattern
   const knowledgePatterns = [
@@ -717,6 +747,19 @@ function isQuickKnowledge(question) {
     /^is it (safe|okay|ok|appropriate|fine) to (give|hold|administer|start)\b/,
     // Why is / why are
     /^why (is|are|do|does|would|can)\b/,
+    // How much / how many / how long — conversion and quantity questions
+    // e.g. "How much percent of FiO2 is 3 L"
+    /^how (much|many|long|often|fast|quickly)\b/,
+    // Equals / conversion — e.g. "3L NC equals what FiO2"
+    /\bequals?\s+(what|how)\b/,
+    // What [unit or metric] — e.g. "3L NC what is the FiO2", "what percent is that"
+    /\bwhat\s+(fio2|percent|percentage|o2|oxygen|flow|rate|level|dose|concentration|equivalent)\b/i,
+    // "Can I / should I" anywhere in the question — e.g. "QTC 520 can i give zofran"
+    // Safe: patient-scenario prefixes are filtered above by scenarioIndicators + padding
+    /\bcan\s+i\s+(give|hold|administer|start|stop|use|run|hang|push|check|take)\b/,
+    /\bshould\s+i\s+(give|hold|administer|start|stop|use|run|hang|push|check)\b/,
+    // Broader pharmacology / physiology descriptors — e.g. "Is lasix potassium wasting"
+    /^is \S.{1,60}(wasting|sparing|nephrotox|ototox|hepatotox|cardiotox|prolong|shorten|widen|narrow|block|dilat|constrict|revers|irrevers|indicated|contraindicated|used for|given for)\b/i,
   ];
   return knowledgePatterns.some((p) => p.test(qNorm));
 }

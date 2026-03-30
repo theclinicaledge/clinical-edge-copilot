@@ -652,7 +652,7 @@ export default function App() {
   return (
     <div style={{
       minHeight: "100vh",
-      background: "#0B1F2A",
+      background: "radial-gradient(circle at top center, rgba(0,194,209,0.08) 0%, rgba(0,194,209,0.03) 22%, rgba(11,31,42,0) 52%), linear-gradient(to bottom, rgba(255,255,255,0.02) 0%, rgba(255,255,255,0) 18%, rgba(0,0,0,0.10) 100%), #0B1F2A",
       color: "#A8C1CC",
       fontFamily: "'Inter', -apple-system, BlinkMacSystemFont, sans-serif",
       padding: "0 0 calc(80px + env(safe-area-inset-bottom))",
@@ -718,12 +718,12 @@ export default function App() {
 
       {/* ── Header ───────────────────────────────────────────────────────── */}
       <div style={{
-        borderBottom: "1px solid rgba(255,255,255,0.07)",
+        borderBottom: "1px solid rgba(255,255,255,0.05)",
         paddingTop: "env(safe-area-inset-top)",
         paddingLeft: "max(20px, env(safe-area-inset-left))",
         paddingRight: "max(20px, env(safe-area-inset-right))",
         paddingBottom: 0,
-        background: "rgba(11,31,42,0.97)",
+        background: "linear-gradient(to bottom, rgba(255,255,255,0.025) 0%, rgba(255,255,255,0) 100%), rgba(11,31,42,0.97)",
         backdropFilter: "blur(20px)",
         position: "sticky",
         top: 0,
@@ -734,7 +734,8 @@ export default function App() {
           margin: "0 auto",
           display: "flex",
           alignItems: "center",
-          height: 56,
+          paddingTop: 26,
+          paddingBottom: 18,
           gap: 11,
         }}>
 
@@ -811,25 +812,26 @@ export default function App() {
       </div>
 
       {/* ── Main ─────────────────────────────────────────────────────────── */}
-      <div style={{ maxWidth: 680, margin: "0 auto", padding: "36px 16px 0" }}>
+      <div style={{ maxWidth: 680, margin: "0 auto", padding: "42px 16px 0" }}>
 
         {/* Hero */}
-        <div style={{ textAlign: "center", marginBottom: 24 }}>
+        <div style={{ textAlign: "center", marginBottom: 26 }}>
           <h1 style={{
             fontFamily: "'Inter', sans-serif",
             fontWeight: 700,
-            fontSize: "clamp(22px, 5vw, 30px)",
-            color: "#F8FBFC",
-            margin: "0 0 8px",
-            lineHeight: 1.2,
-            letterSpacing: "-0.5px",
+            fontSize: "clamp(22px, 5vw, 34px)",
+            color: "rgba(255,255,255,0.96)",
+            margin: "0 auto 16px",
+            lineHeight: 1.12,
+            letterSpacing: "-0.03em",
+            maxWidth: 620,
           }}>
             Clinical reasoning support. Built for nurses.
           </h1>
-          <p style={{ fontSize: 15, color: "#A8C1CC", margin: "0 0 5px", lineHeight: 1.5, fontWeight: 500 }}>
+          <p style={{ fontSize: "clamp(15px, 3.5vw, 17px)", color: "rgba(230,238,242,0.88)", margin: "0 0 10px", lineHeight: 1.4, fontWeight: 500 }}>
             Describe the situation. Copilot helps you think it through.
           </p>
-          <p style={{ fontSize: 13, color: "#7F99A5", margin: 0, lineHeight: 1.5, fontWeight: 400 }}>
+          <p style={{ fontSize: "clamp(14px, 3vw, 15px)", color: "rgba(200,214,222,0.72)", margin: 0, lineHeight: 1.45, fontWeight: 400 }}>
             For real-world questions and practice scenarios. Not a diagnosis.
           </p>
         </div>
@@ -838,11 +840,17 @@ export default function App() {
         <div
           className="preview-scroll"
           style={{
-            background: "rgba(255,255,255,0.015)",
-            border: "1px solid rgba(255,255,255,0.04)",
-            borderRadius: 8,
-            padding: "5px 12px",
-            marginBottom: 18,
+            background: "rgba(17,41,54,0.52)",
+            borderTop: "1px solid rgba(255,255,255,0.07)",
+            borderLeft: "1px solid rgba(255,255,255,0.07)",
+            borderRight: "1px solid rgba(255,255,255,0.07)",
+            borderBottom: "none",
+            borderTopLeftRadius: 14,
+            borderTopRightRadius: 14,
+            borderBottomLeftRadius: 0,
+            borderBottomRightRadius: 0,
+            padding: "12px 14px",
+            marginBottom: 0,
             display: "flex",
             flexWrap: "nowrap",
             alignItems: "center",
@@ -858,13 +866,15 @@ export default function App() {
           {["What this could be", "What matters most", "What to assess next", "What to do right now"].map((item) => (
             <span key={item} style={{
               fontSize: 11,
-              color: "#4F7A87",
+              color: "rgba(181,239,244,0.65)",
               background: "rgba(0,194,209,0.05)",
-              border: "1px solid rgba(0,194,209,0.10)",
+              border: "1px solid rgba(0,194,209,0.13)",
               borderRadius: 4,
               padding: "2px 7px",
               whiteSpace: "nowrap",
               flexShrink: 0,
+              fontWeight: 500,
+              letterSpacing: "-0.01em",
             }}>
               {item}
             </span>
@@ -874,11 +884,14 @@ export default function App() {
         {/* Input card */}
         <div style={{
           background: "#112936",
-          border: "1px solid rgba(255,255,255,0.11)",
-          borderRadius: 13,
+          border: "1px solid rgba(255,255,255,0.09)",
+          borderTopLeftRadius: 0,
+          borderTopRightRadius: 0,
+          borderBottomLeftRadius: 14,
+          borderBottomRightRadius: 14,
           padding: "20px",
-          boxShadow: "0 6px 28px rgba(0,0,0,0.30)",
-          marginBottom: 8,
+          boxShadow: "0 8px 24px rgba(0,0,0,0.16), inset 0 1px 0 rgba(255,255,255,0.03)",
+          marginBottom: 14,
         }}>
           <textarea
             ref={textareaRef}
@@ -944,28 +957,26 @@ export default function App() {
         {/* Helper line */}
         <div style={{
           fontSize: 13,
-          color: "#4F6D7A",
+          color: "rgba(200,214,222,0.70)",
           lineHeight: 1.5,
-          marginBottom: 12,
-          marginTop: 2,
+          marginBottom: 18,
+          marginTop: 0,
         }}>
           Just describe the scenario in your own words.
         </div>
 
         {/* Privacy notice */}
         <div style={{
-          background: "rgba(242,185,75,0.04)",
-          border: "1px solid rgba(242,185,75,0.12)",
-          borderLeft: "2px solid rgba(242,185,75,0.3)",
-          borderRadius: 7,
-          padding: "8px 12px",
+          background: "rgba(176,128,38,0.08)",
+          border: "1px solid rgba(233,186,75,0.20)",
+          borderRadius: 12,
+          padding: "14px 16px",
           fontSize: 12,
-          color: "#907A52",
-          marginBottom: 20,
+          color: "rgba(226,196,123,0.90)",
+          marginBottom: 26,
           display: "flex",
           gap: 8,
           alignItems: "flex-start",
-          opacity: 0.82,
         }}>
           <span style={{
             fontFamily: "'IBM Plex Mono', monospace",
@@ -981,11 +992,11 @@ export default function App() {
         {history.length > 0 && (
           <div style={{ marginBottom: 20 }}>
             <div style={{
-              fontSize: 9,
-              fontWeight: 700,
-              letterSpacing: "1.3px",
+              fontSize: 12,
+              fontWeight: 500,
+              letterSpacing: "0.10em",
               textTransform: "uppercase",
-              color: "#7F99A5",
+              color: "rgba(168,188,198,0.62)",
               marginBottom: 10,
               fontFamily: "'IBM Plex Mono', monospace",
             }}>Recent Cases</div>
@@ -996,13 +1007,19 @@ export default function App() {
                   className="chip"
                   onClick={() => { track("recent_case_clicked"); runQuery(item); }}
                   style={{
-                    background: "transparent",
-                    border: "1px solid rgba(255,255,255,0.09)",
-                    color: "#7F99A5",
-                    padding: "6px 12px",
-                    borderRadius: 100,
-                    fontSize: 12,
+                    background: "rgba(0,194,209,0.06)",
+                    border: "1px solid rgba(0,194,209,0.22)",
+                    boxShadow: "inset 0 1px 0 rgba(255,255,255,0.04)",
+                    color: "rgba(181,239,244,0.90)",
+                    padding: "0 12px",
+                    height: 28,
+                    borderRadius: 999,
+                    fontSize: 13,
+                    fontWeight: 500,
+                    letterSpacing: "-0.01em",
                     cursor: "pointer",
+                    display: "inline-flex",
+                    alignItems: "center",
                     maxWidth: 260,
                     textAlign: "left",
                     overflow: "hidden",
@@ -1028,14 +1045,14 @@ export default function App() {
               marginBottom: 10,
             }}>
               <div style={{
-                fontSize: 9,
-                fontWeight: 700,
-                letterSpacing: "1.3px",
+                fontSize: 12,
+                fontWeight: 500,
+                letterSpacing: "0.10em",
                 textTransform: "uppercase",
-                color: "#7F99A5",
+                color: "rgba(168,188,198,0.62)",
                 fontFamily: "'IBM Plex Mono', monospace",
               }}>
-                Saved Cases <span style={{ color: "#3A5566", fontWeight: 400 }}>({savedCases.length})</span>
+                Saved Cases <span style={{ color: "rgba(168,188,198,0.35)", fontWeight: 400 }}>({savedCases.length})</span>
               </div>
             </div>
             {savedCases.map((sc) => (
@@ -1047,8 +1064,12 @@ export default function App() {
         {/* Example pills */}
         <div style={{ marginBottom: 36 }}>
           <div style={{
-            fontSize: 13,
-            color: "#4F6D7A",
+            fontFamily: "'IBM Plex Mono', monospace",
+            fontSize: 12,
+            fontWeight: 500,
+            letterSpacing: "0.10em",
+            textTransform: "uppercase",
+            color: "rgba(168,188,198,0.62)",
             marginBottom: 10,
           }}>Try this:</div>
           <div style={{ display: "flex", flexWrap: "wrap", gap: 7 }}>
@@ -1058,13 +1079,19 @@ export default function App() {
                 className="chip"
                 onClick={() => setQuestion(ex)}
                 style={{
-                  background: "transparent",
-                  border: "1px solid rgba(255,255,255,0.09)",
-                  color: "#7F99A5",
-                  padding: "6px 12px",
-                  borderRadius: 100,
-                  fontSize: 12,
+                  background: "rgba(0,194,209,0.06)",
+                  border: "1px solid rgba(0,194,209,0.22)",
+                  boxShadow: "inset 0 1px 0 rgba(255,255,255,0.04)",
+                  color: "rgba(181,239,244,0.90)",
+                  padding: "0 12px",
+                  height: 28,
+                  borderRadius: 999,
+                  fontSize: 13,
+                  fontWeight: 500,
+                  letterSpacing: "-0.01em",
                   cursor: "pointer",
+                  display: "inline-flex",
+                  alignItems: "center",
                   textAlign: "left",
                   transition: "all 0.15s",
                 }}

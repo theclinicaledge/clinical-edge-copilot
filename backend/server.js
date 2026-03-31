@@ -920,8 +920,35 @@ function parseUrgency(response) {
   return match ? match[1] : null;
 }
 
+// ── Infer clinical category from normalized input ─────────────────────────────
+// Returns a product-learning category string based on keywords in the
+// normalized question. Checked in specificity order — most specific first.
+// Used only for log analysis; never shown to the user.
+function inferCategory(qNorm) {
+  if (/nclex|select all that apply|which of the following|sata|exam question|board question/.test(qNorm))
+    return "exam";
+  if (/fio2|nasal cannula|high flow nasal cannula|non rebreather|bag valve mask|oxygen percent|liters.*cannula|cannula.*fio2/.test(qNorm))
+    return "oxygen";
+  if (/tracheostomy|peg tube|chest tube|peripherally inserted|central venous catheter|arterial line|foley|ostomy|stoma|feeding tube|nasogastric|dobhoff|jejunostomy|gastrostomy|tidaling|bubbling/.test(qNorm))
+    return "device";
+  if (/atrial fibrillation|rapid ventricular rate|qtc|ventricular tachycardia|ventricular fibrillation|stemi|arrhythmia|ecg|supraventricular|premature atrial|premature ventricular|heart block|bradycardia|tachycardia/.test(qNorm))
+    return "cardiac";
+  if (/heparin|furosemide|vancomycin|norepinephrine|dexmedetomidine|amiodarone|lorazepam|midazolam|haloperidol|levetiracetam|divalproex|valproic|hydromorphone|fentanyl|dopamine|dobutamine|beta blocker|ace inhibitor|antibiotic|zofran|ondansetron|metoprolol|diltiazem|insulin|warfarin|diuretic|drip|infusion/.test(qNorm))
+    return "medication";
+  if (/troponin|partial thromboplastin time|inr|lactate|bicarbonate|magnesium|phosphorus|bnp|hemoglobin|hematocrit|white blood cell|platelets|creatinine|potassium|sodium|glucose|d dimer|complete blood count|metabolic panel|glomerular filtration|blood urea nitrogen/.test(qNorm))
+    return "labs";
+  if (/hypotensive|tachycardic|bradycardic|desatt|deteriorat|worsening|unstable|declining|altered|unresponsive|diaphoretic|distress|pale|confused|lethargic|sepsis|shock/.test(qNorm))
+    return "deterioration";
+  if (/shortness of breath|dyspnea|respiratory|work of breathing|wheez|stridor|ventilat|intubat|airway/.test(qNorm))
+    return "respiratory";
+  return "general";
+}
+
 // ── Append one JSONL entry to the log file ────────────────────────────────────
+// Also emits to stdout so Render's log system captures it even after a
+// filesystem wipe on redeploy. Prefix [LOG] makes it grep-able in the dashboard.
 function appendLog(entry) {
+  console.log("[LOG]", JSON.stringify(entry));
   try {
     fs.appendFileSync(LOG_FILE, JSON.stringify(entry) + "\n", "utf8");
   } catch (err) {
@@ -961,8 +988,18 @@ app.post("/api/copilot", apiLimiter, async (req, res) => {
     selectedPrompt === EXAM_SYSTEM_PROMPT  ? "EXAM_SYSTEM_PROMPT"  :
     "QUICK_KNOWLEDGE_PROMPT";
 
+  // ── Pre-compute log fields before streaming starts ──────────────────────
+  // input_redacted: PHI already blocked above; this strips any residual patterns
+  // input_normalized: derived from the redacted form — what routing "heard"
+  const inputRedacted   = redactInput(question.trim());
+  const inputNormalized = normalizeExtended(inputRedacted.toLowerCase());
+  const wordCount       = question.trim().split(/\s+/).length;
+  const inputLength     = question.trim().length;
+  const category        = inferCategory(inputNormalized);
+  const uiMode          = mode || "quick";
+
   const requestTimestamp = new Date().toISOString();
-  console.log(`[REQUEST] ${requestTimestamp} | route=${promptName}`);
+  console.log(`[REQUEST] ${requestTimestamp} | route=${promptName} | mode=${uiMode} | category=${category} | words=${wordCount}`);
 
   // Set SSE headers so the frontend can read chunks as they arrive
   res.setHeader("Content-Type", "text/event-stream");
@@ -995,7 +1032,12 @@ app.post("/api/copilot", apiLimiter, async (req, res) => {
     appendLog({
       timestamp:        requestTimestamp,
       route:            promptName,
-      input_redacted:   redactInput(question.trim()),
+      mode:             uiMode,
+      category:         category,
+      input_redacted:   inputRedacted,
+      input_normalized: inputNormalized,
+      word_count:       wordCount,
+      input_length:     inputLength,
       urgency:          parseUrgency(fullResponse),
       status:           "success",
       response_preview: fullResponse.slice(0, 250),
@@ -1010,7 +1052,12 @@ app.post("/api/copilot", apiLimiter, async (req, res) => {
     appendLog({
       timestamp:        requestTimestamp,
       route:            promptName,
-      input_redacted:   redactInput(question.trim()),
+      mode:             uiMode,
+      category:         category,
+      input_redacted:   inputRedacted,
+      input_normalized: inputNormalized,
+      word_count:       wordCount,
+      input_length:     inputLength,
       urgency:          null,
       status:           "error",
       response_preview: null,

@@ -9,158 +9,170 @@ import {
 import { ParticleField } from "../components/ParticleField";
 import { GlowBackground } from "../components/GlowBackground";
 
-// Scene 5: 560–660 frames (local frame 0–100)
+// Scene 5: 0–180 local frames (6.0s at 30fps)
+// Transition in: 0–15   No transition out (final scene)
+// Line 1 at 0, divider at 55, line 2 at 70, logo at 118
+// Camera settles (slows to a stop at ~160)
 
-// CE Logo
-const CELogo: React.FC<{ scale: number; opacity: number }> = ({
-  scale,
-  opacity,
-}) => {
-  return (
+const TRANS = 15;
+
+// Real Clinical Edge Copilot logo — exact 4-path SVG from App.jsx
+const ClinicalEdgeLogo: React.FC<{ scale: number; opacity: number }> = ({
+  scale, opacity,
+}) => (
+  <div
+    style={{
+      transform: `scale(${scale})`,
+      opacity,
+      transformOrigin: "center",
+      textAlign: "center",
+    }}
+  >
     <div
       style={{
-        transform: `scale(${scale})`,
-        opacity,
-        transformOrigin: "center",
-        textAlign: "center",
+        display: "inline-flex",
+        alignItems: "center",
+        gap: 18,
+        borderRadius: 20,
+        border: "1.5px solid rgba(0,194,209,0.52)",
+        padding: "20px 40px",
+        background: "rgba(0,194,209,0.055)",
+        backdropFilter: "blur(8px)",
       }}
     >
-      <div
-        style={{
-          display: "inline-flex",
-          alignItems: "center",
-          gap: 16,
-          borderRadius: 20,
-          border: "2px solid rgba(0,194,203,0.7)",
-          padding: "18px 36px",
-          background: "rgba(0,194,203,0.08)",
-          backdropFilter: "blur(8px)",
-        }}
+      {/* Exact SVG from App.jsx — 4 paths, fill #00C2D1 */}
+      <svg
+        width="52"
+        height="46"
+        viewBox="0 0 225 200"
+        xmlns="http://www.w3.org/2000/svg"
+        fill="#00C2D1"
+        aria-label="Clinical Edge"
+        style={{ flexShrink: 0, display: "block" }}
       >
-        <div
+        <path d="M 159.1,24.3 A 96,96 0 1,0 159.1,175.7 L 135.7,145.7 A 58,58 0 1,1 135.7,54.3 Z" />
+        <path d="M 144.0,57 L 208,45 L 218,58 L 208,70 L 150.0,71 Z" />
+        <path d="M 158.0,92 L 215,82 L 225,95 L 215,107 L 158.0,108 Z" />
+        <path d="M 150.0,129 L 208,130 L 218,142 L 208,155 L 144.0,143 Z" />
+      </svg>
+
+      <div style={{ display: "flex", flexDirection: "column", gap: 4 }}>
+        <span
           style={{
-            width: 48,
-            height: 48,
-            borderRadius: 12,
-            backgroundColor: "#00C2CB",
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "center",
-            fontSize: 26,
-            fontWeight: 800,
-            color: "#0A1628",
+            fontSize: 32,
+            fontWeight: 700,
+            color: "#F8FBFC",
             fontFamily: "Syne, system-ui, sans-serif",
+            letterSpacing: "-0.3px",
+            lineHeight: 1.1,
           }}
         >
-          CE
-        </div>
-        <div>
-          <div
-            style={{
-              fontSize: 30,
-              fontWeight: 700,
-              color: "#FFFFFF",
-              fontFamily: "Syne, system-ui, sans-serif",
-              lineHeight: 1,
-              letterSpacing: "-0.01em",
-            }}
-          >
-            Clinical Edge
-          </div>
-          <div
-            style={{
-              fontSize: 18,
-              fontWeight: 500,
-              color: "rgba(0,194,203,0.85)",
-              fontFamily: "DM Mono, monospace",
-              letterSpacing: "0.08em",
-              marginTop: 4,
-            }}
-          >
-            COPILOT
-          </div>
-        </div>
+          Clinical Edge
+        </span>
+        <span
+          style={{
+            fontSize: 16,
+            fontWeight: 500,
+            color: "#7F99A5",
+            letterSpacing: "0.7px",
+            textTransform: "uppercase",
+            fontFamily: "DM Mono, monospace",
+            lineHeight: 1,
+          }}
+        >
+          Copilot
+        </span>
       </div>
     </div>
-  );
-};
+  </div>
+);
 
 export const OutroScene: React.FC = () => {
   const frame = useCurrentFrame();
-  const { fps } = useVideoConfig();
+  const { fps, durationInFrames } = useVideoConfig();
 
-  // Line 1: "This is how you think on shift." — enters at local 0
-  const line1Spring = spring({
-    frame,
-    fps,
-    config: { damping: 16, stiffness: 150, mass: 1 },
+  // ─── Transition in ──────────────────────────────────────────────────────────
+  const fadeIn = interpolate(frame, [0, TRANS], [0, 1], {
+    extrapolateLeft: "clamp",
+    extrapolateRight: "clamp",
   });
+  const blurIn = interpolate(frame, [0, TRANS], [6, 0], { extrapolateRight: "clamp" });
 
-  const line1Blur = interpolate(line1Spring, [0, 1], [8, 0]);
-  const line1Y = interpolate(line1Spring, [0, 1], [20, 0]);
-  const line1Opacity = interpolate(frame, [0, 12], [0, 1], {
+  // ─── Camera settles: slow push that eases to a stop ─────────────────────────
+  // Starts at 1.0, reaches 1.018 by frame 160, then holds still
+  const cameraSettle = interpolate(frame, [0, 160, durationInFrames], [1.0, 1.018, 1.018], {
     extrapolateRight: "clamp",
   });
 
-  // Line 2: "Comment 'copilot'" — enters at local 28
-  const line2Frame = Math.max(0, frame - 28);
-  const line2Spring = spring({
-    frame: line2Frame,
-    fps,
-    config: { damping: 14, stiffness: 160, mass: 0.9 },
+  // ─── Content animations ─────────────────────────────────────────────────────
+  const line1Spring = spring({ frame, fps, config: { damping: 22, stiffness: 115, mass: 1.15 } });
+  const line1Blur = interpolate(line1Spring, [0, 1], [5, 0]);
+  const line1Y = interpolate(line1Spring, [0, 1], [16, 0]);
+  const line1Opacity = interpolate(frame, [TRANS, TRANS + 16], [0, 1], { extrapolateRight: "clamp" });
+
+  const dividerWidth = interpolate(frame, [55, 82], [0, 260], {
+    extrapolateLeft: "clamp",
+    extrapolateRight: "clamp",
   });
-  const line2Y = interpolate(line2Spring, [0, 1], [20, 0]);
-  const line2Opacity = interpolate(line2Frame, [0, 12], [0, 1], {
+  const dividerOpacity = interpolate(frame, [55, 72], [0, 0.5], {
+    extrapolateLeft: "clamp",
     extrapolateRight: "clamp",
   });
 
-  // "copilot" breathing glow
-  const copilotGlow = interpolate(
-    Math.sin(frame * 0.12),
-    [-1, 1],
-    [14, 40]
-  );
+  const line2Frame = Math.max(0, frame - 70);
+  const line2Spring = spring({ frame: line2Frame, fps, config: { damping: 20, stiffness: 125, mass: 1.0 } });
+  const line2Y = interpolate(line2Spring, [0, 1], [16, 0]);
+  const line2Opacity = interpolate(line2Frame, [0, 16], [0, 1], { extrapolateRight: "clamp" });
 
-  // Logo: enters at local 50
-  const logoFrame = Math.max(0, frame - 50);
-  const logoSpring = spring({
-    frame: logoFrame,
-    fps,
-    config: { damping: 14, stiffness: 180, mass: 0.85 },
-  });
-  const logoScale = interpolate(logoSpring, [0, 1], [0.9, 1]);
-  const logoOpacity = interpolate(logoFrame, [0, 14], [0, 1], {
-    extrapolateRight: "clamp",
-  });
+  // "copilot" — slow breathing glow
+  const copilotGlow = interpolate(Math.sin(frame * 0.07), [-1, 1], [10, 28]);
 
-  // Particle slow-down + dim as outro settles
-  const particleDim = interpolate(frame, [0, 60, 100], [0.5, 0.3, 0.15], {
+  const logoFrame = Math.max(0, frame - 118);
+  const logoSpring = spring({ frame: logoFrame, fps, config: { damping: 22, stiffness: 140, mass: 1.0 } });
+  const logoScale = interpolate(logoSpring, [0, 1], [0.92, 1]);
+  const logoOpacity = interpolate(logoFrame, [0, 18], [0, 1], { extrapolateRight: "clamp" });
+
+  const particleDim = interpolate(frame, [0, 90, 180], [0.4, 0.24, 0.1], {
     extrapolateRight: "clamp",
   });
 
   return (
-    <AbsoluteFill style={{ backgroundColor: "#0A1628" }}>
-      <GlowBackground intensity={0.8} showVignette={true} />
-      <ParticleField count={30} slowFactor={0.2} dimFactor={particleDim} />
+    <AbsoluteFill
+      style={{
+        opacity: fadeIn,
+        filter: blurIn > 0 ? `blur(${blurIn}px)` : undefined,
+      }}
+    >
+      {/* Background with camera settle */}
+      <AbsoluteFill
+        style={{
+          transform: `scale(${cameraSettle})`,
+          transformOrigin: "center center",
+        }}
+      >
+        <GlowBackground intensity={0.72} showVignette={true} />
+        <ParticleField count={26} slowFactor={0.16} dimFactor={particleDim} />
+      </AbsoluteFill>
 
-      {/* Strong vignette */}
+      {/* Deep vignette for cinematic final frame */}
       <AbsoluteFill
         style={{
           background:
-            "radial-gradient(ellipse at 50% 50%, transparent 30%, rgba(4,8,18,0.75) 100%)",
+            "radial-gradient(ellipse at 50% 50%, transparent 26%, rgba(4,8,18,0.68) 100%)",
           pointerEvents: "none",
         }}
       />
 
+      {/* Content */}
       <AbsoluteFill
         style={{
           display: "flex",
           flexDirection: "column",
           alignItems: "center",
           justifyContent: "center",
-          gap: 48,
-          paddingLeft: 60,
-          paddingRight: 60,
+          gap: 38,
+          paddingLeft: 64,
+          paddingRight: 64,
         }}
       >
         {/* Line 1 */}
@@ -174,13 +186,13 @@ export const OutroScene: React.FC = () => {
         >
           <div
             style={{
-              fontSize: 72,
+              fontSize: 76,
               fontWeight: 700,
               color: "#FFFFFF",
               fontFamily: "Syne, system-ui, sans-serif",
-              letterSpacing: "-0.02em",
-              lineHeight: 1.15,
-              textShadow: "0 0 40px rgba(255,255,255,0.15)",
+              letterSpacing: "-0.025em",
+              lineHeight: 1.14,
+              textShadow: "0 0 50px rgba(255,255,255,0.1)",
             }}
           >
             This is how you think on shift.
@@ -188,22 +200,17 @@ export const OutroScene: React.FC = () => {
         </div>
 
         {/* Divider */}
-        {frame >= 24 && (
-          <div
-            style={{
-              width: interpolate(frame, [24, 40], [0, 260], {
-                extrapolateRight: "clamp",
-              }),
-              height: 2,
-              background:
-                "linear-gradient(90deg, transparent, #00C2CB, transparent)",
-              opacity: 0.6,
-            }}
-          />
-        )}
+        <div
+          style={{
+            width: dividerWidth,
+            height: 1.5,
+            background: "linear-gradient(90deg, transparent, #00C2CB, transparent)",
+            opacity: dividerOpacity,
+          }}
+        />
 
-        {/* Line 2 */}
-        {frame >= 28 && (
+        {/* Line 2 — CTA */}
+        {frame >= 70 && (
           <div
             style={{
               transform: `translateY(${line2Y}px)`,
@@ -213,12 +220,11 @@ export const OutroScene: React.FC = () => {
           >
             <div
               style={{
-                fontSize: 58,
+                fontSize: 60,
                 fontWeight: 600,
-                color: "rgba(255,255,255,0.75)",
+                color: "rgba(255,255,255,0.7)",
                 fontFamily: "DM Sans, system-ui, sans-serif",
-                letterSpacing: "0",
-                lineHeight: 1.2,
+                lineHeight: 1.22,
               }}
             >
               Comment{" "}
@@ -226,7 +232,7 @@ export const OutroScene: React.FC = () => {
                 style={{
                   color: "#00C2CB",
                   fontWeight: 800,
-                  textShadow: `0 0 ${copilotGlow}px #00C2CB, 0 0 ${copilotGlow * 2}px rgba(0,194,203,0.3)`,
+                  textShadow: `0 0 ${copilotGlow}px #00C2CB, 0 0 ${copilotGlow * 2}px rgba(0,194,203,0.2)`,
                   fontFamily: "DM Mono, monospace",
                 }}
               >
@@ -237,8 +243,8 @@ export const OutroScene: React.FC = () => {
         )}
 
         {/* Logo */}
-        {frame >= 50 && (
-          <CELogo scale={logoScale} opacity={logoOpacity} />
+        {frame >= 118 && (
+          <ClinicalEdgeLogo scale={logoScale} opacity={logoOpacity} />
         )}
       </AbsoluteFill>
     </AbsoluteFill>

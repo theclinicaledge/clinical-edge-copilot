@@ -9,8 +9,11 @@ import {
 import { ParticleField } from "../components/ParticleField";
 import { GlowBackground } from "../components/GlowBackground";
 
-// Scene 4: 420–560 frames (local frame 0–140)
-// Priority action list — staggered entry, no meds
+// Scene 4: 0–225 local frames
+// Transition in: 0–15   Transition out: 210–225
+// Actions at: 0, 32, 68, 108, 148 — all visible and readable by ~190
+
+const TRANS = 15;
 
 const ACTIONS = [
   {
@@ -23,25 +26,25 @@ const ACTIONS = [
     num: "2",
     text: "Apply O₂ if hypoxic",
     sub: "SpO₂ 90% needs supplemental O₂ now — nasal cannula or NRB.",
-    start: 22,
+    start: 32,
   },
   {
     num: "3",
     text: "Cardiac monitor + IV access",
     sub: "Get on the monitor. Establish IV. Know your baseline rhythm.",
-    start: 44,
+    start: 68,
   },
   {
     num: "4",
     text: "12-lead ECG within 10 min",
     sub: "Time-sensitive. STEMI needs activation. Don't wait.",
-    start: 66,
+    start: 108,
   },
   {
     num: "5",
     text: "Escalate early if unstable",
     sub: "Rapid response or provider — don't wait for permission to escalate.",
-    start: 90,
+    start: 148,
   },
 ];
 
@@ -54,11 +57,7 @@ interface ActionLineProps {
 }
 
 const ActionLine: React.FC<ActionLineProps> = ({
-  num,
-  text,
-  sub,
-  localStart,
-  isActive,
+  num, text, sub, localStart, isActive,
 }) => {
   const frame = useCurrentFrame();
   const { fps } = useVideoConfig();
@@ -68,28 +67,25 @@ const ActionLine: React.FC<ActionLineProps> = ({
   const entrySpring = spring({
     frame: localFrame,
     fps,
-    config: { damping: 15, stiffness: 190, mass: 0.8 },
+    config: { damping: 20, stiffness: 145, mass: 1.0 },
   });
 
-  const entryY = interpolate(entrySpring, [0, 1], [28, 0]);
-  const entryOpacity = interpolate(localFrame, [0, 10], [0, 1], {
+  const entryY = interpolate(entrySpring, [0, 1], [22, 0]);
+  const entryOpacity = interpolate(localFrame, [0, 14], [0, 1], {
     extrapolateRight: "clamp",
   });
 
-  const activeScale = isActive ? 1.02 : 1;
+  const activeScale = isActive ? 1.016 : 1;
 
-  // Teal glow pulse when first entering (frames 0–20 after start)
-  const entryGlow = interpolate(localFrame, [0, 6, 18, 30], [0, 1, 1, 0], {
+  // Entry glow pulse — slow, settles gracefully
+  const entryGlow = interpolate(localFrame, [0, 10, 28, 50], [0, 1, 1, 0], {
     extrapolateLeft: "clamp",
     extrapolateRight: "clamp",
   });
-
-  // Persistent glow for active line
   const activeGlow = isActive
-    ? interpolate(Math.sin(frame * 0.1), [-1, 1], [0.2, 0.6])
+    ? interpolate(Math.sin(frame * 0.065), [-1, 1], [0.12, 0.4])
     : 0;
-
-  const glowOpacity = Math.max(entryGlow * 0.7, activeGlow);
+  const glowOpacity = Math.max(entryGlow * 0.55, activeGlow);
 
   if (frame < localStart) return null;
 
@@ -99,33 +95,30 @@ const ActionLine: React.FC<ActionLineProps> = ({
         transform: `translateY(${entryY}px) scale(${activeScale})`,
         opacity: entryOpacity,
         transformOrigin: "left center",
-        marginBottom: 22,
+        marginBottom: 24,
         position: "relative",
+        willChange: "transform, opacity",
       }}
     >
-      {/* Glow flash on entry */}
       <div
         style={{
           position: "absolute",
           inset: -8,
           borderRadius: 16,
-          background: "rgba(0,194,203,0.12)",
+          background: "rgba(0,194,203,0.09)",
           opacity: glowOpacity,
           pointerEvents: "none",
         }}
       />
 
       <div style={{ display: "flex", alignItems: "flex-start", gap: 24 }}>
-        {/* Number badge */}
         <div
           style={{
-            minWidth: 56,
-            height: 56,
+            minWidth: 58,
+            height: 58,
             borderRadius: 14,
-            backgroundColor: isActive
-              ? "#00C2CB"
-              : "rgba(0,194,203,0.18)",
-            border: "1.5px solid rgba(0,194,203,0.6)",
+            backgroundColor: isActive ? "#00C2CB" : "rgba(0,194,203,0.13)",
+            border: "1.5px solid rgba(0,194,203,0.5)",
             display: "flex",
             alignItems: "center",
             justifyContent: "center",
@@ -145,7 +138,7 @@ const ActionLine: React.FC<ActionLineProps> = ({
             style={{
               fontSize: isActive ? 50 : 46,
               fontWeight: 700,
-              color: isActive ? "#FFFFFF" : "rgba(255,255,255,0.85)",
+              color: isActive ? "#FFFFFF" : "rgba(255,255,255,0.8)",
               fontFamily: "Syne, system-ui, sans-serif",
               letterSpacing: "-0.01em",
               lineHeight: 1.1,
@@ -158,7 +151,7 @@ const ActionLine: React.FC<ActionLineProps> = ({
             style={{
               fontSize: 30,
               fontWeight: 400,
-              color: "rgba(0,194,203,0.75)",
+              color: "rgba(0,194,203,0.68)",
               fontFamily: "DM Sans, system-ui, sans-serif",
               lineHeight: 1.4,
             }}
@@ -173,12 +166,54 @@ const ActionLine: React.FC<ActionLineProps> = ({
 
 export const PriorityActionsScene: React.FC = () => {
   const frame = useCurrentFrame();
+  const { durationInFrames } = useVideoConfig();
+
+  // ─── Transitions ────────────────────────────────────────────────────────────
+  const fadeIn = interpolate(frame, [0, TRANS], [0, 1], {
+    extrapolateLeft: "clamp",
+    extrapolateRight: "clamp",
+  });
+  const fadeOut = interpolate(
+    frame,
+    [durationInFrames - TRANS, durationInFrames],
+    [1, 0],
+    { extrapolateLeft: "clamp", extrapolateRight: "clamp" }
+  );
+  const sceneOpacity = Math.min(fadeIn, fadeOut);
+
+  const blurIn = interpolate(frame, [0, TRANS], [6, 0], { extrapolateRight: "clamp" });
+  const blurOut = interpolate(
+    frame,
+    [durationInFrames - TRANS, durationInFrames],
+    [0, 6],
+    { extrapolateLeft: "clamp" }
+  );
+  const sceneBlur = frame < TRANS ? blurIn : frame > durationInFrames - TRANS ? blurOut : 0;
+
+  // ─── Camera push-in ─────────────────────────────────────────────────────────
+  const cameraPush = interpolate(frame, [0, durationInFrames], [1.0, 1.022], {
+    extrapolateRight: "clamp",
+  });
 
   return (
-    <AbsoluteFill style={{ backgroundColor: "#0A1628" }}>
-      <GlowBackground intensity={1.3} />
-      <ParticleField count={25} slowFactor={0.25} dimFactor={0.45} />
+    <AbsoluteFill
+      style={{
+        opacity: sceneOpacity,
+        filter: sceneBlur > 0 ? `blur(${sceneBlur}px)` : undefined,
+      }}
+    >
+      {/* Background with camera push */}
+      <AbsoluteFill
+        style={{
+          transform: `scale(${cameraPush})`,
+          transformOrigin: "center center",
+        }}
+      >
+        <GlowBackground intensity={1.15} />
+        <ParticleField count={20} slowFactor={0.2} dimFactor={0.38} />
+      </AbsoluteFill>
 
+      {/* Content */}
       <AbsoluteFill
         style={{
           display: "flex",
@@ -188,20 +223,19 @@ export const PriorityActionsScene: React.FC = () => {
           paddingRight: 56,
         }}
       >
-        {/* Scene header */}
         <div
           style={{
-            fontSize: 24,
+            fontSize: 22,
             fontWeight: 700,
             color: "#00C2CB",
             fontFamily: "DM Mono, monospace",
             letterSpacing: "0.18em",
             textTransform: "uppercase",
-            marginBottom: 36,
-            opacity: interpolate(frame, [0, 14], [0, 1], {
+            marginBottom: 38,
+            opacity: interpolate(frame, [TRANS, TRANS + 18], [0, 1], {
               extrapolateRight: "clamp",
             }),
-            textShadow: "0 0 20px rgba(0,194,203,0.6)",
+            textShadow: "0 0 16px rgba(0,194,203,0.45)",
           }}
         >
           PRIORITY ACTIONS

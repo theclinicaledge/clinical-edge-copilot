@@ -6,6 +6,11 @@ const rateLimit = require("express-rate-limit");
 const Anthropic = require("@anthropic-ai/sdk");
 const fs = require("fs");
 const path = require("path");
+const {
+  ABBREVIATION_EXPANSIONS,
+  NURSE_PRACTICAL_PATTERNS,
+  DEVICE_PROCEDURE_TERMS,
+} = require("./nurse-language-dataset");
 
 const app = express();
 
@@ -413,13 +418,17 @@ const QUICK_KNOWLEDGE_PROMPT = `You are an experienced bedside nurse answering a
 Your job: give a fast, clear, useful answer. No structure bloat. No forced sections. Just the right answer in the right amount of words.
 
 LANGUAGE HANDLING:
-Nurses ask questions in shorthand, abbreviations, and imperfect grammar. Handle it naturally.
+Nurses ask questions in shorthand, abbreviations, fragments, and imperfect grammar. Handle it naturally.
 Common examples: abx = antibiotics, tx = treatment, dx = diagnosis, sx = symptoms, hx = history,
 st = ST (ECG), t wave / t abnormality = T-wave abnormality, lasix = furosemide, bb = beta blocker,
 hf/chf = heart failure, afib = atrial fibrillation, aki = acute kidney injury,
 sob = shortness of breath, wob = work of breathing, uo = urine output,
-cxr = chest x-ray, ecg/ekg = ECG, nc = nasal cannula, nrb = non-rebreather.
-Do NOT refuse to answer because of shorthand — interpret charitably and answer the real question.
+cxr = chest x-ray, ecg/ekg = ECG, nc = nasal cannula, nrb = non-rebreather,
+trach = tracheostomy, peg = PEG tube, hep gtt = heparin infusion, vanco = vancomycin,
+trop = troponin, bicarb = bicarbonate, mag = magnesium, bnp = BNP, cbc/cmp/bmp = lab panels.
+Compressed fragments like "fresh trach and peg", "trach care first 24 hr", "peg leaking normal?",
+"afib rvr meaning", or "qtc 520 can i give zofran" are valid questions — interpret the clinical intent and answer directly.
+Do NOT refuse to answer because of shorthand or incomplete phrasing — interpret charitably and answer the real question.
 
 QUESTION TYPE RULES:
 1. YES/NO QUESTIONS — answer yes or no first when the question has a clear answer, then explain briefly.
@@ -680,10 +689,30 @@ function normalizeAbbreviations(q) {
     .replace(/\bpe\b/g, "pulmonary embolism");
 }
 
+// ── Extended normalization using nurse-language-dataset ───────────────────────
+// Runs after normalizeAbbreviations() for routing/matching purposes only.
+// NEVER applied to text sent to the model.
+function normalizeExtended(q) {
+  let result = normalizeAbbreviations(q);
+  for (const [pattern, replacement] of ABBREVIATION_EXPANSIONS) {
+    result = result.replace(pattern, replacement);
+  }
+  return result;
+}
+
+// ── Detect compressed practical bedside question ──────────────────────────────
+// Returns true when the normalized input looks like a practical nurse question:
+// device care, procedure monitoring, conversion, med ID, or compressed fragment.
+// Used as a supplement to the knowledgePatterns inside isQuickKnowledge().
+function isNursePracticalQuestion(qNorm) {
+  return NURSE_PRACTICAL_PATTERNS.some((p) => p.test(qNorm));
+}
+
 function isQuickKnowledge(question) {
   // Normalize smart/curly apostrophes → straight apostrophe before any matching
   const q = question.toLowerCase().trim().replace(/[\u2018\u2019]/g, "'");
-  const qNorm = normalizeAbbreviations(q); // normalized copy for pattern matching only
+  // Full normalization (base abbreviations + extended dataset expansions)
+  const qNorm = normalizeExtended(q);
   const wordCount = q.split(/\s+/).length;
 
   // Knowledge questions are short — cap at 35 words (raised from 25 for natural shorthand)
@@ -760,7 +789,23 @@ function isQuickKnowledge(question) {
     /\bshould\s+i\s+(give|hold|administer|start|stop|use|run|hang|push|check)\b/,
     // Broader pharmacology / physiology descriptors — e.g. "Is lasix potassium wasting"
     /^is \S.{1,60}(wasting|sparing|nephrotox|ototox|hepatotox|cardiotox|prolong|shorten|widen|narrow|block|dilat|constrict|revers|irrevers|indicated|contraindicated|used for|given for)\b/i,
+    // "X meaning" / "X definition" at end of phrase — e.g. "afib rvr meaning"
+    /\b(meaning|definition)\s*\?*\s*$/,
+    // "Is this normal" / trailing "normal?" — e.g. "peg leaking normal?"
+    /\bis\s+(this|it|that)\s+(normal|okay|ok|safe|expected|common)\b/,
+    /\bnormal\?*\s*$/,
+    // How to care for / manage / clean / suction
+    /\bhow\s+to\s+(care for|manage|clean|suction|assess|monitor|handle)\b/,
+    // What to watch / look / monitor for
+    /\bwhat\s+to\s+(watch|look|monitor|check|assess)\b/,
+    // "What now" variants — e.g. "hep gtt ptt 140 what should i do now"
+    /\bwhat\s+should\s+i\s+do\s+(now|next)\b/,
+    /\bwhat\s+now\b/,
   ];
+
+  // Broad practical question check (device care, fragments, conversions, etc.)
+  if (isNursePracticalQuestion(qNorm)) return true;
+
   return knowledgePatterns.some((p) => p.test(qNorm));
 }
 
@@ -776,6 +821,9 @@ function isQuickKnowledge(question) {
 //
 function detectPrompt(question, uiMode) {
   const q = question.toLowerCase();
+  // Normalized version used for clinical/med-safety trigger matching
+  // so "hep gtt" → "heparin infusion", "trach" → "tracheostomy", etc.
+  const qNorm = normalizeExtended(q);
   const basePrompt = uiMode === "quick" ? QUICK_SYSTEM_PROMPT : DEEP_SYSTEM_PROMPT;
 
   // ── 0. Exam / NCLEX Style (highest priority) ──────────────────────────────
@@ -791,17 +839,20 @@ function detectPrompt(question, uiMode) {
   if (isQuickKnowledge(question)) return QUICK_KNOWLEDGE_PROMPT;
 
   // ── A. Medication Safety (next priority) ─────────────────────────────────
-  // Action-oriented phrases that signal a real-time give/hold decision
+  // Action-oriented phrases that signal a real-time give/hold decision.
+  // Checked against both original and normalized text.
   const medSafetyTriggers = [
     "can i give", "should i give", "should i hold", "ok to give", "okay to give",
     "is it safe to give", "safe to administer", "med due", "meds due",
     "before scan", "before pet", "before procedure", "before surgery",
     "hold the", "give the",
   ];
-  if (medSafetyTriggers.some((t) => q.includes(t))) return basePrompt;
+  if (medSafetyTriggers.some((t) => q.includes(t) || qNorm.includes(t))) return basePrompt;
 
   // ── B. Clinical Reasoning ─────────────────────────────────────────────────
-  // Patient-specific context: symptoms, vitals, trends, devices, diagnoses
+  // Patient-specific context: symptoms, vitals, trends, devices, diagnoses.
+  // Checked against normalized text so shorthand like "trach", "hep gtt",
+  // "peg", "picc" still match device/procedure clinical triggers.
   const clinicalTriggers = [
     "patient", " pt ", "pale", "hypotensive", "confused", "tachy", "brady",
     "desatt", "urine output", "postop", "post-op", "post op",
@@ -812,8 +863,10 @@ function detectPrompt(question, uiMode) {
     "altered", "unresponsive", "diaphoretic", "distress",
     "vitals", "drip", "infusion", "icu", "stepdown",
     "intubat", "ventilat", "foley", "chest tube", "central line",
+    // ── Device / procedure terms from dataset ────────────────────────────
+    ...DEVICE_PROCEDURE_TERMS,
   ];
-  if (clinicalTriggers.some((t) => q.includes(t))) return basePrompt;
+  if (clinicalTriggers.some((t) => qNorm.includes(t))) return basePrompt;
 
   // ── C. Quick Knowledge Fallback ───────────────────────────────────────────
   // Short question in quick mode with no clinical context — treat as knowledge.

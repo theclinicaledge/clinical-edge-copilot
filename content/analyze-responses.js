@@ -244,8 +244,68 @@ async function analyze() {
     }
   }
 
-  // ── 9. FIX-PRIORITY SUGGESTIONS ──────────────────────────────────────────
-  console.log(header("9 · Fix-Priority Suggestions"));
+  // ── 9. FAILURE CAPTURE REPORT ────────────────────────────────────────────
+  console.log(header("9 · Failure Capture Report"));
+
+  const failures = entries.filter((e) => e.possible_failure === true);
+  const failTotal = failures.length;
+  console.log(`  Total flagged possible failures : ${failTotal}  (${pct(failTotal, total)} of all requests)\n`);
+
+  if (failTotal > 0) {
+    // By failure reason
+    const byReason = {};
+    for (const e of failures) {
+      const r = e.failure_reason || "unknown";
+      byReason[r] = (byReason[r] || 0) + 1;
+    }
+    console.log("  By failure reason:");
+    for (const [reason, count] of sortedDesc(byReason)) {
+      console.log(`    ${bar(count, failTotal, 16)}  ${count.toString().padStart(3)}  ${pct(count, failTotal).padStart(4)}  ${reason}`);
+    }
+
+    // By category
+    const failByCat = {};
+    for (const e of failures) {
+      const c = e.category || "unknown";
+      failByCat[c] = (failByCat[c] || 0) + 1;
+    }
+    console.log("\n  Failed requests by category:");
+    for (const [cat, count] of sortedDesc(failByCat)) {
+      console.log(`    ${count.toString().padStart(3)}  ${cat}`);
+    }
+
+    // Repeated failed inputs
+    const failInputFreq = {};
+    for (const e of failures) {
+      const key = (e.input_normalized || e.input_redacted || "").toLowerCase().trim();
+      if (key) failInputFreq[key] = (failInputFreq[key] || 0) + 1;
+    }
+    const repeatedFails = sortedDesc(failInputFreq).filter(([, c]) => c > 1).slice(0, 10);
+    if (repeatedFails.length > 0) {
+      console.log("\n  Repeated failing inputs (same query failed >1×):");
+      for (const [input, count] of repeatedFails) {
+        const preview = input.length > 75 ? input.slice(0, 75) + "…" : input;
+        console.log(`    [×${count}] ${preview}`);
+      }
+    }
+
+    // Recent failures (last 5)
+    const recentFails = failures.slice(-5).reverse();
+    console.log("\n  Most recent possible failures:");
+    for (const e of recentFails) {
+      const ts   = e.timestamp?.slice(0, 16).replace("T", " ") ?? "?";
+      const inp  = (e.input_normalized || e.input_redacted || "—").slice(0, 60);
+      const cat  = (e.category || "?").padEnd(18);
+      const why  = e.failure_reason || "?";
+      console.log(`    [${ts}]  ${cat}  ${why}`);
+      console.log(`             input: "${inp}"`);
+    }
+  } else {
+    console.log("  ✓  No possible failures flagged in this dataset.");
+  }
+
+  // ── 10. FIX-PRIORITY SUGGESTIONS ─────────────────────────────────────────
+  console.log(header("10 · Fix-Priority Suggestions"));
 
   const suggestions = [];
 

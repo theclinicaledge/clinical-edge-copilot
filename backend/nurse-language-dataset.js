@@ -96,6 +96,17 @@ const ABBREVIATION_EXPANSIONS = [
   [/\bnormal\?+\s*$/g,              "is this normal"],
   [/\bokay\?+\s*$/g,                "is this okay"],
   [/\bok\?+\s*$/g,                  "is this okay"],
+
+  // ── Infection control / isolation shorthand ───────────────────────────────
+  // Multi-word form first: "c. diff" / "c diff" before bare "cdiff"
+  [/\bc\.?\s*diff\b/gi,             "clostridioides difficile"],
+  [/\bcdiff\b/gi,                   "clostridioides difficile"],
+  [/\bmrsa\b/g,                     "mrsa methicillin resistant"],
+  [/\bvre\b/g,                      "vancomycin resistant enterococcus"],
+  [/\brsv\b/g,                      "respiratory syncytial virus"],
+  [/\btb\b/g,                       "tuberculosis"],
+  [/\bppe\b/g,                      "personal protective equipment"],
+  [/\bn95\b/g,                      "n95 respirator"],
 ];
 
 
@@ -165,6 +176,27 @@ const NURSE_PRACTICAL_PATTERNS = [
   // ── Medication pharmacology / effect questions ─────────────────────────────
   /\bwhat\s+(does|is)\s+[a-z]{3,}\s+(do|used for|for|mean|treat|indicated|used)\b/,
   /\b[a-z]{3,}\s+(mechanism|action|effect|side effect|adverse|indication|contraindication|dose|class)\b/,
+
+  // ── Precautions / Isolation / Infection Control ───────────────────────────
+  // Bare "[condition] precautions" noun phrase — the most common nurse phrasing.
+  // e.g. "shingles precautions", "cdiff precautions", "neutropenic precautions",
+  //      "mrsa methicillin resistant precautions" (after normalization)
+  // Gated by isQuickKnowledge's 35-word cap and scenarioIndicators filter.
+  /\b\S+\s+precautions?\b/,
+  // "precautions for [condition]" — e.g. "precautions for shingles"
+  /\bprecautions?\s+for\b/,
+  // Interrogative forms — "what precautions", "what isolation", "what ppe"
+  /\bwhat\s+(precautions?|isolation|personal\s+protective\s+equipment)\b/,
+  // Isolation type comparisons — "airborne vs droplet", "droplet or contact"
+  /\b(airborne|droplet|contact)\s+(vs\.?|versus|or)\s+(airborne|droplet|contact)\b/,
+  // "what ppe" / "ppe for X" / "ppe needed"
+  /\bwhat\s+personal\s+protective\s+equipment\b/,
+  /\bpersonal\s+protective\s+equipment\s+(for|with|needed|required|when)\b/,
+  // "[type] isolation" noun phrase — "tuberculosis isolation", "airborne isolation"
+  /\b(tuberculosis|airborne|droplet|contact|reverse|neutropenic)\s+isolation\b/,
+  // Trailing "precautions?" or "isolation?" — e.g. "mrsa precautions?"
+  /\bprecautions?\?*\s*$/,
+  /\bisolation\?*\s*$/,
 ];
 
 
@@ -208,6 +240,15 @@ const REWORDING_EQUIVALENTS = {
   "afib rvr meaning":                           "atrial fibrillation with rapid ventricular rate — definition and significance",
   "new chest tube no tidaling":                 "absent tidaling in chest tube — causes and nursing response",
   "fresh peg leaking a little normal?":         "peg tube site drainage after placement — expected vs concerning",
+  // ── Infection control / isolation / PPE ──────────────────────────────────
+  "shingles precautions":                       "shingles — contact and airborne/droplet precautions, PPE required",
+  "cdiff precautions":                          "clostridioides difficile — contact and enteric precautions",
+  "airborne vs droplet":                        "airborne vs. droplet precautions — comparison and examples",
+  "neutropenic precautions":                    "neutropenic precautions — reverse isolation and infection prevention",
+  "tb isolation":                               "tuberculosis — airborne isolation requirements",
+  "mrsa precautions":                           "mrsa — contact precautions and PPE requirements",
+  "rsv precautions":                            "respiratory syncytial virus — droplet and contact precautions",
+  "what ppe for shingles":                      "shingles PPE — gown, gloves, N95 if lesions not covered",
 };
 
 

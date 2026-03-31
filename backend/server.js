@@ -428,6 +428,9 @@ trach = tracheostomy, peg = PEG tube, hep gtt = heparin infusion, vanco = vancom
 trop = troponin, bicarb = bicarbonate, mag = magnesium, bnp = BNP, cbc/cmp/bmp = lab panels.
 Compressed fragments like "fresh trach and peg", "trach care first 24 hr", "peg leaking normal?",
 "afib rvr meaning", or "qtc 520 can i give zofran" are valid questions — interpret the clinical intent and answer directly.
+Infection control questions are first-class bedside utility questions. "shingles precautions", "cdiff isolation",
+"airborne vs droplet", "what ppe for tb", "mrsa contact precautions", "neutropenic precautions",
+"rsv droplet precautions" — state the isolation type and PPE required directly and concisely.
 Do NOT refuse to answer because of shorthand or incomplete phrasing — interpret charitably and answer the real question.
 
 QUESTION TYPE RULES:
@@ -724,6 +727,7 @@ function isQuickKnowledge(question) {
     " patient ", "my patient", "the patient",
     " pt is ", "my pt", "the pt",
     "spo2", "o2 sat",
+    "desatt",                          // "desatting" / "desaturating" — always a patient event
     "trending", "worsening", "deteriorat", "unstable",
     "over the last", "over the past",
     "looks worse", "more tired", "confused now",
@@ -920,6 +924,46 @@ function parseUrgency(response) {
   return match ? match[1] : null;
 }
 
+// ── Detect likely failure signals from backend-visible response properties ────
+// Conservative heuristics only — no false positives on legitimately short answers.
+// Returns { possible_failure: bool, failure_reason: string|null }.
+//
+// Signals checked (in priority order):
+//   1. API error                         → api_error
+//   2. Empty / near-empty response       → empty_response / near_empty_response
+//   3. Out-of-scope deflection text      → out_of_scope_deflection
+//   4. Response too short for route type → response_too_short_for_route
+//   5. Missing urgency line on long resp → no_urgency_line
+function detectPossibleFailure({ route, status, responseLength, responsePreview, urgency }) {
+  if (status === "error")       return { possible_failure: true,  failure_reason: "api_error" };
+  if (responseLength === 0)     return { possible_failure: true,  failure_reason: "empty_response" };
+  if (responseLength < 80)      return { possible_failure: true,  failure_reason: "near_empty_response" };
+
+  // Model deflection — the out-of-scope message all prompts fall back to
+  if (responsePreview && /i'm built specifically for bedside nursing/i.test(responsePreview)) {
+    return { possible_failure: true, failure_reason: "out_of_scope_deflection" };
+  }
+
+  // Minimum useful length varies by route:
+  //   QUICK_KNOWLEDGE_PROMPT  — can be shorter; 180 chars is still useful
+  //   QUICK / DEEP / EXAM     — must have full structure; < 350 chars is suspicious
+  const minLength =
+    route === "QUICK_KNOWLEDGE_PROMPT" ? 180 :
+    route === "EXAM_SYSTEM_PROMPT"     ? 300 :
+    350;
+  if (responseLength < minLength) {
+    return { possible_failure: true, failure_reason: "response_too_short_for_route" };
+  }
+
+  // All prompts require an urgency line. Missing it on a reasonably long response
+  // suggests the format was not followed (possible model refusal or truncation).
+  if (!urgency && responseLength > 200) {
+    return { possible_failure: true, failure_reason: "no_urgency_line" };
+  }
+
+  return { possible_failure: false, failure_reason: null };
+}
+
 // ── Infer clinical category from normalized input ─────────────────────────────
 // Returns a product-learning category string based on keywords in the
 // normalized question. Checked in specificity order — most specific first.
@@ -941,6 +985,8 @@ function inferCategory(qNorm) {
     return "deterioration";
   if (/shortness of breath|dyspnea|respiratory|work of breathing|wheez|stridor|ventilat|intubat|airway/.test(qNorm))
     return "respiratory";
+  if (/precautions?|isolation|personal protective equipment|n95 respirator|airborne|droplet precautions|contact precautions|clostridioides|mrsa methicillin|vancomycin resistant|respiratory syncytial|tuberculosis|neutropenic|varicella|shingles|influenza|norovirus|infection control/.test(qNorm))
+    return "infection_control";
   return "general";
 }
 
@@ -1029,6 +1075,14 @@ app.post("/api/copilot", apiLimiter, async (req, res) => {
       }
     }
 
+    const parsedUrgency = parseUrgency(fullResponse);
+    const { possible_failure, failure_reason } = detectPossibleFailure({
+      route:           promptName,
+      status:          "success",
+      responseLength:  fullResponse.length,
+      responsePreview: fullResponse.slice(0, 250),
+      urgency:         parsedUrgency,
+    });
     appendLog({
       timestamp:        requestTimestamp,
       route:            promptName,
@@ -1038,10 +1092,12 @@ app.post("/api/copilot", apiLimiter, async (req, res) => {
       input_normalized: inputNormalized,
       word_count:       wordCount,
       input_length:     inputLength,
-      urgency:          parseUrgency(fullResponse),
+      urgency:          parsedUrgency,
       status:           "success",
       response_preview: fullResponse.slice(0, 250),
       response_length:  fullResponse.length,
+      possible_failure,
+      failure_reason,
     });
 
     // Signal stream completion
@@ -1049,6 +1105,13 @@ app.post("/api/copilot", apiLimiter, async (req, res) => {
     res.end();
   } catch (error) {
     console.error("[Clinical Edge] Anthropic API error:", error.status ?? "", error.message);
+    const { possible_failure: errFail, failure_reason: errReason } = detectPossibleFailure({
+      route:           promptName,
+      status:          "error",
+      responseLength:  0,
+      responsePreview: null,
+      urgency:         null,
+    });
     appendLog({
       timestamp:        requestTimestamp,
       route:            promptName,
@@ -1062,6 +1125,8 @@ app.post("/api/copilot", apiLimiter, async (req, res) => {
       status:           "error",
       response_preview: null,
       response_length:  0,
+      possible_failure: errFail,
+      failure_reason:   errReason,
     });
     // SSE headers are already sent — respond with an error SSE event so the
     // frontend can stop streaming and display the message cleanly.

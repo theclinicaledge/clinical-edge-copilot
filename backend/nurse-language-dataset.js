@@ -194,6 +194,8 @@ const NURSE_PRACTICAL_PATTERNS = [
   /\bpersonal\s+protective\s+equipment\s+(for|with|needed|required|when)\b/,
   // "[type] isolation" noun phrase — "tuberculosis isolation", "airborne isolation"
   /\b(tuberculosis|airborne|droplet|contact|reverse|neutropenic)\s+isolation\b/,
+  // "contact enteric" — nurse shorthand for contact/enteric precautions (no keyword needed)
+  /\bcontact\s+enteric\b/,
   // Trailing "precautions?" or "isolation?" — e.g. "mrsa precautions?"
   /\bprecautions?\?*\s*$/,
   /\bisolation\?*\s*$/,

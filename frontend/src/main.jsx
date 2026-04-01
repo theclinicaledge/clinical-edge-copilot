@@ -6,6 +6,7 @@ import App from './App.jsx'
 import Landing from './Landing.jsx'
 import Scenario from './Scenario.jsx'
 import QuickStart from './QuickStart.jsx'
+import Privacy from './Privacy.jsx'
 
 // ── Service Worker Registration ─────────────────────────────────────────────
 if ('serviceWorker' in navigator) {
@@ -195,6 +196,7 @@ function getPage() {
   if (hash === '#/landing') return 'landing';
   if (hash === '#/scenario') return 'scenario';
   if (hash === '#/quickstart') return 'quickstart';
+  if (hash === '#/privacy') return 'privacy';
   return 'app';
 }
 
@@ -219,6 +221,7 @@ function Root() {
       {page === 'scenario'   && <Scenario onBack={goBack} onEnterApp={enterApp} onQuickStart={enterQuickStart} />}
       {page === 'quickstart' && <QuickStart onBack={goBackToScenario} onEnterApp={enterApp} />}
       {page === 'landing'    && <Landing onEnterApp={enterApp} onEnterScenario={enterScenario} />}
+      {page === 'privacy'    && <Privacy />}
       <IOSInstallHint />
       <InstallBanner />
       <Analytics />

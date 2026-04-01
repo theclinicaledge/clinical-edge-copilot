@@ -735,16 +735,15 @@ export default function App() {
             color: rgba(233,186,75,0.82) !important;
           }
           /* 3 + 4: Tighten hero spacing + pull input closer */
-          .main-container { padding: 28px 16px 0 !important; }
+          .main-container { max-width: 800px !important; margin: 0 auto !important; padding: 24px 18px 0 !important; }
           .hero { margin-bottom: 18px !important; }
           .hero h1 { margin-bottom: 10px !important; }
-          /* Bridge line — tighter rhythm, constrained width, smooth wrapping */
+          /* Bridge line — tighter rhythm, full width on mobile */
           .hero p:first-of-type {
             font-size: 15px !important;
             line-height: 1.35 !important;
             letter-spacing: -0.01em !important;
-            max-width: 320px !important;
-            margin: 0 auto 6px !important;
+            margin: 0 0 6px !important;
             color: rgba(230,238,242,0.88) !important;
           }
           /* Subline — hidden on mobile (redundant at small size; visible on desktop) */
@@ -761,8 +760,8 @@ export default function App() {
       <div style={{
         borderBottom: "1px solid rgba(255,255,255,0.05)",
         paddingTop: "env(safe-area-inset-top)",
-        paddingLeft: "max(20px, env(safe-area-inset-left))",
-        paddingRight: "max(20px, env(safe-area-inset-right))",
+        paddingLeft: "max(14px, env(safe-area-inset-left))",
+        paddingRight: "max(14px, env(safe-area-inset-right))",
         paddingBottom: 0,
         background: "linear-gradient(to bottom, rgba(255,255,255,0.025) 0%, rgba(255,255,255,0) 100%), rgba(11,31,42,0.97)",
         backdropFilter: "blur(20px)",
@@ -771,8 +770,7 @@ export default function App() {
         zIndex: 50,
       }}>
         <div style={{
-          maxWidth: 680,
-          margin: "0 auto",
+          width: "100%",
           display: "flex",
           alignItems: "center",
           paddingTop: 26,
@@ -853,7 +851,7 @@ export default function App() {
       </div>
 
       {/* ── Main ─────────────────────────────────────────────────────────── */}
-      <div className="main-container" style={{ maxWidth: 680, margin: "0 auto", padding: "42px 16px 0" }}>
+      <div className="main-container" style={{ maxWidth: 800, margin: "0 auto", width: "100%", padding: "36px 20px 0", display: "flex", flexDirection: "column", alignItems: "stretch", background: "radial-gradient(ellipse at top center, rgba(0,194,209,0.04) 0%, rgba(0,194,209,0) 68%)" }}>
 
         {/* Hero */}
         <div className="hero" style={{ textAlign: "center", marginBottom: 26 }}>
@@ -862,10 +860,9 @@ export default function App() {
             fontWeight: 700,
             fontSize: "clamp(22px, 5vw, 34px)",
             color: "rgba(255,255,255,0.96)",
-            margin: "0 auto 16px",
+            margin: "0 0 16px",
             lineHeight: 1.12,
             letterSpacing: "-0.03em",
-            maxWidth: 620,
           }}>
             Clinical reasoning support. Built for nurses.
           </h1>

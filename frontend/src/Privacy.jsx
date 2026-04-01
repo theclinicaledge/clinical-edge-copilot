@@ -58,7 +58,7 @@ export default function Privacy() {
           Privacy Policy
         </h1>
         <p style={{ fontSize: 13, color: "#4F6D7A", fontFamily: "'IBM Plex Mono', monospace", margin: "0 0 40px" }}>
-          Effective date: April 1, 2025
+          Effective date: April 1, 2026
         </p>
 
         {[

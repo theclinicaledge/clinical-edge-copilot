@@ -100,7 +100,7 @@ export default function Privacy() {
           },
           {
             title: "Contact",
-            body: `For questions about this privacy policy or the app, contact: hello@theclinicaledge.org`,
+            body: `For questions about this privacy policy or the app, contact: clinicaledgehq@gmail.com`,
           },
         ].map(({ title, body }) => (
           <div key={title} style={{ marginBottom: 32 }}>

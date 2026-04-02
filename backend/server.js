@@ -8,8 +8,6 @@ const fs = require("fs");
 const path = require("path");
 const {
   ABBREVIATION_EXPANSIONS,
-  NURSE_PRACTICAL_PATTERNS,
-  DEVICE_PROCEDURE_TERMS,
 } = require("./nurse-language-dataset");
 
 const app = express();
@@ -417,6 +415,9 @@ VOICE RULES:
 const QUICK_KNOWLEDGE_PROMPT = `You are an experienced bedside nurse answering a short, practical clinical knowledge question.
 Your job: give a fast, clear, useful answer. No structure bloat. No forced sections. Just the right answer in the right amount of words.
 
+SCOPE:
+This prompt handles ALL bedside nursing utility questions — clinical vocabulary, lab values and ranges, medication questions, wound care and dressings, infection control and precautions, device and drain questions, procedure knowledge, patient education basics, and general nursing practice. If the question is relevant to bedside nursing care, answer it directly and practically.
+
 LANGUAGE HANDLING:
 Nurses ask questions in shorthand, abbreviations, fragments, and imperfect grammar. Handle it naturally.
 Common examples: abx = antibiotics, tx = treatment, dx = diagnosis, sx = symptoms, hx = history,
@@ -703,13 +704,88 @@ function normalizeExtended(q) {
   return result;
 }
 
-// ── Detect compressed practical bedside question ──────────────────────────────
-// Returns true when the normalized input looks like a practical nurse question:
-// device care, procedure monitoring, conversion, med ID, or compressed fragment.
-// Used as a supplement to the knowledgePatterns inside isQuickKnowledge().
-function isNursePracticalQuestion(qNorm) {
-  return NURSE_PRACTICAL_PATTERNS.some((p) => p.test(qNorm));
+// ── Detect patient scenario ───────────────────────────────────────────────────
+// Returns true when the input contains signals of a REAL patient situation that
+// needs clinical reasoning. Everything else defaults to QUICK_KNOWLEDGE_PROMPT.
+//
+// Detection categories (conservative — lean toward false negative over false positive):
+//   1. Explicit patient subject    ("patient", "my pt", "year old", "yo")
+//   2. Vital sign narrative        ("bp dropped", "hr climbing", "spo2 drifting")
+//   3. Active deterioration        ("desatting", "worsening", "unresponsive")
+//   4. Post-procedure / admission  ("post-op", "came back from", "in the icu")
+//   5. Temporal progression        ("was stable", "over the last X", "was found")
+//
+function isPatientScenario(question) {
+  const q  = question.toLowerCase().trim().replace(/[\u2018\u2019]/g, "'");
+  const qN = normalizeExtended(q);   // abbreviation-expanded for matching
+  const qP = " " + qN + " ";         // space-padded for safe boundary matching
+
+  // ── 1. Explicit patient subject ───────────────────────────────────────────
+  if (
+    qP.includes(" patient ") || qP.includes("my patient") ||
+    qP.includes("the patient") || qP.includes("a patient") ||
+    qP.includes(" my pt") || qP.includes("the pt ") ||
+    qP.includes(" pt is ") || qP.includes(" pt was ") || qP.includes(" pt with ") ||
+    qP.includes("year old") || qP.includes("year-old") || qP.includes(" yo ")
+  ) return true;
+
+  // ── 2. Vital sign narrative (vital + directional verb) ────────────────────
+  // Distinguishes "bp dropped to 88/50" (scenario) from "what is normal bp" (knowledge).
+  if (
+    qP.includes("bp drop") || qP.includes("bp fell") || qP.includes("bp falling") ||
+    qP.includes("bp down to") || qP.includes("bp drifting") || qP.includes("bp climbing") ||
+    qP.includes("blood pressure drop") || qP.includes("blood pressure fell") ||
+    qP.includes("blood pressure falling") || qP.includes("blood pressure drifting") ||
+    qP.includes("hr climb") || qP.includes("hr up to") || qP.includes("heart rate climb") ||
+    qP.includes("spo2 drop") || qP.includes("spo2 down to") || qP.includes("spo2 falling") ||
+    qP.includes("spo2 drifting") || qP.includes("oxygen saturation drop") ||
+    qP.includes("o2 sat drop") || qP.includes("o2 sat down") ||
+    qP.includes("pressure drifting") || qP.includes("pressure dropping")
+  ) return true;
+
+  // ── 3. Active deterioration / acute clinical event ────────────────────────
+  if (
+    qP.includes("desatting") || qP.includes("desaturating") || qP.includes(" desatt") ||
+    qP.includes("deteriorating") || qP.includes("is deteriorating") ||
+    qP.includes(" worsening ") || qP.includes("is worsening") ||
+    qP.includes("getting worse") || qP.includes(" declining ") ||
+    qP.includes("unstable") || qP.includes("unresponsive") ||
+    qP.includes("not responding") || qP.includes("diaphoretic") || qP.includes("diaphoresis") ||
+    qP.includes("confused now") || qP.includes("newly confused") ||
+    qP.includes("altered mental") || qP.includes("altered status")
+  ) return true;
+
+  // ── 4. Post-procedure / admission context ─────────────────────────────────
+  if (
+    qP.includes("post op") || qP.includes("post-op") || qP.includes("postop") ||
+    qP.includes("post procedure") || qP.includes("post-procedure") ||
+    qP.includes("came back from") || qP.includes("just returned from") ||
+    qP.includes("was admitted") || qP.includes("just admitted") ||
+    qP.includes("admitted with") || qP.includes("admitted for") ||
+    qP.includes("in the icu ") || qP.includes("in icu ") ||
+    qP.includes("post-op day") || qP.includes(" pod ")
+  ) return true;
+
+  // ── 5. Temporal progression (was stable / over the last X / was found) ────
+  if (
+    qP.includes("was stable ") || qP.includes("was stable,") ||
+    qP.includes("was doing well") || qP.includes("was fine and") ||
+    qP.includes("over the last ") || qP.includes("over the past ") ||
+    qP.includes("in the last hour") ||
+    qP.includes("who presents") || qP.includes("presenting with") ||
+    qP.includes("was found unresponsive") || qP.includes("found unresponsive") ||
+    qP.includes("brought in") || qP.includes("came in with") ||
+    qP.includes("has a history of") || qP.includes("with a history of")
+  ) return true;
+
+  return false;
 }
+
+// ── DEPRECATED — kept for reference; no longer called ────────────────────────
+// The old isQuickKnowledge() opt-in pattern matcher has been replaced by the
+// opt-out isPatientScenario() approach. All non-scenario questions now default
+// to QUICK_KNOWLEDGE_PROMPT without requiring explicit pattern matching.
+// ─────────────────────────────────────────────────────────────────────────────
 
 function isQuickKnowledge(question) {
   // Normalize smart/curly apostrophes → straight apostrophe before any matching
@@ -821,73 +897,36 @@ function isQuickKnowledge(question) {
   return knowledgePatterns.some((p) => p.test(qNorm));
 }
 
-// ── Input-based prompt routing ─────────────────────────────────────────────
+// ── Input-based prompt routing ────────────────────────────────────────────────
 //
-// Priority order:
-//   0. Exam / NCLEX Style      → clearly structured exam question → EXAM_SYSTEM_PROMPT
-//   1. Quick Knowledge         → short conceptual question, no scenario → QUICK_KNOWLEDGE_PROMPT (mode override)
-//   A. Medication Safety Mode  → action-oriented med phrases → QUICK or DEEP
-//   B. Clinical Reasoning Mode → patient context / vitals / trends → QUICK or DEEP
-//   C. Quick Knowledge Fallback → short question in quick mode, no clinical context → QUICK_KNOWLEDGE_PROMPT
-//   D. Default                 → Clinical Reasoning (QUICK or DEEP)
+// Priority order (simplified opt-out architecture):
+//   0. Exam / NCLEX Style     → EXAM_SYSTEM_PROMPT        (unchanged)
+//   1. Patient Scenario       → QUICK or DEEP clinical     (real patient signals detected)
+//   2. Everything else        → QUICK_KNOWLEDGE_PROMPT     (default — broad utility coverage)
+//
+// Rationale: QUICK_KNOWLEDGE_PROMPT handles all bedside utility questions —
+// medication, lab, wound care, precautions, devices, definitions, shorthand.
+// Clinical prompts are reserved for questions that contain clear evidence of
+// a real patient situation requiring clinical reasoning (detected by isPatientScenario).
 //
 function detectPrompt(question, uiMode) {
-  const q = question.toLowerCase();
-  // Normalized version used for clinical/med-safety trigger matching
-  // so "hep gtt" → "heparin infusion", "trach" → "tracheostomy", etc.
-  const qNorm = normalizeExtended(q);
   const basePrompt = uiMode === "quick" ? QUICK_SYSTEM_PROMPT : DEEP_SYSTEM_PROMPT;
 
-  // ── 0. Exam / NCLEX Style (highest priority) ──────────────────────────────
-  // Must run before other checks — an exam question containing "patient" or
-  // a med name would otherwise be misrouted to clinical / med-safety prompts.
+  // ── 0. Exam / NCLEX Style (highest priority, unchanged) ──────────────────
   if (isExamStyle(question)) return EXAM_SYSTEM_PROMPT;
 
-  // ── 1. Quick Knowledge (mode override) ───────────────────────────────────
-  // Clearly conceptual/factual questions with no scenario context always route
-  // to QUICK_KNOWLEDGE_PROMPT regardless of selected mode. Runs before
-  // clinical/med-safety checks so terms like "potassium" in a knowledge
-  // question don't get caught by clinical trigger matching.
-  if (isQuickKnowledge(question)) return QUICK_KNOWLEDGE_PROMPT;
+  // ── 1. Patient Scenario → Clinical Reasoning ─────────────────────────────
+  // If the input signals a real patient with an active situation, route to
+  // the clinical prompt (quick or deep based on mode).
+  if (isPatientScenario(question)) return basePrompt;
 
-  // ── A. Medication Safety (next priority) ─────────────────────────────────
-  // Action-oriented phrases that signal a real-time give/hold decision.
-  // Checked against both original and normalized text.
-  const medSafetyTriggers = [
-    "can i give", "should i give", "should i hold", "ok to give", "okay to give",
-    "is it safe to give", "safe to administer", "med due", "meds due",
-    "before scan", "before pet", "before procedure", "before surgery",
-    "hold the", "give the",
-  ];
-  if (medSafetyTriggers.some((t) => q.includes(t) || qNorm.includes(t))) return basePrompt;
-
-  // ── B. Clinical Reasoning ─────────────────────────────────────────────────
-  // Patient-specific context: symptoms, vitals, trends, devices, diagnoses.
-  // Checked against normalized text so shorthand like "trach", "hep gtt",
-  // "peg", "picc" still match device/procedure clinical triggers.
-  const clinicalTriggers = [
-    "patient", " pt ", "pale", "hypotensive", "confused", "tachy", "brady",
-    "desatt", "urine output", "postop", "post-op", "post op",
-    "bp ", " hr ", "spo2", "o2 sat", "temperature", "temp ",
-    "respirat", "creatinine", "potassium", "sodium", "lactate",
-    "trending", "worsening", "deteriorat", "declining", "unstable",
-    "chest pain", "shortness of breath", " sob", "dyspnea",
-    "altered", "unresponsive", "diaphoretic", "distress",
-    "vitals", "drip", "infusion", "icu", "stepdown",
-    "intubat", "ventilat", "foley", "chest tube", "central line",
-    // ── Device / procedure terms from dataset ────────────────────────────
-    ...DEVICE_PROCEDURE_TERMS,
-  ];
-  if (clinicalTriggers.some((t) => qNorm.includes(t))) return basePrompt;
-
-  // ── C. Quick Knowledge Fallback ───────────────────────────────────────────
-  // Short question in quick mode with no clinical context — treat as knowledge.
-  // Deep mode falls through to D so the user gets the richer reasoning prompt.
-  const wordCount = question.trim().split(/\s+/).length;
-  if (uiMode !== "deep" && wordCount <= 25) return QUICK_KNOWLEDGE_PROMPT;
-
-  // ── D. Default → Clinical Reasoning ──────────────────────────────────────
-  return basePrompt;
+  // ── 2. Default → Quick Knowledge ─────────────────────────────────────────
+  // All other inputs — medical vocabulary, lab ranges, medication questions,
+  // wound care, precautions, device knowledge, shorthand fragments, definitions,
+  // practical action questions — are answered by QUICK_KNOWLEDGE_PROMPT.
+  // Mode (quick/deep) no longer determines routing; it only affects clinical
+  // reasoning depth when a patient scenario IS detected.
+  return QUICK_KNOWLEDGE_PROMPT;
 }
 
 // ── Patient-identifier guardrail ──────────────────────────────────────────────

@@ -805,6 +805,14 @@ function isQuickKnowledge(question) {
     // "What now" variants — e.g. "hep gtt ptt 140 what should i do now"
     /\bwhat\s+should\s+i\s+do\s+(now|next)\b/,
     /\bwhat\s+now\b/,
+    // "is X good/appropriate/safe for/to/on Y" — product/intervention recommendation
+    // e.g. "is mepilex good to cover blisters", "is tegaderm okay for wounds"
+    /\bis\s+\S+\s+(good|appropriate|okay|ok|safe|right|best)\s+(for|to|on|with)\b/,
+    // "can I put/apply/cover/leave/wrap" — wound care application queries
+    // (complements existing "can i give/hold/use" pattern above)
+    /\bcan\s+i\s+(put|apply|cover|leave|wrap|place)\b/,
+    // "when to use/apply/change/remove" — dressing and product selection
+    /\bwhen\s+to\s+(use|apply|change|remove|place)\b/,
   ];
 
   // Broad practical question check (device care, fragments, conversions, etc.)
@@ -987,6 +995,8 @@ function inferCategory(qNorm) {
     return "respiratory";
   if (/precautions?|isolation|personal protective equipment|n95 respirator|airborne|droplet precautions|contact precautions|clostridioides|mrsa methicillin|vancomycin resistant|respiratory syncytial|tuberculosis|neutropenic|varicella|shingles|influenza|norovirus|infection control/.test(qNorm))
     return "infection_control";
+  if (/mepilex|tegaderm|xeroform|foam\s+dressing|wound\s+dressing|skin\s+tear|blister|excoriation|maceration|pressure\s+injury|pressure\s+ulcer|wound\s+care|wound\s+vac|dehiscence|necrosis|eschar|slough|granulation|dressing\s+change|wound\s+bed/.test(qNorm))
+    return "wound_care";
   return "general";
 }
 

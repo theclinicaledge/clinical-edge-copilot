@@ -199,6 +199,20 @@ const NURSE_PRACTICAL_PATTERNS = [
   // Trailing "precautions?" or "isolation?" — e.g. "mrsa precautions?"
   /\bprecautions?\?*\s*$/,
   /\bisolation\?*\s*$/,
+
+  // ── Wound Care / Skin Care / Dressings ───────────────────────────────────────
+  // "[product/type] dressing" bare noun phrase — "skin tear dressing", "foam dressing"
+  /\b\S+\s+dressing\b/,
+  // "stage N pressure injury/wound/ulcer" — staging queries
+  /\bstage\s+\d+\s+(pressure\s+injury|pressure\s+ulcer|wound)\b/,
+  // "what dressing for X" / "what dressing to use"
+  /\bwhat\s+dressing\s+(for|to\s+use|should)\b/,
+  // "what should I put/use/apply on/for" — practical product application
+  /\bwhat\s+should\s+i\s+(put|use|apply|do)\s+(on|for|with)\b/,
+  // "do you leave / wrap / cover / change / clean" — procedural wound/skin questions
+  /\bdo\s+you\s+(leave|wrap|cover|change|remove|apply|keep|clean|debride)\b/,
+  // Trailing wound/skin term — "blisters?", "skin tear", "excoriation", "maceration"
+  /\b(blister|skin\s+tear|excoriation|maceration|wound)\?*\s*$/,
 ];
 
 
@@ -251,6 +265,16 @@ const REWORDING_EQUIVALENTS = {
   "mrsa precautions":                           "mrsa — contact precautions and PPE requirements",
   "rsv precautions":                            "respiratory syncytial virus — droplet and contact precautions",
   "what ppe for shingles":                      "shingles PPE — gown, gloves, N95 if lesions not covered",
+  // ── Wound care / skin care / dressings ───────────────────────────────────
+  "is mepilex good to cover blisters":          "mepilex foam dressing — appropriate use for blister coverage",
+  "can i use mepilex for blister":              "mepilex — blister dressing selection",
+  "what dressing for skin tear":                "skin tear — dressing selection and wound care",
+  "do you leave blister intact":                "blister management — intact vs debrided approach",
+  "stage 2 pressure injury dressing":           "stage 2 pressure injury — dressing selection",
+  "what is xeroform used for":                  "xeroform petrolatum gauze — indications and nursing use",
+  "foam dressing vs gauze":                     "foam dressing versus gauze — wound care comparison",
+  "what does maceration mean":                  "maceration — skin breakdown from moisture, wound care implication",
+  "excoriation meaning":                        "excoriation — definition, wound/skin assessment",
 };
 
 

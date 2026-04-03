@@ -1,4 +1,4 @@
-import React, { useMemo, useRef } from "react";
+import React, { useMemo } from "react";
 import {
   AbsoluteFill,
   useCurrentFrame,
@@ -29,8 +29,58 @@ const LINE_CONFIGS = [
   { text: "Most people get this wrong.", start: 105, fontSize: 68, weight: 600 },
 ];
 
-// Spotlight vertical positions (% of height) per line
-const SPOTLIGHT_Y_MAP = [47, 52, 58]; // tracks active line
+// Spotlight vertical positions (% of height) per active line
+const SPOTLIGHT_Y_MAP = [47, 52, 58];
+
+// ─── Depth grid — subtle horizontal lines for atmosphere ──────────────────────
+interface DepthGridProps {
+  opacity: number;
+}
+const DepthGrid: React.FC<DepthGridProps> = ({ opacity }) => {
+  const frame = useCurrentFrame();
+  // 9 horizontal lines spaced across middle 70% of frame height
+  const lines = useMemo(() => {
+    return Array.from({ length: 9 }, (_, i) => {
+      const yPct = 22 + i * 7.5; // 22% to 82%
+      const seed = i * 31 + 7;
+      const widthPct = 28 + random(seed) * 44; // 28%–72% width
+      const xOffsetPct = (100 - widthPct) / 2 + (random(seed + 1) - 0.5) * 12;
+      const lineOpacity = 0.04 + random(seed + 2) * 0.05; // 0.04–0.09
+      return { yPct, widthPct, xOffsetPct, lineOpacity };
+    });
+  }, []);
+
+  // Lines drift very slowly upward
+  const drift = (frame * 0.04) % 100;
+
+  return (
+    <div
+      style={{
+        position: "absolute",
+        inset: 0,
+        opacity,
+        pointerEvents: "none",
+      }}
+    >
+      {lines.map((l, i) => {
+        const y = ((l.yPct + drift) % 90) + 5; // wrap 5%–95%
+        return (
+          <div
+            key={i}
+            style={{
+              position: "absolute",
+              top: `${y}%`,
+              left: `${l.xOffsetPct}%`,
+              width: `${l.widthPct}%`,
+              height: 1,
+              background: `linear-gradient(90deg, transparent 0%, rgba(0,194,203,${l.lineOpacity.toFixed(3)}) 25%, rgba(0,194,203,${(l.lineOpacity * 1.4).toFixed(3)}) 50%, rgba(0,194,203,${l.lineOpacity.toFixed(3)}) 75%, transparent 100%)`,
+            }}
+          />
+        );
+      })}
+    </div>
+  );
+};
 
 interface HookLineProps {
   text: string;
@@ -64,8 +114,8 @@ const HookLine: React.FC<HookLineProps> = ({
     extrapolateRight: "clamp",
   });
 
-  // Dimmed lines: drop opacity + shift slightly cool/gray
-  const finalOpacity = dimmed ? entryOpacity * 0.28 : entryOpacity;
+  // Dimmed lines: drop opacity + shift cool/gray
+  const finalOpacity = dimmed ? entryOpacity * 0.25 : entryOpacity;
 
   // Active line: slow breathing glow that starts after spring settles
   const glowStartFrame = springSettleFrames;
@@ -73,10 +123,10 @@ const HookLine: React.FC<HookLineProps> = ({
   const glowColor = interpolateColors(
     Math.sin(glowFrame * 0.04 + start * 0.08),
     [-1, 1],
-    ["rgba(255,255,255,0.45)", "rgba(0,194,203,0.75)"]
+    ["rgba(255,255,255,0.45)", "rgba(0,194,203,0.80)"]
   );
   const textShadow = !dimmed
-    ? `0 0 48px ${glowColor}, 0 0 96px rgba(0,194,203,0.18)`
+    ? `0 0 52px ${glowColor}, 0 0 110px rgba(0,194,203,0.18), 0 2px 0 rgba(0,0,0,0.4)`
     : "none";
 
   return (
@@ -94,7 +144,7 @@ const HookLine: React.FC<HookLineProps> = ({
         style={{
           fontSize,
           fontWeight: weight,
-          color: dimmed ? "#4E6A7A" : "#FFFFFF",
+          color: dimmed ? "#3E5A6A" : "#FFFFFF",
           fontFamily: "Syne, system-ui, sans-serif",
           letterSpacing: "-0.03em",
           textShadow,
@@ -127,17 +177,11 @@ export const HookScene: React.FC = () => {
   );
 
   // ─── Camera push-in: background scales slowly ───────────────────────────────
-  const cameraPush = interpolate(frame, [0, durationInFrames], [1.0, 1.022], {
+  const cameraPush = interpolate(frame, [0, durationInFrames], [1.0, 1.025], {
     extrapolateRight: "clamp",
   });
 
-  // ─── Spotlight behind active line ──────────────────────────────────────────
-  const activeLineIdx = LINE_CONFIGS.reduce(
-    (acc, l, i) => (frame >= l.start ? i : acc),
-    0
-  );
-  const targetSpotY = SPOTLIGHT_Y_MAP[activeLineIdx];
-  // Smooth spotlight position: interpolate toward target
+  // ─── Spotlight: follows active line, breathing opacity ─────────────────────
   const spotlightY = interpolate(
     frame,
     [0, 44, 45, 100, 105, 180],
@@ -147,18 +191,48 @@ export const HookScene: React.FC = () => {
   const spotlightOpacity = interpolate(
     Math.sin(frame * 0.028),
     [-1, 1],
-    [0.08, 0.18]
+    [0.14, 0.30]
   );
 
-  // ─── Light sweep: slow, elegant diagonal pan — frames 10–130 ───────────────
+  // ─── Secondary spotlight — offset, slower pulse, adds depth ─────────────────
+  const spot2Opacity = interpolate(
+    Math.sin(frame * 0.018 + 1.6),
+    [-1, 1],
+    [0.06, 0.14]
+  );
+
+  // ─── Light sweep: slow diagonal pan — frames 10–130 ────────────────────────
   const beamX = interpolate(frame, [10, 130], [-320, 1540], {
     extrapolateLeft: "clamp",
     extrapolateRight: "clamp",
   });
-  const beamOpacity = interpolate(frame, [10, 32, 100, 130], [0, 0.18, 0.18, 0], {
+  const beamOpacity = interpolate(frame, [10, 32, 100, 130], [0, 0.22, 0.22, 0], {
     extrapolateLeft: "clamp",
     extrapolateRight: "clamp",
   });
+
+  // ─── Floor glow: rises from bottom, breathes slowly ─────────────────────────
+  const floorGlowOpacity = interpolate(
+    Math.sin(frame * 0.019 + 0.5),
+    [-1, 1],
+    [0.12, 0.26]
+  );
+  // Floor glow entry: fades in over first 30 frames
+  const floorGlowEntry = interpolate(frame, [0, 30], [0, 1], {
+    extrapolateRight: "clamp",
+  });
+
+  // ─── Left edge accent — vertical teal strip, very subtle ───────────────────
+  const edgeOpacity = interpolate(
+    Math.sin(frame * 0.024 + 3.2),
+    [-1, 1],
+    [0.08, 0.18]
+  );
+
+  // ─── Depth grid entry opacity ────────────────────────────────────────────────
+  const gridOpacity = interpolate(frame, [0, 45], [0, 1], {
+    extrapolateRight: "clamp",
+  }) * 0.7;
 
   // ─── Active line index for dimming logic ────────────────────────────────────
   const lastVisibleIdx = LINE_CONFIGS.reduce(
@@ -180,20 +254,77 @@ export const HookScene: React.FC = () => {
           transformOrigin: "center center",
         }}
       >
-        <GlowBackground intensity={1.15} />
-        <ParticleField count={42} slowFactor={0.35} dimFactor={0.55} />
+        <GlowBackground intensity={1.25} />
+        <ParticleField count={48} slowFactor={0.32} dimFactor={0.52} />
       </AbsoluteFill>
 
-      {/* ── Spotlight behind active text ────────────────────────────────────── */}
+      {/* ── Depth grid — very subtle horizontal line atmosphere ─────────────── */}
+      <DepthGrid opacity={gridOpacity} />
+
+      {/* ── Floor glow — teal rising from bottom third ───────────────────────── */}
+      <div
+        style={{
+          position: "absolute",
+          bottom: 0,
+          left: 0,
+          right: 0,
+          height: "52%",
+          background: `radial-gradient(ellipse 90% 80% at 50% 100%, rgba(0,194,203,${(floorGlowOpacity * floorGlowEntry).toFixed(3)}) 0%, rgba(0,160,185,${(floorGlowOpacity * floorGlowEntry * 0.35).toFixed(3)}) 38%, transparent 68%)`,
+          pointerEvents: "none",
+        }}
+      />
+
+      {/* ── Left edge accent — subtle vertical teal band ──────────────────────── */}
+      <div
+        style={{
+          position: "absolute",
+          top: 0,
+          left: 0,
+          width: 180,
+          height: "100%",
+          background: `linear-gradient(90deg, rgba(0,194,203,${edgeOpacity.toFixed(3)}) 0%, rgba(0,194,203,${(edgeOpacity * 0.3).toFixed(3)}) 45%, transparent 100%)`,
+          pointerEvents: "none",
+        }}
+      />
+
+      {/* ── Right edge accent — mirror, different phase ─────────────────────── */}
+      <div
+        style={{
+          position: "absolute",
+          top: 0,
+          right: 0,
+          width: 120,
+          height: "100%",
+          background: `linear-gradient(270deg, rgba(0,160,185,${(edgeOpacity * 0.45).toFixed(3)}) 0%, transparent 100%)`,
+          pointerEvents: "none",
+        }}
+      />
+
+      {/* ── Primary spotlight behind active text line ────────────────────────── */}
       <div
         style={{
           position: "absolute",
           left: "50%",
           top: `${spotlightY}%`,
-          width: 1180,
-          height: 560,
+          width: 1320,
+          height: 680,
           borderRadius: "50%",
-          background: `radial-gradient(ellipse, rgba(0,194,203,${spotlightOpacity.toFixed(3)}) 0%, transparent 55%)`,
+          background: `radial-gradient(ellipse, rgba(0,194,203,${spotlightOpacity.toFixed(3)}) 0%, rgba(0,194,203,${(spotlightOpacity * 0.18).toFixed(3)}) 42%, transparent 65%)`,
+          transform: "translate(-50%, -50%)",
+          pointerEvents: "none",
+        }}
+      />
+
+      {/* ── Secondary spotlight — wider, softer, lower ──────────────────────── */}
+      <div
+        style={{
+          position: "absolute",
+          left: "50%",
+          top: "62%",
+          width: 1100,
+          height: 900,
+          borderRadius: "50%",
+          background: `radial-gradient(ellipse, rgba(0,128,175,${spot2Opacity.toFixed(3)}) 0%, transparent 58%)`,
           transform: "translate(-50%, -50%)",
           pointerEvents: "none",
         }}
@@ -205,21 +336,21 @@ export const HookScene: React.FC = () => {
           position: "absolute",
           top: 0,
           left: beamX,
-          width: 260,
+          width: 280,
           height: "100%",
           background:
-            "linear-gradient(90deg, transparent 0%, rgba(0,194,203,0.08) 35%, rgba(0,194,203,0.16) 50%, rgba(0,194,203,0.08) 65%, transparent 100%)",
+            "linear-gradient(90deg, transparent 0%, rgba(0,194,203,0.07) 30%, rgba(0,194,203,0.17) 50%, rgba(0,194,203,0.07) 70%, transparent 100%)",
           opacity: beamOpacity,
           pointerEvents: "none",
           transform: "skewX(-10deg)",
         }}
       />
 
-      {/* ── Hard vignette corners ───────────────────────────────────────────── */}
+      {/* ── Vignette — darkens corners and bottom, grounds the frame ────────── */}
       <AbsoluteFill
         style={{
           background:
-            "radial-gradient(ellipse 76% 88% at 50% 50%, transparent 28%, rgba(5,12,24,0.52) 68%, rgba(3,7,15,0.9) 100%)",
+            "radial-gradient(ellipse 80% 90% at 50% 44%, transparent 25%, rgba(5,12,24,0.46) 64%, rgba(3,7,15,0.88) 100%)",
           pointerEvents: "none",
         }}
       />

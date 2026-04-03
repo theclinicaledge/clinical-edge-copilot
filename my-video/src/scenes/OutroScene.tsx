@@ -216,28 +216,35 @@ export const OutroScene: React.FC = () => {
               transform: `translateY(${line2Y}px)`,
               opacity: line2Opacity,
               textAlign: "center",
+              display: "flex",
+              flexDirection: "column",
+              alignItems: "center",
+              gap: 18,
             }}
           >
             <div
               style={{
-                fontSize: 60,
-                fontWeight: 600,
-                color: "rgba(255,255,255,0.7)",
-                fontFamily: "DM Sans, system-ui, sans-serif",
-                lineHeight: 1.22,
+                fontSize: 62,
+                fontWeight: 700,
+                color: "#00C2CB",
+                fontFamily: "Syne, system-ui, sans-serif",
+                letterSpacing: "-0.01em",
+                textShadow: `0 0 ${copilotGlow}px rgba(0,194,203,0.55), 0 0 ${copilotGlow * 2}px rgba(0,194,203,0.15)`,
+                lineHeight: 1.1,
               }}
             >
-              Comment{" "}
-              <span
-                style={{
-                  color: "#00C2CB",
-                  fontWeight: 800,
-                  textShadow: `0 0 ${copilotGlow}px #00C2CB, 0 0 ${copilotGlow * 2}px rgba(0,194,203,0.2)`,
-                  fontFamily: "DM Mono, monospace",
-                }}
-              >
-                'copilot'
-              </span>
+              Try Copilot
+            </div>
+            <div
+              style={{
+                fontSize: 32,
+                fontWeight: 500,
+                color: "rgba(255,255,255,0.45)",
+                fontFamily: "DM Mono, monospace",
+                letterSpacing: "0.04em",
+              }}
+            >
+              theclinicaledge.org
             </div>
           </div>
         )}

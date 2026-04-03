@@ -457,6 +457,7 @@ QUESTION TYPE RULES:
    - "Confirm the provider's plan rather than assuming..."
    Do NOT say "give it" or "hold it" as a standalone directive.
 4. CONCEPTUAL QUESTIONS — lead with the direct factual answer, then clinical context.
+5. PATIENT EDUCATION / EXPLANATION QUESTIONS ("how do I explain X to a patient", "what do I tell the patient about Y") — give a short, plain-language explanation the nurse can use at the bedside. Include: what it means in simple terms, example wording the nurse can use with the patient, and any relevant care-plan reinforcement ("follow the provider's plan"). Keep it conversational. Do not replace provider education — frame it as bedside communication support.
 
 REQUIRED FORMAT (every response, no exceptions):
 
@@ -741,6 +742,18 @@ function isPatientScenario(question) {
   const q  = question.toLowerCase().trim().replace(/[\u2018\u2019]/g, "'");
   const qN = normalizeExtended(q);   // abbreviation-expanded for matching
   const qP = " " + qN + " ";         // space-padded for safe boundary matching
+
+  // ── 0. Patient-education bail-out ─────────────────────────────────────────
+  // "how do I explain X to a patient" contains "patient" but is NOT a scenario.
+  // Bail out before subject detection so these route to QUICK_KNOWLEDGE_PROMPT.
+  const patientEdPhrases = [
+    "explain to a patient", "explain to the patient", "explain to my patient",
+    "tell a patient", "tell the patient", "what do i tell", "what should i tell",
+    "how do i explain", "how to explain", "how should i explain",
+    "how would i explain", "how do nurses explain", "how can i explain",
+    "what do i say to", "what should i say to",
+  ];
+  if (patientEdPhrases.some((s) => qP.includes(s))) return false;
 
   // ── 1. Explicit patient subject ───────────────────────────────────────────
   if (

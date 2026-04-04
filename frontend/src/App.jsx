@@ -169,21 +169,24 @@ function smallBtnStyle(bg, color, border) {
 function SectionCard({ title, content }) {
   const cfg = SECTION_CONFIG[title] || { accent: "#4da3ff", bg: "rgba(77,163,255,0.06)" };
 
-  // Closing line — rendered as a plain italic sentence, no label, no bullets
+  // Closing — italic pull-quote treatment, no label
   if (title === "Closing") {
     return (
       <div style={{
-        borderLeft: "3px solid " + cfg.accent,
-        padding: "12px 18px",
-        marginTop: 6,
-        marginBottom: 4,
+        borderLeft: "2px solid " + cfg.accent + "60",
+        padding: "14px 20px",
+        marginTop: 10,
+        marginBottom: 6,
+        background: "rgba(0,194,209,0.018)",
+        borderRadius: "0 10px 10px 0",
       }}>
         <p style={{
           margin: 0,
           fontSize: 14,
           fontStyle: "italic",
-          color: "#7F99A5",
-          lineHeight: 1.75,
+          color: "#8BAABB",
+          lineHeight: 1.82,
+          letterSpacing: "0.008em",
         }}>
           {content.trim()}
         </p>
@@ -195,33 +198,35 @@ function SectionCard({ title, content }) {
   return (
     <div style={{
       background: cfg.bg,
-      border: "1px solid " + cfg.accent + "28",
+      border: "1px solid " + cfg.accent + "1C",
       borderLeft: "3px solid " + cfg.accent,
-      borderRadius: 11,
-      padding: "16px 18px",
+      borderRadius: 12,
+      padding: "18px 20px",
       marginBottom: 10,
+      boxShadow: "0 2px 14px rgba(0,0,0,0.13), inset 0 1px 0 rgba(255,255,255,0.025)",
     }}>
       <div style={{
-        fontSize: 9,
+        fontSize: 10,
         fontWeight: 700,
         textTransform: "uppercase",
-        letterSpacing: "1.3px",
+        letterSpacing: "1.5px",
         color: cfg.accent,
-        marginBottom: 10,
+        marginBottom: 12,
         fontFamily: "'IBM Plex Mono', 'Courier New', monospace",
+        opacity: 0.88,
       }}>
         {title}
       </div>
-      <div style={{ fontSize: 14, lineHeight: 1.75, color: "#A8C1CC" }}>
+      <div style={{ fontSize: 14, lineHeight: 1.8, color: "#B4C9D4" }}>
         {lines.map((line, i) => {
           const isBullet = /^[-\u2022*]\s/.test(line);
           if (isBullet) return (
-            <div key={i} style={{ display: "flex", gap: 10, marginBottom: 6, alignItems: "flex-start" }}>
-              <span style={{ color: cfg.accent, fontWeight: 700, marginTop: 1, flexShrink: 0 }}>&rsaquo;</span>
-              <span>{line.replace(/^[-\u2022*]\s+/, "")}</span>
+            <div key={i} style={{ display: "flex", gap: 11, marginBottom: 8, alignItems: "flex-start" }}>
+              <span style={{ color: cfg.accent, fontWeight: 700, marginTop: 2, flexShrink: 0, fontSize: 14, lineHeight: 1.8 }}>&rsaquo;</span>
+              <span style={{ color: "#BCCDD6" }}>{line.replace(/^[-\u2022*]\s+/, "")}</span>
             </div>
           );
-          return <p key={i} style={{ margin: "0 0 6px" }}>{line}</p>;
+          return <p key={i} style={{ margin: "0 0 7px", color: "#BCCDD6" }}>{line}</p>;
         })}
       </div>
     </div>
@@ -234,21 +239,29 @@ function UrgencyBadge({ level }) {
   if (!s) return null;
   return (
     <div style={{
-      display: "inline-flex",
+      display: "flex",
       alignItems: "center",
-      gap: 8,
+      gap: 10,
       background: s.bg,
       border: "1px solid " + s.border,
-      borderRadius: 8,
-      padding: "8px 14px",
-      marginBottom: 14,
+      borderRadius: 10,
+      padding: "10px 16px",
+      marginBottom: 16,
     }}>
       <span style={{
-        fontSize: 10,
+        width: 7,
+        height: 7,
+        borderRadius: "50%",
+        background: s.color,
+        flexShrink: 0,
+        boxShadow: "0 0 7px " + s.color + "99",
+      }} />
+      <span style={{
+        fontSize: 11,
         fontWeight: 700,
         color: s.color,
         fontFamily: "'IBM Plex Mono', 'Courier New', monospace",
-        letterSpacing: "1px",
+        letterSpacing: "1.2px",
         textTransform: "uppercase",
       }}>
         Urgency: {level}
@@ -259,23 +272,23 @@ function UrgencyBadge({ level }) {
 
 function LoadingIndicator({ phase }) {
   return (
-    <div style={{ padding: "28px 0 12px", display: "flex", flexDirection: "column", alignItems: "flex-start", gap: 14 }}>
-      <div style={{ display: "flex", gap: 5, alignItems: "center" }}>
-        {[0, 1, 2, 3].map((i) => (
+    <div style={{ padding: "32px 0 16px", display: "flex", flexDirection: "column", alignItems: "flex-start", gap: 16 }}>
+      <div style={{ display: "flex", gap: 4, alignItems: "center" }}>
+        {[0, 1, 2, 3, 4].map((i) => (
           <div key={i} style={{
             width: 3,
-            borderRadius: 2,
+            borderRadius: 3,
             background: "#00C2D1",
-            opacity: 0.6,
-            animation: "barPulse 1.2s ease-in-out " + (i * 0.15) + "s infinite",
+            opacity: 0.75,
+            animation: "barPulse 1.1s ease-in-out " + (i * 0.11) + "s infinite",
           }} />
         ))}
       </div>
       <div style={{
-        fontSize: 13,
-        color: "#7F99A5",
+        fontSize: 12,
+        color: "#5A7A8A",
         fontFamily: "'IBM Plex Mono', 'Courier New', monospace",
-        letterSpacing: "0.2px",
+        letterSpacing: "0.3px",
       }}>
         {phase}
       </div>
@@ -287,30 +300,29 @@ function StreamPreview({ text }) {
   if (!text) return null;
   return (
     <div style={{
-      background: "rgba(0,194,209,0.03)",
-      border: "1px solid rgba(0,194,209,0.10)",
-      borderRadius: 10,
-      padding: "16px 18px",
+      background: "rgba(15,36,50,0.75)",
+      border: "1px solid rgba(0,194,209,0.09)",
+      borderRadius: 12,
+      padding: "18px 20px",
       marginBottom: 10,
-      fontSize: 13,
-      color: "#7F99A5",
-      lineHeight: 1.8,
+      fontSize: 14,
+      color: "#6A8A9A",
+      lineHeight: 1.82,
       whiteSpace: "pre-wrap",
-      fontFamily: "'IBM Plex Mono', 'Courier New', monospace",
-      maxHeight: 320,
+      maxHeight: 340,
       overflowY: "auto",
     }}>
       {text}
       <span style={{
         display: "inline-block",
-        width: 7,
-        height: 13,
+        width: 6,
+        height: 14,
         background: "#00C2D1",
         marginLeft: 3,
         verticalAlign: "middle",
         animation: "cursorBlink 1s step-end infinite",
         borderRadius: 1,
-        opacity: 0.8,
+        opacity: 0.7,
       }} />
     </div>
   );
@@ -652,7 +664,13 @@ export default function App() {
   return (
     <div style={{
       minHeight: "100vh",
-      background: "radial-gradient(circle at top center, rgba(0,194,209,0.08) 0%, rgba(0,194,209,0.03) 22%, rgba(11,31,42,0) 52%), linear-gradient(to bottom, rgba(255,255,255,0.02) 0%, rgba(255,255,255,0) 18%, rgba(0,0,0,0.10) 100%), #0B1F2A",
+      background: [
+        "radial-gradient(ellipse 90% 50% at 50% -8%, rgba(0,194,209,0.20) 0%, rgba(0,194,209,0.07) 42%, transparent 68%)",
+        "radial-gradient(ellipse 50% 28% at 50% 2%, rgba(79,209,197,0.09) 0%, transparent 58%)",
+        "radial-gradient(ellipse 60% 60% at 80% 80%, rgba(0,50,70,0.35) 0%, transparent 65%)",
+        "linear-gradient(180deg, rgba(13,32,44,0.55) 0%, rgba(11,31,42,0) 26%, rgba(0,0,0,0.22) 100%)",
+        "#0B1F2A",
+      ].join(", "),
       color: "#A8C1CC",
       fontFamily: "'Inter', -apple-system, BlinkMacSystemFont, sans-serif",
       padding: "0 0 calc(80px + env(safe-area-inset-bottom))",
@@ -660,9 +678,9 @@ export default function App() {
       <style>{`
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap');
         *, *::before, *::after { box-sizing: border-box; }
-        body { margin: 0; background: #0B1F2A; }
+        body { margin: 0; background: #0B1F2A; -webkit-font-smoothing: antialiased; }
         textarea { outline: none; }
-        textarea::placeholder { color: #2E4A5C; }
+        textarea::placeholder { color: #3A5B6E; }
         button { transition: all 0.15s ease; font-family: inherit; cursor: pointer; }
         ::-webkit-scrollbar { width: 4px; }
         ::-webkit-scrollbar-track { background: transparent; }
@@ -707,8 +725,8 @@ export default function App() {
           flex-shrink: 0;
         }
         @keyframes barPulse {
-          0%, 100% { height: 8px; opacity: 0.4; }
-          50% { height: 22px; opacity: 1; }
+          0%, 100% { height: 9px; opacity: 0.35; }
+          50% { height: 26px; opacity: 1; }
         }
         @keyframes cursorBlink {
           0%, 100% { opacity: 0.8; }
@@ -851,18 +869,19 @@ export default function App() {
       </div>
 
       {/* ── Main ─────────────────────────────────────────────────────────── */}
-      <div className="main-container" style={{ maxWidth: 800, margin: "0 auto", width: "100%", padding: "36px 20px 0", display: "flex", flexDirection: "column", alignItems: "stretch", background: "radial-gradient(ellipse at top center, rgba(0,194,209,0.04) 0%, rgba(0,194,209,0) 68%)" }}>
+      <div className="main-container" style={{ maxWidth: 800, margin: "0 auto", width: "100%", padding: "40px 20px 0", display: "flex", flexDirection: "column", alignItems: "stretch" }}>
 
         {/* Hero */}
         <div className="hero" style={{ textAlign: "center", marginBottom: 26 }}>
           <h1 style={{
             fontFamily: "'Inter', sans-serif",
-            fontWeight: 700,
-            fontSize: "clamp(22px, 5vw, 34px)",
-            color: "rgba(255,255,255,0.96)",
+            fontWeight: 800,
+            fontSize: "clamp(24px, 5.5vw, 36px)",
+            color: "#F2F8FA",
             margin: "0 0 16px",
-            lineHeight: 1.12,
-            letterSpacing: "-0.03em",
+            lineHeight: 1.1,
+            letterSpacing: "-0.04em",
+            textShadow: "0 2px 24px rgba(0,194,209,0.13)",
           }}>
             Clinical reasoning support. Built for nurses.
           </h1>
@@ -878,16 +897,16 @@ export default function App() {
         <div
           className="preview-scroll"
           style={{
-            background: "rgba(17,41,54,0.52)",
-            borderTop: "1px solid rgba(255,255,255,0.07)",
-            borderLeft: "1px solid rgba(255,255,255,0.07)",
-            borderRight: "1px solid rgba(255,255,255,0.07)",
+            background: "rgba(11,26,36,0.82)",
+            borderTop: "1px solid rgba(255,255,255,0.08)",
+            borderLeft: "1px solid rgba(255,255,255,0.08)",
+            borderRight: "1px solid rgba(255,255,255,0.08)",
             borderBottom: "none",
             borderTopLeftRadius: 14,
             borderTopRightRadius: 14,
             borderBottomLeftRadius: 0,
             borderBottomRightRadius: 0,
-            padding: "12px 14px",
+            padding: "10px 16px",
             marginBottom: 0,
             display: "flex",
             flexWrap: "nowrap",
@@ -921,14 +940,14 @@ export default function App() {
 
         {/* Input card */}
         <div className="input-card" style={{
-          background: "#112936",
+          background: "linear-gradient(160deg, rgba(18,44,60,0.98) 0%, rgba(13,32,44,0.98) 100%)",
           border: "1px solid rgba(255,255,255,0.09)",
           borderTopLeftRadius: 0,
           borderTopRightRadius: 0,
           borderBottomLeftRadius: 14,
           borderBottomRightRadius: 14,
-          padding: "20px",
-          boxShadow: "0 8px 24px rgba(0,0,0,0.16), inset 0 1px 0 rgba(255,255,255,0.03)",
+          padding: "22px",
+          boxShadow: "0 14px 40px rgba(0,0,0,0.26), 0 3px 10px rgba(0,0,0,0.18), inset 0 1px 0 rgba(255,255,255,0.04)",
           marginBottom: 14,
         }}>
           <textarea
@@ -1005,15 +1024,16 @@ export default function App() {
 
         {/* Privacy notice */}
         <div className="privacy-notice" style={{
-          background: "rgba(176,128,38,0.08)",
-          border: "1px solid rgba(233,186,75,0.20)",
-          borderRadius: 12,
-          padding: "14px 16px",
+          background: "rgba(176,128,38,0.06)",
+          border: "1px solid rgba(233,186,75,0.16)",
+          borderLeft: "3px solid rgba(233,186,75,0.30)",
+          borderRadius: 10,
+          padding: "12px 15px",
           fontSize: 12,
-          color: "rgba(226,196,123,0.90)",
+          color: "rgba(220,190,118,0.85)",
           marginBottom: 26,
           display: "flex",
-          gap: 8,
+          gap: 9,
           alignItems: "flex-start",
         }}>
           <span style={{
@@ -1187,36 +1207,35 @@ export default function App() {
             {/* Response trust cue */}
             <div style={{
               display: "flex",
-              alignItems: "flex-start",
-              gap: 8,
-              background: "rgba(242,185,75,0.05)",
-              border: "1px solid rgba(242,185,75,0.15)",
-              borderRadius: 8,
-              padding: "9px 13px",
-              marginBottom: 14,
+              alignItems: "center",
+              gap: 7,
+              padding: "0 2px 14px",
               fontSize: 11,
-              color: "#7F99A5",
+              color: "#4A6675",
               fontFamily: "'IBM Plex Mono', monospace",
-              lineHeight: 1.55,
+              lineHeight: 1.5,
+              borderBottom: "1px solid rgba(255,255,255,0.04)",
+              marginBottom: 16,
             }}>
-              <span style={{ color: "#F2B94B", flexShrink: 0 }}>⚠️</span>
-              <span>Structured clinical reasoning support — always confirm with your assessment and provider guidance</span>
+              <span style={{ color: "#3A5A6A", flexShrink: 0, fontSize: 9 }}>◆</span>
+              <span>Structured clinical reasoning support — confirm with your assessment and provider guidance</span>
             </div>
 
             <UrgencyBadge level={result.urgencyLevel} />
 
             {result.urgent && (
               <div style={{
-                background: "rgba(239,68,68,0.08)",
-                border: "1px solid rgba(239,68,68,0.3)",
-                borderLeft: "3px solid rgba(239,68,68,0.7)",
-                borderRadius: 10,
+                background: "rgba(239,68,68,0.07)",
+                border: "1px solid rgba(239,68,68,0.25)",
+                borderLeft: "3px solid rgba(239,68,68,0.60)",
+                borderRadius: 11,
                 padding: "14px 18px",
-                color: "#fca5a5",
+                color: "#f8a8a8",
                 fontWeight: 600,
                 fontSize: 14,
-                lineHeight: 1.6,
+                lineHeight: 1.65,
                 marginBottom: 14,
+                boxShadow: "0 2px 12px rgba(239,68,68,0.06)",
               }}>
                 {result.urgent}
               </div>
@@ -1242,11 +1261,11 @@ export default function App() {
                 onClick={handleSaveCase}
                 disabled={justSaved}
                 style={{
-                  background: justSaved ? "rgba(31,191,117,0.10)" : "transparent",
-                  border: "1px solid " + (justSaved ? "rgba(31,191,117,0.42)" : "rgba(31,191,117,0.28)"),
-                  color: justSaved ? "#1FBF75" : "#5aaa8a",
-                  borderRadius: 8,
-                  padding: "9px 18px",
+                  background: justSaved ? "rgba(31,191,117,0.10)" : "rgba(31,191,117,0.04)",
+                  border: "1px solid " + (justSaved ? "rgba(31,191,117,0.45)" : "rgba(31,191,117,0.22)"),
+                  color: justSaved ? "#1FBF75" : "#4E9E78",
+                  borderRadius: 9,
+                  padding: "9px 20px",
                   fontSize: 13,
                   fontWeight: 600,
                   cursor: justSaved ? "default" : "pointer",
@@ -1254,6 +1273,7 @@ export default function App() {
                   alignItems: "center",
                   gap: 7,
                   transition: "all 0.15s",
+                  letterSpacing: "-0.1px",
                 }}
               >
                 {justSaved ? "\u2713 Case Saved" : "+ Save Case"}
@@ -1265,14 +1285,15 @@ export default function App() {
                 onClick={() => handleCopyResponse(rawText)}
                 style={{
                   background: "transparent",
-                  border: "1px solid rgba(255,255,255,0.09)",
-                  color: "#4A6978",
-                  borderRadius: 8,
+                  border: "1px solid rgba(255,255,255,0.08)",
+                  color: "#3D5E6E",
+                  borderRadius: 9,
                   padding: "9px 18px",
                   fontSize: 13,
                   fontWeight: 400,
                   cursor: "pointer",
                   transition: "all 0.15s",
+                  letterSpacing: "-0.1px",
                 }}
               >
                 Copy Response
@@ -1281,11 +1302,12 @@ export default function App() {
 
             {/* ── Continue Thinking ─────────────────────────────────────── */}
             <div style={{
-              marginTop: 20,
-              background: "rgba(0,194,209,0.03)",
-              border: "1px solid rgba(0,194,209,0.10)",
-              borderRadius: 11,
-              padding: "14px 16px",
+              marginTop: 22,
+              background: "linear-gradient(160deg, rgba(0,194,209,0.028) 0%, rgba(0,150,165,0.018) 100%)",
+              border: "1px solid rgba(0,194,209,0.12)",
+              borderRadius: 12,
+              padding: "16px 18px",
+              boxShadow: "0 2px 12px rgba(0,0,0,0.10)",
             }}>
               <div style={{
                 fontSize: 9,

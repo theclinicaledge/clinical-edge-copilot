@@ -1361,6 +1361,28 @@ export default function App() {
           Always escalate per your facility's policies.
         </div>
 
+        {/* Footer links */}
+        <div style={{
+          display: "flex",
+          justifyContent: "center",
+          gap: 20,
+          marginTop: 20,
+          paddingBottom: 4,
+        }}>
+          {[["Privacy", "/#/privacy"], ["Support", "/#/support"]].map(([label, href]) => (
+            <a key={label} href={href} style={{
+              fontSize: 11,
+              color: "rgba(168,193,204,0.35)",
+              textDecoration: "none",
+              fontFamily: "'DM Sans', sans-serif",
+              letterSpacing: "0.01em",
+            }}
+            onMouseEnter={e => e.target.style.color = "rgba(168,193,204,0.6)"}
+            onMouseLeave={e => e.target.style.color = "rgba(168,193,204,0.35)"}
+            >{label}</a>
+          ))}
+        </div>
+
       </div>
     </div>
   );

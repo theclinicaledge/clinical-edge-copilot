@@ -483,10 +483,11 @@ export default function App() {
   const [justSaved, setJustSaved]       = useState(false);
   const [followUp, setFollowUp]         = useState("");
 
-  const textareaRef        = useRef(null);
-  const outputRef          = useRef(null);
-  const phaseTimerRef      = useRef(null);
-  const lastSubmittedRef   = useRef("");
+  const textareaRef           = useRef(null);
+  const outputRef             = useRef(null);
+  const phaseTimerRef         = useRef(null);
+  const lastSubmittedRef      = useRef("");
+  const wasRecentlyHiddenRef  = useRef(false);
 
   // Auto-resize textarea
   useEffect(() => {
@@ -496,15 +497,36 @@ export default function App() {
     el.style.height = Math.min(el.scrollHeight, 200) + "px";
   }, [question]);
 
-  // Load QuickStart prefill on mount
+  // Load QuickStart prefill on mount; fall back to sessionStorage draft
   useEffect(() => {
     try {
       const prefill = localStorage.getItem("copilot_prefill");
       if (prefill) {
         setQuestion(prefill);
         localStorage.removeItem("copilot_prefill");
+      } else {
+        const draft = sessionStorage.getItem("cec_draft");
+        if (draft) setQuestion(draft);
       }
     } catch {}
+  }, []);
+
+  // Persist typed question as a draft so it survives background/restore cycles
+  useEffect(() => {
+    try { sessionStorage.setItem("cec_draft", question); } catch {}
+  }, [question]);
+
+  // Track page visibility so network errors during backgrounding are suppressed
+  useEffect(() => {
+    const onVisChange = () => {
+      if (document.hidden) {
+        wasRecentlyHiddenRef.current = true;
+      } else {
+        setTimeout(() => { wasRecentlyHiddenRef.current = false; }, 4000);
+      }
+    };
+    document.addEventListener("visibilitychange", onVisChange);
+    return () => document.removeEventListener("visibilitychange", onVisChange);
   }, []);
 
   // Rotate loading phase messages while loading
@@ -608,7 +630,11 @@ export default function App() {
       }
     } catch {
       track("response_error", { reason: "network_error" });
-      setError("Connection issue — please try again.");
+      // Suppress the error if the device was recently backgrounded — the fetch
+      // failing during sleep is expected; the user can simply try again.
+      if (!wasRecentlyHiddenRef.current) {
+        setError("Connection issue — please try again.");
+      }
       setLoading(false);
       setStreaming(false);
     }
@@ -677,9 +703,9 @@ export default function App() {
     }}>
       <style>{`
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap');
-        *, *::before, *::after { box-sizing: border-box; }
-        body { margin: 0; background: #0B1F2A; -webkit-font-smoothing: antialiased; }
-        textarea { outline: none; }
+        *, *::before, *::after { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+        body { margin: 0; background: #0B1F2A; -webkit-font-smoothing: antialiased; overscroll-behavior: none; -webkit-text-size-adjust: 100%; }
+        textarea { outline: none; touch-action: pan-y; }
         textarea::placeholder { color: #3A5B6E; }
         button { transition: all 0.15s ease; font-family: inherit; cursor: pointer; }
         ::-webkit-scrollbar { width: 4px; }
@@ -771,6 +797,8 @@ export default function App() {
           /* 5: Reduce chip density — show max 3 per section */
           .chips-recent button:nth-child(n+4) { display: none !important; }
           .chips-try button:nth-child(n+4) { display: none !important; }
+          /* Prevent iOS auto-zoom on textarea focus (requires font-size >= 16px) */
+          textarea { font-size: 16px !important; }
         }
       `}</style>
 

@@ -488,6 +488,11 @@ export default function App() {
   const phaseTimerRef         = useRef(null);
   const lastSubmittedRef      = useRef("");
   const wasRecentlyHiddenRef  = useRef(false);
+  const hiddenAtRef           = useRef(null);
+  const abortControllerRef    = useRef(null);
+  const accumulatedRef        = useRef("");
+  const isActiveRef           = useRef(false);
+  const runQueryRef           = useRef(null);
 
   // Auto-resize textarea
   useEffect(() => {
@@ -516,13 +521,33 @@ export default function App() {
     try { sessionStorage.setItem("cec_draft", question); } catch {}
   }, [question]);
 
-  // Track page visibility so network errors during backgrounding are suppressed
+  // Visibility resilience — track backgrounding and recover in-flight requests.
+  // Uses only refs so the effect never needs to be torn down/re-added.
   useEffect(() => {
     const onVisChange = () => {
       if (document.hidden) {
         wasRecentlyHiddenRef.current = true;
+        hiddenAtRef.current = Date.now();
       } else {
-        setTimeout(() => { wasRecentlyHiddenRef.current = false; }, 4000);
+        const hiddenMs = hiddenAtRef.current ? Date.now() - hiddenAtRef.current : 0;
+        // Clear the recently-hidden flag after 5 s so normal network errors still show
+        setTimeout(() => { wasRecentlyHiddenRef.current = false; }, 5000);
+
+        if (!isActiveRef.current) return; // no request in flight — nothing to do
+
+        if (hiddenMs < 15000) {
+          // Brief interruption: give the stream 2.5 s to self-recover; if it's still
+          // stuck (isActiveRef still true), abort and re-fire the same question.
+          const q = lastSubmittedRef.current;
+          setTimeout(() => {
+            if (isActiveRef.current && q && runQueryRef.current) {
+              runQueryRef.current(q);
+            }
+          }, 2500);
+        } else {
+          // Long interruption: abort cleanly; question stays filled, no error shown.
+          if (abortControllerRef.current) abortControllerRef.current.abort();
+        }
       }
     };
     document.addEventListener("visibilitychange", onVisChange);
@@ -544,8 +569,17 @@ export default function App() {
 
   // Core query runner — accepts an explicit query string so chips and
   // follow-ups can call it directly without going through question state.
+  // AbortController lets the visibility handler cancel and restart cleanly.
   const runQuery = async (q) => {
-    if (!q.trim() || loading || streaming) return;
+    if (!q.trim()) return;
+
+    // Cancel any previous in-flight request before starting a new one
+    if (abortControllerRef.current) abortControllerRef.current.abort();
+    const controller = new AbortController();
+    abortControllerRef.current = controller;
+    accumulatedRef.current = "";
+    isActiveRef.current = true;
+
     setQuestion(q);
     setFollowUp("");
     lastSubmittedRef.current = q;
@@ -558,13 +592,12 @@ export default function App() {
     setStreamBuffer("");
     setJustSaved(false);
 
-    let accumulated = "";
-
     try {
       const res = await fetch(`${API_BASE}/api/copilot`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ question: q, mode }),
+        signal: controller.signal,
       });
 
       if (!res.ok) {
@@ -572,6 +605,7 @@ export default function App() {
         track("response_error", { reason: "http_error", status: res.status });
         setError(data.message || (typeof data.error === "string" ? data.error : null) || "Something went wrong. Please try again.");
         setLoading(false);
+        isActiveRef.current = false;
         return;
       }
 
@@ -603,6 +637,7 @@ export default function App() {
             track("response_error", { reason: "api_error" });
             setError(parsed.message || (typeof parsed.error === "string" ? parsed.error : null) || "Something went wrong. Please try again.");
             setStreaming(false);
+            isActiveRef.current = false;
             return;
           }
 
@@ -610,9 +645,10 @@ export default function App() {
             track("response_completed", { mode });
             setStreaming(false);
             setStreamBuffer("");
-            setRawText(accumulated);
-            const parsedResult = parseResponse(accumulated);
-            setResult({ ...parsedResult, urgencyLevel: extractUrgencyLevel(accumulated) });
+            setRawText(accumulatedRef.current);
+            const parsedResult = parseResponse(accumulatedRef.current);
+            setResult({ ...parsedResult, urgencyLevel: extractUrgencyLevel(accumulatedRef.current) });
+            isActiveRef.current = false;
             // Save to recent cases — deduplicate, cap at 10, most-recent first
             setHistory((prev) => {
               const updated = [q, ...prev.filter((h) => h !== q)].slice(0, 10);
@@ -623,22 +659,32 @@ export default function App() {
           }
 
           if (parsed.text) {
-            accumulated += parsed.text;
-            setStreamBuffer(accumulated);
+            accumulatedRef.current += parsed.text;
+            setStreamBuffer(accumulatedRef.current);
           }
         }
       }
-    } catch {
+    } catch (err) {
+      // AbortError = intentional cancel (new request started or long-hide recovery)
+      if (err.name === "AbortError") {
+        isActiveRef.current = false;
+        return;
+      }
       track("response_error", { reason: "network_error" });
-      // Suppress the error if the device was recently backgrounded — the fetch
-      // failing during sleep is expected; the user can simply try again.
+      // Suppress the error when backgrounding caused the failure — the visibility
+      // handler will attempt a retry or silently restore idle state.
       if (!wasRecentlyHiddenRef.current) {
         setError("Connection issue — please try again.");
       }
       setLoading(false);
       setStreaming(false);
+      isActiveRef.current = false;
     }
   };
+
+  // Keep runQueryRef current on every render so the visibilitychange handler
+  // (which has a [] dep array) can always call the latest version.
+  runQueryRef.current = runQuery;
 
   const handleSubmit = () => runQuery(question);
 

@@ -12,7 +12,7 @@ export const Root: React.FC = () => {
       <Composition
         id="ChestPainVideo"
         component={ChestPainComposition}
-        durationInFrames={1050}
+        durationInFrames={1455}
         fps={30}
         width={1080}
         height={1920}

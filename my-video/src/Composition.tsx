@@ -1,51 +1,67 @@
 import React from "react";
 import { AbsoluteFill, Sequence } from "remotion";
-import { HookScene } from "./scenes/HookScene";
-import { ScenarioBuildScene } from "./scenes/ScenarioBuildScene";
-import { ReasoningScene } from "./scenes/ReasoningScene";
-import { PriorityActionsScene } from "./scenes/PriorityActionsScene";
-import { OutroScene } from "./scenes/OutroScene";
+import { HookScene }              from "./scenes/HookScene";
+import { ScenarioBuildScene }     from "./scenes/ScenarioBuildScene";
+import { WhatThisCouldBeScene }   from "./scenes/WhatThisCouldBeScene";
+import { WhatConcernsMostScene }  from "./scenes/WhatConcernsMostScene";
+import { AssessNextScene }        from "./scenes/AssessNextScene";
+import { DoRightNowScene }        from "./scenes/DoRightNowScene";
+import { OutroScene }             from "./scenes/OutroScene";
 
-// Cross-fade transition system — 15-frame overlaps between every scene
-// Each scene handles its own fade-in/out internally via useVideoConfig().durationInFrames
+// Cross-fade transition system — 15-frame overlaps between every scene.
+// Each scene gets +15f of hold vs previous version so transitions feel unhurried.
 //
 // Absolute frame ranges:
-//   S1 Hook:       from=0,   dur=195   → 0–195   (content 0–180 + 15f fade-out tail)
-//   S2 Scenario:   from=180, dur=255   → 180–435 (15f overlap in + content + 15f out)
-//   S3 Reasoning:  from=420, dur=255   → 420–675 (15f overlap in + content + 15f out)
-//   S4 Priority:   from=660, dur=225   → 660–885 (15f overlap in + content + 15f out)
-//   S5 Outro:      from=870, dur=180   → 870–1050(15f overlap in + content, no out)
+//   S1 Hook:           from=0,    dur=210   →  0–210
+//   S2 Scenario:       from=195,  dur=255   →  195–450
+//   S3 CouldBe (BLUE): from=435,  dur=225   →  435–660
+//   S4 Concerns (RED): from=645,  dur=225   →  645–870
+//   S5 Assess  (GRN):  from=855,  dur=225   →  855–1080
+//   S6 DoNow   (YLW):  from=1065, dur=225   →  1065–1290
+//   S7 Outro:          from=1275, dur=180   →  1275–1455
 //
-// Overlapping windows:
-//   S1↔S2: frames 180–195
-//   S2↔S3: frames 420–435
-//   S3↔S4: frames 660–675
-//   S4↔S5: frames 870–885
+// Overlap windows (15f each):
+//   S1↔S2:   195–210
+//   S2↔S3:   435–450
+//   S3↔S4:   645–660
+//   S4↔S5:   855–870
+//   S5↔S6:  1065–1080
+//   S6↔S7:  1275–1290
 //
-// Total: 1050 frames = 35.0 seconds at 30fps
+// Total: 1455 frames = 48.5 seconds at 30fps
 
 export const ChestPainComposition: React.FC = () => {
   return (
     <AbsoluteFill style={{ backgroundColor: "#0A1628" }}>
-      <Sequence from={0} durationInFrames={195}>
+
+      <Sequence from={0}    durationInFrames={210}>
         <HookScene />
       </Sequence>
 
-      <Sequence from={180} durationInFrames={255}>
+      <Sequence from={195}  durationInFrames={255}>
         <ScenarioBuildScene />
       </Sequence>
 
-      <Sequence from={420} durationInFrames={255}>
-        <ReasoningScene />
+      <Sequence from={435}  durationInFrames={225}>
+        <WhatThisCouldBeScene />
       </Sequence>
 
-      <Sequence from={660} durationInFrames={225}>
-        <PriorityActionsScene />
+      <Sequence from={645}  durationInFrames={225}>
+        <WhatConcernsMostScene />
       </Sequence>
 
-      <Sequence from={870} durationInFrames={180}>
+      <Sequence from={855}  durationInFrames={225}>
+        <AssessNextScene />
+      </Sequence>
+
+      <Sequence from={1065} durationInFrames={225}>
+        <DoRightNowScene />
+      </Sequence>
+
+      <Sequence from={1275} durationInFrames={180}>
         <OutroScene />
       </Sequence>
+
     </AbsoluteFill>
   );
 };

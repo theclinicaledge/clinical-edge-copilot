@@ -68,7 +68,7 @@ const TypedLine: React.FC<TypedLineProps> = ({ label, text, localStart }) => {
       style={{
         transform: `translateY(${entryY}px)`,
         opacity: entryOpacity,
-        marginBottom: 22,
+        marginBottom: 30,
         willChange: "transform, opacity",
       }}
     >
@@ -87,12 +87,12 @@ const TypedLine: React.FC<TypedLineProps> = ({ label, text, localStart }) => {
       </div>
       <div
         style={{
-          fontSize: 52,
+          fontSize: 68,
           fontWeight: 700,
           color: "#FFFFFF",
           fontFamily: "Syne, system-ui, sans-serif",
-          letterSpacing: "-0.01em",
-          lineHeight: 1.15,
+          letterSpacing: "-0.02em",
+          lineHeight: 1.12,
         }}
       >
         {displayText}
@@ -241,7 +241,7 @@ export const ScenarioBuildScene: React.FC = () => {
             border: "1.5px solid rgba(0,194,203,0.38)",
             background: "rgba(0,194,203,0.06)",
             boxShadow: `0 0 ${glowSize}px rgba(0,194,203,0.22), inset 0 0 40px rgba(0,194,203,0.02)`,
-            padding: "48px 52px",
+            padding: "52px 56px",
             backdropFilter: "blur(8px)",
           }}
         >

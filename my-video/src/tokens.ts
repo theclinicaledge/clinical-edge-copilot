@@ -34,6 +34,12 @@ export const T = {
   urgLowBg:       "rgba(34,197,94,0.10)",
   urgLowBorder:   "rgba(34,197,94,0.35)",
 
+  // Section accent colors (carousel / output sections)
+  sectionBlue:   "#3CB8FF",  // What this could be
+  sectionRed:    "#FF5C7A",  // What concerns me most
+  sectionGreen:  "#00D97E",  // What I'd assess next
+  sectionYellow: "#FFA927",  // What I'd do right now
+
   // Panels
   panelBg: "rgba(0,194,209,0.04)",
 

@@ -541,11 +541,15 @@ export default function App() {
           const q = lastSubmittedRef.current;
           setTimeout(() => {
             if (isActiveRef.current && q && runQueryRef.current) {
+              // Clear the suppression flag before retrying so any genuine error
+              // in the new request is shown normally.
+              wasRecentlyHiddenRef.current = false;
               runQueryRef.current(q);
             }
           }, 2500);
         } else {
           // Long interruption: abort cleanly; question stays filled, no error shown.
+          // wasRecentlyHiddenRef stays true for 5 s so the AbortError catch is silent.
           if (abortControllerRef.current) abortControllerRef.current.abort();
         }
       }

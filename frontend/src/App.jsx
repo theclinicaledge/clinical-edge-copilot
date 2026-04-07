@@ -24,7 +24,7 @@ const CONTEXT_CHIPS = [
 const EXAMPLES = [
   "QTc is 520, patient just got Zofran. Should I be worried?",
   "How do I explain why we're keeping them NPO for an ileus?",
-  "Shingles precautions, patient is immunocompromised",
+  "BP dropped to 88/50, HR 122, was stable an hour ago — help me think through this before I call.",
 ];
 
 const SECTIONS = [
@@ -1141,7 +1141,7 @@ export default function App() {
           marginBottom: 18,
           marginTop: 0,
         }}>
-          Use your own words — especially when something feels off or before you call.
+          Good for thinking it through — especially right before you call.
         </div>
 
         {/* Guidance chips — lightweight, no mode-locking */}

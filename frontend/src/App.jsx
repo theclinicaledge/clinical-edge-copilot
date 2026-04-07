@@ -1093,30 +1093,30 @@ export default function App() {
           marginBottom: 18,
           marginTop: 0,
         }}>
-          Use your own words — shorthand, fragments, and abbreviations all work.
+          Use your own words — especially when something feels off or before you call.
         </div>
 
         {/* Guidance chips — lightweight, no mode-locking */}
-        <div style={{ marginBottom: 18 }}>
+        <div style={{ marginBottom: 14 }}>
           <div style={{
             fontSize: 11,
-            color: "rgba(168,188,198,0.38)",
+            color: "rgba(168,188,198,0.28)",
             fontFamily: "'IBM Plex Mono', monospace",
             letterSpacing: "0.06em",
             textTransform: "uppercase",
-            marginBottom: 8,
+            marginBottom: 7,
           }}>
             Common ways nurses use Copilot
           </div>
-          <div style={{ display: "flex", flexWrap: "wrap", gap: 6 }}>
+          <div style={{ display: "flex", flexWrap: "wrap", gap: 5 }}>
             {CONTEXT_CHIPS.map(({ label }) => (
               <span key={label} style={{
                 background: "transparent",
-                border: "1px solid rgba(255,255,255,0.08)",
-                color: "rgba(168,193,204,0.45)",
+                border: "1px solid rgba(255,255,255,0.055)",
+                color: "rgba(168,193,204,0.32)",
                 borderRadius: 999,
-                padding: "4px 11px",
-                fontSize: 12,
+                padding: "3px 10px",
+                fontSize: 11.5,
                 fontWeight: 400,
                 letterSpacing: "0.005em",
                 whiteSpace: "nowrap",
@@ -1137,7 +1137,7 @@ export default function App() {
           padding: "12px 15px",
           fontSize: 12,
           color: "rgba(220,190,118,0.85)",
-          marginBottom: 26,
+          marginBottom: 20,
           display: "flex",
           gap: 9,
           alignItems: "flex-start",
@@ -1154,7 +1154,7 @@ export default function App() {
 
         {/* Recent Cases */}
         {history.length > 0 && (
-          <div style={{ marginBottom: 20 }}>
+          <div style={{ marginBottom: 16 }}>
             <div style={{
               fontSize: 12,
               fontWeight: 500,
@@ -1226,7 +1226,7 @@ export default function App() {
         )}
 
         {/* Example prompts — tap to fill input */}
-        <div style={{ marginBottom: 36 }}>
+        <div style={{ marginBottom: 28 }}>
           <div style={{
             fontFamily: "'IBM Plex Mono', monospace",
             fontSize: 11,
@@ -1234,14 +1234,14 @@ export default function App() {
             letterSpacing: "0.09em",
             textTransform: "uppercase",
             color: "rgba(168,188,198,0.45)",
-            marginBottom: 10,
+            marginBottom: 8,
           }}>Examples</div>
-          <div className="chips-try" style={{ display: "flex", flexDirection: "column", gap: 8 }}>
+          <div className="chips-try" style={{ display: "flex", flexDirection: "column", gap: 7 }}>
             {EXAMPLES.map((ex) => (
               <button
                 key={ex}
                 className="chip"
-                onClick={() => setQuestion(ex)}
+                onClick={() => { setQuestion(ex); setTimeout(() => textareaRef.current?.focus(), 0); }}
                 style={{
                   background: "rgba(255,255,255,0.025)",
                   border: "1px solid rgba(255,255,255,0.07)",

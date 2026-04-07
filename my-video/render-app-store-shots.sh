@@ -1,10 +1,8 @@
 #!/bin/bash
 # ─── Clinical Edge Copilot — App Store Screenshot Renderer ────────────────────
 #
-# Renders all 5 App Store slides as PNG at 1290×2796 (iPhone 15 Pro Max).
-#
-# Before running:
-#   Place source screenshots in public/screenshots/ — see PLACE_SCREENSHOTS_HERE.md
+# Renders all 5 App Store slides as PNG at 1284×2778 (iPhone 15 Pro Max).
+# All screens are code-driven — no external files required.
 #
 # Usage:
 #   cd my-video
@@ -18,35 +16,11 @@ set -e
 # Always run from the my-video directory
 cd "$(dirname "$0")"
 
-# ── Pre-flight: check screenshots are present ──────────────────────────────────
-REQUIRED=(
-  "public/screenshots/screen-01-home-input.jpg"
-  "public/screenshots/screen-02-urgency-high.jpg"
-  "public/screenshots/screen-03-response-actions.jpg"
-  "public/screenshots/screen-04-quick-questions.jpg"
-  "public/screenshots/screen-05-sbar.jpg"
-)
-
-MISSING=0
-for f in "${REQUIRED[@]}"; do
-  if [ ! -f "$f" ]; then
-    echo "  ✗ Missing: $f"
-    MISSING=1
-  fi
-done
-
-if [ "$MISSING" -eq 1 ]; then
-  echo ""
-  echo "Add the missing screenshots to public/screenshots/ and try again."
-  echo "See public/screenshots/PLACE_SCREENSHOTS_HERE.md for which screenshot goes in each file."
-  exit 1
-fi
-
 # ── Create output directory ────────────────────────────────────────────────────
 mkdir -p out/app-store
 
 echo ""
-echo "Rendering App Store screenshots at 1290×2796..."
+echo "Rendering App Store screenshots at 1284×2778..."
 echo ""
 
 # ── Render each slide ──────────────────────────────────────────────────────────

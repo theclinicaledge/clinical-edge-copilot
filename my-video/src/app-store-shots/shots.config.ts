@@ -1,60 +1,46 @@
 // ─── App Store Screenshot Config ──────────────────────────────────────────────
 //
-// Each slide maps to a real screenshot + overlay copy.
-// To update a slide: change headline, subtext, eyebrow, or screenshotFile here.
+// Each slide maps to a code-driven mock screen + overlay copy.
+// To update copy: change headline, subtext, or eyebrow here.
+// To update the screen: edit the corresponding Mock*.tsx in screens/
 // To re-render: run ./render-app-store-shots.sh from the my-video/ folder.
-//
-// screenshotFile → place source JPGs in public/screenshots/
-// scrollY        → px to shift the screenshot upward (0 = show from top)
 
 export interface ShotConfig {
   slideIndex: number;
   eyebrow?: string;
   headline: string;
   subtext: string;
-  screenshotFile: string;
-  scrollY: number;
 }
 
 export const SHOTS: ShotConfig[] = [
   {
     slideIndex: 0,
-    eyebrow: "For nurses, on shift",
-    headline: "Clinical support\nthat thinks\nlike a nurse.",
-    subtext: "When something feels off, Copilot helps you think it through.",
-    screenshotFile: "screen-01-home-input.jpg",
-    scrollY: 0,
+    eyebrow: "CLINICAL SUPPORT FOR NURSES",
+    headline: "Clinical reasoning\nsupport for nurses.",
+    subtext: "When something feels off. Before you call.",
   },
   {
     slideIndex: 1,
-    eyebrow: "Clinical reasoning",
-    headline: "When something\ndoesn't feel right.",
-    subtext: "Break down what matters. Spot risk early.",
-    screenshotFile: "screen-02-urgency-high.jpg",
-    scrollY: 0,
+    eyebrow: "WHEN SOMETHING FEELS OFF",
+    headline: "Break down what\nmatters. Spot risk early.",
+    subtext: "Understand what's happening — and what could go wrong.",
   },
   {
     slideIndex: 2,
-    eyebrow: "Before you call",
-    headline: "Think before\nyou call.",
-    subtext: "Know what to assess, what matters, and what to say.",
-    screenshotFile: "screen-03-response-actions.jpg",
-    scrollY: 0,
+    eyebrow: "BEFORE YOU CALL",
+    headline: "Know what to assess —\nand what to say.",
+    subtext: "Walk into the call with clarity and a plan.",
   },
   {
     slideIndex: 3,
-    eyebrow: "Practical support",
-    headline: "Quick questions.\nReal answers.",
+    eyebrow: "QUICK GUIDANCE",
+    headline: "Quick answers\nduring your shift.",
     subtext: "Meds, labs, oxygen, precautions — without overthinking.",
-    screenshotFile: "screen-04-quick-questions.jpg",
-    scrollY: 0,
   },
   {
     slideIndex: 4,
-    eyebrow: "Real shift thinking",
-    headline: "Built for real\nshift thinking.",
-    subtext: "Not perfect inputs. Not textbook scenarios. Real nursing.",
-    screenshotFile: "screen-05-sbar.jpg",
-    scrollY: 0,
+    eyebrow: "SBAR HANDOFF",
+    headline: "Know exactly\nwhat to say.",
+    subtext: "Clear, structured communication in seconds.",
   },
 ];

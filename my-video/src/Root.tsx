@@ -8,8 +8,8 @@ import { confusedPatientScenario } from "./scenarios/confused-patient";
 import { AppStoreShot }            from "./app-store-shots/AppStoreShot";
 
 // App Store screenshot dimensions — 6.7" iPhone display (iPhone 15 Pro Max)
-const AS_W = 1290;
-const AS_H = 2796;
+const AS_W = 1284;
+const AS_H = 2778;
 
 export const Root: React.FC = () => {
   return (
@@ -54,7 +54,7 @@ export const Root: React.FC = () => {
         defaultProps={{ scenario: confusedPatientScenario }}
       />
 
-      {/* ── App Store stills — 1290×2796 (iPhone 15 Pro Max) ── */}
+      {/* ── App Store stills — 1284×2778 (iPhone 15 Pro Max) ── */}
       {/* Preview all 5 slides in Remotion Studio. Render via ./render-app-store-shots.sh */}
       <Composition
         id="AppStoreShot1"

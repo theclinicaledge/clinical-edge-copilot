@@ -1,19 +1,31 @@
 import React from "react";
-import { AbsoluteFill, Img, staticFile } from "remotion";
+import { AbsoluteFill } from "remotion";
 import { SHOTS, type ShotConfig } from "./shots.config";
+import { MockHomeInput } from "./screens/MockHomeInput";
+import { MockUrgencyHigh } from "./screens/MockUrgencyHigh";
+import { MockResponseActions } from "./screens/MockResponseActions";
+import { MockQuickQuestions } from "./screens/MockQuickQuestions";
+import { MockSbar } from "./screens/MockSbar";
 
-// ─── Design tokens (match frontend exactly) ────────────────────────────────────
-const BG    = "#0A1B26";
-const TEAL  = "#00C2D1";
-const WHITE = "#F8FBFC";
-const MUTED = "rgba(168,193,204,0.72)";
+// ─── Screen components indexed by slide ───────────────────────────────────────
+const SCREENS = [
+  MockHomeInput,
+  MockUrgencyHigh,
+  MockResponseActions,
+  MockQuickQuestions,
+  MockSbar,
+];
 
-// System font stack — uses SF Pro Display on macOS (where rendering runs).
-// Fallback is clean Helvetica Neue / system-ui on other platforms.
+// ─── Design tokens (overlay layer) ────────────────────────────────────────────
+const BG       = "#0B1F2A";
+const TEAL     = "#00C2D1";
+const WHITE    = "#F8FBFC";
+const MUTED    = "rgba(168,193,204,0.72)";
+
 const FONT_SANS = '-apple-system, BlinkMacSystemFont, "SF Pro Display", "Helvetica Neue", system-ui, sans-serif';
 const FONT_MONO = '"IBM Plex Mono", "SF Mono", "Courier New", monospace';
 
-// ─── CE Logo SVG (exact paths from the live app) ───────────────────────────────
+// ─── CE Logo SVG ──────────────────────────────────────────────────────────────
 const CELogo: React.FC = () => (
   <svg
     width="42"
@@ -34,23 +46,24 @@ const CELogo: React.FC = () => (
 //
 // Canvas: 1290 × 2796 (App Store 6.7" display size)
 //
-// Text zone:       0 → SCREENSHOT_TOP  (dark background, brand + copy)
-// Gradient bridge: GRADIENT_START → SCREENSHOT_TOP + GRADIENT_H  (seamless fade)
-// Screenshot zone: SCREENSHOT_TOP → 2796  (real screenshot, overflow-hidden crop)
+// Text zone:       0 → SCREEN_TOP   (dark bg, brand mark + copy)
+// Gradient bridge: top of screen zone (seamless fade into mock screen)
+// Screen zone:     SCREEN_TOP → 2796 (code-driven mock screen, overflow-hidden)
 //
-const SCREENSHOT_TOP = 680;   // px where screenshot container begins
-const GRADIENT_H     = 100;   // height of the top-of-screenshot gradient fade
+const SCREEN_TOP     = 680;   // px where mock screen container begins
+const GRADIENT_H     = 90;    // height of the gradient bridge at top of screen zone
 const PAD_H          = 72;    // horizontal padding for text zone
-const BOTTOM_FADE_H  = 140;   // bottom gradient height (softens screenshot crop)
+const BOTTOM_FADE_H  = 140;   // bottom gradient height (softens lower crop edge)
 
 // ─── Main component ────────────────────────────────────────────────────────────
 export const AppStoreShot: React.FC<{ slideIndex: number }> = ({ slideIndex }) => {
   const config: ShotConfig = SHOTS[slideIndex] ?? SHOTS[0];
+  const Screen = SCREENS[slideIndex] ?? SCREENS[0];
 
   return (
     <AbsoluteFill style={{ background: BG, fontFamily: FONT_SANS, overflow: "hidden" }}>
 
-      {/* ── Top glow — adds the subtle depth the app uses ── */}
+      {/* ── Top glow — subtle depth matching the app aesthetic ── */}
       <div style={{
         position: "absolute",
         top: 0, left: 0, right: 0,
@@ -117,7 +130,7 @@ export const AppStoreShot: React.FC<{ slideIndex: number }> = ({ slideIndex }) =
           </div>
         )}
 
-        {/* Headline — the hero element */}
+        {/* Headline */}
         <div style={{
           color: WHITE,
           fontSize: 84,
@@ -143,16 +156,16 @@ export const AppStoreShot: React.FC<{ slideIndex: number }> = ({ slideIndex }) =
         </div>
       </div>
 
-      {/* ── Screenshot container ── */}
+      {/* ── Mock screen zone ── */}
       <div style={{
         position: "absolute",
-        top: SCREENSHOT_TOP,
+        top: SCREEN_TOP,
         left: 0,
         right: 0,
         bottom: 0,
         overflow: "hidden",
       }}>
-        {/* Gradient bridge — fades from background color into screenshot */}
+        {/* Gradient bridge — fades from slide background into mock screen */}
         <div style={{
           position: "absolute",
           top: 0,
@@ -164,25 +177,18 @@ export const AppStoreShot: React.FC<{ slideIndex: number }> = ({ slideIndex }) =
           pointerEvents: "none",
         }} />
 
-        {/* The real screenshot */}
-        <Img
-          src={staticFile(`screenshots/${config.screenshotFile}`)}
-          style={{
-            width: "100%",
-            display: "block",
-            transform: `translateY(-${config.scrollY}px)`,
-          }}
-        />
+        {/* The code-driven mock screen */}
+        <Screen />
       </div>
 
-      {/* ── Bottom fade — softens the screenshot's lower crop edge ── */}
+      {/* ── Bottom fade — softens the lower crop edge ── */}
       <div style={{
         position: "absolute",
         bottom: 0,
         left: 0,
         right: 0,
         height: BOTTOM_FADE_H,
-        background: `linear-gradient(to top, rgba(10,27,38,0.88) 0%, transparent 100%)`,
+        background: `linear-gradient(to top, rgba(11,31,42,0.92) 0%, transparent 100%)`,
         pointerEvents: "none",
         zIndex: 10,
       }} />

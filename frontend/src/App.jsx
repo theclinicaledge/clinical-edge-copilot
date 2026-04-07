@@ -25,6 +25,7 @@ const EXAMPLES = [
   "QTc is 520, patient just got Zofran. Should I be worried?",
   "How do I explain why we're keeping them NPO for an ileus?",
   "BP dropped to 88/50, HR 122, was stable an hour ago — help me think through this before I call.",
+  "Just got report — new confusion, sodium 118, poor PO intake. What matters most first?",
 ];
 
 const SECTIONS = [
@@ -1141,7 +1142,8 @@ export default function App() {
           marginBottom: 18,
           marginTop: 0,
         }}>
-          Good for thinking it through — especially right before you call.
+          Good for thinking it through — especially right before you call.{" "}
+          <span style={{ color: "rgba(168,193,204,0.42)" }}>Also useful after report, when you're sorting out what needs attention first.</span>
         </div>
 
         {/* Guidance chips — lightweight, no mode-locking */}

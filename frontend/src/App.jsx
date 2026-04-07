@@ -479,6 +479,9 @@ export default function App() {
   const [justSaved, setJustSaved]       = useState(false);
   const [followUp, setFollowUp]         = useState("");
   const [inputFocused, setInputFocused] = useState(false);
+  const [sbar, setSbar]                 = useState(null);
+  const [sbarLoading, setSbarLoading]   = useState(false);
+  const [sbarCopied, setSbarCopied]     = useState(false);
 
   const textareaRef           = useRef(null);
   const outputRef             = useRef(null);
@@ -592,6 +595,8 @@ export default function App() {
     setRawText("");
     setStreamBuffer("");
     setJustSaved(false);
+    setSbar(null);
+    setSbarLoading(false);
 
     try {
       const res = await fetch(`${API_BASE}/api/copilot`, {
@@ -725,6 +730,41 @@ export default function App() {
 
   const handleCopyResponse = useCallback((text) => {
     try { navigator.clipboard.writeText(text); } catch {}
+  }, []);
+
+  const handleSbar = useCallback(async () => {
+    if (!rawText || !question) return;
+    setSbarLoading(true);
+    setSbar(null);
+    try {
+      const res = await fetch(`${API_BASE}/api/sbar`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ question, copilotResponse: rawText }),
+      });
+      const data = await res.json();
+      if (!res.ok || data.error) {
+        setSbar({ error: data.error || "Failed to generate SBAR." });
+      } else {
+        setSbar(data.sbar);
+      }
+    } catch {
+      setSbar({ error: "Network error. Please try again." });
+    } finally {
+      setSbarLoading(false);
+    }
+  }, [rawText, question]);
+
+  const handleCopySbar = useCallback((sbarData) => {
+    const text = [
+      `SITUATION:\n${sbarData.situation}`,
+      `BACKGROUND:\n${sbarData.background}`,
+      `ASSESSMENT:\n${sbarData.assessment}`,
+      `RECOMMENDATION:\n${sbarData.recommendation}`,
+    ].join("\n\n");
+    try { navigator.clipboard.writeText(text); } catch {}
+    setSbarCopied(true);
+    setTimeout(() => setSbarCopied(false), 2000);
   }, []);
 
   const handleReopenCase = useCallback((q) => {
@@ -1414,6 +1454,38 @@ export default function App() {
               >
                 Copy Response
               </button>
+
+              {/* SBAR — tertiary, accent */}
+              <button
+                onClick={handleSbar}
+                disabled={sbarLoading}
+                style={{
+                  marginLeft: "auto",
+                  background: sbar && !sbar.error ? "rgba(0,194,209,0.07)" : "transparent",
+                  border: "1px solid " + (sbar && !sbar.error ? "rgba(0,194,209,0.25)" : "rgba(0,194,209,0.14)"),
+                  color: sbarLoading ? "rgba(0,194,209,0.35)" : "#00A8B5",
+                  borderRadius: 9,
+                  padding: "9px 16px",
+                  fontSize: 12.5,
+                  fontWeight: 500,
+                  cursor: sbarLoading ? "default" : "pointer",
+                  transition: "all 0.15s",
+                  letterSpacing: "-0.1px",
+                  display: "flex",
+                  alignItems: "center",
+                  gap: 6,
+                  flexShrink: 0,
+                }}
+              >
+                {sbarLoading ? (
+                  <>
+                    <span style={{ display: "inline-block", width: 10, height: 10, border: "1.5px solid rgba(0,194,209,0.3)", borderTopColor: "#00C2D1", borderRadius: "50%", animation: "spin 0.75s linear infinite" }} />
+                    Building SBAR…
+                  </>
+                ) : (
+                  "Turn into SBAR"
+                )}
+              </button>
             </div>
 
             {/* ── Continue Thinking ─────────────────────────────────────── */}
@@ -1480,7 +1552,98 @@ export default function App() {
               </div>
             </div>
 
-          </div>
+          {/* ── SBAR Card ────────────────────────────────────────────── */}
+          {(sbar || sbarLoading) && (
+            <div style={{
+              marginTop: 16,
+              background: "linear-gradient(160deg, rgba(0,194,209,0.04) 0%, rgba(0,150,165,0.025) 100%)",
+              border: "1px solid rgba(0,194,209,0.16)",
+              borderRadius: 12,
+              padding: "20px 20px 16px",
+              boxShadow: "0 2px 16px rgba(0,0,0,0.12)",
+            }}>
+              {/* Header */}
+              <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 16 }}>
+                <div style={{
+                  fontSize: 9,
+                  fontWeight: 700,
+                  textTransform: "uppercase",
+                  letterSpacing: "1.4px",
+                  color: "#00C2D1",
+                  fontFamily: "'IBM Plex Mono', monospace",
+                }}>
+                  SBAR Handoff Draft
+                </div>
+                {sbar && !sbar.error && (
+                  <button
+                    onClick={() => handleCopySbar(sbar)}
+                    style={{
+                      background: "transparent",
+                      border: "1px solid rgba(0,194,209,0.15)",
+                      color: sbarCopied ? "#1FBF75" : "rgba(0,194,209,0.5)",
+                      borderRadius: 6,
+                      padding: "4px 11px",
+                      fontSize: 11,
+                      fontWeight: 500,
+                      cursor: "pointer",
+                      transition: "all 0.15s",
+                    }}
+                  >
+                    {sbarCopied ? "✓ Copied" : "Copy"}
+                  </button>
+                )}
+              </div>
+
+              {sbarLoading && (
+                <div style={{ color: "rgba(168,193,204,0.4)", fontSize: 13, padding: "8px 0" }}>
+                  Drafting SBAR…
+                </div>
+              )}
+
+              {sbar && sbar.error && (
+                <div style={{ color: "#e05572", fontSize: 13 }}>{sbar.error}</div>
+              )}
+
+              {sbar && !sbar.error && (
+                <div style={{ display: "flex", flexDirection: "column", gap: 14 }}>
+                  {[
+                    { label: "Situation",      value: sbar.situation,      accent: "#4da3ff" },
+                    { label: "Background",     value: sbar.background,     accent: "#A8C1CC" },
+                    { label: "Assessment",     value: sbar.assessment,     accent: "#F2B94B" },
+                    { label: "Recommendation", value: sbar.recommendation, accent: "#1FBF75" },
+                  ].map(({ label, value, accent }) => (
+                    <div key={label}>
+                      <div style={{
+                        fontSize: 9,
+                        fontWeight: 700,
+                        textTransform: "uppercase",
+                        letterSpacing: "1px",
+                        color: accent,
+                        fontFamily: "'IBM Plex Mono', monospace",
+                        marginBottom: 5,
+                        opacity: 0.85,
+                      }}>
+                        {label}
+                      </div>
+                      <div style={{
+                        fontSize: 13.5,
+                        lineHeight: 1.65,
+                        color: "#BCCDD6",
+                      }}>
+                        {value || "—"}
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              )}
+
+              <div style={{ marginTop: 14, fontSize: 10.5, color: "rgba(168,193,204,0.28)", lineHeight: 1.5 }}>
+                AI-generated draft — verify all details before use. Do not include patient identifiers.
+              </div>
+            </div>
+          )}
+
+        </div>
         )}
 
         {/* Disclaimer */}

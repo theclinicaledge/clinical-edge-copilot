@@ -1269,6 +1269,81 @@ app.post("/api/copilot", apiLimiter, async (req, res) => {
   }
 });
 
+// ── SBAR Generation ───────────────────────────────────────────────────────────
+const SBAR_SYSTEM_PROMPT = `You are an experienced bedside nurse helping a colleague draft a concise SBAR handoff.
+
+Generate a structured SBAR using the clinical context provided. Keep each section brief and practical — this is nurse-to-provider communication, not a documentation note.
+
+SBAR rules:
+- SITUATION: 1–2 sentences. What is happening right now and why you are reaching out.
+- BACKGROUND: 2–3 sentences. Relevant clinical context, recent changes, pertinent history.
+- ASSESSMENT: 1–2 sentences. Your nursing concern — what you think may be happening.
+- RECOMMENDATION: 1–2 sentences. What you are requesting or suggesting. Stay within nursing scope — request provider action, do not prescribe independently.
+
+Voice: Direct, clinical, confident. Peer-to-peer handoff tone, not formal documentation.
+
+Output format — use EXACTLY these labels on their own line followed by the content:
+SITUATION:
+BACKGROUND:
+ASSESSMENT:
+RECOMMENDATION:
+
+Do not add any commentary, headers, or text outside these four sections.`;
+
+app.post("/api/sbar", apiLimiter, async (req, res) => {
+  const { question, copilotResponse } = req.body;
+
+  if (!question || !copilotResponse) {
+    return res.status(400).json({ error: "Missing required fields." });
+  }
+  if (question.trim().length > 5000) {
+    return res.status(400).json({ error: "Input too long." });
+  }
+
+  // PHI guardrail
+  const phiMatch = containsPHI(question);
+  if (phiMatch) {
+    return res.status(400).json({
+      error: "Remove patient identifiers before generating SBAR.",
+    });
+  }
+
+  try {
+    const message = await client.messages.create({
+      model: "claude-sonnet-4-6",
+      max_tokens: 500,
+      system: SBAR_SYSTEM_PROMPT,
+      messages: [{
+        role: "user",
+        content: `Clinical scenario:\n${question.trim()}\n\nCopilot analysis:\n${copilotResponse.trim()}`,
+      }],
+    });
+
+    const raw = message.content[0]?.text || "";
+
+    // Parse each labeled section out of the raw text
+    const parseSection = (label, nextLabel) => {
+      const pattern = nextLabel
+        ? new RegExp(`${label}:\\s*([\\s\\S]*?)(?=${nextLabel}:)`, "i")
+        : new RegExp(`${label}:\\s*([\\s\\S]*)$`, "i");
+      const m = raw.match(pattern);
+      return m ? m[1].trim() : "";
+    };
+
+    const sbar = {
+      situation:      parseSection("SITUATION",      "BACKGROUND"),
+      background:     parseSection("BACKGROUND",     "ASSESSMENT"),
+      assessment:     parseSection("ASSESSMENT",     "RECOMMENDATION"),
+      recommendation: parseSection("RECOMMENDATION", null),
+    };
+
+    res.json({ sbar });
+  } catch (error) {
+    console.error("[SBAR] API error:", error.message);
+    res.status(500).json({ error: "Failed to generate SBAR. Please try again." });
+  }
+});
+
 app.get("/health", (_req, res) => res.json({ status: "ok" }));
 
 const PORT = process.env.PORT || 3001;

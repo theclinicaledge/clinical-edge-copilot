@@ -478,7 +478,6 @@ export default function App() {
   const [savedCases, setSavedCases]     = useState(() => lsGet(LS_SAVED, []));
   const [justSaved, setJustSaved]       = useState(false);
   const [followUp, setFollowUp]         = useState("");
-  const [activeChip, setActiveChip]     = useState(null);
 
   const textareaRef           = useRef(null);
   const outputRef             = useRef(null);
@@ -1025,44 +1024,12 @@ export default function App() {
           boxShadow: "0 14px 40px rgba(0,0,0,0.26), 0 3px 10px rgba(0,0,0,0.18), inset 0 1px 0 rgba(255,255,255,0.04)",
           marginBottom: 14,
         }}>
-          {/* Context chips — set placeholder, do not fill input */}
-          <div style={{ display: "flex", flexWrap: "wrap", gap: 6, marginBottom: 14 }}>
-            {CONTEXT_CHIPS.map(({ label }) => {
-              const isActive = activeChip === label;
-              return (
-                <button
-                  key={label}
-                  onClick={() => setActiveChip(isActive ? null : label)}
-                  style={{
-                    background: isActive ? "rgba(0,194,209,0.12)" : "transparent",
-                    border: "1px solid " + (isActive ? "rgba(0,194,209,0.40)" : "rgba(255,255,255,0.10)"),
-                    color: isActive ? "#00C2D1" : "rgba(168,193,204,0.55)",
-                    borderRadius: 999,
-                    padding: "4px 12px",
-                    fontSize: 12,
-                    fontWeight: isActive ? 600 : 400,
-                    cursor: "pointer",
-                    letterSpacing: "0.01em",
-                    transition: "all 0.15s",
-                    whiteSpace: "nowrap",
-                  }}
-                >
-                  {label}
-                </button>
-              );
-            })}
-          </div>
-
           <textarea
             ref={textareaRef}
             value={question}
             onChange={(e) => setQuestion(e.target.value)}
             onKeyDown={handleKey}
-            placeholder={
-              activeChip
-                ? CONTEXT_CHIPS.find(c => c.label === activeChip)?.placeholder
-                : "Type a question or describe what's happening..."
-            }
+            placeholder="What are you thinking through right now?"
             rows={3}
             style={{
               width: "100%",
@@ -1127,6 +1094,38 @@ export default function App() {
           marginTop: 0,
         }}>
           Use your own words — shorthand, fragments, and abbreviations all work.
+        </div>
+
+        {/* Guidance chips — lightweight, no mode-locking */}
+        <div style={{ marginBottom: 18 }}>
+          <div style={{
+            fontSize: 11,
+            color: "rgba(168,188,198,0.38)",
+            fontFamily: "'IBM Plex Mono', monospace",
+            letterSpacing: "0.06em",
+            textTransform: "uppercase",
+            marginBottom: 8,
+          }}>
+            Common ways nurses use Copilot
+          </div>
+          <div style={{ display: "flex", flexWrap: "wrap", gap: 6 }}>
+            {CONTEXT_CHIPS.map(({ label }) => (
+              <span key={label} style={{
+                background: "transparent",
+                border: "1px solid rgba(255,255,255,0.08)",
+                color: "rgba(168,193,204,0.45)",
+                borderRadius: 999,
+                padding: "4px 11px",
+                fontSize: 12,
+                fontWeight: 400,
+                letterSpacing: "0.005em",
+                whiteSpace: "nowrap",
+                userSelect: "none",
+              }}>
+                {label}
+              </span>
+            ))}
+          </div>
         </div>
 
         {/* Privacy notice */}
@@ -1242,7 +1241,7 @@ export default function App() {
               <button
                 key={ex}
                 className="chip"
-                onClick={() => { setQuestion(ex); setActiveChip(null); }}
+                onClick={() => setQuestion(ex)}
                 style={{
                   background: "rgba(255,255,255,0.025)",
                   border: "1px solid rgba(255,255,255,0.07)",

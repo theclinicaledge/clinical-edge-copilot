@@ -574,7 +574,7 @@ export default function App() {
   // Core query runner — accepts an explicit query string so chips and
   // follow-ups can call it directly without going through question state.
   // AbortController lets the visibility handler cancel and restart cleanly.
-  const runQuery = async (q) => {
+  const runQuery = async (q, { isFollowUp = false } = {}) => {
     if (!q.trim()) return;
 
     // Cancel any previous in-flight request before starting a new one
@@ -602,7 +602,7 @@ export default function App() {
       const res = await fetch(`${API_BASE}/api/copilot`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ question: q, mode }),
+        body: JSON.stringify({ question: q, mode, ...(isFollowUp ? { isFollowUp: true } : {}) }),
         signal: controller.signal,
       });
 
@@ -698,7 +698,7 @@ export default function App() {
     if (!followUp.trim()) return;
     track("continue_thinking_used", { mode });
     const combined = `Original situation: ${lastSubmittedRef.current}\n\nUpdate: ${followUp.trim()}`;
-    runQuery(combined);
+    runQuery(combined, { isFollowUp: true });
   };
 
   const handleKey = (e) => {
@@ -1506,13 +1506,13 @@ export default function App() {
                 marginBottom: 10,
                 fontFamily: "'IBM Plex Mono', monospace",
               }}>
-                Continue Thinking
+                Anything change?
               </div>
               <textarea
                 value={followUp}
                 onChange={(e) => setFollowUp(e.target.value)}
                 onKeyDown={(e) => { if (e.key === "Enter" && (e.metaKey || e.ctrlKey)) handleFollowUp(); }}
-                placeholder="Add an update — new vitals, lab result, or change in status..."
+                placeholder="New vitals, labs, or anything different?"
                 rows={2}
                 style={{
                   width: "100%",
@@ -1547,7 +1547,7 @@ export default function App() {
                     transition: "all 0.15s",
                   }}
                 >
-                  Continue →
+                  Update →
                 </button>
               </div>
             </div>

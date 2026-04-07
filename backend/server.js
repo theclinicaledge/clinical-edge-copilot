@@ -1160,7 +1160,7 @@ function appendLog(entry) {
 
 // ── Streaming endpoint ────────────────────────────────────────────────────────
 app.post("/api/copilot", apiLimiter, async (req, res) => {
-  const { question, mode } = req.body;
+  const { question, mode, isFollowUp } = req.body;
 
   if (!question || question.trim() === "") {
     return res.status(400).json({ error: "Please enter a clinical question before submitting." });
@@ -1182,7 +1182,10 @@ app.post("/api/copilot", apiLimiter, async (req, res) => {
     });
   }
 
-  const selectedPrompt = detectPrompt(question.trim(), mode);
+  const FOLLOW_UP_PREFIX = `CONTINUATION: The nurse is following up on a case they already submitted. Their input contains the original scenario and a new update. Your job is to respond to what changed — not restate or re-analyze the original scenario from scratch. Focus on: what the update means in the context of what you already know, whether the overall concern is rising or falling, and what matters most right now given the new information. Acknowledge the prior context naturally. Do not repeat what was already covered unless it directly clarifies the new picture. Stay concise.\n\n`;
+
+  let selectedPrompt = detectPrompt(question.trim(), mode);
+  if (isFollowUp === true) selectedPrompt = FOLLOW_UP_PREFIX + selectedPrompt;
 
   const promptName =
     selectedPrompt === DEEP_SYSTEM_PROMPT  ? "DEEP_SYSTEM_PROMPT"  :

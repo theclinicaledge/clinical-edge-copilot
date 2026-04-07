@@ -1547,7 +1547,7 @@ export default function App() {
                     transition: "all 0.15s",
                   }}
                 >
-                  Update →
+                  Send update
                 </button>
               </div>
             </div>

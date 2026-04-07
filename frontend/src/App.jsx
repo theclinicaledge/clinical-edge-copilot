@@ -478,6 +478,7 @@ export default function App() {
   const [savedCases, setSavedCases]     = useState(() => lsGet(LS_SAVED, []));
   const [justSaved, setJustSaved]       = useState(false);
   const [followUp, setFollowUp]         = useState("");
+  const [inputFocused, setInputFocused] = useState(false);
 
   const textareaRef           = useRef(null);
   const outputRef             = useRef(null);
@@ -1014,21 +1015,28 @@ export default function App() {
 
         {/* Input card */}
         <div className="input-card" style={{
-          background: "linear-gradient(160deg, rgba(18,44,60,0.98) 0%, rgba(13,32,44,0.98) 100%)",
-          border: "1px solid rgba(255,255,255,0.09)",
+          background: "linear-gradient(160deg, rgba(20,48,66,0.99) 0%, rgba(15,35,50,0.99) 100%)",
+          border: inputFocused
+            ? "1px solid rgba(0,194,209,0.28)"
+            : "1px solid rgba(255,255,255,0.13)",
           borderTopLeftRadius: 0,
           borderTopRightRadius: 0,
           borderBottomLeftRadius: 14,
           borderBottomRightRadius: 14,
           padding: "22px",
-          boxShadow: "0 14px 40px rgba(0,0,0,0.26), 0 3px 10px rgba(0,0,0,0.18), inset 0 1px 0 rgba(255,255,255,0.04)",
+          boxShadow: inputFocused
+            ? "0 14px 40px rgba(0,0,0,0.26), 0 3px 10px rgba(0,0,0,0.18), inset 0 1px 0 rgba(255,255,255,0.05), 0 0 0 3px rgba(0,194,209,0.06), inset 0 0 20px rgba(0,194,209,0.03)"
+            : "0 14px 40px rgba(0,0,0,0.26), 0 3px 10px rgba(0,0,0,0.18), inset 0 1px 0 rgba(255,255,255,0.05), inset 0 0 20px rgba(0,194,209,0.02)",
           marginBottom: 14,
+          transition: "border-color 0.2s ease, box-shadow 0.2s ease",
         }}>
           <textarea
             ref={textareaRef}
             value={question}
             onChange={(e) => setQuestion(e.target.value)}
             onKeyDown={handleKey}
+            onFocus={() => setInputFocused(true)}
+            onBlur={() => setInputFocused(false)}
             placeholder="What are you thinking through right now?"
             rows={3}
             style={{

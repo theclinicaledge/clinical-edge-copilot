@@ -11,24 +11,20 @@ const API_BASE =
 
 // ─── Constants ────────────────────────────────────────────────────────────────
 
-const EXAMPLES = [
-  "BP dropped to 88/50, HR 122, was stable 20 min ago",
-  "Patient on HFNC suddenly desatting to 84%",
-  "Potassium 2.9, patient on a Lasix drip",
-  "Chest tube stopped bubbling and tidaling",
-  "Patient suddenly confused, new onset agitation",
-  "Heparin drip PTT came back at 140",
+// Context chips — set placeholder only, do not fill input
+const CONTEXT_CHIPS = [
+  { label: "Something feels off",       placeholder: "What changed, and what is worrying you most?" },
+  { label: "Before you call",           placeholder: "What are you about to call about?" },
+  { label: "Medication question",       placeholder: "What med or safety question are you trying to sort out?" },
+  { label: "Explain to the patient",   placeholder: "What do you need help explaining in simple terms?" },
+  { label: "Precautions / wound / device", placeholder: "What are you trying to clarify?" },
 ];
 
-const STARTER_TEMPLATES = [
-  { label: "Rapid deterioration", prompt: "Patient was stable earlier and is now declining: BP down, HR up, concern for acute deterioration" },
-  { label: "Abnormal lab",        prompt: "Abnormal lab result: [lab value], patient context: [diagnosis / meds / symptoms]" },
-  { label: "Medication / drip",   prompt: "Question about medication or drip: [med/drip], current issue: [lab / vitals / symptoms]" },
-  { label: "Respiratory",         prompt: "Respiratory concern: oxygen requirement changed, work of breathing, saturation, device settings" },
-  { label: "Neuro change",        prompt: "New neuro change: confusion, lethargy, agitation, speech change, or new focal concern" },
-  { label: "Chest tube / device", prompt: "Device concern: chest tube, line, drain, Foley, feeding tube, or monitor issue" },
-  { label: "Behavior / agitation",prompt: "Behavior or agitation concern: sudden confusion, restlessness, pulling lines, or change from baseline" },
-  { label: "Post-op concern",     prompt: "Post-op concern: pain, sedation, respiratory change, bleeding, vitals, or delayed recovery" },
+// Example prompts — these DO fill the input when tapped
+const EXAMPLES = [
+  "QTc is 520, patient just got Zofran. Should I be worried?",
+  "How do I explain why we're keeping them NPO for an ileus?",
+  "Shingles precautions, patient is immunocompromised",
 ];
 
 const SECTIONS = [
@@ -482,6 +478,7 @@ export default function App() {
   const [savedCases, setSavedCases]     = useState(() => lsGet(LS_SAVED, []));
   const [justSaved, setJustSaved]       = useState(false);
   const [followUp, setFollowUp]         = useState("");
+  const [activeChip, setActiveChip]     = useState(null);
 
   const textareaRef           = useRef(null);
   const outputRef             = useRef(null);
@@ -964,7 +961,7 @@ export default function App() {
             Clinical reasoning support. Built for nurses.
           </h1>
           <p style={{ fontSize: "clamp(15px, 3.5vw, 17px)", color: "rgba(230,238,242,0.88)", margin: "0 0 10px", lineHeight: 1.4, fontWeight: 500 }}>
-            Describe the situation. Copilot helps you think it through.
+            When something feels off. Before you call. Quick clinical questions.
           </p>
           <p style={{ fontSize: "clamp(14px, 3vw, 15px)", color: "rgba(200,214,222,0.72)", margin: 0, lineHeight: 1.45, fontWeight: 400 }}>
             For real-world questions and practice scenarios. Not a diagnosis.
@@ -1028,12 +1025,44 @@ export default function App() {
           boxShadow: "0 14px 40px rgba(0,0,0,0.26), 0 3px 10px rgba(0,0,0,0.18), inset 0 1px 0 rgba(255,255,255,0.04)",
           marginBottom: 14,
         }}>
+          {/* Context chips — set placeholder, do not fill input */}
+          <div style={{ display: "flex", flexWrap: "wrap", gap: 6, marginBottom: 14 }}>
+            {CONTEXT_CHIPS.map(({ label }) => {
+              const isActive = activeChip === label;
+              return (
+                <button
+                  key={label}
+                  onClick={() => setActiveChip(isActive ? null : label)}
+                  style={{
+                    background: isActive ? "rgba(0,194,209,0.12)" : "transparent",
+                    border: "1px solid " + (isActive ? "rgba(0,194,209,0.40)" : "rgba(255,255,255,0.10)"),
+                    color: isActive ? "#00C2D1" : "rgba(168,193,204,0.55)",
+                    borderRadius: 999,
+                    padding: "4px 12px",
+                    fontSize: 12,
+                    fontWeight: isActive ? 600 : 400,
+                    cursor: "pointer",
+                    letterSpacing: "0.01em",
+                    transition: "all 0.15s",
+                    whiteSpace: "nowrap",
+                  }}
+                >
+                  {label}
+                </button>
+              );
+            })}
+          </div>
+
           <textarea
             ref={textareaRef}
             value={question}
             onChange={(e) => setQuestion(e.target.value)}
             onKeyDown={handleKey}
-            placeholder="Patient more lethargic, HR climbing, unsure what to make of it..."
+            placeholder={
+              activeChip
+                ? CONTEXT_CHIPS.find(c => c.label === activeChip)?.placeholder
+                : "Type a question or describe what's happening..."
+            }
             rows={3}
             style={{
               width: "100%",
@@ -1097,7 +1126,7 @@ export default function App() {
           marginBottom: 18,
           marginTop: 0,
         }}>
-          Just describe the scenario in your own words.
+          Use your own words — shorthand, fragments, and abbreviations all work.
         </div>
 
         {/* Privacy notice */}
@@ -1197,41 +1226,43 @@ export default function App() {
           </div>
         )}
 
-        {/* Example pills */}
+        {/* Example prompts — tap to fill input */}
         <div style={{ marginBottom: 36 }}>
           <div style={{
             fontFamily: "'IBM Plex Mono', monospace",
-            fontSize: 12,
+            fontSize: 11,
             fontWeight: 500,
-            letterSpacing: "0.10em",
+            letterSpacing: "0.09em",
             textTransform: "uppercase",
-            color: "rgba(168,188,198,0.62)",
+            color: "rgba(168,188,198,0.45)",
             marginBottom: 10,
-          }}>Try this:</div>
-          <div className="chips-try" style={{ display: "flex", flexWrap: "wrap", gap: 7 }}>
+          }}>Examples</div>
+          <div className="chips-try" style={{ display: "flex", flexDirection: "column", gap: 8 }}>
             {EXAMPLES.map((ex) => (
               <button
                 key={ex}
                 className="chip"
-                onClick={() => setQuestion(ex)}
+                onClick={() => { setQuestion(ex); setActiveChip(null); }}
                 style={{
-                  background: "rgba(0,194,209,0.06)",
-                  border: "1px solid rgba(0,194,209,0.22)",
-                  boxShadow: "inset 0 1px 0 rgba(255,255,255,0.04)",
-                  color: "rgba(181,239,244,0.90)",
-                  padding: "0 12px",
-                  height: 28,
-                  borderRadius: 999,
+                  background: "rgba(255,255,255,0.025)",
+                  border: "1px solid rgba(255,255,255,0.07)",
+                  color: "rgba(168,193,204,0.70)",
+                  padding: "10px 14px",
+                  borderRadius: 10,
                   fontSize: 13,
-                  fontWeight: 500,
+                  fontWeight: 400,
                   letterSpacing: "-0.01em",
                   cursor: "pointer",
-                  display: "inline-flex",
+                  display: "flex",
                   alignItems: "center",
+                  gap: 10,
                   textAlign: "left",
+                  lineHeight: 1.45,
                   transition: "all 0.15s",
+                  width: "100%",
                 }}
               >
+                <span style={{ color: "rgba(0,194,209,0.35)", fontSize: 10, flexShrink: 0 }}>▶</span>
                 {ex}
               </button>
             ))}

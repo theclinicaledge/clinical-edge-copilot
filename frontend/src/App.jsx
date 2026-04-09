@@ -1541,18 +1541,52 @@ export default function App() {
                   fontFamily: "'IBM Plex Mono', monospace",
                   marginBottom: 10,
                 }}>
-                  General reference categories
+                  Clinical reference sources
                 </div>
-                {[
-                  "Nursing assessment and escalation frameworks",
-                  "Standard inpatient monitoring and communication practices",
-                  "General clinical education references and hospital protocol concepts",
-                ].map((item) => (
-                  <div key={item} style={{ display: "flex", gap: 8, marginBottom: 6, alignItems: "flex-start" }}>
-                    <span style={{ color: "#3A5566", fontSize: 10, marginTop: 3, flexShrink: 0 }}>›</span>
-                    <span style={{ fontSize: 12.5, color: "#7F99A5", lineHeight: 1.5 }}>{item}</span>
-                  </div>
-                ))}
+                <div style={{ display: "flex", flexDirection: "column", gap: 10, marginTop: 10 }}>
+                  {[
+                    {
+                      label: "AACN — Clinical Practice Resources",
+                      url: "https://www.aacn.org/clinical-resources",
+                    },
+                    {
+                      label: "The Joint Commission — National Patient Safety Goals",
+                      url: "https://www.jointcommission.org/standards/national-patient-safety-goals/",
+                    },
+                    {
+                      label: "AHRQ — TeamSTEPPS Clinical Communication Resources",
+                      url: "https://www.ahrq.gov/teamstepps/index.html",
+                    },
+                    {
+                      label: "ISMP — Medication Safety Resources",
+                      url: "https://www.ismp.org/resources",
+                    },
+                  ].map((source) => (
+                    <a
+                      key={source.url}
+                      href={source.url}
+                      target="_blank"
+                      rel="noreferrer"
+                      style={{
+                        display: "flex",
+                        alignItems: "center",
+                        justifyContent: "space-between",
+                        gap: 12,
+                        padding: "10px 12px",
+                        borderRadius: 10,
+                        background: "rgba(255,255,255,0.03)",
+                        border: "1px solid rgba(255,255,255,0.06)",
+                        color: "#00C2D1",
+                        textDecoration: "none",
+                        fontSize: 14,
+                        lineHeight: 1.35,
+                      }}
+                    >
+                      <span>{source.label}</span>
+                      <span style={{ opacity: 0.9, flexShrink: 0 }}>↗</span>
+                    </a>
+                  ))}
+                </div>
                 <div style={{
                   marginTop: 10,
                   paddingTop: 10,

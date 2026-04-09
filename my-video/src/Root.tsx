@@ -6,6 +6,7 @@ import { bpDropScenario }          from "./scenarios/bp-drop";
 import { qtcZofranScenario }       from "./scenarios/qtc-zofran";
 import { confusedPatientScenario } from "./scenarios/confused-patient";
 import { AppStoreShot }            from "./app-store-shots/AppStoreShot";
+import { CopilotAppStoreDemoComposition } from "./compositions/AppStoreDemo";
 
 // App Store screenshot dimensions — 6.7" iPhone display (iPhone 15 Pro Max)
 const AS_W = 1284;
@@ -52,6 +53,16 @@ export const Root: React.FC = () => {
         width={1080}
         height={1920}
         defaultProps={{ scenario: confusedPatientScenario }}
+      />
+
+      {/* ── Product demo video — filmed clips ── */}
+      <Composition
+        id="CopilotAppStoreDemo"
+        component={CopilotAppStoreDemoComposition}
+        durationInFrames={1350}
+        fps={30}
+        width={1080}
+        height={1920}
       />
 
       {/* ── App Store stills — 1284×2778 (iPhone 15 Pro Max) ── */}

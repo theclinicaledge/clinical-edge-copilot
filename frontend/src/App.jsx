@@ -29,11 +29,11 @@ const EXAMPLES = [
 ];
 
 const SECTIONS = [
-  { name: "What this could be",   aliases: ["What this could be"],   accent: "#4da3ff", bg: "rgba(77,163,255,0.06)"  },
-  { name: "What concerns me most", aliases: ["What concerns me most"], accent: "#e05572", bg: "rgba(224,85,114,0.06)"  },
-  { name: "What I'd assess next",  aliases: ["What I'd assess next"],  accent: "#1FBF75", bg: "rgba(31,191,117,0.06)"  },
-  { name: "What I'd do right now", aliases: ["What I'd do right now"], accent: "#F2B94B", bg: "rgba(242,185,75,0.06)"  },
-  { name: "Closing",               aliases: ["Closing"],               accent: "#00C2D1", bg: "rgba(0,194,209,0.04)"   },
+  { name: "What this could be",   aliases: ["What this could be"],                                        accent: "#4da3ff", bg: "rgba(77,163,255,0.06)"  },
+  { name: "Possible concerns",     aliases: ["Possible concerns",     "What concerns me most"],           accent: "#e05572", bg: "rgba(224,85,114,0.06)"  },
+  { name: "What to assess next",   aliases: ["What to assess next",   "What I'd assess next"],            accent: "#1FBF75", bg: "rgba(31,191,117,0.06)"  },
+  { name: "What to consider next", aliases: ["What to consider next", "What I'd do right now"],           accent: "#F2B94B", bg: "rgba(242,185,75,0.06)"  },
+  { name: "Closing",               aliases: ["Closing"],                                                  accent: "#00C2D1", bg: "rgba(0,194,209,0.04)"   },
 ];
 
 const SECTION_CONFIG = {};

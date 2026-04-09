@@ -483,6 +483,7 @@ export default function App() {
   const [sbar, setSbar]                 = useState(null);
   const [sbarLoading, setSbarLoading]   = useState(false);
   const [sbarCopied, setSbarCopied]     = useState(false);
+  const [sourcesOpen, setSourcesOpen]   = useState(false);
 
   const textareaRef           = useRef(null);
   const outputRef             = useRef(null);
@@ -598,6 +599,7 @@ export default function App() {
     setJustSaved(false);
     setSbar(null);
     setSbarLoading(false);
+    setSourcesOpen(false);
 
     try {
       const res = await fetch(`${API_BASE}/api/copilot`, {
@@ -1036,7 +1038,7 @@ export default function App() {
           <span style={{ fontSize: 11, color: "#4F6D7A", fontFamily: "'IBM Plex Mono', monospace", whiteSpace: "nowrap", flexShrink: 0, marginRight: 2 }}>
             You'll get:
           </span>
-          {["What this could be", "What matters most", "What to assess next", "What to do right now"].map((item) => (
+          {["What this could be", "Possible concerns", "What to assess next", "What to consider next"].map((item) => (
             <span key={item} style={{
               fontSize: 11,
               color: "rgba(181,239,244,0.65)",
@@ -1200,6 +1202,18 @@ export default function App() {
             marginTop: 1,
           }}>&#9888;</span>
           <span>Do not enter names, MRNs, dates of birth, SSNs, phone numbers, or any patient identifiers. Describe the clinical situation only.</span>
+        </div>
+
+        {/* Educational disclaimer */}
+        <div style={{
+          fontSize: 11,
+          color: "rgba(168,193,204,0.38)",
+          marginBottom: 20,
+          marginTop: -12,
+          paddingLeft: 3,
+          lineHeight: 1.55,
+        }}>
+          For educational support only. Not a substitute for clinical judgment, provider guidance, or institutional protocol.
         </div>
 
         {/* Recent Cases */}
@@ -1457,6 +1471,25 @@ export default function App() {
                 Copy Response
               </button>
 
+              {/* Sources — regulatory affordance */}
+              <button
+                onClick={() => setSourcesOpen(o => !o)}
+                style={{
+                  background: "transparent",
+                  border: "1px solid rgba(255,255,255,0.07)",
+                  color: sourcesOpen ? "rgba(168,193,204,0.65)" : "#3D5E6E",
+                  borderRadius: 9,
+                  padding: "9px 16px",
+                  fontSize: 12.5,
+                  fontWeight: 400,
+                  cursor: "pointer",
+                  transition: "all 0.15s",
+                  letterSpacing: "-0.1px",
+                }}
+              >
+                Sources
+              </button>
+
               {/* SBAR — tertiary, accent */}
               <button
                 onClick={handleSbar}
@@ -1488,6 +1521,60 @@ export default function App() {
                   "Turn into SBAR"
                 )}
               </button>
+            </div>
+
+            {/* ── Sources panel ─────────────────────────────────────────── */}
+            {sourcesOpen && (
+              <div style={{
+                marginTop: 10,
+                background: "rgba(255,255,255,0.018)",
+                border: "1px solid rgba(255,255,255,0.07)",
+                borderRadius: 10,
+                padding: "14px 16px",
+              }}>
+                <div style={{
+                  fontSize: 10,
+                  fontWeight: 700,
+                  textTransform: "uppercase",
+                  letterSpacing: "1.2px",
+                  color: "#5A7A8A",
+                  fontFamily: "'IBM Plex Mono', monospace",
+                  marginBottom: 10,
+                }}>
+                  General reference categories
+                </div>
+                {[
+                  "Nursing assessment and escalation frameworks",
+                  "Standard inpatient monitoring and communication practices",
+                  "General clinical education references and hospital protocol concepts",
+                ].map((item) => (
+                  <div key={item} style={{ display: "flex", gap: 8, marginBottom: 6, alignItems: "flex-start" }}>
+                    <span style={{ color: "#3A5566", fontSize: 10, marginTop: 3, flexShrink: 0 }}>›</span>
+                    <span style={{ fontSize: 12.5, color: "#7F99A5", lineHeight: 1.5 }}>{item}</span>
+                  </div>
+                ))}
+                <div style={{
+                  marginTop: 10,
+                  paddingTop: 10,
+                  borderTop: "1px solid rgba(255,255,255,0.05)",
+                  fontSize: 11,
+                  color: "#3A5566",
+                  lineHeight: 1.5,
+                }}>
+                  Always follow your local policy, approved references, and clinician judgment.
+                </div>
+              </div>
+            )}
+
+            {/* ── Response disclaimer footer ─────────────────────────────── */}
+            <div style={{
+              marginTop: 14,
+              fontSize: 11,
+              color: "rgba(168,193,204,0.28)",
+              lineHeight: 1.55,
+              textAlign: "center",
+            }}>
+              For educational support only. Use your clinical judgment and follow local protocol.
             </div>
 
             {/* ── Continue Thinking ─────────────────────────────────────── */}

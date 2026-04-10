@@ -438,7 +438,7 @@ export default function Landing({ onEnterApp, onEnterScenario }) {
             margin: "0 auto 50px",
             maxWidth: 580,
           }}>
-            Clinical Edge Copilot helps you think through patient situations, medication questions, and clinical decisions — whether you're learning, practicing, or leading.
+            Clinical Edge Copilot helps you think through patient situations, medication questions, and clinical reasoning — whether you're new to nursing, building your skills, or practicing at the bedside.
           </p>
 
           {/* Bridge line */}
@@ -558,14 +558,14 @@ export default function Landing({ onEnterApp, onEnterScenario }) {
 
               {/* Section cards */}
               <div style={{ display: "flex", flexDirection: "column", gap: 9 }}>
-                <MockCard label="Most Likely Issue" accent="#e05572" bg="rgba(224,85,114,0.06)" border="rgba(224,85,114,0.18)">
-                  Acute hemodynamic compromise — cardiogenic or distributive shock
+                <MockCard label="What this could be" accent="#e05572" bg="rgba(224,85,114,0.06)" border="rgba(224,85,114,0.18)">
+                  Acute hemodynamic compromise — the combination of hypotension and tachycardia points toward shock physiology.
                 </MockCard>
-                <MockCard label="Clinical Pattern Recognition" accent="#4da3ff" bg="rgba(77,163,255,0.06)" border="rgba(77,163,255,0.18)">
-                  Hypotension + tachycardia + acute onset = shock physiology. Assess JVD, lung sounds, skin perfusion, cap refill.
+                <MockCard label="Possible concerns" accent="#4da3ff" bg="rgba(77,163,255,0.06)" border="rgba(77,163,255,0.18)">
+                  Hypotension + tachycardia + acute onset suggests circulatory instability. JVD, lung sounds, skin perfusion, and cap refill help clarify the picture.
                 </MockCard>
-                <MockCard label="Immediate Nursing Assessments" accent="#1FBF75" bg="rgba(31,191,117,0.06)" border="rgba(31,191,117,0.18)">
-                  Full reassessment, IV access ×2, 12-lead ECG, fluid responsiveness, notify provider now
+                <MockCard label="What to assess next" accent="#1FBF75" bg="rgba(31,191,117,0.06)" border="rgba(31,191,117,0.18)">
+                  Full reassessment, IV access, 12-lead ECG, fluid responsiveness assessment, and provider awareness.
                 </MockCard>
               </div>
             </div>
@@ -697,10 +697,10 @@ export default function Landing({ onEnterApp, onEnterScenario }) {
                 {/* Output preview */}
                 <div style={{ display: "flex", flexDirection: "column", gap: 7 }}>
                   <MockCard label="What this could be" accent="#e05572" bg="rgba(224,85,114,0.05)" border="rgba(224,85,114,0.15)">
-                    Trending tachycardia in a post-op patient is occult bleeding or early sepsis until proven otherwise — "feels off" is a red flag.
+                    Trending tachycardia in a post-op patient can point toward occult bleeding or early sepsis — the trajectory over time is the key signal.
                   </MockCard>
-                  <MockCard label="Priority right now" accent="#4da3ff" bg="rgba(77,163,255,0.05)" border="rgba(77,163,255,0.15)">
-                    Trend matters more than the single value. Reassess perfusion, urine output, and pain — then loop in the provider early.
+                  <MockCard label="Possible concerns" accent="#4da3ff" bg="rgba(77,163,255,0.05)" border="rgba(77,163,255,0.15)">
+                    Trending values carry more weight than any single reading. Perfusion, urine output, and pain together build the fuller picture.
                   </MockCard>
                 </div>
               </div>
@@ -827,7 +827,7 @@ export default function Landing({ onEnterApp, onEnterScenario }) {
                   textTransform: "uppercase",
                   letterSpacing: "0.8px",
                 }}>
-                  NCLEX
+                  Clinical Knowledge
                 </span>
               </div>
 
@@ -910,7 +910,7 @@ export default function Landing({ onEnterApp, onEnterScenario }) {
                   textTransform: "uppercase",
                   letterSpacing: "0.8px",
                 }}>
-                  What I'd Do Right Now
+                  What to Consider Next
                 </span>
               </div>
 
@@ -945,11 +945,11 @@ export default function Landing({ onEnterApp, onEnterScenario }) {
                 </div>
 
                 <div style={{ display: "flex", flexDirection: "column", gap: 7 }}>
-                  <MockCard label="Priority right now" accent="#fb923c" bg="rgba(251,146,60,0.05)" border="rgba(251,146,60,0.15)">
-                    Apply O₂ now, sit them up, full respiratory assessment — anxious + tachypnea + dropping sats = act first, ask questions second.
+                  <MockCard label="Possible concerns" accent="#fb923c" bg="rgba(251,146,60,0.05)" border="rgba(251,146,60,0.15)">
+                    Anxious presentation with tachypnea and dropping O₂ sats together point toward a respiratory picture that tends to move quickly.
                   </MockCard>
-                  <MockCard label="What I'd do right now" accent="#e05572" bg="rgba(224,85,114,0.05)" border="rgba(224,85,114,0.15)">
-                    O₂ via NC or NRB → listen to lung sounds → notify provider with full picture → anticipate ABG, CXR, and possible escalation.
+                  <MockCard label="What to consider next" accent="#e05572" bg="rgba(224,85,114,0.05)" border="rgba(224,85,114,0.15)">
+                    Oxygen support, lung sound assessment, and keeping the provider aware tend to be early priorities in this kind of picture.
                   </MockCard>
                 </div>
               </div>
@@ -1130,7 +1130,7 @@ export default function Landing({ onEnterApp, onEnterScenario }) {
               { step: "01", label: "Recognizes the pattern",  body: "Identifies what's clinically concerning",    accent: C.accent,   accentRgb: "0,194,209"   },
               { step: "02", label: "Prioritizes risk",       body: "Surfaces urgency and red flags first",        accent: "#4da3ff",  accentRgb: "77,163,255"  },
               { step: "03", label: "Guides assessment",      body: "Shows what to check and why",                 accent: "#F2B94B",  accentRgb: "242,185,75"  },
-              { step: "04", label: "Suggests next steps",    body: "What to do, watch, and escalate",             accent: "#1FBF75",  accentRgb: "31,191,117"  },
+              { step: "04", label: "Clarifies what matters next", body: "What to consider, what to watch, and when provider awareness may be helpful", accent: "#1FBF75",  accentRgb: "31,191,117"  },
             ].map((item, i) => (
               <>
                 {i > 0 && (
@@ -1639,17 +1639,17 @@ export default function Landing({ onEnterApp, onEnterScenario }) {
 
               {/* Sections */}
               <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
-                <MockCard label="Most Likely Issue" accent="#e05572" bg="rgba(224,85,114,0.06)" border="rgba(224,85,114,0.16)">
-                  Acute decompensated heart failure with progressive fluid overload and early respiratory failure
+                <MockCard label="What this could be" accent="#e05572" bg="rgba(224,85,114,0.06)" border="rgba(224,85,114,0.16)">
+                  Acute decompensated heart failure with progressive fluid overload — the escalating oxygen need is the signal here.
                 </MockCard>
-                <MockCard label="Clinical Pattern Recognition" accent="#4da3ff" bg="rgba(77,163,255,0.06)" border="rgba(77,163,255,0.16)">
-                  Escalating O₂ requirement + bilateral crackles + tachycardia in a CHF patient = classic ADHF pattern. The trend over 3 hours is the concern — this is not compensating.
+                <MockCard label="Possible concerns" accent="#4da3ff" bg="rgba(77,163,255,0.06)" border="rgba(77,163,255,0.16)">
+                  Escalating O₂ requirement + bilateral crackles + tachycardia in a CHF patient is a pattern consistent with ADHF. The 3-hour trend matters more than any single value.
                 </MockCard>
-                <MockCard label="Immediate Nursing Assessments" accent="#1FBF75" bg="rgba(31,191,117,0.06)" border="rgba(31,191,117,0.16)">
-                  Work of breathing, O₂ sat trend, lung sounds, lower extremity edema, urine output, daily weight delta, JVP. Upright positioning now. Notify provider.
+                <MockCard label="What to assess next" accent="#1FBF75" bg="rgba(31,191,117,0.06)" border="rgba(31,191,117,0.16)">
+                  Work of breathing, O₂ sat trend, lung sounds, lower extremity edema, urine output, daily weight delta, and JVP. Upright positioning is typically prioritized in this picture.
                 </MockCard>
-                <MockCard label="Notify Provider / Escalate If" accent="#e07a3a" bg="rgba(224,122,58,0.06)" border="rgba(224,122,58,0.16)">
-                  O₂ requirement continues rising, SpO₂ &lt;92%, respiratory rate &gt;28, patient can't speak in full sentences, or mental status changes.
+                <MockCard label="Where this may be heading" accent="#e07a3a" bg="rgba(224,122,58,0.06)" border="rgba(224,122,58,0.16)">
+                  If O₂ requirement continues rising, SpO₂ falls below 92%, respiratory rate exceeds 28, or mental status changes — these are patterns that tend to warrant provider awareness.
                 </MockCard>
               </div>
             </div>

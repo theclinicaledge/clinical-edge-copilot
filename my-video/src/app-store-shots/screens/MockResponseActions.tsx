@@ -15,7 +15,7 @@ export const MockResponseActions: React.FC = () => (
 
     <div style={{ padding: `${16 * S}px ${16 * S}px 0` }}>
 
-      {/* What I'd do right now */}
+      {/* What to consider next */}
       <div style={{
         background: C.bgYellow,
         borderLeft: `3px solid ${C.yellow}`,
@@ -34,12 +34,12 @@ export const MockResponseActions: React.FC = () => (
           marginBottom: 12 * S,
           opacity: 0.88,
         }}>
-          What I'd do right now
+          What to consider next
         </div>
-        <Bullet accent={C.yellow}>Get to the bedside — you need eyes on this patient before anything else</Bullet>
-        <Bullet accent={C.yellow}>Notify the provider now — lead with the BP, HR, and how fast it dropped</Bullet>
-        <Bullet accent={C.yellow}>Loop in your charge nurse — this isn't a solo call</Bullet>
-        <Bullet accent={C.yellow}>Confirm IV access and have fluids ready to run pending orders</Bullet>
+        <Bullet accent={C.yellow}>Bedside assessment first — patient appearance, skin color, and work of breathing shift the picture significantly</Bullet>
+        <Bullet accent={C.yellow}>Provider awareness tends to come next — leading with the BP, HR, and how fast this changed</Bullet>
+        <Bullet accent={C.yellow}>Charge nurse involvement is often part of how situations like this are managed</Bullet>
+        <Bullet accent={C.yellow}>IV access status is worth confirming — available lines matter ahead of any orders</Bullet>
       </div>
 
       {/* Closing */}
@@ -55,9 +55,20 @@ export const MockResponseActions: React.FC = () => (
           fontStyle: "italic",
           margin: 0,
         }}>
-          Built for real decisions — not textbook scenarios.
+          That kind of change is worth escalating early.
         </p>
       </div>
+
+      {/* Footer */}
+      <p style={{
+        color: "rgba(168,193,204,0.32)",
+        fontSize: 11 * S,
+        lineHeight: 1.5,
+        fontStyle: "italic",
+        margin: `0 0 ${12 * S}px`,
+      }}>
+        For educational support only. Use your clinical judgment and follow local protocol.
+      </p>
 
       {/* Action bar */}
       <div style={{

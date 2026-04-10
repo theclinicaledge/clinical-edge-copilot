@@ -97,7 +97,7 @@ export const MockUrgencyHigh: React.FC = () => (
           lineHeight: 1.55,
           fontWeight: 500,
         }}>
-          This may represent acute clinical deterioration.{"\n"}Prioritize immediate bedside assessment and escalation.
+          This pattern is often associated with acute clinical deterioration and typically prompts urgent bedside evaluation and escalation based on institutional protocol.
         </span>
       </div>
 
@@ -117,12 +117,30 @@ export const MockUrgencyHigh: React.FC = () => (
         ))}
       </SectionCard>
 
-      {/* What concerns me most */}
-      <SectionCard label="What concerns me most" accent={C.red} bg={C.bgRed}>
-        <Bullet accent={C.red}>Compensation is active right now — when it breaks, the drop accelerates</Bullet>
-        <Bullet accent={C.red}>The trajectory is the red flag: stable an hour ago is the part I'm not ignoring</Bullet>
-        <Bullet accent={C.red}>Any mental status change or labored breathing and this escalates fast</Bullet>
+      {/* Possible concerns */}
+      <SectionCard label="Possible concerns" accent={C.red} bg={C.bgRed}>
+        <Bullet accent={C.red}>Compensation appears active — that kind of rapid drop carries weight regardless of the absolute numbers</Bullet>
+        <Bullet accent={C.red}>The trajectory matters more than any single value — stable an hour ago makes this a trend, not a snapshot</Bullet>
+        <Bullet accent={C.red}>Mental status changes or increasing work of breathing would add significantly to the concern here</Bullet>
       </SectionCard>
+
+      {/* Footer */}
+      <div style={{
+        borderTop: `1px solid rgba(255,255,255,0.05)`,
+        marginTop: 14 * S,
+        paddingTop: 12 * S,
+        marginBottom: 10 * S,
+      }}>
+        <p style={{
+          color: "rgba(168,193,204,0.32)",
+          fontSize: 11 * S,
+          lineHeight: 1.5,
+          fontStyle: "italic",
+          margin: 0,
+        }}>
+          For educational support only. Use your clinical judgment and follow local protocol.
+        </p>
+      </div>
 
     </div>
   </div>

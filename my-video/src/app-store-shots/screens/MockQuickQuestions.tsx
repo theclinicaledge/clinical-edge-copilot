@@ -100,7 +100,7 @@ export const MockQuickQuestions: React.FC = () => (
           fontFamily: MONO,
           marginBottom: 8 * S,
         }}>
-          What this is
+          What this could be
         </div>
         <div style={{ color: "#BCCDD6", fontSize: 14 * S, lineHeight: 1.65 }}>
           QTc is prolonged — Zofran increases QT risk.{"\n\n"}This raises concern for dangerous arrhythmias like torsades.
@@ -124,28 +124,28 @@ export const MockQuickQuestions: React.FC = () => (
           fontFamily: MONO,
           marginBottom: 10 * S,
         }}>
-          What to do now
+          What to consider next
         </div>
-        <Bullet accent={C.yellow}>Notify provider before giving more</Bullet>
-        <Bullet accent={C.yellow}>Hold next dose unless cleared</Bullet>
-        <Bullet accent={C.yellow}>Check for other QT-prolonging meds</Bullet>
-        <Bullet accent={C.yellow}>Place on telemetry if not already</Bullet>
+        <Bullet accent={C.yellow}>Provider awareness before additional doses is typically part of how this situation is approached</Bullet>
+        <Bullet accent={C.yellow}>Next dose timing may depend on current QTc trend and any hold parameters already documented</Bullet>
+        <Bullet accent={C.yellow}>Other QT-prolonging agents on the MAR — whether any are currently active or recent</Bullet>
+        <Bullet accent={C.yellow}>Continuous cardiac monitoring, if not already in place, often becomes relevant in this picture</Bullet>
       </div>
 
-      {/* Safety note */}
+      {/* Footer */}
       <div style={{
-        borderLeft: `3px solid rgba(168,193,204,0.15)`,
-        paddingLeft: 14 * S,
-        margin: `${12 * S}px 0`,
+        borderTop: `1px solid rgba(255,255,255,0.05)`,
+        marginTop: 14 * S,
+        paddingTop: 12 * S,
       }}>
         <p style={{
-          color: "rgba(168,193,204,0.45)",
-          fontSize: 12 * S,
-          lineHeight: 1.6,
+          color: "rgba(168,193,204,0.32)",
+          fontSize: 11 * S,
+          lineHeight: 1.5,
           fontStyle: "italic",
           margin: 0,
         }}>
-          Real bedside questions. Real answers.
+          For educational support only. Use your clinical judgment and follow local protocol.
         </p>
       </div>
 

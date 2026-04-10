@@ -600,7 +600,7 @@ export default function Landing({ onEnterApp, onEnterScenario }) {
               maxWidth: 560,
               margin: "0 auto",
             }}>
-              From real clinical situations to quick med questions to NCLEX-style reasoning — Copilot adapts to how nurses and students actually think.
+              From real clinical situations to quick bedside questions to clinical knowledge — Copilot adapts to how nurses and students actually think.
             </p>
           </div>
         </Fade>
@@ -783,7 +783,7 @@ export default function Landing({ onEnterApp, onEnterScenario }) {
                     Yes — furosemide lowers potassium. It's a loop diuretic that increases urinary K⁺ loss.
                   </MockCard>
                   <MockCard label="What to watch" accent="#1FBF75" bg="rgba(31,191,117,0.05)" border="rgba(31,191,117,0.15)">
-                    Monitor for hypokalemia — weakness, cramps, arrhythmias. Check labs and review cardiac status. Anticipate potassium repletion per provider order and continue monitoring trends.
+                    Signs of hypokalemia — weakness, cramps, arrhythmias. Lab trends and cardiac status are worth following, with management guided by provider assessment.
                   </MockCard>
                 </div>
               </div>
@@ -862,11 +862,11 @@ export default function Landing({ onEnterApp, onEnterScenario }) {
                 </div>
 
                 <div style={{ display: "flex", flexDirection: "column", gap: 7 }}>
-                  <MockCard label="Correct Answer" accent="#c084fc" bg="rgba(192,132,252,0.05)" border="rgba(192,132,252,0.15)">
-                    B — Calcium gluconate stabilizes the myocardium first. Peaked T waves = cardiac instability risk. Protect the heart before lowering K⁺.
+                  <MockCard label="What this suggests" accent="#c084fc" bg="rgba(192,132,252,0.05)" border="rgba(192,132,252,0.15)">
+                    B — Calcium gluconate stabilizes the myocardium first. Peaked T waves point toward cardiac instability risk — membrane protection typically comes before K⁺ lowering.
                   </MockCard>
-                  <MockCard label="Why not the others" accent="#4da3ff" bg="rgba(77,163,255,0.05)" border="rgba(77,163,255,0.15)">
-                    A/C/D may lower K⁺ but act too slowly — cardiac membrane stabilization is the immediate priority when EKG changes are present.
+                  <MockCard label="Clinical context" accent="#4da3ff" bg="rgba(77,163,255,0.05)" border="rgba(77,163,255,0.15)">
+                    A/C/D address the potassium level but act more slowly — when EKG changes are present, cardiac membrane stabilization tends to be the earlier priority.
                   </MockCard>
                 </div>
               </div>
@@ -877,7 +877,7 @@ export default function Landing({ onEnterApp, onEnterScenario }) {
                 fontSize: 11,
                 color: C.muted,
               }}>
-                Builds clinical reasoning for boards and beyond
+                Builds clinical reasoning and pattern recognition
               </div>
             </div>
           </Fade>
@@ -960,7 +960,7 @@ export default function Landing({ onEnterApp, onEnterScenario }) {
                 fontSize: 11,
                 color: C.muted,
               }}>
-                Gives you the next step when uncertainty is highest
+                Helps organize thinking when uncertainty is highest
               </div>
             </div>
           </Fade>
@@ -1064,7 +1064,7 @@ export default function Landing({ onEnterApp, onEnterScenario }) {
             },
             {
               title: "Shows what matters",
-              body: "Cuts through noise and highlights the patterns you actually need to act on.",
+              body: "Cuts through noise and highlights the patterns that actually matter.",
             },
             {
               title: "Helps you connect the dots",
@@ -1402,7 +1402,7 @@ export default function Landing({ onEnterApp, onEnterScenario }) {
             },
             {
               n: "03",
-              title: "For nurses making decisions in real time",
+              title: "For nurses thinking through situations in real time",
               body: "When things are moving fast and you need clarity — not more noise.",
             },
           ].map((card, i) => (

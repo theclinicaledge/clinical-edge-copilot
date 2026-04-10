@@ -1108,6 +1108,15 @@ function appendLog(entry) {
   }
 }
 
+// ── Detect temporary Anthropic overload errors ────────────────────────────────
+function isOverloadError(err) {
+  return (
+    err?.status === 529 ||
+    err?.error?.type === "overloaded_error" ||
+    /overload/i.test(err?.message ?? "")
+  );
+}
+
 // ── Streaming endpoint ────────────────────────────────────────────────────────
 app.post("/api/copilot", apiLimiter, async (req, res) => {
   const { question, mode, isFollowUp } = req.body;
@@ -1162,16 +1171,19 @@ app.post("/api/copilot", apiLimiter, async (req, res) => {
   res.setHeader("Connection", "keep-alive");
   res.setHeader("X-Accel-Buffering", "no"); // disables Nginx buffering on Render
 
-  try {
+  let fullResponse    = "";
+  let retryAttempted  = false;
+  let fallbackUsed    = false;
+
+  // Runs one full Anthropic stream, appending chunks to fullResponse and
+  // writing each chunk to the SSE stream as it arrives.
+  const callStream = async () => {
     const stream = await client.messages.stream({
       model: "claude-sonnet-4-6",
       max_tokens: 1400,
       system: selectedPrompt,
       messages: [{ role: "user", content: question.trim() }],
     });
-
-    let fullResponse = "";
-
     for await (const chunk of stream) {
       if (
         chunk.type === "content_block_delta" &&
@@ -1179,15 +1191,47 @@ app.post("/api/copilot", apiLimiter, async (req, res) => {
         chunk.delta?.text
       ) {
         fullResponse += chunk.delta.text;
-        // Send each text chunk as an SSE data event
         res.write(`data: ${JSON.stringify({ text: chunk.delta.text })}\n\n`);
       }
     }
+  };
 
+  try {
+    // ── First attempt ─────────────────────────────────────────────────────
+    try {
+      await callStream();
+    } catch (firstErr) {
+      // Only retry on overload and only if no content has been sent yet
+      // (partial content already on the wire cannot be safely retried).
+      if (!isOverloadError(firstErr) || fullResponse.length > 0) throw firstErr;
+
+      retryAttempted = true;
+      console.warn("[Clinical Edge] Anthropic overloaded — retrying once.");
+      await new Promise((resolve) => setTimeout(resolve, 300));
+
+      // ── Single retry ───────────────────────────────────────────────────
+      try {
+        await callStream();
+      } catch (retryErr) {
+        if (!isOverloadError(retryErr)) throw retryErr;
+
+        // Both attempts overloaded — send a graceful fallback instead of
+        // a hard error. Slightly stronger language for deterioration cases.
+        fallbackUsed = true;
+        const fallbackText =
+          category === "deterioration"
+            ? "Something interrupted the full response, but changes like this can carry clinical significance and may warrant closer attention in context.\n\nFor educational support only. Use your clinical judgment and follow local protocol."
+            : "Something interrupted the full response, but this still appears to be a situation worth thinking through carefully in clinical context.\n\nFor educational support only. Use your clinical judgment and follow local protocol.";
+        fullResponse = fallbackText;
+        res.write(`data: ${JSON.stringify({ text: fallbackText })}\n\n`);
+      }
+    }
+
+    // ── Post-stream logging (covers real response, retry, and fallback) ──
     const parsedUrgency = parseUrgency(fullResponse);
     const { possible_failure, failure_reason } = detectPossibleFailure({
       route:           promptName,
-      status:          "success",
+      status:          fallbackUsed ? "fallback" : "success",
       responseLength:  fullResponse.length,
       responsePreview: fullResponse.slice(0, 250),
       urgency:         parsedUrgency,
@@ -1202,17 +1246,20 @@ app.post("/api/copilot", apiLimiter, async (req, res) => {
       word_count:       wordCount,
       input_length:     inputLength,
       urgency:          parsedUrgency,
-      status:           "success",
+      status:           fallbackUsed ? "fallback" : "success",
       response_preview: fullResponse.slice(0, 250),
       response_length:  fullResponse.length,
       possible_failure,
       failure_reason,
+      ...(retryAttempted && { retry_attempted: true }),
+      ...(fallbackUsed    && { fallback_used:   true }),
     });
 
     // Signal stream completion
     res.write(`data: ${JSON.stringify({ done: true, sourceCategoryNote: "Nursing assessment frameworks, standard monitoring and escalation practices, and general clinical education references" })}\n\n`);
     res.end();
   } catch (error) {
+    // Non-overload errors, or overload after partial content — existing behavior.
     console.error("[Clinical Edge] Anthropic API error:", error.status ?? "", error.message);
     const { possible_failure: errFail, failure_reason: errReason } = detectPossibleFailure({
       route:           promptName,
@@ -1236,6 +1283,7 @@ app.post("/api/copilot", apiLimiter, async (req, res) => {
       response_length:  0,
       possible_failure: errFail,
       failure_reason:   errReason,
+      ...(retryAttempted && { retry_attempted: true }),
     });
     // SSE headers are already sent — respond with an error SSE event so the
     // frontend can stop streaming and display the message cleanly.

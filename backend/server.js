@@ -1293,18 +1293,22 @@ app.post("/api/copilot", apiLimiter, async (req, res) => {
 });
 
 // ── SBAR Generation ───────────────────────────────────────────────────────────
-const SBAR_SYSTEM_PROMPT = `You are drafting a short verbal SBAR exactly as a nurse would say it on a phone call — calm, natural, ready to use as written.
+const SBAR_SYSTEM_PROMPT = `You are drafting a short verbal SBAR communication support draft — concise, clear, and ready to use as written.
+
+This is a structured communication support tool for nurses, not a diagnostic or treatment tool.
 
 SECTION RULES:
-- SITUATION: 1 sentence. What's happening and why you're calling. Casual opener is fine: "Hey, I'm calling about..." or "Just wanted to loop you in on..."
+- SITUATION: 1 sentence. Factual and de-identified — what is happening and why you are calling. Casual opener is fine: "Hey, I'm calling about..." or "Just wanted to loop you in on..."
 - BACKGROUND: 1 sentence. The single most relevant piece of context. If context is limited, say so naturally — "No clear trigger so far" or "Still working it up."
-- ASSESSMENT: 1 sentence. A nursing-level concern only — "I'm concerned about this change," "Something isn't right," or "This is a significant change from baseline." Never name a differential diagnosis (no PE, sepsis, cardiac event, etc.).
-- RECOMMENDATION: 1 sentence. A calm, in-scope ask — "Can you take a look?" or "Would love your input on next steps." Never suggest specific orders, meds, or imaging.
+- ASSESSMENT: 1 sentence. An observational, nursing-level concern — framed without first-person authority or diagnostic certainty. Use phrases like: "This pattern raises concern for possible..." / "There is concern for a significant change from baseline." / "This may reflect..." Never say "I'm concerned" or "I think." Never name a diagnosis with certainty (do not say "this is sepsis" or "this is PE" — if a clinical concern must be named, say "this pattern raises concern for possible...").
+- RECOMMENDATION: 1 sentence. A calm, in-scope request for evaluation. Use phrases like: "Requesting provider evaluation." / "Would appreciate your input on next steps." / "Additional management can be guided based on your assessment and current protocol." Never say "I need you to," "do you want me to start," "should I give," "start fluids," "draw labs," "administer," or any specific treatment prompt.
 
 ABSOLUTE RULES — violations are not acceptable:
 - Never output bracketed text, placeholders, or fill-in instructions of any kind — no [insert...], no [patient name], no [brief history], nothing in brackets
 - Every word in the output must be usable as spoken — no template language, no meta-commentary
+- Never use first-person authority phrasing: no "I'm concerned," "I need you to," "I want you to"
 - Never use dramatic phrasing: no "immediately," "urgently," "I need you at the bedside now"
+- Never suggest specific treatments, medications, procedures, or orders in any section
 - No bullet points, no lists, no extra lines outside the four sections
 - Total length: short enough to say aloud in about 15 seconds
 
@@ -1355,11 +1359,22 @@ app.post("/api/sbar", apiLimiter, async (req, res) => {
       return m ? m[1].trim() : "";
     };
 
+    // ── SBAR safety post-processing ───────────────────────────────────────────
+    // Catch residual risky phrasing that may slip through the model instruction.
+    // Scoped strictly to SBAR output — does not touch any other response path.
+    const safeText = (t) => t
+      .replace(/\bI(?:'m| am) concerned about\b/gi,        "There is concern for possible")
+      .replace(/\bI need you to come assess\b/gi,           "Requesting provider evaluation")
+      .replace(/\bI need you to\b/gi,                       "Requesting provider evaluation —")
+      .replace(/\bdo you want me to start\b/gi,             "additional management can be guided regarding")
+      .replace(/\bdo you want me to draw\b/gi,              "additional workup can be guided regarding")
+      .replace(/\bshould I (?:start|give|draw|administer|bolus)\b/gi, "additional management can be reviewed for");
+
     const sbar = {
-      situation:      parseSection("SITUATION",      "BACKGROUND"),
-      background:     parseSection("BACKGROUND",     "ASSESSMENT"),
-      assessment:     parseSection("ASSESSMENT",     "RECOMMENDATION"),
-      recommendation: parseSection("RECOMMENDATION", null),
+      situation:      safeText(parseSection("SITUATION",      "BACKGROUND")),
+      background:     safeText(parseSection("BACKGROUND",     "ASSESSMENT")),
+      assessment:     safeText(parseSection("ASSESSMENT",     "RECOMMENDATION")),
+      recommendation: safeText(parseSection("RECOMMENDATION", null)),
     };
 
     res.json({ sbar });

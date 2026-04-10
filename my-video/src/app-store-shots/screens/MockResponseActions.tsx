@@ -55,7 +55,7 @@ export const MockResponseActions: React.FC = () => (
           fontStyle: "italic",
           margin: 0,
         }}>
-          That kind of change is worth escalating early.
+          That kind of change is something that may warrant early escalation depending on the clinical context.
         </p>
       </div>
 

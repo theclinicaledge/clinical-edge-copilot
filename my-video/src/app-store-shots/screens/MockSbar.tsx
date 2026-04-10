@@ -118,11 +118,11 @@ export const MockSbar: React.FC = () => (
         </SbarRow>
 
         <SbarRow initial="A" label="Assessment" rgbColor="242,185,75">
-          I'm concerned about septic shock. He's tachycardic, hypotensive, and his mental status has been slightly off today.
+          This pattern raises concern for possible septic shock given hypotension, tachycardia, and changes in mental status.
         </SbarRow>
 
         <SbarRow initial="R" label="Recommendation" rgbColor="31,191,117" last>
-          I need you to come assess him now. IV access is confirmed — do you want me to start fluids or draw additional labs?
+          Requesting provider evaluation. IV access is confirmed — additional management can be guided based on provider assessment and current protocol.
         </SbarRow>
 
       </div>

@@ -97,7 +97,7 @@ export const MockUrgencyHigh: React.FC = () => (
           lineHeight: 1.55,
           fontWeight: 500,
         }}>
-          This pattern is often associated with acute clinical deterioration and typically prompts urgent bedside evaluation and escalation based on institutional protocol.
+          This pattern is often associated with acute clinical deterioration and is commonly linked with situations that require timely clinical attention based on institutional protocol.
         </span>
       </div>
 

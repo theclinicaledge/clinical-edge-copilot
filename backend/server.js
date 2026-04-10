@@ -1293,24 +1293,37 @@ app.post("/api/copilot", apiLimiter, async (req, res) => {
 });
 
 // ── SBAR Generation ───────────────────────────────────────────────────────────
-const SBAR_SYSTEM_PROMPT = `You are drafting a short verbal SBAR communication support draft — concise, clear, and ready to use as written.
+const SBAR_SYSTEM_PROMPT = `You are drafting a short SBAR that sounds exactly like a real nurse speaking on the phone to a provider — natural, conversational, and ready to use as written.
 
-This is a structured communication support tool for nurses, not a diagnostic or treatment tool.
+This is a communication support tool, not a diagnostic or treatment tool.
+
+TONE — this is the most important rule:
+Write the way a nurse would actually talk during a phone call. Slightly informal, plain language, short sentences. Nothing academic, nothing robotic. The whole thing should sound like something you would actually say, not something you would read off a form.
 
 SECTION RULES:
-- SITUATION: 1 sentence. Factual and de-identified — what is happening and why you are calling. Casual opener is fine: "Hey, I'm calling about..." or "Just wanted to loop you in on..."
-- BACKGROUND: 1 sentence. The single most relevant piece of context. If context is limited, say so naturally — "No clear trigger so far" or "Still working it up."
-- ASSESSMENT: 1 sentence. An observational, nursing-level concern — framed without first-person authority or diagnostic certainty. Use phrases like: "This pattern raises concern for possible..." / "There is concern for a significant change from baseline." / "This may reflect..." Never say "I'm concerned" or "I think." Never name a diagnosis with certainty (do not say "this is sepsis" or "this is PE" — if a clinical concern must be named, say "this pattern raises concern for possible...").
-- RECOMMENDATION: 1 sentence. A calm, in-scope request for evaluation. Use phrases like: "Requesting provider evaluation." / "Would appreciate your input on next steps." / "Additional management can be guided based on your assessment and current protocol." Never say "I need you to," "do you want me to start," "should I give," "start fluids," "draw labs," "administer," or any specific treatment prompt.
 
-ABSOLUTE RULES — violations are not acceptable:
-- Never output bracketed text, placeholders, or fill-in instructions of any kind — no [insert...], no [patient name], no [brief history], nothing in brackets
-- Every word in the output must be usable as spoken — no template language, no meta-commentary
-- Never use first-person authority phrasing: no "I'm concerned," "I need you to," "I want you to"
-- Never use dramatic phrasing: no "immediately," "urgently," "I need you at the bedside now"
-- Never suggest specific treatments, medications, procedures, or orders in any section
+SITUATION: 1–2 short sentences. Natural opener — what is happening and why you are calling.
+Good openers: "Hey, calling about..." / "Just wanted to loop you in..." / "I'm seeing something with one of my patients..."
+
+BACKGROUND: 1 short sentence. Only the most relevant context. Nothing extra.
+If limited: "Still working it up" or "No clear trigger so far."
+
+ASSESSMENT: 1–2 short sentences. Plain spoken observation — what you are noticing at the bedside. Not diagnostic.
+Good phrasing: "HR has been really elevated and the pressure is dropping." / "He is looking a lot more lethargic than before." / "Something just feels off — a significant change from earlier."
+Do NOT write: "This pattern raises concern for possible..." / "There is concern for..." / "This may reflect..." / "This indicates..." / "This suggests..."
+
+RECOMMENDATION: 1 short sentence. A calm non-directive request for input.
+Good phrasing: "Wanted to get your input." / "Wanted to update you and see how you would like to proceed." / "Wanted to check in before continuing."
+Do NOT write: "Requesting provider evaluation" / "I need you to..." / "Start fluids" / "Draw labs" / "Should I give..."
+
+ABSOLUTE RULES:
+- No bracketed placeholders, no fill-in text, no template language
+- Every word must be speakable exactly as written
+- No diagnostic certainty — do not say "this is sepsis," "this is a PE"
+- No treatment suggestions, medication orders, or specific procedure prompts
+- No "I am concerned" / "I need you to" / "I need you at the bedside"
 - No bullet points, no lists, no extra lines outside the four sections
-- Total length: short enough to say aloud in about 15 seconds
+- Total length: speakable in about 20–30 seconds
 
 Output ONLY the four labeled sections, each on its own line, with content immediately following the label.
 
@@ -1363,12 +1376,15 @@ app.post("/api/sbar", apiLimiter, async (req, res) => {
     // Catch residual risky phrasing that may slip through the model instruction.
     // Scoped strictly to SBAR output — does not touch any other response path.
     const safeText = (t) => t
-      .replace(/\bI(?:'m| am) concerned about\b/gi,        "There is concern for possible")
-      .replace(/\bI need you to come assess\b/gi,           "Requesting provider evaluation")
-      .replace(/\bI need you to\b/gi,                       "Requesting provider evaluation —")
-      .replace(/\bdo you want me to start\b/gi,             "additional management can be guided regarding")
-      .replace(/\bdo you want me to draw\b/gi,              "additional workup can be guided regarding")
-      .replace(/\bshould I (?:start|give|draw|administer|bolus)\b/gi, "additional management can be reviewed for");
+      .replace(/\bI(?:'m| am) concerned about\b/gi,                   "I'm noticing some changes with")
+      .replace(/\bThis pattern raises concern for possible\b/gi,       "Something's been off with")
+      .replace(/\bThere is concern for possible\b/gi,                  "I'm seeing something that could be")
+      .replace(/\bRequesting provider evaluation\.?\b/gi,              "Wanted to get your input.")
+      .replace(/\bI need you to come assess\b/gi,                      "Wanted to get your eyes on this")
+      .replace(/\bI need you to\b/gi,                                  "Wanted to check —")
+      .replace(/\bdo you want me to start\b/gi,                        "wanted to check how you'd like to proceed with")
+      .replace(/\bdo you want me to draw\b/gi,                         "wanted to check if you'd like")
+      .replace(/\bshould I (?:start|give|draw|administer|bolus)\b/gi,  "wanted to check about");
 
     const sbar = {
       situation:      safeText(parseSection("SITUATION",      "BACKGROUND")),

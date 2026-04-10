@@ -110,19 +110,19 @@ export const MockSbar: React.FC = () => (
         </div>
 
         <SbarRow initial="S" label="Situation" rgbColor="0,194,209">
-          BP dropped to 88/50 and HR is 122. He was stable about an hour ago — this happened fast.
+          Hey, calling about one of my patients — BP dropped to 88/50 and HR is up to 122. He was stable an hour ago.
         </SbarRow>
 
         <SbarRow initial="B" label="Background" rgbColor="77,163,255">
-          67-year-old with pneumonia, on IV fluids and antibiotics. No recent procedures or medication changes.
+          67-year-old, admitted for pneumonia, on IV fluids and antibiotics.
         </SbarRow>
 
         <SbarRow initial="A" label="Assessment" rgbColor="242,185,75">
-          This pattern raises concern for possible septic shock given hypotension, tachycardia, and changes in mental status.
+          He is looking a lot more lethargic and his pressure just is not sitting right. Something feels off from earlier.
         </SbarRow>
 
         <SbarRow initial="R" label="Recommendation" rgbColor="31,191,117" last>
-          Requesting provider evaluation. IV access is confirmed — additional management can be guided based on provider assessment and current protocol.
+          Wanted to get your input and see how you would like to proceed.
         </SbarRow>
 
       </div>

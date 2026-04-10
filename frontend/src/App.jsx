@@ -1146,7 +1146,7 @@ export default function App() {
           marginTop: 0,
         }}>
           Good for thinking it through — especially right before you call.{" "}
-          <span style={{ color: "rgba(168,193,204,0.42)" }}>Also useful after report, when you're sorting out what needs attention first.</span>
+          <span style={{ color: "rgba(168,193,204,0.42)" }}>Also useful right after report — when you're sorting out what actually matters first.</span>
         </div>
 
         {/* Guidance chips — lightweight, no mode-locking */}
@@ -1600,17 +1600,6 @@ export default function App() {
                 </div>
               </div>
             )}
-
-            {/* ── Response disclaimer footer ─────────────────────────────── */}
-            <div style={{
-              marginTop: 14,
-              fontSize: 11,
-              color: "rgba(168,193,204,0.28)",
-              lineHeight: 1.55,
-              textAlign: "center",
-            }}>
-              For educational support only. Use your clinical judgment and follow local protocol.
-            </div>
 
             {/* ── Continue Thinking ─────────────────────────────────────── */}
             <div style={{

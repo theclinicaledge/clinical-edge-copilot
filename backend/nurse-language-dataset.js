@@ -107,6 +107,80 @@ const ABBREVIATION_EXPANSIONS = [
   [/\btb\b/g,                       "tuberculosis"],
   [/\bppe\b/g,                      "personal protective equipment"],
   [/\bn95\b/g,                      "n95 respirator"],
+
+  // ── Post-op / surgical shorthand ─────────────────────────────────────────
+  [/\bpacu\b/gi,                           "post anesthesia care unit"],
+  [/\bpod\s*(\d+)\b/gi,                    "post op day $1"],
+  [/\bpod\b/gi,                            "post op day"],
+  [/\bfresh\s+post\s*op\b/gi,              "fresh post op patient from pacu"],
+  [/\bsbo\b/gi,                            "small bowel obstruction"],
+  [/\bileus\b/gi,                          "ileus bowel obstruction"],
+  [/\bng\s*tube\s+output\b/gi,             "nasogastric tube output"],
+  [/\bjp\s+drain\b/gi,                     "jackson pratt drain"],
+  [/\bhemovac\b/gi,                        "hemovac drain"],
+  [/\bpigtail\b/gi,                        "pigtail drain catheter"],
+
+  // ── ABG / Respiratory shorthand ──────────────────────────────────────────
+  [/\babg\b/gi,                            "arterial blood gas"],
+  [/\bvbg\b/gi,                            "venous blood gas"],
+  [/\bpco2\b/gi,                           "pCO2 carbon dioxide"],
+  [/\bpo2\b/gi,                            "pO2 oxygen partial pressure"],
+  [/\bfio2\s+(\d+)%?/gi,                  "FiO2 $1 percent"],
+  [/\bra\b/g,                              "room air"],
+  [/\bon\s+ra\b/gi,                        "on room air"],
+  [/\bnrb\b/gi,                            "non rebreather mask"],
+  [/\bhfnc\b/gi,                           "high flow nasal cannula"],
+  [/\bwob\b/gi,                            "work of breathing"],
+  [/\bresp\s+acidosis\b/gi,               "respiratory acidosis"],
+  [/\bmet\s+acidosis\b/gi,                "metabolic acidosis"],
+  [/\bresp\s+alkalosis\b/gi,              "respiratory alkalosis"],
+  [/\bmet\s+alkalosis\b/gi,               "metabolic alkalosis"],
+  [/\bcomp(ensated|ensation)?\b/gi,       "compensated"],
+  [/\bpe\b/g,                              "pulmonary embolism"],
+
+  // ── Medication administration shorthand ──────────────────────────────────
+  // Route / access
+  [/\bpiv\b/gi,                           "peripheral intravenous access"],
+  [/\bcentral\s+access\b/gi,              "central venous access"],
+  [/\bperipheral\s+iv\b/gi,               "peripheral intravenous access"],
+  // Y-site / compatibility
+  [/\by[-\s]?site\b/gi,                   "y site compatibility"],
+  // Drug monitoring
+  [/\bvanco\s+trough\b/gi,               "vancomycin trough level"],
+  [/\bpeak\s+and\s+trough\b/gi,          "peak and trough drug monitoring"],
+  [/\bgentamicin\s+trough\b/gi,          "gentamicin trough level"],
+  [/\bamikacin\s+trough\b/gi,            "amikacin trough level"],
+  // Drip / infusion shorthand
+  [/\bhep\s+(gtt|drip)\b/gi,             "heparin infusion"],
+  [/\binsulin\s+gtt\b/gi,                "insulin infusion"],
+  [/\bnitroglycerin\s+gtt\b/gi,          "nitroglycerin infusion"],
+  [/\bntg\s+gtt\b/gi,                    "nitroglycerin infusion"],
+  [/\bntg\b/g,                            "nitroglycerin"],
+  // Push / bolus shorthand
+  [/\biv\s+push\b/gi,                    "intravenous push"],
+  [/\bivp\b/g,                            "intravenous push"],
+
+  // ── Patient subject (nursing universal shorthand) ─────────────────────────
+  // Note: "pt" → "patient" is now handled in normalizeAbbreviations() directly
+  // so it applies before both routing and dataset expansions. Listed here for
+  // documentation and dataset completeness only.
+
+  // ── Safety / monitoring / precautions shorthand ──────────────────────────
+  // "SI precautions" → suicide self-harm precautions (longer form first)
+  [/\bsi\s+precautions?\b/gi,       "suicide self-harm precautions"],
+  // Neuro check frequency — "q2 neuro", "neuro q4h", etc.
+  [/\bq1\s*h?\s+neuro\b/gi,         "q1 hour neuro checks"],
+  [/\bq2\s*h?\s+neuro\b/gi,         "q2 hour neuro checks"],
+  [/\bq4\s*h?\s+neuro\b/gi,         "q4 hour neuro checks"],
+  [/\bneuro\s+q\s*1\s*h?\b/gi,      "q1 hour neuro checks"],
+  [/\bneuro\s+q\s*2\s*h?\b/gi,      "q2 hour neuro checks"],
+  [/\bneuro\s+q\s*4\s*h?\b/gi,      "q4 hour neuro checks"],
+  // 1:1 observation shorthand
+  [/\b1:1\s+(?:obs|observation)\b/gi, "one to one observation sitter"],
+  [/\b1:1\b/g,                        "one to one observation"],
+  // Restraint shorthand
+  [/\bsoft\s+wrist\s+restraints?\b/gi, "soft wrist restraints"],
+  [/\bwrist\s+restraints?\b/gi,        "wrist restraints"],
 ];
 
 
@@ -200,6 +274,27 @@ const NURSE_PRACTICAL_PATTERNS = [
   /\bprecautions?\?*\s*$/,
   /\bisolation\?*\s*$/,
 
+  // ── Safety / Restraints / Sitter / Precautions / Monitoring ─────────────────
+  // Bare "restraints?" — e.g. "restraints what to watch", "soft wrist restraints"
+  /\brestraints?\b/,
+  // "sitter" — 1:1 observation questions
+  /\bsitter\b/,
+  // Named safety precautions — "seizure precautions", "fall precautions", etc.
+  /\b(seizure|fall|aspiration|suicide|self.harm|neutropenic)\s+precautions?\b/,
+  // Neuro check questions — "q2 neuro checks", "neuro q4", "neuro assessments"
+  /\bneuro\s+(checks?|q\s*\d|assessments?|monitoring)\b/,
+  /\bq\s*\d+\s*h?\s+neuro\b/,
+  // "what matters with / for / in" — common nurse phrasing for these questions
+  /\bwhat\s+matters?\s+(with|for|in)\b/,
+  // "what do I have to take into consideration" / "what should I be paying attention to"
+  /\bwhat\s+do\s+i\s+have\s+to\s+take\s+into\s+consideration\b/,
+  /\bwhat\s+should\s+i\s+be\s+paying\s+attention\b/,
+  // "bedside monitoring" / "order renewal" awareness questions
+  /\bbedside\s+monitoring\b/,
+  /\border\s+renewal\b/,
+  // 1:1 observation bare noun phrase (after normalization)
+  /\bone\s+to\s+one\s+observation\b/,
+
   // ── Wound Care / Skin Care / Dressings ───────────────────────────────────────
   // "[product/type] dressing" bare noun phrase — "skin tear dressing", "foam dressing"
   /\b\S+\s+dressing\b/,
@@ -265,6 +360,36 @@ const REWORDING_EQUIVALENTS = {
   "mrsa precautions":                           "mrsa — contact precautions and PPE requirements",
   "rsv precautions":                            "respiratory syncytial virus — droplet and contact precautions",
   "what ppe for shingles":                      "shingles PPE — gown, gloves, N95 if lesions not covered",
+  // ── Post-op reasoning ─────────────────────────────────────────────────────
+  "just got a fresh post op from pacu what matters first": "fresh post-op priorities — airway, hemodynamics, pain/sedation, surgical site, drain output, urine output",
+  "post op day 1 urine output low":                        "post-op day 1 low urine output — expected vs concerning, perfusion context",
+  "drain output bright red and increasing":                "post-op drain — bright red increasing output, concern for active bleeding",
+  "post op pain but rr 8":                                 "post-op respiratory depression — pain vs over-sedation, airway and opioid context",
+  "post op ileus what am i looking at":                    "post-op ileus — expected GI slowing vs obstruction, monitoring considerations",
+  "post op pale tachycardic bp drifting":                  "post-op hemodynamic compromise — bleeding, volume depletion, or other causes",
+  "sedation vs pain post op":                              "post-op mentation — distinguishing residual sedation, pain, and deterioration",
+  "post op confused not waking up":                        "post-op altered mentation — sedation, hypoxia, hemodynamic, or other causes",
+
+  // ── Medication administration practicalities ──────────────────────────────
+  "can i give mag through a peripheral":     "magnesium sulfate peripheral IV administration — osmolarity and vein irritation considerations",
+  "how fast can i push potassium":           "potassium IV push rate — cardiac risk and rate safety considerations",
+  "can i run these together y-site":         "y-site compatibility — how to check and when pharmacy guidance applies",
+  "does this need central access":           "central vs peripheral IV access — which medications require or prefer central",
+  "what matters if vanco trough is high":    "vancomycin supratherapeutic trough — clinical significance and next steps",
+  "heparin drip ptt 140 what does that mean": "supratherapeutic PTT on heparin infusion — clinical significance",
+  "insulin due but not eating":              "insulin administration with poor oral intake — safety considerations and hold parameter awareness",
+
+  // ── Safety / restraints / sitter / precautions / monitoring ─────────────
+  "restraints what to watch":            "soft restraint monitoring — circulation, skin, behavior, reassessment needs",
+  "soft wrist restraints what to watch": "soft wrist restraints — circulation, skin integrity, limb position, ongoing reassessment",
+  "what matters with seizure precautions": "seizure precautions — environment safety, monitoring, and nursing considerations",
+  "fall precautions patient keeps getting up": "fall precautions with persistent mobility attempts — nursing response and safety planning",
+  "aspiration precautions what to watch":    "aspiration precautions — positioning, feeding considerations, and monitoring",
+  "suicide precautions what matters most":   "suicide/self-harm precautions — environment safety, monitoring, and communication",
+  "what matters with a sitter":              "1:1 sitter observation — monitoring role, escalation triggers, nursing communication",
+  "q2 neuro checks what matters":            "q2 hour neuro assessments — components, significant changes, and provider notification",
+  "patient on restraints what to consider":  "restraint monitoring — circulation, skin, behavior, order renewal, documentation awareness",
+
   // ── Wound care / skin care / dressings ───────────────────────────────────
   "is mepilex good to cover blisters":          "mepilex foam dressing — appropriate use for blister coverage",
   "can i use mepilex for blister":              "mepilex — blister dressing selection",

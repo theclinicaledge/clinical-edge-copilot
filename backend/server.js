@@ -161,6 +161,9 @@ Explicitly banned output patterns and required replacements:
 - "Notify now" / "Escalate now" / "Call now" → "Situations like this are often brought to the team's attention promptly."
 - "Give [medication]" / "Hold [medication]" as a standalone directive → "Whether to continue or hold this typically depends on..."
 - "Dilute appropriately" → "Dilution requirements for this medication are typically confirmed with pharmacy or the current drug label..."
+- "The first step is..." / "First, you should..." / "Stopping [X] is typically the first step" → "Management of this is often approached by first clarifying..." / "This kind of situation is commonly handled by..."
+- "Verify it fast" / "Get the team on the phone" → "This pattern is often treated as higher urgency and may prompt provider awareness and team-level attention."
+- "First, do X" / "You need to X" / any sentence beginning with an action verb directed at the nurse → reframe as observation, clinical context, or what tends to matter in this situation
 
 DIAGNOSTIC HUMILITY:
 Guide reasoning — don't declare diagnoses.
@@ -281,6 +284,9 @@ BANNED PATTERN REPLACEMENTS — use these when the clinical concept is relevant:
 - "Notify now" / "Escalate now" → "Situations like this are often brought to the team's attention promptly."
 - "Give / Hold [medication]" as directive → "Whether to continue or hold this typically depends on..."
 - "Dilute appropriately" → "Dilution requirements are typically confirmed with pharmacy or the current drug label..."
+- "The first step is..." / "Stopping [X] is typically the first step" → "Management of this kind of situation is often approached by clarifying..." / "This is commonly handled by first..."
+- "Verify it fast" / "Get the team on the phone" → "This pattern may prompt team-level awareness depending on the context."
+- "First, do X" / any sentence that structures a treatment sequence → reframe around what tends to matter clinically, what the situation often involves, or what the team would typically want to know
 
 APPROVED LANGUAGE PATTERNS:
 - "One of the main things to sort out here is..."
@@ -619,6 +625,9 @@ Explicitly banned output patterns and required replacements:
 - "Give [medication]" / "Hold [medication]" as a standalone directive → "Whether to continue or hold this typically depends on..."
 - "Dilute appropriately" → "Dilution requirements for this medication are typically confirmed with pharmacy or the current drug label..."
 - "Check [X]" as a command bullet → "It can be helpful to look at [X] in this context..." or frame as an observational question
+- "The first step is..." / "Stopping [X] is typically the first step" → "Management of this is typically approached by..." / "This is commonly handled by first clarifying..."
+- "Verify it fast" / "Get the team on the phone" → "This pattern is often treated as higher urgency and may prompt provider awareness."
+- Treatment sequences ("first..., then..., next...") → reframe as what tends to matter clinically, what the situation often involves, or what the team would typically want to be aware of
 
 STYLE EXAMPLES
 
@@ -1120,6 +1129,78 @@ function isQuickKnowledge(question) {
   return knowledgePatterns.some((p) => p.test(qNorm));
 }
 
+// ── Hard urgency override ─────────────────────────────────────────────────────
+// Deterministic pre-generation check for unmistakably dangerous presentations.
+// Returns "HIGH" to trigger prompt-level override injection before streaming.
+// Conservative — only fires on clearly critical patterns, not borderline scenarios.
+function getUrgencyOverride(question) {
+  const q = question.toLowerCase().trim();
+  return (
+    // Critically low BP fragments — bp 70/40, bp 60/30, etc.
+    /\bbp\s+(of\s+)?[5-7]\d\/[1-4]\d\b/.test(q) ||
+    q.includes("bp 70/") || q.includes("bp 60/") || q.includes("bp 50/") ||
+    q.includes("profoundly hypotensive") || q.includes("profound hypotension") ||
+    q.includes("severely hypotensive") ||
+    // Critically low O2 sats in the 60s-70s and low 80s
+    /\b(sat|sats|spo2)\s*(is\s+|at\s+|of\s+)?[6-7]\d\b/.test(q) ||
+    /\b(sat|sats|spo2)\s*(is\s+|at\s+|of\s+)?8[0-2]\b/.test(q) ||
+    // Crash / code language
+    q.includes("patient crashing") || q.includes("pt crashing") || q.includes("is crashing") ||
+    q.includes("code blue") || q.includes("calling a code") ||
+    q.includes("not breathing") || q.includes("stopped breathing") || q.includes("no breathing") ||
+    q.includes("agonal") ||
+    q.includes("pulseless") || q.includes("no pulse") ||
+    q.includes("cardiac arrest") || q.includes("respiratory arrest") ||
+    q.includes("found unresponsive")
+  ) ? "HIGH" : null;
+}
+
+// ── Crash input detection ─────────────────────────────────────────────────────
+// Returns true for extreme emergency language. Used to activate the structured
+// crash fallback when the model response is empty or near-empty.
+function isCrashInput(question) {
+  const q = question.toLowerCase().trim();
+  return (
+    q.includes("patient crashing") || q.includes("pt crashing") || q.includes("is crashing") ||
+    (q.includes("crashing") && (q.includes("what do i do") || q.includes("what should i do"))) ||
+    q.includes("code blue") || q.includes("calling a code") || q.includes("coding") ||
+    q.includes("not breathing") || q.includes("stopped breathing") || q.includes("no breathing") ||
+    q.includes("agonal") ||
+    q.includes("pulseless") || q.includes("no pulse") ||
+    q.includes("cardiac arrest") || q.includes("respiratory arrest") ||
+    q.includes("found unresponsive")
+  );
+}
+
+// ── Structured crash fallback text ───────────────────────────────────────────
+// Apple-safe structured response for extreme emergency inputs when model
+// generation fails or returns an empty / near-empty response.
+const CRASH_FALLBACK_TEXT = `Urgency Level: HIGH
+
+⚠️ This type of presentation is often treated as an immediate clinical emergency requiring rapid team awareness and escalation through local emergency pathways.
+
+**What this could be**
+Sudden clinical deterioration can reflect airway compromise, respiratory failure, hemodynamic collapse, arrhythmia, or another rapidly evolving emergency.
+
+**Possible concerns**
+› Changes in responsiveness, breathing pattern, circulation, and overall appearance carry the most weight here
+› Situations described this way are commonly treated as requiring immediate team-level attention
+› The speed of change is itself a major concern
+
+**What to assess next**
+› Responsiveness, breathing effort, skin color, pulse quality, and any obvious change from baseline
+› Whether the current state reflects a true sudden decline or worsening trend already in motion
+› What support is already in place and who is already aware
+
+**Where this may be heading**
+› Without rapid intervention, this type of deterioration can progress toward respiratory or cardiac arrest
+› Situations like this are typically managed through urgent escalation pathways already defined by local protocol
+
+**Closing**
+This kind of change is generally treated as something that needs immediate team awareness.
+
+For educational support only. Use your clinical judgment and follow local protocol.`;
+
 // ── Input-based prompt routing ────────────────────────────────────────────────
 //
 // Priority order (simplified opt-out architecture):
@@ -1312,11 +1393,26 @@ app.post("/api/copilot", apiLimiter, async (req, res) => {
   let selectedPrompt = detectPrompt(question.trim(), mode);
   if (isFollowUp === true) selectedPrompt = FOLLOW_UP_PREFIX + selectedPrompt;
 
+  // ── promptName must be derived before any prompt mutation ──────────────────
   const promptName =
-    selectedPrompt === DEEP_SYSTEM_PROMPT  ? "DEEP_SYSTEM_PROMPT"  :
-    selectedPrompt === QUICK_SYSTEM_PROMPT ? "QUICK_SYSTEM_PROMPT" :
-    selectedPrompt === EXAM_SYSTEM_PROMPT  ? "EXAM_SYSTEM_PROMPT"  :
+    selectedPrompt.includes(DEEP_SYSTEM_PROMPT)  ? "DEEP_SYSTEM_PROMPT"  :
+    selectedPrompt.includes(QUICK_SYSTEM_PROMPT) ? "QUICK_SYSTEM_PROMPT" :
+    selectedPrompt.includes(EXAM_SYSTEM_PROMPT)  ? "EXAM_SYSTEM_PROMPT"  :
     "QUICK_KNOWLEDGE_PROMPT";
+
+  // ── Hard urgency override injection ────────────────────────────────────────
+  // If the question matches clearly critical patterns, prepend a hard instruction
+  // forcing HIGH urgency before the model generates a single token.
+  // Runs AFTER promptName is assigned so logging is not affected.
+  const urgencyOverrideLevel = getUrgencyOverride(question.trim());
+  if (urgencyOverrideLevel === "HIGH") {
+    selectedPrompt =
+      `URGENCY OVERRIDE — MANDATORY: This input describes a clearly high-urgency presentation. ` +
+      `Your response MUST begin with exactly:\nUrgency Level: HIGH\n` +
+      `Do not output MODERATE or LOW urgency for this response under any circumstances.\n\n` +
+      selectedPrompt;
+    console.log(`[URGENCY-OVERRIDE] HIGH forced | input: ${question.trim().slice(0, 80)}`);
+  }
 
   // ── Pre-compute log fields before streaming starts ──────────────────────
   // input_redacted: PHI already blocked above; this strips any residual patterns
@@ -1363,33 +1459,43 @@ app.post("/api/copilot", apiLimiter, async (req, res) => {
   };
 
   try {
-    // ── First attempt ─────────────────────────────────────────────────────
-    try {
-      await callStream();
-    } catch (firstErr) {
-      // Only retry on overload and only if no content has been sent yet
-      // (partial content already on the wire cannot be safely retried).
-      if (!isOverloadError(firstErr) || fullResponse.length > 0) throw firstErr;
-
-      retryAttempted = true;
-      console.warn("[Clinical Edge] Anthropic overloaded — retrying once.");
-      await new Promise((resolve) => setTimeout(resolve, 300));
-
-      // ── Single retry ───────────────────────────────────────────────────
+    // ── Crash shortcut: return structured fallback immediately, skip streaming ──
+    // Only fires for unmistakably extreme emergency language ("patient crashing",
+    // "not breathing", "code blue", etc.) — not for normal high-risk queries.
+    if (isCrashInput(question.trim())) {
+      fallbackUsed = true;
+      fullResponse = CRASH_FALLBACK_TEXT;
+      res.write(`data: ${JSON.stringify({ text: CRASH_FALLBACK_TEXT })}\n\n`);
+      console.log("[CRASH-FALLBACK] Returned structured response — skipped streaming.");
+    } else {
+      // ── First attempt ───────────────────────────────────────────────────
       try {
         await callStream();
-      } catch (retryErr) {
-        if (!isOverloadError(retryErr)) throw retryErr;
+      } catch (firstErr) {
+        // Only retry on overload and only if no content has been sent yet
+        // (partial content already on the wire cannot be safely retried).
+        if (!isOverloadError(firstErr) || fullResponse.length > 0) throw firstErr;
 
-        // Both attempts overloaded — send a graceful fallback instead of
-        // a hard error. Slightly stronger language for deterioration cases.
-        fallbackUsed = true;
-        const fallbackText =
-          category === "deterioration"
-            ? "Something interrupted the full response, but changes like this can carry clinical significance and may warrant closer attention in context.\n\nFor educational support only. Use your clinical judgment and follow local protocol."
-            : "Something interrupted the full response, but this still appears to be a situation worth thinking through carefully in clinical context.\n\nFor educational support only. Use your clinical judgment and follow local protocol.";
-        fullResponse = fallbackText;
-        res.write(`data: ${JSON.stringify({ text: fallbackText })}\n\n`);
+        retryAttempted = true;
+        console.warn("[Clinical Edge] Anthropic overloaded — retrying once.");
+        await new Promise((resolve) => setTimeout(resolve, 300));
+
+        // ── Single retry ─────────────────────────────────────────────────
+        try {
+          await callStream();
+        } catch (retryErr) {
+          if (!isOverloadError(retryErr)) throw retryErr;
+
+          // Both attempts overloaded — send a graceful fallback instead of
+          // a hard error. Slightly stronger language for deterioration cases.
+          fallbackUsed = true;
+          const fallbackText =
+            category === "deterioration"
+              ? "Something interrupted the full response, but changes like this can carry clinical significance and may warrant closer attention in context.\n\nFor educational support only. Use your clinical judgment and follow local protocol."
+              : "Something interrupted the full response, but this still appears to be a situation worth thinking through carefully in clinical context.\n\nFor educational support only. Use your clinical judgment and follow local protocol.";
+          fullResponse = fallbackText;
+          res.write(`data: ${JSON.stringify({ text: fallbackText })}\n\n`);
+        }
       }
     }
 
@@ -1417,8 +1523,9 @@ app.post("/api/copilot", apiLimiter, async (req, res) => {
       response_length:  fullResponse.length,
       possible_failure,
       failure_reason,
-      ...(retryAttempted && { retry_attempted: true }),
-      ...(fallbackUsed    && { fallback_used:   true }),
+      ...(retryAttempted          && { retry_attempted:    true }),
+      ...(fallbackUsed            && { fallback_used:      true }),
+      ...(urgencyOverrideLevel    && { urgency_override:   urgencyOverrideLevel }),
     });
 
     // Signal stream completion

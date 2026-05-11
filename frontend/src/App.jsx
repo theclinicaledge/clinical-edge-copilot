@@ -957,7 +957,7 @@ export default function App() {
 
           {/* Learn more — right-aligned */}
           <div style={{ marginLeft: "auto", display: "flex", alignItems: "center", gap: 12 }}>
-            <
+            <a
               href="/#/landing"
               style={{
                 fontSize: 12,

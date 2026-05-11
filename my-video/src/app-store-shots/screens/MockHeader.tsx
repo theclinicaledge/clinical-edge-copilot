@@ -44,20 +44,8 @@ export const MockHeader: React.FC = () => (
       </div>
     </div>
 
-    {/* BETA + Learn more — right-aligned */}
-    <div style={{ marginLeft: "auto", display: "flex", alignItems: "center", gap: 12 * S }}>
-      <div style={{
-        border: `1px solid ${C.teal}`,
-        color: C.teal,
-        fontFamily: MONO,
-        fontSize: 10 * S,
-        fontWeight: 600,
-        padding: `${3 * S}px ${8 * S}px`,
-        borderRadius: 999,
-        letterSpacing: "0.05em",
-      }}>
-        BETA
-      </div>
+    {/* Learn more — right-aligned */}
+    <div style={{ marginLeft: "auto", display: "flex", alignItems: "center" }}>
       <div style={{
         color: "rgba(168,193,204,0.5)",
         fontFamily: SANS,

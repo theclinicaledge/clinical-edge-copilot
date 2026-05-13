@@ -974,7 +974,7 @@ export default function App() {
       </div>
 
       {/* ── Warm clinical workspace ──────────────────────────────────────── */}
-      <div style={{ background: "#F0EDE6", minHeight: "100vh" }}>
+      <div style={{ background: "#E9E3D8", minHeight: "100vh" }}>
 
       {/* ── Main ─────────────────────────────────────────────────────────── */}
       <div className="main-container" style={{ maxWidth: 800, margin: "0 auto", width: "100%", padding: "40px 20px 0", display: "flex", flexDirection: "column", alignItems: "stretch" }}>
@@ -1092,7 +1092,7 @@ export default function App() {
           }}>
             <span style={{
               fontSize: 11,
-              color: "#526174",
+              color: "rgba(240,237,230,0.40)",
               fontFamily: "'IBM Plex Mono', monospace",
             }}>
               &#8984; + Enter
@@ -1114,7 +1114,7 @@ export default function App() {
                 alignItems: "center",
                 gap: 8,
                 letterSpacing: "-0.1px",
-                boxShadow: (!question.trim() || isActive) ? "none" : "0 3px 12px rgba(0,194,209,0.2)",
+                boxShadow: (!question.trim() || isActive) ? "none" : "0 2px 8px rgba(0,194,209,0.15)",
                 transition: "all 0.18s",
               }}
             >
@@ -1151,8 +1151,8 @@ export default function App() {
             {CONTEXT_CHIPS.map(({ label }) => (
               <span key={label} style={{
                 background: "transparent",
-                border: "1px solid #2D3B4E",
-                color: "#94A3B8",
+                border: "1px solid #C4BDB5",
+                color: "#526174",
                 borderRadius: 999,
                 padding: "3px 10px",
                 fontSize: 11.5,
@@ -1169,8 +1169,8 @@ export default function App() {
 
         {/* Privacy notice */}
         <div className="privacy-notice" style={{
-          background: "#FBF7EE",
-          border: "1px solid rgba(212,168,75,0.25)",
+          background: "#FFFDF8",
+          border: "1px solid rgba(212,168,75,0.30)",
           borderLeft: "3px solid #D4A84B",
           borderRadius: 8,
           padding: "12px 15px",
@@ -1222,10 +1222,10 @@ export default function App() {
                   className="chip"
                   onClick={() => { track("recent_case_clicked"); runQuery(item); }}
                   style={{
-                    background: "rgba(10,191,188,0.10)",
-                    border: "1px solid rgba(10,191,188,0.30)",
+                    background: "#DDD6CA",
+                    border: "1px solid #C4BDB5",
                     boxShadow: "none",
-                    color: "#0ABFBC",
+                    color: "#111827",
                     padding: "0 12px",
                     height: 28,
                     borderRadius: 999,

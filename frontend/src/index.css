@@ -26,3 +26,24 @@ body {
   background: #2D3B4E;
   border-radius: 3px;
 }
+
+/* Textarea placeholder — muted warm-white on dark input card */
+textarea::placeholder {
+  color: rgba(240, 237, 230, 0.35);
+}
+
+/* Mobile: tighten workspace padding and chip text */
+@media (max-width: 600px) {
+  .main-container {
+    padding-left: 14px !important;
+    padding-right: 14px !important;
+    padding-top: 28px !important;
+  }
+  .chip {
+    font-size: 12px !important;
+  }
+  .chips-recent .chip {
+    height: 26px !important;
+    padding: 0 10px !important;
+  }
+}

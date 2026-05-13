@@ -796,7 +796,7 @@ export default function App() {
         *, *::before, *::after { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
         body { margin: 0; background: #0B1F2A; -webkit-font-smoothing: antialiased; overscroll-behavior: none; -webkit-text-size-adjust: 100%; }
         textarea { outline: none; touch-action: pan-y; }
-        textarea::placeholder { color: #3A5B6E; }
+        textarea::placeholder { color: #94A3B8; }
         button { transition: all 0.15s ease; font-family: inherit; cursor: pointer; }
         ::-webkit-scrollbar { width: 4px; }
         ::-webkit-scrollbar-track { background: transparent; }
@@ -866,7 +866,7 @@ export default function App() {
             padding: 12px 14px !important;
             font-size: 13px !important;
             line-height: 1.4 !important;
-            color: rgba(233,186,75,0.82) !important;
+            color: #8A6A22 !important;
           }
           /* 3 + 4: Tighten hero spacing + pull input closer */
           .main-container { max-width: 800px !important; margin: 0 auto !important; padding: 24px 18px 0 !important; }
@@ -878,7 +878,7 @@ export default function App() {
             line-height: 1.35 !important;
             letter-spacing: -0.01em !important;
             margin: 0 0 6px !important;
-            color: rgba(230,238,242,0.88) !important;
+            color: #526174 !important;
           }
           /* Subline — hidden on mobile (redundant at small size; visible on desktop) */
           .hero p:last-of-type {
@@ -887,6 +887,14 @@ export default function App() {
           /* 5: Reduce chip density — show max 3 per section */
           .chips-recent button:nth-child(n+4) { display: none !important; }
           .chips-try button:nth-child(n+4) { display: none !important; }
+          /* Prevent recent case chips from overflowing their row */
+          .chips-recent button {
+            font-size: 13px !important;
+            max-width: 200px !important;
+            overflow: hidden !important;
+            text-overflow: ellipsis !important;
+            white-space: nowrap !important;
+          }
           /* Prevent iOS auto-zoom on textarea focus (requires font-size >= 16px) */
           textarea { font-size: 16px !important; }
         }
@@ -1103,7 +1111,7 @@ export default function App() {
               disabled={!question.trim() || isActive}
               style={{
                 background: (!question.trim() || isActive) ? "rgba(0,194,209,0.08)" : "#00C2D1",
-                color: (!question.trim() || isActive) ? "#3A5566" : "#0B1F2A",
+                color: (!question.trim() || isActive) ? "#94A3B8" : "#0B1F2A",
                 border: "none",
                 borderRadius: 8,
                 padding: "10px 22px",
@@ -1175,7 +1183,7 @@ export default function App() {
           borderRadius: 8,
           padding: "12px 15px",
           fontSize: 12,
-          color: "#7A5820",
+          color: "#8A6A22",
           marginBottom: 20,
           display: "flex",
           gap: 9,

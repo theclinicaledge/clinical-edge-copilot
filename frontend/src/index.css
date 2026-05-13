@@ -29,7 +29,7 @@ body {
 
 /* Textarea placeholder — muted warm-white on dark input card */
 textarea::placeholder {
-  color: rgba(240, 237, 230, 0.35);
+  color: #94A3B8;
 }
 
 /* Mobile: tighten workspace padding and chip text */

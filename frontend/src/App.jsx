@@ -175,7 +175,7 @@ function SectionCard({ title, content }) {
         padding: "14px 20px",
         marginTop: 10,
         marginBottom: 6,
-        background: "#F5F2EB",
+        background: "#FFFFFF",
         borderRadius: "0 8px 8px 0",
       }}>
         <p style={{
@@ -195,7 +195,7 @@ function SectionCard({ title, content }) {
   const lines = content.split("\n").filter((l) => l.trim());
   return (
     <div style={{
-      background: "#F0EDE6",
+      background: "#FFFFFF",
       border: "1px solid #D6D0C4",
       borderLeft: "3px solid " + cfg.accent,
       borderRadius: 8,
@@ -973,6 +973,9 @@ export default function App() {
         </div>
       </div>
 
+      {/* ── Warm clinical workspace ──────────────────────────────────────── */}
+      <div style={{ background: "#F0EDE6", minHeight: "100vh" }}>
+
       {/* ── Main ─────────────────────────────────────────────────────────── */}
       <div className="main-container" style={{ maxWidth: 800, margin: "0 auto", width: "100%", padding: "40px 20px 0", display: "flex", flexDirection: "column", alignItems: "stretch" }}>
 
@@ -982,17 +985,17 @@ export default function App() {
             fontFamily: "'Inter', sans-serif",
             fontWeight: 800,
             fontSize: "clamp(24px, 5.5vw, 36px)",
-            color: "#F0EDE6",
+            color: "#111827",
             margin: "0 0 16px",
             lineHeight: 1.1,
             letterSpacing: "-0.04em",
           }}>
             Clinical reasoning support. Built for nurses.
           </h1>
-          <p style={{ fontSize: "clamp(15px, 3.5vw, 17px)", color: "rgba(230,238,242,0.88)", margin: "0 0 10px", lineHeight: 1.4, fontWeight: 500 }}>
+          <p style={{ fontSize: "clamp(15px, 3.5vw, 17px)", color: "#526174", margin: "0 0 10px", lineHeight: 1.4, fontWeight: 500 }}>
             When something feels off. Before you call. Quick clinical questions.
           </p>
-          <p style={{ fontSize: "clamp(14px, 3vw, 15px)", color: "rgba(200,214,222,0.72)", margin: 0, lineHeight: 1.45, fontWeight: 400 }}>
+          <p style={{ fontSize: "clamp(14px, 3vw, 15px)", color: "#526174", margin: 0, lineHeight: 1.45, fontWeight: 400 }}>
             For real-world questions and practice scenarios. Not a diagnosis.
           </p>
         </div>
@@ -1123,13 +1126,13 @@ export default function App() {
         {/* Helper line */}
         <div style={{
           fontSize: 13,
-          color: "rgba(200,214,222,0.70)",
+          color: "#526174",
           lineHeight: 1.5,
           marginBottom: 18,
           marginTop: 0,
         }}>
           Good for thinking it through — especially right before you call.{" "}
-          <span style={{ color: "rgba(168,193,204,0.42)" }}>Also useful right after report — when you're sorting out what actually matters first.</span>
+          <span style={{ color: "rgba(82,97,116,0.65)" }}>Also useful right after report — when you're sorting out what actually matters first.</span>
         </div>
 
         {/* Guidance chips — lightweight, no mode-locking */}
@@ -1208,7 +1211,7 @@ export default function App() {
               fontWeight: 500,
               letterSpacing: "0.10em",
               textTransform: "uppercase",
-              color: "rgba(168,188,198,0.62)",
+              color: "#526174",
               marginBottom: 10,
               fontFamily: "'IBM Plex Mono', monospace",
             }}>Recent Cases</div>
@@ -1219,10 +1222,10 @@ export default function App() {
                   className="chip"
                   onClick={() => { track("recent_case_clicked"); runQuery(item); }}
                   style={{
-                    background: "rgba(0,194,209,0.06)",
-                    border: "1px solid rgba(0,194,209,0.22)",
-                    boxShadow: "inset 0 1px 0 rgba(255,255,255,0.04)",
-                    color: "rgba(181,239,244,0.90)",
+                    background: "rgba(10,191,188,0.10)",
+                    border: "1px solid rgba(10,191,188,0.30)",
+                    boxShadow: "none",
+                    color: "#0ABFBC",
                     padding: "0 12px",
                     height: 28,
                     borderRadius: 999,
@@ -1261,10 +1264,10 @@ export default function App() {
                 fontWeight: 500,
                 letterSpacing: "0.10em",
                 textTransform: "uppercase",
-                color: "rgba(168,188,198,0.62)",
+                color: "#526174",
                 fontFamily: "'IBM Plex Mono', monospace",
               }}>
-                Saved Cases <span style={{ color: "rgba(168,188,198,0.35)", fontWeight: 400 }}>({savedCases.length})</span>
+                Saved Cases <span style={{ color: "rgba(82,97,116,0.55)", fontWeight: 400 }}>({savedCases.length})</span>
               </div>
             </div>
             {savedCases.map((sc) => (
@@ -1767,18 +1770,19 @@ export default function App() {
           {[["Privacy", "/#/privacy"], ["Support", "/#/support"]].map(([label, href]) => (
             <a key={label} href={href} style={{
               fontSize: 11,
-              color: "rgba(168,193,204,0.35)",
+              color: "#526174",
               textDecoration: "none",
               fontFamily: "'DM Sans', sans-serif",
               letterSpacing: "0.01em",
             }}
-            onMouseEnter={e => e.target.style.color = "rgba(168,193,204,0.6)"}
-            onMouseLeave={e => e.target.style.color = "rgba(168,193,204,0.35)"}
+            onMouseEnter={e => e.target.style.color = "#0ABFBC"}
+            onMouseLeave={e => e.target.style.color = "#526174"}
             >{label}</a>
           ))}
         </div>
 
       </div>
+      </div>{/* end warm workspace */}
     </div>
   );
 }

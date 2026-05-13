@@ -171,18 +171,18 @@ function SectionCard({ title, content }) {
   if (title === "Closing") {
     return (
       <div style={{
-        borderLeft: "2px solid " + cfg.accent + "60",
+        borderLeft: "2px solid #0ABFBC",
         padding: "14px 20px",
         marginTop: 10,
         marginBottom: 6,
-        background: "rgba(0,194,209,0.018)",
-        borderRadius: "0 10px 10px 0",
+        background: "#F5F2EB",
+        borderRadius: "0 8px 8px 0",
       }}>
         <p style={{
           margin: 0,
           fontSize: 14,
           fontStyle: "italic",
-          color: "#8BAABB",
+          color: "#526174",
           lineHeight: 1.82,
           letterSpacing: "0.008em",
         }}>
@@ -195,13 +195,12 @@ function SectionCard({ title, content }) {
   const lines = content.split("\n").filter((l) => l.trim());
   return (
     <div style={{
-      background: cfg.bg,
-      border: "1px solid " + cfg.accent + "1C",
+      background: "#F0EDE6",
+      border: "1px solid #D6D0C4",
       borderLeft: "3px solid " + cfg.accent,
-      borderRadius: 12,
+      borderRadius: 8,
       padding: "18px 20px",
       marginBottom: 10,
-      boxShadow: "0 2px 14px rgba(0,0,0,0.13), inset 0 1px 0 rgba(255,255,255,0.025)",
     }}>
       <div style={{
         fontSize: 10,
@@ -215,16 +214,16 @@ function SectionCard({ title, content }) {
       }}>
         {title}
       </div>
-      <div style={{ fontSize: 14, lineHeight: 1.8, color: "#B4C9D4" }}>
+      <div style={{ fontSize: 14, lineHeight: 1.8, color: "#1E2A3A" }}>
         {lines.map((line, i) => {
           const isBullet = /^[-\u2022*]\s/.test(line);
           if (isBullet) return (
             <div key={i} style={{ display: "flex", gap: 11, marginBottom: 8, alignItems: "flex-start" }}>
               <span style={{ color: cfg.accent, fontWeight: 700, marginTop: 2, flexShrink: 0, fontSize: 14, lineHeight: 1.8 }}>&rsaquo;</span>
-              <span style={{ color: "#BCCDD6" }}>{line.replace(/^[-\u2022*]\s+/, "")}</span>
+              <span style={{ color: "#1E2A3A" }}>{line.replace(/^[-\u2022*]\s+/, "")}</span>
             </div>
           );
-          return <p key={i} style={{ margin: "0 0 7px", color: "#BCCDD6" }}>{line}</p>;
+          return <p key={i} style={{ margin: "0 0 7px", color: "#1E2A3A" }}>{line}</p>;
         })}
       </div>
     </div>
@@ -345,7 +344,7 @@ function SavedCaseRow({ sc, onReopen, onDelete, onCopy, onSaveNote }) {
   };
 
   return (
-    <div style={{ background: "rgba(255,255,255,0.02)", border: "1px solid rgba(255,255,255,0.08)", borderRadius: 10, marginBottom: 8, overflow: "hidden" }}>
+    <div style={{ background: "#1E2A3A", border: "1px solid #2D3B4E", borderRadius: 8, marginBottom: 8, overflow: "hidden" }}>
       <div style={{ padding: "12px 14px", display: "flex", gap: 10, alignItems: "flex-start" }}>
         <div style={{ flex: 1, minWidth: 0 }}>
           <div style={{ display: "flex", alignItems: "center", gap: 7, marginBottom: 4, flexWrap: "wrap" }}>
@@ -983,11 +982,10 @@ export default function App() {
             fontFamily: "'Inter', sans-serif",
             fontWeight: 800,
             fontSize: "clamp(24px, 5.5vw, 36px)",
-            color: "#F2F8FA",
+            color: "#F0EDE6",
             margin: "0 0 16px",
             lineHeight: 1.1,
             letterSpacing: "-0.04em",
-            textShadow: "0 2px 24px rgba(0,194,209,0.13)",
           }}>
             Clinical reasoning support. Built for nurses.
           </h1>
@@ -1003,13 +1001,13 @@ export default function App() {
         <div
           className="preview-scroll"
           style={{
-            background: "rgba(11,26,36,0.82)",
-            borderTop: "1px solid rgba(255,255,255,0.08)",
-            borderLeft: "1px solid rgba(255,255,255,0.08)",
-            borderRight: "1px solid rgba(255,255,255,0.08)",
+            background: "#17222D",
+            borderTop: "1px solid #2D3B4E",
+            borderLeft: "1px solid #2D3B4E",
+            borderRight: "1px solid #2D3B4E",
             borderBottom: "none",
-            borderTopLeftRadius: 14,
-            borderTopRightRadius: 14,
+            borderTopLeftRadius: 8,
+            borderTopRightRadius: 8,
             borderBottomLeftRadius: 0,
             borderBottomRightRadius: 0,
             padding: "10px 16px",
@@ -1046,20 +1044,18 @@ export default function App() {
 
         {/* Input card */}
         <div className="input-card" style={{
-          background: "linear-gradient(160deg, rgba(20,48,66,0.99) 0%, rgba(15,35,50,0.99) 100%)",
+          background: "#1E2A3A",
           border: inputFocused
-            ? "1px solid rgba(0,194,209,0.28)"
-            : "1px solid rgba(255,255,255,0.13)",
+            ? "1px solid #0ABFBC"
+            : "1px solid rgba(240,237,230,0.10)",
           borderTopLeftRadius: 0,
           borderTopRightRadius: 0,
-          borderBottomLeftRadius: 14,
-          borderBottomRightRadius: 14,
+          borderBottomLeftRadius: 8,
+          borderBottomRightRadius: 8,
           padding: "22px",
-          boxShadow: inputFocused
-            ? "0 14px 40px rgba(0,0,0,0.26), 0 3px 10px rgba(0,0,0,0.18), inset 0 1px 0 rgba(255,255,255,0.05), 0 0 0 3px rgba(0,194,209,0.06), inset 0 0 20px rgba(0,194,209,0.03)"
-            : "0 14px 40px rgba(0,0,0,0.26), 0 3px 10px rgba(0,0,0,0.18), inset 0 1px 0 rgba(255,255,255,0.05), inset 0 0 20px rgba(0,194,209,0.02)",
+          boxShadow: "0 8px 24px rgba(0,0,0,0.22)",
           marginBottom: 14,
-          transition: "border-color 0.2s ease, box-shadow 0.2s ease",
+          transition: "border-color 0.2s ease",
         }}>
           <textarea
             ref={textareaRef}
@@ -1074,7 +1070,7 @@ export default function App() {
               width: "100%",
               background: "transparent",
               border: "none",
-              color: "#F8FBFC",
+              color: "#F0EDE6",
               fontSize: 15,
               lineHeight: 1.65,
               resize: "none",
@@ -1089,11 +1085,11 @@ export default function App() {
             alignItems: "center",
             marginTop: 12,
             paddingTop: 12,
-            borderTop: "1px solid rgba(255,255,255,0.07)",
+            borderTop: "1px solid rgba(240,237,230,0.09)",
           }}>
             <span style={{
               fontSize: 11,
-              color: "#3A5566",
+              color: "#526174",
               fontFamily: "'IBM Plex Mono', monospace",
             }}>
               &#8984; + Enter
@@ -1140,7 +1136,7 @@ export default function App() {
         <div style={{ marginBottom: 14 }}>
           <div style={{
             fontSize: 11,
-            color: "rgba(168,188,198,0.28)",
+            color: "#526174",
             fontFamily: "'IBM Plex Mono', monospace",
             letterSpacing: "0.06em",
             textTransform: "uppercase",
@@ -1152,8 +1148,8 @@ export default function App() {
             {CONTEXT_CHIPS.map(({ label }) => (
               <span key={label} style={{
                 background: "transparent",
-                border: "1px solid rgba(255,255,255,0.055)",
-                color: "rgba(168,193,204,0.32)",
+                border: "1px solid #2D3B4E",
+                color: "#94A3B8",
                 borderRadius: 999,
                 padding: "3px 10px",
                 fontSize: 11.5,
@@ -1170,13 +1166,13 @@ export default function App() {
 
         {/* Privacy notice */}
         <div className="privacy-notice" style={{
-          background: "rgba(176,128,38,0.06)",
-          border: "1px solid rgba(233,186,75,0.16)",
-          borderLeft: "3px solid rgba(233,186,75,0.30)",
-          borderRadius: 10,
+          background: "#FBF7EE",
+          border: "1px solid rgba(212,168,75,0.25)",
+          borderLeft: "3px solid #D4A84B",
+          borderRadius: 8,
           padding: "12px 15px",
           fontSize: 12,
-          color: "rgba(220,190,118,0.85)",
+          color: "#7A5820",
           marginBottom: 20,
           display: "flex",
           gap: 9,
@@ -1185,7 +1181,7 @@ export default function App() {
           <span style={{
             fontFamily: "'IBM Plex Mono', monospace",
             fontSize: 10,
-            color: "#C49A3C",
+            color: "#D4A84B",
             flexShrink: 0,
             marginTop: 1,
           }}>&#9888;</span>
@@ -1195,7 +1191,7 @@ export default function App() {
         {/* Educational disclaimer */}
         <div style={{
           fontSize: 11,
-          color: "rgba(168,193,204,0.38)",
+          color: "#526174",
           marginBottom: 20,
           marginTop: -12,
           paddingLeft: 3,
@@ -1285,7 +1281,7 @@ export default function App() {
             fontWeight: 500,
             letterSpacing: "0.09em",
             textTransform: "uppercase",
-            color: "rgba(168,188,198,0.45)",
+            color: "#526174",
             marginBottom: 8,
           }}>Examples</div>
           <div className="chips-try" style={{ display: "flex", flexDirection: "column", gap: 7 }}>
@@ -1295,11 +1291,11 @@ export default function App() {
                 className="chip"
                 onClick={() => { setQuestion(ex); setTimeout(() => textareaRef.current?.focus(), 0); }}
                 style={{
-                  background: "rgba(255,255,255,0.025)",
-                  border: "1px solid rgba(255,255,255,0.07)",
-                  color: "rgba(168,193,204,0.70)",
+                  background: "#1E2A3A",
+                  border: "1px solid #2D3B4E",
+                  color: "#94A3B8",
                   padding: "10px 14px",
-                  borderRadius: 10,
+                  borderRadius: 8,
                   fontSize: 13,
                   fontWeight: 400,
                   letterSpacing: "-0.01em",
@@ -1313,7 +1309,7 @@ export default function App() {
                   width: "100%",
                 }}
               >
-                <span style={{ color: "rgba(0,194,209,0.35)", fontSize: 10, flexShrink: 0 }}>▶</span>
+                <span style={{ color: "#0ABFBC", fontSize: 10, flexShrink: 0 }}>▶</span>
                 {ex}
               </button>
             ))}
@@ -1515,9 +1511,9 @@ export default function App() {
             {sourcesOpen && (
               <div style={{
                 marginTop: 10,
-                background: "rgba(255,255,255,0.018)",
-                border: "1px solid rgba(255,255,255,0.07)",
-                borderRadius: 10,
+                background: "#1E2A3A",
+                border: "1px solid #2D3B4E",
+                borderRadius: 8,
                 padding: "14px 16px",
               }}>
                 <div style={{
@@ -1561,10 +1557,10 @@ export default function App() {
                         justifyContent: "space-between",
                         gap: 12,
                         padding: "10px 12px",
-                        borderRadius: 10,
-                        background: "rgba(255,255,255,0.03)",
-                        border: "1px solid rgba(255,255,255,0.06)",
-                        color: "#00C2D1",
+                        borderRadius: 6,
+                        background: "#243040",
+                        border: "1px solid #2D3B4E",
+                        color: "#0ABFBC",
                         textDecoration: "none",
                         fontSize: 14,
                         lineHeight: 1.35,
@@ -1578,9 +1574,9 @@ export default function App() {
                 <div style={{
                   marginTop: 10,
                   paddingTop: 10,
-                  borderTop: "1px solid rgba(255,255,255,0.05)",
+                  borderTop: "1px solid #2D3B4E",
                   fontSize: 11,
-                  color: "#3A5566",
+                  color: "#526174",
                   lineHeight: 1.5,
                 }}>
                   Always follow your local policy, approved references, and clinician judgment.
@@ -1591,11 +1587,10 @@ export default function App() {
             {/* ── Continue Thinking ─────────────────────────────────────── */}
             <div style={{
               marginTop: 22,
-              background: "linear-gradient(160deg, rgba(0,194,209,0.028) 0%, rgba(0,150,165,0.018) 100%)",
-              border: "1px solid rgba(0,194,209,0.12)",
-              borderRadius: 12,
+              background: "#1E2A3A",
+              border: "1px solid #2D3B4E",
+              borderRadius: 8,
               padding: "16px 18px",
-              boxShadow: "0 2px 12px rgba(0,0,0,0.10)",
             }}>
               <div style={{
                 fontSize: 9,
@@ -1656,11 +1651,10 @@ export default function App() {
           {(sbar || sbarLoading) && (
             <div style={{
               marginTop: 16,
-              background: "linear-gradient(160deg, rgba(0,194,209,0.04) 0%, rgba(0,150,165,0.025) 100%)",
-              border: "1px solid rgba(0,194,209,0.16)",
-              borderRadius: 12,
+              background: "#1E2A3A",
+              border: "1px solid #2D3B4E",
+              borderRadius: 8,
               padding: "20px 20px 16px",
-              boxShadow: "0 2px 16px rgba(0,0,0,0.12)",
             }}>
               {/* Header */}
               <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 16 }}>
@@ -1750,9 +1744,9 @@ export default function App() {
         <div style={{
           marginTop: 48,
           padding: "14px 16px",
-          borderTop: "1px solid rgba(255,255,255,0.07)",
+          borderTop: "1px solid #2D3B4E",
           fontSize: 11,
-          color: "#3A5566",
+          color: "#526174",
           textAlign: "center",
           lineHeight: 1.75,
           fontFamily: "'IBM Plex Mono', monospace",

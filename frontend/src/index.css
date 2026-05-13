@@ -10,8 +10,8 @@ html {
 
 body {
   margin: 0;
-  background: #060d1a;
-  color: #c8d8ec;
+  background: #111827;
+  color: #E8E4DC;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
@@ -20,9 +20,9 @@ body {
   width: 5px;
 }
 ::-webkit-scrollbar-track {
-  background: #060d1a;
+  background: #111827;
 }
 ::-webkit-scrollbar-thumb {
-  background: #1a3050;
+  background: #2D3B4E;
   border-radius: 3px;
 }

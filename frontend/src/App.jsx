@@ -44,9 +44,11 @@ const ALIAS_MAP = {};
 SECTIONS.forEach((s) => { s.aliases.forEach((a) => { ALIAS_MAP[a] = s.name; }); });
 
 const URGENCY_STYLES = {
-  HIGH:     { color: "#fca5a5", bg: "rgba(239,68,68,0.12)",  border: "rgba(239,68,68,0.4)"  },
-  MODERATE: { color: "#fcd34d", bg: "rgba(245,158,11,0.12)", border: "rgba(245,158,11,0.4)" },
-  LOW:      { color: "#86efac", bg: "rgba(34,197,94,0.10)",  border: "rgba(34,197,94,0.35)" },
+  // color     = text/dot on warm light surface (UrgencyBadge, callouts)
+  // darkText  = text/dot on dark card surface (SavedCaseRow)
+  HIGH:     { color: "#8E2F2F", bg: "rgba(190,70,70,0.10)",    border: "#B45454",               darkText: "#f4a4a4" },
+  MODERATE: { color: "#9A6F1F", bg: "rgba(212,168,75,0.10)",   border: "#C79A3B",               darkText: "#e8c060" },
+  LOW:      { color: "#0F766E", bg: "rgba(10,191,188,0.08)",   border: "rgba(10,191,188,0.30)", darkText: "#5eead4" },
 };
 
 const LS_HISTORY = "clinical_edge_history";
@@ -352,7 +354,7 @@ function SavedCaseRow({ sc, onReopen, onDelete, onCopy, onSaveNote }) {
                 width: 6,
                 height: 6,
                 borderRadius: "50%",
-                background: urgStyle.color,
+                background: urgStyle.darkText || urgStyle.color,
                 flexShrink: 0,
                 display: "inline-block",
               }} />
@@ -361,7 +363,7 @@ function SavedCaseRow({ sc, onReopen, onDelete, onCopy, onSaveNote }) {
               fontSize: 9,
               fontWeight: 700,
               fontFamily: "'IBM Plex Mono', monospace",
-              color: urgStyle ? urgStyle.color : "#7F99A5",
+              color: urgStyle ? (urgStyle.darkText || urgStyle.color) : "#7F99A5",
               textTransform: "uppercase",
               letterSpacing: "0.8px",
             }}>
@@ -1390,17 +1392,16 @@ export default function App() {
 
             {result.urgent && (
               <div style={{
-                background: "rgba(239,68,68,0.07)",
-                border: "1px solid rgba(239,68,68,0.25)",
-                borderLeft: "3px solid rgba(239,68,68,0.60)",
+                background: "rgba(190,70,70,0.08)",
+                border: "1px solid rgba(180,84,84,0.20)",
+                borderLeft: "3px solid #B45454",
                 borderRadius: 6,
                 padding: "14px 18px",
-                color: "#f8a8a8",
+                color: "#8E2F2F",
                 fontWeight: 600,
                 fontSize: 14,
                 lineHeight: 1.65,
                 marginBottom: 14,
-                boxShadow: "0 2px 12px rgba(239,68,68,0.06)",
               }}>
                 {result.urgent}
               </div>

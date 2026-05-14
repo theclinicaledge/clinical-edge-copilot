@@ -7,7 +7,8 @@ export default function Support() {
     }}>
       <style>{`
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap');
-        *, *::before, *::after { box-sizing: border-box; }
+        *, *::before, *::after { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+        a { outline: none; -webkit-tap-highlight-color: transparent; }
       `}</style>
 
       {/* ── Header — dark navy shell, matches App.jsx ─────────────────── */}
@@ -57,6 +58,8 @@ export default function Support() {
             padding: "4px 10px",
             letterSpacing: "0.01em",
             fontFamily: "'IBM Plex Mono', monospace",
+            outline: "none",
+            WebkitTapHighlightColor: "transparent",
           }}
           >
             ← Back

@@ -979,22 +979,6 @@ export default function App() {
             </span>
           </div>
 
-          {/* Learn more — right-aligned */}
-          <div style={{ marginLeft: "auto", display: "flex", alignItems: "center", gap: 12 }}>
-            <a
-              href="/#/landing"
-              style={{
-                fontSize: 12,
-                color: "#7F99A5",
-                textDecoration: "none",
-                fontWeight: 400,
-                opacity: 0.8,
-              }}
-            >
-              Learn more
-            </a>
-          </div>
-
         </div>
       </div>
 
@@ -1109,19 +1093,12 @@ export default function App() {
           />
           <div style={{
             display: "flex",
-            justifyContent: "space-between",
+            justifyContent: "flex-end",
             alignItems: "center",
             marginTop: 12,
             paddingTop: 12,
             borderTop: "1px solid rgba(240,237,230,0.09)",
           }}>
-            <span style={{
-              fontSize: 11,
-              color: "rgba(240,237,230,0.40)",
-              fontFamily: "'IBM Plex Mono', monospace",
-            }}>
-              &#8984; + Enter
-            </span>
             <button
               className="submit-btn"
               onClick={handleSubmit}

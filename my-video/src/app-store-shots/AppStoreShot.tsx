@@ -64,8 +64,8 @@ export const AppStoreShot: React.FC<{ slideIndex: number }> = ({ slideIndex }) =
       {/* ── Brand mark — CE logo + name ── */}
       <div style={{
         position: "absolute",
-        top: 96,
-        left: PAD_H,
+        top: 52,
+        left: 52,
         display: "flex",
         alignItems: "center",
         gap: 14,
@@ -93,12 +93,12 @@ export const AppStoreShot: React.FC<{ slideIndex: number }> = ({ slideIndex }) =
         {/* Headline — large, dark, sharp */}
         <div style={{
           color: NAVY,
-          fontSize: 84,
+          fontSize: 96,
           fontWeight: 800,
           lineHeight: 1.03,
           letterSpacing: "-0.040em",
           whiteSpace: "pre-line",
-          marginBottom: 26,
+          marginBottom: 28,
         }}>
           {config.headline}
         </div>
@@ -106,7 +106,7 @@ export const AppStoreShot: React.FC<{ slideIndex: number }> = ({ slideIndex }) =
         {/* Subtext */}
         <div style={{
           color: SECONDARY,
-          fontSize: 33,
+          fontSize: 38,
           fontWeight: 400,
           lineHeight: 1.52,
           letterSpacing: "-0.010em",
@@ -134,6 +134,7 @@ export const AppStoreShot: React.FC<{ slideIndex: number }> = ({ slideIndex }) =
           style={{ width: "100%", display: "block" }}
         />
       </div>
+
 
       {/* ── Bottom-edge fade — softens the lower crop ── */}
       <div style={{

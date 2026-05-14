@@ -153,7 +153,7 @@ function smallBtnStyle(bg, color, border) {
     background: bg,
     color,
     border: border || "none",
-    borderRadius: 7,
+    borderRadius: 6,
     padding: "6px 14px",
     fontSize: 12,
     fontWeight: 500,
@@ -214,12 +214,12 @@ function SectionCard({ title, content }) {
       }}>
         {title}
       </div>
-      <div style={{ fontSize: 14, lineHeight: 1.8, color: "#1E2A3A" }}>
+      <div style={{ fontSize: 14, lineHeight: 1.72, color: "#1E2A3A" }}>
         {lines.map((line, i) => {
           const isBullet = /^[-\u2022*]\s/.test(line);
           if (isBullet) return (
             <div key={i} style={{ display: "flex", gap: 11, marginBottom: 8, alignItems: "flex-start" }}>
-              <span style={{ color: cfg.accent, fontWeight: 700, marginTop: 2, flexShrink: 0, fontSize: 14, lineHeight: 1.8 }}>&rsaquo;</span>
+              <span style={{ color: cfg.accent, fontWeight: 700, marginTop: 2, flexShrink: 0, fontSize: 14, lineHeight: 1.72 }}>&rsaquo;</span>
               <span style={{ color: "#1E2A3A" }}>{line.replace(/^[-\u2022*]\s+/, "")}</span>
             </div>
           );
@@ -241,7 +241,7 @@ function UrgencyBadge({ level }) {
       gap: 10,
       background: s.bg,
       border: "1px solid " + s.border,
-      borderRadius: 10,
+      borderRadius: 6,
       padding: "10px 16px",
       marginBottom: 16,
     }}>
@@ -251,7 +251,6 @@ function UrgencyBadge({ level }) {
         borderRadius: "50%",
         background: s.color,
         flexShrink: 0,
-        boxShadow: "0 0 7px " + s.color + "99",
       }} />
       <span style={{
         fontSize: 11,
@@ -299,7 +298,7 @@ function StreamPreview({ text }) {
     <div style={{
       background: "rgba(15,36,50,0.75)",
       border: "1px solid rgba(0,194,209,0.09)",
-      borderRadius: 12,
+      borderRadius: 8,
       padding: "18px 20px",
       marginBottom: 10,
       fontSize: 14,
@@ -815,7 +814,6 @@ export default function App() {
         .submit-btn:hover:not(:disabled) {
           background: #19D3E0 !important;
           transform: translateY(-1px);
-          box-shadow: 0 5px 18px rgba(0,194,209,0.22) !important;
         }
         .submit-btn:active:not(:disabled) { transform: translateY(0); }
         .save-case-btn:hover:not(:disabled) {
@@ -855,14 +853,14 @@ export default function App() {
           .preview-scroll { display: none !important; }
           /* Restore full top radius on input card when preview strip is hidden */
           .input-card {
-            border-top-left-radius: 14px !important;
-            border-top-right-radius: 14px !important;
+            border-top-left-radius: 8px !important;
+            border-top-right-radius: 8px !important;
           }
           /* 2: Soften warning box — guidance tone, not alert tone */
           .privacy-notice {
             background: rgba(176,128,38,0.06) !important;
             border: 1px solid rgba(233,186,75,0.14) !important;
-            border-radius: 10px !important;
+            border-radius: 6px !important;
             padding: 12px 14px !important;
             font-size: 13px !important;
             line-height: 1.4 !important;
@@ -1038,9 +1036,9 @@ export default function App() {
           {["What this could be", "Possible concerns", "What to assess next", "What to consider next"].map((item) => (
             <span key={item} style={{
               fontSize: 11,
-              color: "rgba(181,239,244,0.65)",
-              background: "rgba(0,194,209,0.05)",
-              border: "1px solid rgba(0,194,209,0.13)",
+              color: "#5A7A8A",
+              background: "rgba(255,255,255,0.04)",
+              border: "1px solid rgba(255,255,255,0.07)",
               borderRadius: 4,
               padding: "2px 7px",
               whiteSpace: "nowrap",
@@ -1122,7 +1120,7 @@ export default function App() {
                 alignItems: "center",
                 gap: 8,
                 letterSpacing: "-0.1px",
-                boxShadow: (!question.trim() || isActive) ? "none" : "0 2px 8px rgba(0,194,209,0.15)",
+                boxShadow: "none",
                 transition: "all 0.18s",
               }}
             >
@@ -1161,7 +1159,7 @@ export default function App() {
                 background: "transparent",
                 border: "1px solid #C4BDB5",
                 color: "#526174",
-                borderRadius: 999,
+                borderRadius: 6,
                 padding: "3px 10px",
                 fontSize: 11.5,
                 fontWeight: 400,
@@ -1236,7 +1234,7 @@ export default function App() {
                     color: "#111827",
                     padding: "0 12px",
                     height: 28,
-                    borderRadius: 999,
+                    borderRadius: 6,
                     fontSize: 13,
                     fontWeight: 500,
                     letterSpacing: "-0.01em",
@@ -1305,22 +1303,22 @@ export default function App() {
                   background: "#1E2A3A",
                   border: "1px solid #2D3B4E",
                   color: "#94A3B8",
-                  padding: "10px 14px",
-                  borderRadius: 8,
-                  fontSize: 13,
+                  padding: "8px 12px",
+                  borderRadius: 6,
+                  fontSize: 12,
                   fontWeight: 400,
                   letterSpacing: "-0.01em",
                   cursor: "pointer",
                   display: "flex",
                   alignItems: "center",
-                  gap: 10,
+                  gap: 8,
                   textAlign: "left",
-                  lineHeight: 1.45,
+                  lineHeight: 1.4,
                   transition: "all 0.15s",
                   width: "100%",
                 }}
               >
-                <span style={{ color: "#0ABFBC", fontSize: 10, flexShrink: 0 }}>▶</span>
+                <span style={{ color: "#0ABFBC", fontSize: 9, flexShrink: 0 }}>▶</span>
                 {ex}
               </button>
             ))}
@@ -1336,7 +1334,7 @@ export default function App() {
             background: "rgba(233,107,107,0.07)",
             border: "1px solid rgba(233,107,107,0.22)",
             borderLeft: "3px solid #E96B6B",
-            borderRadius: 9,
+            borderRadius: 6,
             padding: "12px 15px",
             color: "#E96B6B",
             fontSize: 13,
@@ -1381,7 +1379,7 @@ export default function App() {
               color: "#4A6675",
               fontFamily: "'IBM Plex Mono', monospace",
               lineHeight: 1.5,
-              borderBottom: "1px solid rgba(255,255,255,0.04)",
+              borderBottom: "1px solid rgba(0,0,0,0.07)",
               marginBottom: 16,
             }}>
               <span style={{ color: "#3A5A6A", flexShrink: 0, fontSize: 9 }}>◆</span>
@@ -1395,7 +1393,7 @@ export default function App() {
                 background: "rgba(239,68,68,0.07)",
                 border: "1px solid rgba(239,68,68,0.25)",
                 borderLeft: "3px solid rgba(239,68,68,0.60)",
-                borderRadius: 11,
+                borderRadius: 6,
                 padding: "14px 18px",
                 color: "#f8a8a8",
                 fontWeight: 600,
@@ -1419,7 +1417,7 @@ export default function App() {
               gap: 10,
               marginTop: 18,
               paddingTop: 18,
-              borderTop: "1px solid rgba(255,255,255,0.07)",
+              borderTop: "1px solid rgba(0,0,0,0.08)",
               flexWrap: "wrap",
             }}>
               {/* Save — primary action */}
@@ -1431,7 +1429,7 @@ export default function App() {
                   background: justSaved ? "rgba(31,191,117,0.10)" : "rgba(31,191,117,0.04)",
                   border: "1px solid " + (justSaved ? "rgba(31,191,117,0.45)" : "rgba(31,191,117,0.22)"),
                   color: justSaved ? "#1FBF75" : "#4E9E78",
-                  borderRadius: 9,
+                  borderRadius: 6,
                   padding: "9px 20px",
                   fontSize: 13,
                   fontWeight: 600,
@@ -1452,9 +1450,9 @@ export default function App() {
                 onClick={() => handleCopyResponse(rawText)}
                 style={{
                   background: "transparent",
-                  border: "1px solid rgba(255,255,255,0.08)",
+                  border: "1px solid rgba(0,0,0,0.12)",
                   color: "#3D5E6E",
-                  borderRadius: 9,
+                  borderRadius: 6,
                   padding: "9px 18px",
                   fontSize: 13,
                   fontWeight: 400,
@@ -1471,9 +1469,9 @@ export default function App() {
                 onClick={() => setSourcesOpen(o => !o)}
                 style={{
                   background: "transparent",
-                  border: "1px solid rgba(255,255,255,0.07)",
-                  color: sourcesOpen ? "rgba(168,193,204,0.65)" : "#3D5E6E",
-                  borderRadius: 9,
+                  border: "1px solid rgba(0,0,0,0.10)",
+                  color: sourcesOpen ? "#526174" : "#3D5E6E",
+                  borderRadius: 6,
                   padding: "9px 16px",
                   fontSize: 12.5,
                   fontWeight: 400,
@@ -1494,7 +1492,7 @@ export default function App() {
                   background: sbar && !sbar.error ? "rgba(0,194,209,0.07)" : "transparent",
                   border: "1px solid " + (sbar && !sbar.error ? "rgba(0,194,209,0.25)" : "rgba(0,194,209,0.14)"),
                   color: sbarLoading ? "rgba(0,194,209,0.35)" : "#00A8B5",
-                  borderRadius: 9,
+                  borderRadius: 6,
                   padding: "9px 16px",
                   fontSize: 12.5,
                   fontWeight: 500,
@@ -1608,7 +1606,7 @@ export default function App() {
                 fontWeight: 700,
                 textTransform: "uppercase",
                 letterSpacing: "1.3px",
-                color: "#00C2D1",
+                color: "#7F99A5",
                 marginBottom: 10,
                 fontFamily: "'IBM Plex Mono', monospace",
               }}>
@@ -1644,7 +1642,7 @@ export default function App() {
                     background: followUp.trim() ? "rgba(0,194,209,0.12)" : "transparent",
                     border: "1px solid " + (followUp.trim() ? "rgba(0,194,209,0.35)" : "rgba(255,255,255,0.08)"),
                     color: followUp.trim() ? "#00C2D1" : "#3A5566",
-                    borderRadius: 7,
+                    borderRadius: 6,
                     padding: "7px 16px",
                     fontSize: 12,
                     fontWeight: 600,
@@ -1674,7 +1672,7 @@ export default function App() {
                   fontWeight: 700,
                   textTransform: "uppercase",
                   letterSpacing: "1.4px",
-                  color: "#00C2D1",
+                  color: "#7F99A5",
                   fontFamily: "'IBM Plex Mono', monospace",
                 }}>
                   SBAR Handoff Draft
@@ -1755,7 +1753,7 @@ export default function App() {
         <div style={{
           marginTop: 48,
           padding: "14px 16px",
-          borderTop: "1px solid #2D3B4E",
+          borderTop: "1px solid rgba(0,0,0,0.10)",
           fontSize: 11,
           color: "#526174",
           textAlign: "center",

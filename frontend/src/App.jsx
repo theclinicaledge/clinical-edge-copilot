@@ -165,16 +165,27 @@ function smallBtnStyle(bg, color, border) {
 }
 
 // ─── Inline markdown renderer ─────────────────────────────────────────────────
-// Handles **bold** only — no extra deps, returns string when no markers found.
+// Handles **bold** and *italic* — no extra deps, single-pass regex.
 
 function renderInline(text) {
-  if (!text || !text.includes("**")) return text;
-  const parts = text.split(/(\*\*[^*]+\*\*)/g);
-  return parts.map((part, i) =>
-    /^\*\*[^*]+\*\*$/.test(part)
-      ? <strong key={i} style={{ fontWeight: 700 }}>{part.slice(2, -2)}</strong>
-      : part
-  );
+  if (!text || !text.includes("*")) return text;
+  const result = [];
+  // Match **bold** before *italic* so double-star wins over single-star
+  const pattern = /(\*\*[^*]+\*\*|\*[^*\s][^*]*\*)/g;
+  let last = 0, key = 0, match;
+  while ((match = pattern.exec(text)) !== null) {
+    if (match.index > last) result.push(text.slice(last, match.index));
+    const m = match[0];
+    if (m.startsWith("**"))
+      result.push(<strong key={key++} style={{ fontWeight: 700 }}>{m.slice(2, -2)}</strong>);
+    else
+      result.push(<em key={key++}>{m.slice(1, -1)}</em>);
+    last = match.index + m.length;
+  }
+  if (last < text.length) result.push(text.slice(last));
+  if (result.length === 0) return text;
+  if (result.length === 1 && typeof result[0] === "string") return result[0];
+  return result;
 }
 
 // ─── Sub-components ───────────────────────────────────────────────────────────
@@ -1740,7 +1751,7 @@ export default function App() {
                         lineHeight: 1.65,
                         color: "#BCCDD6",
                       }}>
-                        {value || "—"}
+                        {value ? renderInline(value) : "—"}
                       </div>
                     </div>
                   ))}
@@ -1788,7 +1799,7 @@ export default function App() {
               fontFamily: "'DM Sans', sans-serif",
               letterSpacing: "0.01em",
             }}
-            onMouseEnter={e => e.target.style.color = "#0ABFBC"}
+            onMouseEnter={e => e.target.style.color = "#0A9E9B"}
             onMouseLeave={e => e.target.style.color = "#526174"}
             >{label}</a>
           ))}

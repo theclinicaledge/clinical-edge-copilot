@@ -52,7 +52,7 @@ function IOSInstallHint() {
   return (
     <div style={{
       position: 'fixed',
-      bottom: '20px',
+      bottom: 'calc(24px + env(safe-area-inset-bottom))',
       left: '50%',
       transform: 'translateX(-50%)',
       zIndex: 9999,
@@ -60,20 +60,19 @@ function IOSInstallHint() {
       alignItems: 'center',
       gap: '10px',
       background: '#0d1f35',
-      border: '1px solid rgba(0,194,209,0.35)',
-      borderRadius: '16px',
-      padding: '11px 16px 11px 14px',
-      boxShadow: '0 4px 24px rgba(0,0,0,0.5)',
+      border: '1px solid #2D3B4E',
+      borderRadius: '8px',
+      padding: '10px 14px',
       fontFamily: 'DM Sans, system-ui, sans-serif',
       fontSize: '13px',
-      color: '#c8d8e8',
+      color: '#94A3B8',
       maxWidth: '300px',
       userSelect: 'none',
     }}>
-      <span style={{ fontSize: '17px', lineHeight: 1, flexShrink: 0 }}>📲</span>
+      <span style={{ fontSize: '16px', lineHeight: 1, flexShrink: 0 }}>📲</span>
       <span style={{ lineHeight: 1.4 }}>
-        Install: tap <strong style={{ color: '#00C2D1' }}>Share</strong> then{' '}
-        <strong style={{ color: '#00C2D1' }}>Add to Home Screen</strong>
+        Install: tap <strong style={{ color: '#94A3B8', fontWeight: 600 }}>Share</strong> then{' '}
+        <strong style={{ color: '#94A3B8', fontWeight: 600 }}>Add to Home Screen</strong>
       </span>
       <button
         onClick={handleDismiss}
@@ -136,7 +135,7 @@ function InstallBanner() {
   return (
     <div style={{
       position: 'fixed',
-      bottom: '20px',
+      bottom: 'calc(24px + env(safe-area-inset-bottom))',
       left: '50%',
       transform: 'translateX(-50%)',
       zIndex: 9999,
@@ -144,24 +143,23 @@ function InstallBanner() {
       alignItems: 'center',
       gap: '10px',
       background: '#0d1f35',
-      border: '1px solid rgba(0,194,209,0.35)',
-      borderRadius: '999px',
-      padding: '10px 16px 10px 14px',
-      boxShadow: '0 4px 24px rgba(0,0,0,0.45)',
+      border: '1px solid #2D3B4E',
+      borderRadius: '8px',
+      padding: '10px 14px',
       fontFamily: 'DM Sans, system-ui, sans-serif',
       fontSize: '13px',
-      color: '#c8d8e8',
+      color: '#94A3B8',
       whiteSpace: 'nowrap',
       userSelect: 'none',
     }}>
-      <span style={{ fontSize: '16px', lineHeight: 1 }}>📲</span>
+      <span style={{ fontSize: '15px', lineHeight: 1 }}>📲</span>
       <button
         onClick={handleInstall}
         style={{
           background: 'none',
           border: 'none',
           cursor: 'pointer',
-          color: '#00C2D1',
+          color: '#0ABFBC',
           fontFamily: 'inherit',
           fontSize: '13px',
           fontWeight: 600,

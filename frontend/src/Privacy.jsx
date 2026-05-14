@@ -46,9 +46,20 @@ export default function Privacy() {
           </div>
           <a
             href="/#/"
-            style={{ marginLeft: "auto", fontSize: 12, color: "#7F99A5", textDecoration: "none", fontWeight: 400 }}
+            style={{
+            marginLeft: "auto",
+            fontSize: 11,
+            color: "#7F99A5",
+            textDecoration: "none",
+            fontWeight: 500,
+            border: "1px solid rgba(255,255,255,0.10)",
+            borderRadius: 6,
+            padding: "4px 10px",
+            letterSpacing: "0.01em",
+            fontFamily: "'IBM Plex Mono', monospace",
+          }}
           >
-            ← Back to app
+            ← Back
           </a>
         </div>
       </div>

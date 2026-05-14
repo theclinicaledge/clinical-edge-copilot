@@ -34,7 +34,7 @@ const SECTIONS = [
   { name: "What to assess next",      aliases: ["What to assess next",    "What I'd assess next"],            accent: "#1FBF75", bg: "rgba(31,191,117,0.06)"  },
   { name: "What to consider next",    aliases: ["What to consider next",  "What I'd do right now"],           accent: "#F2B94B", bg: "rgba(242,185,75,0.06)"  },
   { name: "Where this may be heading",aliases: ["Where this may be heading"],                                 accent: "#F2B94B", bg: "rgba(242,185,75,0.06)"  },
-  { name: "Closing",                  aliases: ["Closing"],                                                   accent: "#00C2D1", bg: "rgba(0,194,209,0.04)"   },
+  { name: "Closing",                  aliases: ["Closing"],                                                   accent: "#0ABFBC", bg: "rgba(10,191,188,0.04)"  },
 ];
 
 const SECTION_CONFIG = {};
@@ -276,7 +276,7 @@ function LoadingIndicator({ phase }) {
           <div key={i} style={{
             width: 3,
             borderRadius: 3,
-            background: "#00C2D1",
+            background: "#0ABFBC",
             opacity: 0.75,
             animation: "barPulse 1.1s ease-in-out " + (i * 0.11) + "s infinite",
           }} />
@@ -299,7 +299,7 @@ function StreamPreview({ text }) {
   return (
     <div style={{
       background: "rgba(15,36,50,0.75)",
-      border: "1px solid rgba(0,194,209,0.09)",
+      border: "1px solid rgba(10,191,188,0.08)",
       borderRadius: 8,
       padding: "18px 20px",
       marginBottom: 10,
@@ -315,7 +315,7 @@ function StreamPreview({ text }) {
         display: "inline-block",
         width: 6,
         height: 14,
-        background: "#00C2D1",
+        background: "#0ABFBC",
         marginLeft: 3,
         verticalAlign: "middle",
         animation: "cursorBlink 1s step-end infinite",
@@ -387,8 +387,8 @@ function SavedCaseRow({ sc, onReopen, onDelete, onCopy, onSaveNote }) {
         </div>
         <div style={{ display: "flex", gap: 5, flexShrink: 0, alignItems: "center" }}>
           <button onClick={() => setExpanded(!expanded)} title={expanded ? "Collapse" : "Expand"} style={iconBtnStyle("#4A6978")}>{expanded ? "\u25b2" : "\u25bc"}</button>
-          <button onClick={() => onReopen(sc.question)} title="Reopen in input" style={iconBtnStyle("#00C2D1")}>&crarr;</button>
-          <button onClick={handleCopy} title="Copy response" style={iconBtnStyle(copied ? "#1FBF75" : "#00C2D1")}>{copied ? "\u2713" : "\u2398"}</button>
+          <button onClick={() => onReopen(sc.question)} title="Reopen in input" style={iconBtnStyle("#0ABFBC")}>&crarr;</button>
+          <button onClick={handleCopy} title="Copy response" style={iconBtnStyle(copied ? "#1FBF75" : "#0ABFBC")}>{copied ? "\u2713" : "\u2398"}</button>
           <button onClick={() => { setEditNote(true); setExpanded(true); }} title="Add/edit note" style={iconBtnStyle("#F2B94B")}>Copy</button>
           <button onClick={() => onDelete(sc.id)} title="Delete case" style={iconBtnStyle("#E96B6B")}>&times;</button>
         </div>
@@ -413,8 +413,8 @@ function SavedCaseRow({ sc, onReopen, onDelete, onCopy, onSaveNote }) {
             rows={2}
             style={{
               width: "100%",
-              background: "rgba(0,194,209,0.04)",
-              border: "1px solid rgba(0,194,209,0.15)",
+              background: "rgba(0,0,0,0.04)",
+              border: "1px solid rgba(0,0,0,0.12)",
               borderRadius: 7,
               padding: "8px 10px",
               color: "#A8C1CC",
@@ -426,7 +426,7 @@ function SavedCaseRow({ sc, onReopen, onDelete, onCopy, onSaveNote }) {
             }}
           />
           <div style={{ display: "flex", gap: 8, marginTop: 8 }}>
-            <button onClick={handleNoteSave} style={{ ...smallBtnStyle("#00C2D1", "#0B1F2A"), fontWeight: 700 }}>Save Note</button>
+            <button onClick={handleNoteSave} style={{ ...smallBtnStyle("#0ABFBC", "#0B1F2A"), fontWeight: 700 }}>Save Note</button>
             <button onClick={() => { setEditNote(false); setNoteText(sc.note || ""); }} style={smallBtnStyle("transparent", "#7F99A5", "1px solid rgba(255,255,255,0.1)")}>Cancel</button>
           </div>
         </div>
@@ -781,13 +781,7 @@ export default function App() {
   return (
     <div style={{
       minHeight: "100vh",
-      background: [
-        "radial-gradient(ellipse 90% 50% at 50% -8%, rgba(0,194,209,0.20) 0%, rgba(0,194,209,0.07) 42%, transparent 68%)",
-        "radial-gradient(ellipse 50% 28% at 50% 2%, rgba(79,209,197,0.09) 0%, transparent 58%)",
-        "radial-gradient(ellipse 60% 60% at 80% 80%, rgba(0,50,70,0.35) 0%, transparent 65%)",
-        "linear-gradient(180deg, rgba(13,32,44,0.55) 0%, rgba(11,31,42,0) 26%, rgba(0,0,0,0.22) 100%)",
-        "#0B1F2A",
-      ].join(", "),
+      background: "#111827",
       color: "#A8C1CC",
       fontFamily: "'Inter', -apple-system, BlinkMacSystemFont, sans-serif",
       padding: "0 0 calc(80px + env(safe-area-inset-bottom))",
@@ -795,26 +789,25 @@ export default function App() {
       <style>{`
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap');
         *, *::before, *::after { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
-        body { margin: 0; background: #0B1F2A; -webkit-font-smoothing: antialiased; overscroll-behavior: none; -webkit-text-size-adjust: 100%; }
+        body { margin: 0; background: #111827; -webkit-font-smoothing: antialiased; overscroll-behavior: none; -webkit-text-size-adjust: 100%; }
         textarea { outline: none; touch-action: pan-y; }
         textarea::placeholder { color: #94A3B8; }
         button { transition: all 0.15s ease; font-family: inherit; cursor: pointer; }
         ::-webkit-scrollbar { width: 4px; }
         ::-webkit-scrollbar-track { background: transparent; }
-        ::-webkit-scrollbar-thumb { background: rgba(0,194,209,0.2); border-radius: 2px; }
+        ::-webkit-scrollbar-thumb { background: #2D3B4E; border-radius: 2px; }
         .preview-scroll::-webkit-scrollbar { display: none; }
 
         .chip:hover {
-          background: rgba(0,194,209,0.06) !important;
-          border-color: rgba(0,194,209,0.2) !important;
-          color: #A8C1CC !important;
+          background: rgba(10,191,188,0.07) !important;
+          border-color: rgba(10,191,188,0.22) !important;
         }
         .mode-btn:hover:not(.mode-active) {
-          border-color: rgba(0,194,209,0.25) !important;
-          color: #A8C1CC !important;
+          border-color: rgba(10,191,188,0.22) !important;
+          color: #94A3B8 !important;
         }
         .submit-btn:hover:not(:disabled) {
-          background: #19D3E0 !important;
+          background: #0ABFBC !important;
           transform: translateY(-1px);
         }
         .submit-btn:active:not(:disabled) { transform: translateY(0); }
@@ -824,8 +817,8 @@ export default function App() {
           color: #1FBF75 !important;
         }
         .copy-btn:hover {
-          border-color: rgba(255,255,255,0.15) !important;
-          color: #A8C1CC !important;
+          border-color: rgba(0,0,0,0.15) !important;
+          color: #526174 !important;
         }
 
         @keyframes fadeUp { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
@@ -833,8 +826,8 @@ export default function App() {
         .fade-up { animation: fadeUp 0.35s ease forwards; }
         .spinner {
           width: 15px; height: 15px;
-          border: 2px solid rgba(0,194,209,0.2);
-          border-top-color: #00C2D1;
+          border: 2px solid rgba(10,191,188,0.20);
+          border-top-color: #0ABFBC;
           border-radius: 50%;
           animation: spin 0.7s linear infinite;
           display: inline-block;
@@ -930,7 +923,7 @@ export default function App() {
             xmlns="http://www.w3.org/2000/svg"
             style={{ flexShrink: 0, display: "block" }}
             aria-label="Clinical Edge"
-            fill="#00C2D1"
+            fill="#0ABFBC"
           >
             <path d="M 159.1,24.3 A 96,96 0 1,0 159.1,175.7 L 135.7,145.7 A 58,58 0 1,1 135.7,54.3 Z" />
             <path d="M 144.0,57 L 208,45 L 218,58 L 208,70 L 150.0,71 Z" />
@@ -982,7 +975,7 @@ export default function App() {
       </div>
 
       {/* ── Warm clinical workspace ──────────────────────────────────────── */}
-      <div style={{ background: "#E9E3D8", minHeight: "100vh" }}>
+      <div style={{ background: "#E7E1D6", minHeight: "100vh" }}>
 
       {/* ── Main ─────────────────────────────────────────────────────────── */}
       <div className="main-container" style={{ maxWidth: 800, margin: "0 auto", width: "100%", padding: "40px 20px 0", display: "flex", flexDirection: "column", alignItems: "stretch" }}>
@@ -1110,7 +1103,7 @@ export default function App() {
               onClick={handleSubmit}
               disabled={!question.trim() || isActive}
               style={{
-                background: (!question.trim() || isActive) ? "rgba(0,194,209,0.08)" : "#00C2D1",
+                background: (!question.trim() || isActive) ? "rgba(10,191,188,0.08)" : "#0ABFBC",
                 color: (!question.trim() || isActive) ? "#94A3B8" : "#0B1F2A",
                 border: "none",
                 borderRadius: 8,
@@ -1490,9 +1483,9 @@ export default function App() {
                 disabled={sbarLoading}
                 style={{
                   marginLeft: "auto",
-                  background: sbar && !sbar.error ? "rgba(0,194,209,0.07)" : "transparent",
-                  border: "1px solid " + (sbar && !sbar.error ? "rgba(0,194,209,0.25)" : "rgba(0,194,209,0.14)"),
-                  color: sbarLoading ? "rgba(0,194,209,0.35)" : "#00A8B5",
+                  background: sbar && !sbar.error ? "rgba(10,191,188,0.07)" : "transparent",
+                  border: "1px solid " + (sbar && !sbar.error ? "rgba(10,191,188,0.25)" : "rgba(10,191,188,0.14)"),
+                  color: sbarLoading ? "rgba(10,191,188,0.35)" : "#0ABFBC",
                   borderRadius: 6,
                   padding: "9px 16px",
                   fontSize: 12.5,
@@ -1508,7 +1501,7 @@ export default function App() {
               >
                 {sbarLoading ? (
                   <>
-                    <span style={{ display: "inline-block", width: 10, height: 10, border: "1.5px solid rgba(0,194,209,0.3)", borderTopColor: "#00C2D1", borderRadius: "50%", animation: "spin 0.75s linear infinite" }} />
+                    <span style={{ display: "inline-block", width: 10, height: 10, border: "1.5px solid rgba(10,191,188,0.28)", borderTopColor: "#0ABFBC", borderRadius: "50%", animation: "spin 0.75s linear infinite" }} />
                     Building SBAR…
                   </>
                 ) : (
@@ -1623,7 +1616,7 @@ export default function App() {
                   width: "100%",
                   background: "transparent",
                   border: "none",
-                  borderBottom: "1px solid rgba(0,194,209,0.12)",
+                  borderBottom: "1px solid rgba(10,191,188,0.15)",
                   color: "#F8FBFC",
                   fontSize: 14,
                   lineHeight: 1.6,
@@ -1640,9 +1633,9 @@ export default function App() {
                   onClick={handleFollowUp}
                   disabled={!followUp.trim()}
                   style={{
-                    background: followUp.trim() ? "rgba(0,194,209,0.12)" : "transparent",
-                    border: "1px solid " + (followUp.trim() ? "rgba(0,194,209,0.35)" : "rgba(255,255,255,0.08)"),
-                    color: followUp.trim() ? "#00C2D1" : "#3A5566",
+                    background: followUp.trim() ? "rgba(10,191,188,0.10)" : "transparent",
+                    border: "1px solid " + (followUp.trim() ? "rgba(10,191,188,0.30)" : "rgba(255,255,255,0.10)"),
+                    color: followUp.trim() ? "#0ABFBC" : "#3A5566",
                     borderRadius: 6,
                     padding: "7px 16px",
                     fontSize: 12,
@@ -1683,8 +1676,8 @@ export default function App() {
                     onClick={() => handleCopySbar(sbar)}
                     style={{
                       background: "transparent",
-                      border: "1px solid rgba(0,194,209,0.15)",
-                      color: sbarCopied ? "#1FBF75" : "rgba(0,194,209,0.5)",
+                      border: "1px solid rgba(10,191,188,0.18)",
+                      color: sbarCopied ? "#1FBF75" : "rgba(10,191,188,0.55)",
                       borderRadius: 6,
                       padding: "4px 11px",
                       fontSize: 11,

@@ -164,6 +164,19 @@ function smallBtnStyle(bg, color, border) {
   };
 }
 
+// ─── Inline markdown renderer ─────────────────────────────────────────────────
+// Handles **bold** only — no extra deps, returns string when no markers found.
+
+function renderInline(text) {
+  if (!text || !text.includes("**")) return text;
+  const parts = text.split(/(\*\*[^*]+\*\*)/g);
+  return parts.map((part, i) =>
+    /^\*\*[^*]+\*\*$/.test(part)
+      ? <strong key={i} style={{ fontWeight: 700 }}>{part.slice(2, -2)}</strong>
+      : part
+  );
+}
+
 // ─── Sub-components ───────────────────────────────────────────────────────────
 
 function SectionCard({ title, content }) {
@@ -188,7 +201,7 @@ function SectionCard({ title, content }) {
           lineHeight: 1.82,
           letterSpacing: "0.008em",
         }}>
-          {content.trim()}
+          {renderInline(content.trim())}
         </p>
       </div>
     );
@@ -222,10 +235,10 @@ function SectionCard({ title, content }) {
           if (isBullet) return (
             <div key={i} style={{ display: "flex", gap: 11, marginBottom: 8, alignItems: "flex-start" }}>
               <span style={{ color: cfg.accent, fontWeight: 700, marginTop: 2, flexShrink: 0, fontSize: 14, lineHeight: 1.72 }}>&rsaquo;</span>
-              <span style={{ color: "#1E2A3A" }}>{line.replace(/^[-\u2022*]\s+/, "")}</span>
+              <span style={{ color: "#1E2A3A" }}>{renderInline(line.replace(/^[-\u2022*]\s+/, ""))}</span>
             </div>
           );
-          return <p key={i} style={{ margin: "0 0 7px", color: "#1E2A3A" }}>{line}</p>;
+          return <p key={i} style={{ margin: "0 0 7px", color: "#1E2A3A" }}>{renderInline(line)}</p>;
         })}
       </div>
     </div>
@@ -1396,7 +1409,7 @@ export default function App() {
                 lineHeight: 1.65,
                 marginBottom: 14,
               }}>
-                {result.urgent}
+                {renderInline(result.urgent)}
               </div>
             )}
 

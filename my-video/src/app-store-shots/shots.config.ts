@@ -1,46 +1,54 @@
 // ─── App Store Screenshot Config ──────────────────────────────────────────────
 //
-// Each slide maps to a code-driven mock screen + overlay copy.
-// To update copy: change headline, subtext, or eyebrow here.
-// To update the screen: edit the corresponding Mock*.tsx in screens/
-// To re-render: run ./render-app-store-shots.sh from the my-video/ folder.
+// Each slide loads a REAL app screenshot from public/screenshots/
+// and wraps it in a premium marketing composition.
+//
+// File placement:
+//   my-video/public/screenshots/
+//     home.png        ← home / input screen
+//     urgency.png     ← urgency badge + "What this could be"
+//     assessments.png ← "What to assess next" + possible concerns
+//     actions.png     ← actions + "Anything change?" panel
+//     sbar.png        ← SBAR handoff draft
+//
+// To re-render all 5: ./render-app-store-shots.sh
 
 export interface ShotConfig {
   slideIndex: number;
-  eyebrow?: string;
-  headline: string;
-  subtext: string;
+  shotFile:   string;   // path relative to public/ dir
+  headline:   string;   // \n creates a line break
+  subtext:    string;
 }
 
 export const SHOTS: ShotConfig[] = [
   {
     slideIndex: 0,
-    eyebrow: "CLINICAL SUPPORT FOR NURSES",
-    headline: "Clinical reasoning\nsupport for nurses.",
-    subtext: "When something feels off. Before you call.",
+    shotFile:   "screenshots/home.png",
+    headline:   "Think clearly\nbefore you call.",
+    subtext:    "Clinical reasoning support for nurses, built for real shift decisions.",
   },
   {
     slideIndex: 1,
-    eyebrow: "WHEN SOMETHING FEELS OFF",
-    headline: "Break down what\nmatters. Spot risk early.",
-    subtext: "Understand what's happening — and what could go wrong.",
+    shotFile:   "screenshots/urgency.png",
+    headline:   "Know what you're\ndealing with.",
+    subtext:    "Urgency level and clinical possibilities — surfaced immediately.",
   },
   {
     slideIndex: 2,
-    eyebrow: "BEFORE YOU CALL",
-    headline: "Know what to assess —\nand what to say.",
-    subtext: "Walk into the call with clarity and a plan.",
+    shotFile:   "screenshots/assessments.png",
+    headline:   "Know what to\nassess next.",
+    subtext:    "Possible concerns and targeted assessments — structured for the bedside.",
   },
   {
     slideIndex: 3,
-    eyebrow: "QUICK GUIDANCE",
-    headline: "Quick answers\nduring your shift.",
-    subtext: "Meds, labs, oxygen, precautions — without overthinking.",
+    shotFile:   "screenshots/actions.png",
+    headline:   "Know when and\nhow to escalate.",
+    subtext:    "Next steps, escalation guidance, and follow-up support.",
   },
   {
     slideIndex: 4,
-    eyebrow: "SBAR HANDOFF",
-    headline: "Know exactly\nwhat to say.",
-    subtext: "Clear, structured communication in seconds.",
+    shotFile:   "screenshots/sbar.png",
+    headline:   "SBAR ready\nin seconds.",
+    subtext:    "Structured handoffs generated from your clinical scenario.",
   },
 ];

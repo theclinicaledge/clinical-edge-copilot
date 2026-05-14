@@ -3,47 +3,56 @@
 // Scale reference: iPhone 15 Pro Max viewport = 430 CSS px → 1290px canvas
 // Every app CSS value × S = canvas pixels
 //
+// Real app visual system (warm / light theme):
+//   Content bg   #E8E2D8   Warm beige — main content area
+//   Card bg      #FFFFFF   White — section cards
+//   Card bg 2    #F5F2EC   Slightly warm white — input / secondary cards
+//   Text primary #1B2433   Dark navy — headings and body on warm bg
+//   Text body    #3D4F5C   Medium dark — body text on white cards
+//   Teal accent  #0EA5B7   Muted cyan — legible on warm/white bg
+//
 export const S = 3;
 
 export const C = {
-  // Backgrounds
-  bgApp:   "#0B1F2A",
-  bgCard:  "#0F2232",
-  bgCard2: "rgba(20,48,66,0.99)",
+  // Backgrounds — warm / light
+  bgApp:   "#E8E2D8",   // warm beige — content area
+  bgCard:  "#FFFFFF",   // white section cards
+  bgCard2: "#F5F2EC",   // slightly warm white
 
-  // Text
-  textPrimary: "#F8FBFC",
-  textBody:    "#A8C1CC",
-  textMuted:   "#7F99A5",
-  textDim:     "#4A6978",
-  textHint:    "#3A5566",
+  // Text (dark on light bg)
+  textPrimary: "#1B2433",
+  textBody:    "#3D4F5C",
+  textMuted:   "#5D7080",
+  textDim:     "#8FA3B0",
+  textHint:    "rgba(27,36,51,0.35)",
 
-  // Accent
-  teal:        "#00C2D1",
-  tealFaint:   "rgba(0,194,209,0.06)",
-  tealBorder:  "rgba(0,194,209,0.18)",
+  // Teal accent — muted, legible on light bg
+  teal:       "#0EA5B7",
+  tealMuted:  "#0891A0",
+  tealFaint:  "rgba(14,165,183,0.08)",
+  tealBorder: "rgba(14,165,183,0.25)",
 
-  // Borders
-  border:      "rgba(255,255,255,0.09)",
-  borderFaint: "rgba(255,255,255,0.055)",
-  borderDim:   "rgba(255,255,255,0.07)",
+  // Borders on light bg
+  border:      "rgba(0,0,0,0.08)",
+  borderFaint: "rgba(0,0,0,0.05)",
+  borderDim:   "rgba(0,0,0,0.07)",
 
-  // Section cards
-  blue:    "#4da3ff",    bgBlue:    "rgba(77,163,255,0.06)",
-  red:     "#e05572",    bgRed:     "rgba(224,85,114,0.06)",
-  green:   "#1FBF75",    bgGreen:   "rgba(31,191,117,0.06)",
-  yellow:  "#F2B94B",    bgYellow:  "rgba(242,185,75,0.06)",
+  // Section card colors — richer saturation on white cards
+  blue:    "#2563EB",    bgBlue:    "#FFFFFF",
+  red:     "#DC2626",    bgRed:     "#FFFFFF",
+  green:   "#059669",    bgGreen:   "#FFFFFF",
+  yellow:  "#D97706",    bgYellow:  "#FFFFFF",
 
-  // Urgency
-  urgHigh:       "#fca5a5",
-  urgHighBg:     "rgba(239,68,68,0.10)",
-  urgHighBorder: "rgba(239,68,68,0.38)",
+  // Urgency — HIGH
+  urgHigh:       "#DC2626",
+  urgHighBg:     "rgba(220,38,38,0.06)",
+  urgHighBorder: "rgba(220,38,38,0.20)",
 
-  // Warning (amber)
-  amber:       "#F59E0B",
-  amberBg:     "rgba(245,158,11,0.08)",
-  amberBorder: "rgba(245,158,11,0.32)",
-  amberText:   "#E9BA4B",
+  // Warning — MODERATE
+  amber:       "#D97706",
+  amberBg:     "rgba(217,119,6,0.07)",
+  amberBorder: "rgba(217,119,6,0.25)",
+  amberText:   "#92400E",
 };
 
 // Font stacks — system fonts render as SF Pro on macOS (where rendering runs)

@@ -2,6 +2,24 @@ import React from "react";
 import { C, S, SANS, MONO } from "./tokens";
 import { MockHeader } from "./MockHeader";
 
+// ── Reusable sub-components ───────────────────────────────────────────────────
+
+const SafetyStrip: React.FC = () => (
+  <div style={{
+    background: "rgba(180,83,9,0.045)",
+    borderBottom: `1px solid rgba(180,83,9,0.10)`,
+    padding: `${5 * S}px ${16 * S}px`,
+    display: "flex",
+    alignItems: "center",
+    gap: 6 * S,
+  }}>
+    <span style={{ color: "rgba(180,83,9,0.65)", fontSize: 11 * S, flexShrink: 0, lineHeight: 1 }}>ⓘ</span>
+    <span style={{ color: "rgba(27,36,51,0.52)", fontSize: 11 * S, fontFamily: SANS, lineHeight: 1.4 }}>
+      For clinical support only — not a substitute for your judgment or facility protocol
+    </span>
+  </div>
+);
+
 interface SbarRowProps {
   initial: string;
   label: string;
@@ -17,13 +35,13 @@ const SbarRow: React.FC<SbarRowProps> = ({ initial, label, rgbColor, children, l
     alignItems: "flex-start",
     marginBottom: last ? 0 : 14 * S,
     paddingBottom: last ? 0 : 14 * S,
-    borderBottom: last ? "none" : `1px solid rgba(255,255,255,0.05)`,
+    borderBottom: last ? "none" : `1px solid rgba(255,255,255,0.07)`,
   }}>
     {/* Letter badge */}
     <div style={{
-      background: `rgba(${rgbColor}, 0.12)`,
+      background: `rgba(${rgbColor}, 0.18)`,
       color: `rgba(${rgbColor}, 1)`,
-      borderRadius: 7 * S,
+      borderRadius: 6 * S,
       width: 24 * S,
       height: 24 * S,
       flexShrink: 0,
@@ -43,16 +61,16 @@ const SbarRow: React.FC<SbarRowProps> = ({ initial, label, rgbColor, children, l
         fontWeight: 700,
         textTransform: "uppercase",
         letterSpacing: "1.2px",
-        color: `rgba(${rgbColor}, 0.80)`,
+        color: `rgba(${rgbColor}, 0.85)`,
         fontFamily: MONO,
         marginBottom: 5 * S,
       }}>
         {label}
       </div>
       <div style={{
-        color: "#BCCDD6",
+        color: "#C8D8E2",
         fontSize: 13 * S,
-        lineHeight: 1.65,
+        lineHeight: 1.68,
         fontFamily: SANS,
       }}>
         {children}
@@ -61,45 +79,61 @@ const SbarRow: React.FC<SbarRowProps> = ({ initial, label, rgbColor, children, l
   </div>
 );
 
+// ── Main screen ───────────────────────────────────────────────────────────────
+
 export const MockSbar: React.FC = () => (
   <div style={{ background: C.bgApp, width: "100%", fontFamily: SANS }}>
     <MockHeader />
+    <SafetyStrip />
 
-    <div style={{ padding: `${16 * S}px ${16 * S}px 0` }}>
+    <div style={{ padding: `${14 * S}px ${16 * S}px 0` }}>
 
-      {/* SBAR card */}
+      {/* Section label */}
       <div style={{
-        background: "linear-gradient(160deg, rgba(0,194,209,0.038) 0%, rgba(0,150,165,0.022) 100%)",
-        border: `1px solid rgba(0,194,209,0.18)`,
-        borderRadius: 14 * S,
-        padding: `${20 * S}px ${20 * S}px`,
-        marginBottom: 14 * S,
-        boxShadow: `0 ${2 * S}px ${18 * S}px rgba(0,0,0,0.18)`,
+        fontSize: 10 * S,
+        fontWeight: 700,
+        textTransform: "uppercase",
+        letterSpacing: "1.5px",
+        color: C.teal,
+        fontFamily: MONO,
+        marginBottom: 10 * S,
+      }}>
+        SBAR Handoff Draft
+      </div>
+
+      {/* SBAR card — intentionally dark, visual contrast on warm bg */}
+      <div style={{
+        background: "#0A1D33",
+        border: `1px solid rgba(14,165,183,0.20)`,
+        borderRadius: 12 * S,
+        padding: `${18 * S}px ${18 * S}px`,
+        marginBottom: 12 * S,
+        boxShadow: `0 ${3 * S}px ${18 * S}px rgba(0,0,0,0.16)`,
       }}>
 
-        {/* Card header row */}
+        {/* Card header */}
         <div style={{
           display: "flex",
           alignItems: "center",
-          marginBottom: 18 * S,
+          marginBottom: 16 * S,
         }}>
           <div style={{
             fontSize: 10 * S,
             fontWeight: 700,
             textTransform: "uppercase",
             letterSpacing: "1.6px",
-            color: C.teal,
+            color: "#22D3EE",
             fontFamily: MONO,
           }}>
             SBAR Handoff
           </div>
           <div style={{
             marginLeft: "auto",
-            background: "rgba(31,191,117,0.08)",
-            border: `1px solid rgba(31,191,117,0.22)`,
-            color: "#4E9E78",
-            borderRadius: 999,
-            padding: `${3 * S}px ${10 * S}px`,
+            background: "rgba(5,150,105,0.12)",
+            border: `1px solid rgba(5,150,105,0.28)`,
+            color: "#34D399",
+            borderRadius: 6 * S,
+            padding: `${3 * S}px ${9 * S}px`,
             fontSize: 10 * S,
             fontWeight: 600,
             fontFamily: MONO,
@@ -109,33 +143,33 @@ export const MockSbar: React.FC = () => (
           </div>
         </div>
 
-        <SbarRow initial="S" label="Situation" rgbColor="0,194,209">
-          Hey, calling about one of my patients — BP dropped to 88/50 and HR is up to 122. He was stable an hour ago.
+        <SbarRow initial="S" label="Situation" rgbColor="14,165,183">
+          I'm calling about my patient in room [X]. Their BP just dropped to 88/50 and their heart rate is up to 122 — they were stable about an hour ago.
         </SbarRow>
 
         <SbarRow initial="B" label="Background" rgbColor="77,163,255">
-          67-year-old, admitted for pneumonia, on IV fluids and antibiotics.
+          [Age]-year-old admitted for [reason]. Currently on IV fluids and [current medications]. No prior history of hemodynamic instability on this admission.
         </SbarRow>
 
-        <SbarRow initial="A" label="Assessment" rgbColor="242,185,75">
-          He is looking a lot more lethargic and his pressure just is not sitting right. Something feels off from earlier.
+        <SbarRow initial="A" label="Assessment" rgbColor="217,119,6">
+          They're looking more lethargic now and their skin feels slightly cool. I'm concerned — this feels like an acute change from where they were. Something is different.
         </SbarRow>
 
-        <SbarRow initial="R" label="Recommendation" rgbColor="31,191,117" last>
-          Wanted to get your input and see how you would like to proceed.
+        <SbarRow initial="R" label="Recommendation" rgbColor="5,150,105" last>
+          I'd like you to come assess. In the meantime — are there any orders you'd like me to start, or should I activate rapid response per protocol?
         </SbarRow>
 
       </div>
 
       {/* Action buttons */}
-      <div style={{ display: "flex", gap: 10 * S, marginBottom: 18 * S }}>
+      <div style={{ display: "flex", gap: 9 * S, marginBottom: 16 * S }}>
         <div style={{
           flex: 1,
-          background: "rgba(0,194,209,0.07)",
-          border: `1px solid rgba(0,194,209,0.22)`,
+          background: "rgba(14,165,183,0.07)",
+          border: `1px solid rgba(14,165,183,0.24)`,
           color: C.teal,
-          borderRadius: 10 * S,
-          padding: `${11 * S}px ${18 * S}px`,
+          borderRadius: 8 * S,
+          padding: `${10 * S}px 0`,
           fontSize: 13 * S,
           fontWeight: 600,
           textAlign: "center" as const,
@@ -144,11 +178,11 @@ export const MockSbar: React.FC = () => (
         </div>
         <div style={{
           flex: 1,
-          background: "rgba(31,191,117,0.04)",
-          border: `1px solid rgba(31,191,117,0.22)`,
-          color: "#4E9E78",
-          borderRadius: 10 * S,
-          padding: `${11 * S}px ${18 * S}px`,
+          background: "rgba(5,150,105,0.06)",
+          border: `1px solid rgba(5,150,105,0.22)`,
+          color: C.green,
+          borderRadius: 8 * S,
+          padding: `${10 * S}px 0`,
           fontSize: 13 * S,
           fontWeight: 600,
           textAlign: "center" as const,
@@ -160,11 +194,11 @@ export const MockSbar: React.FC = () => (
       {/* Closing note */}
       <div style={{
         borderLeft: `3px solid ${C.teal}`,
-        paddingLeft: 16 * S,
-        margin: `${4 * S}px 0`,
+        paddingLeft: 14 * S,
+        marginBottom: 16 * S,
       }}>
         <p style={{
-          color: "rgba(168,193,204,0.65)",
+          color: "rgba(27,36,51,0.52)",
           fontSize: 13 * S,
           lineHeight: 1.65,
           fontStyle: "italic",

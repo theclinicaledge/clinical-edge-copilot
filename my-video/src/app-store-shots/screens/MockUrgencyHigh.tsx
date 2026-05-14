@@ -2,61 +2,70 @@ import React from "react";
 import { C, S, SANS, MONO } from "./tokens";
 import { MockHeader } from "./MockHeader";
 
-interface SectionCardProps {
-  label: string;
-  accent: string;
-  bg: string;
-  children: React.ReactNode;
-}
+// ── Reusable sub-components ───────────────────────────────────────────────────
 
-const SectionCard: React.FC<SectionCardProps> = ({ label, accent, bg, children }) => (
+const SafetyStrip: React.FC = () => (
   <div style={{
-    background: bg,
-    borderLeft: `${3}px solid ${accent}`,
-    borderRadius: 12 * S,
-    padding: `${18 * S}px ${20 * S}px`,
-    marginBottom: 10 * S,
-    boxShadow: `0 ${2 * S}px ${14 * S}px rgba(0,0,0,0.13)`,
+    background: "rgba(180,83,9,0.045)",
+    borderBottom: `1px solid rgba(180,83,9,0.10)`,
+    padding: `${5 * S}px ${16 * S}px`,
+    display: "flex",
+    alignItems: "center",
+    gap: 6 * S,
   }}>
-    <div style={{
-      fontSize: 10 * S,
-      fontWeight: 700,
-      textTransform: "uppercase",
-      letterSpacing: "1.5px",
-      color: accent,
-      fontFamily: MONO,
-      marginBottom: 12 * S,
-      opacity: 0.88,
-    }}>
-      {label}
-    </div>
-    {children}
+    <span style={{ color: "rgba(180,83,9,0.65)", fontSize: 11 * S, flexShrink: 0, lineHeight: 1 }}>ⓘ</span>
+    <span style={{ color: "rgba(27,36,51,0.52)", fontSize: 11 * S, fontFamily: SANS, lineHeight: 1.4 }}>
+      For clinical support only — not a substitute for your judgment or facility protocol
+    </span>
   </div>
 );
 
-const Bullet: React.FC<{ accent: string; children: React.ReactNode }> = ({ accent, children }) => (
-  <div style={{ display: "flex", gap: 11 * S, marginBottom: 8 * S, alignItems: "flex-start" }}>
-    <span style={{ color: accent, fontWeight: 700, flexShrink: 0, fontSize: 14 * S, lineHeight: 1.7, marginTop: 1 * S }}>›</span>
-    <span style={{ color: "#BCCDD6", fontSize: 14 * S, lineHeight: 1.7, fontFamily: SANS }}>{children}</span>
-  </div>
+const Dot: React.FC<{ color: string }> = ({ color }) => (
+  <span style={{
+    display: "inline-block",
+    width: 6 * S,
+    height: 6 * S,
+    borderRadius: "50%",
+    background: color,
+    flexShrink: 0,
+    marginTop: 5 * S,
+  }} />
 );
+
+// ── Main screen ───────────────────────────────────────────────────────────────
 
 export const MockUrgencyHigh: React.FC = () => (
   <div style={{ background: C.bgApp, width: "100%", fontFamily: SANS }}>
     <MockHeader />
+    <SafetyStrip />
 
-    <div style={{ padding: `${16 * S}px ${16 * S}px 0` }}>
+    <div style={{ padding: `${14 * S}px ${16 * S}px 0` }}>
+
+      {/* Scenario echo */}
+      <div style={{
+        background: "rgba(255,255,255,0.50)",
+        border: `1px solid rgba(0,0,0,0.07)`,
+        borderRadius: 10 * S,
+        padding: `${10 * S}px ${14 * S}px`,
+        marginBottom: 12 * S,
+        fontSize: 13 * S,
+        color: "rgba(27,36,51,0.60)",
+        lineHeight: 1.5,
+        fontStyle: "italic",
+      }}>
+        "BP dropped to 88/50, HR 122, was stable an hour ago — help me think through this before I call."
+      </div>
 
       {/* Urgency badge */}
       <div style={{
         display: "flex",
         alignItems: "center",
-        gap: 10 * S,
+        gap: 9 * S,
         background: C.urgHighBg,
         border: `1px solid ${C.urgHighBorder}`,
-        borderRadius: 10 * S,
-        padding: `${10 * S}px ${16 * S}px`,
-        marginBottom: 16 * S,
+        borderRadius: 8 * S,
+        padding: `${9 * S}px ${14 * S}px`,
+        marginBottom: 10 * S,
       }}>
         <span style={{
           width: 7 * S,
@@ -64,7 +73,6 @@ export const MockUrgencyHigh: React.FC = () => (
           borderRadius: "50%",
           background: C.urgHigh,
           flexShrink: 0,
-          boxShadow: `0 0 ${7 * S}px ${C.urgHigh}99`,
           display: "inline-block",
         }} />
         <span style={{
@@ -74,73 +82,158 @@ export const MockUrgencyHigh: React.FC = () => (
           fontFamily: MONO,
           letterSpacing: "1.2px",
           textTransform: "uppercase",
+          flex: 1,
         }}>
-          Urgency: High
+          Urgency: HIGH
+        </span>
+        <span style={{
+          fontSize: 12 * S,
+          color: C.urgHigh,
+          opacity: 0.80,
+        }}>
+          ⚠
         </span>
       </div>
 
-      {/* Warning box */}
+      {/* Urgent deterioration warning */}
       <div style={{
-        background: C.amberBg,
-        border: `1px solid ${C.amberBorder}`,
-        borderRadius: 10 * S,
-        padding: `${12 * S}px ${16 * S}px`,
-        marginBottom: 20 * S,
+        background: "rgba(220,38,38,0.04)",
+        border: `1px solid rgba(220,38,38,0.14)`,
+        borderRadius: 8 * S,
+        padding: `${10 * S}px ${14 * S}px`,
+        marginBottom: 12 * S,
         display: "flex",
-        gap: 10 * S,
+        gap: 9 * S,
         alignItems: "flex-start",
       }}>
-        <span style={{ fontSize: 16 * S, lineHeight: 1.4, flexShrink: 0 }}>⚠️</span>
+        <span style={{ fontSize: 14 * S, flexShrink: 0, lineHeight: 1.4 }}>⚠️</span>
         <span style={{
-          color: C.amberText,
+          color: "#9B1C1C",
           fontSize: 13 * S,
           lineHeight: 1.55,
           fontWeight: 500,
         }}>
-          This pattern is often associated with acute clinical deterioration and is commonly linked with situations where timely clinical attention is often considered based on institutional protocol.
+          This pattern is consistent with acute hemodynamic instability. Prompt bedside assessment and provider notification are typically indicated.
         </span>
       </div>
 
-      {/* What this could be */}
-      <SectionCard label="What this could be" accent={C.blue} bg={C.bgBlue}>
-        <p style={{ color: "#BCCDD6", fontSize: 14 * S, lineHeight: 1.75, margin: `0 0 ${10 * S}px`, fontFamily: SANS }}>
-          Rapid BP drop with compensatory tachycardia — the body is working to maintain perfusion.
-        </p>
-        <p style={{ color: "#BCCDD6", fontSize: 13 * S, lineHeight: 1.6, margin: `0 0 ${6 * S}px`, fontFamily: SANS, opacity: 0.85 }}>
-          Could be:
-        </p>
-        {["Volume loss (bleeding or third-spacing)", "Sepsis catching up", "Cardiac event", "PE"].map((item) => (
-          <div key={item} style={{ display: "flex", gap: 8 * S, marginBottom: 5 * S, alignItems: "flex-start" }}>
-            <span style={{ color: C.blue, fontSize: 11 * S, flexShrink: 0, marginTop: 3 * S }}>•</span>
-            <span style={{ color: "#BCCDD6", fontSize: 13 * S, lineHeight: 1.5, fontFamily: SANS }}>{item}</span>
-          </div>
-        ))}
-      </SectionCard>
-
-      {/* Possible concerns */}
-      <SectionCard label="Possible concerns" accent={C.red} bg={C.bgRed}>
-        <Bullet accent={C.red}>Compensation appears active — that kind of rapid drop carries weight regardless of the absolute numbers</Bullet>
-        <Bullet accent={C.red}>The trajectory matters more than any single value — stable an hour ago makes this a trend, not a snapshot</Bullet>
-        <Bullet accent={C.red}>Mental status changes or increasing work of breathing would add significantly to the concern here</Bullet>
-      </SectionCard>
-
-      {/* Footer */}
+      {/* Most Likely Issue — blue card */}
       <div style={{
-        borderTop: `1px solid rgba(255,255,255,0.05)`,
-        marginTop: 14 * S,
-        paddingTop: 12 * S,
+        background: C.bgCard,
+        borderLeft: `3px solid ${C.blue}`,
+        borderRadius: 10 * S,
+        padding: `${14 * S}px ${16 * S}px`,
         marginBottom: 10 * S,
+        boxShadow: `0 ${1 * S}px ${8 * S}px rgba(0,0,0,0.06)`,
       }}>
-        <p style={{
-          color: "rgba(168,193,204,0.32)",
-          fontSize: 11 * S,
-          lineHeight: 1.5,
-          fontStyle: "italic",
-          margin: 0,
+        <div style={{
+          fontSize: 10 * S,
+          fontWeight: 700,
+          textTransform: "uppercase",
+          letterSpacing: "1.4px",
+          color: C.blue,
+          fontFamily: MONO,
+          marginBottom: 10 * S,
         }}>
-          For educational support only. Use your clinical judgment and follow local protocol.
+          Most Likely Issue
+        </div>
+        <p style={{
+          color: C.textBody,
+          fontSize: 14 * S,
+          lineHeight: 1.70,
+          margin: `0 0 ${10 * S}px`,
+        }}>
+          Acute hemodynamic compromise — BP 88/50 with HR 122 in a patient who was stable an hour ago suggests the body is actively compensating for a perfusion deficit.
+        </p>
+        <p style={{
+          color: "rgba(27,36,51,0.55)",
+          fontSize: 13 * S,
+          lineHeight: 1.55,
+          margin: `0 0 ${8 * S}px`,
+        }}>
+          The trend matters more than any single reading. This is an acute change, not a chronic state.
         </p>
       </div>
+
+      {/* What this could be — blue card */}
+      <div style={{
+        background: C.bgCard,
+        borderLeft: `3px solid ${C.blue}`,
+        borderRadius: 10 * S,
+        padding: `${14 * S}px ${16 * S}px`,
+        marginBottom: 10 * S,
+        boxShadow: `0 ${1 * S}px ${8 * S}px rgba(0,0,0,0.06)`,
+      }}>
+        <div style={{
+          fontSize: 10 * S,
+          fontWeight: 700,
+          textTransform: "uppercase",
+          letterSpacing: "1.4px",
+          color: C.blue,
+          fontFamily: MONO,
+          marginBottom: 10 * S,
+        }}>
+          What this could be
+        </div>
+        {[
+          "Volume loss — bleeding, third-spacing, or inadequate intake",
+          "Sepsis — vasodilation from an infectious source catching up",
+          "Cardiac dysfunction — rate-related, ischemic, or structural",
+          "Pulmonary embolism — obstructive pattern",
+          "Medication effect — vasodilators, diuretics, or other agents",
+        ].map((item) => (
+          <div key={item} style={{
+            display: "flex",
+            gap: 9 * S,
+            marginBottom: 7 * S,
+            alignItems: "flex-start",
+          }}>
+            <Dot color={C.blue} />
+            <span style={{ color: C.textBody, fontSize: 13 * S, lineHeight: 1.55 }}>{item}</span>
+          </div>
+        ))}
+      </div>
+
+      {/* Urgency summary card */}
+      <div style={{
+        background: C.bgCard,
+        borderLeft: `3px solid ${C.amber}`,
+        borderRadius: 10 * S,
+        padding: `${14 * S}px ${16 * S}px`,
+        marginBottom: 14 * S,
+        boxShadow: `0 ${1 * S}px ${8 * S}px rgba(0,0,0,0.06)`,
+      }}>
+        <div style={{
+          fontSize: 10 * S,
+          fontWeight: 700,
+          textTransform: "uppercase",
+          letterSpacing: "1.4px",
+          color: C.amber,
+          fontFamily: MONO,
+          marginBottom: 10 * S,
+        }}>
+          Urgency Summary
+        </div>
+        <p style={{
+          color: C.textBody,
+          fontSize: 14 * S,
+          lineHeight: 1.70,
+          margin: 0,
+        }}>
+          Hypotension + tachycardia with a rapid onset in a previously stable patient warrants immediate assessment. Do not wait for additional data points before going to the bedside.
+        </p>
+      </div>
+
+      {/* Footer disclaimer */}
+      <p style={{
+        color: "rgba(27,36,51,0.30)",
+        fontSize: 11 * S,
+        lineHeight: 1.5,
+        fontStyle: "italic",
+        margin: `0 0 ${16 * S}px`,
+      }}>
+        For educational support only. Use your clinical judgment and follow local protocol.
+      </p>
 
     </div>
   </div>

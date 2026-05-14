@@ -1,0 +1,513 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Clinical Edge — Post 53 — The Signal Before the Number</title>
+  <link
+    href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=IBM+Plex+Mono:wght@400;500;700&display=swap"
+    rel="stylesheet"
+  />
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      background: #040b18;
+      font-family: 'Inter', -apple-system, sans-serif;
+      padding: 48px 32px;
+      display: flex; flex-direction: column; align-items: center; gap: 56px;
+    }
+
+    /* ─── Slide shell ─── */
+    .slide {
+      width: 1080px; height: 1350px;
+      background: #07142A;
+      position: relative; overflow: hidden; flex-shrink: 0;
+    }
+    .slide-label {
+      width: 1080px; display: flex; align-items: center; gap: 14px; margin-bottom: -40px;
+    }
+    .slide-label span {
+      font-family: 'IBM Plex Mono', monospace; font-size: 11px; font-weight: 500;
+      color: #1E2F4A; letter-spacing: 2px; text-transform: uppercase;
+    }
+    .slide-label::after { content: ''; flex: 1; height: 1px; background: rgba(255,255,255,0.03); }
+
+    /* Subtle dot texture */
+    .slide::before {
+      content: ''; position: absolute; inset: 0;
+      background-image: radial-gradient(circle, rgba(255,255,255,0.014) 1px, transparent 1px);
+      background-size: 40px 40px; pointer-events: none; z-index: 0;
+    }
+
+    /* ─── Footer — softened, less dominant ─── */
+    .slide-footer {
+      position: absolute; bottom: 0; left: 0; right: 0; height: 96px;
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 0 72px;
+      border-top: 1px solid rgba(255,255,255,0.06);
+      background: rgba(7,20,42,0.88);
+      backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px); z-index: 2;
+    }
+    .footer-brand { display: flex; align-items: center; gap: 14px; }
+    .footer-dot { width: 8px; height: 8px; border-radius: 50%; background: #0EA5B7; }
+    .footer-name { font-family: 'Inter', sans-serif; font-size: 26px; font-weight: 500; color: #7A8EA8; letter-spacing: -0.2px; }
+    .footer-handle { font-family: 'IBM Plex Mono', monospace; font-size: 23px; font-weight: 500; color: #7A8EA8; letter-spacing: 1.5px; text-transform: uppercase; }
+
+    /* ─── Counter — muted active dot ─── */
+    .slide-number { position: absolute; bottom: 26px; left: 50%; transform: translateX(-50%); display: flex; gap: 7px; z-index: 3; }
+    .slide-number .dot { width: 5px; height: 5px; border-radius: 50%; background: rgba(255,255,255,0.09); }
+    .slide-number .dot.active { background: #0EA5B7; }
+
+    /* ─── Labels ─── */
+    .label { font-family: 'IBM Plex Mono', monospace; font-size: 23px; font-weight: 700; letter-spacing: 2.5px; text-transform: uppercase; color: #22D3EE; }
+    .label.muted { color: #2C3F58; }
+    .label.soft { color: #0EA5B7; }
+
+    /* ─── Badges ─── */
+    .badge { display: inline-flex; align-items: center; padding: 12px 26px; border-radius: 100px; background: rgba(34,211,238,0.06); border: 1px solid rgba(34,211,238,0.16); font-family: 'IBM Plex Mono', monospace; font-size: 22px; font-weight: 700; letter-spacing: 2px; text-transform: uppercase; color: #22D3EE; }
+    .badge.dim { background: rgba(14,165,183,0.04); border-color: rgba(14,165,183,0.12); color: #0EA5B7; }
+
+    /* ─── Type scale ─── */
+    h1 { font-family: 'Inter', sans-serif; font-size: 136px; font-weight: 900; line-height: 0.92; letter-spacing: -5px; color: #F0F2F5; }
+    h2 { font-family: 'Inter', sans-serif; font-size: 84px; font-weight: 800; line-height: 1.0; letter-spacing: -3px; color: #F0F2F5; }
+    h3 { font-family: 'Inter', sans-serif; font-size: 62px; font-weight: 700; line-height: 1.08; letter-spacing: -2px; color: #F0F2F5; }
+    h4 { font-family: 'Inter', sans-serif; font-size: 44px; font-weight: 600; line-height: 1.2; letter-spacing: -1px; color: #F0F2F5; }
+    p { font-family: 'Inter', sans-serif; font-size: 36px; font-weight: 400; line-height: 1.55; color: #94A3B8; }
+    p.large { font-size: 40px; font-weight: 400; line-height: 1.5; color: #94A3B8; }
+    p.small { font-size: 28px; line-height: 1.6; color: #64748B; }
+
+    /* ─── Accents & dividers ─── */
+    .divider { width: 100%; height: 1px; background: rgba(255,255,255,0.07); }
+
+    /* ─── Cards ─── */
+    .card-navy { background: #102742; border: 1px solid #1A3654; border-radius: 18px; padding: 52px 56px; }
+    .card-ivory { background: #F3EFE7; border: 1px solid #D8CBB8; border-radius: 18px; padding: 56px 60px; }
+    .card-ivory .ivory-head { font-family: 'Inter', sans-serif; font-weight: 700; color: #07142A; letter-spacing: -2px; line-height: 1.08; }
+    .card-ivory .ivory-body { font-family: 'Inter', sans-serif; font-weight: 400; color: #2E4266; line-height: 1.55; }
+    .card-ivory .ivory-muted { font-family: 'IBM Plex Mono', monospace; font-size: 20px; font-weight: 700; color: #0EA5B7; letter-spacing: 2px; text-transform: uppercase; }
+
+    /* ─── Layout ─── */
+    .slide-content { position: relative; z-index: 1; padding: 60px 72px 116px; height: 100%; display: flex; flex-direction: column; }
+  </style>
+</head>
+<body>
+
+  <!-- POST 53 — "The Signal Before the Number" -->
+
+
+  <!-- ════════════════════════════════════════════════════════
+       SLIDE 1 — HOOK
+       Composition: upper-anchored editorial
+       Content flows from badge downward — clear upper anchor.
+       Swipe indicator held at floor with margin-top:auto.
+       ════════════════════════════════════════════════════════ -->
+  <div class="slide-label"><span>Slide 01 — Hook</span></div>
+  <div class="slide" id="slide-1">
+
+    <div style="position:absolute; top:-140px; right:-100px; width:520px; height:520px; background:radial-gradient(circle, rgba(14,165,183,0.04) 0%, transparent 60%); pointer-events:none; z-index:0;"></div>
+
+    <div class="slide-content" style="justify-content:flex-start;">
+
+      <div style="display:flex; align-items:center; justify-content:space-between;">
+        <div class="badge">Clinical Edge</div>
+        <span class="label muted">01 / 09</span>
+      </div>
+
+      <div style="margin-top:44px; display:flex; flex-direction:column; gap:32px;">
+        <span style="font-family:'IBM Plex Mono',monospace; font-size:21px; font-weight:600; color:#0EA5B7; letter-spacing:3px; text-transform:uppercase;">Clinical Reasoning</span>
+        <h2>The signal<br>before the number.</h2>
+        <div style="width:44px; height:1.5px; background:#0EA5B7; border-radius:2px;"></div>
+        <p style="max-width:680px;">What nurses notice before the chart catches up.</p>
+      </div>
+
+      <div style="margin-top:auto; display:flex; align-items:center; gap:16px; padding-bottom:14px;">
+        <span class="label muted">Swipe</span>
+        <div style="display:flex; gap:8px; align-items:center;">
+          <div style="width:24px; height:1px; background:#1A3654;"></div>
+          <div style="width:6px; height:6px; border-radius:50%; background:#0EA5B7;"></div>
+          <div style="width:8px; height:1px; background:#1A3654;"></div>
+        </div>
+      </div>
+
+    </div>
+
+    <div class="slide-footer">
+      <div class="footer-brand"><div class="footer-dot"></div><span class="footer-name">Clinical Edge Copilot</span></div>
+      <span class="footer-handle">@clinicaledgeco</span>
+    </div>
+    <div class="slide-number">
+      <div class="dot active"></div>
+      <div class="dot"></div><div class="dot"></div><div class="dot"></div>
+      <div class="dot"></div><div class="dot"></div><div class="dot"></div>
+      <div class="dot"></div><div class="dot"></div>
+    </div>
+  </div>
+
+
+  <!-- ════════════════════════════════════════════════════════
+       SLIDE 2 — BEDSIDE (quiet statement)
+       Composition: true mid-frame.
+       margin-top:auto + margin-bottom:auto centers content
+       between the badge and the footer. No bottom anchoring.
+       ════════════════════════════════════════════════════════ -->
+  <div class="slide-label"><span>Slide 02 — Bedside</span></div>
+  <div class="slide" id="slide-2">
+
+    <div class="slide-content" style="justify-content:flex-start;">
+
+      <div style="display:flex; align-items:center; justify-content:space-between;">
+        <div class="badge dim">Bedside</div>
+        <span class="label muted">02 / 09</span>
+      </div>
+
+      <!-- Upper-mid anchor: content high, space falls below -->
+      <div style="margin-top:116px; display:flex; flex-direction:column; gap:28px;">
+        <div style="width:36px; height:1.5px; background:#0EA5B7; border-radius:2px;"></div>
+        <h3>The patient was answering.<br>Not engaging.</h3>
+        <p>Different things.</p>
+      </div>
+
+    </div>
+
+    <div class="slide-footer">
+      <div class="footer-brand"><div class="footer-dot"></div><span class="footer-name">Clinical Edge Copilot</span></div>
+      <span class="footer-handle">@clinicaledgeco</span>
+    </div>
+    <div class="slide-number">
+      <div class="dot"></div>
+      <div class="dot active"></div>
+      <div class="dot"></div><div class="dot"></div><div class="dot"></div>
+      <div class="dot"></div><div class="dot"></div><div class="dot"></div>
+      <div class="dot"></div>
+    </div>
+  </div>
+
+
+  <!-- ════════════════════════════════════════════════════════
+       SLIDE 3 — PATTERN (warm ivory card)
+       Composition: card anchored in upper area.
+       flex:1 spacer pushes a quiet supporting line to the floor.
+       Two-anchor composition: card top, footnote bottom.
+       ════════════════════════════════════════════════════════ -->
+  <div class="slide-label"><span>Slide 03 — Pattern</span></div>
+  <div class="slide" id="slide-3">
+
+    <div class="slide-content" style="justify-content:flex-start;">
+
+      <div style="display:flex; align-items:center; justify-content:space-between;">
+        <div class="badge dim">Pattern</div>
+        <span class="label muted">03 / 09</span>
+      </div>
+
+      <div style="margin-top:36px;">
+        <div class="card-ivory">
+          <span class="ivory-muted">Pattern Recognition</span>
+          <div style="height:1px; background:#D8CBB8; margin:32px 0;"></div>
+          <div class="ivory-head" style="font-size:60px;">That's the first signal.</div>
+          <div style="height:1px; background:#D8CBB8; margin:32px 0;"></div>
+          <div class="ivory-body" style="font-size:36px;">Not the labs. Not the vitals.<br>The person.</div>
+        </div>
+      </div>
+
+      <!-- Supporting line sits immediately below the card — no floor-anchor -->
+      <p class="small" style="margin-top:28px;">The nurse noticed before the chart had a reason to.</p>
+
+    </div>
+
+    <div class="slide-footer">
+      <div class="footer-brand"><div class="footer-dot"></div><span class="footer-name">Clinical Edge Copilot</span></div>
+      <span class="footer-handle">@clinicaledgeco</span>
+    </div>
+    <div class="slide-number">
+      <div class="dot"></div><div class="dot"></div>
+      <div class="dot active"></div>
+      <div class="dot"></div><div class="dot"></div><div class="dot"></div>
+      <div class="dot"></div><div class="dot"></div><div class="dot"></div>
+    </div>
+  </div>
+
+
+  <!-- ════════════════════════════════════════════════════════
+       SLIDE 4 — THE CHART (structured data card)
+       Composition: labeled data block, upper-third.
+       Context label above the card creates intentional hierarchy.
+       ════════════════════════════════════════════════════════ -->
+  <div class="slide-label"><span>Slide 04 — The Chart</span></div>
+  <div class="slide" id="slide-4">
+
+    <div class="slide-content" style="justify-content:flex-start;">
+
+      <div style="display:flex; align-items:center; justify-content:space-between;">
+        <div class="badge dim">The Chart</div>
+        <span class="label muted">04 / 09</span>
+      </div>
+
+      <div style="margin-top:52px; display:flex; flex-direction:column; gap:28px;">
+
+        <span style="font-family:'IBM Plex Mono',monospace; font-size:19px; font-weight:600; color:#2C3F58; letter-spacing:2px; text-transform:uppercase;">Patient Status</span>
+
+        <div class="card-navy">
+          <div style="display:flex; border-bottom:1px solid #1A3654; padding-bottom:40px; margin-bottom:40px;">
+            <div style="flex:1; display:flex; flex-direction:column; gap:10px;">
+              <span style="font-family:'IBM Plex Mono',monospace; font-size:19px; font-weight:500; color:#64748B; letter-spacing:1.5px;">HR</span>
+              <span style="font-family:'Inter',sans-serif; font-size:58px; font-weight:700; color:#F0F2F5; letter-spacing:-2.5px; line-height:1;">88</span>
+            </div>
+            <div style="flex:1; display:flex; flex-direction:column; gap:10px;">
+              <span style="font-family:'IBM Plex Mono',monospace; font-size:19px; font-weight:500; color:#64748B; letter-spacing:1.5px;">BP</span>
+              <span style="font-family:'Inter',sans-serif; font-size:46px; font-weight:700; color:#F0F2F5; letter-spacing:-2px; line-height:1;">124/78</span>
+            </div>
+            <div style="flex:1; display:flex; flex-direction:column; gap:10px;">
+              <span style="font-family:'IBM Plex Mono',monospace; font-size:19px; font-weight:500; color:#64748B; letter-spacing:1.5px;">SpO2</span>
+              <span style="font-family:'Inter',sans-serif; font-size:58px; font-weight:700; color:#F0F2F5; letter-spacing:-2.5px; line-height:1;">97%</span>
+            </div>
+          </div>
+          <p style="font-size:34px; color:#94A3B8;">Normal. The nurse wasn't satisfied.</p>
+        </div>
+
+        <p class="small" style="padding-left:4px;">That hesitation was the signal.</p>
+
+      </div>
+
+    </div>
+
+    <div class="slide-footer">
+      <div class="footer-brand"><div class="footer-dot"></div><span class="footer-name">Clinical Edge Copilot</span></div>
+      <span class="footer-handle">@clinicaledgeco</span>
+    </div>
+    <div class="slide-number">
+      <div class="dot"></div><div class="dot"></div><div class="dot"></div>
+      <div class="dot active"></div>
+      <div class="dot"></div><div class="dot"></div><div class="dot"></div>
+      <div class="dot"></div><div class="dot"></div>
+    </div>
+  </div>
+
+
+  <!-- ════════════════════════════════════════════════════════
+       SLIDE 5 — PUNCHLINE (the ONE h1 moment)
+       Composition: upper-anchored type drama.
+       Type sits in the upper third. The lower half is negative
+       space — intentional weight and gravity below the words.
+       ════════════════════════════════════════════════════════ -->
+  <div class="slide-label"><span>Slide 05 — Punchline</span></div>
+  <div class="slide" id="slide-5">
+
+    <div style="position:absolute; bottom:-100px; left:-60px; width:440px; height:440px; background:radial-gradient(circle, rgba(14,165,183,0.05) 0%, transparent 65%); pointer-events:none; z-index:0;"></div>
+
+    <div class="slide-content" style="justify-content:flex-start;">
+
+      <div style="display:flex; align-items:center; justify-content:space-between;">
+        <div class="badge">Clinical Edge</div>
+        <span class="label muted">05 / 09</span>
+      </div>
+
+      <!-- Type drops straight down from badge — upper-third anchor -->
+      <div style="margin-top:60px; display:flex; flex-direction:column; gap:0;">
+        <h2>Nurses don't</h2>
+        <h1 style="margin-top:-10px; font-size:118px; letter-spacing:-4.5px;">wait for</h1>
+        <h1 style="margin-top:-14px; font-size:118px; letter-spacing:-4.5px; color:#22D3EE;">the alarm.</h1>
+      </div>
+
+      <!-- Lower two-thirds: intentional breathing room -->
+
+    </div>
+
+    <div class="slide-footer">
+      <div class="footer-brand"><div class="footer-dot"></div><span class="footer-name">Clinical Edge Copilot</span></div>
+      <span class="footer-handle">@clinicaledgeco</span>
+    </div>
+    <div class="slide-number">
+      <div class="dot"></div><div class="dot"></div><div class="dot"></div><div class="dot"></div>
+      <div class="dot active"></div>
+      <div class="dot"></div><div class="dot"></div><div class="dot"></div>
+      <div class="dot"></div>
+    </div>
+  </div>
+
+
+  <!-- ════════════════════════════════════════════════════════
+       SLIDE 6 — DEFINITION (split-zone composition)
+       Zone 1: upper — setup statement and elaboration.
+       Zone 2: lower — the conclusion, anchored to the floor.
+       flex:1 spacer creates intentional breathing room between.
+       ════════════════════════════════════════════════════════ -->
+  <div class="slide-label"><span>Slide 06 — Clinical Judgment</span></div>
+  <div class="slide" id="slide-6">
+
+    <div class="slide-content" style="justify-content:flex-start;">
+
+      <div style="display:flex; align-items:center; justify-content:space-between;">
+        <div class="badge dim">Clinical Judgment</div>
+        <span class="label muted">06 / 09</span>
+      </div>
+
+      <!-- All content anchored high — space opens below, not above -->
+      <div style="margin-top:64px; display:flex; flex-direction:column; gap:36px;">
+        <div style="width:36px; height:1.5px; background:#0EA5B7; border-radius:2px;"></div>
+        <h3>That awareness.</h3>
+        <p class="large" style="max-width:720px;">The one with no name in the chart.</p>
+        <div class="divider"></div>
+        <h4 style="color:#22D3EE;">That's clinical judgment.</h4>
+        <p class="small">Not overcaution. The trained eye reading the room.</p>
+      </div>
+
+    </div>
+
+    <div class="slide-footer">
+      <div class="footer-brand"><div class="footer-dot"></div><span class="footer-name">Clinical Edge Copilot</span></div>
+      <span class="footer-handle">@clinicaledgeco</span>
+    </div>
+    <div class="slide-number">
+      <div class="dot"></div><div class="dot"></div><div class="dot"></div>
+      <div class="dot"></div><div class="dot"></div>
+      <div class="dot active"></div>
+      <div class="dot"></div><div class="dot"></div><div class="dot"></div>
+    </div>
+  </div>
+
+
+  <!-- ════════════════════════════════════════════════════════
+       SLIDE 7 — THE GAP (warm ivory card, bridge slide)
+       Composition: card anchored upper-mid, footnote at floor.
+       Same two-anchor logic as slide 3 — card top, text bottom.
+       Different card content creates variation, not repetition.
+       ════════════════════════════════════════════════════════ -->
+  <div class="slide-label"><span>Slide 07 — The Gap</span></div>
+  <div class="slide" id="slide-7">
+
+    <div class="slide-content" style="justify-content:flex-start;">
+
+      <div style="display:flex; align-items:center; justify-content:space-between;">
+        <div class="badge dim">The Gap</div>
+        <span class="label muted">07 / 09</span>
+      </div>
+
+      <div style="margin-top:36px;">
+        <div class="card-ivory">
+          <span class="ivory-muted">The Problem</span>
+          <div style="height:1px; background:#D8CBB8; margin:32px 0;"></div>
+          <div class="ivory-head" style="font-size:56px;">Most clinical tools don't account for it.</div>
+          <div style="height:1px; background:#D8CBB8; margin:32px 0;"></div>
+          <div class="ivory-body" style="font-size:35px;">Clinical Edge Copilot was built around that gap.</div>
+        </div>
+      </div>
+
+      <!-- Supporting line sits directly below card — no floor-anchor -->
+      <p class="small" style="margin-top:28px;">Reasoning support for what the chart can't capture.</p>
+
+    </div>
+
+    <div class="slide-footer">
+      <div class="footer-brand"><div class="footer-dot"></div><span class="footer-name">Clinical Edge Copilot</span></div>
+      <span class="footer-handle">@clinicaledgeco</span>
+    </div>
+    <div class="slide-number">
+      <div class="dot"></div><div class="dot"></div><div class="dot"></div>
+      <div class="dot"></div><div class="dot"></div><div class="dot"></div>
+      <div class="dot active"></div>
+      <div class="dot"></div><div class="dot"></div>
+    </div>
+  </div>
+
+
+  <!-- ════════════════════════════════════════════════════════
+       SLIDE 8 — PRODUCT (upper-anchored editorial)
+       Composition: content anchored to the top.
+       White h3 + gray h3 creates hierarchy through color,
+       not scale. Breathing room opens below the divider.
+       ════════════════════════════════════════════════════════ -->
+  <div class="slide-label"><span>Slide 08 — Product</span></div>
+  <div class="slide" id="slide-8">
+
+    <div class="slide-content" style="justify-content:flex-start;">
+
+      <div style="display:flex; align-items:center; justify-content:space-between;">
+        <div class="badge">Clinical Edge Copilot</div>
+        <span class="label muted">08 / 09</span>
+      </div>
+
+      <div style="margin-top:56px; display:flex; flex-direction:column; gap:32px;">
+        <div style="width:36px; height:1.5px; background:#0EA5B7; border-radius:2px;"></div>
+        <h3>AI reasoning support</h3>
+        <h3 style="margin-top:-20px; color:#94A3B8;">that respects the<br>nurse's instinct.</h3>
+        <div class="divider" style="margin-top:8px;"></div>
+        <p style="max-width:720px;">Because clinical judgment deserves more than a checklist.</p>
+      </div>
+
+    </div>
+
+    <div class="slide-footer">
+      <div class="footer-brand"><div class="footer-dot"></div><span class="footer-name">Clinical Edge Copilot</span></div>
+      <span class="footer-handle">@clinicaledgeco</span>
+    </div>
+    <div class="slide-number">
+      <div class="dot"></div><div class="dot"></div><div class="dot"></div>
+      <div class="dot"></div><div class="dot"></div><div class="dot"></div>
+      <div class="dot"></div>
+      <div class="dot active"></div>
+      <div class="dot"></div>
+    </div>
+  </div>
+
+
+  <!-- ════════════════════════════════════════════════════════
+       SLIDE 9 — CTA (premium, restrained)
+       Composition: centered in frame, URL is the focal point.
+       No loud button. A thin outlined link — confident, not loud.
+       The domain carries the weight. The CTA merely confirms it.
+       ════════════════════════════════════════════════════════ -->
+  <div class="slide-label"><span>Slide 09 — CTA</span></div>
+  <div class="slide" id="slide-9">
+
+    <div style="position:absolute; top:-120px; right:-80px; width:480px; height:480px; background:radial-gradient(circle, rgba(14,165,183,0.04) 0%, transparent 60%); pointer-events:none; z-index:0;"></div>
+
+    <div class="slide-content" style="justify-content:space-between;">
+
+      <div style="display:flex; align-items:center; justify-content:space-between;">
+        <div class="badge">Clinical Edge</div>
+        <span class="label muted">09 / 09</span>
+      </div>
+
+      <div style="flex:1; display:flex; flex-direction:column; justify-content:flex-start; padding-top:120px; gap:36px;">
+
+        <div style="display:flex; align-items:center; gap:14px;">
+          <div style="width:28px; height:1.5px; background:#0EA5B7; border-radius:2px;"></div>
+          <span style="font-family:'IBM Plex Mono',monospace; font-size:20px; font-weight:600; color:#0EA5B7; letter-spacing:2.5px; text-transform:uppercase;">For Bedside Nurses</span>
+        </div>
+
+        <!-- Domain is the focal point -->
+        <h2>theclinicaledge.org</h2>
+
+        <div class="divider"></div>
+
+        <p class="large">Clinical reasoning support for nurses</p>
+
+        <!-- Restrained CTA — outlined, not solid-filled -->
+        <div style="padding-top:12px;">
+          <div style="display:inline-flex; align-items:center; gap:16px; padding:20px 44px; border:1px solid rgba(14,165,183,0.28); border-radius:12px; font-family:'Inter',sans-serif; font-size:28px; font-weight:500; color:#0EA5B7; letter-spacing:-0.2px;">
+            Visit theclinicaledge.org
+          </div>
+        </div>
+
+      </div>
+
+      <div></div>
+
+    </div>
+
+    <div class="slide-footer">
+      <div class="footer-brand"><div class="footer-dot"></div><span class="footer-name">Clinical Edge Copilot</span></div>
+      <span class="footer-handle">@clinicaledgeco</span>
+    </div>
+    <div class="slide-number">
+      <div class="dot"></div><div class="dot"></div><div class="dot"></div>
+      <div class="dot"></div><div class="dot"></div><div class="dot"></div>
+      <div class="dot"></div><div class="dot"></div>
+      <div class="dot active"></div>
+    </div>
+  </div>
+
+
+</body>
+</html>

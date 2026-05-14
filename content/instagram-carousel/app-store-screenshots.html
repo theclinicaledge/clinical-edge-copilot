@@ -1,0 +1,1141 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Clinical Edge — App Store Screenshots</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=IBM+Plex+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    background: #2A2A2A;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 40px;
+    padding: 40px;
+    font-family: 'Inter', -apple-system, sans-serif;
+  }
+
+  /* ══════════════════════════════════════
+     SLIDE BASE — 660 × 1344 CSS
+     → 1320 × 2688 px at 2× export
+  ══════════════════════════════════════ */
+  .slide {
+    width: 660px;
+    height: 1344px;
+    position: relative;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    font-family: 'Inter', -apple-system, sans-serif;
+    -webkit-font-smoothing: antialiased;
+    flex-shrink: 0;
+  }
+
+  /* ── Status bar (simulated iOS) ─────── */
+  .status-bar {
+    background: rgba(11,31,42,0.97);
+    height: 44px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 22px;
+    flex-shrink: 0;
+  }
+  .status-time {
+    font-size: 15px;
+    font-weight: 600;
+    color: #F8FBFC;
+    letter-spacing: -0.3px;
+  }
+  .status-icons {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+  .status-icons svg { opacity: 0.85; }
+
+  /* ── App header ─────────────────────── */
+  .app-header {
+    background: rgba(11,31,42,0.97);
+    border-bottom: 1px solid rgba(255,255,255,0.05);
+    padding: 16px 18px 14px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    flex-shrink: 0;
+  }
+  .wordmark { display: flex; flex-direction: column; gap: 1px; }
+  .wordmark-main {
+    font-size: 15px;
+    font-weight: 700;
+    color: #F8FBFC;
+    letter-spacing: -0.3px;
+    line-height: 1.15;
+  }
+  .wordmark-sub {
+    font-size: 9px;
+    font-weight: 500;
+    color: #7F99A5;
+    letter-spacing: 0.7px;
+    text-transform: uppercase;
+    font-family: 'IBM Plex Mono', monospace;
+    line-height: 1;
+  }
+
+  /* ── Workspace (warm tan bg) ────────── */
+  .workspace {
+    background: #E7E1D6;
+    flex: 1;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+  }
+
+  .main-pad {
+    padding: 22px 18px 0;
+    display: flex;
+    flex-direction: column;
+    flex: 1;
+    overflow: hidden;
+  }
+
+  /* ── Hero ───────────────────────────── */
+  .hero {
+    text-align: center;
+    margin-bottom: 18px;
+  }
+  .hero h1 {
+    font-size: 23px;
+    font-weight: 800;
+    color: #111827;
+    margin: 0 0 9px;
+    line-height: 1.12;
+    letter-spacing: -0.04em;
+  }
+  .hero p {
+    font-size: 13px;
+    color: #526174;
+    margin: 0 0 4px;
+    line-height: 1.4;
+    font-weight: 500;
+  }
+  .hero p.sub {
+    font-size: 12px;
+    color: rgba(82,97,116,0.75);
+    font-weight: 400;
+  }
+
+  /* ── Preview strip ──────────────────── */
+  .preview-strip {
+    background: #17222D;
+    border: 1px solid #2D3B4E;
+    border-bottom: none;
+    border-radius: 8px 8px 0 0;
+    padding: 8px 14px;
+    display: flex;
+    align-items: center;
+    gap: 7px;
+    flex-shrink: 0;
+    overflow: hidden;
+  }
+  .ps-label {
+    font-size: 10px;
+    color: #4F6D7A;
+    font-family: 'IBM Plex Mono', monospace;
+    white-space: nowrap;
+    flex-shrink: 0;
+    margin-right: 2px;
+  }
+  .ps-chip {
+    font-size: 10px;
+    color: #5A7A8A;
+    background: rgba(255,255,255,0.04);
+    border: 1px solid rgba(255,255,255,0.07);
+    border-radius: 4px;
+    padding: 2px 7px;
+    white-space: nowrap;
+    font-weight: 500;
+    flex-shrink: 0;
+  }
+
+  /* ── Input card ─────────────────────── */
+  .input-card {
+    background: #1E2A3A;
+    border: 1px solid rgba(240,237,230,0.10);
+    border-radius: 0 0 8px 8px;
+    padding: 18px 18px 14px;
+    box-shadow: 0 8px 24px rgba(0,0,0,0.22);
+    flex-shrink: 0;
+    margin-bottom: 12px;
+  }
+  .input-card.focused {
+    border-color: #0ABFBC;
+  }
+  .input-text {
+    font-size: 14px;
+    color: #F0EDE6;
+    line-height: 1.65;
+    font-family: inherit;
+    margin-bottom: 12px;
+  }
+  .input-divider {
+    height: 1px;
+    background: rgba(240,237,230,0.09);
+    margin-bottom: 10px;
+  }
+  .input-row {
+    display: flex;
+    justify-content: flex-end;
+  }
+  .btn-ask {
+    background: #0ABFBC;
+    color: #0B1F2A;
+    border: none;
+    border-radius: 8px;
+    padding: 9px 20px;
+    font-size: 13px;
+    font-weight: 700;
+    letter-spacing: -0.1px;
+    font-family: inherit;
+    cursor: pointer;
+  }
+  .btn-ask.dimmed {
+    background: rgba(10,191,188,0.08);
+    color: #94A3B8;
+  }
+
+  /* ── Helper line ────────────────────── */
+  .helper-line {
+    font-size: 12px;
+    color: #526174;
+    line-height: 1.5;
+    margin-bottom: 14px;
+  }
+  .helper-line span {
+    color: rgba(82,97,116,0.65);
+  }
+
+  /* ── Chips ──────────────────────────── */
+  .chips-section { margin-bottom: 12px; }
+  .chips-label {
+    font-size: 10px;
+    color: #526174;
+    font-family: 'IBM Plex Mono', monospace;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    margin-bottom: 6px;
+  }
+  .chips-row { display: flex; flex-wrap: wrap; gap: 5px; }
+  .chip-outline {
+    background: transparent;
+    border: 1px solid #C4BDB5;
+    color: #526174;
+    border-radius: 6px;
+    padding: 3px 10px;
+    font-size: 11px;
+    font-weight: 400;
+    white-space: nowrap;
+    font-family: inherit;
+  }
+  .chip-example {
+    background: #1E2A3A;
+    border: 1px solid #2D3B4E;
+    color: #94A3B8;
+    padding: 8px 12px;
+    border-radius: 6px;
+    font-size: 11.5px;
+    font-weight: 400;
+    display: flex;
+    align-items: center;
+    gap: 7px;
+    text-align: left;
+    line-height: 1.4;
+    width: 100%;
+    font-family: inherit;
+  }
+  .chip-example .play { color: #0ABFBC; font-size: 8px; flex-shrink: 0; }
+
+  /* ── Privacy notice ─────────────────── */
+  .privacy-notice {
+    background: #FFFDF8;
+    border: 1px solid rgba(212,168,75,0.30);
+    border-left: 3px solid #D4A84B;
+    border-radius: 8px;
+    padding: 10px 13px;
+    font-size: 11px;
+    color: #8A6A22;
+    margin-bottom: 12px;
+    display: flex;
+    gap: 8px;
+    align-items: flex-start;
+    flex-shrink: 0;
+    line-height: 1.5;
+  }
+  .privacy-icon {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 10px;
+    color: #D4A84B;
+    flex-shrink: 0;
+    margin-top: 1px;
+  }
+
+  /* ── Educational disclaimer ─────────── */
+  .edu-disclaimer {
+    font-size: 10.5px;
+    color: rgba(82,97,116,0.75);
+    line-height: 1.55;
+    margin-bottom: 16px;
+    padding-left: 2px;
+  }
+
+  /* ── Response section ───────────────── */
+  .response-area {
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+  }
+
+  /* Trust cue */
+  .trust-cue {
+    display: flex;
+    align-items: flex-start;
+    gap: 7px;
+    padding: 0 2px 11px;
+    font-size: 10px;
+    color: #4A6675;
+    font-family: 'IBM Plex Mono', monospace;
+    line-height: 1.5;
+    border-bottom: 1px solid rgba(0,0,0,0.07);
+    margin-bottom: 13px;
+    flex-shrink: 0;
+  }
+  .trust-diamond { color: #3A5A6A; font-size: 8px; margin-top: 2px; flex-shrink: 0; }
+
+  /* Urgency badge */
+  .urgency-badge {
+    display: flex;
+    align-items: center;
+    gap: 9px;
+    border-radius: 6px;
+    padding: 9px 14px;
+    margin-bottom: 12px;
+    flex-shrink: 0;
+  }
+  .urgency-badge.high {
+    background: rgba(190,70,70,0.10);
+    border: 1px solid #B45454;
+  }
+  .urgency-dot {
+    width: 7px;
+    height: 7px;
+    border-radius: 50%;
+    flex-shrink: 0;
+  }
+  .urgency-dot.high { background: #8E2F2F; }
+  .urgency-text {
+    font-size: 10px;
+    font-weight: 700;
+    font-family: 'IBM Plex Mono', monospace;
+    letter-spacing: 1.2px;
+    text-transform: uppercase;
+  }
+  .urgency-text.high { color: #8E2F2F; }
+
+  /* Urgent callout */
+  .urgent-callout {
+    background: rgba(190,70,70,0.08);
+    border: 1px solid rgba(180,84,84,0.20);
+    border-left: 3px solid #B45454;
+    border-radius: 6px;
+    padding: 12px 16px;
+    color: #8E2F2F;
+    font-weight: 600;
+    font-size: 12.5px;
+    line-height: 1.65;
+    margin-bottom: 12px;
+    flex-shrink: 0;
+  }
+
+  /* Section card (white) */
+  .section-card {
+    background: #FFFFFF;
+    border: 1px solid #D6D0C4;
+    border-radius: 8px;
+    padding: 14px 16px;
+    margin-bottom: 8px;
+    flex-shrink: 0;
+  }
+  .section-label {
+    font-size: 9px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 1.5px;
+    font-family: 'IBM Plex Mono', monospace;
+    margin-bottom: 10px;
+    opacity: 0.88;
+  }
+  .section-body {
+    font-size: 12.5px;
+    line-height: 1.72;
+    color: #1E2A3A;
+  }
+  .bullet-row {
+    display: flex;
+    gap: 9px;
+    margin-bottom: 6px;
+    align-items: flex-start;
+  }
+  .bullet-chevron {
+    font-weight: 700;
+    margin-top: 1px;
+    flex-shrink: 0;
+    font-size: 13px;
+    line-height: 1.72;
+  }
+
+  /* Closing card — teal accent */
+  .closing-card {
+    background: #FFFFFF;
+    border: 1px solid #D6D0C4;
+    border-left: 3px solid #0ABFBC;
+    border-radius: 0 8px 8px 0;
+    padding: 12px 16px;
+    margin-bottom: 8px;
+    flex-shrink: 0;
+  }
+  .closing-text {
+    font-size: 12.5px;
+    font-style: italic;
+    color: #526174;
+    line-height: 1.82;
+    letter-spacing: 0.008em;
+  }
+
+  /* ── Action bar ─────────────────────── */
+  .action-bar {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-top: 14px;
+    padding-top: 14px;
+    border-top: 1px solid rgba(0,0,0,0.08);
+    flex-wrap: wrap;
+    flex-shrink: 0;
+  }
+  .btn-save {
+    background: rgba(31,191,117,0.04);
+    border: 1px solid rgba(31,191,117,0.22);
+    color: #4E9E78;
+    border-radius: 6px;
+    padding: 8px 18px;
+    font-size: 12px;
+    font-weight: 600;
+    font-family: inherit;
+  }
+  .btn-copy {
+    background: transparent;
+    border: 1px solid rgba(0,0,0,0.12);
+    color: #3D5E6E;
+    border-radius: 6px;
+    padding: 8px 16px;
+    font-size: 12px;
+    font-weight: 400;
+    font-family: inherit;
+  }
+  .btn-sources {
+    background: transparent;
+    border: 1px solid rgba(0,0,0,0.10);
+    color: #3D5E6E;
+    border-radius: 6px;
+    padding: 8px 14px;
+    font-size: 11.5px;
+    font-weight: 400;
+    font-family: inherit;
+  }
+  .btn-sbar {
+    background: transparent;
+    border: 1px solid rgba(10,191,188,0.14);
+    color: #0ABFBC;
+    border-radius: 6px;
+    padding: 8px 14px;
+    font-size: 11.5px;
+    font-weight: 500;
+    font-family: inherit;
+    margin-left: auto;
+  }
+  .btn-sbar.active {
+    background: rgba(10,191,188,0.07);
+    border-color: rgba(10,191,188,0.25);
+  }
+
+  /* ── Dark card (SBAR / Follow-up) ───── */
+  .dark-card {
+    background: #1E2A3A;
+    border: 1px solid #2D3B4E;
+    border-radius: 8px;
+    padding: 16px 18px;
+    flex-shrink: 0;
+    margin-bottom: 10px;
+  }
+  .dark-card-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 14px;
+  }
+  .dark-card-label {
+    font-size: 9px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 1.4px;
+    color: #7F99A5;
+    font-family: 'IBM Plex Mono', monospace;
+  }
+  .dark-card-btn {
+    background: transparent;
+    border: 1px solid rgba(10,191,188,0.18);
+    color: rgba(10,191,188,0.55);
+    border-radius: 6px;
+    padding: 4px 11px;
+    font-size: 10px;
+    font-weight: 500;
+    font-family: inherit;
+  }
+
+  /* SBAR sections */
+  .sbar-sections { display: flex; flex-direction: column; gap: 12px; }
+  .sbar-section {}
+  .sbar-label {
+    font-size: 9px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    font-family: 'IBM Plex Mono', monospace;
+    margin-bottom: 4px;
+    opacity: 0.85;
+  }
+  .sbar-text {
+    font-size: 12px;
+    line-height: 1.65;
+    color: #BCCDD6;
+  }
+
+  /* Follow-up box */
+  .followup-label {
+    font-size: 9px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 1.3px;
+    color: #7F99A5;
+    font-family: 'IBM Plex Mono', monospace;
+    margin-bottom: 10px;
+  }
+  .followup-input {
+    border-bottom: 1px solid rgba(10,191,188,0.15);
+    color: #F8FBFC;
+    font-size: 13px;
+    line-height: 1.6;
+    padding-bottom: 8px;
+    margin-bottom: 10px;
+    font-family: inherit;
+  }
+  .followup-btn-row { display: flex; justify-content: flex-end; }
+  .btn-send {
+    background: rgba(10,191,188,0.10);
+    border: 1px solid rgba(10,191,188,0.30);
+    color: #0ABFBC;
+    border-radius: 6px;
+    padding: 7px 14px;
+    font-size: 11.5px;
+    font-weight: 600;
+    font-family: inherit;
+  }
+
+  /* ── Divider line ─────────────────── */
+  .divider {
+    height: 1px;
+    background: rgba(0,0,0,0.07);
+    margin: 0 0 12px;
+  }
+
+  /* ── Section-color utilities ─────── */
+  .blue  { border-left-color: #4da3ff !important; }
+  .red   { border-left-color: #e05572 !important; }
+  .green { border-left-color: #1FBF75 !important; }
+  .amber { border-left-color: #F2B94B !important; }
+
+</style>
+</head>
+<body>
+
+<!-- ══════════════════════════════════════════════════════════
+     SLIDE 1 — Home input screen
+     Nurse has typed the scenario; about to submit
+═══════════════════════════════════════════════════════════ -->
+<div class="slide" id="slide-1">
+
+  <!-- iOS status bar -->
+  <div class="status-bar">
+    <span class="status-time">9:41</span>
+    <div class="status-icons">
+      <!-- Signal bars -->
+      <svg width="17" height="12" viewBox="0 0 17 12" fill="#F8FBFC">
+        <rect x="0"  y="8"  width="3" height="4" rx="0.5" opacity="0.4"/>
+        <rect x="4"  y="5.5" width="3" height="6.5" rx="0.5" opacity="0.6"/>
+        <rect x="8"  y="3"  width="3" height="9" rx="0.5" opacity="0.8"/>
+        <rect x="12" y="0"  width="3" height="12" rx="0.5"/>
+      </svg>
+      <!-- WiFi -->
+      <svg width="16" height="12" viewBox="0 0 16 12" fill="#F8FBFC">
+        <path d="M8 9.5 a1.5 1.5 0 1 0 0.001 0Z" opacity="1"/>
+        <path d="M4.5 6.8 Q8 3.5 11.5 6.8" stroke="#F8FBFC" stroke-width="1.5" fill="none" stroke-linecap="round" opacity="0.85"/>
+        <path d="M2 4.2 Q8 -0.5 14 4.2" stroke="#F8FBFC" stroke-width="1.5" fill="none" stroke-linecap="round" opacity="0.5"/>
+      </svg>
+      <!-- Battery -->
+      <svg width="25" height="12" viewBox="0 0 25 12" fill="none">
+        <rect x="0.5" y="0.5" width="21" height="11" rx="3.5" stroke="#F8FBFC" stroke-opacity="0.35"/>
+        <rect x="2"   y="2"   width="16" height="8"  rx="2" fill="#F8FBFC"/>
+        <path d="M22 4v4a2 2 0 0 1 0-4Z" fill="#F8FBFC" opacity="0.4"/>
+      </svg>
+    </div>
+  </div>
+
+  <!-- App header -->
+  <div class="app-header">
+    <svg width="28" height="28" viewBox="0 0 225 200" fill="#0ABFBC" style="flex-shrink:0">
+      <path d="M 159.1,24.3 A 96,96 0 1,0 159.1,175.7 L 135.7,145.7 A 58,58 0 1,1 135.7,54.3 Z"/>
+      <path d="M 144.0,57 L 208,45 L 218,58 L 208,70 L 150.0,71 Z"/>
+      <path d="M 158.0,92 L 215,82 L 225,95 L 215,107 L 158.0,108 Z"/>
+      <path d="M 150.0,129 L 208,130 L 218,142 L 208,155 L 144.0,143 Z"/>
+    </svg>
+    <div class="wordmark">
+      <span class="wordmark-main">Clinical Edge</span>
+      <span class="wordmark-sub">Copilot</span>
+    </div>
+  </div>
+
+  <!-- Workspace -->
+  <div class="workspace">
+    <div class="main-pad">
+
+      <!-- Hero -->
+      <div class="hero">
+        <h1>Clinical reasoning support.<br>Built for nurses.</h1>
+        <p>When something feels off. Before you call. Quick clinical questions.</p>
+        <p class="sub">For real-world questions and practice scenarios. Not a diagnosis.</p>
+      </div>
+
+      <!-- Preview strip + input card -->
+      <div class="preview-strip">
+        <span class="ps-label">You'll get:</span>
+        <span class="ps-chip">What this could be</span>
+        <span class="ps-chip">Possible concerns</span>
+        <span class="ps-chip">What to assess next</span>
+        <span class="ps-chip">What to consider next</span>
+      </div>
+
+      <div class="input-card focused">
+        <div class="input-text">BP dropped to 88/50, HR 122, was stable an hour ago — help me think through this before I call.</div>
+        <div class="input-divider"></div>
+        <div class="input-row">
+          <button class="btn-ask">Ask Copilot</button>
+        </div>
+      </div>
+
+      <!-- Helper line -->
+      <div class="helper-line">
+        Good for thinking it through — especially right before you call.
+        <span> Also useful right after report — when you're sorting out what actually matters first.</span>
+      </div>
+
+      <!-- Guidance chips -->
+      <div class="chips-section">
+        <div class="chips-label">Common ways nurses use Copilot</div>
+        <div class="chips-row">
+          <span class="chip-outline">Something feels off</span>
+          <span class="chip-outline">Before you call</span>
+          <span class="chip-outline">Medication question</span>
+          <span class="chip-outline">Explain to the patient</span>
+        </div>
+      </div>
+
+      <!-- Privacy notice -->
+      <div class="privacy-notice">
+        <span class="privacy-icon">⚠</span>
+        <span>Do not enter names, MRNs, dates of birth, SSNs, or any patient identifiers. Describe the clinical situation only.</span>
+      </div>
+
+      <!-- Edu disclaimer -->
+      <div class="edu-disclaimer">
+        For educational support only. Not a substitute for clinical judgment, provider guidance, or institutional protocol.
+      </div>
+
+      <!-- Example prompts label -->
+      <div style="font-family:'IBM Plex Mono',monospace; font-size:10px; font-weight:500; letter-spacing:0.09em; text-transform:uppercase; color:#526174; margin-bottom:7px;">Examples</div>
+      <div style="display:flex; flex-direction:column; gap:6px;">
+        <div class="chip-example">
+          <span class="play">▶</span>
+          QTc is 520, patient just got Zofran. Should I be worried?
+        </div>
+        <div class="chip-example">
+          <span class="play">▶</span>
+          Just got report — new confusion, sodium 118, poor PO intake. What matters most first?
+        </div>
+      </div>
+
+    </div>
+  </div>
+</div><!-- /slide-1 -->
+
+
+<!-- ══════════════════════════════════════════════════════════
+     SLIDE 2 — Urgency level + "What this could be"
+     First section of the clinical response
+═══════════════════════════════════════════════════════════ -->
+<div class="slide" id="slide-2">
+
+  <div class="status-bar">
+    <span class="status-time">9:42</span>
+    <div class="status-icons">
+      <svg width="17" height="12" viewBox="0 0 17 12" fill="#F8FBFC"><rect x="0" y="8" width="3" height="4" rx="0.5" opacity="0.4"/><rect x="4" y="5.5" width="3" height="6.5" rx="0.5" opacity="0.6"/><rect x="8" y="3" width="3" height="9" rx="0.5" opacity="0.8"/><rect x="12" y="0" width="3" height="12" rx="0.5"/></svg>
+      <svg width="16" height="12" viewBox="0 0 16 12" fill="#F8FBFC"><path d="M8 9.5 a1.5 1.5 0 1 0 0.001 0Z"/><path d="M4.5 6.8 Q8 3.5 11.5 6.8" stroke="#F8FBFC" stroke-width="1.5" fill="none" stroke-linecap="round" opacity="0.85"/><path d="M2 4.2 Q8 -0.5 14 4.2" stroke="#F8FBFC" stroke-width="1.5" fill="none" stroke-linecap="round" opacity="0.5"/></svg>
+      <svg width="25" height="12" viewBox="0 0 25 12" fill="none"><rect x="0.5" y="0.5" width="21" height="11" rx="3.5" stroke="#F8FBFC" stroke-opacity="0.35"/><rect x="2" y="2" width="16" height="8" rx="2" fill="#F8FBFC"/><path d="M22 4v4a2 2 0 0 1 0-4Z" fill="#F8FBFC" opacity="0.4"/></svg>
+    </div>
+  </div>
+
+  <div class="app-header">
+    <svg width="28" height="28" viewBox="0 0 225 200" fill="#0ABFBC" style="flex-shrink:0">
+      <path d="M 159.1,24.3 A 96,96 0 1,0 159.1,175.7 L 135.7,145.7 A 58,58 0 1,1 135.7,54.3 Z"/>
+      <path d="M 144.0,57 L 208,45 L 218,58 L 208,70 L 150.0,71 Z"/>
+      <path d="M 158.0,92 L 215,82 L 225,95 L 215,107 L 158.0,108 Z"/>
+      <path d="M 150.0,129 L 208,130 L 218,142 L 208,155 L 144.0,143 Z"/>
+    </svg>
+    <div class="wordmark">
+      <span class="wordmark-main">Clinical Edge</span>
+      <span class="wordmark-sub">Copilot</span>
+    </div>
+  </div>
+
+  <div class="workspace">
+    <div class="main-pad" style="padding-top:18px;">
+
+      <!-- Question echo -->
+      <div style="background:#1E2A3A; border:1px solid #2D3B4E; border-radius:8px; padding:12px 16px; margin-bottom:16px; flex-shrink:0;">
+        <div style="font-size:9px; font-weight:700; text-transform:uppercase; letter-spacing:1.2px; color:#5A7A8A; font-family:'IBM Plex Mono',monospace; margin-bottom:6px;">Your scenario</div>
+        <div style="font-size:12.5px; color:#A8C1CC; line-height:1.55;">BP dropped to 88/50, HR 122, was stable an hour ago — help me think through this before I call.</div>
+      </div>
+
+      <!-- Trust cue -->
+      <div class="trust-cue">
+        <span class="trust-diamond">◆</span>
+        <span>Structured clinical reasoning support — confirm with your assessment and provider guidance</span>
+      </div>
+
+      <!-- Urgency badge -->
+      <div class="urgency-badge high">
+        <span class="urgency-dot high"></span>
+        <span class="urgency-text high">Urgency: HIGH</span>
+      </div>
+
+      <!-- Urgent callout -->
+      <div class="urgent-callout">
+        ⚠️ Urgent deterioration pattern — this hemodynamic picture requires immediate evaluation. Do not delay notification.
+      </div>
+
+      <!-- What this could be — blue -->
+      <div class="section-card" style="border-left:3px solid #4da3ff;">
+        <div class="section-label" style="color:#4da3ff;">What this could be</div>
+        <div class="section-body">
+          <div class="bullet-row">
+            <span class="bullet-chevron" style="color:#4da3ff;">›</span>
+            <span><strong>Distributive or septic shock</strong> — tachycardia compensating for falling perfusion; consider recent infection, fever, or source</span>
+          </div>
+          <div class="bullet-row">
+            <span class="bullet-chevron" style="color:#4da3ff;">›</span>
+            <span><strong>Cardiogenic shock</strong> — especially if patient has cardiac history, recent procedure, or chest symptoms</span>
+          </div>
+          <div class="bullet-row">
+            <span class="bullet-chevron" style="color:#4da3ff;">›</span>
+            <span><strong>Hemorrhagic or hypovolemic</strong> — internal bleeding, GI bleed, or inadequate fluid resuscitation</span>
+          </div>
+          <div class="bullet-row">
+            <span class="bullet-chevron" style="color:#4da3ff;">›</span>
+            <span><strong>Medication-induced</strong> — antihypertensives, sedatives, analgesics given recently</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Partial second card visible for scroll affordance -->
+      <div class="section-card" style="border-left:3px solid #e05572; opacity:0.65;">
+        <div class="section-label" style="color:#e05572;">Possible concerns</div>
+        <div class="section-body">
+          <div class="bullet-row">
+            <span class="bullet-chevron" style="color:#e05572;">›</span>
+            <span>Estimated MAP ≈ 54 mmHg — well below the 65 mmHg threshold for adequate organ perfusion</span>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</div><!-- /slide-2 -->
+
+
+<!-- ══════════════════════════════════════════════════════════
+     SLIDE 3 — Possible concerns + What to assess next
+═══════════════════════════════════════════════════════════ -->
+<div class="slide" id="slide-3">
+
+  <div class="status-bar">
+    <span class="status-time">9:42</span>
+    <div class="status-icons">
+      <svg width="17" height="12" viewBox="0 0 17 12" fill="#F8FBFC"><rect x="0" y="8" width="3" height="4" rx="0.5" opacity="0.4"/><rect x="4" y="5.5" width="3" height="6.5" rx="0.5" opacity="0.6"/><rect x="8" y="3" width="3" height="9" rx="0.5" opacity="0.8"/><rect x="12" y="0" width="3" height="12" rx="0.5"/></svg>
+      <svg width="16" height="12" viewBox="0 0 16 12" fill="#F8FBFC"><path d="M8 9.5 a1.5 1.5 0 1 0 0.001 0Z"/><path d="M4.5 6.8 Q8 3.5 11.5 6.8" stroke="#F8FBFC" stroke-width="1.5" fill="none" stroke-linecap="round" opacity="0.85"/><path d="M2 4.2 Q8 -0.5 14 4.2" stroke="#F8FBFC" stroke-width="1.5" fill="none" stroke-linecap="round" opacity="0.5"/></svg>
+      <svg width="25" height="12" viewBox="0 0 25 12" fill="none"><rect x="0.5" y="0.5" width="21" height="11" rx="3.5" stroke="#F8FBFC" stroke-opacity="0.35"/><rect x="2" y="2" width="16" height="8" rx="2" fill="#F8FBFC"/><path d="M22 4v4a2 2 0 0 1 0-4Z" fill="#F8FBFC" opacity="0.4"/></svg>
+    </div>
+  </div>
+
+  <div class="app-header">
+    <svg width="28" height="28" viewBox="0 0 225 200" fill="#0ABFBC" style="flex-shrink:0">
+      <path d="M 159.1,24.3 A 96,96 0 1,0 159.1,175.7 L 135.7,145.7 A 58,58 0 1,1 135.7,54.3 Z"/>
+      <path d="M 144.0,57 L 208,45 L 218,58 L 208,70 L 150.0,71 Z"/>
+      <path d="M 158.0,92 L 215,82 L 225,95 L 215,107 L 158.0,108 Z"/>
+      <path d="M 150.0,129 L 208,130 L 218,142 L 208,155 L 144.0,143 Z"/>
+    </svg>
+    <div class="wordmark">
+      <span class="wordmark-main">Clinical Edge</span>
+      <span class="wordmark-sub">Copilot</span>
+    </div>
+  </div>
+
+  <div class="workspace">
+    <div class="main-pad" style="padding-top:18px;">
+
+      <!-- Possible concerns — red -->
+      <div class="section-card" style="border-left:3px solid #e05572;">
+        <div class="section-label" style="color:#e05572;">Possible concerns</div>
+        <div class="section-body">
+          <div class="bullet-row">
+            <span class="bullet-chevron" style="color:#e05572;">›</span>
+            <span>Estimated MAP ≈ 54 mmHg — well below the 65 mmHg perfusion threshold; end-organ risk is already present</span>
+          </div>
+          <div class="bullet-row">
+            <span class="bullet-chevron" style="color:#e05572;">›</span>
+            <span>Compensatory tachycardia at 122 may not sustain perfusion — if HR drops or rises further, the picture changes fast</span>
+          </div>
+          <div class="bullet-row">
+            <span class="bullet-chevron" style="color:#e05572;">›</span>
+            <span>Acute onset (stable 1 hour ago) suggests a sudden precipitating event — not chronic hypotension</span>
+          </div>
+          <div class="bullet-row">
+            <span class="bullet-chevron" style="color:#e05572;">›</span>
+            <span>Potential for rapid deterioration in minutes without targeted intervention</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- What to assess next — green -->
+      <div class="section-card" style="border-left:3px solid #1FBF75;">
+        <div class="section-label" style="color:#1FBF75;">What to assess next</div>
+        <div class="section-body">
+          <div class="bullet-row">
+            <span class="bullet-chevron" style="color:#1FBF75;">›</span>
+            <span><strong>Skin perfusion</strong> — cap refill, temperature, mottling; cool/clammy = low output state</span>
+          </div>
+          <div class="bullet-row">
+            <span class="bullet-chevron" style="color:#1FBF75;">›</span>
+            <span><strong>Mental status</strong> — new confusion or agitation is an early perfusion sign</span>
+          </div>
+          <div class="bullet-row">
+            <span class="bullet-chevron" style="color:#1FBF75;">›</span>
+            <span><strong>Urine output trend</strong> — &lt;0.5 mL/kg/hr signals hypoperfusion</span>
+          </div>
+          <div class="bullet-row">
+            <span class="bullet-chevron" style="color:#1FBF75;">›</span>
+            <span><strong>IV access</strong> — confirm large-bore patency; consider second access if single 22g</span>
+          </div>
+          <div class="bullet-row">
+            <span class="bullet-chevron" style="color:#1FBF75;">›</span>
+            <span><strong>Recent medications</strong> — anything given in the past hour that could explain the drop?</span>
+          </div>
+          <div class="bullet-row">
+            <span class="bullet-chevron" style="color:#1FBF75;">›</span>
+            <span><strong>12-lead ECG</strong> — rule out cardiac etiology; look for ST changes, new arrhythmia</span>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</div><!-- /slide-3 -->
+
+
+<!-- ══════════════════════════════════════════════════════════
+     SLIDE 4 — Where this may be heading + action buttons
+═══════════════════════════════════════════════════════════ -->
+<div class="slide" id="slide-4">
+
+  <div class="status-bar">
+    <span class="status-time">9:42</span>
+    <div class="status-icons">
+      <svg width="17" height="12" viewBox="0 0 17 12" fill="#F8FBFC"><rect x="0" y="8" width="3" height="4" rx="0.5" opacity="0.4"/><rect x="4" y="5.5" width="3" height="6.5" rx="0.5" opacity="0.6"/><rect x="8" y="3" width="3" height="9" rx="0.5" opacity="0.8"/><rect x="12" y="0" width="3" height="12" rx="0.5"/></svg>
+      <svg width="16" height="12" viewBox="0 0 16 12" fill="#F8FBFC"><path d="M8 9.5 a1.5 1.5 0 1 0 0.001 0Z"/><path d="M4.5 6.8 Q8 3.5 11.5 6.8" stroke="#F8FBFC" stroke-width="1.5" fill="none" stroke-linecap="round" opacity="0.85"/><path d="M2 4.2 Q8 -0.5 14 4.2" stroke="#F8FBFC" stroke-width="1.5" fill="none" stroke-linecap="round" opacity="0.5"/></svg>
+      <svg width="25" height="12" viewBox="0 0 25 12" fill="none"><rect x="0.5" y="0.5" width="21" height="11" rx="3.5" stroke="#F8FBFC" stroke-opacity="0.35"/><rect x="2" y="2" width="16" height="8" rx="2" fill="#F8FBFC"/><path d="M22 4v4a2 2 0 0 1 0-4Z" fill="#F8FBFC" opacity="0.4"/></svg>
+    </div>
+  </div>
+
+  <div class="app-header">
+    <svg width="28" height="28" viewBox="0 0 225 200" fill="#0ABFBC" style="flex-shrink:0">
+      <path d="M 159.1,24.3 A 96,96 0 1,0 159.1,175.7 L 135.7,145.7 A 58,58 0 1,1 135.7,54.3 Z"/>
+      <path d="M 144.0,57 L 208,45 L 218,58 L 208,70 L 150.0,71 Z"/>
+      <path d="M 150.0,129 L 208,130 L 218,142 L 208,155 L 144.0,143 Z"/>
+    </svg>
+    <div class="wordmark">
+      <span class="wordmark-main">Clinical Edge</span>
+      <span class="wordmark-sub">Copilot</span>
+    </div>
+  </div>
+
+  <div class="workspace">
+    <div class="main-pad" style="padding-top:18px;">
+
+      <!-- Where this may be heading — amber -->
+      <div class="section-card" style="border-left:3px solid #F2B94B;">
+        <div class="section-label" style="color:#F2B94B;">Where this may be heading</div>
+        <div class="section-body">
+          <div class="bullet-row">
+            <span class="bullet-chevron" style="color:#F2B94B;">›</span>
+            <span>MAP sustained below 65 for &gt;30 minutes — kidney, liver, and cardiac injury become likely</span>
+          </div>
+          <div class="bullet-row">
+            <span class="bullet-chevron" style="color:#F2B94B;">›</span>
+            <span>May require <strong>vasopressor support</strong> (norepinephrine first-line) if fluid-unresponsive</span>
+          </div>
+          <div class="bullet-row">
+            <span class="bullet-chevron" style="color:#F2B94B;">›</span>
+            <span><strong>ICU transfer</strong> is likely — anticipate early escalation conversation</span>
+          </div>
+          <div class="bullet-row">
+            <span class="bullet-chevron" style="color:#F2B94B;">›</span>
+            <span>Anticipate orders: fluid challenge, lactate, CBC, BMP, blood cultures if sepsis suspected, 12-lead ECG</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Closing / safety note -->
+      <div class="closing-card">
+        <div class="closing-text">
+          This is a support tool, not a substitute for your assessment or provider judgment. Use this to organize your thinking before you call — then trust your clinical picture.
+        </div>
+      </div>
+
+      <!-- Action bar -->
+      <div class="action-bar">
+        <button class="btn-save">+ Save Case</button>
+        <button class="btn-copy">Copy Response</button>
+        <button class="btn-sources">Sources</button>
+        <button class="btn-sbar">Turn into SBAR</button>
+      </div>
+
+      <!-- Spacer -->
+      <div style="height:18px; flex-shrink:0;"></div>
+
+      <!-- Continue thinking box (preview) -->
+      <div class="dark-card">
+        <div class="followup-label">Anything change?</div>
+        <div class="followup-input" style="color:#5A7A8A; font-style:italic;">New vitals, labs, or anything different?</div>
+        <div class="followup-btn-row">
+          <button class="btn-send" style="opacity:0.4;">Send update</button>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</div><!-- /slide-4 -->
+
+
+<!-- ══════════════════════════════════════════════════════════
+     SLIDE 5 — SBAR handoff draft
+═══════════════════════════════════════════════════════════ -->
+<div class="slide" id="slide-5">
+
+  <div class="status-bar">
+    <span class="status-time">9:43</span>
+    <div class="status-icons">
+      <svg width="17" height="12" viewBox="0 0 17 12" fill="#F8FBFC"><rect x="0" y="8" width="3" height="4" rx="0.5" opacity="0.4"/><rect x="4" y="5.5" width="3" height="6.5" rx="0.5" opacity="0.6"/><rect x="8" y="3" width="3" height="9" rx="0.5" opacity="0.8"/><rect x="12" y="0" width="3" height="12" rx="0.5"/></svg>
+      <svg width="16" height="12" viewBox="0 0 16 12" fill="#F8FBFC"><path d="M8 9.5 a1.5 1.5 0 1 0 0.001 0Z"/><path d="M4.5 6.8 Q8 3.5 11.5 6.8" stroke="#F8FBFC" stroke-width="1.5" fill="none" stroke-linecap="round" opacity="0.85"/><path d="M2 4.2 Q8 -0.5 14 4.2" stroke="#F8FBFC" stroke-width="1.5" fill="none" stroke-linecap="round" opacity="0.5"/></svg>
+      <svg width="25" height="12" viewBox="0 0 25 12" fill="none"><rect x="0.5" y="0.5" width="21" height="11" rx="3.5" stroke="#F8FBFC" stroke-opacity="0.35"/><rect x="2" y="2" width="16" height="8" rx="2" fill="#F8FBFC"/><path d="M22 4v4a2 2 0 0 1 0-4Z" fill="#F8FBFC" opacity="0.4"/></svg>
+    </div>
+  </div>
+
+  <div class="app-header">
+    <svg width="28" height="28" viewBox="0 0 225 200" fill="#0ABFBC" style="flex-shrink:0">
+      <path d="M 159.1,24.3 A 96,96 0 1,0 159.1,175.7 L 135.7,145.7 A 58,58 0 1,1 135.7,54.3 Z"/>
+      <path d="M 144.0,57 L 208,45 L 218,58 L 208,70 L 150.0,71 Z"/>
+      <path d="M 150.0,129 L 208,130 L 218,142 L 208,155 L 144.0,143 Z"/>
+    </svg>
+    <div class="wordmark">
+      <span class="wordmark-main">Clinical Edge</span>
+      <span class="wordmark-sub">Copilot</span>
+    </div>
+  </div>
+
+  <div class="workspace">
+    <div class="main-pad" style="padding-top:18px;">
+
+      <!-- Action bar — SBAR active -->
+      <div class="action-bar" style="margin-top:0; padding-top:0; border-top:none; margin-bottom:14px;">
+        <button class="btn-save" style="background:rgba(31,191,117,0.10); border-color:rgba(31,191,117,0.45); color:#1FBF75;">✓ Case Saved</button>
+        <button class="btn-copy">Copy Response</button>
+        <button class="btn-sources">Sources</button>
+        <button class="btn-sbar active">Turn into SBAR</button>
+      </div>
+
+      <!-- SBAR card -->
+      <div class="dark-card" style="padding:18px 20px 16px;">
+        <div class="dark-card-header">
+          <span class="dark-card-label">SBAR Handoff Draft</span>
+          <button class="dark-card-btn">Copy</button>
+        </div>
+        <div class="sbar-sections">
+          <div class="sbar-section">
+            <div class="sbar-label" style="color:#4da3ff;">Situation</div>
+            <div class="sbar-text">I'm calling about my patient in room [X]. Their BP has dropped to 88/50 with a HR of 122. They were hemodynamically stable one hour ago. I'm concerned this may represent early shock and they need to be evaluated immediately.</div>
+          </div>
+          <div class="sbar-section">
+            <div class="sbar-label" style="color:#A8C1CC;">Background</div>
+            <div class="sbar-text">Patient was stable at the start of my assessment this hour with no prior hemodynamic instability documented this shift. No complaints of chest pain or shortness of breath were noted. Medications administered recently include [list].</div>
+          </div>
+          <div class="sbar-section">
+            <div class="sbar-label" style="color:#F2B94B;">Assessment</div>
+            <div class="sbar-text">This pattern is consistent with early or evolving shock. Estimated MAP is approximately 54 mmHg — below the 65 mmHg threshold. Tachycardia appears compensatory. Skin assessment is ongoing; mental status is [note current].</div>
+          </div>
+          <div class="sbar-section">
+            <div class="sbar-label" style="color:#1FBF75;">Recommendation</div>
+            <div class="sbar-text">Requesting immediate bedside evaluation. I have large-bore IV access in place. I can initiate a fluid challenge per protocol and have oxygen available. Please advise on priority orders including labs and ECG.</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Continue thinking box -->
+      <div class="dark-card">
+        <div class="followup-label">Anything change?</div>
+        <div class="followup-input" style="color:#5A7A8A; font-style:italic;">New vitals, labs, or anything different?</div>
+        <div class="followup-btn-row">
+          <button class="btn-send" style="opacity:0.4;">Send update</button>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</div><!-- /slide-5 -->
+
+
+<!-- ══════════════════════════════════════════════════════════
+     SLIDE 6 — Anything change / follow-up update
+     Nurse has added new info and sent an update
+═══════════════════════════════════════════════════════════ -->
+<div class="slide" id="slide-6">
+
+  <div class="status-bar">
+    <span class="status-time">9:47</span>
+    <div class="status-icons">
+      <svg width="17" height="12" viewBox="0 0 17 12" fill="#F8FBFC"><rect x="0" y="8" width="3" height="4" rx="0.5" opacity="0.4"/><rect x="4" y="5.5" width="3" height="6.5" rx="0.5" opacity="0.6"/><rect x="8" y="3" width="3" height="9" rx="0.5" opacity="0.8"/><rect x="12" y="0" width="3" height="12" rx="0.5"/></svg>
+      <svg width="16" height="12" viewBox="0 0 16 12" fill="#F8FBFC"><path d="M8 9.5 a1.5 1.5 0 1 0 0.001 0Z"/><path d="M4.5 6.8 Q8 3.5 11.5 6.8" stroke="#F8FBFC" stroke-width="1.5" fill="none" stroke-linecap="round" opacity="0.85"/><path d="M2 4.2 Q8 -0.5 14 4.2" stroke="#F8FBFC" stroke-width="1.5" fill="none" stroke-linecap="round" opacity="0.5"/></svg>
+      <svg width="25" height="12" viewBox="0 0 25 12" fill="none"><rect x="0.5" y="0.5" width="21" height="11" rx="3.5" stroke="#F8FBFC" stroke-opacity="0.35"/><rect x="2" y="2" width="16" height="8" rx="2" fill="#F8FBFC"/><path d="M22 4v4a2 2 0 0 1 0-4Z" fill="#F8FBFC" opacity="0.4"/></svg>
+    </div>
+  </div>
+
+  <div class="app-header">
+    <svg width="28" height="28" viewBox="0 0 225 200" fill="#0ABFBC" style="flex-shrink:0">
+      <path d="M 159.1,24.3 A 96,96 0 1,0 159.1,175.7 L 135.7,145.7 A 58,58 0 1,1 135.7,54.3 Z"/>
+      <path d="M 144.0,57 L 208,45 L 218,58 L 208,70 L 150.0,71 Z"/>
+      <path d="M 150.0,129 L 208,130 L 218,142 L 208,155 L 144.0,143 Z"/>
+    </svg>
+    <div class="wordmark">
+      <span class="wordmark-main">Clinical Edge</span>
+      <span class="wordmark-sub">Copilot</span>
+    </div>
+  </div>
+
+  <div class="workspace">
+    <div class="main-pad" style="padding-top:18px;">
+
+      <!-- "Anything change?" box — filled with update text -->
+      <div class="dark-card">
+        <div class="followup-label">Anything change?</div>
+        <div class="followup-input">
+          MAP now 58, still tachycardic at 118. Fluid bolus 500 mL in — no obvious bleed. Skin is cool and clammy, cap refill 3+ seconds.
+        </div>
+        <div class="followup-btn-row">
+          <button class="btn-send">Send update</button>
+        </div>
+      </div>
+
+      <!-- Updated response trust cue -->
+      <div class="trust-cue" style="margin-top:4px;">
+        <span class="trust-diamond">◆</span>
+        <span>Updated reasoning based on your new information</span>
+      </div>
+
+      <!-- Updated urgency -->
+      <div class="urgency-badge high" style="margin-bottom:10px;">
+        <span class="urgency-dot high"></span>
+        <span class="urgency-text high">Urgency: HIGH — persisting</span>
+      </div>
+
+      <!-- Updated "What this could be" note -->
+      <div class="section-card" style="border-left:3px solid #4da3ff;">
+        <div class="section-label" style="color:#4da3ff;">Updated picture</div>
+        <div class="section-body">
+          <div class="bullet-row">
+            <span class="bullet-chevron" style="color:#4da3ff;">›</span>
+            <span>MAP 58 after 500 mL fluid — <strong>fluid responsiveness is partial at best</strong>; this may not be volume-responsive</span>
+          </div>
+          <div class="bullet-row">
+            <span class="bullet-chevron" style="color:#4da3ff;">›</span>
+            <span>Cool, clammy skin and slow cap refill confirms <strong>low cardiac output state</strong> — cardiogenic or distributive shock pattern</span>
+          </div>
+          <div class="bullet-row">
+            <span class="bullet-chevron" style="color:#4da3ff;">›</span>
+            <span>If septic or cardiogenic: vasopressor initiation conversation is now appropriate — do not delay provider notification</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Updated action -->
+      <div class="section-card" style="border-left:3px solid #F2B94B;">
+        <div class="section-label" style="color:#F2B94B;">What to do now</div>
+        <div class="section-body">
+          <div class="bullet-row">
+            <span class="bullet-chevron" style="color:#F2B94B;">›</span>
+            <span>Call provider now if not already done — MAP 58, cool/clammy, partial fluid response = needs eyes on immediately</span>
+          </div>
+          <div class="bullet-row">
+            <span class="bullet-chevron" style="color:#F2B94B;">›</span>
+            <span>Anticipate rapid response or ICU transfer — prepare the room and your SBAR</span>
+          </div>
+          <div class="bullet-row">
+            <span class="bullet-chevron" style="color:#F2B94B;">›</span>
+            <span>Continue monitoring every 5 min — document trends to hand off clearly</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Action bar -->
+      <div class="action-bar">
+        <button class="btn-save">+ Save Case</button>
+        <button class="btn-copy">Copy Response</button>
+        <button class="btn-sbar">Turn into SBAR</button>
+      </div>
+
+    </div>
+  </div>
+</div><!-- /slide-6 -->
+
+</body>
+</html>

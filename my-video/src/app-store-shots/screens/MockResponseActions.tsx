@@ -2,169 +2,155 @@ import React from "react";
 import { C, S, SANS, MONO } from "./tokens";
 import { MockHeader } from "./MockHeader";
 
-const Bullet: React.FC<{ accent: string; children: React.ReactNode }> = ({ accent, children }) => (
-  <div style={{ display: "flex", gap: 11 * S, marginBottom: 8 * S, alignItems: "flex-start" }}>
-    <span style={{ color: accent, fontWeight: 700, flexShrink: 0, fontSize: 14 * S, lineHeight: 1.7, marginTop: 1 * S }}>›</span>
-    <span style={{ color: "#BCCDD6", fontSize: 14 * S, lineHeight: 1.7, fontFamily: SANS }}>{children}</span>
+// ── Reusable sub-components ───────────────────────────────────────────────────
+
+const SafetyStrip: React.FC = () => (
+  <div style={{
+    background: "rgba(180,83,9,0.045)",
+    borderBottom: `1px solid rgba(180,83,9,0.10)`,
+    padding: `${5 * S}px ${16 * S}px`,
+    display: "flex",
+    alignItems: "center",
+    gap: 6 * S,
+  }}>
+    <span style={{ color: "rgba(180,83,9,0.65)", fontSize: 11 * S, flexShrink: 0, lineHeight: 1 }}>ⓘ</span>
+    <span style={{ color: "rgba(27,36,51,0.52)", fontSize: 11 * S, fontFamily: SANS, lineHeight: 1.4 }}>
+      For clinical support only — not a substitute for your judgment or facility protocol
+    </span>
   </div>
 );
+
+interface CardProps {
+  label: string;
+  accent: string;
+  children: React.ReactNode;
+}
+
+const SectionCard: React.FC<CardProps> = ({ label, accent, children }) => (
+  <div style={{
+    background: C.bgCard,
+    borderLeft: `3px solid ${accent}`,
+    borderRadius: 10 * S,
+    padding: `${14 * S}px ${16 * S}px`,
+    marginBottom: 10 * S,
+    boxShadow: `0 ${1 * S}px ${8 * S}px rgba(0,0,0,0.06)`,
+  }}>
+    <div style={{
+      fontSize: 10 * S,
+      fontWeight: 700,
+      textTransform: "uppercase",
+      letterSpacing: "1.4px",
+      color: accent,
+      fontFamily: MONO,
+      marginBottom: 11 * S,
+    }}>
+      {label}
+    </div>
+    {children}
+  </div>
+);
+
+const BulletRow: React.FC<{ accent: string; children: React.ReactNode }> = ({ accent, children }) => (
+  <div style={{ display: "flex", gap: 10 * S, marginBottom: 8 * S, alignItems: "flex-start" }}>
+    <span style={{
+      color: accent,
+      fontWeight: 700,
+      flexShrink: 0,
+      fontSize: 13 * S,
+      lineHeight: 1.65,
+      marginTop: 1 * S,
+    }}>›</span>
+    <span style={{ color: C.textBody, fontSize: 13 * S, lineHeight: 1.65, fontFamily: SANS }}>
+      {children}
+    </span>
+  </div>
+);
+
+const DotRow: React.FC<{ accent: string; children: React.ReactNode }> = ({ accent, children }) => (
+  <div style={{ display: "flex", gap: 9 * S, marginBottom: 7 * S, alignItems: "flex-start" }}>
+    <span style={{
+      display: "inline-block",
+      width: 6 * S,
+      height: 6 * S,
+      borderRadius: "50%",
+      background: accent,
+      flexShrink: 0,
+      marginTop: 5 * S,
+    }} />
+    <span style={{ color: C.textBody, fontSize: 13 * S, lineHeight: 1.55 }}>{children}</span>
+  </div>
+);
+
+// ── Main screen ───────────────────────────────────────────────────────────────
 
 export const MockResponseActions: React.FC = () => (
   <div style={{ background: C.bgApp, width: "100%", fontFamily: SANS }}>
     <MockHeader />
+    <SafetyStrip />
 
-    <div style={{ padding: `${16 * S}px ${16 * S}px 0` }}>
+    <div style={{ padding: `${14 * S}px ${16 * S}px 0` }}>
 
-      {/* What to consider next */}
-      <div style={{
-        background: C.bgYellow,
-        borderLeft: `3px solid ${C.yellow}`,
-        borderRadius: 12 * S,
-        padding: `${18 * S}px ${20 * S}px`,
-        marginBottom: 10 * S,
-        boxShadow: `0 ${2 * S}px ${14 * S}px rgba(0,0,0,0.13)`,
-      }}>
-        <div style={{
-          fontSize: 10 * S,
-          fontWeight: 700,
-          textTransform: "uppercase",
-          letterSpacing: "1.5px",
-          color: C.yellow,
-          fontFamily: MONO,
-          marginBottom: 12 * S,
-          opacity: 0.88,
-        }}>
-          What to consider next
-        </div>
-        <Bullet accent={C.yellow}>Bedside assessment first — patient appearance, skin color, and work of breathing shift the picture significantly</Bullet>
-        <Bullet accent={C.yellow}>Provider awareness tends to come next — leading with the BP, HR, and how fast this changed</Bullet>
-        <Bullet accent={C.yellow}>Charge nurse involvement is often part of how situations like this are managed</Bullet>
-        <Bullet accent={C.yellow}>IV access status is worth confirming — available lines matter ahead of any orders</Bullet>
-      </div>
-
-      {/* Closing */}
-      <div style={{
-        borderLeft: `3px solid ${C.teal}`,
-        paddingLeft: 16 * S,
-        margin: `${16 * S}px 0`,
-      }}>
+      {/* Clinical Pattern Recognition */}
+      <SectionCard label="Clinical Pattern Recognition" accent={C.blue}>
         <p style={{
-          color: "rgba(168,193,204,0.75)",
+          color: C.textBody,
           fontSize: 14 * S,
-          lineHeight: 1.7,
-          fontStyle: "italic",
+          lineHeight: 1.70,
+          margin: `0 0 ${10 * S}px`,
+        }}>
+          Hypotension with compensatory tachycardia is a classic shock pattern. The body is attempting to maintain cardiac output by increasing heart rate to offset the falling blood pressure.
+        </p>
+        <p style={{
+          color: "rgba(27,36,51,0.55)",
+          fontSize: 13 * S,
+          lineHeight: 1.55,
           margin: 0,
         }}>
-          That kind of change is something that may be considered for early escalation depending on the clinical context.
+          The acute onset — stable just an hour ago — is the key clinical signal here.
         </p>
-      </div>
+      </SectionCard>
+
+      {/* Immediate Nursing Assessments — green */}
+      <SectionCard label="Immediate Nursing Assessments" accent={C.green}>
+        <BulletRow accent={C.green}>
+          Mental status — oriented and at baseline, or changed since last assessment?
+        </BulletRow>
+        <BulletRow accent={C.green}>
+          Skin — color, temperature, moisture, and capillary refill
+        </BulletRow>
+        <BulletRow accent={C.green}>
+          Work of breathing — rate, effort, accessory muscle use, SpO₂ trend
+        </BulletRow>
+        <BulletRow accent={C.green}>
+          Pain — any new or worsening pain, especially chest or abdomen
+        </BulletRow>
+        <BulletRow accent={C.green}>
+          IV access — confirm patency and gauge; note available lines
+        </BulletRow>
+        <BulletRow accent={C.green}>
+          Urine output — last void or catheter output if applicable
+        </BulletRow>
+      </SectionCard>
+
+      {/* Possible Clinical Causes — blue */}
+      <SectionCard label="Possible Clinical Causes" accent={C.blue}>
+        <DotRow accent={C.blue}>Volume depletion — active bleeding, GI losses, poor intake, third-spacing</DotRow>
+        <DotRow accent={C.blue}>Septic process — source may not be obvious; temperature and WBC may lag</DotRow>
+        <DotRow accent={C.blue}>Acute cardiac event — MI, new arrhythmia, or decompensated pump failure</DotRow>
+        <DotRow accent={C.blue}>Pulmonary embolism — sudden onset with risk factors</DotRow>
+        <DotRow accent={C.blue}>Medication effect — vasodilators, diuretics, recent sedation or opioids</DotRow>
+      </SectionCard>
 
       {/* Footer */}
       <p style={{
-        color: "rgba(168,193,204,0.32)",
+        color: "rgba(27,36,51,0.30)",
         fontSize: 11 * S,
         lineHeight: 1.5,
         fontStyle: "italic",
-        margin: `0 0 ${12 * S}px`,
+        margin: `0 0 ${16 * S}px`,
       }}>
         For educational support only. Use your clinical judgment and follow local protocol.
       </p>
-
-      {/* Action bar */}
-      <div style={{
-        display: "flex",
-        alignItems: "center",
-        gap: 10 * S,
-        marginTop: 18 * S,
-        paddingTop: 18 * S,
-        borderTop: `1px solid rgba(255,255,255,0.07)`,
-        flexWrap: "wrap",
-      }}>
-        {/* Save Case */}
-        <div style={{
-          background: "rgba(31,191,117,0.04)",
-          border: `1px solid rgba(31,191,117,0.22)`,
-          color: "#4E9E78",
-          borderRadius: 9 * S,
-          padding: `${9 * S}px ${20 * S}px`,
-          fontSize: 13 * S,
-          fontWeight: 600,
-          letterSpacing: "-0.1px",
-        }}>
-          + Save Case
-        </div>
-        {/* Copy Response */}
-        <div style={{
-          background: "transparent",
-          border: `1px solid rgba(255,255,255,0.08)`,
-          color: "#3D5E6E",
-          borderRadius: 9 * S,
-          padding: `${9 * S}px ${18 * S}px`,
-          fontSize: 13 * S,
-          fontWeight: 400,
-          letterSpacing: "-0.1px",
-        }}>
-          Copy Response
-        </div>
-        {/* Turn into SBAR */}
-        <div style={{
-          marginLeft: "auto",
-          background: "transparent",
-          border: `1px solid rgba(0,194,209,0.14)`,
-          color: "#00A8B5",
-          borderRadius: 9 * S,
-          padding: `${9 * S}px ${16 * S}px`,
-          fontSize: 12 * S,
-          fontWeight: 500,
-          letterSpacing: "-0.1px",
-        }}>
-          Turn into SBAR
-        </div>
-      </div>
-
-      {/* Anything change? */}
-      <div style={{
-        marginTop: 22 * S,
-        background: "linear-gradient(160deg, rgba(0,194,209,0.028) 0%, rgba(0,150,165,0.018) 100%)",
-        border: `1px solid rgba(0,194,209,0.12)`,
-        borderRadius: 12 * S,
-        padding: `${16 * S}px ${18 * S}px`,
-      }}>
-        <div style={{
-          fontSize: 9 * S,
-          fontWeight: 700,
-          textTransform: "uppercase",
-          letterSpacing: "1.3px",
-          color: C.teal,
-          marginBottom: 10 * S,
-          fontFamily: MONO,
-        }}>
-          Anything change?
-        </div>
-        <div style={{
-          color: C.textHint,
-          fontSize: 14 * S,
-          lineHeight: 1.6,
-          paddingBottom: 8 * S,
-          borderBottom: `1px solid rgba(0,194,209,0.12)`,
-          marginBottom: 10 * S,
-        }}>
-          New vitals, labs, or anything different?
-        </div>
-        <div style={{ display: "flex", justifyContent: "flex-end" }}>
-          <div style={{
-            background: "transparent",
-            border: `1px solid rgba(255,255,255,0.08)`,
-            color: "#3A5566",
-            borderRadius: 7 * S,
-            padding: `${7 * S}px ${16 * S}px`,
-            fontSize: 12 * S,
-            fontWeight: 600,
-          }}>
-            Send update
-          </div>
-        </div>
-      </div>
 
     </div>
   </div>

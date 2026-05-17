@@ -28,7 +28,7 @@
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
     body {
-      background: #0B0F14;
+      background: #0D1117;
       font-family: 'Inter', -apple-system, sans-serif;
       padding: 48px 32px;
       display: flex; flex-direction: column; align-items: center; gap: 56px;
@@ -37,8 +37,24 @@
     /* ── Slide base ─────────────────────────────────────── */
     .slide {
       width: 1080px; height: 1350px;
-      background: var(--ce-bg-dark);
+      background-color: var(--ce-bg-dark);
+      /* Cinematic depth — two gradient layers over the flat bg color:
+         1. Soft vignette: edges pull slightly darker, centers the eye
+         2. Ultra-subtle warm lift: barely-there ambient at upper-center         */
+      background-image:
+        radial-gradient(ellipse 90% 85% at 50% 50%, transparent 28%, rgba(0,0,0,0.16) 100%),
+        radial-gradient(ellipse 58% 42% at 50% 28%, rgba(255,252,248,0.028) 0%, transparent 52%);
       position: relative; overflow: hidden; flex-shrink: 0;
+    }
+
+    /* Ultra-subtle matte grain — removes flat digital feel.
+       SVG feTurbulence fractalNoise at ~2.5% opacity.
+       Tiles at 200px so it reads as texture not pattern.     */
+    .slide::before {
+      content: ''; position: absolute; inset: 0; z-index: 0; pointer-events: none;
+      background-image: url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' width='200' height='200'><filter id='g'><feTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/></filter><rect width='200' height='200' filter='url(%23g)' opacity='0.025'/></svg>");
+      background-size: 200px 200px;
+      background-repeat: repeat;
     }
 
     /* Slide label (above each slide — not exported) */
@@ -51,13 +67,6 @@
     }
     .slide-label::after {
       content: ''; flex: 1; height: 1px; background: var(--ce-border-dark); opacity: 0.3;
-    }
-
-    /* Subtle dot grid */
-    .slide::before {
-      content: ''; position: absolute; inset: 0;
-      background-image: radial-gradient(circle, rgba(255,255,255,0.012) 1px, transparent 1px);
-      background-size: 40px 40px; pointer-events: none; z-index: 0;
     }
 
     /* ── Footer ─────────────────────────────────────────── */
@@ -84,7 +93,7 @@
 
     /* ── Labels ──────────────────────────────────────────── */
     .label       { font-family: 'IBM Plex Mono', monospace; font-size: 28px; font-weight: 700; letter-spacing: 2.5px; text-transform: uppercase; color: var(--ce-teal); }
-    .label.muted { color: var(--ce-border-dark); }
+    .label.muted { color: rgba(168,193,204,0.30); }
 
     /* ── Type scale ─────────────────────────────────────── */
     h1      { font-family: 'Inter', sans-serif; font-size: 140px; font-weight: 900; line-height: 0.95; letter-spacing: -5px;  color: var(--ce-text-dark); }

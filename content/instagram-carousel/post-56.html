@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Clinical Edge — Post 53 — The Patient Didn't Look Critical</title>
+  <title>Clinical Edge — Post 56 — Nurses Carry Unfinished Thoughts Home</title>
   <link
     href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=IBM+Plex+Mono:wght@400;500;700&display=swap"
     rel="stylesheet"
@@ -11,18 +11,17 @@
   <style>
     /* ── Real Clinical Edge palette — do not modify ─────── */
     :root {
-      --ce-bg-dark:        #111827;
-      --ce-card-dark:      #1E2A3A;
-      --ce-surface-elev:   #243040;
-      --ce-border-dark:    #2D3B4E;
-      --ce-bg-warm:        #E7E1D6;
-      --ce-card-warm:      #F0EDE6;
-      --ce-card-warm-lt:   #FFFDF8;
-      --ce-teal:           #0ABFBC;
-      --ce-text-warm:      #111827;
-      --ce-text-warm-muted:#526174;
-      --ce-text-dark:      #F0EDE6;
-      --ce-text-dark-muted:#A8C1CC;
+      --ce-bg-warm:         #E7E1D6;
+      --ce-card-warm:       #F0EDE6;
+      --ce-card-warm-lt:    #FFFDF8;
+      --ce-card-dark:       #1E2A3A;
+      --ce-surface-elev:    #243040;
+      --ce-border-dark:     #2D3B4E;
+      --ce-teal:            #0ABFBC;
+      --ce-text-warm:       #111827;
+      --ce-text-warm-muted: #526174;
+      --ce-text-dark:       #F0EDE6;
+      --ce-text-dark-muted: #A8C1CC;
     }
 
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
@@ -34,121 +33,107 @@
       display: flex; flex-direction: column; align-items: center; gap: 56px;
     }
 
-    /* ── Slide base ─────────────────────────────────────── */
+    /* ── Slide base — warm ivory/tan ────────────────────── */
     .slide {
       width: 1080px; height: 1350px;
-      background-color: var(--ce-bg-dark);
-      /* Cinematic depth — two gradient layers over the flat bg color:
-         1. Soft vignette: edges pull slightly darker, centers the eye
-         2. Ultra-subtle warm lift: barely-there ambient at upper-center         */
+      background-color: var(--ce-bg-warm);
+      /* Warm cinematic depth:
+         1. Soft edge vignette — pulls focus inward
+         2. Ultra-subtle warm amber accent at upper-left — ambient light feel */
       background-image:
-        radial-gradient(ellipse 90% 85% at 50% 50%, transparent 28%, rgba(0,0,0,0.16) 100%),
-        radial-gradient(ellipse 58% 42% at 50% 28%, rgba(255,252,248,0.028) 0%, transparent 52%);
+        radial-gradient(ellipse 90% 85% at 50% 50%, transparent 30%, rgba(0,0,0,0.09) 100%),
+        radial-gradient(ellipse 65% 52% at 18% 18%, rgba(255,232,180,0.13) 0%, transparent 58%);
       position: relative; overflow: hidden; flex-shrink: 0;
     }
 
-    /* Ultra-subtle matte grain — removes flat digital feel.
-       SVG feTurbulence fractalNoise at ~2.5% opacity.
-       Tiles at 200px so it reads as texture not pattern.     */
+    /* Warm matte grain — feTurbulence fractalNoise, slightly stronger than first pass */
     .slide::before {
       content: ''; position: absolute; inset: 0; z-index: 0; pointer-events: none;
-      background-image: url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' width='200' height='200'><filter id='g'><feTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/></filter><rect width='200' height='200' filter='url(%23g)' opacity='0.025'/></svg>");
+      background-image: url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' width='200' height='200'><filter id='g'><feTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/></filter><rect width='200' height='200' filter='url(%23g)' opacity='0.022'/></svg>");
       background-size: 200px 200px;
       background-repeat: repeat;
     }
 
-    /* Slide label (above each slide — not exported) */
+    /* Slide label (not exported) */
     .slide-label {
       width: 1080px; display: flex; align-items: center; gap: 14px; margin-bottom: -40px;
     }
     .slide-label span {
       font-family: 'IBM Plex Mono', monospace; font-size: 11px; font-weight: 500;
-      color: var(--ce-border-dark); letter-spacing: 2px; text-transform: uppercase;
+      color: #9B8E7E; letter-spacing: 2px; text-transform: uppercase;
     }
     .slide-label::after {
-      content: ''; flex: 1; height: 1px; background: var(--ce-border-dark); opacity: 0.3;
+      content: ''; flex: 1; height: 1px; background: #C4B8A8; opacity: 0.4;
     }
 
-    /* ── Footer ─────────────────────────────────────────── */
+    /* ── Footer — warm, no dark navy ───────────────────── */
     .slide-footer {
       position: absolute; bottom: 0; left: 0; right: 0; height: 96px;
       display: flex; align-items: center; justify-content: space-between;
       padding: 0 72px;
-      border-top: 1px solid var(--ce-border-dark);
-      background: var(--ce-card-dark);
+      border-top: 1px solid rgba(17,24,39,0.10);
+      background: var(--ce-card-warm);
       z-index: 2;
     }
     .footer-brand  { display: flex; align-items: center; gap: 14px; }
     .footer-dot    { width: 10px; height: 10px; border-radius: 50%; background: var(--ce-teal); }
-    .footer-name   { font-family: 'Inter', sans-serif; font-size: 28px; font-weight: 600; color: var(--ce-text-dark-muted); letter-spacing: -0.2px; }
-    .footer-handle { font-family: 'IBM Plex Mono', monospace; font-size: 26px; font-weight: 500; color: var(--ce-text-dark-muted); letter-spacing: 1.5px; text-transform: uppercase; }
+    .footer-name   { font-family: 'Inter', sans-serif; font-size: 28px; font-weight: 600; color: var(--ce-text-warm-muted); letter-spacing: -0.2px; }
+    .footer-handle { font-family: 'IBM Plex Mono', monospace; font-size: 26px; font-weight: 500; color: var(--ce-text-warm-muted); letter-spacing: 1.5px; text-transform: uppercase; }
 
-    /* ── Slide counter ───────────────────────────────────── */
+    /* ── Slide counter dots ──────────────────────────────── */
     .slide-number {
       position: absolute; bottom: 25px; left: 50%; transform: translateX(-50%);
       display: flex; gap: 7px; z-index: 3;
     }
-    .slide-number .dot        { width: 6px; height: 6px; border-radius: 50%; background: var(--ce-border-dark); }
+    .slide-number .dot        { width: 6px; height: 6px; border-radius: 50%; background: rgba(82,97,116,0.28); }
     .slide-number .dot.active { background: var(--ce-teal); }
 
     /* ── Labels ──────────────────────────────────────────── */
     .label       { font-family: 'IBM Plex Mono', monospace; font-size: 28px; font-weight: 700; letter-spacing: 2.5px; text-transform: uppercase; color: var(--ce-teal); }
-    .label.muted { color: rgba(168,193,204,0.30); }
+    .label.muted { color: rgba(82,97,116,0.50); }
 
-    /* ── Type scale ─────────────────────────────────────── */
-    h1      { font-family: 'Inter', sans-serif; font-size: 140px; font-weight: 900; line-height: 0.95; letter-spacing: -5px;  color: var(--ce-text-dark); }
-    h2      { font-family: 'Inter', sans-serif; font-size: 96px;  font-weight: 800; line-height: 1.02; letter-spacing: -3px;  color: var(--ce-text-dark); }
-    h3      { font-family: 'Inter', sans-serif; font-size: 72px;  font-weight: 700; line-height: 1.08; letter-spacing: -2px;  color: var(--ce-text-dark); }
-    p       { font-family: 'Inter', sans-serif; font-size: 40px;  font-weight: 400; line-height: 1.5;  color: var(--ce-text-dark-muted); }
-    p.large { font-size: 44px; font-weight: 400; line-height: 1.5; color: var(--ce-text-dark-muted); }
-    p.small { font-size: 34px; line-height: 1.5; color: rgba(168,193,204,0.55); }
-
-    /* Type on warm surfaces */
-    .warm-h3 { color: var(--ce-text-warm); }
-    .warm-p  { color: var(--ce-text-warm-muted); }
+    /* ── Type scale — warm surface ──────────────────────── */
+    h1      { font-family: 'Inter', sans-serif; font-size: 140px; font-weight: 900; line-height: 0.95; letter-spacing: -5px;  color: var(--ce-text-warm); }
+    h2      { font-family: 'Inter', sans-serif; font-size: 96px;  font-weight: 800; line-height: 1.02; letter-spacing: -3px;  color: var(--ce-text-warm); }
+    h3      { font-family: 'Inter', sans-serif; font-size: 72px;  font-weight: 700; line-height: 1.08; letter-spacing: -2px;  color: var(--ce-text-warm); }
+    p       { font-family: 'Inter', sans-serif; font-size: 40px;  font-weight: 400; line-height: 1.5;  color: var(--ce-text-warm-muted); }
+    p.large { font-size: 44px; font-weight: 400; line-height: 1.5; color: var(--ce-text-warm-muted); }
+    p.small { font-size: 34px; line-height: 1.5; color: rgba(82,97,116,0.65); }
 
     /* ── Accents ─────────────────────────────────────────── */
     .accent-text { color: var(--ce-teal); }
-    .divider     { width: 100%; height: 1px; background: var(--ce-border-dark); }
+    .divider     { width: 100%; height: 1px; background: rgba(17,24,39,0.12); }
     .teal-bar    { height: 2px; border-radius: 2px; background: var(--ce-teal); }
 
-    /* ── Badges ──────────────────────────────────────────── */
+    /* ── Badges — strengthened for warm bg readability ───── */
     .badge {
       display: inline-flex; align-items: center;
       padding: 14px 30px; border-radius: 100px;
       background: rgba(10,191,188,0.10);
-      border: 1px solid rgba(10,191,188,0.22);
+      border: 1px solid rgba(10,191,188,0.35);
       font-family: 'IBM Plex Mono', monospace; font-size: 26px; font-weight: 700;
       letter-spacing: 2px; text-transform: uppercase; color: var(--ce-teal);
     }
     .badge.dim {
-      background: rgba(10,191,188,0.05);
-      border-color: rgba(10,191,188,0.12);
-      color: rgba(10,191,188,0.5);
+      background: rgba(10,191,188,0.07);
+      border-color: rgba(10,191,188,0.22);
+      color: rgba(10,191,188,0.72);
     }
 
-    /* ── Dark card (inside dark slide) ──────────────────── */
-    .card {
+    /* ── Dark card within warm slide ────────────────────── */
+    .card-dark {
       background: var(--ce-card-dark);
       border: 1px solid var(--ce-border-dark);
       border-radius: 20px; padding: 52px 56px;
+      box-shadow: 0 6px 28px rgba(0,0,0,0.14);
     }
 
-    /* ── Warm card (warm tan inside dark slide) ──────────── */
-    .card-warm {
-      background: var(--ce-card-warm);
-      border: 1px solid rgba(0,0,0,0.08);
+    /* ── Warm elevated card — #FFFDF8 lifted above tan bg ── */
+    .card-warm-lt {
+      background: var(--ce-card-warm-lt);
+      border: 1px solid rgba(17,24,39,0.09);
       border-radius: 20px; padding: 52px 56px;
-    }
-
-    /* ── CTA button ──────────────────────────────────────── */
-    .cta-btn-visual {
-      display: inline-flex; align-items: center; justify-content: center;
-      padding: 26px 60px;
-      background: var(--ce-teal);
-      color: var(--ce-bg-dark);
-      font-family: 'Inter', sans-serif; font-size: 34px; font-weight: 700;
-      letter-spacing: -0.3px; border-radius: 16px;
+      box-shadow: 0 2px 14px rgba(0,0,0,0.06);
     }
 
     /* ── Layout wrapper ──────────────────────────────────── */
@@ -161,7 +146,7 @@
 </head>
 <body>
 
-  <!-- POST 53 — "The Patient Didn't Look Critical" -->
+  <!-- POST 56 — "Nurses Carry Unfinished Thoughts Home" — WARM IVORY POST -->
 
 
   <!-- SLIDE 1 — HOOK -->
@@ -174,20 +159,17 @@
         <span class="label muted">01 / 08</span>
       </div>
 
-      <div style="flex:1; display:flex; flex-direction:column; justify-content:center; gap:16px; padding:44px 0 32px;">
-        <h1 style="font-size:128px; letter-spacing:-5px;">The patient</h1>
-        <h2 style="margin-top:4px;">didn't look</h2>
-        <h2 style="margin-top:-8px;"><span class="accent-text">critical.</span></h2>
-        <div class="teal-bar" style="width:64px; margin-top:20px;"></div>
-        <p class="large" style="margin-top:8px;">That's why people missed it.</p>
+      <div style="flex:1; display:flex; flex-direction:column; justify-content:center; gap:28px; padding:44px 0 32px;">
+        <h2>Nurses carry unfinished thoughts home.</h2>
+        <div class="teal-bar" style="width:64px;"></div>
       </div>
 
       <div style="display:flex; align-items:center; gap:16px; padding-bottom:14px;">
         <span class="label muted">Swipe to read</span>
         <div style="display:flex; gap:8px; align-items:center;">
-          <div style="width:28px; height:1px; background:var(--ce-border-dark);"></div>
+          <div style="width:28px; height:1px; background:rgba(0,0,0,0.14);"></div>
           <div style="width:8px; height:8px; border-radius:50%; background:var(--ce-teal);"></div>
-          <div style="width:10px; height:1px; background:var(--ce-border-dark);"></div>
+          <div style="width:10px; height:1px; background:rgba(0,0,0,0.14);"></div>
         </div>
       </div>
 
@@ -205,21 +187,23 @@
   </div>
 
 
-  <!-- SLIDE 2 — BEDSIDE -->
-  <div class="slide-label"><span>Slide 02 — Bedside</span></div>
+  <!-- SLIDE 2 — AFTER SHIFT -->
+  <div class="slide-label"><span>Slide 02 — After Shift</span></div>
   <div class="slide" id="slide-2">
     <div class="slide-content" style="justify-content:space-between;">
 
       <div style="display:flex; align-items:center; justify-content:space-between;">
-        <div class="badge dim">Bedside</div>
+        <div class="badge dim">After Shift</div>
         <span class="label muted">02 / 08</span>
       </div>
 
-      <div style="flex:1; display:flex; flex-direction:column; justify-content:center; gap:40px;">
-        <div class="teal-bar" style="width:48px;"></div>
-        <h2>They were<br>talking.</h2>
-        <div class="divider"></div>
-        <p class="large">Answering questions.<br>Vitals mostly okay.</p>
+      <div style="flex:1; display:flex; flex-direction:column; justify-content:center;">
+        <div class="card-warm-lt" style="display:flex; flex-direction:column; gap:44px;">
+          <div class="teal-bar" style="width:48px;"></div>
+          <h3>A lab you wanted to recheck.</h3>
+          <div class="divider"></div>
+          <p class="large">A patient you keep thinking about.</p>
+        </div>
       </div>
 
       <div></div>
@@ -238,21 +222,21 @@
   </div>
 
 
-  <!-- SLIDE 3 — EXPERIENCE -->
-  <div class="slide-label"><span>Slide 03 — Experience</span></div>
+  <!-- SLIDE 3 — NURSE BRAIN -->
+  <div class="slide-label"><span>Slide 03 — Nurse Brain</span></div>
   <div class="slide" id="slide-3">
     <div class="slide-content" style="justify-content:space-between;">
 
       <div style="display:flex; align-items:center; justify-content:space-between;">
-        <div class="badge dim">Experience</div>
+        <div class="badge dim">Nurse Brain</div>
         <span class="label muted">03 / 08</span>
       </div>
 
       <div style="flex:1; display:flex; flex-direction:column; justify-content:center; gap:44px;">
         <div class="teal-bar" style="width:48px;"></div>
-        <h3>But experienced<br>nurses know:</h3>
+        <h3>Something someone said</h3>
         <div class="divider"></div>
-        <p class="large">people can compensate<br>for a long time.</p>
+        <p class="large">that still doesn't sit right.</p>
       </div>
 
       <div></div>
@@ -271,20 +255,20 @@
   </div>
 
 
-  <!-- SLIDE 4 — THE ROOM (warm card on dark bg) -->
-  <div class="slide-label"><span>Slide 04 — The Room</span></div>
+  <!-- SLIDE 4 — THE PART PEOPLE MISS (dark card pivot within warm) -->
+  <div class="slide-label"><span>Slide 04 — The Part People Miss</span></div>
   <div class="slide" id="slide-4">
     <div class="slide-content" style="justify-content:space-between;">
 
       <div style="display:flex; align-items:center; justify-content:space-between;">
-        <div class="badge dim">The Room</div>
+        <div class="badge dim">The Part People Miss</div>
         <span class="label muted">04 / 08</span>
       </div>
 
       <div style="flex:1; display:flex; flex-direction:column; justify-content:center;">
-        <div class="card-warm">
-          <h3 class="warm-h3" style="font-size:66px; letter-spacing:-2px;">Sometimes the room changes</h3>
-          <p class="large warm-p" style="margin-top:32px;">before the monitor does.</p>
+        <div class="card-dark">
+          <h3 style="color:var(--ce-text-dark);">People think nursing stress ends</h3>
+          <p class="large" style="color:var(--ce-text-dark-muted); margin-top:32px;">when the shift ends.</p>
         </div>
       </div>
 
@@ -304,22 +288,23 @@
   </div>
 
 
-  <!-- SLIDE 5 — CLINICAL JUDGMENT -->
-  <div class="slide-label"><span>Slide 05 — Clinical Judgment</span></div>
+  <!-- SLIDE 5 — REAL LIFE -->
+  <div class="slide-label"><span>Slide 05 — Real Life</span></div>
   <div class="slide" id="slide-5">
     <div class="slide-content" style="justify-content:space-between;">
 
       <div style="display:flex; align-items:center; justify-content:space-between;">
-        <div class="badge dim">Clinical Judgment</div>
+        <div class="badge dim">Real Life</div>
         <span class="label muted">05 / 08</span>
       </div>
 
-      <div style="flex:1; display:flex; flex-direction:column; justify-content:center; gap:44px;">
-        <h2>That feeling of</h2>
-        <div class="teal-bar" style="width:48px; margin-top:-16px;"></div>
-        <p class="large" style="font-style:italic;">"something isn't right yet"</p>
-        <div class="divider"></div>
-        <p class="large">matters more than<br>people think.</p>
+      <div style="flex:1; display:flex; flex-direction:column; justify-content:center;">
+        <div class="card-warm-lt" style="display:flex; flex-direction:column; gap:44px;">
+          <div class="teal-bar" style="width:48px;"></div>
+          <h3>Most nurses know</h3>
+          <div class="divider"></div>
+          <p class="large">it follows you home quietly.</p>
+        </div>
       </div>
 
       <div></div>
@@ -337,20 +322,20 @@
   </div>
 
 
-  <!-- SLIDE 6 — PUNCHLINE -->
-  <div class="slide-label"><span>Slide 06 — Punchline</span></div>
+  <!-- SLIDE 6 — RESPONSIBILITY (punchline) -->
+  <div class="slide-label"><span>Slide 06 — Responsibility</span></div>
   <div class="slide" id="slide-6">
     <div class="slide-content" style="justify-content:space-between;">
 
       <div style="display:flex; align-items:center; justify-content:space-between;">
-        <div class="badge">Nursing</div>
+        <div class="badge dim">Responsibility</div>
         <span class="label muted">06 / 08</span>
       </div>
 
-      <div style="flex:1; display:flex; flex-direction:column; justify-content:center; gap:12px;">
-        <h2>Clinical judgment</h2>
-        <h2 style="margin-top:-4px;">usually starts</h2>
-        <h2 style="margin-top:-4px;"><span class="accent-text">quietly.</span></h2>
+      <div style="flex:1; display:flex; flex-direction:column; justify-content:center; gap:32px;">
+        <h2>That constant mental replay?</h2>
+        <div class="teal-bar" style="width:48px;"></div>
+        <p class="large">That's <span style="font-weight:600; color:var(--ce-text-warm);">responsibility.</span></p>
       </div>
 
       <div></div>
@@ -379,11 +364,11 @@
         <span class="label muted">07 / 08</span>
       </div>
 
-      <div style="flex:1; display:flex; flex-direction:column; justify-content:center; gap:44px;">
-        <div class="teal-bar" style="width:48px;"></div>
-        <h2>Built for<br>the moments</h2>
-        <div class="divider"></div>
-        <p class="large">that are hard to explain<br>at first.</p>
+      <div style="flex:1; display:flex; flex-direction:column; justify-content:center;">
+        <div class="card-dark">
+          <div class="teal-bar" style="width:48px; margin-bottom:40px;"></div>
+          <h2 style="color:var(--ce-text-dark);">Built for how nurses actually think.</h2>
+        </div>
       </div>
 
       <div></div>
@@ -402,33 +387,22 @@
   </div>
 
 
-  <!-- SLIDE 8 — CTA -->
+  <!-- SLIDE 8 — CTA (editorial, warm, restrained) -->
   <div class="slide-label"><span>Slide 08 — CTA</span></div>
   <div class="slide" id="slide-8">
     <div class="slide-content" style="justify-content:space-between;">
 
       <div style="display:flex; align-items:center; justify-content:space-between;">
-        <div class="badge">Clinical Edge</div>
+        <div class="badge">Clinical Edge Copilot</div>
         <span class="label muted">08 / 08</span>
       </div>
 
       <div style="flex:1; display:flex; flex-direction:column; justify-content:center; gap:40px;">
-
-        <div style="display:flex; align-items:center; gap:16px;">
-          <div class="teal-bar" style="width:40px;"></div>
-          <span class="label" style="font-size:26px; letter-spacing:3px;">For Bedside Nurses</span>
-        </div>
-
-        <h2>theclinicaledge.org</h2>
-
+        <div class="teal-bar" style="width:48px;"></div>
+        <h2>Support your thinking.</h2>
         <div class="divider"></div>
-
-        <p class="large">Clinical reasoning support for nurses</p>
-
-        <div style="padding-top:4px;">
-          <div class="cta-btn-visual">Visit theclinicaledge.org</div>
-        </div>
-
+        <p class="large">Not replace it.</p>
+        <p class="small" style="margin-top:8px;">Clinical Edge Copilot &bull; Available on the App Store</p>
       </div>
 
       <div></div>

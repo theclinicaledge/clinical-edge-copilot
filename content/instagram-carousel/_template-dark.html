@@ -3,27 +3,41 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Clinical Edge — Post 53 — The Patient Didn't Look Critical</title>
+  <!--
+  ╔══════════════════════════════════════════════════════════════════╗
+  ║  CLINICAL EDGE — DARK CAROUSEL TEMPLATE                         ║
+  ║  Copy this file → rename post-XX.html → fill in content only    ║
+  ╠══════════════════════════════════════════════════════════════════╣
+  ║  WHAT TO CHANGE:  slide copy, badge labels, slide count label   ║
+  ║  NEVER CHANGE:    palette, depth system, footer, type scale     ║
+  ║  WARM MIX RULE:   use .card-warm for highlight cards on dark bg ║
+  ╚══════════════════════════════════════════════════════════════════╝
+  -->
+  <title>Clinical Edge — Post XX — Title Here</title>
   <link
     href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=IBM+Plex+Mono:wght@400;500;700&display=swap"
     rel="stylesheet"
   />
   <style>
-    /* ── Real Clinical Edge palette — do not modify ─────── */
+    /* ══════════════════════════════════════════════════════
+       LOCKED PALETTE — SOURCE OF TRUTH — DO NOT MODIFY
+       These are the real Clinical Edge app colors exactly.
+    ══════════════════════════════════════════════════════ */
     :root {
-      --ce-bg-dark:        #111827;
-      --ce-card-dark:      #1E2A3A;
-      --ce-surface-elev:   #243040;
-      --ce-border-dark:    #2D3B4E;
-      --ce-bg-warm:        #E7E1D6;
-      --ce-card-warm:      #F0EDE6;
-      --ce-card-warm-lt:   #FFFDF8;
-      --ce-teal:           #0ABFBC;
-      --ce-text-warm:      #111827;
-      --ce-text-warm-muted:#526174;
-      --ce-text-dark:      #F0EDE6;
-      --ce-text-dark-muted:#A8C1CC;
+      --ce-bg-dark:         #111827;   /* Main dark slide background          */
+      --ce-card-dark:       #1E2A3A;   /* Dark cards / panels / footer bg     */
+      --ce-surface-elev:    #243040;   /* Elevated dark surfaces (rare use)   */
+      --ce-border-dark:     #2D3B4E;   /* Dark borders, dividers              */
+      --ce-bg-warm:         #E7E1D6;   /* Warm app background (warm posts)    */
+      --ce-card-warm:       #F0EDE6;   /* Warm highlight cards on dark slides */
+      --ce-card-warm-lt:    #FFFDF8;   /* Lighter warm card variant           */
+      --ce-teal:            #0ABFBC;   /* Brand teal — CTA, dots, bars        */
+      --ce-text-warm:       #111827;   /* Heading text on warm surfaces       */
+      --ce-text-warm-muted: #526174;   /* Body text on warm surfaces          */
+      --ce-text-dark:       #F0EDE6;   /* Heading text on dark surfaces       */
+      --ce-text-dark-muted: #A8C1CC;   /* Body/secondary text on dark         */
     }
+    /* ══ END LOCKED PALETTE ════════════════════════════ */
 
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
@@ -34,22 +48,22 @@
       display: flex; flex-direction: column; align-items: center; gap: 56px;
     }
 
-    /* ── Slide base ─────────────────────────────────────── */
+    /* ── Slide base ─────────────────────────────────────
+       background-color = flat #111827
+       background-image = cinematic depth layers (do not remove):
+         Layer 1: Vignette — edges pull darker, eye centers
+         Layer 2: Warm lift — ultra-subtle ambient at upper center
+    ──────────────────────────────────────────────────── */
     .slide {
       width: 1080px; height: 1350px;
       background-color: var(--ce-bg-dark);
-      /* Cinematic depth — two gradient layers over the flat bg color:
-         1. Soft vignette: edges pull slightly darker, centers the eye
-         2. Ultra-subtle warm lift: barely-there ambient at upper-center         */
       background-image:
         radial-gradient(ellipse 90% 85% at 50% 50%, transparent 28%, rgba(0,0,0,0.16) 100%),
         radial-gradient(ellipse 58% 42% at 50% 28%, rgba(255,252,248,0.028) 0%, transparent 52%);
       position: relative; overflow: hidden; flex-shrink: 0;
     }
 
-    /* Ultra-subtle matte grain — removes flat digital feel.
-       SVG feTurbulence fractalNoise at ~2.5% opacity.
-       Tiles at 200px so it reads as texture not pattern.     */
+    /* Matte grain — removes flat digital feel, ~2.5% opacity */
     .slide::before {
       content: ''; position: absolute; inset: 0; z-index: 0; pointer-events: none;
       background-image: url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' width='200' height='200'><filter id='g'><feTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/></filter><rect width='200' height='200' filter='url(%23g)' opacity='0.025'/></svg>");
@@ -57,7 +71,7 @@
       background-repeat: repeat;
     }
 
-    /* Slide label (above each slide — not exported) */
+    /* Slide label — appears above each slide in preview only, NOT exported */
     .slide-label {
       width: 1080px; display: flex; align-items: center; gap: 14px; margin-bottom: -40px;
     }
@@ -69,7 +83,7 @@
       content: ''; flex: 1; height: 1px; background: var(--ce-border-dark); opacity: 0.3;
     }
 
-    /* ── Footer ─────────────────────────────────────────── */
+    /* ── Footer (locked — same on every slide) ───────── */
     .slide-footer {
       position: absolute; bottom: 0; left: 0; right: 0; height: 96px;
       display: flex; align-items: center; justify-content: space-between;
@@ -83,7 +97,7 @@
     .footer-name   { font-family: 'Inter', sans-serif; font-size: 28px; font-weight: 600; color: var(--ce-text-dark-muted); letter-spacing: -0.2px; }
     .footer-handle { font-family: 'IBM Plex Mono', monospace; font-size: 26px; font-weight: 500; color: var(--ce-text-dark-muted); letter-spacing: 1.5px; text-transform: uppercase; }
 
-    /* ── Slide counter ───────────────────────────────────── */
+    /* ── Slide counter (dots) ────────────────────────── */
     .slide-number {
       position: absolute; bottom: 25px; left: 50%; transform: translateX(-50%);
       display: flex; gap: 7px; z-index: 3;
@@ -91,28 +105,28 @@
     .slide-number .dot        { width: 6px; height: 6px; border-radius: 50%; background: var(--ce-border-dark); }
     .slide-number .dot.active { background: var(--ce-teal); }
 
-    /* ── Labels ──────────────────────────────────────────── */
+    /* ── Labels (badges + counters) ─────────────────── */
     .label       { font-family: 'IBM Plex Mono', monospace; font-size: 28px; font-weight: 700; letter-spacing: 2.5px; text-transform: uppercase; color: var(--ce-teal); }
     .label.muted { color: rgba(168,193,204,0.30); }
 
-    /* ── Type scale ─────────────────────────────────────── */
+    /* ── Type scale ─────────────────────────────────── */
     h1      { font-family: 'Inter', sans-serif; font-size: 140px; font-weight: 900; line-height: 0.95; letter-spacing: -5px;  color: var(--ce-text-dark); }
     h2      { font-family: 'Inter', sans-serif; font-size: 96px;  font-weight: 800; line-height: 1.02; letter-spacing: -3px;  color: var(--ce-text-dark); }
     h3      { font-family: 'Inter', sans-serif; font-size: 72px;  font-weight: 700; line-height: 1.08; letter-spacing: -2px;  color: var(--ce-text-dark); }
     p       { font-family: 'Inter', sans-serif; font-size: 40px;  font-weight: 400; line-height: 1.5;  color: var(--ce-text-dark-muted); }
-    p.large { font-size: 44px; font-weight: 400; line-height: 1.5; color: var(--ce-text-dark-muted); }
-    p.small { font-size: 34px; line-height: 1.5; color: rgba(168,193,204,0.55); }
+    p.large { font-size: 44px; font-weight: 400; line-height: 1.5;  color: var(--ce-text-dark-muted); }
+    p.small { font-size: 34px; line-height: 1.5;  color: rgba(168,193,204,0.55); }
 
-    /* Type on warm surfaces */
+    /* Type on warm cards */
     .warm-h3 { color: var(--ce-text-warm); }
     .warm-p  { color: var(--ce-text-warm-muted); }
 
-    /* ── Accents ─────────────────────────────────────────── */
+    /* ── Accents ─────────────────────────────────────── */
     .accent-text { color: var(--ce-teal); }
     .divider     { width: 100%; height: 1px; background: var(--ce-border-dark); }
     .teal-bar    { height: 2px; border-radius: 2px; background: var(--ce-teal); }
 
-    /* ── Badges ──────────────────────────────────────────── */
+    /* ── Badges ──────────────────────────────────────── */
     .badge {
       display: inline-flex; align-items: center;
       padding: 14px 30px; border-radius: 100px;
@@ -127,21 +141,21 @@
       color: rgba(10,191,188,0.5);
     }
 
-    /* ── Dark card (inside dark slide) ──────────────────── */
+    /* ── Dark card — darker island on dark bg ────────── */
     .card {
       background: var(--ce-card-dark);
       border: 1px solid var(--ce-border-dark);
       border-radius: 20px; padding: 52px 56px;
     }
 
-    /* ── Warm card (warm tan inside dark slide) ──────────── */
+    /* ── Warm card — warm tan island on dark bg ──────── */
     .card-warm {
       background: var(--ce-card-warm);
       border: 1px solid rgba(0,0,0,0.08);
       border-radius: 20px; padding: 52px 56px;
     }
 
-    /* ── CTA button ──────────────────────────────────────── */
+    /* ── CTA button ──────────────────────────────────── */
     .cta-btn-visual {
       display: inline-flex; align-items: center; justify-content: center;
       padding: 26px 60px;
@@ -151,17 +165,39 @@
       letter-spacing: -0.3px; border-radius: 16px;
     }
 
-    /* ── Layout wrapper ──────────────────────────────────── */
+    /* ── Layout wrapper ──────────────────────────────── */
     .slide-content {
       position: relative; z-index: 1;
       padding: 60px 72px 116px;
       height: 100%; display: flex; flex-direction: column;
     }
+
+    /*
+    ════════════════════════════════════════════════════
+    COMPOSITION RULES — preserve these on every slide
+    ════════════════════════════════════════════════════
+    - Use justify-content: space-between on .slide-content
+    - Top zone:    badge (left) + counter "0X / 09" (right)
+    - Middle zone: flex:1 with justify-content:center — main content
+    - Bottom zone: swipe indicator (slide 1) or empty div (others)
+    - Slide 4-ish: use .card-warm for the pull-quote/highlight card
+    - Footer:      always the same — Clinical Edge Copilot / handle
+    - Counter:     9 dots, .dot.active on the current slide
+
+    SLIDE COUNT:
+    - Default is 9 slides
+    - Adjust counter dots + "0X / 09" labels to match actual count
+    ════════════════════════════════════════════════════
+    */
   </style>
 </head>
 <body>
 
-  <!-- POST 53 — "The Patient Didn't Look Critical" -->
+  <!-- ═══════════════════════════════════════════════════════
+       REPLACE EVERYTHING BELOW WITH YOUR POST CONTENT.
+       Keep slide structure, footer, and counter intact.
+       Only change: copy, badge labels, slide count numbers.
+  ═══════════════════════════════════════════════════════ -->
 
 
   <!-- SLIDE 1 — HOOK -->
@@ -170,16 +206,15 @@
     <div class="slide-content" style="justify-content:space-between;">
 
       <div style="display:flex; align-items:center; justify-content:space-between;">
-        <div class="badge">Clinical Edge</div>
-        <span class="label muted">01 / 08</span>
+        <div class="badge">Clinical Edge</div>  <!-- or topic badge -->
+        <span class="label muted">01 / 09</span>
       </div>
 
-      <div style="flex:1; display:flex; flex-direction:column; justify-content:center; gap:16px; padding:44px 0 32px;">
-        <h1 style="font-size:128px; letter-spacing:-5px;">The patient</h1>
-        <h2 style="margin-top:4px;">didn't look</h2>
-        <h2 style="margin-top:-8px;"><span class="accent-text">critical.</span></h2>
-        <div class="teal-bar" style="width:64px; margin-top:20px;"></div>
-        <p class="large" style="margin-top:8px;">That's why people missed it.</p>
+      <!-- ✏️ HOOK CONTENT — large h1 split, teal accent on key word -->
+      <div style="flex:1; display:flex; flex-direction:column; justify-content:center; gap:28px; padding:44px 0 32px;">
+        <h1>First line</h1>
+        <h1 style="margin-top:-22px; font-size:115px; letter-spacing:-4px;">second <span class="accent-text">word.</span></h1>
+        <div class="teal-bar" style="width:64px; margin-top:16px;"></div>
       </div>
 
       <div style="display:flex; align-items:center; gap:16px; padding-bottom:14px;">
@@ -200,26 +235,25 @@
       <div class="dot active"></div>
       <div class="dot"></div><div class="dot"></div><div class="dot"></div>
       <div class="dot"></div><div class="dot"></div><div class="dot"></div>
-      <div class="dot"></div>
+      <div class="dot"></div><div class="dot"></div>
     </div>
   </div>
 
 
-  <!-- SLIDE 2 — BEDSIDE -->
-  <div class="slide-label"><span>Slide 02 — Bedside</span></div>
+  <!-- SLIDE 2 -->
+  <div class="slide-label"><span>Slide 02</span></div>
   <div class="slide" id="slide-2">
     <div class="slide-content" style="justify-content:space-between;">
 
       <div style="display:flex; align-items:center; justify-content:space-between;">
-        <div class="badge dim">Bedside</div>
-        <span class="label muted">02 / 08</span>
+        <div class="badge dim">Category</div>  <!-- ✏️ badge label -->
+        <span class="label muted">02 / 09</span>
       </div>
 
-      <div style="flex:1; display:flex; flex-direction:column; justify-content:center; gap:40px;">
+      <!-- ✏️ CONTENT — h2 + teal-bar, or h2 + divider + p.large -->
+      <div style="flex:1; display:flex; flex-direction:column; justify-content:center; gap:32px;">
         <div class="teal-bar" style="width:48px;"></div>
-        <h2>They were<br>talking.</h2>
-        <div class="divider"></div>
-        <p class="large">Answering questions.<br>Vitals mostly okay.</p>
+        <h2>Your slide two headline here.</h2>
       </div>
 
       <div></div>
@@ -234,25 +268,27 @@
       <div class="dot active"></div>
       <div class="dot"></div><div class="dot"></div><div class="dot"></div>
       <div class="dot"></div><div class="dot"></div><div class="dot"></div>
+      <div class="dot"></div>
     </div>
   </div>
 
 
-  <!-- SLIDE 3 — EXPERIENCE -->
-  <div class="slide-label"><span>Slide 03 — Experience</span></div>
+  <!-- SLIDE 3 -->
+  <div class="slide-label"><span>Slide 03</span></div>
   <div class="slide" id="slide-3">
     <div class="slide-content" style="justify-content:space-between;">
 
       <div style="display:flex; align-items:center; justify-content:space-between;">
-        <div class="badge dim">Experience</div>
-        <span class="label muted">03 / 08</span>
+        <div class="badge dim">Category</div>
+        <span class="label muted">03 / 09</span>
       </div>
 
+      <!-- ✏️ CONTENT — h2 + divider + p.large (two-part rhythm) -->
       <div style="flex:1; display:flex; flex-direction:column; justify-content:center; gap:44px;">
         <div class="teal-bar" style="width:48px;"></div>
-        <h3>But experienced<br>nurses know:</h3>
+        <h2>Short punchy line.</h2>
         <div class="divider"></div>
-        <p class="large">people can compensate<br>for a long time.</p>
+        <p class="large">Supporting thought or second beat.</p>
       </div>
 
       <div></div>
@@ -265,26 +301,27 @@
     <div class="slide-number">
       <div class="dot"></div><div class="dot"></div>
       <div class="dot active"></div>
-      <div class="dot"></div><div class="dot"></div>
+      <div class="dot"></div><div class="dot"></div><div class="dot"></div>
       <div class="dot"></div><div class="dot"></div><div class="dot"></div>
     </div>
   </div>
 
 
-  <!-- SLIDE 4 — THE ROOM (warm card on dark bg) -->
-  <div class="slide-label"><span>Slide 04 — The Room</span></div>
+  <!-- SLIDE 4 — WARM CARD (highlight / pull-quote) -->
+  <div class="slide-label"><span>Slide 04 — Warm Card</span></div>
   <div class="slide" id="slide-4">
     <div class="slide-content" style="justify-content:space-between;">
 
       <div style="display:flex; align-items:center; justify-content:space-between;">
-        <div class="badge dim">The Room</div>
-        <span class="label muted">04 / 08</span>
+        <div class="badge dim">Category</div>
+        <span class="label muted">04 / 09</span>
       </div>
 
+      <!-- ✏️ WARM CARD — key insight or pull-quote. Text uses warm colors. -->
       <div style="flex:1; display:flex; flex-direction:column; justify-content:center;">
         <div class="card-warm">
-          <h3 class="warm-h3" style="font-size:66px; letter-spacing:-2px;">Sometimes the room changes</h3>
-          <p class="large warm-p" style="margin-top:32px;">before the monitor does.</p>
+          <h3 class="warm-h3">Your headline here</h3>
+          <p class="large warm-p" style="margin-top:32px;">Supporting thought or detail.</p>
         </div>
       </div>
 
@@ -299,27 +336,26 @@
       <div class="dot"></div><div class="dot"></div><div class="dot"></div>
       <div class="dot active"></div>
       <div class="dot"></div><div class="dot"></div><div class="dot"></div>
-      <div class="dot"></div>
+      <div class="dot"></div><div class="dot"></div>
     </div>
   </div>
 
 
-  <!-- SLIDE 5 — CLINICAL JUDGMENT -->
-  <div class="slide-label"><span>Slide 05 — Clinical Judgment</span></div>
+  <!-- SLIDE 5 -->
+  <div class="slide-label"><span>Slide 05</span></div>
   <div class="slide" id="slide-5">
     <div class="slide-content" style="justify-content:space-between;">
 
       <div style="display:flex; align-items:center; justify-content:space-between;">
-        <div class="badge dim">Clinical Judgment</div>
-        <span class="label muted">05 / 08</span>
+        <div class="badge dim">Category</div>
+        <span class="label muted">05 / 09</span>
       </div>
 
       <div style="flex:1; display:flex; flex-direction:column; justify-content:center; gap:44px;">
-        <h2>That feeling of</h2>
-        <div class="teal-bar" style="width:48px; margin-top:-16px;"></div>
-        <p class="large" style="font-style:italic;">"something isn't right yet"</p>
+        <div class="teal-bar" style="width:48px;"></div>
+        <h3>Your slide five headline.</h3>
         <div class="divider"></div>
-        <p class="large">matters more than<br>people think.</p>
+        <p class="large">Secondary supporting line.</p>
       </div>
 
       <div></div>
@@ -333,24 +369,25 @@
       <div class="dot"></div><div class="dot"></div><div class="dot"></div><div class="dot"></div>
       <div class="dot active"></div>
       <div class="dot"></div><div class="dot"></div><div class="dot"></div>
+      <div class="dot"></div>
     </div>
   </div>
 
 
-  <!-- SLIDE 6 — PUNCHLINE -->
+  <!-- SLIDE 6 — BIG STATEMENT (h1 punchline) -->
   <div class="slide-label"><span>Slide 06 — Punchline</span></div>
   <div class="slide" id="slide-6">
     <div class="slide-content" style="justify-content:space-between;">
 
       <div style="display:flex; align-items:center; justify-content:space-between;">
-        <div class="badge">Nursing</div>
-        <span class="label muted">06 / 08</span>
+        <div class="badge">Category</div>  <!-- active badge for punchline slide -->
+        <span class="label muted">06 / 09</span>
       </div>
 
-      <div style="flex:1; display:flex; flex-direction:column; justify-content:center; gap:12px;">
-        <h2>Clinical judgment</h2>
-        <h2 style="margin-top:-4px;">usually starts</h2>
-        <h2 style="margin-top:-4px;"><span class="accent-text">quietly.</span></h2>
+      <!-- ✏️ BIG STATEMENT — use h1 split with teal accent -->
+      <div style="flex:1; display:flex; flex-direction:column; justify-content:center; gap:20px;">
+        <h1>Not just the</h1>
+        <h1 style="margin-top:-22px; font-size:115px; letter-spacing:-4px;"><span class="accent-text">keyword.</span></h1>
       </div>
 
       <div></div>
@@ -364,26 +401,26 @@
       <div class="dot"></div><div class="dot"></div><div class="dot"></div>
       <div class="dot"></div><div class="dot"></div>
       <div class="dot active"></div>
-      <div class="dot"></div><div class="dot"></div>
+      <div class="dot"></div><div class="dot"></div><div class="dot"></div>
     </div>
   </div>
 
 
-  <!-- SLIDE 7 — PRODUCT -->
-  <div class="slide-label"><span>Slide 07 — Product</span></div>
+  <!-- SLIDE 7 -->
+  <div class="slide-label"><span>Slide 07</span></div>
   <div class="slide" id="slide-7">
     <div class="slide-content" style="justify-content:space-between;">
 
       <div style="display:flex; align-items:center; justify-content:space-between;">
-        <div class="badge">Clinical Edge Copilot</div>
-        <span class="label muted">07 / 08</span>
+        <div class="badge dim">Category</div>
+        <span class="label muted">07 / 09</span>
       </div>
 
       <div style="flex:1; display:flex; flex-direction:column; justify-content:center; gap:44px;">
         <div class="teal-bar" style="width:48px;"></div>
-        <h2>Built for<br>the moments</h2>
+        <h3>Your slide seven headline.</h3>
         <div class="divider"></div>
-        <p class="large">that are hard to explain<br>at first.</p>
+        <p class="large">Secondary supporting line.</p>
       </div>
 
       <div></div>
@@ -396,22 +433,56 @@
     <div class="slide-number">
       <div class="dot"></div><div class="dot"></div><div class="dot"></div>
       <div class="dot"></div><div class="dot"></div><div class="dot"></div>
+      <div class="dot active"></div>
+      <div class="dot"></div><div class="dot"></div>
+    </div>
+  </div>
+
+
+  <!-- SLIDE 8 — PRODUCT -->
+  <div class="slide-label"><span>Slide 08 — Product</span></div>
+  <div class="slide" id="slide-8">
+    <div class="slide-content" style="justify-content:space-between;">
+
+      <div style="display:flex; align-items:center; justify-content:space-between;">
+        <div class="badge">Clinical Edge Copilot</div>
+        <span class="label muted">08 / 09</span>
+      </div>
+
+      <!-- ✏️ PRODUCT SLIDE — keep teel bar + h2 pattern -->
+      <div style="flex:1; display:flex; flex-direction:column; justify-content:center; gap:32px;">
+        <div class="teal-bar" style="width:48px;"></div>
+        <h2>Built for how nurses actually think.</h2>
+      </div>
+
+      <div></div>
+
+    </div>
+    <div class="slide-footer">
+      <div class="footer-brand"><div class="footer-dot"></div><span class="footer-name">Clinical Edge Copilot</span></div>
+      <span class="footer-handle">@clinicaledgeco</span>
+    </div>
+    <div class="slide-number">
+      <div class="dot"></div><div class="dot"></div><div class="dot"></div>
+      <div class="dot"></div><div class="dot"></div><div class="dot"></div>
+      <div class="dot"></div>
       <div class="dot active"></div>
       <div class="dot"></div>
     </div>
   </div>
 
 
-  <!-- SLIDE 8 — CTA -->
-  <div class="slide-label"><span>Slide 08 — CTA</span></div>
-  <div class="slide" id="slide-8">
+  <!-- SLIDE 9 — CTA -->
+  <div class="slide-label"><span>Slide 09 — CTA</span></div>
+  <div class="slide" id="slide-9">
     <div class="slide-content" style="justify-content:space-between;">
 
       <div style="display:flex; align-items:center; justify-content:space-between;">
         <div class="badge">Clinical Edge</div>
-        <span class="label muted">08 / 08</span>
+        <span class="label muted">09 / 09</span>
       </div>
 
+      <!-- CTA — keep this structure locked -->
       <div style="flex:1; display:flex; flex-direction:column; justify-content:center; gap:40px;">
 
         <div style="display:flex; align-items:center; gap:16px;">
@@ -441,7 +512,7 @@
     <div class="slide-number">
       <div class="dot"></div><div class="dot"></div><div class="dot"></div>
       <div class="dot"></div><div class="dot"></div><div class="dot"></div>
-      <div class="dot"></div>
+      <div class="dot"></div><div class="dot"></div>
       <div class="dot active"></div>
     </div>
   </div>

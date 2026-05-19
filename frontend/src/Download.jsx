@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import { track } from "@vercel/analytics";
 
 // ── App Store destination ────────────────────────────────────────────────────
 const APP_STORE_URL =
@@ -263,6 +264,7 @@ export default function Download() {
               target="_blank"
               rel="noreferrer"
               className="dl-badge-link"
+              onClick={() => track("app_store_click", { page: "download", destination: "app_store" })}
             >
               <AppStoreBadge />
             </a>

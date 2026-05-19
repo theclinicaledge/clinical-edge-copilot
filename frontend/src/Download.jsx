@@ -362,7 +362,7 @@ export default function Download() {
         </div>
         <div style={{ display: "flex", gap: 16 }}>
           <a
-            href="/#/privacy"
+            href="/privacy"
             style={{
               fontSize: 11,
               color: "#7B8494",
@@ -373,7 +373,7 @@ export default function Download() {
             Privacy
           </a>
           <a
-            href="/#/support"
+            href="/support"
             style={{
               fontSize: 11,
               color: "#7B8494",

@@ -46,7 +46,7 @@ export default function Privacy() {
             </span>
           </div>
           <a
-            href="/#/"
+            href="/"
             style={{
             marginLeft: "auto",
             fontSize: 11,

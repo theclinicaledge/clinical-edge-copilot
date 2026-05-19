@@ -192,30 +192,37 @@ function InstallBanner() {
 
 // ── Routing ─────────────────────────────────────────────────────────────────
 function getPage() {
-  const hash = window.location.hash;
-  if (hash === '#/landing') return 'landing';
-  if (hash === '#/scenario') return 'scenario';
-  if (hash === '#/quickstart') return 'quickstart';
-  if (hash === '#/privacy') return 'privacy';
-  if (hash === '#/support') return 'support';
-  if (hash === '#/download') return 'download';
-  return 'app';
+  const path = window.location.pathname;
+  if (path === '/landing')    return 'landing';
+  if (path === '/scenario')   return 'scenario';
+  if (path === '/quickstart') return 'quickstart';
+  if (path === '/privacy')    return 'privacy';
+  if (path === '/support')    return 'support';
+  if (path === '/download')   return 'download';
+  return 'app'; // '/' and '/app' and anything else → main app
 }
 
 function Root() {
   const [page, setPage] = useState(getPage);
 
+  // navigate() — pushes pathname and syncs React state without a reload
+  const navigate = (path) => {
+    history.pushState({}, '', path);
+    setPage(getPage());
+  };
+
   useEffect(() => {
-    const onHashChange = () => setPage(getPage());
-    window.addEventListener('hashchange', onHashChange);
-    return () => window.removeEventListener('hashchange', onHashChange);
+    // Handle browser back / forward
+    const onPop = () => setPage(getPage());
+    window.addEventListener('popstate', onPop);
+    return () => window.removeEventListener('popstate', onPop);
   }, []);
 
-  const enterApp = () => { window.location.hash = '#/app'; };
-  const enterScenario = () => { window.location.hash = '#/scenario'; };
-  const enterQuickStart = () => { window.location.hash = '#/quickstart'; };
-  const goBack = () => { window.location.hash = ''; };
-  const goBackToScenario = () => { window.location.hash = '#/scenario'; };
+  const enterApp         = () => navigate('/');
+  const enterScenario    = () => navigate('/scenario');
+  const enterQuickStart  = () => navigate('/quickstart');
+  const goBack           = () => navigate('/');
+  const goBackToScenario = () => navigate('/scenario');
 
   return (
     <>

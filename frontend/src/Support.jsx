@@ -46,7 +46,7 @@ export default function Support() {
             </span>
           </div>
           <a
-            href="/#/"
+            href="/"
             style={{
             marginLeft: "auto",
             fontSize: 11,
@@ -172,8 +172,8 @@ export default function Support() {
             color: "#526174",
             fontFamily: "'IBM Plex Mono', monospace",
           }}>
-            <a href="/#/privacy" style={{ color: "#526174", textDecoration: "none" }}>Privacy Policy</a>
-            <a href="/#/" style={{ color: "#526174", textDecoration: "none" }}>Back to Copilot</a>
+            <a href="/privacy" style={{ color: "#526174", textDecoration: "none" }}>Privacy Policy</a>
+            <a href="/" style={{ color: "#526174", textDecoration: "none" }}>Back to Copilot</a>
           </div>
 
         </div>

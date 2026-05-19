@@ -1768,7 +1768,7 @@ export default function App() {
           marginTop: 20,
           paddingBottom: 4,
         }}>
-          {[["Privacy", "/#/privacy"], ["Support", "/#/support"]].map(([label, href]) => (
+          {[["Privacy", "/privacy"], ["Support", "/support"]].map(([label, href]) => (
             <a key={label} href={href} style={{
               fontSize: 11,
               color: "#526174",

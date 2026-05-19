@@ -8,6 +8,7 @@ import Scenario from './Scenario.jsx'
 import QuickStart from './QuickStart.jsx'
 import Privacy from './Privacy.jsx'
 import Support from './Support.jsx'
+import Download from './Download.jsx'
 
 // ── Service Worker Registration ─────────────────────────────────────────────
 if ('serviceWorker' in navigator) {
@@ -197,6 +198,7 @@ function getPage() {
   if (hash === '#/quickstart') return 'quickstart';
   if (hash === '#/privacy') return 'privacy';
   if (hash === '#/support') return 'support';
+  if (hash === '#/download') return 'download';
   return 'app';
 }
 
@@ -223,6 +225,7 @@ function Root() {
       {page === 'landing'    && <Landing onEnterApp={enterApp} onEnterScenario={enterScenario} />}
       {page === 'privacy'    && <Privacy />}
       {page === 'support'    && <Support />}
+      {page === 'download'   && <Download />}
       <IOSInstallHint />
       <InstallBanner />
       <Analytics />

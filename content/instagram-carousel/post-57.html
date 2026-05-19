@@ -1,0 +1,596 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Clinical Edge — Post 57 — Nurses See It First (Case Study)</title>
+  <link
+    href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=IBM+Plex+Mono:wght@400;500;700&display=swap"
+    rel="stylesheet"
+  />
+  <style>
+    /* ── Palette ─────────────────────────────────────────── */
+    :root {
+      --ce-bg-warm:   #E7E1D6;
+      --ce-card-warm: #F0EDE6;
+      --ce-card-dark: #1E2A3A;
+      --ce-elev:      #243040;
+      --ce-border:    #2D3B4E;
+      --ce-teal:      #0ABFBC;
+      --ce-tw:        #111827;   /* text on warm */
+      --ce-twm:       #526174;   /* muted text on warm */
+      --ce-td:        #F0EDE6;   /* text on dark */
+      --ce-tdm:       #A8C1CC;   /* muted text on dark */
+      /* case-study section accents */
+      --cs-teal:   #0ABFBC;
+      --cs-rose:   #C05C5C;
+      --cs-green:  #2E9A72;
+      --cs-amber:  #B07820;
+    }
+
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      background: #0D1117;
+      font-family: 'Inter', -apple-system, sans-serif;
+      padding: 48px 32px;
+      display: flex; flex-direction: column; align-items: center; gap: 56px;
+    }
+
+    /* ── Slide base ─────────────────────────────────────── */
+    .slide {
+      width: 1080px; height: 1350px;
+      background-color: var(--ce-bg-warm);
+      background-image:
+        radial-gradient(ellipse 90% 85% at 50% 50%, transparent 30%, rgba(0,0,0,0.09) 100%),
+        radial-gradient(ellipse 65% 52% at 18% 18%, rgba(255,232,180,0.13) 0%, transparent 58%);
+      position: relative; overflow: hidden; flex-shrink: 0;
+    }
+    .slide::before {
+      content: ''; position: absolute; inset: 0; z-index: 0; pointer-events: none;
+      background-image: url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' width='200' height='200'><filter id='g'><feTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/></filter><rect width='200' height='200' filter='url(%23g)' opacity='0.022'/></svg>");
+      background-size: 200px 200px; background-repeat: repeat;
+    }
+
+    /* Slide label (preview only) */
+    .slide-label {
+      width: 1080px; display: flex; align-items: center; gap: 14px; margin-bottom: -40px;
+    }
+    .slide-label span {
+      font-family: 'IBM Plex Mono', monospace; font-size: 11px; font-weight: 500;
+      color: #9B8E7E; letter-spacing: 2px; text-transform: uppercase;
+    }
+    .slide-label::after { content: ''; flex: 1; height: 1px; background: #C4B8A8; opacity: 0.4; }
+
+    /* ── Footer ─────────────────────────────────────────── */
+    .slide-footer {
+      position: absolute; bottom: 0; left: 0; right: 0; height: 96px;
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 0 72px;
+      border-top: 1px solid rgba(17,24,39,0.10);
+      background: var(--ce-card-warm); z-index: 2;
+    }
+    .footer-brand { display: flex; align-items: center; gap: 14px; }
+    .footer-dot   { width: 10px; height: 10px; border-radius: 50%; background: var(--ce-teal); }
+    .footer-name  { font-family: 'Inter', sans-serif; font-size: 28px; font-weight: 600; color: var(--ce-twm); letter-spacing: -0.2px; }
+    .footer-handle{ font-family: 'IBM Plex Mono', monospace; font-size: 26px; font-weight: 500; color: var(--ce-twm); letter-spacing: 1.5px; text-transform: uppercase; }
+
+    /* ── Counter dots ────────────────────────────────────── */
+    .slide-number {
+      position: absolute; bottom: 25px; left: 50%; transform: translateX(-50%);
+      display: flex; gap: 7px; z-index: 3;
+    }
+    .slide-number .dot        { width: 6px; height: 6px; border-radius: 50%; background: rgba(82,97,116,0.28); }
+    .slide-number .dot.active { background: var(--ce-teal); }
+
+    /* ── Labels / badges ─────────────────────────────────── */
+    .label       { font-family: 'IBM Plex Mono', monospace; font-size: 28px; font-weight: 700; letter-spacing: 2.5px; text-transform: uppercase; color: var(--ce-teal); }
+    .label.muted { color: rgba(82,97,116,0.50); }
+
+    .badge {
+      display: inline-flex; align-items: center;
+      padding: 14px 30px; border-radius: 100px;
+      background: rgba(10,191,188,0.10); border: 1px solid rgba(10,191,188,0.35);
+      font-family: 'IBM Plex Mono', monospace; font-size: 26px; font-weight: 700;
+      letter-spacing: 2px; text-transform: uppercase; color: var(--ce-teal);
+    }
+    .badge.amber {
+      background: rgba(176,120,32,0.10); border-color: rgba(176,120,32,0.35);
+      color: var(--cs-amber);
+    }
+    .badge.rose {
+      background: rgba(192,92,92,0.10); border-color: rgba(192,92,92,0.30);
+      color: var(--cs-rose);
+    }
+
+    /* ── Type scale — warm surface ──────────────────────── */
+    h1 { font-size: 140px; font-weight: 900; line-height: 0.95; letter-spacing: -5px; color: var(--ce-tw); }
+    h2 { font-size: 96px;  font-weight: 800; line-height: 1.02; letter-spacing: -3px; color: var(--ce-tw); }
+    h3 { font-size: 72px;  font-weight: 700; line-height: 1.08; letter-spacing: -2px; color: var(--ce-tw); }
+    p  { font-size: 40px;  font-weight: 400; line-height: 1.5; color: var(--ce-twm); }
+    p.large { font-size: 44px; }
+    p.small { font-size: 34px; color: rgba(82,97,116,0.65); }
+
+    /* ── Section headline accents ────────────────────────── */
+    .sec-head { font-family: 'Inter', sans-serif; font-weight: 800; line-height: 1.0; letter-spacing: -3px; }
+    .sec-head.teal  { font-size: 88px; color: var(--cs-teal); }
+    .sec-head.rose  { font-size: 88px; color: var(--cs-rose); }
+    .sec-head.green { font-size: 88px; color: var(--cs-green); }
+    .sec-head.amber { font-size: 88px; color: var(--cs-amber); }
+
+    /* ── Global accents ──────────────────────────────────── */
+    .teal-bar { height: 2px; border-radius: 2px; background: var(--ce-teal); }
+    .divider-warm { width: 100%; height: 1px; background: rgba(17,24,39,0.12); }
+    .divider-dark { width: 100%; height: 1px; background: var(--ce-border); }
+
+    /* ── Blockquote left-border (for narrative quote slides) */
+    .quote-teal { border-left: 4px solid var(--cs-teal); padding-left: 28px; }
+    .quote-rose { border-left: 4px solid var(--cs-rose); padding-left: 28px; }
+
+    /* ── Left-border dark panel cards ───────────────────── */
+    .panel {
+      background: var(--ce-card-dark);
+      border-radius: 16px;
+      padding: 36px 44px;
+      box-shadow: 0 4px 24px rgba(0,0,0,0.13);
+    }
+    .panel.teal  { border-left: 4px solid var(--cs-teal); }
+    .panel.rose  { border-left: 4px solid var(--cs-rose); }
+    .panel.green { border-left: 4px solid var(--cs-green); }
+    .panel.amber { border-left: 4px solid var(--cs-amber); }
+
+    /* panel section label */
+    .panel-label {
+      font-family: 'IBM Plex Mono', monospace; font-size: 20px; font-weight: 700;
+      letter-spacing: 2px; text-transform: uppercase; display: block; margin-bottom: 16px;
+    }
+    .panel-label.teal  { color: var(--cs-teal); }
+    .panel-label.rose  { color: var(--cs-rose); }
+    .panel-label.green { color: var(--cs-green); }
+    .panel-label.amber { color: var(--cs-amber); }
+
+    /* ── Bullet list item ────────────────────────────────── */
+    .bullet-row { display: flex; align-items: flex-start; gap: 18px; }
+    .bullet-dot {
+      width: 9px; height: 9px; border-radius: 50%; flex-shrink: 0; margin-top: 14px;
+    }
+    .bullet-dot.teal  { background: var(--cs-teal); }
+    .bullet-dot.rose  { background: var(--cs-rose); }
+    .bullet-dot.green { background: var(--cs-green); }
+    .bullet-text {
+      font-family: 'Inter', sans-serif; font-size: 36px; font-weight: 400;
+      line-height: 1.4; color: var(--ce-td);
+    }
+
+    /* ── Numbered item (for trajectory slide) ────────────── */
+    .num-row { display: flex; align-items: flex-start; gap: 22px; }
+    .num-badge {
+      width: 44px; height: 44px; border-radius: 50%; flex-shrink: 0;
+      border: 1.5px solid var(--cs-amber);
+      display: flex; align-items: center; justify-content: center;
+      font-family: 'IBM Plex Mono', monospace; font-size: 16px;
+      font-weight: 700; color: var(--cs-amber);
+    }
+    .num-content-title {
+      font-family: 'Inter', sans-serif; font-size: 32px; font-weight: 700;
+      color: var(--ce-td); line-height: 1.2; margin-bottom: 6px;
+    }
+    .num-content-desc {
+      font-family: 'Inter', sans-serif; font-size: 26px; font-weight: 400;
+      color: var(--ce-tdm); line-height: 1.45;
+    }
+
+    /* ── CTA pill ────────────────────────────────────────── */
+    .cta-pill {
+      display: inline-flex; align-items: center; padding: 24px 48px;
+      border-radius: 14px; border: 1px solid rgba(10,191,188,0.35);
+      background: rgba(10,191,188,0.08); font-family: 'Inter', sans-serif;
+      font-size: 34px; font-weight: 600; color: var(--ce-teal);
+      letter-spacing: -0.4px; width: fit-content;
+    }
+
+    /* ── Layout wrapper ──────────────────────────────────── */
+    .slide-content {
+      position: relative; z-index: 1;
+      padding: 60px 72px 116px;
+      height: 100%; display: flex; flex-direction: column;
+    }
+    .top-row {
+      display: flex; align-items: center; justify-content: space-between;
+    }
+  </style>
+</head>
+<body>
+
+<!-- POST 57 — "Nurses See It First" — Sepsis Case Study — WARM TAN + CASE STUDY FORMAT -->
+
+
+<!-- ═══ SLIDE 1 — HOOK ═══════════════════════════════════════════════════════ -->
+<div class="slide-label"><span>Slide 01 — Hook</span></div>
+<div class="slide" id="slide-1">
+  <div class="slide-content" style="justify-content:space-between;">
+
+    <div class="top-row">
+      <div class="badge">Clinical Edge</div>
+      <span class="label muted">01 / 08</span>
+    </div>
+
+    <div style="flex:1; display:flex; flex-direction:column; justify-content:center; gap:16px; padding:44px 0 32px;">
+      <h1>Nurses</h1>
+      <h2 style="margin-top:-8px;">see it first.</h2>
+      <div class="teal-bar" style="width:64px; margin-top:18px;"></div>
+      <p class="large" style="margin-top:10px;">Before the alarm. Before the number.</p>
+    </div>
+
+    <div style="display:flex; align-items:center; gap:16px; padding-bottom:14px;">
+      <span class="label muted">Swipe to read</span>
+      <div style="display:flex; gap:8px; align-items:center;">
+        <div style="width:28px; height:1px; background:rgba(0,0,0,0.14);"></div>
+        <div style="width:8px; height:8px; border-radius:50%; background:var(--ce-teal);"></div>
+        <div style="width:10px; height:1px; background:rgba(0,0,0,0.14);"></div>
+      </div>
+    </div>
+
+  </div>
+  <div class="slide-footer">
+    <div class="footer-brand"><div class="footer-dot"></div><span class="footer-name">Clinical Edge Copilot</span></div>
+    <span class="footer-handle">@clinicaledgeco</span>
+  </div>
+  <div class="slide-number">
+    <div class="dot active"></div><div class="dot"></div><div class="dot"></div><div class="dot"></div>
+    <div class="dot"></div><div class="dot"></div><div class="dot"></div><div class="dot"></div>
+  </div>
+</div>
+
+
+<!-- ═══ SLIDE 2 — THE SCENARIO (two-panel contrast) ══════════════════════════ -->
+<div class="slide-label"><span>Slide 02 — The Scenario</span></div>
+<div class="slide" id="slide-2">
+  <div class="slide-content" style="justify-content:space-between;">
+
+    <div class="top-row">
+      <div class="badge amber">Clinical Scenario</div>
+      <span class="label muted">02 / 08</span>
+    </div>
+
+    <div style="display:flex; flex-direction:column; gap:28px;">
+      <h3 style="margin-top:8px;">The patient looked okay.</h3>
+      <div class="quote-teal">
+        <p class="large" style="color:var(--ce-twm);">The nurse wasn't convinced.</p>
+      </div>
+    </div>
+
+    <div style="display:flex; flex-direction:column; gap:20px;">
+      <div class="divider-warm"></div>
+
+      <div class="panel teal">
+        <span class="panel-label teal">The Chart</span>
+        <p style="font-family:'Inter',sans-serif; font-size:36px; color:#A8C1CC; line-height:1.5;">
+          HR 96. Temp 38.1&deg;. BP 104/66.<br>Numbers at the edge — not alarming yet.
+        </p>
+      </div>
+
+      <div class="panel rose">
+        <span class="panel-label rose">The Patient</span>
+        <p style="font-family:'Inter',sans-serif; font-size:36px; color:#A8C1CC; line-height:1.5;">
+          More lethargic. Flushed. Restless.<br>Different than an hour ago.
+        </p>
+      </div>
+    </div>
+
+  </div>
+  <div class="slide-footer">
+    <div class="footer-brand"><div class="footer-dot"></div><span class="footer-name">Clinical Edge Copilot</span></div>
+    <span class="footer-handle">@clinicaledgeco</span>
+  </div>
+  <div class="slide-number">
+    <div class="dot"></div><div class="dot active"></div><div class="dot"></div><div class="dot"></div>
+    <div class="dot"></div><div class="dot"></div><div class="dot"></div><div class="dot"></div>
+  </div>
+</div>
+
+
+<!-- ═══ SLIDE 3 — CLINICAL FEELING (two-panel, lab vs nurse) ════════════════ -->
+<div class="slide-label"><span>Slide 03 — Clinical Feeling</span></div>
+<div class="slide" id="slide-3">
+  <div class="slide-content" style="justify-content:space-between;">
+
+    <div class="top-row">
+      <div class="badge amber">Clinical Feeling</div>
+      <span class="label muted">03 / 08</span>
+    </div>
+
+    <div style="display:flex; flex-direction:column; gap:28px;">
+      <h3 style="margin-top:8px;">The number didn't alarm.</h3>
+      <div class="quote-rose">
+        <p class="large" style="color:var(--ce-twm);">The presentation did.</p>
+      </div>
+    </div>
+
+    <div style="display:flex; flex-direction:column; gap:20px;">
+      <div class="divider-warm"></div>
+
+      <div class="panel teal">
+        <span class="panel-label teal">The Lab</span>
+        <p style="font-family:'Inter',sans-serif; font-size:36px; color:#A8C1CC; line-height:1.5;">
+          Value shifted. On paper, things looked<br>like they were moving in the right direction.<br>Team exhaled.
+        </p>
+      </div>
+
+      <div class="panel rose">
+        <span class="panel-label rose">The Patient</span>
+        <p style="font-family:'Inter',sans-serif; font-size:36px; color:#A8C1CC; line-height:1.5;">
+          Still off. Not back to baseline. The number<br>improved &mdash; the presentation didn&rsquo;t follow.
+        </p>
+      </div>
+    </div>
+
+  </div>
+  <div class="slide-footer">
+    <div class="footer-brand"><div class="footer-dot"></div><span class="footer-name">Clinical Edge Copilot</span></div>
+    <span class="footer-handle">@clinicaledgeco</span>
+  </div>
+  <div class="slide-number">
+    <div class="dot"></div><div class="dot"></div><div class="dot active"></div><div class="dot"></div>
+    <div class="dot"></div><div class="dot"></div><div class="dot"></div><div class="dot"></div>
+  </div>
+</div>
+
+
+<!-- ═══ SLIDE 4 — WHAT THIS COULD BE (teal, bullet card) ═══════════════════ -->
+<div class="slide-label"><span>Slide 04 — What This Could Be</span></div>
+<div class="slide" id="slide-4">
+  <div class="slide-content" style="justify-content:flex-start;">
+
+    <div class="top-row">
+      <div class="badge">Copilot</div>
+      <span class="label muted">04 / 08</span>
+    </div>
+
+    <div style="margin-top:44px; display:flex; flex-direction:column; gap:20px;">
+      <div class="sec-head teal">What this could be</div>
+      <p style="color:var(--ce-twm); font-size:40px; line-height:1.5;">
+        A single result doesn&rsquo;t always capture<br>the full clinical picture.
+      </p>
+    </div>
+
+    <div class="divider-warm" style="margin:32px 0;"></div>
+
+    <div class="panel teal" style="display:flex; flex-direction:column; gap:20px;">
+      <div class="bullet-row">
+        <div class="bullet-dot teal"></div>
+        <span class="bullet-text">early sepsis / SIRS pattern building</span>
+      </div>
+      <div class="bullet-row">
+        <div class="bullet-dot teal"></div>
+        <span class="bullet-text">partial improvement without full resolution</span>
+      </div>
+      <div class="bullet-row">
+        <div class="bullet-dot teal"></div>
+        <span class="bullet-text">underlying issue still active</span>
+      </div>
+      <div class="bullet-row">
+        <div class="bullet-dot teal"></div>
+        <span class="bullet-text">mismatch between data and presentation</span>
+      </div>
+    </div>
+
+  </div>
+  <div class="slide-footer">
+    <div class="footer-brand"><div class="footer-dot"></div><span class="footer-name">Clinical Edge Copilot</span></div>
+    <span class="footer-handle">@clinicaledgeco</span>
+  </div>
+  <div class="slide-number">
+    <div class="dot"></div><div class="dot"></div><div class="dot"></div><div class="dot active"></div>
+    <div class="dot"></div><div class="dot"></div><div class="dot"></div><div class="dot"></div>
+  </div>
+</div>
+
+
+<!-- ═══ SLIDE 5 — POSSIBLE CONCERNS (rose, bullet card) ════════════════════ -->
+<div class="slide-label"><span>Slide 05 — Possible Concerns</span></div>
+<div class="slide" id="slide-5">
+  <div class="slide-content" style="justify-content:flex-start;">
+
+    <div class="top-row">
+      <div class="badge">Copilot</div>
+      <span class="label muted">05 / 08</span>
+    </div>
+
+    <div style="margin-top:44px; display:flex; flex-direction:column; gap:20px;">
+      <div class="sec-head rose">Possible concerns</div>
+      <p style="color:var(--ce-twm); font-size:40px; line-height:1.5;">
+        Improving numbers can shift attention<br>away from the bedside.
+      </p>
+    </div>
+
+    <div class="divider-warm" style="margin:32px 0;"></div>
+
+    <div class="panel rose" style="display:flex; flex-direction:column; gap:20px;">
+      <div class="bullet-row">
+        <div class="bullet-dot rose"></div>
+        <span class="bullet-text">false reassurance from a single result</span>
+      </div>
+      <div class="bullet-row">
+        <div class="bullet-dot rose"></div>
+        <span class="bullet-text">anchoring on improvement</span>
+      </div>
+      <div class="bullet-row">
+        <div class="bullet-dot rose"></div>
+        <span class="bullet-text">missing ongoing bedside change</span>
+      </div>
+      <div class="bullet-row">
+        <div class="bullet-dot rose"></div>
+        <span class="bullet-text">delay in escalation</span>
+      </div>
+    </div>
+
+  </div>
+  <div class="slide-footer">
+    <div class="footer-brand"><div class="footer-dot"></div><span class="footer-name">Clinical Edge Copilot</span></div>
+    <span class="footer-handle">@clinicaledgeco</span>
+  </div>
+  <div class="slide-number">
+    <div class="dot"></div><div class="dot"></div><div class="dot"></div><div class="dot"></div>
+    <div class="dot active"></div><div class="dot"></div><div class="dot"></div><div class="dot"></div>
+  </div>
+</div>
+
+
+<!-- ═══ SLIDE 6 — WHAT TO ASSESS NEXT (green, bullet card) ════════════════ -->
+<div class="slide-label"><span>Slide 06 — What to Assess Next</span></div>
+<div class="slide" id="slide-6">
+  <div class="slide-content" style="justify-content:flex-start;">
+
+    <div class="top-row">
+      <div class="badge">Copilot</div>
+      <span class="label muted">06 / 08</span>
+    </div>
+
+    <div style="margin-top:44px; display:flex; flex-direction:column; gap:20px;">
+      <div class="sec-head green">What to assess next</div>
+      <p style="color:var(--ce-twm); font-size:40px; line-height:1.5;">
+        One value tells one moment.<br>The trend tells the story.
+      </p>
+    </div>
+
+    <div class="divider-warm" style="margin:32px 0;"></div>
+
+    <div class="panel green" style="display:flex; flex-direction:column; gap:18px;">
+      <div class="bullet-row">
+        <div class="bullet-dot green"></div>
+        <span class="bullet-text">full vital trend, not just current values</span>
+      </div>
+      <div class="bullet-row">
+        <div class="bullet-dot green"></div>
+        <span class="bullet-text">mental status vs patient baseline</span>
+      </div>
+      <div class="bullet-row">
+        <div class="bullet-dot green"></div>
+        <span class="bullet-text">urine output</span>
+      </div>
+      <div class="bullet-row">
+        <div class="bullet-dot green"></div>
+        <span class="bullet-text">blood cultures before antibiotics</span>
+      </div>
+      <div class="bullet-row">
+        <div class="bullet-dot green"></div>
+        <span class="bullet-text">overall trajectory</span>
+      </div>
+    </div>
+
+  </div>
+  <div class="slide-footer">
+    <div class="footer-brand"><div class="footer-dot"></div><span class="footer-name">Clinical Edge Copilot</span></div>
+    <span class="footer-handle">@clinicaledgeco</span>
+  </div>
+  <div class="slide-number">
+    <div class="dot"></div><div class="dot"></div><div class="dot"></div><div class="dot"></div>
+    <div class="dot"></div><div class="dot active"></div><div class="dot"></div><div class="dot"></div>
+  </div>
+</div>
+
+
+<!-- ═══ SLIDE 7 — WHERE THIS MAY BE HEADING (amber, numbered) ══════════════ -->
+<div class="slide-label"><span>Slide 07 — Where This May Be Heading</span></div>
+<div class="slide" id="slide-7">
+  <div class="slide-content" style="justify-content:flex-start;">
+
+    <div class="top-row">
+      <div class="badge">Copilot</div>
+      <span class="label muted">07 / 08</span>
+    </div>
+
+    <div style="margin-top:36px;">
+      <div class="sec-head amber">Where this may be heading</div>
+    </div>
+
+    <div class="panel amber" style="margin-top:32px; display:flex; flex-direction:column; gap:0;">
+
+      <div class="num-row" style="padding:20px 0;">
+        <div class="num-badge">01</div>
+        <div>
+          <div class="num-content-title">True recovery</div>
+          <div class="num-content-desc">The lab reflects genuine improvement and the patient&rsquo;s clinical picture starts to follow.</div>
+        </div>
+      </div>
+
+      <div class="divider-dark"></div>
+
+      <div class="num-row" style="padding:20px 0;">
+        <div class="num-badge">02</div>
+        <div>
+          <div class="num-content-title">Slow or partial improvement</div>
+          <div class="num-content-desc">The number moved but the underlying issue is still working its way through.</div>
+        </div>
+      </div>
+
+      <div class="divider-dark"></div>
+
+      <div class="num-row" style="padding:20px 0;">
+        <div class="num-badge">03</div>
+        <div>
+          <div class="num-content-title">Continued instability</div>
+          <div class="num-content-desc">The result improved while the patient stayed off. Two different timelines in play.</div>
+        </div>
+      </div>
+
+      <div class="divider-dark"></div>
+
+      <div class="num-row" style="padding:20px 0;">
+        <div class="num-badge">04</div>
+        <div>
+          <div class="num-content-title">Reassessment depending on the pattern</div>
+          <div class="num-content-desc">The full picture &mdash; not one value &mdash; determines the next conversation.</div>
+        </div>
+      </div>
+
+    </div>
+
+  </div>
+  <div class="slide-footer">
+    <div class="footer-brand"><div class="footer-dot"></div><span class="footer-name">Clinical Edge Copilot</span></div>
+    <span class="footer-handle">@clinicaledgeco</span>
+  </div>
+  <div class="slide-number">
+    <div class="dot"></div><div class="dot"></div><div class="dot"></div><div class="dot"></div>
+    <div class="dot"></div><div class="dot"></div><div class="dot active"></div><div class="dot"></div>
+  </div>
+</div>
+
+
+<!-- ═══ SLIDE 8 — CTA ════════════════════════════════════════════════════════ -->
+<div class="slide-label"><span>Slide 08 — CTA</span></div>
+<div class="slide" id="slide-8">
+  <div class="slide-content" style="justify-content:space-between;">
+
+    <div class="top-row">
+      <div class="badge">Clinical Edge Copilot</div>
+      <span class="label muted">08 / 08</span>
+    </div>
+
+    <div style="flex:1; display:flex; flex-direction:column; justify-content:center; gap:40px;">
+      <div class="teal-bar" style="width:48px;"></div>
+      <h2>Support your clinical reasoning.</h2>
+      <div class="divider-warm"></div>
+      <p class="large">Not replace it.</p>
+      <div class="cta-pill">Download Clinical Edge Copilot</div>
+      <p class="small" style="margin-top:4px;">Available on the App Store &bull; theclinicaledge.org</p>
+    </div>
+
+    <div></div>
+
+  </div>
+  <div class="slide-footer">
+    <div class="footer-brand"><div class="footer-dot"></div><span class="footer-name">Clinical Edge Copilot</span></div>
+    <span class="footer-handle">@clinicaledgeco</span>
+  </div>
+  <div class="slide-number">
+    <div class="dot"></div><div class="dot"></div><div class="dot"></div><div class="dot"></div>
+    <div class="dot"></div><div class="dot"></div><div class="dot"></div><div class="dot active"></div>
+  </div>
+</div>
+
+
+</body>
+</html>

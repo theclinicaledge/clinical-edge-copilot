@@ -234,15 +234,39 @@ export default function ClinicalEdgeHome({ onNavigate }) {
             ))}
           </div>
 
-          {/* Footer */}
+          {/* Footer — disclaimer + compliance links */}
           <div style={{
             marginTop: 36,
-            fontSize: 11,
-            color: "#7F99A5",
-            lineHeight: 1.6,
             fontFamily: "'IBM Plex Mono', monospace",
           }}>
-            For educational and clinical decision support only. Not a substitute for clinical judgment, provider guidance, or institutional protocol.
+            <p style={{
+              fontSize: 11,
+              color: "#7F99A5",
+              lineHeight: 1.65,
+              margin: "0 0 12px",
+            }}>
+              Educational and clinical reasoning support only. Not a diagnostic tool. Follow local protocol, provider guidance, and institutional policy.
+            </p>
+            <div style={{ display: "flex", gap: 18 }}>
+              {[
+                { label: "Privacy",    path: "/privacy" },
+                { label: "Support",    path: "/support" },
+              ].map(({ label, path }) => (
+                <a
+                  key={label}
+                  href={path}
+                  onClick={(e) => { e.preventDefault(); onNavigate(path); }}
+                  style={{
+                    fontSize: 11,
+                    color: "#7F99A5",
+                    textDecoration: "none",
+                    letterSpacing: "0.02em",
+                  }}
+                >
+                  {label}
+                </a>
+              ))}
+            </div>
           </div>
 
         </div>

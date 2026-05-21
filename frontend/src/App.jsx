@@ -490,7 +490,7 @@ function SavedCaseRow({ sc, onReopen, onDelete, onCopy, onSaveNote }) {
 
 // ─── Main App ──────────────────────────────────────────────────────────────────
 
-export default function App() {
+export default function App({ onGoHome }) {
   const [question, setQuestion]         = useState("");
   const [result, setResult]             = useState(null);
   const [rawText, setRawText]           = useState("");
@@ -978,6 +978,30 @@ export default function App() {
               Copilot
             </span>
           </div>
+
+          {/* All tools — subtle back link */}
+          {onGoHome && (
+            <button
+              onClick={onGoHome}
+              onMouseEnter={(e) => { e.currentTarget.style.color = "#0ABFBC"; }}
+              onMouseLeave={(e) => { e.currentTarget.style.color = "#4A6978"; }}
+              style={{
+                marginLeft: "auto",
+                background: "none",
+                border: "none",
+                color: "#4A6978",
+                fontSize: 12,
+                cursor: "pointer",
+                fontFamily: "'IBM Plex Mono', 'Courier New', monospace",
+                letterSpacing: "0.03em",
+                padding: "4px 0",
+                lineHeight: 1,
+                transition: "color 0.15s",
+              }}
+            >
+              ← All tools
+            </button>
+          )}
 
         </div>
       </div>

@@ -9,6 +9,8 @@ import QuickStart from './QuickStart.jsx'
 import Privacy from './Privacy.jsx'
 import Support from './Support.jsx'
 import Download from './Download.jsx'
+import ClinicalEdgeHome from './ClinicalEdgeHome.jsx'
+import RhythmLabModule from './modules/rhythm-lab/RhythmLabModule.tsx'
 
 // ── Service Worker Registration ─────────────────────────────────────────────
 if ('serviceWorker' in navigator) {
@@ -193,13 +195,16 @@ function InstallBanner() {
 // ── Routing ─────────────────────────────────────────────────────────────────
 function getPage() {
   const path = window.location.pathname;
+  if (path === '/' || path === '/home') return 'home';
+  if (path === '/copilot')    return 'app';
+  if (path === '/rhythm-lab') return 'rhythmlab';
   if (path === '/landing')    return 'landing';
   if (path === '/scenario')   return 'scenario';
   if (path === '/quickstart') return 'quickstart';
   if (path === '/privacy')    return 'privacy';
   if (path === '/support')    return 'support';
   if (path === '/download')   return 'download';
-  return 'app'; // '/' and '/app' and anything else → main app
+  return 'home'; // fallback to home hub
 }
 
 function Root() {
@@ -218,15 +223,17 @@ function Root() {
     return () => window.removeEventListener('popstate', onPop);
   }, []);
 
-  const enterApp         = () => navigate('/');
+  const enterApp         = () => navigate('/copilot');
   const enterScenario    = () => navigate('/scenario');
   const enterQuickStart  = () => navigate('/quickstart');
-  const goBack           = () => navigate('/');
+  const goBack           = () => navigate('/copilot');
   const goBackToScenario = () => navigate('/scenario');
 
   return (
     <>
-      {page === 'app'        && <App />}
+      {page === 'home'       && <ClinicalEdgeHome onNavigate={navigate} />}
+      {page === 'app'        && <App onGoHome={() => navigate('/')} />}
+      {page === 'rhythmlab'  && <RhythmLabModule onGoHome={() => navigate('/')} />}
       {page === 'scenario'   && <Scenario onBack={goBack} onEnterApp={enterApp} onQuickStart={enterQuickStart} />}
       {page === 'quickstart' && <QuickStart onBack={goBackToScenario} onEnterApp={enterApp} />}
       {page === 'landing'    && <Landing onEnterApp={enterApp} onEnterScenario={enterScenario} />}

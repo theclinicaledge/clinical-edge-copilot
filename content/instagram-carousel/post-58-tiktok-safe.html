@@ -1,0 +1,828 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Clinical Edge — Post 58 — TikTok Safe Zone</title>
+  <link
+    href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=IBM+Plex+Mono:wght@400;500;700&display=swap"
+    rel="stylesheet"
+  />
+  <style>
+    /*
+     * TikTok Safe-Zone Layout — 1080 × 1920
+     * ────────────────────────────────────────────────────────
+     * Top safe padding    : 180px  (TikTok status bar + profile UI)
+     * Bottom safe padding : 420px  (TikTok caption + action buttons)
+     * Left/right padding  : 90px   (TikTok edge chrome)
+     * Usable content area : 900px wide × 1320px tall
+     * tt-main flex:1      : ≈1140px (after topbar + brand bar)
+     * ────────────────────────────────────────────────────────
+     * NO fixed footer — replaced with inline tt-brand bar
+     * NO slide-number dots — TikTok shows its own indicators
+     */
+
+    /* ── Palette ─────────────────────────────────────────── */
+    :root {
+      --bg:   #E7E2D8;
+      --card: #F5F3EF;
+      --tp:   #162033;
+      --ts:   #5D687C;
+      --teal: #19C2D1;
+      --bdr:  #D7D1C7;
+    }
+
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      background: #CCC8BF;
+      font-family: 'Inter', -apple-system, sans-serif;
+      padding: 48px 32px;
+      display: flex; flex-direction: column; align-items: center; gap: 72px;
+    }
+
+    /* ── Slide — 1080 × 1920 ─────────────────────────────── */
+    .slide {
+      width: 1080px; height: 1920px;
+      background-color: var(--bg);
+      background-image:
+        radial-gradient(ellipse 90% 85% at 50% 50%, transparent 40%, rgba(0,0,0,0.06) 100%),
+        radial-gradient(ellipse 55% 48% at 14% 18%, rgba(255,238,195,0.17) 0%, transparent 55%);
+      position: relative; overflow: hidden; flex-shrink: 0;
+    }
+    .slide::before {
+      content: ''; position: absolute; inset: 0; z-index: 0; pointer-events: none;
+      background-image: url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' width='200' height='200'><filter id='g'><feTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/></filter><rect width='200' height='200' filter='url(%23g)' opacity='0.020'/></svg>");
+      background-size: 200px 200px; background-repeat: repeat;
+    }
+
+    /* Browser-preview label — not exported */
+    .slide-label {
+      width: 1080px; display: flex; align-items: center; gap: 14px; margin-bottom: -54px;
+    }
+    .slide-label span {
+      font-family: 'IBM Plex Mono', monospace; font-size: 11px; font-weight: 500;
+      color: #999; letter-spacing: 2px; text-transform: uppercase;
+    }
+    .slide-label::after { content: ''; flex: 1; height: 1px; background: #999; opacity: 0.3; }
+
+    /* ── Safe-zone content wrapper ───────────────────────── */
+    .slide-content {
+      position: relative; z-index: 1;
+      /*
+       * Top 180px  = TikTok status bar + @handle + back arrow safe zone
+       * Bottom 420px = TikTok caption + like/comment/share safe zone
+       * Left/right 90px = TikTok edge chrome
+       * All critical content lives between y=180 and y=1500
+       */
+      padding: 180px 90px 420px;
+      height: 100%;
+      display: flex; flex-direction: column;
+    }
+
+    /* ── Section: top badge row ──────────────────────────── */
+    .tt-topbar {
+      flex-shrink: 0;
+      display: flex; align-items: center; justify-content: space-between;
+      margin-bottom: 28px;   /* gap below topbar before main content */
+    }
+
+    /* ── Section: main content (fills available space) ───── */
+    .tt-main {
+      flex: 1;  /* ≈1140px within the 1320px safe zone */
+      display: flex;
+      /* flex-direction and justify-content set per-slide inline */
+    }
+
+    /* ── Section: inline brand bar (replaces footer) ─────── */
+    .tt-brand {
+      flex-shrink: 0;
+      display: flex; align-items: center; justify-content: space-between;
+      border-top: 1px solid rgba(22,32,51,0.09);
+      padding-top: 18px;
+      margin-top: 16px;
+    }
+    .tt-brand-left  { display: flex; align-items: center; gap: 12px; }
+    .tt-brand-dot   { width: 10px; height: 10px; border-radius: 50%; background: var(--teal); }
+    .tt-brand-name  { font-size: 26px; font-weight: 600; color: var(--ts); letter-spacing: -0.2px; }
+    .tt-brand-handle {
+      font-family: 'IBM Plex Mono', monospace; font-size: 22px; font-weight: 500;
+      color: rgba(93,104,124,0.55); letter-spacing: 1.5px; text-transform: uppercase;
+    }
+
+    /* ── Labels ───────────────────────────────────────────── */
+    .label       { font-family: 'IBM Plex Mono', monospace; font-size: 28px; font-weight: 700; letter-spacing: 2.5px; text-transform: uppercase; color: var(--teal); }
+    .label.muted { color: rgba(93,104,124,0.40); }
+
+    /* ── Badges ───────────────────────────────────────────── */
+    .badge {
+      display: inline-flex; align-items: center;
+      padding: 14px 32px; border-radius: 100px;
+      background: rgba(25,194,209,0.10); border: 1px solid rgba(25,194,209,0.35);
+      font-family: 'IBM Plex Mono', monospace; font-size: 26px; font-weight: 700;
+      letter-spacing: 2px; text-transform: uppercase; color: var(--teal);
+    }
+    .badge.dim {
+      background: rgba(25,194,209,0.06); border-color: rgba(25,194,209,0.18);
+      color: rgba(25,194,209,0.55);
+    }
+
+    /* ── Typography ───────────────────────────────────────── */
+    h3      { font-size: 80px;  font-weight: 700; line-height: 1.06; letter-spacing: -2.5px; color: var(--tp); }
+    p       { font-size: 44px;  font-weight: 400; line-height: 1.55; color: var(--ts); }
+    p.small { font-size: 32px;  line-height: 1.5;  color: rgba(93,104,124,0.60); }
+
+    /* ── Accents ──────────────────────────────────────────── */
+    .divider  { width: 100%; height: 1px; background: var(--bdr); }
+    .teal-bar { height: 3px; border-radius: 2px; background: var(--teal); }
+
+    /* ── iPhone frame ─────────────────────────────────────── */
+    .iphone {
+      position: relative; flex-shrink: 0;
+      background: linear-gradient(158deg, #38383C 0%, #1C1C20 100%);
+      border-radius: 52px;
+      box-shadow:
+        inset 0 0 0 1.5px rgba(255,255,255,0.10),
+        0 0 0 1px rgba(0,0,0,0.25),
+        0 32px 90px rgba(0,0,0,0.44),
+        0 10px 28px rgba(0,0,0,0.26);
+    }
+    .iphone-inner {
+      margin: 14px; border-radius: 40px; overflow: hidden;
+      background: #ECEAE3;
+      position: relative; display: flex; flex-direction: column;
+      height: calc(100% - 28px);
+    }
+    .iphone-island {
+      position: absolute; top: 11px; left: 50%; transform: translateX(-50%);
+      width: 105px; height: 28px;
+      background: #000; border-radius: 15px; z-index: 10;
+    }
+    .iphone-home-bar {
+      position: absolute; bottom: 8px; left: 50%; transform: translateX(-50%);
+      width: 124px; height: 4px;
+      background: rgba(0,0,0,0.18); border-radius: 3px; z-index: 10;
+    }
+
+    /* ── Real app UI — preserved from source carousel ─────── */
+    .ra-header {
+      background: #0B1F2A; padding: 10px 16px;
+      display: flex; align-items: center; gap: 10px;
+      flex-shrink: 0; padding-top: 48px;
+    }
+    .ra-hname { font-size: 13px; font-weight: 700; color: #E8E4DC; line-height: 1.1; letter-spacing: -0.2px; }
+    .ra-hsub  { font-size: 8.5px; font-weight: 700; letter-spacing: 2.5px; text-transform: uppercase; color: rgba(232,228,220,0.45); }
+
+    .ra-scroll {
+      flex: 1; overflow: hidden; background: #ECEAE3;
+      padding: 12px 13px 16px;
+      display: flex; flex-direction: column; gap: 8px;
+    }
+    .ra-hero-h { font-size: 18px; font-weight: 700; color: #162033; line-height: 1.2; letter-spacing: -0.3px; margin-bottom: 5px; text-align: center; }
+    .ra-hero-p { font-size: 12px; color: #5D687C; line-height: 1.45; text-align: center; margin-bottom: 10px; }
+    .ra-hint {
+      font-size: 11px; font-family: 'IBM Plex Mono', monospace;
+      color: rgba(22,32,51,0.45); letter-spacing: 0.3px;
+      padding: 5px 0 6px; border-bottom: 1px solid rgba(22,32,51,0.10);
+      display: flex; align-items: center; gap: 5px; margin-bottom: 2px;
+    }
+    .ra-hint-dot { width: 4px; height: 4px; border-radius: 50%; background: var(--teal); flex-shrink: 0; }
+    .ra-urgency {
+      display: flex; align-items: center; gap: 8px;
+      padding: 8px 12px; border-radius: 6px;
+      background: rgba(190,70,70,0.10); border: 1px solid #B45454;
+    }
+    .ra-urg-dot  { width: 7px; height: 7px; border-radius: 50%; background: #8E2F2F; flex-shrink: 0; }
+    .ra-urg-text { font-family: 'IBM Plex Mono', monospace; font-size: 11px; font-weight: 700; letter-spacing: 2px; text-transform: uppercase; color: #8E2F2F; }
+    .ra-warn {
+      background: rgba(190,70,70,0.08); border: 1px solid rgba(180,84,84,0.28);
+      border-radius: 8px; padding: 10px 12px;
+    }
+    .ra-warn-text { font-size: 12px; color: #7A2626; font-weight: 700; line-height: 1.5; }
+    .ra-sec { background: #FFFFFF; border: 1px solid #D6D0C4; border-radius: 8px; overflow: hidden; }
+    .ra-sec-body { padding: 10px 12px 10px 14px; position: relative; }
+    .ra-sec-body::before { content: ''; position: absolute; left: 0; top: 0; bottom: 0; width: 3px; }
+    .ra-sec-label { font-family: 'IBM Plex Mono', monospace; font-size: 10px; font-weight: 700; letter-spacing: 2.5px; text-transform: uppercase; margin-bottom: 7px; }
+    .ra-sec-p { font-size: 12px; line-height: 1.5; color: #1E2A3A; margin-bottom: 4px; }
+    .ra-brow  { display: flex; align-items: flex-start; gap: 5px; margin-bottom: 4px; }
+    .ra-brow:last-child { margin-bottom: 0; }
+    .ra-bmark { font-size: 14px; font-weight: 700; flex-shrink: 0; line-height: 1.3; }
+    .ra-btext { font-size: 12px; line-height: 1.4; color: #1E2A3A; }
+    .ra-btext b { font-weight: 700; }
+    .ra-input { background: #1E2A3A; border: 1px solid #2D3B4E; border-radius: 8px; padding: 12px 14px; }
+    .ra-input-text { font-size: 13px; line-height: 1.5; color: rgba(232,228,220,0.84); }
+    .ra-ask-wrap { display: flex; justify-content: flex-end; margin-top: 10px; }
+    .ra-ask-btn  { background: #00C2D1; color: #0B1F2A; font-size: 12px; font-weight: 700; padding: 7px 14px; border-radius: 6px; display: inline-flex; align-items: center; gap: 5px; }
+    .ra-phi { background: rgba(176,120,32,0.08); border: 1px solid rgba(176,120,32,0.28); border-radius: 6px; padding: 8px 11px; }
+    .ra-phi-icon { font-size: 11px; color: #8A5F10; }
+    .ra-phi-text { font-size: 11px; color: #8A5F10; line-height: 1.45; }
+    .ra-chips { display: flex; flex-wrap: wrap; gap: 4px; }
+    .ra-chip-label { font-family: 'IBM Plex Mono', monospace; font-size: 9px; font-weight: 700; letter-spacing: 1.5px; text-transform: uppercase; color: rgba(22,32,51,0.40); margin-bottom: 5px; }
+    .ra-chip { font-size: 11px; color: #1E2A3A; border: 1px solid #C8C2B8; border-radius: 100px; padding: 3px 10px; background: rgba(255,255,255,0.70); }
+    .ra-actions { display: flex; gap: 5px; flex-wrap: nowrap; }
+    .ra-act { font-size: 11px; border-radius: 6px; padding: 6px 12px; font-weight: 500; }
+    .ra-sbar { background: #1E2A3A; border: 1px solid #2D3B4E; border-radius: 8px; padding: 12px 14px; overflow: hidden; }
+    .ra-sbar-hdr { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; padding-bottom: 8px; border-bottom: 1px solid rgba(45,59,78,0.65); }
+    .ra-sbar-title { font-family: 'IBM Plex Mono', monospace; font-size: 9.5px; font-weight: 700; letter-spacing: 2px; color: #00C2D1; }
+    .ra-sbar-copy  { font-size: 11px; color: #19C2D1; border: 1px solid rgba(25,194,209,0.30); border-radius: 4px; padding: 2px 9px; }
+    .ra-sbar-sec   { margin-bottom: 8px; }
+    .ra-sbar-sec:last-child { margin-bottom: 0; }
+    .ra-sbar-l { font-family: 'IBM Plex Mono', monospace; font-size: 9px; font-weight: 700; letter-spacing: 1.5px; text-transform: uppercase; color: #00C2D1; margin-bottom: 3px; }
+    .ra-sbar-t { font-size: 12px; color: #E8E4DC; line-height: 1.45; }
+    .ra-disclaimer { font-size: 10.5px; color: rgba(93,104,124,0.70); line-height: 1.5; text-align: center; padding: 6px 4px; border-top: 1px solid rgba(22,32,51,0.10); margin-top: 6px; }
+
+    /* ── App Store badge ─────────────────────────────────── */
+    .store-badge {
+      display: inline-flex; align-items: center; gap: 16px;
+      background: #0D1117; padding: 20px 40px;
+      border-radius: 18px; box-shadow: 0 10px 32px rgba(0,0,0,0.24);
+    }
+    .store-badge-txt  { display: flex; flex-direction: column; }
+    .store-badge-sub  { font-size: 20px; color: rgba(255,255,255,0.68); letter-spacing: 0.3px; }
+    .store-badge-main { font-size: 38px; font-weight: 700; color: #fff; letter-spacing: -0.3px; line-height: 1.1; }
+
+    /* ── App icon badge (slide 7) ────────────────────────── */
+    .app-icon-badge {
+      width: 110px; height: 110px; border-radius: 28px; flex-shrink: 0;
+      background: #0B1F2A; border: 1px solid rgba(0,194,209,0.22);
+      display: flex; align-items: center; justify-content: center;
+      box-shadow: 0 10px 32px rgba(0,0,0,0.22);
+    }
+
+    /* ── Slide bullet list (outside phone) ───────────────── */
+    .bullet-list { display: flex; flex-direction: column; gap: 22px; }
+    .bullet-row  { display: flex; align-items: flex-start; gap: 20px; }
+    .bullet-mark { width: 8px; height: 8px; border-radius: 50%; background: var(--teal); flex-shrink: 0; margin-top: 16px; }
+    .bullet-text { font-size: 38px; font-weight: 400; line-height: 1.45; color: var(--ts); }
+
+    /* ── CE logo SVG shorthand ───────────────────────────── */
+  </style>
+</head>
+<body>
+
+<!-- ════════════════════════════════════════════════════════════
+     POST 58 — TIKTOK SAFE ZONE — 1080 × 1920
+     Top safe: y=180  |  Bottom safe: y=1500  |  Side safe: x=90–990
+     All brand/headline/CTA content stays within y=180–1500
+     ════════════════════════════════════════════════════════════ -->
+
+
+<!-- ═══════════ SLIDE 1 — HERO ═══════════ -->
+<div class="slide-label"><span>Slide 01 — Hero — TikTok Safe Zone</span></div>
+<div class="slide" id="slide-1">
+  <div class="slide-content">
+
+    <!-- TOP BAR — y ≈ 180 → 260 — within safe zone ✓ -->
+    <div class="tt-topbar">
+      <div class="badge">Now on the App Store</div>
+      <span class="label muted">01 / 07</span>
+    </div>
+
+    <!-- MAIN CONTENT — y ≈ 288 → 1428 — fully within safe zone ✓ -->
+    <div class="tt-main" style="flex-direction:row; align-items:center; gap:56px;">
+
+      <!-- LEFT: Headline → subtext → App Store badge stacked in left column -->
+      <div style="flex:0 0 418px; display:flex; flex-direction:column; gap:30px;">
+        <div style="display:flex; flex-direction:column; gap:0;">
+          <div style="font-size:88px; font-weight:900; line-height:1.0; letter-spacing:-3.5px; color:var(--tp);">Think clearly</div>
+          <div style="font-size:88px; font-weight:900; line-height:1.0; letter-spacing:-3.5px; color:var(--tp);">under</div>
+          <div style="font-size:88px; font-weight:900; line-height:1.0; letter-spacing:-3.5px; color:var(--teal);">pressure.</div>
+        </div>
+        <div class="teal-bar" style="width:48px;"></div>
+        <p style="font-size:36px; line-height:1.55; max-width:400px;">Clinical reasoning support for nurses, built for real shift decisions.</p>
+        <!-- App Store badge: sits comfortably inside left col, well above bottom safe line -->
+        <div class="store-badge">
+          <svg width="34" height="42" viewBox="0 0 24 29" fill="white" xmlns="http://www.w3.org/2000/svg">
+            <path d="M18.71 19.5C17.88 20.74 17 21.95 15.66 21.97C14.32 22 13.89 21.18 12.37 21.18C10.84 21.18 10.37 21.95 9.1 22C7.78 22.05 6.8 20.68 5.96 19.47C4.25 17 2.94 12.45 4.7 9.39C5.57 7.87 7.13 6.91 8.82 6.88C10.1 6.86 11.32 7.75 12.11 7.75C12.89 7.75 14.37 6.68 15.92 6.84C16.57 6.87 18.39 7.1 19.56 8.82C19.47 8.88 17.39 10.1 17.41 12.63C17.44 15.65 20.06 16.66 20.09 16.67C20.06 16.74 19.67 18.11 18.71 19.5ZM13 3.5C13.73 2.67 14.94 2.04 15.94 2C16.07 3.17 15.6 4.35 14.9 5.19C14.21 6.04 13.07 6.7 11.95 6.61C11.8 5.46 12.36 4.26 13 3.5Z"/>
+          </svg>
+          <div class="store-badge-txt">
+            <span class="store-badge-sub">Download on the</span>
+            <span class="store-badge-main">App Store</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- RIGHT: iPhone — SCREENSHOT PLACEHOLDER: app-home-screen -->
+      <div style="flex:1; display:flex; justify-content:flex-end; align-items:center;">
+        <div class="iphone" style="width:372px; height:774px;">
+          <div class="iphone-inner" style="background:#0B1F2A;">
+            <div class="iphone-island"></div>
+            <div class="ra-header" style="background:#0B1F2A;">
+              <svg width="26" height="23" viewBox="0 0 225 200" xmlns="http://www.w3.org/2000/svg"><g fill="#00C2D1"><path d="M 159.1,24.3 A 96,96 0 1,0 159.1,175.7 L 135.7,145.7 A 58,58 0 1,1 135.7,54.3 Z"/><path d="M 144.0,57 L 208,45 L 218,58 L 208,70 L 150.0,71 Z"/><path d="M 158.0,92 L 215,82 L 225,95 L 215,107 L 158.0,108 Z"/><path d="M 150.0,129 L 208,130 L 218,142 L 208,155 L 144.0,143 Z"/></g></svg>
+              <div><div class="ra-hname">Clinical Edge</div><div class="ra-hsub">COPILOT</div></div>
+            </div>
+            <div class="ra-scroll" style="background:#ECEAE3; padding-top:14px;">
+              <div class="ra-hero-h">Clinical reasoning support.<br>Built for nurses.</div>
+              <div class="ra-hero-p">When something feels off. Before you call.<br>Quick clinical questions.</div>
+              <div class="ra-input">
+                <div class="ra-input-text">BP dropped to 88/50, HR 122, was stable an hour ago — help me think through this before I call.</div>
+                <div class="ra-ask-wrap"><div class="ra-ask-btn">Ask Copilot</div></div>
+              </div>
+              <div class="ra-phi">
+                <div style="display:flex; align-items:flex-start; gap:6px;">
+                  <span class="ra-phi-icon">&#9651;</span>
+                  <span class="ra-phi-text">Do not enter patient identifiers. Describe the clinical situation only.</span>
+                </div>
+              </div>
+              <div>
+                <div class="ra-chip-label">HOW NURSES USE COPILOT</div>
+                <div class="ra-chips">
+                  <span class="ra-chip">Something feels off</span>
+                  <span class="ra-chip">Quick bedside question</span>
+                </div>
+                <div class="ra-chips" style="margin-top:4px;">
+                  <span class="ra-chip">Before you call</span>
+                  <span class="ra-chip">SBAR support</span>
+                </div>
+              </div>
+            </div>
+            <div class="iphone-home-bar"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- BRAND BAR — bottom of safe zone, y ≈ 1462–1500 ✓ -->
+    <div class="tt-brand">
+      <div class="tt-brand-left">
+        <div class="tt-brand-dot"></div>
+        <span class="tt-brand-name">Clinical Edge Copilot</span>
+      </div>
+      <span class="tt-brand-handle">@clinicaledgeco</span>
+    </div>
+
+  </div>
+</div>
+
+
+<!-- ═══════════ SLIDE 2 — RESPONSE / URGENCY ═══════════ -->
+<div class="slide-label"><span>Slide 02 — Clinical Response</span></div>
+<div class="slide" id="slide-2">
+  <div class="slide-content">
+
+    <div class="tt-topbar">
+      <div class="badge dim">Clinical Response</div>
+      <span class="label muted">02 / 07</span>
+    </div>
+
+    <!-- Centered column: text → phone -->
+    <div class="tt-main" style="flex-direction:column; align-items:center; justify-content:center; gap:30px;">
+      <div style="text-align:center;">
+        <div class="teal-bar" style="width:48px; margin:0 auto 22px;"></div>
+        <h3 style="text-align:center;">Know what you're<br>dealing with.</h3>
+        <p style="text-align:center; margin-top:16px; max-width:820px;">Urgency level and clinical possibilities — organized clearly.</p>
+      </div>
+      <!-- SCREENSHOT PLACEHOLDER: app-response-screen -->
+      <div class="iphone" style="width:432px; height:820px;">
+        <div class="iphone-inner">
+          <div class="iphone-island"></div>
+          <div class="ra-header">
+            <svg width="24" height="21" viewBox="0 0 225 200" xmlns="http://www.w3.org/2000/svg"><g fill="#00C2D1"><path d="M 159.1,24.3 A 96,96 0 1,0 159.1,175.7 L 135.7,145.7 A 58,58 0 1,1 135.7,54.3 Z"/><path d="M 144.0,57 L 208,45 L 218,58 L 208,70 L 150.0,71 Z"/><path d="M 158.0,92 L 215,82 L 225,95 L 215,107 L 158.0,108 Z"/><path d="M 150.0,129 L 208,130 L 218,142 L 208,155 L 144.0,143 Z"/></g></svg>
+            <div><div class="ra-hname">Clinical Edge</div><div class="ra-hsub">COPILOT</div></div>
+          </div>
+          <div class="ra-scroll">
+            <div class="ra-hint"><div class="ra-hint-dot"></div><span>Structured clinical reasoning — confirm with assessment and provider guidance</span></div>
+            <div class="ra-urgency"><div class="ra-urg-dot"></div><span class="ra-urg-text">URGENCY: HIGH</span></div>
+            <div class="ra-warn"><div class="ra-warn-text">&#9888; This pattern may represent an acute clinical change and should be interpreted with bedside assessment, provider guidance, and local protocol.</div></div>
+            <div class="ra-sec">
+              <div class="ra-sec-body" style="border-left:3px solid #4da3ff;">
+                <div class="ra-sec-label" style="color:#4da3ff;">What this could be</div>
+                <div class="ra-sec-p">A BP of 88/50 with compensatory HR 122, after stability, points toward an acute hemodynamic shift. The speed of change matters as much as the numbers.</div>
+              </div>
+            </div>
+            <div class="ra-sec">
+              <div class="ra-sec-body" style="border-left:3px solid #e05572;">
+                <div class="ra-sec-label" style="color:#e05572;">Possible concerns</div>
+                <div class="ra-brow"><span class="ra-bmark" style="color:#e05572;">&rsaquo;</span><span class="ra-btext"><b>Shock</b> — distributive, hypovolemic, cardiogenic, or obstructive all fit this picture</span></div>
+                <div class="ra-brow"><span class="ra-bmark" style="color:#e05572;">&rsaquo;</span><span class="ra-btext">Compensation may be masking the true degree of change</span></div>
+              </div>
+            </div>
+          </div>
+          <div class="iphone-home-bar"></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="tt-brand">
+      <div class="tt-brand-left"><div class="tt-brand-dot"></div><span class="tt-brand-name">Clinical Edge Copilot</span></div>
+      <span class="tt-brand-handle">@clinicaledgeco</span>
+    </div>
+
+  </div>
+</div>
+
+
+<!-- ═══════════ SLIDE 3 — WHAT TO ASSESS NEXT ═══════════ -->
+<div class="slide-label"><span>Slide 03 — Assessment</span></div>
+<div class="slide" id="slide-3">
+  <div class="slide-content">
+
+    <div class="tt-topbar">
+      <div class="badge dim">Assessment</div>
+      <span class="label muted">03 / 07</span>
+    </div>
+
+    <div class="tt-main" style="flex-direction:column; align-items:center; justify-content:center; gap:30px;">
+      <div style="text-align:center;">
+        <div class="teal-bar" style="width:48px; margin:0 auto 22px;"></div>
+        <h3 style="text-align:center;">Know what<br>to assess next.</h3>
+        <p style="text-align:center; margin-top:16px; max-width:820px;">Possible concerns and targeted assessments — structured for the bedside.</p>
+      </div>
+      <!-- SCREENSHOT PLACEHOLDER: app-assess-next-screen -->
+      <div class="iphone" style="width:432px; height:820px;">
+        <div class="iphone-inner">
+          <div class="iphone-island"></div>
+          <div class="ra-header">
+            <svg width="24" height="21" viewBox="0 0 225 200" xmlns="http://www.w3.org/2000/svg"><g fill="#00C2D1"><path d="M 159.1,24.3 A 96,96 0 1,0 159.1,175.7 L 135.7,145.7 A 58,58 0 1,1 135.7,54.3 Z"/><path d="M 144.0,57 L 208,45 L 218,58 L 208,70 L 150.0,71 Z"/><path d="M 158.0,92 L 215,82 L 225,95 L 215,107 L 158.0,108 Z"/><path d="M 150.0,129 L 208,130 L 218,142 L 208,155 L 144.0,143 Z"/></g></svg>
+            <div><div class="ra-hname">Clinical Edge</div><div class="ra-hsub">COPILOT</div></div>
+          </div>
+          <div class="ra-scroll">
+            <div class="ra-hint"><div class="ra-hint-dot"></div><span>Structured clinical reasoning — confirm with your assessment</span></div>
+            <div class="ra-urgency"><div class="ra-urg-dot"></div><span class="ra-urg-text">URGENCY: HIGH</span></div>
+            <div class="ra-sec">
+              <div class="ra-sec-body" style="border-left:3px solid #4da3ff;">
+                <div class="ra-sec-label" style="color:#4da3ff;">What this could be</div>
+                <div class="ra-sec-p">A sudden BP drop with compensatory tachycardia after a stable period points toward an acute hemodynamic shift worth investigating at the bedside.</div>
+              </div>
+            </div>
+            <div class="ra-sec">
+              <div class="ra-sec-body" style="border-left:3px solid #1FBF75;">
+                <div class="ra-sec-label" style="color:#1FBF75;">What to assess next</div>
+                <div class="ra-brow"><span class="ra-bmark" style="color:#1FBF75;">&rsaquo;</span><span class="ra-btext"><b>Mental status</b> — confusion, agitation, or unusual quietness</span></div>
+                <div class="ra-brow"><span class="ra-bmark" style="color:#1FBF75;">&rsaquo;</span><span class="ra-btext"><b>Skin perfusion</b> — mottling, pallor, temperature, capillary refill</span></div>
+                <div class="ra-brow"><span class="ra-bmark" style="color:#1FBF75;">&rsaquo;</span><span class="ra-btext"><b>Work of breathing</b> — tachypnea or accessory muscle use</span></div>
+                <div class="ra-brow"><span class="ra-bmark" style="color:#1FBF75;">&rsaquo;</span><span class="ra-btext"><b>What changed in the last hour</b> — medication, fluid, new complaint</span></div>
+                <div class="ra-brow"><span class="ra-bmark" style="color:#1FBF75;">&rsaquo;</span><span class="ra-btext"><b>Volume status</b> — dry mucous membranes, flat neck veins, recent output</span></div>
+              </div>
+            </div>
+          </div>
+          <div class="iphone-home-bar"></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="tt-brand">
+      <div class="tt-brand-left"><div class="tt-brand-dot"></div><span class="tt-brand-name">Clinical Edge Copilot</span></div>
+      <span class="tt-brand-handle">@clinicaledgeco</span>
+    </div>
+
+  </div>
+</div>
+
+
+<!-- ═══════════ SLIDE 4 — ESCALATION ═══════════ -->
+<div class="slide-label"><span>Slide 04 — Clinical Trajectory</span></div>
+<div class="slide" id="slide-4">
+  <div class="slide-content">
+
+    <div class="tt-topbar">
+      <div class="badge dim">Clinical Trajectory</div>
+      <span class="label muted">04 / 07</span>
+    </div>
+
+    <div class="tt-main" style="flex-direction:row; align-items:center; gap:52px;">
+
+      <!-- LEFT: Headline + bullets — fits in safe width -->
+      <div style="flex:1; display:flex; flex-direction:column; gap:36px;">
+        <div style="display:flex; flex-direction:column; gap:20px;">
+          <div class="teal-bar" style="width:44px;"></div>
+          <h3>Know when and<br>how to escalate.</h3>
+          <p style="max-width:420px; font-size:40px;">Organize what changed, what matters, and what to communicate.</p>
+        </div>
+        <div class="divider"></div>
+        <div class="bullet-list">
+          <div class="bullet-row">
+            <div class="bullet-mark"></div>
+            <span class="bullet-text">Provider awareness may be appropriate when trends change quickly</span>
+          </div>
+          <div class="bullet-row">
+            <div class="bullet-mark"></div>
+            <span class="bullet-text">Charge nurse support may help organize additional resources</span>
+          </div>
+          <div class="bullet-row">
+            <div class="bullet-mark"></div>
+            <span class="bullet-text">IV access and monitoring status — useful context before the call</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- RIGHT: iPhone — SCREENSHOT PLACEHOLDER: app-consider-next-screen -->
+      <div style="flex:0 0 338px; display:flex; justify-content:center; align-items:center;">
+        <div class="iphone" style="width:320px; height:666px;">
+          <div class="iphone-inner">
+            <div class="iphone-island" style="width:88px; height:24px; border-radius:13px;"></div>
+            <div class="ra-header">
+              <svg width="22" height="19" viewBox="0 0 225 200" xmlns="http://www.w3.org/2000/svg"><g fill="#00C2D1"><path d="M 159.1,24.3 A 96,96 0 1,0 159.1,175.7 L 135.7,145.7 A 58,58 0 1,1 135.7,54.3 Z"/><path d="M 144.0,57 L 208,45 L 218,58 L 208,70 L 150.0,71 Z"/><path d="M 158.0,92 L 215,82 L 225,95 L 215,107 L 158.0,108 Z"/><path d="M 150.0,129 L 208,130 L 218,142 L 208,155 L 144.0,143 Z"/></g></svg>
+              <div><div class="ra-hname">Clinical Edge</div><div class="ra-hsub">COPILOT</div></div>
+            </div>
+            <div class="ra-scroll">
+              <div class="ra-sec">
+                <div class="ra-sec-body" style="border-left:3px solid #1FBF75;">
+                  <div class="ra-sec-label" style="color:#1FBF75;">What to assess next</div>
+                  <div class="ra-brow"><span class="ra-bmark" style="color:#1FBF75;">&rsaquo;</span><span class="ra-btext">Mental status and responsiveness</span></div>
+                  <div class="ra-brow"><span class="ra-bmark" style="color:#1FBF75;">&rsaquo;</span><span class="ra-btext">Skin perfusion and capillary refill</span></div>
+                  <div class="ra-brow"><span class="ra-bmark" style="color:#1FBF75;">&rsaquo;</span><span class="ra-btext">Respiratory rate and effort</span></div>
+                </div>
+              </div>
+              <div class="ra-sec">
+                <div class="ra-sec-body" style="border-left:3px solid #F2B94B;">
+                  <div class="ra-sec-label" style="color:#F2B94B;">Where this may be heading</div>
+                  <div class="ra-brow"><span class="ra-bmark" style="color:#F2B94B;">&rsaquo;</span><span class="ra-btext">The tachycardia compensating this may not hold indefinitely</span></div>
+                  <div class="ra-brow"><span class="ra-bmark" style="color:#F2B94B;">&rsaquo;</span><span class="ra-btext"><b>Mentation changes</b> often signal progressive hypoperfusion</span></div>
+                  <div class="ra-brow"><span class="ra-bmark" style="color:#F2B94B;">&rsaquo;</span><span class="ra-btext">Local protocol and provider guidance come first</span></div>
+                </div>
+              </div>
+              <div class="ra-disclaimer" style="font-size:10px;">For educational support only. Clinical judgment and local protocol always come first.</div>
+            </div>
+            <div class="iphone-home-bar" style="width:98px; height:3px;"></div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+
+    <div class="tt-brand">
+      <div class="tt-brand-left"><div class="tt-brand-dot"></div><span class="tt-brand-name">Clinical Edge Copilot</span></div>
+      <span class="tt-brand-handle">@clinicaledgeco</span>
+    </div>
+
+  </div>
+</div>
+
+
+<!-- ═══════════ SLIDE 5 — SBAR ═══════════ -->
+<div class="slide-label"><span>Slide 05 — SBAR Communication</span></div>
+<div class="slide" id="slide-5">
+  <div class="slide-content">
+
+    <div class="tt-topbar">
+      <div class="badge dim">Communication</div>
+      <span class="label muted">05 / 07</span>
+    </div>
+
+    <div class="tt-main" style="flex-direction:column; align-items:center; justify-content:center; gap:30px;">
+      <div style="text-align:center;">
+        <div class="teal-bar" style="width:48px; margin:0 auto 22px;"></div>
+        <h3 style="text-align:center;">SBAR ready<br>in seconds.</h3>
+        <p style="text-align:center; margin-top:16px; max-width:820px;">Structured handoffs generated from your clinical scenario.</p>
+      </div>
+      <!-- SCREENSHOT PLACEHOLDER: app-sbar-screen -->
+      <div class="iphone" style="width:432px; height:820px;">
+        <div class="iphone-inner">
+          <div class="iphone-island"></div>
+          <div class="ra-header">
+            <svg width="24" height="21" viewBox="0 0 225 200" xmlns="http://www.w3.org/2000/svg"><g fill="#00C2D1"><path d="M 159.1,24.3 A 96,96 0 1,0 159.1,175.7 L 135.7,145.7 A 58,58 0 1,1 135.7,54.3 Z"/><path d="M 144.0,57 L 208,45 L 218,58 L 208,70 L 150.0,71 Z"/><path d="M 158.0,92 L 215,82 L 225,95 L 215,107 L 158.0,108 Z"/><path d="M 150.0,129 L 208,130 L 218,142 L 208,155 L 144.0,143 Z"/></g></svg>
+            <div><div class="ra-hname">Clinical Edge</div><div class="ra-hsub">COPILOT</div></div>
+          </div>
+          <div class="ra-scroll">
+            <div class="ra-sbar">
+              <div class="ra-sbar-hdr">
+                <span class="ra-sbar-title">SBAR HANDOFF DRAFT</span>
+                <span class="ra-sbar-copy">Copy</span>
+              </div>
+              <div class="ra-sbar-sec">
+                <div class="ra-sbar-l" style="color:#00C2D1;">SITUATION</div>
+                <div class="ra-sbar-t">BP dropped to 88/50 and HR is 122 after being stable about an hour ago.</div>
+              </div>
+              <div class="ra-sbar-sec">
+                <div class="ra-sbar-l" style="color:rgba(93,104,124,0.70);">BACKGROUND</div>
+                <div class="ra-sbar-t">Patient had been stable earlier in the shift. No patient identifiers included.</div>
+              </div>
+              <div class="ra-sbar-sec">
+                <div class="ra-sbar-l" style="color:#F2B94B;">ASSESSMENT</div>
+                <div class="ra-sbar-t">This change may represent a meaningful hemodynamic shift — interpret with bedside assessment.</div>
+              </div>
+              <div class="ra-sbar-sec">
+                <div class="ra-sbar-l" style="color:#1FBF75;">RECOMMENDATION</div>
+                <div class="ra-sbar-t">Requesting provider review and guidance based on current assessment and local protocol.</div>
+              </div>
+            </div>
+            <div style="font-size:10px; color:rgba(93,104,124,0.65); line-height:1.5; padding:4px 2px;">AI-generated draft — verify all details before use. No patient identifiers.</div>
+            <div style="border-top:1px solid rgba(22,32,51,0.10); padding-top:10px; margin-top:4px;">
+              <div class="ra-actions">
+                <span class="ra-act" style="color:#1FBF75; border:1px solid rgba(31,191,117,0.35);">+ Save Case</span>
+                <span class="ra-act" style="color:#00C2D1; border:1px solid rgba(0,194,209,0.35);">Copy Response</span>
+                <span class="ra-act" style="color:#5D687C; border:1px solid rgba(93,104,124,0.25);">Sources</span>
+              </div>
+            </div>
+          </div>
+          <div class="iphone-home-bar"></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="tt-brand">
+      <div class="tt-brand-left"><div class="tt-brand-dot"></div><span class="tt-brand-name">Clinical Edge Copilot</span></div>
+      <span class="tt-brand-handle">@clinicaledgeco</span>
+    </div>
+
+  </div>
+</div>
+
+
+<!-- ═══════════ SLIDE 6 — WORKFLOW ═══════════ -->
+<div class="slide-label"><span>Slide 06 — Workflow</span></div>
+<div class="slide" id="slide-6">
+  <div class="slide-content">
+
+    <div class="tt-topbar">
+      <div class="badge dim">Workflow</div>
+      <span class="label muted">06 / 07</span>
+    </div>
+
+    <div class="tt-main" style="flex-direction:row; align-items:center; gap:52px;">
+
+      <!-- LEFT: Headline + bullets -->
+      <div style="flex:1; display:flex; flex-direction:column; gap:36px;">
+        <div style="display:flex; flex-direction:column; gap:20px;">
+          <div class="teal-bar" style="width:44px;"></div>
+          <h3>Turn bedside details into a clearer update.</h3>
+        </div>
+        <div class="divider"></div>
+        <div class="bullet-list">
+          <div class="bullet-row">
+            <div class="bullet-mark"></div>
+            <span class="bullet-text">One tap generates an SBAR draft from your scenario</span>
+          </div>
+          <div class="bullet-row">
+            <div class="bullet-mark"></div>
+            <span class="bullet-text">Save cases to review patterns over time</span>
+          </div>
+          <div class="bullet-row">
+            <div class="bullet-mark"></div>
+            <span class="bullet-text">Your clinical judgment comes first — this organizes thinking</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- RIGHT: iPhone — SCREENSHOT PLACEHOLDER: app-actions-screen -->
+      <div style="flex:0 0 330px; display:flex; justify-content:center; align-items:center;">
+        <div class="iphone" style="width:312px; height:649px;">
+          <div class="iphone-inner">
+            <div class="iphone-island" style="width:84px; height:22px; border-radius:12px;"></div>
+            <div class="ra-header">
+              <svg width="21" height="18" viewBox="0 0 225 200" xmlns="http://www.w3.org/2000/svg"><g fill="#00C2D1"><path d="M 159.1,24.3 A 96,96 0 1,0 159.1,175.7 L 135.7,145.7 A 58,58 0 1,1 135.7,54.3 Z"/><path d="M 144.0,57 L 208,45 L 218,58 L 208,70 L 150.0,71 Z"/><path d="M 158.0,92 L 215,82 L 225,95 L 215,107 L 158.0,108 Z"/><path d="M 150.0,129 L 208,130 L 218,142 L 208,155 L 144.0,143 Z"/></g></svg>
+              <div><div class="ra-hname">Clinical Edge</div><div class="ra-hsub">COPILOT</div></div>
+            </div>
+            <div class="ra-scroll">
+              <div class="ra-sec">
+                <div class="ra-sec-body" style="border-left:3px solid #F2B94B;">
+                  <div class="ra-sec-label" style="color:#F2B94B;">Where this may be heading</div>
+                  <div class="ra-brow"><span class="ra-bmark" style="color:#F2B94B;">&rsaquo;</span><span class="ra-btext">Current IV access is useful context before the call</span></div>
+                  <div class="ra-brow"><span class="ra-bmark" style="color:#F2B94B;">&rsaquo;</span><span class="ra-btext">Provider awareness when trends change quickly</span></div>
+                </div>
+              </div>
+              <div style="border-top:1px solid rgba(22,32,51,0.10); padding-top:9px;">
+                <div class="ra-actions">
+                  <span class="ra-act" style="color:#1FBF75; border:1px solid rgba(31,191,117,0.35);">+ Save Case</span>
+                  <span class="ra-act" style="color:#00C2D1; border:1px solid rgba(0,194,209,0.35);">Copy Response</span>
+                  <span class="ra-act" style="color:#5D687C; border:1px solid rgba(93,104,124,0.25);">Sources</span>
+                </div>
+              </div>
+              <div style="display:flex; align-items:center; justify-content:center; gap:6px; padding:6px 0 2px;">
+                <span style="font-size:11px; font-weight:700; color:#00C2D1;">Turn into SBAR</span>
+                <span style="font-size:11px; color:#00C2D1;">&#8594;</span>
+              </div>
+              <div style="background:#0B1F2A; border:1px solid rgba(0,194,209,0.18); border-radius:10px; padding:12px 14px; margin-top:4px;">
+                <div style="font-family:'IBM Plex Mono',monospace; font-size:8px; font-weight:700; letter-spacing:1.8px; text-transform:uppercase; color:rgba(0,194,209,0.60); margin-bottom:7px;">ANYTHING CHANGE?</div>
+                <div style="font-size:11px; color:rgba(236,234,227,0.45); line-height:1.5; margin-bottom:10px;">Describe any new changes to update your assessment…</div>
+                <div style="display:flex; justify-content:flex-end;">
+                  <div style="background:#00C2D1; border-radius:6px; padding:6px 14px; font-size:10px; font-weight:700; color:#0B1F2A;">Send update</div>
+                </div>
+              </div>
+            </div>
+            <div class="iphone-home-bar" style="width:94px; height:3px;"></div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+
+    <div class="tt-brand">
+      <div class="tt-brand-left"><div class="tt-brand-dot"></div><span class="tt-brand-name">Clinical Edge Copilot</span></div>
+      <span class="tt-brand-handle">@clinicaledgeco</span>
+    </div>
+
+  </div>
+</div>
+
+
+<!-- ═══════════ SLIDE 7 — CTA / CONVERSION ═══════════ -->
+<div class="slide-label"><span>Slide 07 — Download CTA</span></div>
+<div class="slide" id="slide-7">
+  <div class="slide-content">
+
+    <div class="tt-topbar">
+      <div class="badge">Now Available</div>
+      <span class="label muted">07 / 07</span>
+    </div>
+
+    <!-- Two-column conversion layout -->
+    <div class="tt-main" style="flex-direction:row; align-items:center; gap:52px;">
+
+      <!-- LEFT: App identity → benefits → App Store badge (all above safe zone bottom) -->
+      <div style="flex:0 0 416px; display:flex; flex-direction:column; gap:28px;">
+
+        <!-- App icon + name -->
+        <div style="display:flex; align-items:center; gap:22px;">
+          <div class="app-icon-badge">
+            <svg width="62" height="55" viewBox="0 0 225 200" xmlns="http://www.w3.org/2000/svg"><g fill="#00C2D1"><path d="M 159.1,24.3 A 96,96 0 1,0 159.1,175.7 L 135.7,145.7 A 58,58 0 1,1 135.7,54.3 Z"/><path d="M 144.0,57 L 208,45 L 218,58 L 208,70 L 150.0,71 Z"/><path d="M 158.0,92 L 215,82 L 225,95 L 215,107 L 158.0,108 Z"/><path d="M 150.0,129 L 208,130 L 218,142 L 208,155 L 144.0,143 Z"/></g></svg>
+          </div>
+          <div>
+            <div style="font-size:44px; font-weight:800; letter-spacing:-1.5px; color:var(--tp); line-height:1.05;">Clinical Edge</div>
+            <div style="font-size:44px; font-weight:800; letter-spacing:-1.5px; color:var(--teal); line-height:1.05;">Copilot</div>
+          </div>
+        </div>
+
+        <div class="divider"></div>
+
+        <!-- 3 core benefits -->
+        <div style="display:flex; flex-direction:column; gap:18px;">
+          <div style="display:flex; align-items:center; gap:18px;">
+            <div style="width:8px; height:8px; border-radius:50%; background:var(--teal); flex-shrink:0;"></div>
+            <span style="font-size:38px; font-weight:400; color:var(--tp);">Clinical reasoning support</span>
+          </div>
+          <div style="display:flex; align-items:center; gap:18px;">
+            <div style="width:8px; height:8px; border-radius:50%; background:var(--teal); flex-shrink:0;"></div>
+            <span style="font-size:38px; font-weight:400; color:var(--tp);">Quick bedside questions</span>
+          </div>
+          <div style="display:flex; align-items:center; gap:18px;">
+            <div style="width:8px; height:8px; border-radius:50%; background:var(--teal); flex-shrink:0;"></div>
+            <span style="font-size:38px; font-weight:400; color:var(--tp);">SBAR communication support</span>
+          </div>
+        </div>
+
+        <div class="divider"></div>
+
+        <!-- CTA — App Store badge centered in column, well above y=1500 -->
+        <div style="display:flex; flex-direction:column; gap:14px;">
+          <p style="font-size:36px; font-weight:600; color:var(--tp);">Available now on the App Store.</p>
+          <div class="store-badge">
+            <svg width="32" height="40" viewBox="0 0 24 29" fill="white" xmlns="http://www.w3.org/2000/svg">
+              <path d="M18.71 19.5C17.88 20.74 17 21.95 15.66 21.97C14.32 22 13.89 21.18 12.37 21.18C10.84 21.18 10.37 21.95 9.1 22C7.78 22.05 6.8 20.68 5.96 19.47C4.25 17 2.94 12.45 4.7 9.39C5.57 7.87 7.13 6.91 8.82 6.88C10.1 6.86 11.32 7.75 12.11 7.75C12.89 7.75 14.37 6.68 15.92 6.84C16.57 6.87 18.39 7.1 19.56 8.82C19.47 8.88 17.39 10.1 17.41 12.63C17.44 15.65 20.06 16.66 20.09 16.67C20.06 16.74 19.67 18.11 18.71 19.5ZM13 3.5C13.73 2.67 14.94 2.04 15.94 2C16.07 3.17 15.6 4.35 14.9 5.19C14.21 6.04 13.07 6.7 11.95 6.61C11.8 5.46 12.36 4.26 13 3.5Z"/>
+            </svg>
+            <div class="store-badge-txt">
+              <span class="store-badge-sub">Download on the</span>
+              <span class="store-badge-main">App Store</span>
+            </div>
+          </div>
+          <!-- URL — inside safe zone, above y=1500 ✓ -->
+          <p class="small" style="font-size:28px;">theclinicaledge.org/download</p>
+        </div>
+
+      </div>
+
+      <!-- RIGHT: iPhone — full response overview -->
+      <!-- SCREENSHOT PLACEHOLDER: app-response-screen -->
+      <div style="flex:1; display:flex; justify-content:flex-end; align-items:center;">
+        <div class="iphone" style="width:388px; height:808px;">
+          <div class="iphone-inner">
+            <div class="iphone-island"></div>
+            <div class="ra-header">
+              <svg width="26" height="23" viewBox="0 0 225 200" xmlns="http://www.w3.org/2000/svg"><g fill="#00C2D1"><path d="M 159.1,24.3 A 96,96 0 1,0 159.1,175.7 L 135.7,145.7 A 58,58 0 1,1 135.7,54.3 Z"/><path d="M 144.0,57 L 208,45 L 218,58 L 208,70 L 150.0,71 Z"/><path d="M 158.0,92 L 215,82 L 225,95 L 215,107 L 158.0,108 Z"/><path d="M 150.0,129 L 208,130 L 218,142 L 208,155 L 144.0,143 Z"/></g></svg>
+              <div><div class="ra-hname">Clinical Edge</div><div class="ra-hsub">COPILOT</div></div>
+            </div>
+            <div class="ra-scroll">
+              <div class="ra-hint"><div class="ra-hint-dot"></div><span>Structured clinical reasoning — confirm with assessment and provider guidance</span></div>
+              <div class="ra-urgency"><div class="ra-urg-dot"></div><span class="ra-urg-text">URGENCY: HIGH</span></div>
+              <div class="ra-sec">
+                <div class="ra-sec-body" style="border-left:3px solid #4da3ff;">
+                  <div class="ra-sec-label" style="color:#4da3ff;">What this could be</div>
+                  <div class="ra-sec-p">A BP of 88/50 with compensatory HR 122 after stability points toward an acute hemodynamic shift.</div>
+                </div>
+              </div>
+              <div class="ra-sec">
+                <div class="ra-sec-body" style="border-left:3px solid #e05572;">
+                  <div class="ra-sec-label" style="color:#e05572;">Possible concerns</div>
+                  <div class="ra-brow"><span class="ra-bmark" style="color:#e05572;">&rsaquo;</span><span class="ra-btext"><b>Shock</b> — distributive, hypovolemic, cardiogenic, or obstructive</span></div>
+                  <div class="ra-brow"><span class="ra-bmark" style="color:#e05572;">&rsaquo;</span><span class="ra-btext">Compensation may be masking the true degree of change</span></div>
+                </div>
+              </div>
+              <div class="ra-sec">
+                <div class="ra-sec-body" style="border-left:3px solid #1FBF75;">
+                  <div class="ra-sec-label" style="color:#1FBF75;">What to assess next</div>
+                  <div class="ra-brow"><span class="ra-bmark" style="color:#1FBF75;">&rsaquo;</span><span class="ra-btext">Mental status and responsiveness</span></div>
+                  <div class="ra-brow"><span class="ra-bmark" style="color:#1FBF75;">&rsaquo;</span><span class="ra-btext">Skin perfusion and capillary refill</span></div>
+                  <div class="ra-brow"><span class="ra-bmark" style="color:#1FBF75;">&rsaquo;</span><span class="ra-btext">Respiratory rate and effort</span></div>
+                </div>
+              </div>
+              <div class="ra-disclaimer">For educational support only. Not a substitute for clinical judgment or provider guidance.</div>
+            </div>
+            <div class="iphone-home-bar"></div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+
+    <div class="tt-brand">
+      <div class="tt-brand-left"><div class="tt-brand-dot"></div><span class="tt-brand-name">Clinical Edge Copilot</span></div>
+      <span class="tt-brand-handle">@clinicaledgeco</span>
+    </div>
+
+  </div>
+</div>
+
+
+</body>
+</html>

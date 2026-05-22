@@ -11,6 +11,12 @@ interface RhythmLabHomeProps {
   onPractice: () => void;
 }
 
+// Normalise a search string: lowercase, hyphens → spaces, collapse whitespace.
+// Lets queries like "v-tach", "a-fib", "mobitz-2" hit the right rhythm.
+function norm(s: string): string {
+  return s.toLowerCase().replace(/-/g, ' ').replace(/\s+/g, ' ').trim();
+}
+
 const TEACHING_POINTS = [
   {
     title: 'Start with pattern',
@@ -37,14 +43,14 @@ export function RhythmLabHome({ rhythms, onSelect, onCompare, onPractice }: Rhyt
   const recentRhythms   = recentIds.map(id => RHYTHMS.find(r => r.id === id)).filter((r): r is Rhythm => r != null);
   const favoriteRhythms = favoriteIds.map(id => RHYTHMS.find(r => r.id === id)).filter((r): r is Rhythm => r != null);
 
-  const q = query.trim().toLowerCase();
+  const q = norm(query);
   const filtered = q
     ? rhythms.filter(r => {
         const aliases = RHYTHM_ALIASES[r.id] ?? [];
         return (
-          r.name.toLowerCase().includes(q) ||
-          r.shortName.toLowerCase().includes(q) ||
-          aliases.some(a => a.includes(q))
+          norm(r.name).includes(q) ||
+          norm(r.shortName).includes(q) ||
+          aliases.some(a => norm(a).includes(q))
         );
       })
     : rhythms;

@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Clinical Edge — Post 59 — Rhythm Lab: MAT vs A-Fib</title>
+  <title>Clinical Edge — Post 59 — Rhythm Lab: A-Fib vs PACs</title>
   <link
     href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=IBM+Plex+Mono:wght@400;500;700&display=swap"
     rel="stylesheet"
@@ -176,31 +176,36 @@
 </head>
 <body>
 
-<!-- POST 59 — Rhythm Lab: This rhythm gets mistaken for A-Fib (MAT vs A-Fib) -->
+<!-- POST 59 — Rhythm Lab: A-Fib vs Sinus Rhythm with PACs -->
 
 
 <!-- ═══ SLIDE 1 — HOOK + ECG PREVIEW ═════════════════════════════════════════ -->
 <div class="slide-label"><span>Slide 01 — Hook</span></div>
 <div class="slide" id="slide-1">
-  <div class="slide-content" style="justify-content:space-between;">
+  <div class="slide-content" style="justify-content:flex-start;">
 
-    <div>
-      <div class="top-row">
-        <div class="badge">Rhythm Lab</div>
-        <span class="ctr w">01 / 08</span>
-      </div>
-
-      <div style="margin-top:52px; display:flex; flex-direction:column; gap:4px;">
-        <div style="font-size:76px; font-weight:900; line-height:1.0; letter-spacing:-3px; color:var(--tw);">This rhythm gets called</div>
-        <div style="font-size:76px; font-weight:900; line-height:1.0; letter-spacing:-3px; color:var(--teal);">A-Fib all the time.</div>
-      </div>
-
-      <div style="margin-top:28px; font-size:46px; font-weight:400; line-height:1.4; color:var(--twm);">But look closer.</div>
+    <div class="top-row">
+      <div class="badge">Rhythm Lab</div>
+      <span class="ctr w">01 / 08</span>
     </div>
 
-    <div style="display:flex; flex-direction:column; gap:16px;">
-      <div class="ecg-card">
-        <span class="ecg-label">Lead II — Rhythm Strip</span>
+    <!-- Single unified block, vertically centered in remaining space -->
+    <div style="flex:1; display:flex; flex-direction:column; justify-content:center; gap:0;">
+
+      <div style="display:flex; flex-direction:column; gap:4px;">
+        <div style="font-size:80px; font-weight:900; line-height:1.0; letter-spacing:-3px; color:var(--tw);">This gets called</div>
+        <div style="font-size:80px; font-weight:900; line-height:1.0; letter-spacing:-3px; color:var(--teal);">A-Fib all the time.</div>
+      </div>
+
+      <div style="margin-top:24px; font-size:46px; font-weight:400; line-height:1.4; color:var(--twm);">But it might just be PACs.</div>
+
+      <div style="margin-top:40px;" class="ecg-card">
+        <span class="ecg-label">Lead II — Sinus Rhythm with PACs</span>
+        <!-- 2 PACs in sinus rhythm. Sinus RR=165px. -->
+        <!-- R positions: S1@85 S2@250 PAC1@350 S3@545 PAC2@645 S4@840 -->
+        <!-- RR pattern: 165·100(short)·195(pause)·100(short)·195(pause)·— -->
+        <!-- Sinus P: rounded, peak y=47. PAC P: pointed/narrower, peak y=45. -->
+        <!-- PAC P appears ~8px after prior T-end — realistically close. -->
         <svg width="880" height="100" viewBox="0 0 880 100" xmlns="http://www.w3.org/2000/svg">
           <defs>
             <pattern id="s1sg" width="8" height="8" patternUnits="userSpaceOnUse">
@@ -212,37 +217,37 @@
             </pattern>
           </defs>
           <rect width="880" height="100" fill="url(#s1lg)"/>
-          <!-- MAT-like waveform: irregular R-R, varying P-wave morphologies -->
-          <!-- Baseline y=58. R-peak y=10. Q/S y=64. T-peak y=48. -->
-          <!-- Beat 1 R@90: P-wave morph A (moderate upright) -->
-          <!-- Beat 2 R@275: P-wave morph B (tall peaked) -->
-          <!-- Beat 3 R@510: P-wave morph C (notched/wide) -->
-          <!-- Beat 4 R@710: P-wave morph D (low, wide) -->
           <path d="
-            M 10,58 L 46,58
-            C 48,58 51,52 56,48 C 60,45 64,49 69,58
-            L 82,58 L 82,64 L 90,10 L 97,66 L 101,58
-            L 113,58 C 115,58 121,51 128,47 C 134,51 138,55 142,58
-            L 240,58
-            C 242,58 245,50 250,45 C 255,50 260,56 264,58
-            L 274,58 L 274,64 L 280,10 L 286,66 L 291,58
-            L 302,58 C 304,58 310,51 317,47 C 323,51 327,55 331,58
-            L 460,58
-            C 462,58 464,52 468,50 C 471,48 474,50 477,53
-            C 479,55 481,53 484,51 C 487,49 490,52 493,58
-            L 505,58 L 505,64 L 513,10 L 519,66 L 523,58
-            L 533,58 C 535,58 541,51 548,47 C 554,51 558,55 562,58
-            L 658,58
-            C 660,58 663,55 667,53 C 670,51 674,54 678,58
-            L 698,58 L 698,64 L 705,10 L 712,66 L 716,58
-            L 726,58 C 728,58 734,51 741,47 C 747,51 751,55 755,58
-            L 880,58
+            M 10,58 L 30,58
+            C 32,58 37,49 41,47 C 45,47 50,54 52,58
+            L 77,58 L 77,63 L 85,12 L 91,65 L 95,58
+            L 97,58 C 99,58 105,50 113,48 C 121,50 127,55 135,58
+            L 195,58
+            C 197,58 202,49 206,47 C 210,47 215,54 217,58
+            L 242,58 L 242,63 L 250,12 L 256,65 L 260,58
+            L 262,58 C 264,58 270,50 278,48 C 286,50 292,55 300,58
+            L 308,58
+            C 310,58 315,46 317,45 C 319,46 324,55 326,58
+            L 342,58 L 342,63 L 350,12 L 356,65 L 360,58
+            L 362,58 C 364,58 370,50 378,48 C 386,50 392,55 400,58
+            L 490,58
+            C 492,58 497,49 501,47 C 505,47 510,54 512,58
+            L 537,58 L 537,63 L 545,12 L 551,65 L 555,58
+            L 557,58 C 559,58 565,50 573,48 C 581,50 587,55 595,58
+            L 603,58
+            C 605,58 610,46 612,45 C 614,46 619,55 621,58
+            L 637,58 L 637,63 L 645,12 L 651,65 L 655,58
+            L 657,58 C 659,58 665,50 673,48 C 681,50 687,55 695,58
+            L 785,58
+            C 787,58 792,49 796,47 C 800,47 805,54 807,58
+            L 832,58 L 832,63 L 840,12 L 846,65 L 850,58
+            L 852,58 C 854,58 860,50 868,48 C 876,52 880,57 880,58
           " fill="none" stroke="#0ABFBC" stroke-width="2.2"
              stroke-linecap="round" stroke-linejoin="round"/>
         </svg>
       </div>
 
-      <div style="display:flex; align-items:center; gap:16px;">
+      <div style="margin-top:20px; display:flex; align-items:center; gap:16px;">
         <span style="font-family:'IBM Plex Mono',monospace; font-size:23px; font-weight:500; letter-spacing:2px; color:rgba(82,97,116,0.38); text-transform:uppercase;">Swipe to analyze</span>
         <div style="display:flex; gap:8px; align-items:center;">
           <div style="width:28px; height:1px; background:rgba(82,97,116,0.20);"></div>
@@ -250,6 +255,7 @@
           <div style="width:10px; height:1px; background:rgba(82,97,116,0.20);"></div>
         </div>
       </div>
+
     </div>
 
   </div>
@@ -275,11 +281,11 @@
     </div>
 
     <div style="flex:1; display:flex; flex-direction:column; justify-content:center; gap:6px; padding:28px 0;">
-      <div style="font-size:92px; font-weight:900; line-height:1.0; letter-spacing:-3.5px; color:var(--tw);">Don't start</div>
-      <div style="font-size:92px; font-weight:900; line-height:1.0; letter-spacing:-3.5px; color:var(--tw);">with the rate.</div>
+      <div style="font-size:92px; font-weight:900; line-height:1.0; letter-spacing:-3.5px; color:var(--tw);">Don't stop at</div>
+      <div style="font-size:92px; font-weight:900; line-height:1.0; letter-spacing:-3.5px; color:var(--teal);">"irregular."</div>
       <div class="tbar" style="width:64px; margin-top:36px; margin-bottom:32px;"></div>
-      <div style="font-size:48px; font-weight:400; line-height:1.45; color:var(--twm);">Start with the</div>
-      <div style="font-size:48px; font-weight:600; line-height:1.45; color:var(--teal);">atrial activity.</div>
+      <div style="font-size:48px; font-weight:400; line-height:1.45; color:var(--twm);">Ask why</div>
+      <div style="font-size:48px; font-weight:600; line-height:1.45; color:var(--teal);">it's irregular.</div>
     </div>
 
   </div>
@@ -310,7 +316,11 @@
     </div>
 
     <div style="margin-top:36px;" class="ecg-card">
-      <span class="ecg-label">Lead II — Irregular Narrow-Complex Rhythm</span>
+      <span class="ecg-label">Lead II — Sinus Rhythm with PACs</span>
+      <!-- Same rhythm as slide 1 at larger scale (880×140). -->
+      <!-- Sinus RR≈185px. R@90(sinus), R@275(sinus), R@395(PAC), R@645(post-pause sinus), R@830(sinus). -->
+      <!-- Baseline y=82. R-peak y=14. Sinus P peak y=66. PAC P peak y=63 (slightly different). -->
+      <!-- RR pattern: 185 · 120(short PAC) · 250(long pause) · 185 — clearly irregular. -->
       <svg width="880" height="140" viewBox="0 0 880 140" xmlns="http://www.w3.org/2000/svg">
         <defs>
           <pattern id="s3sg" width="8" height="8" patternUnits="userSpaceOnUse">
@@ -322,29 +332,27 @@
           </pattern>
         </defs>
         <rect width="880" height="140" fill="url(#s3lg)"/>
-        <!-- Baseline y=82. R-peak y=14. Q/S y=90. T-peak y=70. -->
-        <!-- Beat 1 R@100: P-wave morph A (upright, rounded, moderate 12px) -->
-        <!-- Beat 2 R@295: P-wave morph B (tall peaked, 18px above baseline) -->
-        <!-- Beat 3 R@545: P-wave morph C (notched/wide) -->
-        <!-- Beat 4 R@755: P-wave morph D (low voltage, subtle) -->
         <path d="
-          M 10,82 L 47,82
-          C 49,82 53,74 58,69 C 62,65 67,69 72,82
-          L 91,82 L 91,90 L 100,14 L 108,92 L 113,82
-          L 128,82 C 130,82 137,74 145,70 C 151,74 155,79 159,82
-          L 253,82
-          C 255,82 259,70 264,64 C 269,70 275,79 279,82
-          L 292,82 L 292,90 L 300,14 L 308,92 L 313,82
-          L 326,82 C 328,82 336,74 344,70 C 350,74 354,79 358,82
-          L 490,82
-          C 492,82 494,75 498,72 C 501,70 504,72 507,75
-          C 510,77 513,75 516,72 C 519,69 522,72 526,82
-          L 540,82 L 540,90 L 548,14 L 556,92 L 560,82
-          L 572,82 C 574,82 581,74 589,70 C 595,74 599,79 603,82
-          L 710,82
-          C 712,82 715,78 719,76 C 722,74 726,77 731,82
-          L 747,82 L 747,90 L 755,14 L 763,92 L 768,82
-          L 780,82 C 782,82 789,74 797,70 C 803,74 807,79 811,82
+          M 10,82 L 35,82
+          C 37,82 40,74 45,70 C 49,67 53,71 57,82
+          L 82,82 L 82,89 L 90,14 L 96,91 L 100,82
+          L 115,82 C 117,82 123,74 128,70 C 133,73 137,78 140,82
+          L 220,82
+          C 222,82 225,74 230,70 C 234,67 238,71 242,82
+          L 267,82 L 267,89 L 275,14 L 281,91 L 285,82
+          L 300,82 C 302,82 308,74 313,70 C 318,73 322,78 325,82
+          L 355,82
+          C 357,82 361,72 365,68 C 369,72 373,79 375,82
+          L 387,82 L 387,89 L 395,14 L 401,91 L 405,82
+          L 418,82 C 420,82 425,74 430,70 C 435,73 439,78 441,82
+          L 590,82
+          C 592,82 595,74 600,70 C 604,67 608,71 612,82
+          L 637,82 L 637,89 L 645,14 L 651,91 L 655,82
+          L 668,82 C 670,82 676,74 681,70 C 686,73 690,78 693,82
+          L 775,82
+          C 777,82 780,74 785,70 C 789,67 793,71 797,82
+          L 822,82 L 822,89 L 830,14 L 836,91 L 840,82
+          L 853,82 C 855,82 861,74 866,70 C 871,73 875,78 878,82
           L 880,82
         " fill="none" stroke="#0ABFBC" stroke-width="2.5"
            stroke-linecap="round" stroke-linejoin="round"/>
@@ -354,15 +362,15 @@
     <div style="margin-top:32px; display:flex; flex-direction:column; gap:18px;">
       <div class="obs-row">
         <div class="obs-dot"></div>
-        <span class="obs-text">Irregular rhythm. R-R intervals vary.</span>
+        <span class="obs-text">Mostly regular rhythm. One beat comes early.</span>
       </div>
       <div class="obs-row">
         <div class="obs-dot"></div>
-        <span class="obs-text">Narrow QRS. This isn't ventricular.</span>
+        <span class="obs-text">Narrow QRS. Not ventricular ectopy.</span>
       </div>
       <div class="obs-row">
         <div class="obs-dot teal"></div>
-        <span class="obs-text" style="color:var(--tw);">The baseline isn't just chaotic.</span>
+        <span class="obs-text" style="color:var(--tw);">Early beats interrupt the pattern.</span>
       </div>
     </div>
 
@@ -392,14 +400,14 @@
 
       <div class="cmp-card muted-border">
         <span class="cmp-label muted">A-Fib</span>
-        <div style="font-size:44px; font-weight:700; line-height:1.25; color:var(--td); margin-bottom:12px;">No consistent P waves.</div>
-        <div class="cmp-text">Disorganized atrial activity. The baseline is fibrillating — no true P-wave morphology to identify.</div>
+        <div style="font-size:44px; font-weight:700; line-height:1.25; color:var(--td); margin-bottom:12px;">No organized P waves.</div>
+        <div class="cmp-text">Disorganized atrial activity. The baseline is fibrillating — no true P-wave before each QRS.</div>
       </div>
 
       <div class="cmp-card teal-border">
-        <span class="cmp-label teal">MAT</span>
-        <div style="font-size:44px; font-weight:700; line-height:1.25; color:var(--td); margin-bottom:12px;">Multiple different P-wave shapes.</div>
-        <div class="cmp-text">At least 3 distinct P-wave morphologies before each QRS. That's the defining feature.</div>
+        <span class="cmp-label teal">PACs</span>
+        <div style="font-size:44px; font-weight:700; line-height:1.25; color:var(--td); margin-bottom:12px;">PACs interrupt an organized rhythm.</div>
+        <div class="cmp-text">A P-wave appears before the early QRS — it may look slightly different, but it's there. The underlying sinus rhythm continues.</div>
       </div>
 
     </div>
@@ -458,9 +466,9 @@
 
     <div style="flex:1; display:flex; flex-direction:column; justify-content:center; gap:6px; padding:28px 0;">
       <div style="font-size:88px; font-weight:900; line-height:1.0; letter-spacing:-3.5px; color:var(--td);">This points more</div>
-      <div style="font-size:88px; font-weight:900; line-height:1.0; letter-spacing:-3.5px; color:var(--teal);">toward MAT.</div>
+      <div style="font-size:88px; font-weight:900; line-height:1.0; letter-spacing:-3.5px; color:var(--teal);">toward PACs.</div>
       <div class="tbar" style="width:64px; margin-top:36px; margin-bottom:28px;"></div>
-      <div style="font-size:42px; font-weight:400; line-height:1.55; color:var(--tdm);">Irregular rhythm with at least 3 different P-wave morphologies — each one visible before a narrow QRS.</div>
+      <div style="font-size:42px; font-weight:400; line-height:1.55; color:var(--tdm);">Early narrow beats on top of an organized sinus rhythm — with a visible P-wave before each one.</div>
     </div>
 
   </div>
@@ -489,7 +497,7 @@
       <div style="font-size:88px; font-weight:900; line-height:1.0; letter-spacing:-3.5px; color:var(--tw);">The first clue</div>
       <div style="font-size:88px; font-weight:900; line-height:1.0; letter-spacing:-3.5px; color:var(--tw);">wasn't the rate.</div>
       <div class="tbar" style="width:64px; margin-top:36px; margin-bottom:28px;"></div>
-      <div style="font-size:56px; font-weight:600; line-height:1.25; letter-spacing:-1px; color:var(--teal);">It was the P waves.</div>
+      <div style="font-size:56px; font-weight:600; line-height:1.25; letter-spacing:-1px; color:var(--teal);">It was the underlying rhythm.</div>
     </div>
 
   </div>

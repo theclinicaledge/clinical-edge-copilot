@@ -35,8 +35,8 @@ const MODULES = [
     titleSize: "clamp(22px, 4.5vw, 28px)",
     titleWeight: 800,
     titleTracking: "-0.038em",
-    paddingTop: 32,
-    paddingBottom: 28,
+    paddingTop: 34,
+    paddingBottom: 22,
     descSize: 14,
     descColor: "#526174",
     tagColor: "#0ABFBC",
@@ -54,8 +54,8 @@ const MODULES = [
     titleSize: "clamp(17px, 3.2vw, 20px)",
     titleWeight: 700,
     titleTracking: "-0.028em",
-    paddingTop: 22,
-    paddingBottom: 20,
+    paddingTop: 26,
+    paddingBottom: 17,
     descSize: 13,
     descColor: "#526174",
     tagColor: "#0ABFBC",
@@ -73,8 +73,8 @@ const MODULES = [
     titleSize: "clamp(15px, 2.8vw, 17px)",
     titleWeight: 600,
     titleTracking: "-0.018em",
-    paddingTop: 18,
-    paddingBottom: 16,
+    paddingTop: 20,
+    paddingBottom: 14,
     descSize: 12.5,
     descColor: "#8A9BA8",
     tagColor: "#8A9BA8",
@@ -100,6 +100,13 @@ function ModuleEntry({ module, isLast, onNavigate }) {
         paddingBottom: module.paddingBottom,
         borderBottom: isLast ? "none" : "1px solid rgba(17,24,39,0.07)",
         cursor: isActive ? "pointer" : "default",
+        // Subtle background wash on hover — tactile without adding a card
+        background: hovered && isActive ? "rgba(17,24,39,0.032)" : "transparent",
+        transition: "background 0.18s",
+        borderRadius: 4,
+        margin: "0 -6px",
+        paddingLeft: 6,
+        paddingRight: 6,
       }}
     >
       {/* Tag row — tag text left, hover arrow right */}
@@ -207,16 +214,19 @@ export default function ClinicalEdgeHome({ onNavigate }) {
         zIndex: 50,
         flexShrink: 0,
       }}>
-        <div style={{
-          maxWidth: 800,
-          margin: "0 auto",
-          width: "100%",
-          display: "flex",
-          alignItems: "center",
-          paddingTop: 26,
-          paddingBottom: 18,
-          gap: 11,
-        }}>
+        <div
+          className="ce-home-header-inner"
+          style={{
+            maxWidth: 860,
+            margin: "0 auto",
+            width: "100%",
+            display: "flex",
+            alignItems: "center",
+            paddingTop: 26,
+            paddingBottom: 18,
+            gap: 11,
+          }}
+        >
           <CELogo />
           <span style={{
             fontSize: 15,
@@ -232,21 +242,23 @@ export default function ClinicalEdgeHome({ onNavigate }) {
 
       {/* ── Warm surface ─────────────────────────────────────────────────── */}
       <div style={{ background: "#E7E1D6", flex: 1 }}>
-        <div style={{
-          maxWidth: 780,
-          margin: "0 auto",
-          width: "100%",
-          padding: "48px 20px 72px",
-        }}>
+        <div
+          className="ce-home-content"
+          style={{
+            maxWidth: 860,
+            margin: "0 auto",
+            width: "100%",
+          }}
+        >
 
           {/* Hero */}
-          <div style={{ marginBottom: 36 }}>
+          <div style={{ marginBottom: 46 }}>
             <h1 style={{
               fontFamily: "'Inter', sans-serif",
               fontWeight: 800,
               fontSize: "clamp(24px, 5.5vw, 36px)",
               color: "#111827",
-              margin: "0 0 13px",
+              margin: "0 0 9px",
               lineHeight: 1.08,
               letterSpacing: "-0.04em",
             }}>

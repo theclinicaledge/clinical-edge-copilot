@@ -32,6 +32,27 @@ textarea::placeholder {
   color: #94A3B8;
 }
 
+/* ── Home Hub — responsive layout ─────────────────────────────────────────── */
+/* Mobile-first: 20px horizontal padding.                                      */
+/* On wider screens, pad to 48px and let the 860px max-width breathe.          */
+.ce-home-content {
+  padding: 44px 20px 72px;
+}
+.ce-home-header-inner {
+  padding-left: 20px;
+  padding-right: 20px;
+}
+
+@media (min-width: 768px) {
+  .ce-home-content {
+    padding: 58px 48px 88px;
+  }
+  .ce-home-header-inner {
+    padding-left: 12px;
+    padding-right: 12px;
+  }
+}
+
 /* Mobile: tighten workspace padding and chip text */
 @media (max-width: 600px) {
   .main-container {

@@ -21,7 +21,8 @@ function CELogo() {
 }
 
 // ─── Module definitions ───────────────────────────────────────────────────────
-// Each entry carries its own visual weight tokens — no uniform treatment.
+// Copilot and Rhythm Lab are co-primary modules — identical visual weight.
+// ICU Drips is the only muted coming-soon entry.
 const MODULES = [
   {
     key: "copilot",
@@ -31,16 +32,6 @@ const MODULES = [
       "Bedside clinical reasoning support. For the moment before a call, or right after getting report.",
     status: "active",
     path: "/copilot",
-    // Dominant — largest type, most space, strongest weight
-    titleSize: "clamp(22px, 4.5vw, 28px)",
-    titleWeight: 800,
-    titleTracking: "-0.038em",
-    paddingTop: 34,
-    paddingBottom: 22,
-    descSize: 14,
-    descColor: "#526174",
-    tagColor: "#0ABFBC",
-    tagOpacity: 1,
   },
   {
     key: "rhythmlab",
@@ -50,16 +41,6 @@ const MODULES = [
       "Systematic ECG strip analysis and rhythm recognition. Built for nurses who work with monitored patients.",
     status: "active",
     path: "/rhythm-lab",
-    // Secondary — tighter, editorial utility feel
-    titleSize: "clamp(17px, 3.2vw, 20px)",
-    titleWeight: 700,
-    titleTracking: "-0.028em",
-    paddingTop: 26,
-    paddingBottom: 17,
-    descSize: 13,
-    descColor: "#526174",
-    tagColor: "#0ABFBC",
-    tagOpacity: 0.85,
   },
   {
     key: "icudrips",
@@ -69,26 +50,42 @@ const MODULES = [
       "Common critical care infusion reference — dosing, titration parameters, and monitoring essentials.",
     status: "soon",
     path: null,
-    // Quieter — future-facing, intentional placeholder
-    titleSize: "clamp(15px, 2.8vw, 17px)",
-    titleWeight: 600,
-    titleTracking: "-0.018em",
-    paddingTop: 20,
-    paddingBottom: 14,
-    descSize: 12.5,
-    descColor: "#8A9BA8",
-    tagColor: "#8A9BA8",
-    tagOpacity: 0.75,
   },
 ];
 
+// Shared visual tokens for active modules (applied identically to Copilot + Rhythm Lab)
+const ACTIVE_STYLE = {
+  titleSize:    "clamp(19px, 3.8vw, 23px)",
+  titleWeight:  700,
+  titleTracking: "-0.03em",
+  paddingTop:   28,
+  paddingBottom: 22,
+  descSize:     13.5,
+  descColor:    "#526174",
+  tagColor:     "#0ABFBC",
+  tagOpacity:   1,
+};
+
+// Muted tokens for coming-soon module
+const SOON_STYLE = {
+  titleSize:    "clamp(15px, 2.8vw, 17px)",
+  titleWeight:  500,
+  titleTracking: "-0.018em",
+  paddingTop:   18,
+  paddingBottom: 14,
+  descSize:     12.5,
+  descColor:    "#8A9BA8",
+  tagColor:     "#8A9BA8",
+  tagOpacity:   0.65,
+};
+
 // ─── Module Entry ─────────────────────────────────────────────────────────────
-// Each entry renders from its own style tokens — no shared uniform treatment.
-// Active modules: hover deepens title color and fades in a directional arrow.
-// Soon modules: lower contrast throughout, "· soon" inline with the tag.
+// Active entries: identical size, weight, spacing, hover treatment.
+// Soon entry: reduced contrast, no hover or cursor.
 function ModuleEntry({ module, isLast, onNavigate }) {
   const [hovered, setHovered] = useState(false);
   const isActive = module.status === "active";
+  const s = isActive ? ACTIVE_STYLE : SOON_STYLE;
 
   return (
     <div
@@ -96,89 +93,55 @@ function ModuleEntry({ module, isLast, onNavigate }) {
       onMouseLeave={() => setHovered(false)}
       onClick={isActive ? () => onNavigate(module.path) : undefined}
       style={{
-        paddingTop: module.paddingTop,
-        paddingBottom: module.paddingBottom,
-        borderBottom: isLast ? "none" : "1px solid rgba(17,24,39,0.07)",
+        paddingTop: s.paddingTop,
+        paddingBottom: s.paddingBottom,
+        borderBottom: isLast ? "none" : "1px solid rgba(17,24,39,0.08)",
         cursor: isActive ? "pointer" : "default",
-        // Subtle background wash on hover — tactile without adding a card
-        background: hovered && isActive ? "rgba(17,24,39,0.032)" : "transparent",
+        background: hovered ? "rgba(17,24,39,0.03)" : "transparent",
         transition: "background 0.18s",
-        borderRadius: 4,
-        margin: "0 -6px",
-        paddingLeft: 6,
-        paddingRight: 6,
       }}
     >
-      {/* Tag row — tag text left, hover arrow right */}
+      {/* Tag */}
       <div style={{
+        fontSize: 9.5,
+        fontWeight: 700,
+        textTransform: "uppercase",
+        letterSpacing: "1.5px",
+        color: s.tagColor,
+        opacity: s.tagOpacity,
+        fontFamily: "'IBM Plex Mono', 'Courier New', monospace",
+        marginBottom: 8,
         display: "flex",
         alignItems: "center",
-        justifyContent: "space-between",
-        marginBottom: 9,
+        gap: 7,
       }}>
-        <span style={{
-          fontSize: 9.5,
-          fontWeight: 700,
-          textTransform: "uppercase",
-          letterSpacing: "1.5px",
-          color: module.tagColor,
-          opacity: module.tagOpacity,
-          fontFamily: "'IBM Plex Mono', 'Courier New', monospace",
-          display: "flex",
-          alignItems: "center",
-          gap: 8,
-        }}>
-          {module.tag}
-          {/* "soon" is part of the tag line — intentional, not a badge */}
-          {!isActive && (
-            <span style={{
-              fontWeight: 400,
-              letterSpacing: "0.8px",
-              opacity: 0.65,
-            }}>
-              · soon
-            </span>
-          )}
-        </span>
-
-        {/* Directional arrow — appears only on hover, replaces "Open →" */}
-        {isActive && (
-          <span style={{
-            fontSize: 12,
-            color: hovered ? "#0ABFBC" : "transparent",
-            fontFamily: "'IBM Plex Mono', monospace",
-            letterSpacing: "0.04em",
-            transition: "color 0.18s",
-            flexShrink: 0,
-            userSelect: "none",
-          }}>
-            ↗
+        {module.tag}
+        {!isActive && (
+          <span style={{ fontWeight: 400, letterSpacing: "0.8px", opacity: 0.7 }}>
+            · soon
           </span>
         )}
       </div>
 
-      {/* Title — size and weight differ per module */}
+      {/* Title */}
       <div style={{
-        fontSize: module.titleSize,
-        fontWeight: module.titleWeight,
-        color: isActive
-          ? (hovered ? "#07111C" : "#111827")
-          : "#9AABBA",
-        letterSpacing: module.titleTracking,
-        lineHeight: 1.1,
-        marginBottom: 9,
-        transform: hovered && isActive ? "translateX(2px)" : "translateX(0)",
-        transition: "color 0.15s, transform 0.2s",
+        fontSize: s.titleSize,
+        fontWeight: s.titleWeight,
+        color: isActive ? (hovered ? "#07111C" : "#111827") : "#9AABBA",
+        letterSpacing: s.titleTracking,
+        lineHeight: 1.12,
+        marginBottom: 8,
+        transition: "color 0.15s",
       }}>
         {module.title}
       </div>
 
-      {/* Description — size and color differ per module */}
+      {/* Description */}
       <div style={{
-        fontSize: module.descSize,
-        color: module.descColor,
+        fontSize: s.descSize,
+        color: s.descColor,
         lineHeight: 1.62,
-        maxWidth: 520,
+        maxWidth: 540,
       }}>
         {module.description}
       </div>
@@ -217,13 +180,13 @@ export default function ClinicalEdgeHome({ onNavigate }) {
         <div
           className="ce-home-header-inner"
           style={{
-            maxWidth: 860,
+            maxWidth: 750,
             margin: "0 auto",
             width: "100%",
             display: "flex",
             alignItems: "center",
-            paddingTop: 26,
-            paddingBottom: 18,
+            paddingTop: 22,
+            paddingBottom: 16,
             gap: 11,
           }}
         >
@@ -244,39 +207,35 @@ export default function ClinicalEdgeHome({ onNavigate }) {
       <div style={{ background: "#E7E1D6", flex: 1 }}>
         <div
           className="ce-home-content"
-          style={{
-            maxWidth: 860,
-            margin: "0 auto",
-            width: "100%",
-          }}
+          style={{ maxWidth: 750, margin: "0 auto", width: "100%" }}
         >
 
           {/* Hero */}
-          <div style={{ marginBottom: 46 }}>
+          <div style={{ marginBottom: 32 }}>
             <h1 style={{
               fontFamily: "'Inter', sans-serif",
               fontWeight: 800,
-              fontSize: "clamp(24px, 5.5vw, 36px)",
+              fontSize: "clamp(23px, 5vw, 34px)",
               color: "#111827",
-              margin: "0 0 9px",
-              lineHeight: 1.08,
+              margin: "0 0 10px",
+              lineHeight: 1.1,
               letterSpacing: "-0.04em",
             }}>
               Clinical tools for real-world nursing.
             </h1>
             <p style={{
-              fontSize: "clamp(14px, 2.8vw, 16px)",
+              fontSize: "clamp(14px, 2.8vw, 15.5px)",
               color: "#526174",
               margin: 0,
               lineHeight: 1.55,
               fontWeight: 400,
-              maxWidth: 500,
+              maxWidth: 480,
             }}>
               Think through clinical situations, practice rhythm recognition, and build bedside confidence.
             </p>
           </div>
 
-          {/* Module list — entries with individual visual weight */}
+          {/* Module list */}
           <div style={{ borderTop: "1px solid rgba(17,24,39,0.09)" }}>
             {MODULES.map((mod, i) => (
               <ModuleEntry
@@ -288,16 +247,13 @@ export default function ClinicalEdgeHome({ onNavigate }) {
             ))}
           </div>
 
-          {/* Footer — disclaimer + compliance links */}
-          <div style={{
-            marginTop: 36,
-            fontFamily: "'IBM Plex Mono', monospace",
-          }}>
+          {/* Footer */}
+          <div style={{ marginTop: 32, fontFamily: "'IBM Plex Mono', monospace" }}>
             <p style={{
               fontSize: 11,
               color: "#7F99A5",
               lineHeight: 1.65,
-              margin: "0 0 12px",
+              margin: "0 0 10px",
             }}>
               Educational and clinical reasoning support only. Not a diagnostic tool. Follow local protocol, provider guidance, and institutional policy.
             </p>

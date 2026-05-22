@@ -33,10 +33,8 @@ textarea::placeholder {
 }
 
 /* ── Home Hub — responsive layout ─────────────────────────────────────────── */
-/* Mobile-first: 20px horizontal padding.                                      */
-/* On wider screens, pad to 48px and let the 860px max-width breathe.          */
 .ce-home-content {
-  padding: 44px 20px 72px;
+  padding: 38px 20px 60px;
 }
 .ce-home-header-inner {
   padding-left: 20px;
@@ -45,11 +43,11 @@ textarea::placeholder {
 
 @media (min-width: 768px) {
   .ce-home-content {
-    padding: 58px 48px 88px;
+    padding: 48px 36px 72px;
   }
   .ce-home-header-inner {
-    padding-left: 12px;
-    padding-right: 12px;
+    padding-left: 8px;
+    padding-right: 8px;
   }
 }
 

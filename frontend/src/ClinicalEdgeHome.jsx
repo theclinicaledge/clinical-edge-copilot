@@ -21,6 +21,7 @@ function CELogo() {
 }
 
 // ─── Module definitions ───────────────────────────────────────────────────────
+// Each entry carries its own visual weight tokens — no uniform treatment.
 const MODULES = [
   {
     key: "copilot",
@@ -30,6 +31,16 @@ const MODULES = [
       "Bedside clinical reasoning support. For the moment before a call, or right after getting report.",
     status: "active",
     path: "/copilot",
+    // Dominant — largest type, most space, strongest weight
+    titleSize: "clamp(22px, 4.5vw, 28px)",
+    titleWeight: 800,
+    titleTracking: "-0.038em",
+    paddingTop: 32,
+    paddingBottom: 28,
+    descSize: 14,
+    descColor: "#526174",
+    tagColor: "#0ABFBC",
+    tagOpacity: 1,
   },
   {
     key: "rhythmlab",
@@ -39,6 +50,16 @@ const MODULES = [
       "Systematic ECG strip analysis and rhythm recognition. Built for nurses who work with monitored patients.",
     status: "active",
     path: "/rhythm-lab",
+    // Secondary — tighter, editorial utility feel
+    titleSize: "clamp(17px, 3.2vw, 20px)",
+    titleWeight: 700,
+    titleTracking: "-0.028em",
+    paddingTop: 22,
+    paddingBottom: 20,
+    descSize: 13,
+    descColor: "#526174",
+    tagColor: "#0ABFBC",
+    tagOpacity: 0.85,
   },
   {
     key: "icudrips",
@@ -48,13 +69,24 @@ const MODULES = [
       "Common critical care infusion reference — dosing, titration parameters, and monitoring essentials.",
     status: "soon",
     path: null,
+    // Quieter — future-facing, intentional placeholder
+    titleSize: "clamp(15px, 2.8vw, 17px)",
+    titleWeight: 600,
+    titleTracking: "-0.018em",
+    paddingTop: 18,
+    paddingBottom: 16,
+    descSize: 12.5,
+    descColor: "#8A9BA8",
+    tagColor: "#8A9BA8",
+    tagOpacity: 0.75,
   },
 ];
 
 // ─── Module Entry ─────────────────────────────────────────────────────────────
-// Editorial list entry — no background box, warm surface breathes through,
-// separated by thin horizontal dividers.
-function ModuleEntry({ module, onNavigate }) {
+// Each entry renders from its own style tokens — no shared uniform treatment.
+// Active modules: hover deepens title color and fades in a directional arrow.
+// Soon modules: lower contrast throughout, "· soon" inline with the tag.
+function ModuleEntry({ module, isLast, onNavigate }) {
   const [hovered, setHovered] = useState(false);
   const isActive = module.status === "active";
 
@@ -64,76 +96,81 @@ function ModuleEntry({ module, onNavigate }) {
       onMouseLeave={() => setHovered(false)}
       onClick={isActive ? () => onNavigate(module.path) : undefined}
       style={{
-        padding: "20px 0",
-        borderBottom: `1px solid ${hovered ? "rgba(17,24,39,0.15)" : "rgba(17,24,39,0.09)"}`,
+        paddingTop: module.paddingTop,
+        paddingBottom: module.paddingBottom,
+        borderBottom: isLast ? "none" : "1px solid rgba(17,24,39,0.07)",
         cursor: isActive ? "pointer" : "default",
-        transition: "border-color 0.2s",
       }}
     >
-      {/* Tag + action */}
+      {/* Tag row — tag text left, hover arrow right */}
       <div style={{
         display: "flex",
         alignItems: "center",
         justifyContent: "space-between",
-        marginBottom: 5,
-        gap: 12,
+        marginBottom: 9,
       }}>
         <span style={{
-          fontSize: 10,
+          fontSize: 9.5,
           fontWeight: 700,
           textTransform: "uppercase",
           letterSpacing: "1.5px",
-          color: isActive ? "#0ABFBC" : "#8A9BA8",
+          color: module.tagColor,
+          opacity: module.tagOpacity,
           fontFamily: "'IBM Plex Mono', 'Courier New', monospace",
+          display: "flex",
+          alignItems: "center",
+          gap: 8,
         }}>
           {module.tag}
+          {/* "soon" is part of the tag line — intentional, not a badge */}
+          {!isActive && (
+            <span style={{
+              fontWeight: 400,
+              letterSpacing: "0.8px",
+              opacity: 0.65,
+            }}>
+              · soon
+            </span>
+          )}
         </span>
-        {isActive ? (
+
+        {/* Directional arrow — appears only on hover, replaces "Open →" */}
+        {isActive && (
           <span style={{
             fontSize: 12,
-            color: hovered ? "#0ABFBC" : "#6A8A9A",
+            color: hovered ? "#0ABFBC" : "transparent",
             fontFamily: "'IBM Plex Mono', monospace",
             letterSpacing: "0.04em",
-            display: "inline-block",
-            transform: hovered ? "translateX(2px)" : "translateX(0)",
-            transition: "color 0.15s, transform 0.18s",
+            transition: "color 0.18s",
             flexShrink: 0,
+            userSelect: "none",
           }}>
-            Open →
-          </span>
-        ) : (
-          <span style={{
-            fontSize: 10,
-            fontWeight: 500,
-            textTransform: "uppercase",
-            letterSpacing: "1.1px",
-            color: "#8A9BA8",
-            fontFamily: "'IBM Plex Mono', monospace",
-            flexShrink: 0,
-          }}>
-            Coming soon
+            ↗
           </span>
         )}
       </div>
 
-      {/* Title */}
+      {/* Title — size and weight differ per module */}
       <div style={{
-        fontSize: "clamp(17px, 3.2vw, 20px)",
-        fontWeight: 700,
-        color: isActive ? (hovered ? "#07111C" : "#111827") : "#9AABBA",
-        letterSpacing: "-0.025em",
-        lineHeight: 1.15,
-        marginBottom: 6,
-        transition: "color 0.15s",
+        fontSize: module.titleSize,
+        fontWeight: module.titleWeight,
+        color: isActive
+          ? (hovered ? "#07111C" : "#111827")
+          : "#9AABBA",
+        letterSpacing: module.titleTracking,
+        lineHeight: 1.1,
+        marginBottom: 9,
+        transform: hovered && isActive ? "translateX(2px)" : "translateX(0)",
+        transition: "color 0.15s, transform 0.2s",
       }}>
         {module.title}
       </div>
 
-      {/* Description */}
+      {/* Description — size and color differ per module */}
       <div style={{
-        fontSize: 13.5,
-        color: isActive ? "#526174" : "#8A9BA8",
-        lineHeight: 1.6,
+        fontSize: module.descSize,
+        color: module.descColor,
+        lineHeight: 1.62,
         maxWidth: 520,
       }}>
         {module.description}
@@ -227,10 +264,15 @@ export default function ClinicalEdgeHome({ onNavigate }) {
             </p>
           </div>
 
-          {/* Module list — editorial entries with dividers */}
+          {/* Module list — entries with individual visual weight */}
           <div style={{ borderTop: "1px solid rgba(17,24,39,0.09)" }}>
-            {MODULES.map((mod) => (
-              <ModuleEntry key={mod.key} module={mod} onNavigate={onNavigate} />
+            {MODULES.map((mod, i) => (
+              <ModuleEntry
+                key={mod.key}
+                module={mod}
+                isLast={i === MODULES.length - 1}
+                onNavigate={onNavigate}
+              />
             ))}
           </div>
 
@@ -249,8 +291,8 @@ export default function ClinicalEdgeHome({ onNavigate }) {
             </p>
             <div style={{ display: "flex", gap: 18 }}>
               {[
-                { label: "Privacy",    path: "/privacy" },
-                { label: "Support",    path: "/support" },
+                { label: "Privacy", path: "/privacy" },
+                { label: "Support", path: "/support" },
               ].map(({ label, path }) => (
                 <a
                   key={label}

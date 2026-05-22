@@ -1226,7 +1226,7 @@ export default function App({ onGoHome }) {
           paddingLeft: 3,
           lineHeight: 1.55,
         }}>
-          For educational support only. Not a substitute for clinical judgment, provider guidance, or institutional protocol.
+          Educational and clinical reasoning support only. Not a diagnostic tool. Follow local protocol, provider guidance, and institutional policy.
         </div>
 
         {/* Recent Cases */}
@@ -1800,8 +1800,8 @@ export default function App({ onGoHome }) {
               fontFamily: "'DM Sans', sans-serif",
               letterSpacing: "0.01em",
             }}
-            onMouseEnter={e => e.target.style.color = "#0A9E9B"}
-            onMouseLeave={e => e.target.style.color = "#526174"}
+            onMouseEnter={e => e.currentTarget.style.color = "#0A9E9B"}
+            onMouseLeave={e => e.currentTarget.style.color = "#526174"}
             >{label}</a>
           ))}
         </div>

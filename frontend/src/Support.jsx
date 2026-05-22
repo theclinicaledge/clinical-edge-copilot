@@ -173,7 +173,7 @@ export default function Support() {
             fontFamily: "'IBM Plex Mono', monospace",
           }}>
             <a href="/privacy" style={{ color: "#526174", textDecoration: "none" }}>Privacy Policy</a>
-            <a href="/" style={{ color: "#526174", textDecoration: "none" }}>Back to Copilot</a>
+            <a href="/" style={{ color: "#526174", textDecoration: "none" }}>← Home</a>
           </div>
 
         </div>

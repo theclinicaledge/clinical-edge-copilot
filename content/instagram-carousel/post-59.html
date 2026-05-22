@@ -1,0 +1,549 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Clinical Edge — Post 59 — Rhythm Lab: MAT vs A-Fib</title>
+  <link
+    href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=IBM+Plex+Mono:wght@400;500;700&display=swap"
+    rel="stylesheet"
+  />
+  <style>
+    :root {
+      --bg:        #E7E1D6;
+      --card-warm: #FFFDF8;
+      --card-dark: #1E2A3A;
+      --elev:      #243040;
+      --strip-bg:  #111A24;
+      --teal:      #0ABFBC;
+      --tw:        #111827;
+      --twm:       #526174;
+      --td:        #F0EDE6;
+      --tdm:       #A8C1CC;
+      --border-w:  #D7D1C7;
+    }
+
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      background: #0D1117;
+      font-family: 'Inter', -apple-system, sans-serif;
+      padding: 48px 32px;
+      display: flex; flex-direction: column; align-items: center; gap: 56px;
+    }
+
+    /* ── Slide base — warm ──────────────────────────────────── */
+    .slide {
+      width: 1080px; height: 1350px;
+      background-color: var(--bg);
+      background-image:
+        radial-gradient(ellipse 90% 85% at 50% 50%, transparent 30%, rgba(0,0,0,0.09) 100%),
+        radial-gradient(ellipse 65% 52% at 18% 18%, rgba(255,232,180,0.13) 0%, transparent 58%);
+      position: relative; overflow: hidden; flex-shrink: 0;
+    }
+    .slide::before {
+      content: ''; position: absolute; inset: 0; z-index: 0; pointer-events: none;
+      background-image: url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' width='200' height='200'><filter id='g'><feTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/></filter><rect width='200' height='200' filter='url(%23g)' opacity='0.022'/></svg>");
+      background-size: 200px 200px; background-repeat: repeat;
+    }
+
+    /* ── Slide base — dark ──────────────────────────────────── */
+    .slide.dark {
+      background-color: var(--card-dark);
+      background-image:
+        radial-gradient(ellipse 90% 80% at 50% 50%, transparent 35%, rgba(0,0,0,0.25) 100%),
+        radial-gradient(ellipse 60% 50% at 20% 20%, rgba(10,191,188,0.06) 0%, transparent 55%);
+    }
+
+    /* Slide label — browser preview only */
+    .slide-label {
+      width: 1080px; display: flex; align-items: center; gap: 14px; margin-bottom: -40px;
+    }
+    .slide-label span {
+      font-family: 'IBM Plex Mono', monospace; font-size: 11px; font-weight: 500;
+      color: #9B8E7E; letter-spacing: 2px; text-transform: uppercase;
+    }
+    .slide-label::after { content: ''; flex: 1; height: 1px; background: #C4B8A8; opacity: 0.4; }
+
+    /* ── Footer ─────────────────────────────────────────────── */
+    .slide-footer {
+      position: absolute; bottom: 0; left: 0; right: 0; height: 96px;
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 0 80px; z-index: 2;
+    }
+    .slide-footer.warm {
+      background: var(--card-warm);
+      border-top: 1px solid rgba(215,209,199,0.80);
+    }
+    .slide-footer.dk {
+      background: var(--elev);
+      border-top: 1px solid rgba(255,255,255,0.06);
+    }
+    .footer-brand { display: flex; align-items: center; gap: 14px; }
+    .footer-dot   { width: 10px; height: 10px; border-radius: 50%; background: var(--teal); }
+    .fnw { font-size: 28px; font-weight: 600; letter-spacing: -0.2px; color: var(--twm); }
+    .fnd { font-size: 28px; font-weight: 600; letter-spacing: -0.2px; color: var(--tdm); }
+    .fhw { font-family: 'IBM Plex Mono', monospace; font-size: 26px; font-weight: 500;
+           letter-spacing: 1.5px; text-transform: uppercase; color: rgba(82,97,116,0.52); }
+    .fhd { font-family: 'IBM Plex Mono', monospace; font-size: 26px; font-weight: 500;
+           letter-spacing: 1.5px; text-transform: uppercase; color: rgba(168,193,204,0.48); }
+
+    /* ── Counter dots ───────────────────────────────────────── */
+    .slide-number {
+      position: absolute; bottom: 33px; left: 50%; transform: translateX(-50%);
+      display: flex; gap: 7px; z-index: 3;
+    }
+    .slide-number .dot { width: 6px; height: 6px; border-radius: 50%; }
+    .slide:not(.dark) .slide-number .dot { background: rgba(82,97,116,0.24); }
+    .slide.dark      .slide-number .dot { background: rgba(168,193,204,0.20); }
+    .slide-number .dot.active { background: var(--teal) !important; }
+
+    /* ── Badge ──────────────────────────────────────────────── */
+    .badge {
+      display: inline-flex; align-items: center;
+      padding: 14px 30px; border-radius: 100px;
+      background: rgba(10,191,188,0.10); border: 1px solid rgba(10,191,188,0.32);
+      font-family: 'IBM Plex Mono', monospace; font-size: 24px; font-weight: 700;
+      letter-spacing: 2px; text-transform: uppercase; color: var(--teal);
+      flex-shrink: 0; white-space: nowrap;
+    }
+
+    /* ── Counter label ──────────────────────────────────────── */
+    .ctr {
+      font-family: 'IBM Plex Mono', monospace; font-size: 26px; font-weight: 500;
+      letter-spacing: 1px; flex-shrink: 0;
+    }
+    .ctr.w { color: rgba(82,97,116,0.40); }
+    .ctr.d { color: rgba(168,193,204,0.34); }
+
+    /* ── Teal bar ───────────────────────────────────────────── */
+    .tbar { height: 2px; border-radius: 2px; background: var(--teal); }
+
+    /* ── ECG strip card ─────────────────────────────────────── */
+    .ecg-card {
+      background: var(--strip-bg);
+      border-radius: 12px;
+      padding: 18px 20px;
+      box-shadow: 0 4px 28px rgba(0,0,0,0.30);
+      border: 1px solid rgba(255,255,255,0.04);
+      overflow: hidden;
+    }
+    .ecg-label {
+      font-family: 'IBM Plex Mono', monospace; font-size: 20px; font-weight: 500;
+      letter-spacing: 2px; text-transform: uppercase; color: rgba(168,193,204,0.40);
+      margin-bottom: 12px; display: block;
+    }
+
+    /* ── Comparison card ────────────────────────────────────── */
+    .cmp-card {
+      background: var(--elev);
+      border-radius: 14px;
+      padding: 34px 40px;
+      box-shadow: 0 2px 18px rgba(0,0,0,0.18);
+    }
+    .cmp-label {
+      font-family: 'IBM Plex Mono', monospace; font-size: 22px; font-weight: 700;
+      letter-spacing: 2.5px; text-transform: uppercase; display: block; margin-bottom: 14px;
+    }
+    .cmp-label.muted { color: rgba(168,193,204,0.50); }
+    .cmp-label.teal  { color: var(--teal); }
+    .cmp-text {
+      font-size: 38px; font-weight: 400; line-height: 1.45; color: var(--tdm);
+    }
+    .cmp-card.teal-border { border-left: 3px solid var(--teal); }
+    .cmp-card.muted-border { border-left: 3px solid rgba(168,193,204,0.20); }
+
+    /* ── Observation row (slide 3) ──────────────────────────── */
+    .obs-row { display: flex; align-items: flex-start; gap: 14px; }
+    .obs-dot {
+      width: 7px; height: 7px; border-radius: 50%; background: rgba(82,97,116,0.40);
+      flex-shrink: 0; margin-top: 16px;
+    }
+    .obs-dot.teal { background: var(--teal); }
+    .obs-text { font-size: 38px; font-weight: 400; line-height: 1.45; color: var(--twm); }
+
+    /* ── Layout ─────────────────────────────────────────────── */
+    .slide-content {
+      position: relative; z-index: 1;
+      padding: 60px 80px 116px;
+      height: 100%; display: flex; flex-direction: column;
+    }
+    .top-row {
+      display: flex; align-items: center; justify-content: space-between;
+      flex-shrink: 0;
+    }
+  </style>
+</head>
+<body>
+
+<!-- POST 59 — Rhythm Lab: This rhythm gets mistaken for A-Fib (MAT vs A-Fib) -->
+
+
+<!-- ═══ SLIDE 1 — HOOK + ECG PREVIEW ═════════════════════════════════════════ -->
+<div class="slide-label"><span>Slide 01 — Hook</span></div>
+<div class="slide" id="slide-1">
+  <div class="slide-content" style="justify-content:space-between;">
+
+    <div>
+      <div class="top-row">
+        <div class="badge">Rhythm Lab</div>
+        <span class="ctr w">01 / 08</span>
+      </div>
+
+      <div style="margin-top:52px; display:flex; flex-direction:column; gap:4px;">
+        <div style="font-size:76px; font-weight:900; line-height:1.0; letter-spacing:-3px; color:var(--tw);">This rhythm gets called</div>
+        <div style="font-size:76px; font-weight:900; line-height:1.0; letter-spacing:-3px; color:var(--teal);">A-Fib all the time.</div>
+      </div>
+
+      <div style="margin-top:28px; font-size:46px; font-weight:400; line-height:1.4; color:var(--twm);">But look closer.</div>
+    </div>
+
+    <div style="display:flex; flex-direction:column; gap:16px;">
+      <div class="ecg-card">
+        <span class="ecg-label">Lead II — Rhythm Strip</span>
+        <svg width="880" height="100" viewBox="0 0 880 100" xmlns="http://www.w3.org/2000/svg">
+          <defs>
+            <pattern id="s1sg" width="8" height="8" patternUnits="userSpaceOnUse">
+              <path d="M8,0 L0,0 L0,8" fill="none" stroke="#1E3040" stroke-width="0.4"/>
+            </pattern>
+            <pattern id="s1lg" width="40" height="40" patternUnits="userSpaceOnUse">
+              <rect width="40" height="40" fill="url(#s1sg)"/>
+              <path d="M40,0 L0,0 L0,40" fill="none" stroke="#223545" stroke-width="0.8"/>
+            </pattern>
+          </defs>
+          <rect width="880" height="100" fill="url(#s1lg)"/>
+          <!-- MAT-like waveform: irregular R-R, varying P-wave morphologies -->
+          <!-- Baseline y=58. R-peak y=10. Q/S y=64. T-peak y=48. -->
+          <!-- Beat 1 R@90: P-wave morph A (moderate upright) -->
+          <!-- Beat 2 R@275: P-wave morph B (tall peaked) -->
+          <!-- Beat 3 R@510: P-wave morph C (notched/wide) -->
+          <!-- Beat 4 R@710: P-wave morph D (low, wide) -->
+          <path d="
+            M 10,58 L 46,58
+            C 48,58 51,52 56,48 C 60,45 64,49 69,58
+            L 82,58 L 82,64 L 90,10 L 97,66 L 101,58
+            L 113,58 C 115,58 121,51 128,47 C 134,51 138,55 142,58
+            L 240,58
+            C 242,58 245,50 250,45 C 255,50 260,56 264,58
+            L 274,58 L 274,64 L 280,10 L 286,66 L 291,58
+            L 302,58 C 304,58 310,51 317,47 C 323,51 327,55 331,58
+            L 460,58
+            C 462,58 464,52 468,50 C 471,48 474,50 477,53
+            C 479,55 481,53 484,51 C 487,49 490,52 493,58
+            L 505,58 L 505,64 L 513,10 L 519,66 L 523,58
+            L 533,58 C 535,58 541,51 548,47 C 554,51 558,55 562,58
+            L 658,58
+            C 660,58 663,55 667,53 C 670,51 674,54 678,58
+            L 698,58 L 698,64 L 705,10 L 712,66 L 716,58
+            L 726,58 C 728,58 734,51 741,47 C 747,51 751,55 755,58
+            L 880,58
+          " fill="none" stroke="#0ABFBC" stroke-width="2.2"
+             stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+      </div>
+
+      <div style="display:flex; align-items:center; gap:16px;">
+        <span style="font-family:'IBM Plex Mono',monospace; font-size:23px; font-weight:500; letter-spacing:2px; color:rgba(82,97,116,0.38); text-transform:uppercase;">Swipe to analyze</span>
+        <div style="display:flex; gap:8px; align-items:center;">
+          <div style="width:28px; height:1px; background:rgba(82,97,116,0.20);"></div>
+          <div style="width:8px; height:8px; border-radius:50%; background:var(--teal);"></div>
+          <div style="width:10px; height:1px; background:rgba(82,97,116,0.20);"></div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+  <div class="slide-footer warm">
+    <div class="footer-brand"><div class="footer-dot"></div><span class="fnw">Clinical Edge Copilot</span></div>
+    <span class="fhw">@clinicaledgeco</span>
+  </div>
+  <div class="slide-number">
+    <div class="dot active"></div><div class="dot"></div><div class="dot"></div><div class="dot"></div>
+    <div class="dot"></div><div class="dot"></div><div class="dot"></div><div class="dot"></div>
+  </div>
+</div>
+
+
+<!-- ═══ SLIDE 2 — BEFORE YOU GUESS ═══════════════════════════════════════════ -->
+<div class="slide-label"><span>Slide 02 — Before You Guess</span></div>
+<div class="slide" id="slide-2">
+  <div class="slide-content" style="justify-content:space-between;">
+
+    <div class="top-row">
+      <div class="badge">Before You Guess</div>
+      <span class="ctr w">02 / 08</span>
+    </div>
+
+    <div style="flex:1; display:flex; flex-direction:column; justify-content:center; gap:6px; padding:28px 0;">
+      <div style="font-size:92px; font-weight:900; line-height:1.0; letter-spacing:-3.5px; color:var(--tw);">Don't start</div>
+      <div style="font-size:92px; font-weight:900; line-height:1.0; letter-spacing:-3.5px; color:var(--tw);">with the rate.</div>
+      <div class="tbar" style="width:64px; margin-top:36px; margin-bottom:32px;"></div>
+      <div style="font-size:48px; font-weight:400; line-height:1.45; color:var(--twm);">Start with the</div>
+      <div style="font-size:48px; font-weight:600; line-height:1.45; color:var(--teal);">atrial activity.</div>
+    </div>
+
+  </div>
+  <div class="slide-footer warm">
+    <div class="footer-brand"><div class="footer-dot"></div><span class="fnw">Clinical Edge Copilot</span></div>
+    <span class="fhw">@clinicaledgeco</span>
+  </div>
+  <div class="slide-number">
+    <div class="dot"></div><div class="dot active"></div><div class="dot"></div><div class="dot"></div>
+    <div class="dot"></div><div class="dot"></div><div class="dot"></div><div class="dot"></div>
+  </div>
+</div>
+
+
+<!-- ═══ SLIDE 3 — RHYTHM STRIP + OBSERVATIONS ════════════════════════════════ -->
+<div class="slide-label"><span>Slide 03 — Rhythm Strip</span></div>
+<div class="slide" id="slide-3">
+  <div class="slide-content" style="justify-content:flex-start; gap:0;">
+
+    <div class="top-row">
+      <div class="badge">Rhythm Strip</div>
+      <span class="ctr w">03 / 08</span>
+    </div>
+
+    <div style="margin-top:40px;">
+      <div style="font-size:72px; font-weight:900; line-height:1.0; letter-spacing:-2.5px; color:var(--tw);">What do you</div>
+      <div style="font-size:72px; font-weight:900; line-height:1.0; letter-spacing:-2.5px; color:var(--tw);">notice first?</div>
+    </div>
+
+    <div style="margin-top:36px;" class="ecg-card">
+      <span class="ecg-label">Lead II — Irregular Narrow-Complex Rhythm</span>
+      <svg width="880" height="140" viewBox="0 0 880 140" xmlns="http://www.w3.org/2000/svg">
+        <defs>
+          <pattern id="s3sg" width="8" height="8" patternUnits="userSpaceOnUse">
+            <path d="M8,0 L0,0 L0,8" fill="none" stroke="#1E3040" stroke-width="0.4"/>
+          </pattern>
+          <pattern id="s3lg" width="40" height="40" patternUnits="userSpaceOnUse">
+            <rect width="40" height="40" fill="url(#s3sg)"/>
+            <path d="M40,0 L0,0 L0,40" fill="none" stroke="#223545" stroke-width="0.8"/>
+          </pattern>
+        </defs>
+        <rect width="880" height="140" fill="url(#s3lg)"/>
+        <!-- Baseline y=82. R-peak y=14. Q/S y=90. T-peak y=70. -->
+        <!-- Beat 1 R@100: P-wave morph A (upright, rounded, moderate 12px) -->
+        <!-- Beat 2 R@295: P-wave morph B (tall peaked, 18px above baseline) -->
+        <!-- Beat 3 R@545: P-wave morph C (notched/wide) -->
+        <!-- Beat 4 R@755: P-wave morph D (low voltage, subtle) -->
+        <path d="
+          M 10,82 L 47,82
+          C 49,82 53,74 58,69 C 62,65 67,69 72,82
+          L 91,82 L 91,90 L 100,14 L 108,92 L 113,82
+          L 128,82 C 130,82 137,74 145,70 C 151,74 155,79 159,82
+          L 253,82
+          C 255,82 259,70 264,64 C 269,70 275,79 279,82
+          L 292,82 L 292,90 L 300,14 L 308,92 L 313,82
+          L 326,82 C 328,82 336,74 344,70 C 350,74 354,79 358,82
+          L 490,82
+          C 492,82 494,75 498,72 C 501,70 504,72 507,75
+          C 510,77 513,75 516,72 C 519,69 522,72 526,82
+          L 540,82 L 540,90 L 548,14 L 556,92 L 560,82
+          L 572,82 C 574,82 581,74 589,70 C 595,74 599,79 603,82
+          L 710,82
+          C 712,82 715,78 719,76 C 722,74 726,77 731,82
+          L 747,82 L 747,90 L 755,14 L 763,92 L 768,82
+          L 780,82 C 782,82 789,74 797,70 C 803,74 807,79 811,82
+          L 880,82
+        " fill="none" stroke="#0ABFBC" stroke-width="2.5"
+           stroke-linecap="round" stroke-linejoin="round"/>
+      </svg>
+    </div>
+
+    <div style="margin-top:32px; display:flex; flex-direction:column; gap:18px;">
+      <div class="obs-row">
+        <div class="obs-dot"></div>
+        <span class="obs-text">Irregular rhythm. R-R intervals vary.</span>
+      </div>
+      <div class="obs-row">
+        <div class="obs-dot"></div>
+        <span class="obs-text">Narrow QRS. This isn't ventricular.</span>
+      </div>
+      <div class="obs-row">
+        <div class="obs-dot teal"></div>
+        <span class="obs-text" style="color:var(--tw);">The baseline isn't just chaotic.</span>
+      </div>
+    </div>
+
+  </div>
+  <div class="slide-footer warm">
+    <div class="footer-brand"><div class="footer-dot"></div><span class="fnw">Clinical Edge Copilot</span></div>
+    <span class="fhw">@clinicaledgeco</span>
+  </div>
+  <div class="slide-number">
+    <div class="dot"></div><div class="dot"></div><div class="dot active"></div><div class="dot"></div>
+    <div class="dot"></div><div class="dot"></div><div class="dot"></div><div class="dot"></div>
+  </div>
+</div>
+
+
+<!-- ═══ SLIDE 4 — THE CLUE ════════════════════════════════════════════════════ -->
+<div class="slide-label"><span>Slide 04 — The Clue</span></div>
+<div class="slide" id="slide-4">
+  <div class="slide-content" style="justify-content:space-between;">
+
+    <div class="top-row">
+      <div class="badge">The Clue</div>
+      <span class="ctr w">04 / 08</span>
+    </div>
+
+    <div style="flex:1; display:flex; flex-direction:column; justify-content:center; gap:24px; padding:20px 0;">
+
+      <div class="cmp-card muted-border">
+        <span class="cmp-label muted">A-Fib</span>
+        <div style="font-size:44px; font-weight:700; line-height:1.25; color:var(--td); margin-bottom:12px;">No consistent P waves.</div>
+        <div class="cmp-text">Disorganized atrial activity. The baseline is fibrillating — no true P-wave morphology to identify.</div>
+      </div>
+
+      <div class="cmp-card teal-border">
+        <span class="cmp-label teal">MAT</span>
+        <div style="font-size:44px; font-weight:700; line-height:1.25; color:var(--td); margin-bottom:12px;">Multiple different P-wave shapes.</div>
+        <div class="cmp-text">At least 3 distinct P-wave morphologies before each QRS. That's the defining feature.</div>
+      </div>
+
+    </div>
+
+  </div>
+  <div class="slide-footer warm">
+    <div class="footer-brand"><div class="footer-dot"></div><span class="fnw">Clinical Edge Copilot</span></div>
+    <span class="fhw">@clinicaledgeco</span>
+  </div>
+  <div class="slide-number">
+    <div class="dot"></div><div class="dot"></div><div class="dot"></div><div class="dot active"></div>
+    <div class="dot"></div><div class="dot"></div><div class="dot"></div><div class="dot"></div>
+  </div>
+</div>
+
+
+<!-- ═══ SLIDE 5 — WHY NURSES MISS IT ══════════════════════════════════════════ -->
+<div class="slide-label"><span>Slide 05 — Why Nurses Miss It</span></div>
+<div class="slide" id="slide-5">
+  <div class="slide-content" style="justify-content:space-between;">
+
+    <div class="top-row">
+      <div class="badge">Why Nurses Miss It</div>
+      <span class="ctr w">05 / 08</span>
+    </div>
+
+    <div style="flex:1; display:flex; flex-direction:column; justify-content:center; gap:6px; padding:28px 0;">
+      <div style="font-size:96px; font-weight:900; line-height:1.0; letter-spacing:-3.5px; color:var(--tw);">Both can look</div>
+      <div style="font-size:96px; font-weight:900; line-height:1.0; letter-spacing:-3.5px; color:var(--tw);">irregular.</div>
+      <div style="font-size:64px; font-weight:400; line-height:1.2; color:var(--twm); margin-top:20px;">That's the trap.</div>
+      <div class="tbar" style="width:60px; margin-top:36px; margin-bottom:28px;"></div>
+      <div style="font-size:36px; font-weight:400; line-height:1.5; color:rgba(82,97,116,0.60);">Irregular does not automatically mean A-Fib.</div>
+    </div>
+
+  </div>
+  <div class="slide-footer warm">
+    <div class="footer-brand"><div class="footer-dot"></div><span class="fnw">Clinical Edge Copilot</span></div>
+    <span class="fhw">@clinicaledgeco</span>
+  </div>
+  <div class="slide-number">
+    <div class="dot"></div><div class="dot"></div><div class="dot"></div><div class="dot"></div>
+    <div class="dot active"></div><div class="dot"></div><div class="dot"></div><div class="dot"></div>
+  </div>
+</div>
+
+
+<!-- ═══ SLIDE 6 — REVEAL (dark) ══════════════════════════════════════════════ -->
+<div class="slide-label"><span>Slide 06 — Reveal</span></div>
+<div class="slide dark" id="slide-6">
+  <div class="slide-content" style="justify-content:space-between;">
+
+    <div class="top-row">
+      <div class="badge">Reveal</div>
+      <span class="ctr d">06 / 08</span>
+    </div>
+
+    <div style="flex:1; display:flex; flex-direction:column; justify-content:center; gap:6px; padding:28px 0;">
+      <div style="font-size:88px; font-weight:900; line-height:1.0; letter-spacing:-3.5px; color:var(--td);">This points more</div>
+      <div style="font-size:88px; font-weight:900; line-height:1.0; letter-spacing:-3.5px; color:var(--teal);">toward MAT.</div>
+      <div class="tbar" style="width:64px; margin-top:36px; margin-bottom:28px;"></div>
+      <div style="font-size:42px; font-weight:400; line-height:1.55; color:var(--tdm);">Irregular rhythm with at least 3 different P-wave morphologies — each one visible before a narrow QRS.</div>
+    </div>
+
+  </div>
+  <div class="slide-footer dk">
+    <div class="footer-brand"><div class="footer-dot"></div><span class="fnd">Clinical Edge Copilot</span></div>
+    <span class="fhd">@clinicaledgeco</span>
+  </div>
+  <div class="slide-number">
+    <div class="dot"></div><div class="dot"></div><div class="dot"></div><div class="dot"></div>
+    <div class="dot"></div><div class="dot active"></div><div class="dot"></div><div class="dot"></div>
+  </div>
+</div>
+
+
+<!-- ═══ SLIDE 7 — CLINICAL EDGE ══════════════════════════════════════════════ -->
+<div class="slide-label"><span>Slide 07 — Clinical Edge</span></div>
+<div class="slide" id="slide-7">
+  <div class="slide-content" style="justify-content:space-between;">
+
+    <div class="top-row">
+      <div class="badge">Clinical Edge</div>
+      <span class="ctr w">07 / 08</span>
+    </div>
+
+    <div style="flex:1; display:flex; flex-direction:column; justify-content:center; gap:6px; padding:28px 0;">
+      <div style="font-size:88px; font-weight:900; line-height:1.0; letter-spacing:-3.5px; color:var(--tw);">The first clue</div>
+      <div style="font-size:88px; font-weight:900; line-height:1.0; letter-spacing:-3.5px; color:var(--tw);">wasn't the rate.</div>
+      <div class="tbar" style="width:64px; margin-top:36px; margin-bottom:28px;"></div>
+      <div style="font-size:56px; font-weight:600; line-height:1.25; letter-spacing:-1px; color:var(--teal);">It was the P waves.</div>
+    </div>
+
+  </div>
+  <div class="slide-footer warm">
+    <div class="footer-brand"><div class="footer-dot"></div><span class="fnw">Clinical Edge Copilot</span></div>
+    <span class="fhw">@clinicaledgeco</span>
+  </div>
+  <div class="slide-number">
+    <div class="dot"></div><div class="dot"></div><div class="dot"></div><div class="dot"></div>
+    <div class="dot"></div><div class="dot"></div><div class="dot active"></div><div class="dot"></div>
+  </div>
+</div>
+
+
+<!-- ═══ SLIDE 8 — CTA ════════════════════════════════════════════════════════ -->
+<div class="slide-label"><span>Slide 08 — CTA</span></div>
+<div class="slide" id="slide-8">
+  <div class="slide-content" style="justify-content:space-between;">
+
+    <div class="top-row">
+      <div class="badge">Rhythm Lab</div>
+      <span class="ctr w">08 / 08</span>
+    </div>
+
+    <div style="flex:1; display:flex; flex-direction:column; justify-content:center; gap:6px; padding:28px 0;">
+      <div style="font-size:72px; font-weight:900; line-height:1.0; letter-spacing:-2.5px; color:var(--tw);">Practice rhythm</div>
+      <div style="font-size:72px; font-weight:900; line-height:1.0; letter-spacing:-2.5px; color:var(--tw);">recognition inside</div>
+      <div style="font-size:72px; font-weight:900; line-height:1.0; letter-spacing:-2.5px; color:var(--teal);">Clinical Edge.</div>
+
+      <div class="tbar" style="width:64px; margin-top:32px; margin-bottom:28px;"></div>
+
+      <div style="font-size:42px; font-weight:400; line-height:1.5; color:var(--twm);">Rhythm Lab is now part of Clinical Edge.</div>
+
+      <div style="margin-top:28px; display:inline-flex; align-items:center; padding:26px 52px;
+                  border-radius:14px; border:1px solid rgba(10,191,188,0.28);
+                  background:rgba(10,191,188,0.08); width:fit-content;">
+        <span style="font-size:36px; font-weight:600; letter-spacing:-0.3px; color:var(--teal);">Explore Clinical Edge →</span>
+      </div>
+
+      <div style="margin-top:28px; font-family:'IBM Plex Mono',monospace; font-size:28px;
+                  font-weight:500; letter-spacing:1px; color:rgba(82,97,116,0.46);">theclinicaledge.org</div>
+    </div>
+
+  </div>
+  <div class="slide-footer warm">
+    <div class="footer-brand"><div class="footer-dot"></div><span class="fnw">Clinical Edge Copilot</span></div>
+    <span class="fhw">@clinicaledgeco</span>
+  </div>
+  <div class="slide-number">
+    <div class="dot"></div><div class="dot"></div><div class="dot"></div><div class="dot"></div>
+    <div class="dot"></div><div class="dot"></div><div class="dot"></div><div class="dot active"></div>
+  </div>
+</div>
+
+
+</body>
+</html>

@@ -488,12 +488,62 @@ function SavedCaseRow({ sc, onReopen, onDelete, onCopy, onSaveNote }) {
   );
 }
 
+// ─── Screenshot mode (capture only, never affects normal users) ───────────────
+//
+// When the URL contains ?screenshot=response, the component mounts with a
+// pre-baked clinical scenario and response already in state. This lets the
+// Puppeteer capture script grab a real rendered response without hitting the API.
+// All screenshot params are stripped from production URLs at deploy time.
+//
+const _ssParam = (() => {
+  try { return new URLSearchParams(window.location.search).get('screenshot'); } catch { return null; }
+})();
+
+const _SS_QUESTION =
+  "BP dropped to 88/50, HR 122, was stable an hour ago — help me think through this before I call.";
+
+const _SS_RESPONSE = `Urgency Level: HIGH
+
+⚠️ Acute hemodynamic compromise. BP 88/50 with compensatory tachycardia is beyond watchful waiting — call now, assess quickly.
+
+**What this could be**
+- Hypovolemic shock — bleeding, GI losses, third-spacing, or inadequate fluid replacement after a procedure
+- Septic shock — distributive physiology is possible even without obvious fever, especially in elderly or immunocompromised patients
+- Cardiogenic shock — new MI, acute decompensated heart failure, or an arrhythmia significantly reducing forward flow
+- Neurogenic or other distributive causes — less likely without supporting context but keep on the differential
+
+**Possible concerns**
+- Tachycardia + hypotension + pallor + cool skin is a recognized sympathetic compensation pattern — the body is working hard
+- Lethargy on top of hemodynamic change raises concern for reduced cerebral perfusion
+- “Was stable an hour ago” makes this an acute deterioration, not a slow drift — the timeline is clinically important
+
+**What to assess next**
+- Skin color, temperature, and capillary refill — compare peripheral to central perfusion
+- Level of consciousness — oriented to person, place, time? Following commands? Any new confusion?
+- Respiratory rate and effort — compensatory tachypnea is common when perfusion drops
+- IV access patency and what is currently running
+- Urine output for the last 1–2 hours if available
+- Last set of vitals and whether this is a downward trend
+
+**What to consider next**
+- Notify the provider now — this is a call, not a chart note to leave for rounds
+- Have rapid response criteria available when you call
+- Ensure IV access is patent; be ready to open fluids pending orders
+- Build your SBAR: vitals trend, current meds and drips, relevant recent labs, what changed
+
+**Closing**
+This is a call-now situation. The numbers and the clinical picture are telling the same story — trust what you're seeing at the bedside.`;
+
 // ─── Main App ──────────────────────────────────────────────────────────────────
 
 export default function App({ onGoHome }) {
-  const [question, setQuestion]         = useState("");
-  const [result, setResult]             = useState(null);
-  const [rawText, setRawText]           = useState("");
+  const [question, setQuestion]         = useState(() => _ssParam === 'response' ? _SS_QUESTION : "");
+  const [result, setResult]             = useState(() => {
+    if (_ssParam !== 'response') return null;
+    const parsed = parseResponse(_SS_RESPONSE);
+    return { ...parsed, urgencyLevel: extractUrgencyLevel(_SS_RESPONSE) };
+  });
+  const [rawText, setRawText]           = useState(() => _ssParam === 'response' ? _SS_RESPONSE : "");
   const [streamBuffer, setStreamBuffer] = useState("");
   const [streaming, setStreaming]       = useState(false);
   const [loading, setLoading]           = useState(false);
@@ -529,8 +579,16 @@ export default function App({ onGoHome }) {
     el.style.height = Math.min(el.scrollHeight, 200) + "px";
   }, [question]);
 
+  // Screenshot mode: scroll response into view immediately on mount
+  useEffect(() => {
+    if (_ssParam === 'response' && outputRef.current) {
+      outputRef.current.scrollIntoView({ behavior: 'instant', block: 'start' });
+    }
+  }, []); // eslint-disable-line react-hooks/exhaustive-deps
+
   // Load QuickStart prefill on mount; fall back to sessionStorage draft
   useEffect(() => {
+    if (_ssParam === 'response') return; // screenshot mode — skip prefill logic
     try {
       const prefill = localStorage.getItem("copilot_prefill");
       if (prefill) {

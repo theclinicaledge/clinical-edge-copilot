@@ -34,7 +34,17 @@ function CELogo() {
 }
 
 export default function RhythmLabModule({ onGoHome }: RhythmLabModuleProps) {
-  const [view, setView]         = useState<View>('home');
+  // Screenshot capture: ?screenshot=compare or ?screenshot=practice
+  // starts the module in that view without affecting normal navigation.
+  const [view, setView] = useState<View>(() => {
+    try {
+      const sp = new URLSearchParams(window.location.search);
+      const s  = sp.get('screenshot');
+      if (s === 'compare')  return 'compare';
+      if (s === 'practice') return 'practice';
+    } catch {}
+    return 'home';
+  });
   const [selected, setSelected] = useState<Rhythm | null>(null);
 
   useEffect(() => {

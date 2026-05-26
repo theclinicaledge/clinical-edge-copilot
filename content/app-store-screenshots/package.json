@@ -1,0 +1,12 @@
+{
+  "name": "ce-app-store-screenshots",
+  "version": "1.0.0",
+  "description": "Puppeteer capture script for Clinical Edge App Store screenshots",
+  "private": true,
+  "scripts": {
+    "capture": "node capture.js"
+  },
+  "dependencies": {
+    "puppeteer": "^22.0.0"
+  }
+}

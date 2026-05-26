@@ -1,0 +1,291 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=430">
+<title>Clinical Edge — Copilot</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:ital,wght@0,400;0,500;0,600;0,700;1,400&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  :root {
+    --bg-base:     #111827;
+    --bg-surface:  #1E2A3A;
+    --bg-elevated: #243040;
+    --text-primary:   #F0EDE6;
+    --text-secondary: #94A3B8;
+    --accent-teal:    #0ABFBC;
+    --border:         #2D3B4E;
+    --font-sans: 'IBM Plex Sans', system-ui, sans-serif;
+    --font-mono: 'IBM Plex Mono', monospace;
+  }
+  html, body {
+    width: 430px;
+    height: 932px;
+    overflow: hidden;
+    background: var(--bg-base);
+    color: var(--text-primary);
+    font-family: var(--font-sans);
+    -webkit-font-smoothing: antialiased;
+  }
+
+  /* Status bar */
+  .status-bar {
+    height: 50px;
+    background: var(--bg-base);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 14px 20px 0;
+    flex-shrink: 0;
+  }
+  .status-time { font-family: var(--font-mono); font-size: 13px; font-weight: 600; color: var(--text-primary); }
+  .status-icons { display: flex; align-items: center; gap: 5px; }
+
+  /* App header */
+  .app-header {
+    height: 52px;
+    background: var(--bg-base);
+    border-bottom: 1px solid var(--border);
+    display: flex;
+    align-items: center;
+    padding: 0 20px;
+    gap: 10px;
+    flex-shrink: 0;
+  }
+  .header-brand { font-family: var(--font-mono); font-size: 12px; font-weight: 600; letter-spacing: 0.12em; text-transform: uppercase; color: var(--text-primary); }
+  .header-module { font-family: var(--font-mono); font-size: 12px; letter-spacing: 0.08em; text-transform: uppercase; color: var(--accent-teal); margin-left: auto; }
+
+  /* Safety strip */
+  .safety-strip {
+    background: rgba(212,168,75,0.06);
+    border-bottom: 1px solid rgba(212,168,75,0.15);
+    padding: 7px 16px;
+    display: flex;
+    align-items: flex-start;
+    gap: 6px;
+    flex-shrink: 0;
+  }
+  .safety-strip-text { font-size: 11px; color: rgba(240,237,230,0.5); line-height: 1.5; }
+
+  /* Mode tabs */
+  .mode-tabs {
+    display: flex;
+    padding: 10px 16px 0;
+    gap: 8px;
+    flex-shrink: 0;
+  }
+  .mode-tab {
+    font-family: var(--font-mono);
+    font-size: 10.5px;
+    font-weight: 600;
+    letter-spacing: 0.06em;
+    padding: 5px 12px;
+    border-radius: 6px;
+    border: 1px solid transparent;
+  }
+  .mode-tab.active {
+    background: rgba(10,191,188,0.12);
+    border-color: rgba(10,191,188,0.30);
+    color: var(--accent-teal);
+  }
+  .mode-tab.inactive {
+    color: var(--text-secondary);
+    border-color: var(--border);
+  }
+
+  /* Scroll container */
+  .scroll {
+    flex: 1;
+    overflow: hidden;
+    padding: 12px 16px 16px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
+
+  /* Scenario echo */
+  .scenario-card {
+    background: var(--bg-surface);
+    border: 1px solid var(--border);
+    border-left: 3px solid var(--accent-teal);
+    border-radius: 8px;
+    padding: 11px 14px;
+  }
+  .scenario-label { font-family: var(--font-mono); font-size: 9px; font-weight: 600; letter-spacing: 0.12em; text-transform: uppercase; color: var(--accent-teal); margin-bottom: 5px; }
+  .scenario-text { font-size: 12.5px; color: rgba(240,237,230,0.75); line-height: 1.55; font-style: italic; }
+
+  /* Urgency badge */
+  .urgency-row {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+  .urgency-label-tag { font-family: var(--font-mono); font-size: 9px; font-weight: 600; letter-spacing: 0.12em; text-transform: uppercase; color: var(--text-secondary); }
+  .urgency-badge {
+    display: flex;
+    align-items: center;
+    gap: 7px;
+    padding: 5px 12px;
+    border-radius: 6px;
+    font-family: var(--font-mono);
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+  }
+  .urgency-badge.high { background: rgba(220,38,38,0.12); border: 1px solid rgba(220,38,38,0.30); color: #EF4444; }
+  .urgency-dot { width: 7px; height: 7px; border-radius: 50%; background: #EF4444; box-shadow: 0 0 5px #EF4444; }
+
+  /* Warning box */
+  .warning-box {
+    background: rgba(220,38,38,0.06);
+    border: 1px solid rgba(220,38,38,0.20);
+    border-radius: 8px;
+    padding: 9px 12px;
+    display: flex;
+    gap: 8px;
+    align-items: flex-start;
+  }
+  .warning-icon { font-size: 13px; flex-shrink: 0; margin-top: 1px; }
+  .warning-text { font-size: 12px; color: rgba(239,68,68,0.90); line-height: 1.5; font-weight: 500; }
+
+  /* Section card */
+  .section-card {
+    background: var(--bg-surface);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    overflow: hidden;
+  }
+  .section-header {
+    padding: 9px 14px 7px;
+    border-bottom: 1px solid var(--border);
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .section-dot { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; }
+  .section-label { font-family: var(--font-mono); font-size: 9.5px; font-weight: 600; letter-spacing: 0.12em; text-transform: uppercase; }
+  .section-body { padding: 10px 14px 12px; }
+  .section-text { font-size: 13px; line-height: 1.6; color: rgba(240,237,230,0.88); }
+
+  /* Bullet items */
+  .bullet-item { display: flex; gap: 8px; align-items: flex-start; margin-bottom: 6px; }
+  .bullet-item:last-child { margin-bottom: 0; }
+  .bullet-dot { width: 5px; height: 5px; border-radius: 50%; margin-top: 7px; flex-shrink: 0; }
+  .bullet-text { font-size: 12.5px; line-height: 1.55; color: rgba(240,237,230,0.85); }
+
+  /* Colors */
+  .blue  { color: #3B82F6; } .dot-blue  { background: #3B82F6; }
+  .red   { color: #EF4444; } .dot-red   { background: #EF4444; }
+  .green { color: #10B981; } .dot-green { background: #10B981; }
+  .amber { color: #F59E0B; } .dot-amber { background: #F59E0B; }
+  .teal  { color: #0ABFBC; } .dot-teal  { background: #0ABFBC; }
+
+  .section-card.blue  { border-top: 2px solid #3B82F6; }
+  .section-card.red   { border-top: 2px solid #EF4444; }
+  .section-card.green { border-top: 2px solid #10B981; }
+  .section-card.amber { border-top: 2px solid #F59E0B; }
+</style>
+</head>
+<body style="display:flex;flex-direction:column">
+
+<!-- Status bar -->
+<div class="status-bar">
+  <span class="status-time">9:41</span>
+  <div class="status-icons">
+    <svg width="17" height="12" viewBox="0 0 17 12" fill="none"><rect x="0" y="8" width="3" height="4" rx="0.8" fill="#F0EDE6" opacity="0.9"/><rect x="4.5" y="5.5" width="3" height="6.5" rx="0.8" fill="#F0EDE6" opacity="0.9"/><rect x="9" y="3" width="3" height="9" rx="0.8" fill="#F0EDE6" opacity="0.9"/><rect x="13.5" y="0" width="3" height="12" rx="0.8" fill="#F0EDE6" opacity="0.9"/></svg>
+    <svg width="16" height="12" viewBox="0 0 16 12" fill="none"><path d="M8 9.5a1.5 1.5 0 1 1 0 3 1.5 1.5 0 0 1 0-3z" fill="#F0EDE6" opacity="0.9"/><path d="M3.5 6.5A6.5 6.5 0 0 1 8 4.8a6.5 6.5 0 0 1 4.5 1.7" stroke="#F0EDE6" stroke-width="1.5" stroke-linecap="round" opacity="0.9"/><path d="M1 3.8A10.2 10.2 0 0 1 8 1a10.2 10.2 0 0 1 7 2.8" stroke="#F0EDE6" stroke-width="1.5" stroke-linecap="round" opacity="0.9"/></svg>
+    <svg width="25" height="12" viewBox="0 0 25 12" fill="none"><rect x="0.5" y="0.5" width="21" height="11" rx="3" stroke="#F0EDE6" stroke-opacity="0.5" stroke-width="1"/><rect x="2" y="2" width="16" height="8" rx="2" fill="#F0EDE6" opacity="0.9"/><path d="M22.5 4v4a2 2 0 0 0 0-4z" fill="#F0EDE6" opacity="0.5"/></svg>
+  </div>
+</div>
+
+<!-- App header -->
+<div class="app-header">
+  <svg width="22" height="20" viewBox="0 0 225 200" xmlns="http://www.w3.org/2000/svg" fill="#0ABFBC">
+    <path d="M 159.1,24.3 A 96,96 0 1,0 159.1,175.7 L 135.7,145.7 A 58,58 0 1,1 135.7,54.3 Z"/>
+    <path d="M 144.0,57 L 208,45 L 218,58 L 208,70 L 150.0,71 Z"/>
+    <path d="M 158.0,92 L 215,82 L 225,95 L 215,107 L 158.0,108 Z"/>
+    <path d="M 150.0,129 L 208,130 L 218,142 L 208,155 L 144.0,143 Z"/>
+  </svg>
+  <span class="header-brand">Clinical Edge</span>
+  <span class="header-module">Copilot</span>
+</div>
+
+<!-- Safety strip -->
+<div class="safety-strip">
+  <span style="color:rgba(212,168,75,0.6);font-size:11px;flex-shrink:0">ⓘ</span>
+  <span class="safety-strip-text">For clinical support only — not a substitute for your judgment or facility protocol</span>
+</div>
+
+<!-- Mode tabs -->
+<div class="mode-tabs">
+  <div class="mode-tab active">Clinical Reasoning ✓</div>
+  <div class="mode-tab inactive">Quick Guidance</div>
+</div>
+
+<!-- Scroll content -->
+<div class="scroll">
+
+  <!-- Scenario echo -->
+  <div class="scenario-card">
+    <div class="scenario-label">Your scenario</div>
+    <div class="scenario-text">"Patient BP dropped to 82/50, HR 118, was stable an hour ago. Looks pale, lethargic, feels cool to touch."</div>
+  </div>
+
+  <!-- Urgency -->
+  <div class="urgency-row">
+    <span class="urgency-label-tag">Urgency Level</span>
+    <div class="urgency-badge high"><div class="urgency-dot"></div> HIGH</div>
+  </div>
+
+  <!-- Warning -->
+  <div class="warning-box">
+    <span class="warning-icon">⚠️</span>
+    <span class="warning-text">Acute hemodynamic deterioration — rapid assessment and escalation warranted immediately.</span>
+  </div>
+
+  <!-- Most Likely Issue -->
+  <div class="section-card blue">
+    <div class="section-header">
+      <div class="section-dot dot-blue"></div>
+      <span class="section-label blue">Most Likely Issue</span>
+    </div>
+    <div class="section-body">
+      <div class="section-text">Acute hemodynamic instability — clinical picture is consistent with early circulatory compromise. BP drop + tachycardia + pallor + cool skin is a recognized deterioration pattern.</div>
+    </div>
+  </div>
+
+  <!-- What this could be -->
+  <div class="section-card blue">
+    <div class="section-header">
+      <div class="section-dot dot-blue"></div>
+      <span class="section-label blue">What This Could Be</span>
+    </div>
+    <div class="section-body">
+      <div class="bullet-item"><div class="bullet-dot dot-blue"></div><div class="bullet-text">Hypovolemic shock — bleeding, third-spacing, GI losses</div></div>
+      <div class="bullet-item"><div class="bullet-dot dot-blue"></div><div class="bullet-text">Septic shock — especially if febrile or source present</div></div>
+      <div class="bullet-item"><div class="bullet-dot dot-blue"></div><div class="bullet-text">Cardiogenic shock — new MI, acute LV failure</div></div>
+      <div class="bullet-item"><div class="bullet-dot dot-blue"></div><div class="bullet-text">Neurogenic or distributive — less likely without context</div></div>
+    </div>
+  </div>
+
+  <!-- Urgency Summary -->
+  <div class="section-card amber">
+    <div class="section-header">
+      <div class="section-dot dot-amber"></div>
+      <span class="section-label amber">Urgency Summary</span>
+    </div>
+    <div class="section-body">
+      <div class="section-text">Hemodynamic compromise demands immediate action. This patient needs provider notification now, IV access, fluid assessment, and escalation if trend continues.</div>
+    </div>
+  </div>
+
+</div>
+
+<script>
+  document.fonts.ready.then(() => { window.ready = true; });
+</script>
+</body>
+</html>

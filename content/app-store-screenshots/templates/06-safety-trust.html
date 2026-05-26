@@ -1,0 +1,214 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=430">
+<title>Clinical Edge — Safety &amp; Trust</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:ital,wght@0,400;0,500;0,600;0,700;1,400&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  :root {
+    --bg-base:     #111827;
+    --bg-surface:  #1E2A3A;
+    --bg-elevated: #243040;
+    --text-primary:   #F0EDE6;
+    --text-secondary: #94A3B8;
+    --accent-teal:    #0ABFBC;
+    --accent-gold:    #D4A84B;
+    --border:         #2D3B4E;
+    --font-sans: 'IBM Plex Sans', system-ui, sans-serif;
+    --font-mono: 'IBM Plex Mono', monospace;
+  }
+  html, body {
+    width: 430px;
+    height: 932px;
+    overflow: hidden;
+    background: var(--bg-base);
+    color: var(--text-primary);
+    font-family: var(--font-sans);
+    -webkit-font-smoothing: antialiased;
+  }
+
+  .status-bar { height: 50px; background: var(--bg-base); display: flex; align-items: center; justify-content: space-between; padding: 14px 20px 0; }
+  .status-time { font-family: var(--font-mono); font-size: 13px; font-weight: 600; }
+  .status-icons { display: flex; align-items: center; gap: 5px; }
+
+  .app-header { height: 52px; background: var(--bg-base); border-bottom: 1px solid var(--border); display: flex; align-items: center; padding: 0 20px; gap: 10px; }
+  .header-brand { font-family: var(--font-mono); font-size: 12px; font-weight: 600; letter-spacing: 0.12em; text-transform: uppercase; }
+  .header-beta { margin-left: auto; background: rgba(10,191,188,0.12); border: 1px solid rgba(10,191,188,0.28); color: var(--accent-teal); font-family: var(--font-mono); font-size: 9px; font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase; padding: 3px 8px; border-radius: 4px; }
+
+  .main { padding: 24px 20px 20px; display: flex; flex-direction: column; gap: 0; height: calc(932px - 50px - 52px); overflow: hidden; }
+
+  /* Hero section */
+  .hero { margin-bottom: 24px; }
+  .hero-eyebrow { font-family: var(--font-mono); font-size: 10px; font-weight: 600; letter-spacing: 0.14em; text-transform: uppercase; color: var(--accent-teal); margin-bottom: 10px; }
+  .hero-title { font-size: 24px; font-weight: 700; line-height: 1.25; color: var(--text-primary); margin-bottom: 10px; }
+  .hero-title span { color: var(--accent-teal); }
+  .hero-sub { font-size: 13px; color: var(--text-secondary); line-height: 1.6; }
+
+  /* Author card */
+  .author-card {
+    background: var(--bg-surface);
+    border: 1px solid var(--border);
+    border-left: 3px solid var(--accent-gold);
+    border-radius: 10px;
+    padding: 14px 16px;
+    margin-bottom: 16px;
+    display: flex;
+    gap: 12px;
+    align-items: flex-start;
+  }
+  .author-avatar {
+    width: 42px;
+    height: 42px;
+    border-radius: 50%;
+    background: rgba(212,168,75,0.12);
+    border: 1px solid rgba(212,168,75,0.25);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 20px;
+    flex-shrink: 0;
+  }
+  .author-body { flex: 1; }
+  .author-name { font-size: 14px; font-weight: 600; color: var(--text-primary); margin-bottom: 3px; }
+  .author-role { font-family: var(--font-mono); font-size: 10px; font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase; color: var(--accent-gold); margin-bottom: 6px; }
+  .author-quote { font-size: 12.5px; color: rgba(240,237,230,0.72); line-height: 1.55; font-style: italic; }
+
+  /* Section label */
+  .section-label { font-family: var(--font-mono); font-size: 10px; font-weight: 600; letter-spacing: 0.12em; text-transform: uppercase; color: var(--text-secondary); margin-bottom: 10px; }
+
+  /* Feature list */
+  .feature-list { display: flex; flex-direction: column; gap: 8px; margin-bottom: 16px; }
+  .feature-item {
+    background: var(--bg-surface);
+    border: 1px solid var(--border);
+    border-radius: 9px;
+    padding: 10px 14px;
+    display: flex;
+    align-items: flex-start;
+    gap: 11px;
+  }
+  .feature-icon {
+    width: 32px;
+    height: 32px;
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    font-size: 16px;
+  }
+  .feature-body { flex: 1; min-width: 0; }
+  .feature-title { font-size: 13px; font-weight: 600; color: var(--text-primary); margin-bottom: 2px; }
+  .feature-desc { font-size: 11.5px; color: var(--text-secondary); line-height: 1.5; }
+
+  /* Safety note */
+  .safety-note {
+    background: rgba(10,191,188,0.05);
+    border: 1px solid rgba(10,191,188,0.18);
+    border-radius: 9px;
+    padding: 11px 14px;
+    display: flex;
+    gap: 10px;
+    align-items: flex-start;
+    margin-top: auto;
+  }
+  .safety-icon { font-size: 15px; flex-shrink: 0; margin-top: 1px; }
+  .safety-text { font-size: 12px; color: rgba(240,237,230,0.65); line-height: 1.6; }
+</style>
+</head>
+<body style="display:flex;flex-direction:column">
+
+<div class="status-bar">
+  <span class="status-time">9:41</span>
+  <div class="status-icons">
+    <svg width="17" height="12" viewBox="0 0 17 12" fill="none"><rect x="0" y="8" width="3" height="4" rx="0.8" fill="#F0EDE6" opacity="0.9"/><rect x="4.5" y="5.5" width="3" height="6.5" rx="0.8" fill="#F0EDE6" opacity="0.9"/><rect x="9" y="3" width="3" height="9" rx="0.8" fill="#F0EDE6" opacity="0.9"/><rect x="13.5" y="0" width="3" height="12" rx="0.8" fill="#F0EDE6" opacity="0.9"/></svg>
+    <svg width="16" height="12" viewBox="0 0 16 12" fill="none"><path d="M8 9.5a1.5 1.5 0 1 1 0 3 1.5 1.5 0 0 1 0-3z" fill="#F0EDE6" opacity="0.9"/><path d="M3.5 6.5A6.5 6.5 0 0 1 8 4.8a6.5 6.5 0 0 1 4.5 1.7" stroke="#F0EDE6" stroke-width="1.5" stroke-linecap="round" opacity="0.9"/><path d="M1 3.8A10.2 10.2 0 0 1 8 1a10.2 10.2 0 0 1 7 2.8" stroke="#F0EDE6" stroke-width="1.5" stroke-linecap="round" opacity="0.9"/></svg>
+    <svg width="25" height="12" viewBox="0 0 25 12" fill="none"><rect x="0.5" y="0.5" width="21" height="11" rx="3" stroke="#F0EDE6" stroke-opacity="0.5" stroke-width="1"/><rect x="2" y="2" width="16" height="8" rx="2" fill="#F0EDE6" opacity="0.9"/><path d="M22.5 4v4a2 2 0 0 0 0-4z" fill="#F0EDE6" opacity="0.5"/></svg>
+  </div>
+</div>
+
+<div class="app-header">
+  <svg width="22" height="20" viewBox="0 0 225 200" xmlns="http://www.w3.org/2000/svg" fill="#0ABFBC">
+    <path d="M 159.1,24.3 A 96,96 0 1,0 159.1,175.7 L 135.7,145.7 A 58,58 0 1,1 135.7,54.3 Z"/>
+    <path d="M 144.0,57 L 208,45 L 218,58 L 208,70 L 150.0,71 Z"/>
+    <path d="M 158.0,92 L 215,82 L 225,95 L 215,107 L 158.0,108 Z"/>
+    <path d="M 150.0,129 L 208,130 L 218,142 L 208,155 L 144.0,143 Z"/>
+  </svg>
+  <span class="header-brand">Clinical Edge</span>
+  <span class="header-beta">Beta</span>
+</div>
+
+<div class="main">
+
+  <!-- Hero -->
+  <div class="hero">
+    <div class="hero-eyebrow">Safety &amp; Trust</div>
+    <div class="hero-title">Built to <span>support</span><br>your judgment.</div>
+    <div class="hero-sub">Every output is a thinking tool — not a protocol replacement. Your clinical judgment always comes first.</div>
+  </div>
+
+  <!-- Author -->
+  <div class="author-card">
+    <div class="author-avatar">👨‍⚕️</div>
+    <div class="author-body">
+      <div class="author-name">Built by a bedside nurse</div>
+      <div class="author-role">Master's-prepared RN · Critical Care</div>
+      <div class="author-quote">"I built this for the moments I needed a clear head — not a replacement for mine."</div>
+    </div>
+  </div>
+
+  <div class="section-label">What this app is — and isn't</div>
+
+  <div class="feature-list">
+
+    <div class="feature-item">
+      <div class="feature-icon" style="background:rgba(10,191,188,0.10)">🔍</div>
+      <div class="feature-body">
+        <div class="feature-title">Clinical reasoning support</div>
+        <div class="feature-desc">Surfaces differential thinking and structured frameworks — you still assess, decide, and act.</div>
+      </div>
+    </div>
+
+    <div class="feature-item">
+      <div class="feature-icon" style="background:rgba(212,168,75,0.10)">📋</div>
+      <div class="feature-body">
+        <div class="feature-title">Not a diagnostic tool</div>
+        <div class="feature-desc">Never diagnoses patients. Outputs are thinking prompts, not clinical orders or conclusions.</div>
+      </div>
+    </div>
+
+    <div class="feature-item">
+      <div class="feature-icon" style="background:rgba(16,185,129,0.10)">🛡️</div>
+      <div class="feature-body">
+        <div class="feature-title">Nurse language, nurse context</div>
+        <div class="feature-desc">Designed around real shift decisions — not textbook abstractions or physician workflows.</div>
+      </div>
+    </div>
+
+    <div class="feature-item">
+      <div class="feature-icon" style="background:rgba(59,130,246,0.10)">💾</div>
+      <div class="feature-body">
+        <div class="feature-title">No data stored externally</div>
+        <div class="feature-desc">Saved cases stay on your device in local storage. No patient data is transmitted or retained.</div>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- Safety note -->
+  <div class="safety-note">
+    <span class="safety-icon">ⓘ</span>
+    <span class="safety-text">Clinical Edge is a reasoning support tool. It is not a substitute for your clinical judgment, facility protocol, or provider orders. Always follow your institution's policies.</span>
+  </div>
+
+</div>
+
+<script>
+  document.fonts.ready.then(() => { window.ready = true; });
+</script>
+</body>
+</html>

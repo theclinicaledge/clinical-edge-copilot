@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import './icu-drips.css';
-import { DRIPS, CATEGORIES, SAFETY_DISCLAIMER } from './data/drips.js';
+import { DRIPS, CATEGORIES, FOUNDATIONS, SAFETY_DISCLAIMER } from './data/drips.js';
 
 // ─── CE Logo ──────────────────────────────────────────────────────────────────
 function CELogo() {
@@ -23,102 +23,110 @@ function CELogo() {
 }
 
 // ─── Normalize search string ───────────────────────────────────────────────────
-// Lowercase, strip hyphens → spaces, collapse whitespace.
 function norm(s) {
-  return s.toLowerCase().replace(/-/g, ' ').replace(/\s+/g, ' ').trim();
+  return String(s).toLowerCase().replace(/-/g, ' ').replace(/\s+/g, ' ').trim();
 }
 
 // ─── Section card ─────────────────────────────────────────────────────────────
-function Section({ label, safety, children }) {
+// variant: undefined | 'watch' | 'escalate' | 'safety'
+function Section({ label, variant, children }) {
+  const cls = ['id-section', variant ? `id-section--${variant}` : ''].filter(Boolean).join(' ');
   return (
-    <div className={`id-section${safety ? ' id-section--safety' : ''}`}>
+    <div className={cls}>
       <span className="id-section__label">{label}</span>
       {children}
     </div>
   );
 }
 
-// ─── Drip Detail ──────────────────────────────────────────────────────────────
+// ─── Bullet list ──────────────────────────────────────────────────────────────
+function BulletList({ items }) {
+  return (
+    <ul className="id-section__list">
+      {items.map((item, i) => <li key={i}>{item}</li>)}
+    </ul>
+  );
+}
+
+// ─── Detail view ──────────────────────────────────────────────────────────────
 function DripsDetail({ drip, onBack }) {
   return (
     <div className="id-detail">
+
+      {/* Back button */}
       <button className="id-detail__back" onClick={onBack}>
         ← Back to ICU Drips
       </button>
 
-      <div className="id-detail__category">{drip.categoryLabel}</div>
-      <h1 className="id-detail__name">{drip.name}</h1>
-      <p className="id-detail__brand">{drip.brandName}</p>
-      <p className="id-detail__snapshot">{drip.snapshot}</p>
+      {/* Identity card */}
+      <div className="id-identity">
+        <div className="id-identity__meta">
+          <span className="id-identity__category">{drip.categoryLabel}</span>
+          {drip.badge && (
+            <span className="id-identity__badge">{drip.badge}</span>
+          )}
+        </div>
+        <h1 className="id-identity__name">{drip.name}</h1>
+        <p className="id-identity__brand">{drip.brandName}</p>
+        <p className="id-identity__snapshot">{drip.snapshot}</p>
+      </div>
 
+      {/* Quick effects grid */}
+      <div className="id-effects">
+        {drip.effects.map((e, i) => (
+          <div key={i} className="id-effect-tile">{e.label}</div>
+        ))}
+      </div>
+
+      {/* Clinical pearl */}
+      <div className="id-pearl">
+        <span className="id-pearl__label">Clinical pearl</span>
+        <p className="id-pearl__text">{drip.pearl}</p>
+      </div>
+
+      {/* Content sections */}
       <div className="id-sections">
 
-        <Section label="Common clinical use">
-          <ul className="id-section__list">
-            {drip.clinicalUse.map((item, i) => (
-              <li key={i}>{item}</li>
-            ))}
-          </ul>
+        <Section label="Commonly used for">
+          <BulletList items={drip.clinicalUse} />
         </Section>
 
         <Section label="What it is doing">
-          <p className="id-section__prose">{drip.mechanism}</p>
+          <BulletList items={drip.mechanism} />
         </Section>
 
         <Section label="What nurses monitor">
-          <ul className="id-section__list">
-            {drip.monitoring.map((item, i) => (
-              <li key={i}>{item}</li>
-            ))}
-          </ul>
+          <BulletList items={drip.monitoring} />
         </Section>
 
-        <Section label="Titration concept">
-          <p className="id-section__prose">{drip.titrationConcept}</p>
+        <Section label="Watch out" variant="watch">
+          <BulletList items={drip.watchOut} />
         </Section>
 
-        <Section label="Bedside concerns & pitfalls">
-          <ul className="id-section__list">
-            {drip.bedsideConcerns.map((item, i) => (
-              <li key={i}>{item}</li>
-            ))}
-          </ul>
+        <Section label="Signals to escalate" variant="escalate">
+          <BulletList items={drip.escalation} />
         </Section>
 
-        <Section label="Lines, access & compatibility">
-          <p className="id-section__prose">{drip.linesAccess}</p>
+        <Section label="Lines, access and policy">
+          <BulletList items={drip.linesAccess} />
         </Section>
 
-        <Section label="Signals to escalate">
-          <ul className="id-section__list">
-            {drip.escalationSignals.map((item, i) => (
-              <li key={i}>{item}</li>
-            ))}
-          </ul>
-        </Section>
-
-        <Section label="Weaning & transition concepts">
-          <p className="id-section__prose">{drip.weaningConcepts}</p>
-        </Section>
-
-        <Section label="Safety flags" safety>
-          <ul className="id-section__list">
-            {drip.safetyFlags.map((item, i) => (
-              <li key={i}>{item}</li>
-            ))}
-          </ul>
+        <Section label="Key safety notes" variant="safety">
+          <BulletList items={drip.safetyFlags} />
         </Section>
 
       </div>
 
+      {/* Footer disclaimer */}
       <div className="id-detail__disclaimer">
         {SAFETY_DISCLAIMER}
       </div>
+
     </div>
   );
 }
 
-// ─── Drips Landing ────────────────────────────────────────────────────────────
+// ─── Landing page ─────────────────────────────────────────────────────────────
 function DripsHome({ onSelect }) {
   const [query,    setQuery]    = useState('');
   const [category, setCategory] = useState('all');
@@ -129,27 +137,30 @@ function DripsHome({ onSelect }) {
     const matchesCategory = category === 'all' || drip.category === category;
     if (!matchesCategory) return false;
     if (!q) return true;
+    const effectsText = drip.effects.map(e => e.label).join(' ');
     return (
       norm(drip.name).includes(q) ||
       norm(drip.brandName).includes(q) ||
       norm(drip.categoryLabel).includes(q) ||
-      norm(drip.snapshot).includes(q)
+      norm(drip.snapshot).includes(q) ||
+      norm(effectsText).includes(q)
     );
   });
 
   return (
     <div className="id-landing">
+
       {/* Hero */}
       <div className="id-hero">
         <span className="id-hero__eyebrow">Infusion Reference</span>
         <h1 className="id-hero__title">ICU Drips</h1>
         <p className="id-hero__desc">
-          Clinical context, monitoring priorities, and bedside awareness
-          for common critical care infusions. Educational reference — not a dosing guide.
+          Clinical context, monitoring priorities, and bedside awareness for
+          common critical care infusions. Educational reference, not a dosing guide.
         </p>
       </div>
 
-      {/* Search + filters */}
+      {/* Search + category filter */}
       <div className="id-search-bar">
         <input
           className="id-search-input"
@@ -192,26 +203,44 @@ function DripsHome({ onSelect }) {
                   <span className="id-drip-row__brand">{drip.brandName}</span>
                 </div>
                 <div className="id-drip-row__snapshot">{drip.snapshot}</div>
+                <div className="id-drip-row__tags">
+                  {drip.effects.map((e, i) => (
+                    <span key={i} className="id-drip-tag">{e.label}</span>
+                  ))}
+                </div>
               </div>
             ))
           : <p className="id-no-results">No matching drips.</p>
         }
       </div>
 
+      {/* Foundations */}
+      <div className="id-foundations">
+        <p className="id-foundations__eyebrow">Foundations</p>
+        <div className="id-foundations__grid">
+          {FOUNDATIONS.map(f => (
+            <div key={f.id} className="id-foundation-card">
+              <p className="id-foundation-card__title">{f.title}</p>
+              <p className="id-foundation-card__body">{f.body}</p>
+            </div>
+          ))}
+        </div>
+      </div>
+
       {/* Quiet disclaimer */}
       <div className="id-landing__disclaimer">
         {SAFETY_DISCLAIMER}
       </div>
+
     </div>
   );
 }
 
-// ─── Module Shell ─────────────────────────────────────────────────────────────
+// ─── Module shell ─────────────────────────────────────────────────────────────
 export default function IcuDripsModule({ onGoHome }) {
   const [view,     setView]     = useState('home');
   const [selected, setSelected] = useState(null);
 
-  // Scroll to top on every view change
   useEffect(() => {
     window.scrollTo({ top: 0, left: 0, behavior: 'instant' });
   }, [view]);
@@ -232,7 +261,7 @@ export default function IcuDripsModule({ onGoHome }) {
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=IBM+Plex+Mono:wght@400;500;700&display=swap');
       `}</style>
 
-      {/* ── Sticky header ── */}
+      {/* Sticky header */}
       <header className="id-header">
         <div className="id-header__inner">
           <CELogo />
@@ -250,7 +279,7 @@ export default function IcuDripsModule({ onGoHome }) {
         </div>
       </header>
 
-      {/* ── Warm content surface ── */}
+      {/* Warm content surface */}
       <div className="id-body">
         {view === 'detail' && selected
           ? <DripsDetail drip={selected} onBack={handleBack} />

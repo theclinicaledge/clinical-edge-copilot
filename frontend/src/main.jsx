@@ -11,6 +11,7 @@ import Support from './Support.jsx'
 import Download from './Download.jsx'
 import ClinicalEdgeHome from './ClinicalEdgeHome.jsx'
 import RhythmLabModule from './modules/rhythm-lab/RhythmLabModule.tsx'
+import IcuDripsModule from './modules/icu-drips/IcuDripsModule.jsx'
 
 // ── Service Worker Registration ─────────────────────────────────────────────
 if ('serviceWorker' in navigator) {
@@ -33,6 +34,7 @@ function getPage() {
   if (path === '/privacy')    return 'privacy';
   if (path === '/support')    return 'support';
   if (path === '/download')   return 'download';
+  if (path === '/icu-drips')  return 'icudrips';
   return 'home'; // fallback to home hub
 }
 
@@ -69,6 +71,7 @@ function Root() {
       {page === 'privacy'    && <Privacy />}
       {page === 'support'    && <Support />}
       {page === 'download'   && <Download />}
+      {page === 'icudrips'   && <IcuDripsModule onGoHome={() => navigate('/')} />}
       <Analytics />
     </>
   );

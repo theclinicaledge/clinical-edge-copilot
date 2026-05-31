@@ -21,8 +21,7 @@ function CELogo() {
 }
 
 // ─── Module definitions ───────────────────────────────────────────────────────
-// Copilot and Rhythm Lab are co-primary modules — identical visual weight.
-// ICU Drips is the only muted coming-soon entry.
+// All three modules are active — identical visual weight.
 const MODULES = [
   {
     key: "copilot",
@@ -47,9 +46,9 @@ const MODULES = [
     tag: "Infusion Reference",
     title: "ICU Drips",
     description:
-      "Common critical care infusion reference — dosing, titration parameters, and monitoring essentials.",
-    status: "soon",
-    path: null,
+      "Clinical context, monitoring essentials, and bedside awareness for common critical care infusions.",
+    status: "active",
+    path: "/icu-drips",
   },
 ];
 

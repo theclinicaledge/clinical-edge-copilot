@@ -13,32 +13,32 @@ export const CATEGORIES = [
   { key: "antiarrhythmic", label: "Antiarrhythmics" },
 ];
 
-// ─── Foundations: short educational concept cards ─────────────────────────────
+// ─── Foundations: field-note concept cards (2-3 lines each) ──────────────────
 export const FOUNDATIONS = [
   {
     id: "central-vs-peripheral",
     title: "Central vs peripheral access",
-    body: "Many critical care infusions prefer or require central venous access because of the drug's properties or the expected duration. Peripheral use follows unit protocol, includes close site monitoring, and involves a clear plan for transition when appropriate.",
+    body: "Many critical infusions prefer central access. Peripheral use follows unit policy, with close monitoring and a planned transition.",
   },
   {
     id: "smart-pumps",
     title: "Smart pumps and drug libraries",
-    body: "Smart infusion pumps include unit-specific drug libraries that define safety thresholds and flag unusual settings. Selecting the correct library and responding to alerts appropriately are part of managing high-alert infusions safely.",
+    body: "The correct library and concentration selection matter. A wrong pump setting can make a normal-looking rate unsafe.",
   },
   {
     id: "interrupted-infusions",
     title: "Interrupted infusions",
-    body: "Some critical drips cannot be paused without clinical consequences. Nurses recognize which infusions are time-sensitive, anticipate the hemodynamic or sedation response to any interruption, and manage tubing swaps or access changes per unit policy.",
+    body: "Some drips are time-sensitive. Bag changes, tubing swaps, and access problems can affect delivery quickly at the bedside.",
   },
   {
     id: "high-alert",
     title: "High-alert medications",
-    body: "Critical care infusions are often classified as high-alert medications, meaning errors carry a higher potential for patient harm. Independent verification, double-check processes, and careful pump programming are common safeguards.",
+    body: "These drips carry higher risk when programmed incorrectly. Independent checks and pump verification are standard safeguards.",
   },
   {
     id: "titrate-to-effect",
     title: "Titrate to ordered effect",
-    body: "Many infusions are adjusted within a provider-ordered range in response to a clinical target: MAP, sedation scale score, or heart rate. The nurse assesses whether the target is being met and communicates findings that fall outside the expected response.",
+    body: "The goal is the provider-ordered clinical target. Nurses watch the trend and communicate when the response falls outside what is expected.",
   },
 ];
 
@@ -53,6 +53,7 @@ export const DRIPS = [
     category: "vasopressor",
     categoryLabel: "Vasopressor",
     badge: "Common ICU pressor",
+    related: ["propofol", "amiodarone"],
 
     snapshot:
       "A potent vasopressor that raises MAP primarily through vasoconstriction, with modest inotropic support and less tachycardia than some other agents.",
@@ -127,6 +128,7 @@ export const DRIPS = [
     category: "sedation",
     categoryLabel: "Sedation / Hypnotic",
     badge: "Sedation, not analgesia",
+    related: ["norepinephrine", "amiodarone"],
 
     snapshot:
       "A fast-acting IV sedative-hypnotic with no analgesic properties, commonly used for intubated ICU patients and titratable to a provider-ordered sedation depth.",
@@ -204,6 +206,7 @@ export const DRIPS = [
     category: "antiarrhythmic",
     categoryLabel: "Antiarrhythmic",
     badge: "Rhythm + rate support",
+    related: ["norepinephrine", "propofol"],
 
     snapshot:
       "A broad-spectrum antiarrhythmic with complex multi-channel pharmacology; a very long half-life means effects and drug interactions continue well beyond the infusion.",

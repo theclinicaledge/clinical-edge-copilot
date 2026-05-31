@@ -49,7 +49,12 @@ function BulletList({ items }) {
 }
 
 // ─── Detail view ──────────────────────────────────────────────────────────────
-function DripsDetail({ drip, onBack }) {
+function DripsDetail({ drip, onBack, onNavigate }) {
+  // Resolve related drips from the DRIPS array
+  const relatedDrips = (drip.related || [])
+    .map(id => DRIPS.find(d => d.id === id))
+    .filter(Boolean);
+
   return (
     <div className="id-detail">
 
@@ -58,24 +63,22 @@ function DripsDetail({ drip, onBack }) {
         ← Back to ICU Drips
       </button>
 
-      {/* Identity card */}
-      <div className="id-identity">
-        <div className="id-identity__meta">
-          <span className="id-identity__category">{drip.categoryLabel}</span>
+      {/* Dark navy hero card */}
+      <div className={`id-hero-card id-hero-card--${drip.category}`}>
+        <div className="id-hero-card__top">
+          <span className="id-hero-card__category">{drip.categoryLabel}</span>
           {drip.badge && (
-            <span className="id-identity__badge">{drip.badge}</span>
+            <span className="id-hero-card__badge">{drip.badge}</span>
           )}
         </div>
-        <h1 className="id-identity__name">{drip.name}</h1>
-        <p className="id-identity__brand">{drip.brandName}</p>
-        <p className="id-identity__snapshot">{drip.snapshot}</p>
-      </div>
-
-      {/* Quick effects grid */}
-      <div className="id-effects">
-        {drip.effects.map((e, i) => (
-          <div key={i} className="id-effect-tile">{e.label}</div>
-        ))}
+        <h1 className="id-hero-card__name">{drip.name}</h1>
+        <p className="id-hero-card__brand">{drip.brandName}</p>
+        <p className="id-hero-card__snapshot">{drip.snapshot}</p>
+        <div className="id-hero-card__chips">
+          {drip.effects.map((e, i) => (
+            <span key={i} className="id-hero-chip">{e.label}</span>
+          ))}
+        </div>
       </div>
 
       {/* Clinical pearl */}
@@ -116,6 +119,29 @@ function DripsDetail({ drip, onBack }) {
         </Section>
 
       </div>
+
+      {/* Explore next */}
+      {relatedDrips.length > 0 && (
+        <div className="id-explore-next">
+          <span className="id-explore-next__label">Explore next</span>
+          {relatedDrips.map(related => (
+            <div
+              key={related.id}
+              className="id-explore-next__row"
+              onClick={() => onNavigate(related)}
+              role="button"
+              tabIndex={0}
+              onKeyDown={e => e.key === 'Enter' && onNavigate(related)}
+            >
+              <div className="id-explore-next__info">
+                <span className="id-explore-next__name">{related.name}</span>
+                <span className="id-explore-next__meta">{related.categoryLabel} · {related.brandName}</span>
+              </div>
+              <span className="id-explore-next__arrow">→</span>
+            </div>
+          ))}
+        </div>
+      )}
 
       {/* Footer disclaimer */}
       <div className="id-detail__disclaimer">
@@ -185,13 +211,19 @@ function DripsHome({ onSelect }) {
         </div>
       </div>
 
+      {/* Drip list header */}
+      <div className="id-list-header">
+        <span className="id-list-header__label">Core drips</span>
+        <span className="id-list-header__count">{filtered.length}</span>
+      </div>
+
       {/* Drip list */}
       <div className="id-list">
         {filtered.length > 0
           ? filtered.map(drip => (
               <div
                 key={drip.id}
-                className="id-drip-row"
+                className={`id-drip-row id-drip-row--${drip.category}`}
                 onClick={() => onSelect(drip)}
                 role="button"
                 tabIndex={0}
@@ -271,8 +303,6 @@ export default function IcuDripsModule({ onGoHome }) {
           <button
             className="id-header__back"
             onClick={onGoHome}
-            onMouseEnter={e => { e.currentTarget.style.color = '#0ABFBC'; }}
-            onMouseLeave={e => { e.currentTarget.style.color = '#4A6978'; }}
           >
             ← All tools
           </button>
@@ -282,7 +312,7 @@ export default function IcuDripsModule({ onGoHome }) {
       {/* Warm content surface */}
       <div className="id-body">
         {view === 'detail' && selected
-          ? <DripsDetail drip={selected} onBack={handleBack} />
+          ? <DripsDetail drip={selected} onBack={handleBack} onNavigate={handleSelect} />
           : <DripsHome onSelect={handleSelect} />
         }
       </div>

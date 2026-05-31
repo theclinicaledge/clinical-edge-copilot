@@ -500,39 +500,30 @@ const _ssParam = (() => {
 })();
 
 const _SS_QUESTION =
-  "BP dropped to 88/50, HR 122, was stable an hour ago — help me think through this before I call.";
+  "Post-op day 2 hip replacement — HR has been slowly climbing from 78 to 96 over the last few hours, BP stable, temp 37.9. Patient says they feel more tired than this morning. Want to organize my thinking before I call.";
 
-const _SS_RESPONSE = `Urgency Level: HIGH
-
-⚠️ Acute hemodynamic compromise. BP 88/50 with compensatory tachycardia is beyond watchful waiting — call now, assess quickly.
+const _SS_RESPONSE = `Urgency Level: MODERATE
 
 **What this could be**
-- Hypovolemic shock — bleeding, GI losses, third-spacing, or inadequate fluid replacement after a procedure
-- Septic shock — distributive physiology is possible even without obvious fever, especially in elderly or immunocompromised patients
-- Cardiogenic shock — new MI, acute decompensated heart failure, or an arrhythmia significantly reducing forward flow
-- Neurogenic or other distributive causes — less likely without supporting context but keep on the differential
-
-**Possible concerns**
-- Tachycardia + hypotension + pallor + cool skin is a recognized sympathetic compensation pattern — the body is working hard
-- Lethargy on top of hemodynamic change raises concern for reduced cerebral perfusion
-- “Was stable an hour ago” makes this an acute deterioration, not a slow drift — the timeline is clinically important
+- Undertreated pain — a gradual HR rise in the post-op period most often reflects pain that isn't fully covered
+- Early fluid imbalance — third-spacing and mild dehydration can present this way before vital signs shift more noticeably
+- Respiratory pattern — atelectasis and guarded breathing are common at this stage and can drive both fatigue and heart rate changes
+- Early infection response — post-op day 2 is the typical window for wound or systemic changes to begin to develop
 
 **What to assess next**
-- Skin color, temperature, and capillary refill — compare peripheral to central perfusion
-- Level of consciousness — oriented to person, place, time? Following commands? Any new confusion?
-- Respiratory rate and effort — compensatory tachypnea is common when perfusion drops
-- IV access patency and what is currently running
-- Urine output for the last 1–2 hours if available
-- Last set of vitals and whether this is a downward trend
+- Pain score now versus earlier in the shift — is the patient's pain coverage keeping up?
+- Breath sounds and respiratory effort — are they taking full breaths or guarding against discomfort?
+- Intake and urine output over the last several hours — mild volume changes often show up quietly
+- Wound site — any warmth, drainage, or change compared to the morning assessment
+- How does the patient look compared to a few hours ago — affect, engagement, color
 
 **What to consider next**
-- Notify the provider now — this is a call, not a chart note to leave for rounds
-- Have rapid response criteria available when you call
-- Ensure IV access is patent; be ready to open fluids pending orders
-- Build your SBAR: vitals trend, current meds and drips, relevant recent labs, what changed
+- Gather the vital sign trend from the last 4–6 hours before calling — one reading rarely tells the full story
+- Know the last documented pain score and what was ordered and given
+- Have the post-op orders and any baseline values from admission available
 
 **Closing**
-This is a call-now situation. The numbers and the clinical picture are telling the same story — trust what you're seeing at the bedside.`;
+A slow HR climb with new fatigue usually has a clear reason. Thinking it through before the call — not after — is the right instinct.`;
 
 // ─── Main App ──────────────────────────────────────────────────────────────────
 

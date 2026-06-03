@@ -109,6 +109,30 @@ function Icon({ type, size = 13 }) {
         <path d="M6 1.5C6 1.5 2.5 5 2.5 7.5a3.5 3.5 0 0 0 7 0C9.5 5 6 1.5 6 1.5z"
           stroke="currentColor" strokeWidth="1.2" strokeLinejoin="round"/>
       </svg>;
+    // New family icons
+    case 'inotropes':
+      return <svg {...p}>
+        <path d="M6 10.5C6 10.5 1.5 7.5 1.5 4.8a2.5 2.5 0 0 1 4.5-1.5 2.5 2.5 0 0 1 4.5 1.5c0 2.7-4.5 5.7-4.5 5.7z"
+          stroke="currentColor" strokeWidth="1.2" strokeLinejoin="round"/>
+      </svg>;
+    case 'vasodilators':
+      return <svg {...p}>
+        <path d="M2 5h8M2 7h8" stroke="currentColor" strokeWidth="1.2" strokeLinecap="round"/>
+        <path d="M1 3.5l1.5 2.5L1 8.5M11 3.5 9.5 6l1.5 2.5"
+          stroke="currentColor" strokeWidth="1.1" strokeLinecap="round" strokeLinejoin="round"/>
+      </svg>;
+    case 'diuretics':
+      return <svg {...p}>
+        <path d="M6 1.5C6 1.5 2.5 5.5 2.5 7.5a3.5 3.5 0 0 0 7 0C9.5 5.5 6 1.5 6 1.5z"
+          stroke="currentColor" strokeWidth="1.2" strokeLinejoin="round"/>
+        <path d="M4.5 8a1.8 1.8 0 0 0 1 1"
+          stroke="currentColor" strokeWidth="1" strokeLinecap="round" opacity="0.55"/>
+      </svg>;
+    case 'glycemic':
+      return <svg {...p}>
+        <path d="M6 2v8M2 6h8" stroke="currentColor" strokeWidth="1.3" strokeLinecap="round"/>
+        <circle cx="6" cy="6" r="1.5" stroke="currentColor" strokeWidth="1.1"/>
+      </svg>;
     case 'compare':
       return <svg {...p} viewBox="0 0 12 12">
         <rect x="1" y="2.5" width="3.5" height="7" rx="0.5" stroke="currentColor" strokeWidth="1.1"/>
@@ -123,9 +147,13 @@ function Icon({ type, size = 13 }) {
 // ─── Family icon helper ───────────────────────────────────────────────────────
 const FAMILY_ICON_TYPE = {
   pressors:        'pressors',
+  inotropes:       'inotropes',
   sedation:        'sedation',
   rhythm:          'rhythm',
+  vasodilators:    'vasodilators',
+  diuretics:       'diuretics',
   anticoagulation: 'anticoag',
+  glycemic:        'glycemic',
 };
 
 // ─── Bullet list (inside ref rows) ───────────────────────────────────────────

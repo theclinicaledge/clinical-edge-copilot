@@ -1,0 +1,478 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Clinical Edge — Post 62 — Pulse Pressure</title>
+  <link
+    href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=IBM+Plex+Mono:wght@400;500;700&display=swap"
+    rel="stylesheet"
+  />
+  <style>
+    :root {
+      --bg:        #E7E1D6;
+      --card-warm: #FFFDF8;
+      --card-dark: #1E2A3A;
+      --elev:      #243040;
+      --teal:      #0ABFBC;
+      --tw:        #111827;
+      --twm:       #526174;
+      --td:        #F0EDE6;
+      --tdm:       #A8C1CC;
+      --border-w:  #D7D1C7;
+    }
+
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      background: #0D1117;
+      font-family: 'Inter', -apple-system, sans-serif;
+      padding: 48px 32px;
+      display: flex; flex-direction: column; align-items: center; gap: 56px;
+    }
+
+    /* ── Slide base — warm ──────────────────────────────────── */
+    .slide {
+      width: 1080px; height: 1350px;
+      background-color: var(--bg);
+      background-image:
+        radial-gradient(ellipse 90% 85% at 50% 50%, transparent 30%, rgba(0,0,0,0.09) 100%),
+        radial-gradient(ellipse 65% 52% at 18% 18%, rgba(255,232,180,0.13) 0%, transparent 58%);
+      position: relative; overflow: hidden; flex-shrink: 0;
+    }
+    .slide::before {
+      content: ''; position: absolute; inset: 0; z-index: 0; pointer-events: none;
+      background-image: url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' width='200' height='200'><filter id='g'><feTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/></filter><rect width='200' height='200' filter='url(%23g)' opacity='0.022'/></svg>");
+      background-size: 200px 200px; background-repeat: repeat;
+    }
+
+    /* Slide label — browser preview only */
+    .slide-label {
+      width: 1080px; display: flex; align-items: center; gap: 14px; margin-bottom: -40px;
+    }
+    .slide-label span {
+      font-family: 'IBM Plex Mono', monospace; font-size: 11px; font-weight: 500;
+      color: #9B8E7E; letter-spacing: 2px; text-transform: uppercase;
+    }
+    .slide-label::after { content: ''; flex: 1; height: 1px; background: #C4B8A8; opacity: 0.4; }
+
+    /* ── Footer ─────────────────────────────────────────────── */
+    .slide-footer {
+      position: absolute; bottom: 0; left: 0; right: 0; height: 96px;
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 0 80px; z-index: 2;
+      background: var(--card-warm);
+      border-top: 1px solid rgba(215,209,199,0.80);
+    }
+    .footer-brand { display: flex; align-items: center; gap: 14px; }
+    .footer-dot   { width: 10px; height: 10px; border-radius: 50%; background: var(--teal); }
+    .fnw { font-size: 28px; font-weight: 600; letter-spacing: -0.2px; color: var(--twm); }
+    .fhw { font-family: 'IBM Plex Mono', monospace; font-size: 26px; font-weight: 500;
+           letter-spacing: 1.5px; text-transform: uppercase; color: rgba(82,97,116,0.52); }
+
+    /* ── Counter dots ───────────────────────────────────────── */
+    .slide-number {
+      position: absolute; bottom: 33px; left: 50%; transform: translateX(-50%);
+      display: flex; gap: 7px; z-index: 3;
+    }
+    .slide-number .dot { width: 6px; height: 6px; border-radius: 50%; background: rgba(82,97,116,0.24); }
+    .slide-number .dot.active { background: var(--teal) !important; }
+
+    /* ── Badge ──────────────────────────────────────────────── */
+    .badge {
+      display: inline-flex; align-items: center;
+      padding: 14px 30px; border-radius: 100px;
+      background: rgba(10,191,188,0.10); border: 1px solid rgba(10,191,188,0.32);
+      font-family: 'IBM Plex Mono', monospace; font-size: 24px; font-weight: 700;
+      letter-spacing: 2px; text-transform: uppercase; color: var(--teal);
+      flex-shrink: 0; white-space: nowrap;
+    }
+
+    /* ── Counter label ──────────────────────────────────────── */
+    .ctr {
+      font-family: 'IBM Plex Mono', monospace; font-size: 26px; font-weight: 500;
+      letter-spacing: 1px; flex-shrink: 0; color: rgba(82,97,116,0.40);
+    }
+
+    /* ── Teal bar ───────────────────────────────────────────── */
+    .tbar { height: 2px; border-radius: 2px; background: var(--teal); }
+
+    /* ── Dark contrast panel ────────────────────────────────── */
+    .dark-panel {
+      background: var(--card-dark); border-radius: 16px; padding: 44px 52px;
+      border: 1px solid rgba(255,255,255,0.05);
+      box-shadow: 0 4px 32px rgba(0,0,0,0.22);
+    }
+    .panel-row { display: flex; align-items: center; gap: 22px; }
+    .panel-dot { width: 6px; height: 6px; border-radius: 50%; background: var(--teal); flex-shrink: 0; }
+    .panel-text { font-size: 40px; font-weight: 400; line-height: 1.35; color: var(--tdm); }
+
+    /* ── Layout ─────────────────────────────────────────────── */
+    .slide-content {
+      position: relative; z-index: 1;
+      padding: 60px 80px 116px;
+      height: 100%; display: flex; flex-direction: column;
+    }
+    .top-row {
+      display: flex; align-items: center; justify-content: space-between;
+      flex-shrink: 0;
+    }
+  </style>
+</head>
+<body>
+
+<!-- POST 62 — Pulse Pressure -->
+
+
+<!-- ═══ SLIDE 1 — HOOK ═══════════════════════════════════════════════════════ -->
+<div class="slide-label"><span>Slide 01 — Hook</span></div>
+<div class="slide" id="slide-1">
+  <div class="slide-content" style="justify-content:flex-start;">
+
+    <div class="top-row">
+      <div class="badge">Clinical Edge</div>
+      <span class="ctr">01 / 08</span>
+    </div>
+
+    <div style="flex:1; display:flex; flex-direction:column; justify-content:center; gap:0;">
+
+      <div style="font-size:48px; font-weight:400; line-height:1.4; color:var(--twm); margin-bottom:40px;">Most nurses never look<br>at this part of the blood pressure.</div>
+
+      <!-- BP visual -->
+      <div style="display:flex; flex-direction:column; align-items:flex-start; gap:0;">
+
+        <!-- 120 / 80 display -->
+        <div style="display:flex; align-items:baseline; gap:0; line-height:1.0;">
+          <span style="font-size:148px; font-weight:900; letter-spacing:-6px; color:var(--tw);">120</span>
+          <span style="font-size:100px; font-weight:300; letter-spacing:-2px; color:rgba(82,97,116,0.38); margin:0 8px;">/</span>
+          <span style="font-size:148px; font-weight:900; letter-spacing:-6px; color:var(--tw);">80</span>
+        </div>
+
+        <!-- Teal callout showing the gap -->
+        <div style="display:flex; align-items:center; gap:20px; margin-top:20px;">
+          <div style="width:3px; height:56px; background:var(--teal); border-radius:2px; flex-shrink:0;"></div>
+          <div style="display:flex; flex-direction:column; gap:4px;">
+            <span style="font-family:'IBM Plex Mono',monospace; font-size:48px; font-weight:700;
+                         letter-spacing:-1px; color:var(--teal);">= 40</span>
+            <span style="font-family:'IBM Plex Mono',monospace; font-size:24px; font-weight:500;
+                         letter-spacing:2px; text-transform:uppercase; color:rgba(82,97,116,0.48);">pulse pressure</span>
+          </div>
+        </div>
+
+      </div>
+
+      <div style="margin-top:52px; display:flex; align-items:center; gap:16px;">
+        <span style="font-family:'IBM Plex Mono',monospace; font-size:23px; font-weight:500;
+                     letter-spacing:2px; color:rgba(82,97,116,0.36); text-transform:uppercase;">Swipe to read</span>
+        <div style="display:flex; gap:8px; align-items:center;">
+          <div style="width:28px; height:1px; background:rgba(82,97,116,0.18);"></div>
+          <div style="width:8px; height:8px; border-radius:50%; background:var(--teal);"></div>
+          <div style="width:10px; height:1px; background:rgba(82,97,116,0.18);"></div>
+        </div>
+      </div>
+
+    </div>
+
+  </div>
+  <div class="slide-footer">
+    <div class="footer-brand"><div class="footer-dot"></div><span class="fnw">Clinical Edge: Nursing Tools</span></div>
+    <span class="fhw">@clinicaledgeco</span>
+  </div>
+  <div class="slide-number">
+    <div class="dot active"></div><div class="dot"></div><div class="dot"></div><div class="dot"></div>
+    <div class="dot"></div><div class="dot"></div><div class="dot"></div><div class="dot"></div>
+  </div>
+</div>
+
+
+<!-- ═══ SLIDE 2 — THE GAP ════════════════════════════════════════════════════ -->
+<div class="slide-label"><span>Slide 02 — Pulse Pressure Is The Gap</span></div>
+<div class="slide" id="slide-2">
+  <div class="slide-content" style="justify-content:flex-start;">
+
+    <div class="top-row">
+      <div class="badge">Bedside Knowledge</div>
+      <span class="ctr">02 / 08</span>
+    </div>
+
+    <div style="flex:1; display:flex; flex-direction:column; justify-content:center; gap:0;">
+
+      <div style="display:flex; flex-direction:column; gap:4px;">
+        <div style="font-size:88px; font-weight:900; line-height:1.0; letter-spacing:-3.5px; color:var(--tw);">Pulse pressure</div>
+        <div style="font-size:88px; font-weight:900; line-height:1.0; letter-spacing:-3.5px; color:var(--teal);">is the gap.</div>
+      </div>
+
+      <div class="tbar" style="width:64px; margin-top:40px; margin-bottom:36px;"></div>
+
+      <div style="font-size:46px; font-weight:400; line-height:1.45; color:var(--twm); margin-bottom:44px;">Systolic minus diastolic.</div>
+
+      <!-- Math visual -->
+      <div style="display:inline-flex; align-items:center; gap:16px;">
+        <span style="font-family:'IBM Plex Mono',monospace; font-size:72px; font-weight:700;
+                     letter-spacing:-2px; color:var(--tw);">120</span>
+        <span style="font-family:'IBM Plex Mono',monospace; font-size:56px; font-weight:300;
+                     color:rgba(82,97,116,0.40);">−</span>
+        <span style="font-family:'IBM Plex Mono',monospace; font-size:72px; font-weight:700;
+                     letter-spacing:-2px; color:var(--tw);">80</span>
+        <span style="font-family:'IBM Plex Mono',monospace; font-size:56px; font-weight:300;
+                     color:rgba(82,97,116,0.40);">=</span>
+        <span style="font-family:'IBM Plex Mono',monospace; font-size:72px; font-weight:700;
+                     letter-spacing:-2px; color:var(--teal);">40</span>
+      </div>
+
+    </div>
+
+  </div>
+  <div class="slide-footer">
+    <div class="footer-brand"><div class="footer-dot"></div><span class="fnw">Clinical Edge: Nursing Tools</span></div>
+    <span class="fhw">@clinicaledgeco</span>
+  </div>
+  <div class="slide-number">
+    <div class="dot"></div><div class="dot active"></div><div class="dot"></div><div class="dot"></div>
+    <div class="dot"></div><div class="dot"></div><div class="dot"></div><div class="dot"></div>
+  </div>
+</div>
+
+
+<!-- ═══ SLIDE 3 — THE REFRAME ════════════════════════════════════════════════ -->
+<div class="slide-label"><span>Slide 03 — The Reframe</span></div>
+<div class="slide" id="slide-3">
+  <div class="slide-content" style="justify-content:flex-start;">
+
+    <div class="top-row">
+      <div class="badge">The Reframe</div>
+      <span class="ctr">03 / 08</span>
+    </div>
+
+    <div style="flex:1; display:flex; flex-direction:column; justify-content:center; gap:0;">
+
+      <div style="display:flex; flex-direction:column; gap:4px;">
+        <div style="font-size:88px; font-weight:900; line-height:1.0; letter-spacing:-3.5px; color:var(--tw);">It's not just</div>
+        <div style="font-size:88px; font-weight:900; line-height:1.0; letter-spacing:-3.5px; color:var(--tw);">"the BP."</div>
+      </div>
+
+      <div class="tbar" style="width:64px; margin-top:40px; margin-bottom:36px;"></div>
+
+      <div style="font-size:46px; font-weight:400; line-height:1.55; color:var(--twm);">The gap can hint at</div>
+      <div style="font-size:46px; font-weight:600; line-height:1.55; color:var(--teal);">stroke volume</div>
+      <div style="font-size:46px; font-weight:400; line-height:1.55; color:var(--twm);">and vascular tone.</div>
+
+    </div>
+
+  </div>
+  <div class="slide-footer">
+    <div class="footer-brand"><div class="footer-dot"></div><span class="fnw">Clinical Edge: Nursing Tools</span></div>
+    <span class="fhw">@clinicaledgeco</span>
+  </div>
+  <div class="slide-number">
+    <div class="dot"></div><div class="dot"></div><div class="dot active"></div><div class="dot"></div>
+    <div class="dot"></div><div class="dot"></div><div class="dot"></div><div class="dot"></div>
+  </div>
+</div>
+
+
+<!-- ═══ SLIDE 4 — NARROW GAP ════════════════════════════════════════════════ -->
+<div class="slide-label"><span>Slide 04 — Narrow Gap</span></div>
+<div class="slide" id="slide-4">
+  <div class="slide-content" style="justify-content:flex-start;">
+
+    <div class="top-row">
+      <div class="badge">Narrow Gap</div>
+      <span class="ctr">04 / 08</span>
+    </div>
+
+    <div style="flex:1; display:flex; flex-direction:column; justify-content:center; gap:0;">
+
+      <div style="display:flex; flex-direction:column; gap:4px;">
+        <div style="font-size:84px; font-weight:900; line-height:1.0; letter-spacing:-3px; color:var(--tw);">A narrowing gap</div>
+        <div style="font-size:84px; font-weight:900; line-height:1.0; letter-spacing:-3px; color:var(--tw);">can matter.</div>
+      </div>
+
+      <div class="tbar" style="width:64px; margin-top:36px; margin-bottom:36px;"></div>
+
+      <div style="font-size:44px; font-weight:400; line-height:1.5; color:var(--twm); margin-bottom:36px;">It may suggest less blood moving forward.</div>
+
+      <!-- Dark contrast panel -->
+      <div class="dark-panel">
+        <div style="font-family:'IBM Plex Mono',monospace; font-size:22px; font-weight:700;
+                    letter-spacing:2px; text-transform:uppercase; color:rgba(168,193,204,0.40);
+                    margin-bottom:24px;">Consider</div>
+        <div style="display:flex; flex-direction:column; gap:20px;">
+          <div class="panel-row"><div class="panel-dot"></div><span class="panel-text">bleeding</span></div>
+          <div class="panel-row"><div class="panel-dot"></div><span class="panel-text">dehydration</span></div>
+          <div class="panel-row"><div class="panel-dot"></div><span class="panel-text">low-output states</span></div>
+        </div>
+      </div>
+
+    </div>
+
+  </div>
+  <div class="slide-footer">
+    <div class="footer-brand"><div class="footer-dot"></div><span class="fnw">Clinical Edge: Nursing Tools</span></div>
+    <span class="fhw">@clinicaledgeco</span>
+  </div>
+  <div class="slide-number">
+    <div class="dot"></div><div class="dot"></div><div class="dot"></div><div class="dot active"></div>
+    <div class="dot"></div><div class="dot"></div><div class="dot"></div><div class="dot"></div>
+  </div>
+</div>
+
+
+<!-- ═══ SLIDE 5 — WIDE GAP ═══════════════════════════════════════════════════ -->
+<div class="slide-label"><span>Slide 05 — Wide Gap</span></div>
+<div class="slide" id="slide-5">
+  <div class="slide-content" style="justify-content:flex-start;">
+
+    <div class="top-row">
+      <div class="badge">Wide Gap</div>
+      <span class="ctr">05 / 08</span>
+    </div>
+
+    <div style="flex:1; display:flex; flex-direction:column; justify-content:center; gap:0;">
+
+      <div style="display:flex; flex-direction:column; gap:4px;">
+        <div style="font-size:84px; font-weight:900; line-height:1.0; letter-spacing:-3px; color:var(--tw);">A wide gap tells</div>
+        <div style="font-size:84px; font-weight:900; line-height:1.0; letter-spacing:-3px; color:var(--tw);">a different story.</div>
+      </div>
+
+      <div class="tbar" style="width:64px; margin-top:40px; margin-bottom:36px;"></div>
+
+      <div style="font-size:46px; font-weight:400; line-height:1.55; color:var(--twm);">It may reflect stiff arteries,</div>
+      <div style="font-size:46px; font-weight:400; line-height:1.55; color:var(--twm);">high-output states,</div>
+      <div style="font-size:46px; font-weight:600; line-height:1.55; color:var(--teal);">or vasodilation.</div>
+
+    </div>
+
+  </div>
+  <div class="slide-footer">
+    <div class="footer-brand"><div class="footer-dot"></div><span class="fnw">Clinical Edge: Nursing Tools</span></div>
+    <span class="fhw">@clinicaledgeco</span>
+  </div>
+  <div class="slide-number">
+    <div class="dot"></div><div class="dot"></div><div class="dot"></div><div class="dot"></div>
+    <div class="dot active"></div><div class="dot"></div><div class="dot"></div><div class="dot"></div>
+  </div>
+</div>
+
+
+<!-- ═══ SLIDE 6 — THE PEARL ══════════════════════════════════════════════════ -->
+<div class="slide-label"><span>Slide 06 — The Pearl</span></div>
+<div class="slide" id="slide-6">
+  <div class="slide-content" style="justify-content:flex-start;">
+
+    <div class="top-row">
+      <div class="badge">The Pearl</div>
+      <span class="ctr">06 / 08</span>
+    </div>
+
+    <div style="flex:1; display:flex; flex-direction:column; justify-content:center; gap:0;">
+
+      <div style="display:flex; flex-direction:column; gap:4px;">
+        <div style="font-size:80px; font-weight:900; line-height:1.02; letter-spacing:-3px; color:var(--tw);">The trend matters</div>
+        <div style="font-size:80px; font-weight:900; line-height:1.02; letter-spacing:-3px; color:var(--teal);">more than one reading.</div>
+      </div>
+
+      <div class="tbar" style="width:64px; margin-top:40px; margin-bottom:36px;"></div>
+
+      <div style="font-size:44px; font-weight:400; line-height:1.55; color:var(--twm);">A pulse pressure that narrows</div>
+      <div style="font-size:44px; font-weight:400; line-height:1.55; color:var(--twm);">across a shift can say more</div>
+      <div style="font-size:44px; font-weight:600; line-height:1.55; color:var(--tw);">than a single BP.</div>
+
+    </div>
+
+  </div>
+  <div class="slide-footer">
+    <div class="footer-brand"><div class="footer-dot"></div><span class="fnw">Clinical Edge: Nursing Tools</span></div>
+    <span class="fhw">@clinicaledgeco</span>
+  </div>
+  <div class="slide-number">
+    <div class="dot"></div><div class="dot"></div><div class="dot"></div><div class="dot"></div>
+    <div class="dot"></div><div class="dot active"></div><div class="dot"></div><div class="dot"></div>
+  </div>
+</div>
+
+
+<!-- ═══ SLIDE 7 — CLINICAL JUDGMENT ══════════════════════════════════════════ -->
+<div class="slide-label"><span>Slide 07 — Clinical Judgment</span></div>
+<div class="slide" id="slide-7">
+  <div class="slide-content" style="justify-content:flex-start;">
+
+    <div class="top-row">
+      <div class="badge">Clinical Judgment</div>
+      <span class="ctr">07 / 08</span>
+    </div>
+
+    <div style="flex:1; display:flex; flex-direction:column; justify-content:center; gap:0;">
+
+      <div style="display:flex; flex-direction:column; gap:4px;">
+        <div style="font-size:104px; font-weight:900; line-height:1.0; letter-spacing:-4px; color:var(--tw);">Read the gap.</div>
+      </div>
+
+      <div class="tbar" style="width:64px; margin-top:40px; margin-bottom:36px;"></div>
+
+      <div style="font-size:56px; font-weight:600; line-height:1.3; letter-spacing:-1px; color:var(--teal);">Then read the patient.</div>
+
+      <div style="margin-top:40px; font-family:'IBM Plex Mono',monospace; font-size:28px;
+                  font-weight:500; letter-spacing:1px; color:rgba(82,97,116,0.46);">Pulse pressure never stands alone.</div>
+
+    </div>
+
+  </div>
+  <div class="slide-footer">
+    <div class="footer-brand"><div class="footer-dot"></div><span class="fnw">Clinical Edge: Nursing Tools</span></div>
+    <span class="fhw">@clinicaledgeco</span>
+  </div>
+  <div class="slide-number">
+    <div class="dot"></div><div class="dot"></div><div class="dot"></div><div class="dot"></div>
+    <div class="dot"></div><div class="dot"></div><div class="dot active"></div><div class="dot"></div>
+  </div>
+</div>
+
+
+<!-- ═══ SLIDE 8 — CTA ════════════════════════════════════════════════════════ -->
+<div class="slide-label"><span>Slide 08 — CTA</span></div>
+<div class="slide" id="slide-8">
+  <div class="slide-content" style="justify-content:flex-start;">
+
+    <div class="top-row">
+      <div class="badge">Clinical Edge</div>
+      <span class="ctr">08 / 08</span>
+    </div>
+
+    <div style="flex:1; display:flex; flex-direction:column; justify-content:center; gap:0;">
+
+      <div style="display:flex; flex-direction:column; gap:4px;">
+        <div style="font-size:88px; font-weight:900; line-height:1.0; letter-spacing:-3.5px; color:var(--tw);">Clinical</div>
+        <div style="font-size:88px; font-weight:900; line-height:1.0; letter-spacing:-3.5px; color:var(--teal);">reasoning.</div>
+      </div>
+
+      <div class="tbar" style="width:64px; margin-top:36px; margin-bottom:32px;"></div>
+
+      <div style="font-size:46px; font-weight:400; line-height:1.55; color:var(--twm);">Rhythm recognition.</div>
+      <div style="font-size:46px; font-weight:400; line-height:1.55; color:var(--twm);">Bedside support.</div>
+
+      <div style="margin-top:44px; display:inline-flex; align-items:center; padding:26px 52px;
+                  border-radius:14px; border:1px solid rgba(10,191,188,0.28);
+                  background:rgba(10,191,188,0.08); width:fit-content;">
+        <span style="font-size:36px; font-weight:600; letter-spacing:-0.3px; color:var(--teal);">Download on the App Store →</span>
+      </div>
+
+      <div style="margin-top:28px; font-family:'IBM Plex Mono',monospace; font-size:26px;
+                  font-weight:500; letter-spacing:0.5px; color:rgba(82,97,116,0.44);">Clinical Edge · theclinicaledge.org</div>
+
+    </div>
+
+  </div>
+  <div class="slide-footer">
+    <div class="footer-brand"><div class="footer-dot"></div><span class="fnw">Clinical Edge: Nursing Tools</span></div>
+    <span class="fhw">@clinicaledgeco</span>
+  </div>
+  <div class="slide-number">
+    <div class="dot"></div><div class="dot"></div><div class="dot"></div><div class="dot"></div>
+    <div class="dot"></div><div class="dot"></div><div class="dot"></div><div class="dot active"></div>
+  </div>
+</div>
+
+
+</body>
+</html>

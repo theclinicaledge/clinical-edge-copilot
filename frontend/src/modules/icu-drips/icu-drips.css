@@ -36,6 +36,22 @@
 .id-drip-row--anticoagulation,
 .id-family-block--anticoagulation { --id-cat-accent: #B07040; }
 
+.id-hero-card--inotrope,
+.id-drip-row--inotrope,
+.id-family-block--inotropes       { --id-cat-accent: #D4785A; }
+
+.id-hero-card--vasodilator,
+.id-drip-row--vasodilator,
+.id-family-block--vasodilators    { --id-cat-accent: #3B9EC9; }
+
+.id-hero-card--diuretic,
+.id-drip-row--diuretic,
+.id-family-block--diuretics       { --id-cat-accent: #5B8AB0; }
+
+.id-hero-card--glycemic,
+.id-drip-row--glycemic,
+.id-family-block--glycemic        { --id-cat-accent: #C4A035; }
+
 /* ── Root shell ──────────────────────────────────────────────────────────────── */
 .icu-drips-root {
   min-height: 100vh;

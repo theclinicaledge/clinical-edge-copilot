@@ -1,16 +1,16 @@
 import { useState, useEffect } from 'react';
 import './icu-drips.css';
-import { DRIPS, CATEGORIES, FOUNDATIONS, SAFETY_DISCLAIMER } from './data/drips.js';
+import {
+  DRIPS, CATEGORIES, FAMILIES, FOUNDATIONS,
+  SAFETY_DISCLAIMER, COMPARE_PAIRS,
+} from './data/drips.js';
 
 // ─── CE Logo ──────────────────────────────────────────────────────────────────
 function CELogo() {
   return (
     <svg
-      width="26"
-      height="26"
-      viewBox="0 0 225 200"
-      xmlns="http://www.w3.org/2000/svg"
-      fill="#0ABFBC"
+      width="26" height="26" viewBox="0 0 225 200"
+      xmlns="http://www.w3.org/2000/svg" fill="#0ABFBC"
       aria-label="Clinical Edge"
       style={{ flexShrink: 0, display: 'block' }}
     >
@@ -22,21 +22,9 @@ function CELogo() {
   );
 }
 
-// ─── Normalize search string ───────────────────────────────────────────────────
+// ─── Normalize search ─────────────────────────────────────────────────────────
 function norm(s) {
   return String(s).toLowerCase().replace(/-/g, ' ').replace(/\s+/g, ' ').trim();
-}
-
-// ─── Section card ─────────────────────────────────────────────────────────────
-// variant: undefined | 'watch' | 'escalate' | 'safety'
-function Section({ label, variant, children }) {
-  const cls = ['id-section', variant ? `id-section--${variant}` : ''].filter(Boolean).join(' ');
-  return (
-    <div className={cls}>
-      <span className="id-section__label">{label}</span>
-      {children}
-    </div>
-  );
 }
 
 // ─── Bullet list ──────────────────────────────────────────────────────────────
@@ -48,17 +36,52 @@ function BulletList({ items }) {
   );
 }
 
+// ─── Collapsible section ──────────────────────────────────────────────────────
+function CollapsibleSection({ label, variant, isOpen, onToggle, children }) {
+  const cls = ['id-section', variant ? `id-section--${variant}` : ''].filter(Boolean).join(' ');
+  return (
+    <div className={cls}>
+      <button className="id-section__toggle" onClick={onToggle} aria-expanded={isOpen}>
+        <span className="id-section__toggle-label">{label}</span>
+        <span className={`id-section__toggle-arrow${isOpen ? ' id-section__toggle-arrow--open' : ''}`}>
+          ▾
+        </span>
+      </button>
+      <div className={`id-section__body${isOpen ? '' : ' id-section__body--hidden'}`}>
+        {children}
+      </div>
+    </div>
+  );
+}
+
 // ─── Detail view ──────────────────────────────────────────────────────────────
+const DEFAULT_OPEN = {
+  commonlyUsedFor:   true,
+  whatItIsDoing:     false,
+  whatNursesMonitor: true,
+  watchOut:          true,
+  signalsToEscalate: true,
+  linesAccessPolicy: false,
+  keySafetyNotes:    true,
+};
+
 function DripsDetail({ drip, onBack, onNavigate }) {
-  // Resolve related drips from the DRIPS array
+  const [open, setOpen] = useState(DEFAULT_OPEN);
+
+  // Reset accordion state each time we view a different drip
+  useEffect(() => { setOpen(DEFAULT_OPEN); }, [drip.id]);
+
+  function toggle(key) {
+    setOpen(prev => ({ ...prev, [key]: !prev[key] }));
+  }
+
+  // Resolve related drips
   const relatedDrips = (drip.related || [])
     .map(id => DRIPS.find(d => d.id === id))
     .filter(Boolean);
 
   return (
     <div className="id-detail">
-
-      {/* Back button */}
       <button className="id-detail__back" onClick={onBack}>
         ← Back to ICU Drips
       </button>
@@ -75,48 +98,79 @@ function DripsDetail({ drip, onBack, onNavigate }) {
         <p className="id-hero-card__brand">{drip.brandName}</p>
         <p className="id-hero-card__snapshot">{drip.snapshot}</p>
         <div className="id-hero-card__chips">
-          {drip.effects.map((e, i) => (
+          {drip.effectChips.map((e, i) => (
             <span key={i} className="id-hero-chip">{e.label}</span>
           ))}
         </div>
       </div>
 
-      {/* Clinical pearl */}
+      {/* Clinical pearl / mental model */}
       <div className="id-pearl">
-        <span className="id-pearl__label">Clinical pearl</span>
-        <p className="id-pearl__text">{drip.pearl}</p>
+        <span className="id-pearl__label">Nurse mental model</span>
+        <p className="id-pearl__text">{drip.mentalModel}</p>
       </div>
 
-      {/* Content sections */}
+      {/* Collapsible content sections */}
       <div className="id-sections">
 
-        <Section label="Commonly used for">
-          <BulletList items={drip.clinicalUse} />
-        </Section>
+        <CollapsibleSection
+          label="Commonly used for"
+          isOpen={open.commonlyUsedFor}
+          onToggle={() => toggle('commonlyUsedFor')}
+        >
+          <BulletList items={drip.commonlyUsedFor} />
+        </CollapsibleSection>
 
-        <Section label="What it is doing">
-          <BulletList items={drip.mechanism} />
-        </Section>
+        <CollapsibleSection
+          label="What it is doing"
+          isOpen={open.whatItIsDoing}
+          onToggle={() => toggle('whatItIsDoing')}
+        >
+          <BulletList items={drip.whatItIsDoing} />
+        </CollapsibleSection>
 
-        <Section label="What nurses monitor">
-          <BulletList items={drip.monitoring} />
-        </Section>
+        <CollapsibleSection
+          label="What nurses monitor"
+          isOpen={open.whatNursesMonitor}
+          onToggle={() => toggle('whatNursesMonitor')}
+        >
+          <BulletList items={drip.whatNursesMonitor} />
+        </CollapsibleSection>
 
-        <Section label="Watch out" variant="watch">
+        <CollapsibleSection
+          label="Watch out"
+          variant="watch"
+          isOpen={open.watchOut}
+          onToggle={() => toggle('watchOut')}
+        >
           <BulletList items={drip.watchOut} />
-        </Section>
+        </CollapsibleSection>
 
-        <Section label="Signals to escalate" variant="escalate">
-          <BulletList items={drip.escalation} />
-        </Section>
+        <CollapsibleSection
+          label="Signals to escalate"
+          variant="escalate"
+          isOpen={open.signalsToEscalate}
+          onToggle={() => toggle('signalsToEscalate')}
+        >
+          <BulletList items={drip.signalsToEscalate} />
+        </CollapsibleSection>
 
-        <Section label="Lines, access and policy">
-          <BulletList items={drip.linesAccess} />
-        </Section>
+        <CollapsibleSection
+          label="Lines, access and policy"
+          isOpen={open.linesAccessPolicy}
+          onToggle={() => toggle('linesAccessPolicy')}
+        >
+          <BulletList items={drip.linesAccessPolicy} />
+        </CollapsibleSection>
 
-        <Section label="Key safety notes" variant="safety">
-          <BulletList items={drip.safetyFlags} />
-        </Section>
+        <CollapsibleSection
+          label="Key safety notes"
+          variant="safety"
+          isOpen={open.keySafetyNotes}
+          onToggle={() => toggle('keySafetyNotes')}
+        >
+          <BulletList items={drip.keySafetyNotes} />
+        </CollapsibleSection>
 
       </div>
 
@@ -135,7 +189,9 @@ function DripsDetail({ drip, onBack, onNavigate }) {
             >
               <div className="id-explore-next__info">
                 <span className="id-explore-next__name">{related.name}</span>
-                <span className="id-explore-next__meta">{related.categoryLabel} · {related.brandName}</span>
+                <span className="id-explore-next__meta">
+                  {related.categoryLabel} · {related.brandName}
+                </span>
               </div>
               <span className="id-explore-next__arrow">→</span>
             </div>
@@ -143,39 +199,166 @@ function DripsDetail({ drip, onBack, onNavigate }) {
         </div>
       )}
 
-      {/* Footer disclaimer */}
-      <div className="id-detail__disclaimer">
-        {SAFETY_DISCLAIMER}
+      <div className="id-detail__disclaimer">{SAFETY_DISCLAIMER}</div>
+    </div>
+  );
+}
+
+// ─── Quick Compare ────────────────────────────────────────────────────────────
+function CompareDetail({ pair, onBack, onNavigateToDrip }) {
+  const aDrip = pair.aId ? DRIPS.find(d => d.id === pair.aId) : null;
+  const bDrip = pair.bId ? DRIPS.find(d => d.id === pair.bId) : null;
+
+  return (
+    <>
+      <button className="id-compare__back" onClick={onBack}>
+        ← All comparisons
+      </button>
+
+      <h2 className="id-compare-detail__title">{pair.label}</h2>
+
+      <table className="id-compare-table">
+        <thead>
+          <tr>
+            <th> </th>
+            <th>{pair.aLabel}</th>
+            <th>{pair.bLabel}</th>
+          </tr>
+        </thead>
+        <tbody>
+          {pair.rows.map((row, i) => (
+            <tr key={i}>
+              <td>{row.aspect}</td>
+              <td>{row.a}</td>
+              <td>{row.b}</td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
+
+      <div className="id-compare-bottom-line">
+        <span className="id-compare-bottom-line__label">Bottom line</span>
+        <p className="id-compare-bottom-line__text">{pair.bottomLine}</p>
       </div>
 
+      {(aDrip || bDrip) && (
+        <div className="id-compare-drip-links">
+          {aDrip && (
+            <button className="id-compare-drip-link" onClick={() => onNavigateToDrip(aDrip)}>
+              {aDrip.name} full reference →
+            </button>
+          )}
+          {bDrip && (
+            <button className="id-compare-drip-link" onClick={() => onNavigateToDrip(bDrip)}>
+              {bDrip.name} full reference →
+            </button>
+          )}
+        </div>
+      )}
+    </>
+  );
+}
+
+function QuickCompare({ onBackToHome, onNavigateToDrip }) {
+  const [selectedPair, setSelectedPair] = useState(null);
+
+  if (selectedPair) {
+    return (
+      <div className="id-compare">
+        <CompareDetail
+          pair={selectedPair}
+          onBack={() => setSelectedPair(null)}
+          onNavigateToDrip={onNavigateToDrip}
+        />
+        <div className="id-detail__disclaimer">{SAFETY_DISCLAIMER}</div>
+      </div>
+    );
+  }
+
+  return (
+    <div className="id-compare">
+      <button className="id-compare__back" onClick={onBackToHome}>
+        ← All drips
+      </button>
+
+      <span className="id-compare__eyebrow">Quick Compare</span>
+      <h2 className="id-compare__title">Side-by-side reference</h2>
+      <p className="id-compare__sub">
+        Educational comparisons across common drip pairs. No dosing. No protocol instructions.
+      </p>
+
+      <div className="id-compare-pair-list">
+        {COMPARE_PAIRS.map(pair => (
+          <button
+            key={pair.id}
+            className="id-compare-pair-row"
+            onClick={() => setSelectedPair(pair)}
+          >
+            <span className="id-compare-pair-row__label">{pair.label}</span>
+            <span className="id-compare-pair-row__arrow">→</span>
+          </button>
+        ))}
+      </div>
+
+      <div className="id-landing__disclaimer" style={{ marginTop: 40 }}>
+        {SAFETY_DISCLAIMER}
+      </div>
     </div>
   );
 }
 
 // ─── Landing page ─────────────────────────────────────────────────────────────
-function DripsHome({ onSelect }) {
+function DripsHome({ onSelect, onShowCompare }) {
   const [query,    setQuery]    = useState('');
   const [category, setCategory] = useState('all');
 
   const q = norm(query);
+  const isFiltering = q || category !== 'all';
 
   const filtered = DRIPS.filter(drip => {
     const matchesCategory = category === 'all' || drip.category === category;
     if (!matchesCategory) return false;
     if (!q) return true;
-    const effectsText = drip.effects.map(e => e.label).join(' ');
+    const chipsText = drip.effectChips.map(e => e.label).join(' ');
     return (
       norm(drip.name).includes(q) ||
       norm(drip.brandName).includes(q) ||
       norm(drip.categoryLabel).includes(q) ||
       norm(drip.snapshot).includes(q) ||
-      norm(effectsText).includes(q)
+      norm(chipsText).includes(q)
     );
   });
 
+  // Group by family when showing all drips without a search query
+  const showFamilies = !isFiltering;
+
+  function renderDripRow(drip) {
+    return (
+      <div
+        key={drip.id}
+        className={`id-drip-row id-drip-row--${drip.category}`}
+        onClick={() => onSelect(drip)}
+        role="button"
+        tabIndex={0}
+        onKeyDown={e => e.key === 'Enter' && onSelect(drip)}
+      >
+        <div className="id-drip-row__category">{drip.categoryLabel}</div>
+        <div className="id-drip-row__top">
+          <span className="id-drip-row__name">{drip.name}</span>
+          <span className="id-drip-row__brand">{drip.brandName}</span>
+        </div>
+        <div className="id-drip-row__snapshot">{drip.snapshot}</div>
+        <div className="id-drip-row__tags">
+          {drip.effectChips.map((e, i) => (
+            <span key={i} className="id-drip-tag">{e.label}</span>
+          ))}
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="id-landing">
-
       {/* Hero */}
       <div className="id-hero">
         <span className="id-hero__eyebrow">Infusion Reference</span>
@@ -211,40 +394,55 @@ function DripsHome({ onSelect }) {
         </div>
       </div>
 
-      {/* Drip list header */}
-      <div className="id-list-header">
-        <span className="id-list-header__label">Core drips</span>
-        <span className="id-list-header__count">{filtered.length}</span>
-      </div>
-
       {/* Drip list */}
-      <div className="id-list">
-        {filtered.length > 0
-          ? filtered.map(drip => (
-              <div
-                key={drip.id}
-                className={`id-drip-row id-drip-row--${drip.category}`}
-                onClick={() => onSelect(drip)}
-                role="button"
-                tabIndex={0}
-                onKeyDown={e => e.key === 'Enter' && onSelect(drip)}
-              >
-                <div className="id-drip-row__category">{drip.categoryLabel}</div>
-                <div className="id-drip-row__top">
-                  <span className="id-drip-row__name">{drip.name}</span>
-                  <span className="id-drip-row__brand">{drip.brandName}</span>
+      {showFamilies ? (
+        // Family-grouped view
+        <>
+          {FAMILIES.map(family => {
+            const familyDrips = DRIPS.filter(d => d.family === family.label);
+            if (!familyDrips.length) return null;
+            return (
+              <div key={family.key} className="id-family-block">
+                <div className="id-family-header">
+                  <span className="id-family-header__label">{family.label}</span>
+                  <span className="id-family-header__count">{familyDrips.length}</span>
                 </div>
-                <div className="id-drip-row__snapshot">{drip.snapshot}</div>
-                <div className="id-drip-row__tags">
-                  {drip.effects.map((e, i) => (
-                    <span key={i} className="id-drip-tag">{e.label}</span>
-                  ))}
+                <div className="id-list">
+                  {familyDrips.map(renderDripRow)}
                 </div>
               </div>
-            ))
-          : <p className="id-no-results">No matching drips.</p>
-        }
-      </div>
+            );
+          })}
+        </>
+      ) : (
+        // Flat filtered view
+        <>
+          <div className="id-list-header">
+            <span className="id-list-header__label">
+              {category !== 'all'
+                ? CATEGORIES.find(c => c.key === category)?.label ?? 'Drips'
+                : 'Results'}
+            </span>
+            <span className="id-list-header__count">{filtered.length}</span>
+          </div>
+          <div className="id-list">
+            {filtered.length > 0
+              ? filtered.map(renderDripRow)
+              : <p className="id-no-results">No matching drips.</p>}
+          </div>
+        </>
+      )}
+
+      {/* Quick Compare CTA */}
+      <button className="id-compare-cta" onClick={onShowCompare}>
+        <div className="id-compare-cta__inner">
+          <span className="id-compare-cta__label">Quick Compare</span>
+          <span className="id-compare-cta__sub">
+            Side-by-side reference for 5 common drip pairs
+          </span>
+        </div>
+        <span className="id-compare-cta__arrow">→</span>
+      </button>
 
       {/* Foundations */}
       <div className="id-foundations">
@@ -259,11 +457,7 @@ function DripsHome({ onSelect }) {
         </div>
       </div>
 
-      {/* Quiet disclaimer */}
-      <div className="id-landing__disclaimer">
-        {SAFETY_DISCLAIMER}
-      </div>
-
+      <div className="id-landing__disclaimer">{SAFETY_DISCLAIMER}</div>
     </div>
   );
 }
@@ -287,6 +481,12 @@ export default function IcuDripsModule({ onGoHome }) {
     setView('home');
   }
 
+  // Called from Quick Compare when user wants to jump to a drip detail
+  function handleNavigateToDrip(drip) {
+    setSelected(drip);
+    setView('detail');
+  }
+
   return (
     <div className="icu-drips-root">
       <style>{`
@@ -300,21 +500,31 @@ export default function IcuDripsModule({ onGoHome }) {
           <span className="id-header__brand">Clinical Edge</span>
           <span className="id-header__sep" aria-hidden="true">/</span>
           <span className="id-header__module">ICU Drips</span>
-          <button
-            className="id-header__back"
-            onClick={onGoHome}
-          >
+          <button className="id-header__back" onClick={onGoHome}>
             ← All tools
           </button>
         </div>
       </header>
 
-      {/* Warm content surface */}
+      {/* Content surface */}
       <div className="id-body">
-        {view === 'detail' && selected
-          ? <DripsDetail drip={selected} onBack={handleBack} onNavigate={handleSelect} />
-          : <DripsHome onSelect={handleSelect} />
-        }
+        {view === 'detail' && selected ? (
+          <DripsDetail
+            drip={selected}
+            onBack={handleBack}
+            onNavigate={handleSelect}
+          />
+        ) : view === 'compare' ? (
+          <QuickCompare
+            onBackToHome={() => setView('home')}
+            onNavigateToDrip={handleNavigateToDrip}
+          />
+        ) : (
+          <DripsHome
+            onSelect={handleSelect}
+            onShowCompare={() => setView('compare')}
+          />
+        )}
       </div>
     </div>
   );

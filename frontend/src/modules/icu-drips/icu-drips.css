@@ -295,11 +295,13 @@
   padding: 12px 13px 10px;
   margin-bottom: 5px;
   cursor: pointer;
-  transition: box-shadow 0.15s, border-color 0.15s;
+  transition: box-shadow 0.15s, border-color 0.15s, border-left-color 0.15s;
+  border-left: 3px solid transparent;
 }
 .id-drip-row:hover {
-  box-shadow: 0 2px 10px rgba(0,0,0,0.07);
+  box-shadow: 0 2px 12px rgba(0,0,0,0.08);
   border-color: rgba(17,24,39,0.14);
+  border-left-color: var(--id-cat-accent, var(--id-teal));
 }
 .id-drip-row:focus-visible {
   outline: 2px solid var(--id-teal);
@@ -560,12 +562,13 @@
 /* ── Dark navy hero card ─────────────────────────────────────────────────────── */
 .id-hero-card {
   background: var(--id-bg-hero);
-  border: 1px solid rgba(255,255,255,0.07);
+  border: 1px solid rgba(255,255,255,0.10);
   border-radius: 10px;
-  padding: 18px 18px 16px;
+  padding: 20px 20px 18px;
   margin-bottom: 14px;
   position: relative;
   overflow: hidden;
+  box-shadow: 0 4px 28px rgba(0,0,0,0.30), inset 0 1px 0 rgba(255,255,255,0.06);
 }
 /* Thin category accent line across top */
 .id-hero-card::before {
@@ -618,10 +621,10 @@
   margin: 0 0 10px;
 }
 .id-hero-card__snapshot {
-  font-size: 12.5px;
-  color: rgba(255,255,255,0.46);
-  line-height: 1.62;
-  margin: 0 0 14px;
+  font-size: 13px;
+  color: rgba(255,255,255,0.60);
+  line-height: 1.65;
+  margin: 0 0 15px;
   max-width: 540px;
 }
 .id-hero-card__chips {
@@ -676,6 +679,7 @@
   border-radius: 9px;
   overflow: hidden;
   margin-bottom: 16px;
+  box-shadow: 0 1px 6px rgba(0,0,0,0.04);
 }
 
 /* Each reference row */
@@ -689,7 +693,7 @@
   display: flex;
   align-items: center;
   gap: 9px;
-  padding: 11px 14px;
+  padding: 12px 14px;
   cursor: pointer;
   background: none;
   border: none;
@@ -698,7 +702,8 @@
   transition: background 0.12s;
   line-height: 1;
 }
-.id-ref-row__header:hover { background: rgba(17,24,39,0.025); }
+.id-ref-row__header:hover { background: rgba(17,24,39,0.03); }
+.id-ref-row__header[aria-expanded="true"] { background: rgba(17,24,39,0.018); }
 
 /* Icon slot */
 .id-ref-row__icon {
@@ -710,7 +715,9 @@
   display: flex;
   align-items: center;
   justify-content: center;
+  transition: opacity 0.12s;
 }
+.id-ref-row__header[aria-expanded="true"] .id-ref-row__icon { opacity: 0.75; }
 .id-ref-row--watch    .id-ref-row__icon { color: #C08030; opacity: 0.75; }
 .id-ref-row--escalate .id-ref-row__icon { color: #B84040; opacity: 0.65; }
 .id-ref-row--safety   .id-ref-row__icon { color: #B07020; opacity: 0.85; }
@@ -1075,3 +1082,43 @@
   line-height: 1;
 }
 .id-compare-drip-link:hover { opacity: 0.7; }
+
+/* ── Clinical Edge Pearls (landing) ─────────────────────────────────────────── */
+.id-pearls-section {
+  margin-top: 26px;
+  padding-top: 22px;
+  border-top: 1px solid var(--id-border-warm);
+}
+.id-pearls__header { margin-bottom: 12px; }
+.id-pearls__eyebrow {
+  display: block;
+  font-size: 9px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 1.8px;
+  color: var(--id-gold);
+  font-family: var(--id-font-mono);
+  margin-bottom: 3px;
+}
+.id-pearls__sub {
+  font-size: 12px;
+  color: var(--id-text-muted);
+  margin: 0;
+  line-height: 1.5;
+}
+.id-pearl-card {
+  background: var(--id-bg-card);
+  border: 1px solid var(--id-border-card);
+  border-left: 3px solid var(--id-gold);
+  border-radius: 7px;
+  padding: 11px 14px;
+  margin-bottom: 6px;
+}
+.id-pearl-card__text {
+  font-size: 13px;
+  color: var(--id-text-mid);
+  line-height: 1.65;
+  margin: 0;
+  font-style: italic;
+  letter-spacing: -0.008em;
+}

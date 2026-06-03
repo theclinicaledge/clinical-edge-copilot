@@ -4,8 +4,10 @@
   "description": "Clinical Edge Copilot — Remotion Video System",
   "scripts": {
     "start": "remotion studio",
+    "preview": "remotion studio",
     "build": "remotion render",
-    "render": "remotion render ChestPainVideo out/chest-pain-priority.mp4 --codec=h264"
+    "render": "remotion render ChestPainVideo out/chest-pain-priority.mp4 --codec=h264",
+    "render:clinical-scenario": "remotion render ClinicalScenarioVideo out/clinical-scenario-septic-shock.mp4 --codec=h264"
   },
   "dependencies": {
     "@remotion/cli": "4.0.438",

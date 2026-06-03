@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import './icu-drips.css';
 import {
   DRIPS, CATEGORIES, FAMILIES, FOUNDATIONS,
-  SAFETY_DISCLAIMER, COMPARE_PAIRS,
+  SAFETY_DISCLAIMER, COMPARE_PAIRS, CLINICAL_PEARLS,
 } from './data/drips.js';
 
 // ─── CE Logo ──────────────────────────────────────────────────────────────────
@@ -632,6 +632,19 @@ function DripsHome({ onSelect, onShowCompare }) {
           <div key={f.id} className="id-foundation-row">
             <span className="id-foundation-row__title">{f.title}</span>
             <span className="id-foundation-row__body">{f.body}</span>
+          </div>
+        ))}
+      </div>
+
+      {/* Clinical Edge Pearls */}
+      <div className="id-pearls-section">
+        <div className="id-pearls__header">
+          <span className="id-pearls__eyebrow">Clinical Edge Pearls</span>
+          <p className="id-pearls__sub">Fast bedside takeaways from the drip library.</p>
+        </div>
+        {CLINICAL_PEARLS.map((pearl, i) => (
+          <div key={i} className="id-pearl-card">
+            <p className="id-pearl-card__text">{pearl}</p>
           </div>
         ))}
       </div>

@@ -7,6 +7,8 @@ import { qtcZofranScenario }       from "./scenarios/qtc-zofran";
 import { confusedPatientScenario } from "./scenarios/confused-patient";
 import { AppStoreShot }            from "./app-store-shots/AppStoreShot";
 import { CopilotAppStoreDemoComposition } from "./compositions/AppStoreDemo";
+import { ClinicalScenarioVideo }   from "./clinical-edge-video/compositions/ClinicalScenarioVideo";
+import { septicShockConfusion }    from "./clinical-edge-video/data/scenarios";
 
 // App Store screenshot dimensions — 6.7" iPhone display (iPhone 15 Pro Max)
 const AS_W = 1284;
@@ -63,6 +65,18 @@ export const Root: React.FC = () => {
         fps={30}
         width={1080}
         height={1920}
+      />
+
+      {/* ── Clinical Edge vertical video — 1080×1920 TikTok/Reels ── */}
+      <Composition
+        id="ClinicalScenarioVideo"
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        component={ClinicalScenarioVideo as any}
+        durationInFrames={630}
+        fps={30}
+        width={1080}
+        height={1920}
+        defaultProps={{ scenario: septicShockConfusion }}
       />
 
       {/* ── App Store stills — 1284×2778 (iPhone 15 Pro Max) ── */}

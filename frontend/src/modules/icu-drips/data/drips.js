@@ -30,6 +30,17 @@ export const FAMILIES = [
   { key: "glycemic",        label: "Glycemic",               categories: ["glycemic"] },
 ];
 
+// ─── Clinical Edge Pearls ─────────────────────────────────────────────────────
+export const CLINICAL_PEARLS = [
+  "Sedation is not analgesia. A still patient can still be in pain.",
+  "Norepinephrine squeezes and gives mild heart support. Phenylephrine mostly just squeezes.",
+  "Dobutamine and milrinone can improve output while BP still falls.",
+  "Insulin drips are really two labs: glucose and potassium.",
+  "A sudden pressure change is a line, pump, or patient change until proven otherwise.",
+  "Heparin is lab-guided anticoagulation. Bleeding and platelets both matter.",
+  "Amiodarone lingers — effects and interactions can outlast the infusion by weeks.",
+];
+
 // ─── Foundations ──────────────────────────────────────────────────────────────
 export const FOUNDATIONS = [
   {
@@ -98,10 +109,10 @@ export const DRIPS = [
     ],
 
     whatItIsDoing: [
-      "Alpha-1 receptor stimulation causes systemic vasoconstriction",
-      "Modest beta-1 effect adds mild inotropic support",
-      "Higher MAP is driven largely by increased vascular resistance",
-      "Less reflex tachycardia compared to some other vasopressors",
+      "Tightens peripheral vessel walls, raising resistance and driving MAP up",
+      "A mild boost to cardiac contractility comes with it — output usually stays supported",
+      "MAP rise is predominantly driven by increased vascular resistance, not heart rate",
+      "Less reflex tachycardia than some other vasopressors",
     ],
 
     whatNursesMonitor: [
@@ -174,10 +185,10 @@ export const DRIPS = [
     ],
 
     whatItIsDoing: [
-      "V1 receptor stimulation in vascular smooth muscle causes vasoconstriction",
-      "Non-catecholamine mechanism: does not act on alpha or beta-adrenergic receptors",
-      "MAP support without direct cardiac rate or inotropic effects",
-      "Often used in combination rather than as a standalone vasopressor",
+      "Works through V1 receptors in vessel walls — a different pathway from catecholamine pressors",
+      "Raises MAP through vasoconstriction without directly affecting heart rate or contractility",
+      "Often used alongside catecholamine vasopressors rather than as a standalone agent",
+      "Has an antidiuretic effect that can shift fluid balance; sodium and urine output are both relevant to watch",
     ],
 
     whatNursesMonitor: [
@@ -251,10 +262,10 @@ export const DRIPS = [
     ],
 
     whatItIsDoing: [
-      "Selective alpha-1 receptor stimulation causes systemic vasoconstriction",
-      "No direct beta-adrenergic effect on heart rate or contractility",
-      "MAP rise is driven entirely by increased vascular resistance",
-      "Reflex bradycardia can occur as baroreceptors respond to higher MAP",
+      "Tightens peripheral blood vessels to raise MAP — purely a vascular effect",
+      "No direct effect on heart rate or cardiac contractility",
+      "As MAP rises, the body may reflexively slow the heart rate in response",
+      "In patients with limited cardiac reserve, the added resistance without inotropic support can reduce output",
     ],
 
     whatNursesMonitor: [
@@ -328,10 +339,10 @@ export const DRIPS = [
     ],
 
     whatItIsDoing: [
-      "Alpha-1 stimulation increases vascular resistance and MAP",
-      "Beta-1 stimulation increases heart rate, contractility, and cardiac output",
-      "Beta-2 stimulation produces bronchodilation and some peripheral vasodilation",
-      "The combined effect produces a broad hemodynamic response across multiple parameters",
+      "Stimulates the heart to beat faster and squeeze harder — more powerfully than most other agents",
+      "Tightens peripheral vessels to raise MAP alongside the cardiac effects",
+      "Relaxes airway smooth muscle — bronchodilation is a recognized and clinically useful effect",
+      "Blood glucose rises as a metabolic consequence — monitor alongside hemodynamics",
     ],
 
     whatNursesMonitor: [
@@ -412,10 +423,10 @@ export const DRIPS = [
     ],
 
     whatItIsDoing: [
-      "Beta-1 agonist activity increases myocardial contractility and cardiac output",
-      "Moderate beta-2 effect produces mild vasodilation, which can reduce SVR",
-      "Heart rate is commonly elevated as a direct pharmacological effect",
-      "MAP response depends on the balance between increased output and reduced SVR",
+      "Helps the heart push harder and increase the volume of blood pumped with each beat",
+      "A mild vessel-relaxing effect can soften blood pressure while output improves",
+      "Heart rate commonly rises — this increases the work and oxygen demand of the heart muscle",
+      "MAP response is variable: output up, resistance can come down, and the net result depends on the clinical balance",
     ],
 
     whatNursesMonitor: [
@@ -489,26 +500,26 @@ export const DRIPS = [
     ],
 
     whatItIsDoing: [
-      "Inhibits phosphodiesterase-3, increasing intracellular cAMP and enhancing contractility",
-      "Produces vasodilation through smooth muscle relaxation, reducing SVR and pulmonary resistance",
-      "Non-catecholamine mechanism: does not act directly on adrenergic receptors",
-      "Longer half-life means hemodynamic effects persist beyond rate changes",
+      "Helps the heart squeeze harder and pump more blood out with each beat",
+      "Simultaneously relaxes vascular walls — resistance falls and blood pressure can drop while cardiac output improves",
+      "Works through a different pathway than catecholamine inotropes, so response and tolerance patterns differ",
+      "Longer-acting than dobutamine — effects take time to show and take time to clear after any rate change",
     ],
 
     whatNursesMonitor: [
-      "Blood pressure — hypotension is a common and clinically significant concern",
-      "Heart rate and cardiac rhythm; arrhythmia risk is a clinical consideration",
+      "Blood pressure — hypotension is common and can be significant, especially if the patient is not well-filled",
+      "Peripheral perfusion: skin color, temperature, and capillary refill alongside the BP numbers",
+      "Heart rate and cardiac rhythm; arrhythmia is a recognized risk throughout the infusion",
+      "Urine output as a downstream signal of how perfusion is holding",
+      "Renal function on prolonged infusions — the drug clears more slowly when kidneys are impaired",
       "Hemodynamic parameters per provider-ordered monitoring plan",
-      "Urine output and volume status",
-      "Renal function on prolonged infusions — elimination is affected by renal function",
-      "Signs of arrhythmia or worsening hemodynamics",
     ],
 
     watchOut: [
-      "Hypotension can be pronounced, particularly in volume-depleted patients",
-      "Arrhythmia risk is clinically meaningful; continuous ECG monitoring is standard",
-      "The longer elimination profile means effects outlast rate changes by a meaningful interval",
-      "Renal function is relevant to elimination and requires ongoing team communication",
+      "Hypotension is the primary bedside concern — the vessel-relaxing effect can drop BP significantly, particularly in patients who are not volume-replete",
+      "Arrhythmias can occur; continuous ECG monitoring is standard",
+      "Effects linger — the longer half-life means hemodynamic changes after any rate adjustment take time to stabilize, and the drug stays on board for a while after stopping",
+      "Renal function affects how quickly the drug clears; impaired kidneys extend the effect",
     ],
 
     signalsToEscalate: [
@@ -570,10 +581,10 @@ export const DRIPS = [
     ],
 
     whatItIsDoing: [
-      "Enhances GABA-A receptor inhibitory activity, producing CNS depression",
-      "Sedation depth ranges from mild to deep depending on infusion",
-      "No effect on pain pathways; analgesia requires a separate agent",
-      "Rapid CNS redistribution produces a manageable and responsive sedation profile",
+      "Quiets CNS activity to produce sedation — adjustable from light to deep",
+      "Has no effect on pain pathways — a sedated patient can still be in pain",
+      "Clears quickly when the infusion is reduced, giving a manageable and responsive offset",
+      "Formulated in a lipid emulsion that contributes to caloric intake on prolonged infusions",
     ],
 
     whatNursesMonitor: [
@@ -649,10 +660,10 @@ export const DRIPS = [
     ],
 
     whatItIsDoing: [
-      "Alpha-2 adrenergic receptor agonism in the locus coeruleus produces sedation and anxiolysis",
-      "Sedation quality is distinct: patients are often arousable and cooperative",
-      "Relative preservation of respiratory drive compared to propofol or opioids",
-      "Some analgesic-sparing properties, though not a primary analgesic",
+      "Produces sedation and anxiolysis while leaving patients arousable and often cooperative",
+      "Breathing and airway reflexes are largely preserved compared to propofol and benzodiazepines",
+      "Slows the heart rate — bradycardia is a recognized and expected pharmacological response",
+      "Has some analgesic-sparing properties, but is not a primary analgesic",
     ],
 
     whatNursesMonitor: [
@@ -727,10 +738,10 @@ export const DRIPS = [
     ],
 
     whatItIsDoing: [
-      "Enhances GABA-A receptor activity, producing CNS depression and anxiolysis",
-      "Short-acting by classification, but accumulates with prolonged infusion",
-      "Active metabolites contribute to prolonged effect in some patient populations",
-      "Dose-dependent respiratory depression is a pharmacological effect",
+      "Quiets CNS activity to produce sedation and reduce anxiety",
+      "Builds up with prolonged infusion — the drug and its active metabolites accumulate",
+      "Breathing is suppressed in a dose-dependent way",
+      "Clears more slowly than expected on extended infusions, especially with renal or hepatic impairment",
     ],
 
     whatNursesMonitor: [
@@ -804,10 +815,10 @@ export const DRIPS = [
     ],
 
     whatItIsDoing: [
-      "Agonist at mu-opioid receptors produces analgesia and sedation",
-      "Rapid onset and offset compared to some opioids due to high lipid solubility",
-      "Less histamine release compared to morphine — a relevant consideration in hemodynamically sensitive patients",
-      "Respiratory depression is a dose-related pharmacological effect",
+      "Works on opioid receptors to blunt pain — that is the primary purpose",
+      "Onset is fast and offset is relatively quick compared to some other opioids",
+      "Gentler on blood pressure and less histamine release than some agents in this class",
+      "Breathing slows in a dose-related way — this is the main safety concern at the bedside",
     ],
 
     whatNursesMonitor: [
@@ -879,10 +890,10 @@ export const DRIPS = [
     ],
 
     whatItIsDoing: [
-      "NMDA receptor antagonism produces dissociative anesthesia and analgesia",
-      "Indirect sympathomimetic effects tend to support or maintain blood pressure and heart rate",
-      "Bronchodilatory effect is a distinct property relevant in bronchospastic disease",
-      "Emergence phenomena are associated with the recovery phase",
+      "Creates a dissociative state where pain and awareness are both blunted",
+      "Blood pressure and heart rate tend to hold or rise rather than fall — a key distinction from most sedatives",
+      "Relaxes airway smooth muscle — useful in bronchospastic presentations",
+      "Emergence is a distinct recovery phase: patients can experience vivid imagery, confusion, or agitation waking up",
     ],
 
     whatNursesMonitor: [
@@ -957,10 +968,10 @@ export const DRIPS = [
     ],
 
     whatItIsDoing: [
-      "Primarily blocks potassium channels, prolonging action potential duration",
-      "Also has sodium channel, beta-adrenergic, and calcium channel effects",
-      "Broad antiarrhythmic spectrum across atrial and ventricular tissue",
-      "Very long elimination half-life; effects persist weeks after the infusion ends",
+      "Works across multiple electrical channels in heart tissue to stabilize rhythm and slow conduction",
+      "Slows AV node conduction, which brings down the ventricular rate in fast rhythms",
+      "Very long half-life — effects and drug interactions persist for weeks after the infusion ends",
+      "Contains iodine, which is relevant to thyroid function on longer courses",
     ],
 
     whatNursesMonitor: [
@@ -1037,10 +1048,10 @@ export const DRIPS = [
     ],
 
     whatItIsDoing: [
-      "Calcium channel blockade in the AV node slows conduction and ventricular rate",
-      "Negative chronotropic effect: slows heart rate",
-      "Negative dromotropic effect: slows AV nodal conduction",
-      "Negative inotropy: contractility may be reduced, particularly relevant in systolic dysfunction",
+      "Slows electrical conduction through the AV node, which slows the ventricular rate",
+      "Does not correct the underlying rhythm — rate control and rhythm control are not the same thing",
+      "Reduces contractility somewhat — relevant in patients with already weakened hearts",
+      "Blood pressure can fall as a result of the combined cardiac and vascular effects",
     ],
 
     whatNursesMonitor: [
@@ -1113,10 +1124,10 @@ export const DRIPS = [
     ],
 
     whatItIsDoing: [
-      "Selective beta-1 receptor blockade slows heart rate and reduces blood pressure",
-      "Ultra-short half-life produces clinical effects that resolve quickly with discontinuation",
-      "Negative chronotropic and inotropic effects are dose-related",
-      "Minimal beta-2 activity makes it more suitable in some patients with bronchospastic disease",
+      "Blocks the heart's beta-1 receptors to slow rate and reduce the force of contraction",
+      "Works and wears off in minutes — that rapid offset is the defining feature and the reason for close watching",
+      "Blood pressure falls along with heart rate",
+      "Bronchoconstriction is possible even with a selective agent — especially relevant in patients with airway disease",
     ],
 
     whatNursesMonitor: [
@@ -1192,10 +1203,10 @@ export const DRIPS = [
     ],
 
     whatItIsDoing: [
-      "Calcium channel blockade in arterial smooth muscle reduces vascular resistance",
-      "Predominantly arterial vasodilation with less venodilation compared to nitrates",
-      "Blood pressure reduction is related to decreased SVR",
-      "Heart rate may increase reflexively as blood pressure falls",
+      "Relaxes arterial walls to reduce vascular resistance and lower blood pressure",
+      "Predominantly an arterial effect — less impact on the venous system than nitrates",
+      "Reflex tachycardia may follow as blood pressure falls",
+      "Response takes a few minutes to stabilize after a rate change — allow time before reassessing",
     ],
 
     whatNursesMonitor: [
@@ -1268,10 +1279,10 @@ export const DRIPS = [
     ],
 
     whatItIsDoing: [
-      "Releases nitric oxide, causing both arterial and venous smooth muscle relaxation",
-      "Reduces SVR (afterload) and venous return (preload)",
-      "Blood pressure falls rapidly with infusion; effects reverse rapidly with discontinuation",
-      "Metabolized to cyanide; hepatic and renal handling is relevant to toxicity risk",
+      "Relaxes both arterial and venous walls very rapidly — blood pressure can drop quickly",
+      "Effect reverses just as fast when the infusion stops",
+      "Metabolized to cyanide — on prolonged infusions, accumulation is a serious and time-sensitive safety concern",
+      "Light-sensitive — the infusion bag and tubing require protection from light throughout",
     ],
 
     whatNursesMonitor: [
@@ -1346,10 +1357,10 @@ export const DRIPS = [
     ],
 
     whatItIsDoing: [
-      "Releases nitric oxide in vascular smooth muscle, causing relaxation",
-      "Predominantly venodilation at lower infusion parameters reduces preload",
-      "Arterial vasodilation contributes at higher parameters, reducing SVR and BP",
-      "Coronary artery vasodilation may improve myocardial perfusion distribution",
+      "Relaxes venous walls to reduce how much blood returns to the heart — this is the primary effect",
+      "At higher parameters, arterial walls relax too and blood pressure falls more broadly",
+      "May improve blood flow distribution to coronary vessels",
+      "Tolerance to the vasodilatory effect can develop with continuous infusion over time",
     ],
 
     whatNursesMonitor: [
@@ -1426,10 +1437,10 @@ export const DRIPS = [
     ],
 
     whatItIsDoing: [
-      "Inhibits sodium-potassium-chloride cotransporter in the loop of Henle, reducing reabsorption",
-      "Increases urinary excretion of sodium, chloride, and water, producing diuresis",
-      "Potassium and magnesium are also lost in urine — a consistent monitoring priority",
-      "IV administration produces a more rapid onset compared to oral dosing",
+      "Signals the kidney to stop reabsorbing sodium, chloride, and water — diuresis follows",
+      "Potassium and magnesium go out in the urine too — electrolyte monitoring is essential alongside the output goal",
+      "IV administration produces a faster response than oral dosing",
+      "If renal function is significantly impaired, the diuretic response may be blunted",
     ],
 
     whatNursesMonitor: [
@@ -1502,9 +1513,9 @@ export const DRIPS = [
     ],
 
     whatItIsDoing: [
-      "Inhibits the same sodium-potassium-chloride cotransporter as furosemide",
-      "Produces diuresis with potassium, magnesium, and sodium losses",
-      "Higher milligram potency compared to furosemide; different dose equivalence",
+      "Works through the same kidney mechanism as furosemide to produce diuresis",
+      "More potent per milligram — dose equivalence between loop diuretics is a pharmacy consideration",
+      "Potassium, magnesium, and sodium are lost in the urine alongside the excess water",
       "IV administration produces rapid onset of diuresis",
     ],
 
@@ -1582,11 +1593,11 @@ export const DRIPS = [
     ],
 
     whatItIsDoing: [
-      "Binds antithrombin, dramatically accelerating its inhibitory effect on clotting factors",
-      "Prevents extension of existing thrombus and formation of new clot",
-      "Does not directly break down or dissolve existing thrombus",
-      "Effect monitored via aPTT or anti-Xa level, per institutional protocol",
-      "Reversible: protamine can be used to reverse effect under provider direction",
+      "Amplifies the body's natural clotting inhibitor, slowing clotting factor activity broadly",
+      "Prevents existing clots from growing and new clots from forming",
+      "Does not dissolve or break down clots that are already present",
+      "Effect is monitored via aPTT or anti-Xa level per institutional protocol",
+      "Reversible — a reversal agent is available under provider direction if needed",
     ],
 
     whatNursesMonitor: [
@@ -1662,10 +1673,10 @@ export const DRIPS = [
     ],
 
     whatItIsDoing: [
-      "Directly inhibits thrombin without requiring antithrombin as a cofactor",
-      "Prevents both clot extension and new thrombus formation",
-      "aPTT is the standard laboratory monitoring parameter",
-      "Eliminated primarily via hepatic metabolism — liver function significantly affects drug levels",
+      "Directly blocks thrombin — the final step in clot formation — without needing a cofactor",
+      "Prevents clot extension and new clot formation",
+      "Cleared primarily through the liver — hepatic function shapes how the drug behaves and how lab results read",
+      "No reversal agent; stopping the infusion is the primary management step if needed",
     ],
 
     whatNursesMonitor: [
@@ -1739,10 +1750,10 @@ export const DRIPS = [
     ],
 
     whatItIsDoing: [
-      "Directly inhibits thrombin without requiring antithrombin as a cofactor",
-      "Enzymatic cleavage accounts for a significant portion of elimination",
-      "Renal elimination pathway means renal function affects drug levels and clearance",
-      "aPTT or ACT is the standard monitoring parameter depending on clinical context",
+      "Directly blocks thrombin without needing a cofactor — same target as argatroban, different clearance path",
+      "Cleared partly through the kidneys and partly broken down in the bloodstream itself",
+      "Renal function changes can shift how the drug accumulates and how lab values read",
+      "No reversal agent; stopping the infusion is the primary management step if needed",
     ],
 
     whatNursesMonitor: [
@@ -1818,10 +1829,10 @@ export const DRIPS = [
     ],
 
     whatItIsDoing: [
-      "Facilitates glucose uptake into cells, lowering blood glucose",
-      "Drives potassium into cells alongside glucose, reducing serum potassium",
-      "IV infusion provides rapidly adjustable glycemic management",
-      "Rate adjustments follow provider-ordered protocols based on glucose monitoring results",
+      "Moves glucose from the bloodstream into cells, lowering blood sugar",
+      "Pulls potassium into cells at the same time — potassium can fall as glucose comes down",
+      "IV infusion gives precise, rapidly adjustable control of blood glucose",
+      "Rate adjustments follow the ordered protocol based on glucose monitoring results",
     ],
 
     whatNursesMonitor: [

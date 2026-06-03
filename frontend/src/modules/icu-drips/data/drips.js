@@ -78,17 +78,17 @@ export const DRIPS = [
     related: ["vasopressin", "epinephrine"],
 
     snapshot:
-      "A potent vasopressor that raises MAP primarily through vasoconstriction, with modest inotropic support and less tachycardia than some other agents.",
+      "The first-line pressor. Squeezes the vessels to bring MAP up, with a small assist to the heart's squeeze. Less tachycardia than most options.",
 
     effectChips: [
       { label: "↑ SVR" },
       { label: "↑ MAP" },
-      { label: "mild ↑ inotropy" },
+      { label: "mild heart support" },
       { label: "watch perfusion" },
     ],
 
     mentalModel:
-      "The vasculature is too relaxed. Norepinephrine helps restore tone — but the MAP number and the patient are both part of the picture. Perfusion still has to be assessed at the bedside, not just on the monitor.",
+      "The vasculature is too relaxed. Norepinephrine helps restore tone. But the MAP number and the patient are both part of the picture — perfusion still has to be assessed at the bedside, not just on the monitor.",
 
     commonlyUsedFor: [
       "Distributive and vasodilatory shock presentations",
@@ -154,7 +154,7 @@ export const DRIPS = [
     related: ["norepinephrine", "phenylephrine"],
 
     snapshot:
-      "A non-catecholamine vasopressor acting through V1 receptors, commonly used alongside other vasopressors in vasodilatory shock presentations.",
+      "A different kind of pressor. Works through its own receptor pathway, not the catecholamine route. Usually added alongside another pressor rather than replacing it.",
 
     effectChips: [
       { label: "↑ SVR" },
@@ -164,7 +164,7 @@ export const DRIPS = [
     ],
 
     mentalModel:
-      "Vasopressin takes a different path than norepinephrine — V1 receptors rather than adrenergic ones. It is often added alongside another vasopressor rather than replacing it. The monitoring priorities and adjustment patterns shift with the mechanism.",
+      "Vasopressin takes a different path than norepinephrine. It squeezes the vessels through its own receptor system, not the catecholamine route. It is often added alongside another vasopressor rather than replacing it, and the adjustment patterns differ from what nurses see with standard catecholamine pressors.",
 
     commonlyUsedFor: [
       "Vasodilatory shock not adequately controlled on catecholamine vasopressors alone",
@@ -231,7 +231,7 @@ export const DRIPS = [
     related: ["norepinephrine", "vasopressin"],
 
     snapshot:
-      "A pure alpha-1 agonist that raises MAP through vasoconstriction without direct cardiac effects, often considered when tachycardia is a clinical concern.",
+      "Squeezes the vessels without touching the heart directly. The go-to when the pressure is low and the heart rate is already fast.",
 
     effectChips: [
       { label: "↑ SVR" },
@@ -308,7 +308,7 @@ export const DRIPS = [
     related: ["norepinephrine", "dobutamine"],
 
     snapshot:
-      "A potent catecholamine with broad alpha and beta receptor activity, used in cardiac arrest management and hemodynamic support requiring both vasopressor and inotropic effect.",
+      "The full-force agent. Rate, squeeze, and vascular tone — all at once. That scope is what makes it essential in arrest and what demands continuous monitoring when it is running as a drip.",
 
     effectChips: [
       { label: "↑ MAP" },
@@ -318,7 +318,7 @@ export const DRIPS = [
     ],
 
     mentalModel:
-      "Epinephrine works on everything at once — heart rate, contractility, and vascular tone. That broad effect is what makes it essential in cardiac arrest and why its hemodynamic footprint at the bedside requires careful and continuous watching.",
+      "Epinephrine hits everything at once — heart rate, contractility, and vascular tone. That broad effect is what makes it essential in cardiac arrest and why its hemodynamic footprint at the bedside requires careful, continuous watching when it is running as an infusion.",
 
     commonlyUsedFor: [
       "Cardiac arrest per ACLS protocol",
@@ -392,7 +392,7 @@ export const DRIPS = [
     related: ["milrinone", "norepinephrine"],
 
     snapshot:
-      "A synthetic catecholamine that primarily supports cardiac output through inotropic and chronotropic effects, commonly seen with low cardiac output presentations.",
+      "The pump booster. Helps a weakened heart push more blood out, but it can soften the blood pressure while it does.",
 
     effectChips: [
       { label: "↑ inotropy" },
@@ -469,7 +469,7 @@ export const DRIPS = [
     related: ["dobutamine", "norepinephrine"],
 
     snapshot:
-      "A phosphodiesterase-3 inhibitor providing inotropic and vasodilatory effects through a non-catecholamine pathway, with a longer elimination profile than catecholamine inotropes.",
+      "Stronger squeeze, looser vessels. The pressure can drop while the pump gets better. And its effects linger well after any rate change.",
 
     effectChips: [
       { label: "↑ inotropy" },
@@ -550,7 +550,7 @@ export const DRIPS = [
     related: ["dexmedetomidine", "midazolam"],
 
     snapshot:
-      "A fast-acting IV sedative-hypnotic with no analgesic properties, adjustable to a provider-ordered sedation depth in intubated ICU patients.",
+      "The on/off sedative. Works fast, clears fast. Does nothing for pain — analgesia needs its own plan alongside it.",
 
     effectChips: [
       { label: "sedation" },
@@ -629,7 +629,7 @@ export const DRIPS = [
     related: ["propofol", "midazolam"],
 
     snapshot:
-      "An alpha-2 agonist providing light, arousable sedation with relative preservation of respiratory drive, often used when patient cooperation and ventilator weaning are clinical goals.",
+      "The shoulder-tap sedative. Calm but usually still rousable and cooperative. Breathing mostly stays intact. Bradycardia is the constant bedside watch.",
 
     effectChips: [
       { label: "sedation" },
@@ -707,7 +707,7 @@ export const DRIPS = [
     related: ["propofol", "dexmedetomidine"],
 
     snapshot:
-      "A short-acting benzodiazepine used for procedural sedation, anxiolysis, and adjunct ICU sedation, with accumulation and respiratory depression considerations on prolonged infusion.",
+      "Sedates and calms, but stacks up quietly on long infusions. Wake-up time runs longer than expected, especially when the liver or kidneys are not clearing it well.",
 
     effectChips: [
       { label: "sedation" },
@@ -784,7 +784,7 @@ export const DRIPS = [
     related: ["midazolam", "ketamine"],
 
     snapshot:
-      "A synthetic opioid analgesic used for pain management and adjunct sedation in critically ill patients, with respiratory depression as the primary bedside safety concern.",
+      "The pain reliever, not the sedative. Fast onset, relatively gentle on blood pressure. Respiratory monitoring is the constant bedside responsibility.",
 
     effectChips: [
       { label: "analgesia" },
@@ -859,7 +859,7 @@ export const DRIPS = [
     related: ["fentanyl", "midazolam"],
 
     snapshot:
-      "A dissociative anesthetic used for procedural sedation and analgesia, notable for hemodynamic preservation and bronchodilatory effects, with emergence phenomena requiring clinical awareness.",
+      "The pressure-friendly sedative. Blood pressure tends to hold or climb rather than drop. But recovery can be vivid and disorienting — emergence is part of the monitoring plan.",
 
     effectChips: [
       { label: "dissociative" },
@@ -937,7 +937,7 @@ export const DRIPS = [
     related: ["diltiazem", "esmolol"],
 
     snapshot:
-      "A broad-spectrum antiarrhythmic with complex multi-channel pharmacology; a very long half-life means effects and drug interactions continue well beyond the infusion.",
+      "The rhythm stabilizer with the longest memory. Works on multiple channels at once, and its effects and interactions stay active for weeks after the drip ends.",
 
     effectChips: [
       { label: "rhythm control" },
@@ -1018,7 +1018,7 @@ export const DRIPS = [
     related: ["amiodarone", "esmolol"],
 
     snapshot:
-      "A calcium channel blocker used for rate control in atrial fibrillation and flutter, slowing AV nodal conduction with meaningful effects on blood pressure.",
+      "The rate brake for AFib and flutter. Slows how fast the ventricles respond, not the underlying rhythm. Rate control and rhythm control are different things.",
 
     effectChips: [
       { label: "rate control" },
@@ -1093,7 +1093,7 @@ export const DRIPS = [
     related: ["diltiazem", "amiodarone"],
 
     snapshot:
-      "An ultra-short-acting beta-1 selective blocker used for rate and blood pressure management in acute settings, with rapid offset that allows for close hemodynamic management.",
+      "The fast-on, fast-off beta-blocker. Rate and pressure respond quickly, and they recover just as fast when the drip stops. Every change deserves close hemodynamic watching.",
 
     effectChips: [
       { label: "rate control" },
@@ -1172,7 +1172,7 @@ export const DRIPS = [
     related: ["nitroprusside", "nitroglycerin"],
 
     snapshot:
-      "A calcium channel blocker used for blood pressure management in acute hypertensive presentations, providing arterial vasodilation with a manageable and predictable response profile.",
+      "The arterial pressure controller. Relaxes vessel walls to bring BP down. Response takes a few minutes to settle after any rate change — worth keeping in mind when reassessing.",
 
     effectChips: [
       { label: "↓ SVR" },
@@ -1248,7 +1248,7 @@ export const DRIPS = [
     related: ["nitroglycerin", "nicardipine"],
 
     snapshot:
-      "A rapidly acting arterial and venous vasodilator used for hypertensive emergencies and afterload reduction, with close monitoring required for cyanide accumulation on prolonged use.",
+      "One of the most powerful BP-lowering drips in the ICU. Fast in, fast out. On long infusions, cyanide buildup is a serious safety concern the whole team needs to know about.",
 
     effectChips: [
       { label: "↓ SVR" },
@@ -1326,7 +1326,7 @@ export const DRIPS = [
     related: ["nitroprusside", "nicardipine"],
 
     snapshot:
-      "A nitrate vasodilator with predominantly venous effects, adding arterial vasodilation at higher infusion parameters, commonly seen in chest pain and acute heart failure management.",
+      "The preload reliever. Mainly relaxes the veins to reduce the blood returning to the heart. Headache is common and expected. Blood pressure drop is the real watch.",
 
     effectChips: [
       { label: "↓ preload" },
@@ -1406,7 +1406,7 @@ export const DRIPS = [
     related: ["bumetanide"],
 
     snapshot:
-      "A loop diuretic used for volume management in fluid overload states, producing diuresis with monitoring of electrolytes, renal function, and hemodynamic response.",
+      "The volume-puller. Signals the kidneys to let go of sodium and water. Output is only half the picture — the potassium and magnesium going with it matter just as much.",
 
     effectChips: [
       { label: "diuresis" },
@@ -1482,7 +1482,7 @@ export const DRIPS = [
     related: ["furosemide"],
 
     snapshot:
-      "A potent loop diuretic with higher milligram potency than furosemide, used in volume management when a different pharmacokinetic profile or diuretic response is clinically indicated.",
+      "Same job as furosemide, different potency per milligram. The monitoring priorities are identical: output, electrolytes, volume status, and kidney function — all watched together.",
 
     effectChips: [
       { label: "diuresis" },
@@ -1562,7 +1562,7 @@ export const DRIPS = [
     related: ["argatroban", "bivalirudin"],
 
     snapshot:
-      "An IV anticoagulant that potentiates antithrombin to inhibit clotting factors, used across a range of thrombotic conditions with laboratory monitoring guiding clinical management.",
+      "The steering-wheel anticoagulant. Keeps clots from growing, not from dissolving. The lab value is the window into where the patient sits on the anticoagulation spectrum.",
 
     effectChips: [
       { label: "anticoagulation" },
@@ -1642,17 +1642,17 @@ export const DRIPS = [
     related: ["bivalirudin", "heparin"],
 
     snapshot:
-      "A direct thrombin inhibitor used as an alternative anticoagulant when heparin-induced thrombocytopenia is confirmed or suspected, with hepatic elimination affecting monitoring.",
+      "The HIT alternative. When heparin has to stop, argatroban takes over. The liver handles most of the clearance, so hepatic function shapes how the drug behaves and how the lab values read.",
 
     effectChips: [
-      { label: "direct thrombin inhibition" },
+      { label: "thrombin blocker" },
       { label: "HIT alternative" },
       { label: "lab-guided" },
-      { label: "hepatic clearance" },
+      { label: "liver-cleared" },
     ],
 
     mentalModel:
-      "Argatroban is one of the agents considered when heparin can no longer be used safely. The monitoring still centers on aPTT, but hepatic function can significantly affect how the drug behaves — and how the lab results interpret the anticoagulation level.",
+      "Argatroban is the go-to when heparin has to come off. The monitoring still centers on aPTT, but liver function can significantly shape how the drug behaves and how those lab results interpret the anticoagulation level.",
 
     commonlyUsedFor: [
       "Anticoagulation management when HIT is confirmed or clinically suspected",
@@ -1719,17 +1719,17 @@ export const DRIPS = [
     related: ["argatroban", "heparin"],
 
     snapshot:
-      "A direct thrombin inhibitor with combined enzymatic and renal elimination, used in anticoagulation management including percutaneous cardiac procedures and HIT contexts.",
+      "Another HIT-safe anticoagulant. Clears through the kidneys and through the bloodstream itself. When kidney function changes, so can the drug's behavior and the lab values.",
 
     effectChips: [
-      { label: "direct thrombin inhibition" },
-      { label: "enzymatic + renal clearance" },
+      { label: "thrombin blocker" },
+      { label: "dual-path clearance" },
       { label: "lab-guided" },
       { label: "HIT context" },
     ],
 
     mentalModel:
-      "Bivalirudin works directly on thrombin like argatroban, but its elimination pathway is different — part renal, part enzymatic. That combination affects how it behaves when renal function changes and why the monitoring picture can shift in less predictable directions.",
+      "Bivalirudin works on the same target as argatroban, but clears differently — partly through the kidneys, partly broken down in the bloodstream itself. When kidney function shifts, so can the drug's behavior and the lab values.",
 
     commonlyUsedFor: [
       "Anticoagulation during percutaneous coronary intervention and cardiac catheterization",
@@ -1798,7 +1798,7 @@ export const DRIPS = [
     related: ["heparin"],
 
     snapshot:
-      "A continuous IV insulin infusion used for glycemic management in critically ill patients, requiring close glucose and potassium monitoring to prevent hypoglycemia and electrolyte imbalance.",
+      "The glucose drip with a potassium shadow. Watch both numbers, not one. The same mechanism that lowers glucose also pulls potassium into cells.",
 
     effectChips: [
       { label: "glycemic control" },

@@ -1,0 +1,261 @@
+export interface RhythmSide {
+  id: string;
+  name: string;
+  short: string;
+  visualClue: string;
+  regularity: string;
+  pWaveStory: string;
+  qrsWidth: string;
+}
+
+export interface ConfusablePair {
+  id: string;
+  label: string;
+  a: RhythmSide;
+  b: RhythmSide;
+  recognitionPearl: string;
+  commonMistake: string;
+}
+
+export const CONFUSABLE_PAIRS: ConfusablePair[] = [
+  {
+    id: 'afib-vs-mat',
+    label: 'A-Fib vs MAT',
+    a: {
+      id: 'afib',
+      name: 'Atrial Fibrillation',
+      short: 'A-Fib',
+      visualClue: 'Chaotic undulating baseline between QRS complexes. No identifiable P waves anywhere on the strip.',
+      regularity: 'Irregularly irregular — no repeating pattern',
+      pWaveStory: 'None. Replaced by continuous fibrillatory activity (f-waves) that vary in size and timing.',
+      qrsWidth: 'Narrow unless aberrant conduction or bundle branch block present',
+    },
+    b: {
+      id: 'mat',
+      name: 'Multifocal Atrial Tachycardia',
+      short: 'MAT',
+      visualClue: 'Three or more distinct P-wave shapes visible on the same strip. Baseline between beats is clean.',
+      regularity: 'Irregularly irregular — same surface appearance as AFib',
+      pWaveStory: 'Present but morphologically different beat to beat. At least 3 distinct P shapes required for the diagnosis.',
+      qrsWidth: 'Narrow — ventricular conduction is normal',
+    },
+    recognitionPearl: 'If you can find organized P waves — even ugly, different-shaped ones — it is not AFib. AFib has no P waves at all.',
+    commonMistake: 'Calling MAT "AFib with weird P waves." They look identically irregular at a glance, but P waves are the whole story.',
+  },
+  {
+    id: 'flutter-vs-sinus-tachy',
+    label: 'Flutter vs Sinus Tachycardia',
+    a: {
+      id: 'aflutter',
+      name: 'Atrial Flutter',
+      short: 'Flutter',
+      visualClue: 'Sawtooth pattern between QRS complexes — the baseline never returns to flat. Rate near 150 with regular spacing.',
+      regularity: 'Regular (or regularly irregular if variable block)',
+      pWaveStory: 'No true P waves. Continuous sawtooth flutter waves (F-waves) at 250–350 per minute. Look for them marching through the QRS.',
+      qrsWidth: 'Narrow unless aberrant conduction',
+    },
+    b: {
+      id: 'sinus_tachycardia',
+      name: 'Sinus Tachycardia',
+      short: 'S-Tachy',
+      visualClue: 'Clear upright P wave before each QRS, with a clean isoelectric baseline between beats.',
+      regularity: 'Regular — RR intervals consistent',
+      pWaveStory: 'Upright, uniform, one before every QRS. PR interval normal. P is often close to the preceding T at fast rates.',
+      qrsWidth: 'Narrow — normal ventricular conduction',
+    },
+    recognitionPearl: 'A rate near 150 that is perfectly regular deserves a flutter hunt. Calipers on the baseline — if it never goes flat between beats, that is flutter.',
+    commonMistake: 'Missing flutter waves buried in T waves at a 2:1 ratio. Look for a rate of exactly 150 and scrutinize every T wave for a hidden F-wave.',
+  },
+  {
+    id: 'vt-vs-svt-aberrancy',
+    label: 'VT vs SVT with Aberrancy',
+    a: {
+      id: 'vtach',
+      name: 'Ventricular Tachycardia',
+      short: 'VT',
+      visualClue: 'Wide bizarre QRS complexes running fast with AV dissociation — P waves march independently if visible at all.',
+      regularity: 'Regular — typically very consistent RR intervals',
+      pWaveStory: 'Dissociated from QRS. P waves march at a slower independent rate if visible. Fusion or capture beats are diagnostic of VT.',
+      qrsWidth: 'Wide ≥ 0.12 s, often > 0.14 s. Bizarre morphology.',
+    },
+    b: {
+      id: 'svt',
+      name: 'SVT with Aberrancy',
+      short: 'SVT-A',
+      visualClue: 'Wide QRS tachycardia but with bundle branch block morphology — RSR′ or broad monophasic pattern. No AV dissociation.',
+      regularity: 'Regular',
+      pWaveStory: 'Retrograde P waves may be visible after the QRS, or buried in it. No independent P-wave march.',
+      qrsWidth: 'Wide, but due to aberrant conduction — morphology matches a bundle branch block pattern',
+    },
+    recognitionPearl: 'When in doubt, treat as VT. SVT with aberrancy is the safer miss. AV dissociation on the strip confirms VT — look for independent P waves.',
+    commonMistake: 'Assuming wide + fast = VT without looking for AV dissociation. Fusion beats are pathognomonic of VT and end the debate.',
+  },
+  {
+    id: 'pac-vs-pvc',
+    label: 'PAC vs PVC',
+    a: {
+      id: 'pac',
+      name: 'Premature Atrial Contraction',
+      short: 'PAC',
+      visualClue: 'Early beat with a P wave that looks different from sinus P waves. QRS is narrow — same shape as the surrounding beats.',
+      regularity: 'Underlying rhythm is interrupted by an early beat. Incomplete compensatory pause follows.',
+      pWaveStory: 'Abnormal P-wave morphology — earlier, different axis, or inverted. Still present and precedes the QRS.',
+      qrsWidth: 'Narrow — conducted normally through the ventricles',
+    },
+    b: {
+      id: 'pvc',
+      name: 'Premature Ventricular Contraction',
+      short: 'PVC',
+      visualClue: 'Early wide bizarre beat with no preceding P wave. T wave deflects opposite to the QRS. Full compensatory pause follows.',
+      regularity: 'Underlying rhythm is interrupted. Full compensatory pause — the next sinus beat arrives on time.',
+      pWaveStory: 'Absent before the ectopic beat. The sinus P wave may march through uninterrupted and be buried in the PVC.',
+      qrsWidth: 'Wide ≥ 0.12 s, bizarre morphology, discordant T wave',
+    },
+    recognitionPearl: 'QRS width decides it. Early narrow beat with an odd P wave is a PAC. Early wide bizarre beat with no P wave is a PVC.',
+    commonMistake: 'Calling every early beat a PVC. Check QRS width first. A narrow early beat with a different-looking P wave is a PAC — a much more benign finding.',
+  },
+  {
+    id: 'wenckebach-vs-mobitz-ii',
+    label: 'Wenckebach vs Mobitz II',
+    a: {
+      id: 'mobitz_i',
+      name: 'Wenckebach (Mobitz I)',
+      short: 'Mobitz I',
+      visualClue: 'PR interval visibly lengthens beat to beat until a QRS is dropped, then the cycle resets. Grouped beating pattern.',
+      regularity: 'Regularly irregular — grouped beats with predictable pauses',
+      pWaveStory: 'Regular P waves throughout. Each P is followed by a QRS except the blocked one, which falls after the longest PR.',
+      qrsWidth: 'Narrow — block is at the AV node level',
+    },
+    b: {
+      id: 'mobitz_ii',
+      name: 'Mobitz II',
+      short: 'Mobitz II',
+      visualClue: 'Consistent PR interval on all conducted beats, then a QRS suddenly drops with no warning. No PR creep.',
+      regularity: 'Regularly irregular — fixed ratio drop (2:1, 3:1, etc.)',
+      pWaveStory: 'Regular P waves. Conducted beats have identical PR intervals. The blocked P wave simply has no QRS after it.',
+      qrsWidth: 'Wide — block is below the AV node (bundle of His or bundle branches)',
+    },
+    recognitionPearl: 'PR stretches before it drops → Mobitz I (the PR is your warning). PR stays fixed then drops → Mobitz II (no warning). Width of QRS confirms the level.',
+    commonMistake: 'Mistaking 2:1 block for Wenckebach. With only two beats before the drop, you cannot see PR lengthening. Count three or more conducted beats to assess PR behavior.',
+  },
+  {
+    id: 'fine-vf-vs-asystole',
+    label: 'Fine VF vs Asystole',
+    a: {
+      id: 'vfib_fine',
+      name: 'Fine Ventricular Fibrillation',
+      short: 'Fine VF',
+      visualClue: 'Continuous low-amplitude irregular oscillations throughout. The baseline shimmers — it never fully rests.',
+      regularity: 'Completely chaotic. No QRS complexes identifiable.',
+      pWaveStory: 'None. No organized atrial or ventricular activity.',
+      qrsWidth: 'No discernible QRS complexes',
+    },
+    b: {
+      id: 'asystole',
+      name: 'Asystole',
+      short: 'Asystole',
+      visualClue: 'Near-flat line. Occasional isolated artifact may appear but the baseline is essentially still.',
+      regularity: 'None — no cardiac electrical activity',
+      pWaveStory: 'None.',
+      qrsWidth: 'None',
+    },
+    recognitionPearl: 'Does the baseline move continuously? Fine VF shimmers — it is never still. Asystole is nearly flat. Always confirm in two leads before concluding either.',
+    commonMistake: 'Shocking asystole. Fine VF may be shockable; asystole is not. A lead artifact can mimic a flat line — check the patient and confirm in a second lead before calling asystole.',
+  },
+  {
+    id: 'junctional-vs-sinus-brady',
+    label: 'Junctional vs Sinus Bradycardia',
+    a: {
+      id: 'junctional_rhythm',
+      name: 'Junctional Rhythm',
+      short: 'Junctional',
+      visualClue: 'Slow regular rhythm. P waves absent, inverted, or hidden inside/after the QRS complex — never upright before it.',
+      regularity: 'Regular at 40–60 bpm',
+      pWaveStory: 'Retrograde P waves: inverted in inferior leads (II, III, aVF), may appear before, during, or just after the QRS.',
+      qrsWidth: 'Narrow — ventricular conduction is normal',
+    },
+    b: {
+      id: 'sinus_bradycardia',
+      name: 'Sinus Bradycardia',
+      short: 'Sinus Brady',
+      visualClue: 'Slow regular rhythm with a clearly upright P wave before every QRS — identical to NSR, just slower.',
+      regularity: 'Regular, < 60 bpm',
+      pWaveStory: 'Upright, uniform, one before every QRS. PR interval normal (0.12–0.20 s). SA node is in charge.',
+      qrsWidth: 'Narrow — normal conduction',
+    },
+    recognitionPearl: 'Find an upright P wave before the QRS. If it is there and the PR is normal, the SA node is in charge — sinus bradycardia. No upright P, or P is inverted → junction is the pacemaker.',
+    commonMistake: 'Missing an inverted P wave hidden just before or inside the QRS complex and assuming there are no P waves at all.',
+  },
+  {
+    id: 'flutter-fixed-vs-variable',
+    label: 'Flutter: Fixed vs Variable Block',
+    a: {
+      id: 'aflutter',
+      name: 'Flutter — Fixed Block (2:1)',
+      short: 'Flutter 2:1',
+      visualClue: 'Every other flutter wave conducts. Rate ~150 bpm. Every QRS is evenly spaced — looks deceptively regular and fast.',
+      regularity: 'Regular — one QRS per two F-waves',
+      pWaveStory: 'F-waves at 250–350/min. With 2:1 block, one F-wave hides in every T wave. Rate of 150 is the giveaway.',
+      qrsWidth: 'Narrow',
+    },
+    b: {
+      id: 'aflutter',
+      name: 'Flutter — Variable Block',
+      short: 'Flutter Variable',
+      visualClue: 'Sawtooth baseline with QRS complexes appearing at irregular intervals. The F-waves march through every QRS.',
+      regularity: 'Irregular — RR intervals vary as the block ratio changes (2:1, 3:1, 4:1)',
+      pWaveStory: 'Same sawtooth F-waves, but conduction varies. Count F-waves between QRS complexes — the ratio changes.',
+      qrsWidth: 'Narrow',
+    },
+    recognitionPearl: 'The sawtooth baseline is the constant — it never changes. What changes is how many F-waves conduct. Count the waves between each QRS to find the ratio.',
+    commonMistake: 'Calling variable-block flutter "AFib" because the RR intervals are irregular. The sawtooth baseline is organized; AFib is chaotic. Look at the baseline between QRS complexes.',
+  },
+  {
+    id: 'unifocal-vs-multifocal-pvc',
+    label: 'Unifocal vs Multifocal PVCs',
+    a: {
+      id: 'pvc',
+      name: 'Unifocal PVCs',
+      short: 'Unifocal',
+      visualClue: 'All PVCs on the strip have identical size, shape, and axis — they are clearly clones of each other.',
+      regularity: 'Underlying rhythm interrupted by PVCs of one consistent morphology',
+      pWaveStory: 'No P wave before each PVC. The morphology is fixed — same ectopic focus firing each time.',
+      qrsWidth: 'Wide, identical morphology on every PVC',
+    },
+    b: {
+      id: 'pvc',
+      name: 'Multifocal PVCs',
+      short: 'Multifocal',
+      visualClue: 'PVCs with two or more different shapes on the same strip — some tall, some negative, varying axis.',
+      regularity: 'Underlying rhythm interrupted by PVCs of varying morphology',
+      pWaveStory: 'No P wave before any PVC. Different morphologies indicate multiple ectopic foci firing from different ventricular locations.',
+      qrsWidth: 'Wide, but shape varies beat to beat across the PVCs',
+    },
+    recognitionPearl: 'Do the ectopic beats all look the same? One shape = one irritable focus (unifocal). Different shapes = multiple foci irritable (multifocal) — a sign of more diffuse electrical instability.',
+    commonMistake: 'Not comparing PVC morphologies to each other. All PVCs look wide and bizarre — the distinction is whether they are wide-bizarre in the same way or different ways.',
+  },
+  {
+    id: 'escape-vs-premature',
+    label: 'Escape Beat vs Premature Beat',
+    a: {
+      id: 'ventricular_escape',
+      name: 'Escape Beat',
+      short: 'Escape',
+      visualClue: 'Wide beat that arrives late — after a pause longer than the normal RR interval. The beat rescues the rhythm after a failure above.',
+      regularity: 'Appears after a prolonged pause. The escape beat ends the pause.',
+      pWaveStory: 'No preceding P wave. The normal pacemaker has failed to fire, so a lower backup pacemaker escapes.',
+      qrsWidth: 'Wide if ventricular escape; narrow if junctional escape',
+    },
+    b: {
+      id: 'pvc',
+      name: 'Premature Beat (PVC)',
+      short: 'Premature',
+      visualClue: 'Wide beat that arrives early — before the next expected sinus beat. Followed by a compensatory pause.',
+      regularity: 'Interrupts the rhythm early, then a pause before the next sinus beat.',
+      pWaveStory: 'No preceding P wave. An irritable ectopic focus fires before it is supposed to.',
+      qrsWidth: 'Wide, bizarre morphology',
+    },
+    recognitionPearl: 'Timing is everything. Early wide beat = ectopic (premature). Late wide beat after a pause = escape (rescue). They look similar but mean the opposite thing clinically.',
+    commonMistake: 'Treating an escape beat as PVC and suppressing it. An escape beat is a safety mechanism — it keeps the heart going when the dominant pacemaker fails. Never suppress an escape rhythm.',
+  },
+];

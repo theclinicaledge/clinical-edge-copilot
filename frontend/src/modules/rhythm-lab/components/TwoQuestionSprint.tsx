@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useCallback } from 'react';
 import { RHYTHMS } from '../data/rhythms';
 import { RhythmStrip } from './RhythmStrip';
 import { getPearlForRhythm } from '../data/phase1';
@@ -7,66 +7,135 @@ interface TwoQuestionSprintProps {
   onBack: () => void;
 }
 
-type RateAnswer = 'fast' | 'normal' | 'slow' | null;
-type RegAnswer  = 'regular' | 'irregular' | null;
+type RateAnswer = 'slow' | 'normal' | 'fast';
+type RegAnswer  = 'regular' | 'irregular';
 
-function pickRhythm(excludeId?: string) {
-  const pool = excludeId ? RHYTHMS.filter(r => r.id !== excludeId) : RHYTHMS;
-  return pool[Math.floor(Math.random() * pool.length)];
+const SPRINT_LENGTH = 5;
+
+function getRhythmRateCategory(rate: string): RateAnswer {
+  const r = rate.toLowerCase();
+  if (r.includes('> 100') || r.includes('>100') || r.includes('150') || r.includes('200') || r.includes('tachycardia') || r.includes('fast')) return 'fast';
+  if (r.includes('< 60') || r.includes('<60') || r.includes('40') || r.includes('bradycardia') || r.includes('slow')) return 'slow';
+  return 'normal';
+}
+
+function getRhythmRegCategory(regularity: string): RegAnswer {
+  const r = regularity.toLowerCase();
+  if (r.includes('irregular')) return 'irregular';
+  return 'regular';
+}
+
+function buildDeck(): typeof RHYTHMS {
+  const shuffled = [...RHYTHMS].sort(() => Math.random() - 0.5);
+  return shuffled.slice(0, SPRINT_LENGTH);
 }
 
 export function TwoQuestionSprint({ onBack }: TwoQuestionSprintProps) {
-  const [rhythm,   setRhythm]   = useState(() => pickRhythm());
-  const [rateAns,  setRateAns]  = useState<RateAnswer>(null);
-  const [regAns,   setRegAns]   = useState<RegAnswer>(null);
+  const [deck,     setDeck]     = useState(() => buildDeck());
+  const [cardIdx,  setCardIdx]  = useState(0);
+  const [rateAns,  setRateAns]  = useState<RateAnswer | null>(null);
+  const [regAns,   setRegAns]   = useState<RegAnswer  | null>(null);
   const [revealed, setRevealed] = useState(false);
+  const [done,     setDone]     = useState(false);
 
-  const pearl = getPearlForRhythm(rhythm.id);
+  const rhythm = deck[cardIdx];
+  const pearl  = getPearlForRhythm(rhythm.id);
+  const correctRate = getRhythmRateCategory(rhythm.rate);
+  const correctReg  = getRhythmRegCategory(rhythm.regularity);
+  const bothAnswered = rateAns !== null && regAns !== null;
+
+  const handleReveal = useCallback(() => setRevealed(true), []);
 
   function next() {
-    setRhythm(r => pickRhythm(r.id));
+    if (cardIdx + 1 >= SPRINT_LENGTH) {
+      setDone(true);
+    } else {
+      setCardIdx(i => i + 1);
+      setRateAns(null);
+      setRegAns(null);
+      setRevealed(false);
+    }
+  }
+
+  function restart() {
+    setDeck(buildDeck());
+    setCardIdx(0);
     setRateAns(null);
     setRegAns(null);
     setRevealed(false);
+    setDone(false);
   }
 
-  const bothAnswered = rateAns !== null && regAns !== null;
+  if (done) {
+    return (
+      <div className="sprint-page">
+        <div className="practice-nav">
+          <button className="detail-back" onClick={onBack}>← All Rhythms</button>
+          <div className="practice-nav__right">
+            <span className="compare-nav__badge">Sprint</span>
+          </div>
+        </div>
+        <div className="sprint-done">
+          <p className="sprint-done__eyebrow">Sprint complete</p>
+          <p className="sprint-done__title">{SPRINT_LENGTH} strips reviewed</p>
+          <p className="sprint-done__sub">Rate and regularity are the first two questions on every strip you see.</p>
+          <div className="sprint-done__actions">
+            <button className="practice-reveal-btn" onClick={restart}>Run another sprint</button>
+            <button className="detail-back" onClick={onBack}>← Back to rhythms</button>
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="sprint-page">
+
+      {/* Nav */}
       <div className="practice-nav">
         <button className="detail-back" onClick={onBack}>← All Rhythms</button>
         <div className="practice-nav__right">
-          <span className="compare-nav__badge">Two-Question Sprint</span>
+          <span className="compare-nav__badge">Sprint</span>
+          <span className="practice-nav__counter">{cardIdx + 1} / {SPRINT_LENGTH}</span>
         </div>
       </div>
 
-      <div className="detail-strip-area">
-        <RhythmStrip key={rhythm.id} rhythmId={rhythm.id} />
+      {/* Progress bar */}
+      <div className="sprint-progress-bar" aria-label={`Strip ${cardIdx + 1} of ${SPRINT_LENGTH}`}>
+        {Array.from({ length: SPRINT_LENGTH }).map((_, i) => (
+          <div
+            key={i}
+            className={`sprint-progress-pip${i < cardIdx ? ' sprint-progress-pip--done' : i === cardIdx ? ' sprint-progress-pip--active' : ''}`}
+          />
+        ))}
+      </div>
+
+      {/* Strip */}
+      <div className="detail-strip-area sprint-strip-area">
+        <RhythmStrip key={`${cardIdx}-${rhythm.id}`} rhythmId={rhythm.id} />
         <div className="detail-strip-meta">
           <span className="detail-strip-label">
-            {revealed ? `${rhythm.shortName} — ${rhythm.name}` : '? — Identity hidden'}
+            {revealed ? `${rhythm.shortName} — ${rhythm.name}` : '? — Identify the rhythm'}
           </span>
           <span className="detail-strip-annotation">Lead II simulation · 25 mm/s</span>
         </div>
       </div>
 
-      <div className="practice-panel">
+      {/* Panel */}
+      <div className="sprint-panel">
         {!revealed ? (
           <div className="sprint-questions">
-            <p className="practice-eyebrow">Sprint</p>
-            <p className="practice-identify__prompt">Two questions only</p>
 
             <div className="sprint-q-block">
-              <p className="sprint-q-label">Fast, normal, or slow?</p>
+              <p className="sprint-q-label">Rate?</p>
               <div className="sprint-options">
                 {(['slow', 'normal', 'fast'] as RateAnswer[]).map(opt => (
                   <button
-                    key={opt!}
+                    key={opt}
                     className={`sprint-option${rateAns === opt ? ' sprint-option--selected' : ''}`}
                     onClick={() => setRateAns(opt)}
                   >
-                    {opt!.charAt(0).toUpperCase() + opt!.slice(1)}
+                    {opt.charAt(0).toUpperCase() + opt.slice(1)}
                   </button>
                 ))}
               </div>
@@ -77,41 +146,47 @@ export function TwoQuestionSprint({ onBack }: TwoQuestionSprintProps) {
               <div className="sprint-options">
                 {(['regular', 'irregular'] as RegAnswer[]).map(opt => (
                   <button
-                    key={opt!}
+                    key={opt}
                     className={`sprint-option${regAns === opt ? ' sprint-option--selected' : ''}`}
                     onClick={() => setRegAns(opt)}
                   >
-                    {opt!.charAt(0).toUpperCase() + opt!.slice(1)}
+                    {opt.charAt(0).toUpperCase() + opt.slice(1)}
                   </button>
                 ))}
               </div>
             </div>
 
             {bothAnswered && (
-              <button
-                className="practice-reveal-btn"
-                style={{ marginTop: 20 }}
-                onClick={() => setRevealed(true)}
-              >
-                Reveal rhythm
+              <button className="sprint-reveal-btn" onClick={handleReveal}>
+                Reveal →
               </button>
             )}
           </div>
         ) : (
-          <div className="sprint-reveal">
-            <div className="practice-answer__header">
-              <span className="practice-answer__abbrev">{rhythm.shortName}</span>
-              <span className="practice-answer__name">{rhythm.name}</span>
+          <div className="sprint-reveal sprint-reveal--animate">
+            <div className="sprint-reveal__header">
+              <div className="sprint-reveal__identity">
+                <span className="practice-answer__abbrev">{rhythm.shortName}</span>
+                <span className="practice-answer__name">{rhythm.name}</span>
+              </div>
+              <div className="sprint-reveal__checks">
+                <span className={`sprint-check${rateAns === correctRate ? ' sprint-check--correct' : ' sprint-check--wrong'}`}>
+                  {rateAns === correctRate ? '✓' : '✗'} Rate: {correctRate}
+                </span>
+                <span className={`sprint-check${regAns === correctReg ? ' sprint-check--correct' : ' sprint-check--wrong'}`}>
+                  {regAns === correctReg ? '✓' : '✗'} {correctReg.charAt(0).toUpperCase() + correctReg.slice(1)}
+                </span>
+              </div>
             </div>
 
-            <div className="sprint-data">
-              <div className="practice-data-row">
-                <span className="practice-data-label">Rate</span>
-                <span className="practice-data-value">{rhythm.rate}</span>
+            <div className="sprint-reveal__data">
+              <div className="sprint-data-row">
+                <span className="sprint-data-label">Rate</span>
+                <span className="sprint-data-value">{rhythm.rate}</span>
               </div>
-              <div className="practice-data-row">
-                <span className="practice-data-label">Regularity</span>
-                <span className="practice-data-value">{rhythm.regularity}</span>
+              <div className="sprint-data-row">
+                <span className="sprint-data-label">Regularity</span>
+                <span className="sprint-data-value">{rhythm.regularity}</span>
               </div>
             </div>
 
@@ -120,12 +195,13 @@ export function TwoQuestionSprint({ onBack }: TwoQuestionSprintProps) {
               <p className="sprint-pearl__text">{pearl.text}</p>
             </div>
 
-            <button className="practice-next-btn" onClick={next}>
-              Next strip →
+            <button className="sprint-next-btn" onClick={next}>
+              {cardIdx + 1 < SPRINT_LENGTH ? 'Next strip →' : 'Finish sprint →'}
             </button>
           </div>
         )}
       </div>
+
     </div>
   );
 }

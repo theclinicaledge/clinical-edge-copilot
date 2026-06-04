@@ -12,6 +12,7 @@ interface RhythmLabHomeProps {
   onCompare: () => void;
   onPractice: () => void;
   onSprint: () => void;
+  onConfusables: () => void;
 }
 
 // Normalise a search string: lowercase, hyphens → spaces, collapse whitespace.
@@ -35,7 +36,7 @@ const TEACHING_POINTS = [
   },
 ];
 
-export function RhythmLabHome({ rhythms, onSelect, onCompare, onPractice, onSprint }: RhythmLabHomeProps) {
+export function RhythmLabHome({ rhythms, onSelect, onCompare, onPractice, onSprint, onConfusables }: RhythmLabHomeProps) {
   const [query, setQuery] = useState('');
 
   // Progress data — read once on mount (home remounts on every return from detail/practice/compare)
@@ -118,6 +119,16 @@ export function RhythmLabHome({ rhythms, onSelect, onCompare, onPractice, onSpri
               : `${rhythms.length} core rhythms — select to explore`}
           </p>
           <div className="home-right__actions">
+          <button className="confusables-mode-btn" onClick={onConfusables}>
+            <span className="practice-mode-btn__main">
+              <svg width="13" height="13" viewBox="0 0 13 13" fill="none" aria-hidden="true">
+                <path d="M2 4h4M7 4h4M2 6.5h4M7 6.5h4M2 9h4M7 9h4" stroke="currentColor" strokeWidth="1.1" strokeLinecap="round"/>
+                <line x1="5.5" y1="1" x2="5.5" y2="12" stroke="currentColor" strokeWidth="1" strokeDasharray="1.5 1.5"/>
+              </svg>
+              Confusables
+            </span>
+            <span className="practice-mode-btn__sub">side-by-side pairs</span>
+          </button>
           <button className="sprint-mode-btn" onClick={onSprint}>
             <span className="practice-mode-btn__main">
               <svg width="13" height="13" viewBox="0 0 13 13" fill="none" aria-hidden="true">

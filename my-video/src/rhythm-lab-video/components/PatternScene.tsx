@@ -61,7 +61,7 @@ function CalloutPin({
         boxShadow: `0 6px 24px rgba(0,0,0,0.50)`,
       }}>
         <span style={{
-          fontFamily: RL.fontMono, fontSize: 18, fontWeight: 700,
+          fontFamily: RL.fontMono, fontSize: 24, fontWeight: 700,
           color: "#fff", letterSpacing: "0.05em", textTransform: "uppercase",
         }}>
           {label}
@@ -116,15 +116,15 @@ export const PatternScene: React.FC = () => {
         padding: "0 32px", gap: 14,
         opacity: brandOp, zIndex: 10,
       }}>
-        <CELogo size={32} />
+        <CELogo size={42} />
         <span style={{
-          fontFamily: RL.fontSans, fontSize: 26, fontWeight: 700,
+          fontFamily: RL.fontSans, fontSize: 36, fontWeight: 700,
           color: RL.textPrimary, letterSpacing: "-0.02em",
         }}>
           Clinical Edge
         </span>
-        <span style={{ color: RL.border, fontSize: 20 }}>·</span>
-        <span style={{ fontFamily: RL.fontSans, fontSize: 26, fontWeight: 600, color: RL.accent }}>
+        <span style={{ color: RL.border, fontSize: 26 }}>·</span>
+        <span style={{ fontFamily: RL.fontSans, fontSize: 36, fontWeight: 600, color: RL.accent }}>
           Rhythm Lab
         </span>
       </div>
@@ -196,15 +196,15 @@ export const PatternScene: React.FC = () => {
                 willChange: "transform, opacity",
               }}>
                 <p style={{
-                  fontFamily: RL.fontMono, fontSize: 14, fontWeight: 600,
-                  color: color, letterSpacing: "0.10em",
+                  fontFamily: RL.fontMono, fontSize: 22, fontWeight: 600,
+                  color: color, letterSpacing: "0.08em",
                   textTransform: "uppercase", marginBottom: 10,
                   lineHeight: 1,
                 }}>
                   {label}
                 </p>
                 <p style={{
-                  fontFamily: RL.fontSans, fontSize: 34, fontWeight: 700,
+                  fontFamily: RL.fontSans, fontSize: 42, fontWeight: 700,
                   color: RL.textPrimary, letterSpacing: "-0.02em",
                   lineHeight: 1.1,
                 }}>

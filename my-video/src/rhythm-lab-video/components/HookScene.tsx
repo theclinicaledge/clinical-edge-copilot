@@ -134,16 +134,16 @@ export const HookScene: React.FC = () => {
           display: "flex", alignItems: "center", gap: 14,
           opacity: logoOp,
         }}>
-          <CELogo size={40} />
-          <div style={{ display: "flex", flexDirection: "column", gap: 3 }}>
+          <CELogo size={52} />
+          <div style={{ display: "flex", flexDirection: "column", gap: 5 }}>
             <span style={{
-              fontSize: 28, fontWeight: 700,
+              fontSize: 38, fontWeight: 700,
               color: T.textPrimary, fontFamily: T.sans, letterSpacing: "-0.02em", lineHeight: 1,
             }}>
               Clinical Edge
             </span>
             <span style={{
-              fontSize: 14, fontWeight: 600,
+              fontSize: 20, fontWeight: 600,
               color: T.accent, fontFamily: T.mono,
               letterSpacing: "0.12em", textTransform: "uppercase", lineHeight: 1,
             }}>

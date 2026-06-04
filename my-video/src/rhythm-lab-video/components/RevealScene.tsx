@@ -86,15 +86,15 @@ export const RevealScene: React.FC = () => {
         padding: "0 32px", gap: 14,
         opacity: brandOp, zIndex: 10,
       }}>
-        <CELogo size={32} />
+        <CELogo size={42} />
         <span style={{
-          fontFamily: RL.fontSans, fontSize: 26, fontWeight: 700,
+          fontFamily: RL.fontSans, fontSize: 36, fontWeight: 700,
           color: RL.textPrimary, letterSpacing: "-0.02em",
         }}>
           Clinical Edge
         </span>
-        <span style={{ color: RL.border, fontSize: 20 }}>·</span>
-        <span style={{ fontFamily: RL.fontSans, fontSize: 26, fontWeight: 600, color: RL.accent }}>
+        <span style={{ color: RL.border, fontSize: 26 }}>·</span>
+        <span style={{ fontFamily: RL.fontSans, fontSize: 36, fontWeight: 600, color: RL.accent }}>
           Rhythm Lab
         </span>
       </div>
@@ -142,8 +142,8 @@ export const RevealScene: React.FC = () => {
           flexShrink: 0,
         }}>
           <p style={{
-            fontFamily: RL.fontMono, fontSize: 14, fontWeight: 600,
-            color: RL.accent, letterSpacing: "0.12em",
+            fontFamily: RL.fontMono, fontSize: 22, fontWeight: 600,
+            color: RL.accent, letterSpacing: "0.10em",
             textTransform: "uppercase", marginBottom: 14,
           }}>
             Rhythm Identified
@@ -160,8 +160,8 @@ export const RevealScene: React.FC = () => {
 
         {/* "Why:" label */}
         <p style={{
-          fontFamily: RL.fontMono, fontSize: 18, fontWeight: 600,
-          color: RL.textSec, letterSpacing: "0.10em",
+          fontFamily: RL.fontMono, fontSize: 30, fontWeight: 600,
+          color: RL.textSec, letterSpacing: "0.08em",
           textTransform: "uppercase",
           opacity: whyOp,
           flexShrink: 0,

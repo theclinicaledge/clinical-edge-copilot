@@ -62,16 +62,16 @@ export const StripScene: React.FC = () => {
         opacity: brandOp,
         zIndex: 10,
       }}>
-        <CELogo size={32} />
+        <CELogo size={42} />
         <span style={{
-          fontFamily: RL.fontSans, fontSize: 26, fontWeight: 700,
+          fontFamily: RL.fontSans, fontSize: 36, fontWeight: 700,
           color: RL.textPrimary, letterSpacing: "-0.02em",
         }}>
           Clinical Edge
         </span>
-        <span style={{ color: RL.border, fontSize: 20 }}>·</span>
+        <span style={{ color: RL.border, fontSize: 26 }}>·</span>
         <span style={{
-          fontFamily: RL.fontSans, fontSize: 26, fontWeight: 600,
+          fontFamily: RL.fontSans, fontSize: 36, fontWeight: 600,
           color: RL.accent,
         }}>
           Rhythm Lab
@@ -126,8 +126,8 @@ export const StripScene: React.FC = () => {
           justifyContent: "center",
         }}>
           <p style={{
-            fontFamily: RL.fontMono, fontSize: 16, fontWeight: 600,
-            color: RL.textSec, letterSpacing: "0.08em",
+            fontFamily: RL.fontMono, fontSize: 28, fontWeight: 600,
+            color: RL.textSec, letterSpacing: "0.06em",
             textTransform: "uppercase", marginBottom: 18,
           }}>
             Would you call this...
@@ -140,8 +140,8 @@ export const StripScene: React.FC = () => {
             SVT?
           </p>
           <p style={{
-            fontFamily: RL.fontSans, fontSize: 26,
-            color: RL.textSec, lineHeight: 1.4, marginTop: 20,
+            fontFamily: RL.fontSans, fontSize: 36,
+            color: RL.textSec, lineHeight: 1.4, marginTop: 24,
           }}>
             Look at the baseline closely.
           </p>

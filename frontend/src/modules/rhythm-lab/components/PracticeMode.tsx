@@ -7,6 +7,7 @@ import {
   saveLastPracticeCat,
   getLastPracticeCat,
 } from '../utils/localProgress';
+import { getPearlForRhythm } from '../data/phase1';
 
 interface PracticeModeProps {
   onBack: () => void;
@@ -195,6 +196,11 @@ export function PracticeMode({ onBack }: PracticeModeProps) {
                   ))}
                 </div>
               </div>
+            </div>
+
+            <div className="sprint-pearl practice-pearl">
+              <span className="sprint-pearl__label">Pearl</span>
+              <p className="sprint-pearl__text">{getPearlForRhythm(rhythm.id).text}</p>
             </div>
 
             <div className="practice-answer__footer">

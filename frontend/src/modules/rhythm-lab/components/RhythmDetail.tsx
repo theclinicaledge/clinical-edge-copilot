@@ -6,6 +6,7 @@ import { RecognitionSidebar } from './RecognitionSidebar';
 import { RecognitionBreakdown } from './RecognitionBreakdown';
 import { CaliperOverlay } from './CaliperOverlay';
 import { isFavorite, toggleFavorite } from '../utils/localProgress';
+import { getPearlForRhythm } from '../data/phase1';
 
 interface RhythmDetailProps {
   rhythm: Rhythm;
@@ -17,6 +18,7 @@ export function RhythmDetail({ rhythm, onBack }: RhythmDetailProps) {
   const urgencyContext = URGENCY_CONTEXT[rhythm.urgency];
   const [caliperOn, setCaliperOn] = useState(false);
   const [bookmarked, setBookmarked] = useState(() => isFavorite(rhythm.id));
+  const pearl = getPearlForRhythm(rhythm.id);
 
   return (
     <div className="detail-page">
@@ -161,6 +163,11 @@ export function RhythmDetail({ rhythm, onBack }: RhythmDetailProps) {
         <aside className="detail-sidebar">
           <RecognitionSidebar />
         </aside>
+      </div>
+
+      <div className="detail-pearl">
+        <span className="detail-pearl__label">Recognition Pearl</span>
+        <p className="detail-pearl__text">{pearl.text}</p>
       </div>
 
       <div className="disclaimer">

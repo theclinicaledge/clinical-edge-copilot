@@ -2,6 +2,8 @@ import { useState } from 'react';
 import type { Rhythm } from '../data/rhythms';
 import { RHYTHMS, RHYTHM_ALIASES } from '../data/rhythms';
 import { RhythmCard } from './RhythmCard';
+import { FoundationsSection } from './FoundationsSection';
+import { PearlsSection } from './PearlsSection';
 import { getRecentRhythms, getFavorites, getStreakText } from '../utils/localProgress';
 
 interface RhythmLabHomeProps {
@@ -9,6 +11,7 @@ interface RhythmLabHomeProps {
   onSelect: (rhythm: Rhythm) => void;
   onCompare: () => void;
   onPractice: () => void;
+  onSprint: () => void;
 }
 
 // Normalise a search string: lowercase, hyphens → spaces, collapse whitespace.
@@ -32,7 +35,7 @@ const TEACHING_POINTS = [
   },
 ];
 
-export function RhythmLabHome({ rhythms, onSelect, onCompare, onPractice }: RhythmLabHomeProps) {
+export function RhythmLabHome({ rhythms, onSelect, onCompare, onPractice, onSprint }: RhythmLabHomeProps) {
   const [query, setQuery] = useState('');
 
   // Progress data — read once on mount (home remounts on every return from detail/practice/compare)
@@ -82,6 +85,10 @@ export function RhythmLabHome({ rhythms, onSelect, onCompare, onPractice }: Rhyt
             ))}
           </div>
         </div>
+
+        <FoundationsSection />
+        <PearlsSection />
+
         {favoriteRhythms.length > 0 && (
           <div className="progress-panel">
             <p className="progress-panel__heading">Saved rhythms</p>
@@ -111,6 +118,17 @@ export function RhythmLabHome({ rhythms, onSelect, onCompare, onPractice }: Rhyt
               : `${rhythms.length} core rhythms — select to explore`}
           </p>
           <div className="home-right__actions">
+          <button className="sprint-mode-btn" onClick={onSprint}>
+            <span className="practice-mode-btn__main">
+              <svg width="13" height="13" viewBox="0 0 13 13" fill="none" aria-hidden="true">
+                <circle cx="6.5" cy="6.5" r="5.5" stroke="currentColor" strokeWidth="1.2" fill="none"/>
+                <line x1="6.5" y1="3.5" x2="6.5" y2="6.5" stroke="currentColor" strokeWidth="1.2" strokeLinecap="round"/>
+                <line x1="6.5" y1="6.5" x2="8.5" y2="8.5" stroke="currentColor" strokeWidth="1" strokeLinecap="round"/>
+              </svg>
+              Sprint
+            </span>
+            <span className="practice-mode-btn__sub">2-question drill</span>
+          </button>
           <button className="practice-mode-btn" onClick={onPractice}>
             <span className="practice-mode-btn__main">
               <svg width="13" height="13" viewBox="0 0 13 13" fill="none" aria-hidden="true">

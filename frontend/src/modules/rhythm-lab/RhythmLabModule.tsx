@@ -6,9 +6,10 @@ import { RhythmLabHome } from './components/RhythmLabHome';
 import { RhythmDetail } from './components/RhythmDetail';
 import { CompareMode } from './components/CompareMode';
 import { PracticeMode } from './components/PracticeMode';
+import { TwoQuestionSprint } from './components/TwoQuestionSprint';
 import { addRecentRhythm } from './utils/localProgress';
 
-type View = 'home' | 'detail' | 'compare' | 'practice';
+type View = 'home' | 'detail' | 'compare' | 'practice' | 'sprint';
 
 interface RhythmLabModuleProps {
   onGoHome: () => void;
@@ -102,12 +103,15 @@ export default function RhythmLabModule({ onGoHome }: RhythmLabModuleProps) {
             <CompareMode onBack={handleBack} />
           ) : view === 'practice' ? (
             <PracticeMode onBack={handleBack} />
+          ) : view === 'sprint' ? (
+            <TwoQuestionSprint onBack={handleBack} />
           ) : (
             <RhythmLabHome
               rhythms={RHYTHMS}
               onSelect={handleSelect}
               onCompare={() => setView('compare')}
               onPractice={() => setView('practice')}
+              onSprint={() => setView('sprint')}
             />
           )}
         </div>

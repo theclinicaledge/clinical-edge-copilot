@@ -119,47 +119,35 @@ export function RhythmLabHome({ rhythms, onSelect, onCompare, onPractice, onSpri
               : `${rhythms.length} core rhythms — select to explore`}
           </p>
           <div className="home-right__actions">
-          <button className="confusables-mode-btn" onClick={onConfusables}>
-            <span className="practice-mode-btn__main">
-              <svg width="13" height="13" viewBox="0 0 13 13" fill="none" aria-hidden="true">
+            <button className="action-btn action-btn--teal" onClick={onConfusables}>
+              <svg width="12" height="12" viewBox="0 0 13 13" fill="none" aria-hidden="true">
                 <path d="M2 4h4M7 4h4M2 6.5h4M7 6.5h4M2 9h4M7 9h4" stroke="currentColor" strokeWidth="1.1" strokeLinecap="round"/>
                 <line x1="5.5" y1="1" x2="5.5" y2="12" stroke="currentColor" strokeWidth="1" strokeDasharray="1.5 1.5"/>
               </svg>
               Confusables
-            </span>
-            <span className="practice-mode-btn__sub">side-by-side pairs</span>
-          </button>
-          <button className="sprint-mode-btn" onClick={onSprint}>
-            <span className="practice-mode-btn__main">
-              <svg width="13" height="13" viewBox="0 0 13 13" fill="none" aria-hidden="true">
+            </button>
+            <button className="action-btn action-btn--gold" onClick={onSprint}>
+              <svg width="12" height="12" viewBox="0 0 13 13" fill="none" aria-hidden="true">
                 <circle cx="6.5" cy="6.5" r="5.5" stroke="currentColor" strokeWidth="1.2" fill="none"/>
                 <line x1="6.5" y1="3.5" x2="6.5" y2="6.5" stroke="currentColor" strokeWidth="1.2" strokeLinecap="round"/>
                 <line x1="6.5" y1="6.5" x2="8.5" y2="8.5" stroke="currentColor" strokeWidth="1" strokeLinecap="round"/>
               </svg>
               Sprint
-            </span>
-            <span className="practice-mode-btn__sub">2-question drill</span>
-          </button>
-          <button className="practice-mode-btn" onClick={onPractice}>
-            <span className="practice-mode-btn__main">
-              <svg width="13" height="13" viewBox="0 0 13 13" fill="none" aria-hidden="true">
+            </button>
+            <button className="action-btn action-btn--gold" onClick={onPractice}>
+              <svg width="12" height="12" viewBox="0 0 13 13" fill="none" aria-hidden="true">
                 <rect x="0.5" y="1.5" width="12" height="10" rx="1.5" stroke="currentColor" strokeWidth="1.2" fill="none"/>
                 <line x1="0.5" y1="5" x2="12.5" y2="5" stroke="currentColor" strokeWidth="1"/>
               </svg>
               Practice
-            </span>
-            <span className="practice-mode-btn__sub">strip recognition</span>
-          </button>
-          <button className="compare-mode-btn" onClick={onCompare}>
-            <span className="compare-mode-btn__main">
-              <svg width="13" height="13" viewBox="0 0 13 13" fill="none" aria-hidden="true">
+            </button>
+            <button className="action-btn action-btn--teal" onClick={onCompare}>
+              <svg width="12" height="12" viewBox="0 0 13 13" fill="none" aria-hidden="true">
                 <rect x="0.5" y="0.5" width="5" height="12" rx="1" stroke="currentColor" strokeWidth="1.2" fill="none"/>
                 <rect x="7.5" y="0.5" width="5" height="12" rx="1" stroke="currentColor" strokeWidth="1.2" fill="none"/>
               </svg>
-              Compare rhythms
-            </span>
-            <span className="compare-mode-btn__sub">side-by-side recognition</span>
-          </button>
+              Compare
+            </button>
           </div>
         </div>
         {recentRhythms.length > 0 && (

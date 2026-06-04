@@ -40,6 +40,8 @@
   -moz-osx-font-smoothing: grayscale;
   min-height: 100svh;
   position: relative;
+  overflow-x: clip; /* prevent any child from blowing out page width */
+  max-width: 100vw;
 }
 
 .rhythm-lab-root::before {
@@ -261,8 +263,12 @@
 }
 
 .home-right__header {
-  padding: 24px 28px 16px;
+  padding: 18px 20px 14px;
   border-bottom: 1px solid var(--border);
+}
+
+@media (max-width: 640px) {
+  .home-right__header { padding: 14px 16px 12px; }
 }
 
 .home-right__label {
@@ -272,6 +278,10 @@
   letter-spacing: 0.14em;
   text-transform: uppercase;
   color: var(--text-secondary);
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
 .rhythm-list {
@@ -576,6 +586,10 @@
   text-transform: uppercase;
   color: var(--text-secondary);
   opacity: 0.6;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
 .detail-strip-annotation {
@@ -1084,13 +1098,14 @@
 
 @media (max-width: 600px) {
   .strip-canvas {
+    width: 100%;        /* bound the container so overflow-x: auto clips correctly */
     overflow-x: auto;
     -webkit-overflow-scrolling: touch;
     scrollbar-width: thin;
   }
 
   .strip-canvas svg {
-    min-width: 480px;
+    min-width: 360px;   /* reduced from 480 — still scrollable but less aggressive */
     height: 80px;
   }
 }
@@ -1132,57 +1147,15 @@
   .compare-analysis   { animation: fade-up 0.3s 0.12s ease-out both; }
 }
 
-/* ─── Home: Compare Mode entry button ───────────────────────────────── */
+/* ─── Home: right header & action row ───────────────────────────────── */
 
 .home-right__header {
   display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 12px;
-}
-
-.compare-mode-btn {
-  display: inline-flex;
   flex-direction: column;
-  align-items: flex-end;
-  gap: 2px;
-  font-family: var(--font-mono);
-  font-size: 10px;
-  font-weight: 600;
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
-  color: var(--accent-teal);
-  padding: 6px 10px;
-  border: 1px solid rgba(10, 191, 188, 0.35);
-  border-radius: 4px;
-  background: rgba(10, 191, 188, 0.06);
-  cursor: pointer;
-  flex-shrink: 0;
-  transition: background 0.14s, border-color 0.14s;
+  gap: 10px;
 }
 
-.compare-mode-btn:hover {
-  background: rgba(10, 191, 188, 0.14);
-  border-color: rgba(10, 191, 188, 0.6);
-}
-
-.compare-mode-btn__main {
-  display: flex;
-  align-items: center;
-  gap: 6px;
-}
-
-.compare-mode-btn__sub {
-  font-size: 8px;
-  font-weight: 500;
-  letter-spacing: 0.1em;
-  color: var(--accent-teal);
-  opacity: 0.55;
-}
-
-@media (max-width: 640px) {
-  .compare-mode-btn__sub { display: none; }
-}
+/* compare-mode-btn, sprint-mode-btn, confusables-mode-btn — replaced by .action-btn */
 
 /* ─── Compare Mode: page shell ───────────────────────────────────────── */
 
@@ -1317,7 +1290,8 @@
   border-radius: 4px;
   padding: 8px 28px 8px 11px;
   cursor: pointer;
-  min-width: 215px;
+  min-width: 0;
+  max-width: 100%;
   background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6' viewBox='0 0 10 6'%3E%3Cpath d='M1 1l4 4 4-4' stroke='%2394A3B8' stroke-width='1.5' fill='none' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
   background-repeat: no-repeat;
   background-position: right 10px center;
@@ -1456,11 +1430,12 @@
 
 @media (max-width: 600px) {
   .compare-strip-card__strip .strip-canvas {
+    width: 100%;
     overflow-x: auto;
     -webkit-overflow-scrolling: touch;
   }
   .compare-strip-card__strip .strip-canvas svg {
-    min-width: 380px;
+    min-width: 340px;
     height: 80px;
   }
 }
@@ -1598,53 +1573,49 @@
 .home-right__actions {
   display: flex;
   align-items: center;
-  gap: 8px;
-  flex-shrink: 0;
+  gap: 6px;
+  flex-wrap: wrap;
 }
 
-/* ─── Home: Practice Mode entry button ───────────────────────────────── */
+/* ─── Home: unified action button ────────────────────────────────────── */
 
-.practice-mode-btn {
+.action-btn {
   display: inline-flex;
-  flex-direction: column;
-  align-items: flex-end;
-  gap: 2px;
+  align-items: center;
+  gap: 5px;
   font-family: var(--font-mono);
   font-size: 10px;
   font-weight: 600;
-  letter-spacing: 0.08em;
+  letter-spacing: 0.07em;
   text-transform: uppercase;
-  color: var(--accent-gold);
-  padding: 6px 10px;
-  border: 1px solid rgba(212, 168, 75, 0.35);
+  padding: 5px 10px;
   border-radius: 4px;
-  background: rgba(212, 168, 75, 0.06);
+  border: 1px solid;
   cursor: pointer;
-  flex-shrink: 0;
-  transition: background 0.14s, border-color 0.14s;
+  white-space: nowrap;
+  transition: background 0.13s, border-color 0.13s;
 }
 
-.practice-mode-btn:hover {
-  background: rgba(212, 168, 75, 0.14);
-  border-color: rgba(212, 168, 75, 0.6);
+.action-btn--teal {
+  color: var(--accent-teal);
+  border-color: rgba(10, 191, 188, 0.35);
+  background: rgba(10, 191, 188, 0.06);
 }
 
-.practice-mode-btn__main {
-  display: flex;
-  align-items: center;
-  gap: 6px;
+.action-btn--teal:hover {
+  background: rgba(10, 191, 188, 0.13);
+  border-color: rgba(10, 191, 188, 0.55);
 }
 
-.practice-mode-btn__sub {
-  font-size: 8px;
-  font-weight: 500;
-  letter-spacing: 0.1em;
+.action-btn--gold {
   color: var(--accent-gold);
-  opacity: 0.55;
+  border-color: rgba(212, 168, 75, 0.35);
+  background: rgba(212, 168, 75, 0.06);
 }
 
-@media (max-width: 640px) {
-  .practice-mode-btn__sub { display: none; }
+.action-btn--gold:hover {
+  background: rgba(212, 168, 75, 0.13);
+  border-color: rgba(212, 168, 75, 0.55);
 }
 
 /* ─── Practice Mode: page shell ──────────────────────────────────────── */
@@ -1728,14 +1699,15 @@
   background-repeat: no-repeat;
   background-position: right 8px center;
   transition: border-color 0.14s;
-  min-width: 200px;
+  min-width: 0;
+  max-width: 100%;
 }
 
 .practice-cat-select:hover { border-color: var(--text-secondary); }
 .practice-cat-select:focus { outline: 2px solid var(--accent-teal); outline-offset: 2px; }
 
 @media (max-width: 640px) {
-  .practice-cat-select { flex: 1; min-width: 0; }
+  .practice-cat-select { flex: 1; }
 }
 
 /* ─── Practice Mode: teaching panel ─────────────────────────────────── */
@@ -2620,29 +2592,28 @@
   line-height: 1.55;
   color: var(--text-primary);
   opacity: 0.9;
+  overflow-wrap: break-word;
 }
 
-/* ─── Phase 1: Sprint Mode button ────────────────────────────────────── */
-
-.sprint-mode-btn {
-  display: inline-flex;
-  flex-direction: column;
-  align-items: flex-start;
-  gap: 1px;
-  padding: 6px 10px;
-  border: 1px solid rgba(212, 168, 75, 0.35);
-  border-radius: 5px;
-  background: rgba(212, 168, 75, 0.07);
+.pearls-expand-btn {
+  margin-top: 10px;
+  padding: 0;
+  background: none;
+  border: none;
+  font-family: var(--font-mono);
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
   color: var(--accent-gold);
   cursor: pointer;
-  transition: background 0.15s, border-color 0.15s;
-  font-family: var(--font-mono);
+  opacity: 0.75;
+  transition: opacity 0.13s;
 }
 
-.sprint-mode-btn:hover {
-  background: rgba(212, 168, 75, 0.13);
-  border-color: rgba(212, 168, 75, 0.55);
-}
+.pearls-expand-btn:hover { opacity: 1; }
+
+/* sprint-mode-btn replaced by .action-btn — see above */
 
 /* ─── Phase 1: Two-Question Sprint page ──────────────────────────────── */
 
@@ -2691,21 +2662,25 @@
   display: flex;
   flex-direction: column;
   gap: 0;
-  padding: 16px 24px 20px;
+  padding: 14px 20px 18px;
 }
 
 .sprint-q-block {
-  margin-top: 14px;
+  margin-top: 12px;
+}
+
+.sprint-q-block:first-of-type {
+  margin-top: 0;
 }
 
 .sprint-q-label {
-  font-size: 12px;
+  font-size: 11px;
   font-weight: 600;
   color: var(--text-dark-muted);
   font-family: var(--font-mono);
   text-transform: uppercase;
-  letter-spacing: 0.07em;
-  margin-bottom: 8px;
+  letter-spacing: 0.08em;
+  margin-bottom: 7px;
 }
 
 .sprint-options {
@@ -2715,21 +2690,23 @@
 }
 
 .sprint-option {
-  padding: 6px 16px;
+  padding: 7px 16px;
   border: 1px solid var(--border-warm);
   border-radius: 4px;
-  background: transparent;
+  background: var(--surface-warm-deep);
   color: var(--text-dark);
   font-family: var(--font-mono);
   font-size: 12px;
   font-weight: 500;
   cursor: pointer;
   transition: background 0.1s, border-color 0.1s, color 0.1s;
+  letter-spacing: 0.02em;
 }
 
 .sprint-option:hover {
   border-color: var(--accent-teal);
   color: var(--accent-teal);
+  background: rgba(10, 191, 188, 0.06);
 }
 
 .sprint-option--selected {
@@ -2738,19 +2715,24 @@
   color: #fff;
 }
 
+.sprint-option--selected:hover {
+  background: var(--accent-teal);
+  color: #fff;
+}
+
 .sprint-reveal-btn {
-  margin-top: 16px;
+  margin-top: 14px;
   align-self: flex-start;
-  padding: 8px 22px;
+  padding: 8px 20px;
   background: var(--text-dark);
   color: var(--surface-warm);
   border: none;
   border-radius: 4px;
   font-family: var(--font-mono);
-  font-size: 12px;
+  font-size: 11px;
   font-weight: 600;
   cursor: pointer;
-  letter-spacing: 0.03em;
+  letter-spacing: 0.04em;
   transition: opacity 0.15s;
 }
 
@@ -2935,6 +2917,7 @@
   font-size: 12.5px;
   line-height: 1.55;
   color: var(--text-dark);
+  overflow-wrap: break-word;
 }
 
 .practice-pearl {
@@ -2979,27 +2962,7 @@
   }
 }
 
-/* ─── Phase 2: Confusables button ────────────────────────────────────── */
-
-.confusables-mode-btn {
-  display: inline-flex;
-  flex-direction: column;
-  align-items: flex-start;
-  gap: 1px;
-  padding: 6px 10px;
-  border: 1px solid rgba(10, 191, 188, 0.30);
-  border-radius: 5px;
-  background: rgba(10, 191, 188, 0.06);
-  color: var(--accent-teal);
-  cursor: pointer;
-  transition: background 0.15s, border-color 0.15s;
-  font-family: var(--font-mono);
-}
-
-.confusables-mode-btn:hover {
-  background: rgba(10, 191, 188, 0.12);
-  border-color: rgba(10, 191, 188, 0.50);
-}
+/* confusables-mode-btn replaced by .action-btn — see above */
 
 /* ─── Phase 2: CompareRhythmsView ────────────────────────────────────── */
 
@@ -3032,16 +2995,17 @@
 }
 
 .crv-selector-btn {
-  padding: 5px 12px;
+  padding: 5px 10px;
   border: 1px solid var(--border);
   border-radius: 4px;
   background: transparent;
   color: var(--text-secondary);
   font-family: var(--font-mono);
-  font-size: 11px;
+  font-size: 10px;
   cursor: pointer;
   transition: background 0.12s, border-color 0.12s, color 0.12s;
   white-space: nowrap;
+  max-width: 100%;
 }
 
 .crv-selector-btn:hover {
@@ -3060,8 +3024,10 @@
   display: grid;
   grid-template-columns: 1fr 36px 1fr;
   gap: 0;
-  padding: 20px 24px;
+  padding: 16px 20px;
   align-items: start;
+  box-sizing: border-box;
+  width: 100%;
 }
 
 .crv-side {
@@ -3144,6 +3110,7 @@
   font-size: 12px;
   line-height: 1.55;
   color: var(--text-dark);
+  overflow-wrap: break-word;
 }
 
 /* VS divider */
@@ -3206,6 +3173,7 @@
   font-size: 12px;
   line-height: 1.6;
   color: var(--text-primary);
+  overflow-wrap: break-word;
 }
 
 /* Mobile */
@@ -3213,7 +3181,7 @@
   .crv-cards {
     grid-template-columns: 1fr;
     grid-template-rows: auto auto auto;
-    padding: 16px;
+    padding: 12px 14px;
     gap: 10px;
   }
 
@@ -3229,11 +3197,15 @@
 
   .crv-bottom {
     grid-template-columns: 1fr;
-    padding: 0 16px 24px;
+    padding: 0 14px 20px;
   }
 
   .crv-selector-wrap {
-    padding: 12px 16px 10px;
+    padding: 10px 14px 8px;
+  }
+
+  .crv-selector-list {
+    gap: 5px;
   }
 }
 

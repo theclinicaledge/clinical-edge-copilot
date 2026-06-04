@@ -1,0 +1,586 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Clinical Edge — Post 63 — What Pulse Oximetry Can't See</title>
+  <link
+    href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=IBM+Plex+Mono:wght@400;500;700&display=swap"
+    rel="stylesheet"
+  />
+  <style>
+    :root {
+      --bg:   #111827;
+      --c1:   #1E2A3A;
+      --c2:   #243040;
+      --teal: #0ABFBC;
+      --td:   #F0EDE6;
+      --tdm:  #A8C1CC;
+    }
+
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      background: #07090F;
+      font-family: 'Inter', -apple-system, sans-serif;
+      padding: 48px 32px;
+      display: flex; flex-direction: column; align-items: center; gap: 56px;
+    }
+
+    /* ── Slide base ─────────────────────────────────────────── */
+    .slide {
+      width: 1080px; height: 1350px;
+      background-color: var(--bg);
+      background-image:
+        radial-gradient(ellipse 92% 82% at 50% 46%, transparent 32%, rgba(0,0,0,0.42) 100%),
+        radial-gradient(ellipse 62% 50% at 19% 16%, rgba(10,191,188,0.08) 0%, transparent 56%);
+      position: relative; overflow: hidden; flex-shrink: 0;
+    }
+    .slide::before {
+      content: ''; position: absolute; inset: 0; z-index: 0; pointer-events: none;
+      background-image: url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' width='200' height='200'><filter id='g'><feTurbulence type='fractalNoise' baseFrequency='0.62' numOctaves='3' stitchTiles='stitch'/></filter><rect width='200' height='200' filter='url(%23g)' opacity='0.028'/></svg>");
+      background-size: 200px 200px; background-repeat: repeat;
+    }
+
+    /* Slide label — browser preview only */
+    .slide-label {
+      width: 1080px; display: flex; align-items: center; gap: 14px; margin-bottom: -40px;
+    }
+    .slide-label span {
+      font-family: 'IBM Plex Mono', monospace; font-size: 11px; font-weight: 500;
+      color: #5A6B7A; letter-spacing: 2px; text-transform: uppercase;
+    }
+    .slide-label::after { content: ''; flex: 1; height: 1px; background: #2A3645; opacity: 0.6; }
+
+    /* ── Footer ─────────────────────────────────────────────── */
+    .slide-footer {
+      position: absolute; bottom: 0; left: 0; right: 0; height: 96px;
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 0 80px; z-index: 2;
+      background: #1A2433;
+      border-top: 1px solid rgba(255,255,255,0.06);
+    }
+    .footer-brand { display: flex; align-items: center; gap: 14px; }
+    .footer-dot   { width: 10px; height: 10px; border-radius: 50%; background: var(--teal); }
+    .fnd { font-size: 28px; font-weight: 600; letter-spacing: -0.2px; color: var(--tdm); }
+    .fhd { font-family: 'IBM Plex Mono', monospace; font-size: 26px; font-weight: 500;
+           letter-spacing: 1.5px; text-transform: uppercase; color: rgba(168,193,204,0.48); }
+
+    /* ── Counter dots ───────────────────────────────────────── */
+    .slide-number {
+      position: absolute; bottom: 33px; left: 50%; transform: translateX(-50%);
+      display: flex; gap: 7px; z-index: 3;
+    }
+    .slide-number .dot { width: 6px; height: 6px; border-radius: 50%; background: rgba(168,193,204,0.20); }
+    .slide-number .dot.active { background: var(--teal) !important; }
+
+    /* ── Badge ──────────────────────────────────────────────── */
+    .badge {
+      display: inline-flex; align-items: center;
+      padding: 14px 30px; border-radius: 100px;
+      background: rgba(10,191,188,0.10); border: 1px solid rgba(10,191,188,0.34);
+      font-family: 'IBM Plex Mono', monospace; font-size: 24px; font-weight: 700;
+      letter-spacing: 2px; text-transform: uppercase; color: var(--teal);
+      flex-shrink: 0; white-space: nowrap;
+    }
+
+    /* ── Counter label ──────────────────────────────────────── */
+    .ctr {
+      font-family: 'IBM Plex Mono', monospace; font-size: 26px; font-weight: 500;
+      letter-spacing: 1px; flex-shrink: 0; color: rgba(168,193,204,0.34);
+    }
+
+    /* ── Teal bar ───────────────────────────────────────────── */
+    .tbar { height: 2px; border-radius: 2px; background: var(--teal); }
+
+    /* ── Info card (elevated dark) ──────────────────────────── */
+    .info-card {
+      background: var(--c2); border-radius: 16px; padding: 40px 48px;
+      border: 1px solid rgba(255,255,255,0.05);
+      box-shadow: 0 4px 28px rgba(0,0,0,0.24);
+    }
+
+    /* ── Comparison card ────────────────────────────────────── */
+    .cmp-card {
+      background: var(--c1); border-radius: 14px; padding: 32px 44px;
+      border: 1px solid rgba(255,255,255,0.05);
+    }
+    .cmp-label {
+      font-family: 'IBM Plex Mono', monospace; font-size: 22px; font-weight: 700;
+      letter-spacing: 2.5px; text-transform: uppercase; display: block; margin-bottom: 18px;
+    }
+
+    /* ── Waveform card ──────────────────────────────────────── */
+    .wform-card {
+      background: #0D1822; border-radius: 12px; padding: 20px 22px;
+      border: 1px solid rgba(255,255,255,0.04);
+      box-shadow: 0 4px 20px rgba(0,0,0,0.30);
+    }
+    .wform-label {
+      font-family: 'IBM Plex Mono', monospace; font-size: 20px; font-weight: 500;
+      letter-spacing: 2px; text-transform: uppercase; display: block; margin-bottom: 12px;
+    }
+
+    /* ── Bullet row ─────────────────────────────────────────── */
+    .brow { display: flex; align-items: center; gap: 20px; }
+    .bdot { width: 6px; height: 6px; border-radius: 50%; flex-shrink: 0; }
+
+    /* ── Layout ─────────────────────────────────────────────── */
+    .slide-content {
+      position: relative; z-index: 1;
+      padding: 60px 80px 116px;
+      height: 100%; display: flex; flex-direction: column;
+    }
+    .top-row {
+      display: flex; align-items: center; justify-content: space-between; flex-shrink: 0;
+    }
+  </style>
+</head>
+<body>
+
+<!-- POST 63 — What Pulse Oximetry Can't See -->
+
+
+<!-- ═══ SLIDE 1 — HOOK ═══════════════════════════════════════════════════════ -->
+<div class="slide-label"><span>Slide 01 — Hook</span></div>
+<div class="slide" id="slide-1">
+  <div class="slide-content" style="justify-content:flex-start;">
+
+    <div class="top-row">
+      <div class="badge">Clinical Edge</div>
+      <span class="ctr">01 / 08</span>
+    </div>
+
+    <div style="flex:1; display:flex; flex-direction:column; justify-content:center; gap:0;">
+
+      <!-- Monitor channel label -->
+      <div style="font-family:'IBM Plex Mono',monospace; font-size:28px; font-weight:500;
+                  letter-spacing:4px; text-transform:uppercase; color:rgba(10,191,188,0.55);
+                  margin-bottom:14px;">SpO₂</div>
+
+      <!-- Hero number -->
+      <div style="display:flex; align-items:baseline; gap:6px; line-height:1.0;">
+        <span style="font-size:160px; font-weight:900; letter-spacing:-6px; color:var(--teal);">98</span>
+        <span style="font-size:84px; font-weight:700; color:rgba(10,191,188,0.65);">%</span>
+      </div>
+
+      <div class="tbar" style="width:64px; margin-top:32px; margin-bottom:32px;"></div>
+
+      <div style="font-size:72px; font-weight:900; line-height:1.02; letter-spacing:-2.5px; color:var(--td);">What pulse oximetry</div>
+      <div style="font-size:72px; font-weight:900; line-height:1.02; letter-spacing:-2.5px; color:var(--td);">can't see.</div>
+
+      <div style="margin-top:28px; font-size:40px; font-weight:400; line-height:1.45; color:var(--tdm);">One of the most trusted numbers at the bedside.</div>
+
+      <!-- Subtle decorative pleth waveform -->
+      <div style="margin-top:48px; opacity:0.13;">
+        <svg width="880" height="80" viewBox="0 0 880 80" xmlns="http://www.w3.org/2000/svg">
+          <path d="
+            M 0,65 L 8,65 C 14,65 16,5 22,5 C 28,5 34,48 36,48 C 38,48 40,38 42,38 C 44,38 52,62 62,64 C 66,65 72,65 110,65
+            L 118,65 C 124,65 126,5 132,5 C 138,5 144,48 146,48 C 148,48 150,38 152,38 C 154,38 162,62 172,64 C 176,65 182,65 220,65
+            L 228,65 C 234,65 236,5 242,5 C 248,5 254,48 256,48 C 258,48 260,38 262,38 C 264,38 272,62 282,64 C 286,65 292,65 330,65
+            L 338,65 C 344,65 346,5 352,5 C 358,5 364,48 366,48 C 368,48 370,38 372,38 C 374,38 382,62 392,64 C 396,65 402,65 440,65
+            L 448,65 C 454,65 456,5 462,5 C 468,5 474,48 476,48 C 478,48 480,38 482,38 C 484,38 492,62 502,64 C 506,65 512,65 550,65
+            L 558,65 C 564,65 566,5 572,5 C 578,5 584,48 586,48 C 588,48 590,38 592,38 C 594,38 602,62 612,64 C 616,65 622,65 660,65
+            L 668,65 C 674,65 676,5 682,5 C 688,5 694,48 696,48 C 698,48 700,38 702,38 C 704,38 712,62 722,64 C 726,65 732,65 770,65
+            L 778,65 C 784,65 786,5 792,5 C 798,5 804,48 806,48 C 808,48 810,38 812,38 C 814,38 822,62 832,64 C 836,65 842,65 880,65
+          " fill="none" stroke="#0ABFBC" stroke-width="2.2"
+             stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+      </div>
+
+    </div>
+
+  </div>
+  <div class="slide-footer">
+    <div class="footer-brand"><div class="footer-dot"></div><span class="fnd">Clinical Edge: Nursing Tools</span></div>
+    <span class="fhd">@clinicaledgeco</span>
+  </div>
+  <div class="slide-number">
+    <div class="dot active"></div><div class="dot"></div><div class="dot"></div><div class="dot"></div>
+    <div class="dot"></div><div class="dot"></div><div class="dot"></div><div class="dot"></div>
+  </div>
+</div>
+
+
+<!-- ═══ SLIDE 2 — WHAT IT MEASURES ══════════════════════════════════════════ -->
+<div class="slide-label"><span>Slide 02 — What It Measures</span></div>
+<div class="slide" id="slide-2">
+  <div class="slide-content" style="justify-content:flex-start;">
+
+    <div class="top-row">
+      <div class="badge">What It Measures</div>
+      <span class="ctr">02 / 08</span>
+    </div>
+
+    <div style="flex:1; display:flex; flex-direction:column; justify-content:center; gap:0;">
+
+      <div style="display:flex; flex-direction:column; gap:4px;">
+        <div style="font-size:80px; font-weight:900; line-height:1.02; letter-spacing:-3px; color:var(--td);">SpO₂ measures</div>
+        <div style="font-size:80px; font-weight:900; line-height:1.02; letter-spacing:-3px; color:var(--teal);">saturation.</div>
+      </div>
+
+      <div class="tbar" style="width:64px; margin-top:40px; margin-bottom:36px;"></div>
+
+      <div style="font-size:44px; font-weight:400; line-height:1.5; color:var(--tdm);">The percentage of hemoglobin carrying oxygen.</div>
+
+      <div style="margin-top:36px;" class="info-card">
+        <div style="font-family:'IBM Plex Mono',monospace; font-size:22px; font-weight:700;
+                    letter-spacing:2px; text-transform:uppercase; color:rgba(168,193,204,0.38);
+                    margin-bottom:16px;">Note</div>
+        <div style="font-size:40px; font-weight:500; line-height:1.4; color:var(--td);">That is not the same thing as oxygen delivery.</div>
+      </div>
+
+    </div>
+
+  </div>
+  <div class="slide-footer">
+    <div class="footer-brand"><div class="footer-dot"></div><span class="fnd">Clinical Edge: Nursing Tools</span></div>
+    <span class="fhd">@clinicaledgeco</span>
+  </div>
+  <div class="slide-number">
+    <div class="dot"></div><div class="dot active"></div><div class="dot"></div><div class="dot"></div>
+    <div class="dot"></div><div class="dot"></div><div class="dot"></div><div class="dot"></div>
+  </div>
+</div>
+
+
+<!-- ═══ SLIDE 3 — THE BLIND SPOT ═════════════════════════════════════════════ -->
+<div class="slide-label"><span>Slide 03 — The Blind Spot</span></div>
+<div class="slide" id="slide-3">
+  <div class="slide-content" style="justify-content:flex-start;">
+
+    <div class="top-row">
+      <div class="badge">The Blind Spot</div>
+      <span class="ctr">03 / 08</span>
+    </div>
+
+    <div style="flex:1; display:flex; flex-direction:column; justify-content:center; gap:0;">
+
+      <div style="display:flex; flex-direction:column; gap:4px;">
+        <div style="font-size:72px; font-weight:900; line-height:1.02; letter-spacing:-2.5px; color:var(--td);">Saturation is not</div>
+        <div style="font-size:72px; font-weight:900; line-height:1.02; letter-spacing:-2.5px; color:var(--teal);">oxygen delivery.</div>
+      </div>
+
+      <div class="tbar" style="width:64px; margin-top:36px; margin-bottom:36px;"></div>
+
+      <!-- Can see card (teal border) -->
+      <div class="cmp-card" style="border-left:3px solid var(--teal);">
+        <span class="cmp-label" style="color:var(--teal);">Pulse ox can see</span>
+        <div style="display:flex; align-items:center; gap:18px;">
+          <span style="font-size:48px; font-weight:800; color:var(--teal);">✓</span>
+          <span style="font-size:48px; font-weight:600; letter-spacing:-0.5px; color:var(--td);">saturation</span>
+        </div>
+      </div>
+
+      <div style="height:16px;"></div>
+
+      <!-- Cannot see card (muted border) -->
+      <div class="cmp-card" style="border-left:3px solid rgba(168,193,204,0.18);">
+        <span class="cmp-label" style="color:rgba(168,193,204,0.38);">Pulse ox cannot see</span>
+        <div style="display:flex; flex-direction:column; gap:14px;">
+          <div class="brow">
+            <div class="bdot" style="background:rgba(168,193,204,0.28);"></div>
+            <span style="font-size:44px; font-weight:400; color:var(--tdm);">hemoglobin</span>
+          </div>
+          <div class="brow">
+            <div class="bdot" style="background:rgba(168,193,204,0.28);"></div>
+            <span style="font-size:44px; font-weight:400; color:var(--tdm);">cardiac output</span>
+          </div>
+          <div class="brow">
+            <div class="bdot" style="background:rgba(168,193,204,0.28);"></div>
+            <span style="font-size:44px; font-weight:400; color:var(--tdm);">perfusion</span>
+          </div>
+        </div>
+      </div>
+
+    </div>
+
+  </div>
+  <div class="slide-footer">
+    <div class="footer-brand"><div class="footer-dot"></div><span class="fnd">Clinical Edge: Nursing Tools</span></div>
+    <span class="fhd">@clinicaledgeco</span>
+  </div>
+  <div class="slide-number">
+    <div class="dot"></div><div class="dot"></div><div class="dot active"></div><div class="dot"></div>
+    <div class="dot"></div><div class="dot"></div><div class="dot"></div><div class="dot"></div>
+  </div>
+</div>
+
+
+<!-- ═══ SLIDE 4 — ANEMIA ══════════════════════════════════════════════════════ -->
+<div class="slide-label"><span>Slide 04 — Anemia</span></div>
+<div class="slide" id="slide-4">
+  <div class="slide-content" style="justify-content:flex-start;">
+
+    <div class="top-row">
+      <div class="badge">Anemia</div>
+      <span class="ctr">04 / 08</span>
+    </div>
+
+    <div style="flex:1; display:flex; flex-direction:column; justify-content:center; gap:0;">
+
+      <div style="display:flex; flex-direction:column; gap:4px;">
+        <div style="font-size:84px; font-weight:900; line-height:1.0; letter-spacing:-3px; color:var(--td);">A patient can</div>
+        <div style="font-size:84px; font-weight:900; line-height:1.0; letter-spacing:-3px; color:var(--td);">read 100%.</div>
+      </div>
+
+      <div class="tbar" style="width:64px; margin-top:36px; margin-bottom:32px;"></div>
+
+      <div style="font-size:52px; font-weight:600; line-height:1.3; letter-spacing:-1px; color:var(--teal);">And still be oxygen-starved.</div>
+
+      <div style="margin-top:36px;" class="info-card">
+        <div style="font-size:38px; font-weight:400; line-height:1.55; color:var(--tdm);">If there isn't enough hemoglobin, the percentage can be perfect while the oxygen supply remains inadequate.</div>
+      </div>
+
+    </div>
+
+  </div>
+  <div class="slide-footer">
+    <div class="footer-brand"><div class="footer-dot"></div><span class="fnd">Clinical Edge: Nursing Tools</span></div>
+    <span class="fhd">@clinicaledgeco</span>
+  </div>
+  <div class="slide-number">
+    <div class="dot"></div><div class="dot"></div><div class="dot"></div><div class="dot active"></div>
+    <div class="dot"></div><div class="dot"></div><div class="dot"></div><div class="dot"></div>
+  </div>
+</div>
+
+
+<!-- ═══ SLIDE 5 — CARBON MONOXIDE ════════════════════════════════════════════ -->
+<div class="slide-label"><span>Slide 05 — Carbon Monoxide</span></div>
+<div class="slide" id="slide-5">
+  <div class="slide-content" style="justify-content:flex-start;">
+
+    <div class="top-row">
+      <div class="badge">Carbon Monoxide</div>
+      <span class="ctr">05 / 08</span>
+    </div>
+
+    <div style="flex:1; display:flex; flex-direction:column; justify-content:center; gap:0;">
+
+      <div style="display:flex; flex-direction:column; gap:4px;">
+        <div style="font-size:76px; font-weight:900; line-height:1.02; letter-spacing:-2.5px; color:var(--td);">The number can</div>
+        <div style="font-size:76px; font-weight:900; line-height:1.02; letter-spacing:-2.5px; color:var(--td);">look reassuring.</div>
+      </div>
+
+      <div class="tbar" style="width:64px; margin-top:36px; margin-bottom:32px;"></div>
+
+      <div style="font-size:52px; font-weight:600; line-height:1.3; letter-spacing:-1px; color:var(--teal);">The patient may not be.</div>
+
+      <div style="margin-top:36px;" class="info-card">
+        <div style="font-size:38px; font-weight:400; line-height:1.55; color:var(--tdm);">Standard pulse ox cannot reliably distinguish oxyhemoglobin from carboxyhemoglobin.</div>
+      </div>
+
+    </div>
+
+  </div>
+  <div class="slide-footer">
+    <div class="footer-brand"><div class="footer-dot"></div><span class="fnd">Clinical Edge: Nursing Tools</span></div>
+    <span class="fhd">@clinicaledgeco</span>
+  </div>
+  <div class="slide-number">
+    <div class="dot"></div><div class="dot"></div><div class="dot"></div><div class="dot"></div>
+    <div class="dot active"></div><div class="dot"></div><div class="dot"></div><div class="dot"></div>
+  </div>
+</div>
+
+
+<!-- ═══ SLIDE 6 — THE 90% RULE ═══════════════════════════════════════════════ -->
+<div class="slide-label"><span>Slide 06 — The 90% Rule</span></div>
+<div class="slide" id="slide-6">
+  <div class="slide-content" style="justify-content:flex-start;">
+
+    <div class="top-row">
+      <div class="badge">The 90% Rule</div>
+      <span class="ctr">06 / 08</span>
+    </div>
+
+    <div style="flex:1; display:flex; flex-direction:column; justify-content:center; gap:0;">
+
+      <div style="display:flex; flex-direction:column; gap:4px;">
+        <div style="font-size:72px; font-weight:900; line-height:1.02; letter-spacing:-2.5px; color:var(--td);">Below 90%, the number</div>
+        <div style="font-size:72px; font-weight:900; line-height:1.02; letter-spacing:-2.5px; color:var(--td);">gets less forgiving.</div>
+      </div>
+
+      <div class="tbar" style="width:64px; margin-top:36px; margin-bottom:36px;"></div>
+
+      <!-- Two comparison boxes -->
+      <div style="display:grid; grid-template-columns:1fr 1fr; gap:22px;">
+
+        <!-- Box 1 — small change -->
+        <div style="background:var(--c1); border-radius:14px; padding:36px 40px;
+                    border:1px solid rgba(255,255,255,0.05);">
+          <div style="font-family:'IBM Plex Mono',monospace; font-size:54px; font-weight:700;
+                      letter-spacing:-1px; color:var(--tdm);">98 → 95</div>
+          <div style="margin-top:14px; font-size:30px; font-weight:400; line-height:1.4;
+                      color:rgba(168,193,204,0.50);">small change<br>on the curve</div>
+        </div>
+
+        <!-- Box 2 — very different story -->
+        <div style="background:var(--c2); border-radius:14px; padding:36px 40px;
+                    border:1px solid rgba(10,191,188,0.14);
+                    border-left:3px solid var(--teal);">
+          <div style="font-family:'IBM Plex Mono',monospace; font-size:54px; font-weight:700;
+                      letter-spacing:-1px; color:var(--teal);">90 → 87</div>
+          <div style="margin-top:14px; font-size:30px; font-weight:600; line-height:1.4;
+                      color:var(--tdm);">very different<br>story</div>
+        </div>
+
+      </div>
+
+      <div style="margin-top:32px; font-size:36px; font-weight:400; line-height:1.55; color:rgba(168,193,204,0.62);">Below ~90%, small drops in saturation can reflect large drops in oxygen tension.</div>
+
+    </div>
+
+  </div>
+  <div class="slide-footer">
+    <div class="footer-brand"><div class="footer-dot"></div><span class="fnd">Clinical Edge: Nursing Tools</span></div>
+    <span class="fhd">@clinicaledgeco</span>
+  </div>
+  <div class="slide-number">
+    <div class="dot"></div><div class="dot"></div><div class="dot"></div><div class="dot"></div>
+    <div class="dot"></div><div class="dot active"></div><div class="dot"></div><div class="dot"></div>
+  </div>
+</div>
+
+
+<!-- ═══ SLIDE 7 — THE WAVEFORM ════════════════════════════════════════════════ -->
+<div class="slide-label"><span>Slide 07 — The Waveform</span></div>
+<div class="slide" id="slide-7">
+  <div class="slide-content" style="justify-content:flex-start;">
+
+    <div class="top-row">
+      <div class="badge">The Waveform</div>
+      <span class="ctr">07 / 08</span>
+    </div>
+
+    <div style="flex:1; display:flex; flex-direction:column; justify-content:center; gap:0;">
+
+      <div style="display:flex; flex-direction:column; gap:4px;">
+        <div style="font-size:76px; font-weight:900; line-height:1.02; letter-spacing:-2.5px; color:var(--td);">Trust the wave</div>
+        <div style="font-size:76px; font-weight:900; line-height:1.02; letter-spacing:-2.5px; color:var(--teal);">before the number.</div>
+      </div>
+
+      <div class="tbar" style="width:64px; margin-top:36px; margin-bottom:32px;"></div>
+
+      <div style="font-size:36px; font-weight:400; line-height:1.55; color:var(--tdm); margin-bottom:32px;">Cold, hypotensive, or vasoconstricted patients can produce unreliable readings.</div>
+
+      <!-- Clean pleth -->
+      <div class="wform-card">
+        <span class="wform-label" style="color:rgba(10,191,188,0.60);">Clean signal — reliable reading</span>
+        <svg width="836" height="80" viewBox="0 0 836 80" xmlns="http://www.w3.org/2000/svg">
+          <path d="
+            M 0,65 L 8,65 C 14,65 16,5 22,5 C 28,5 34,48 36,48 C 38,48 40,38 42,38 C 44,38 52,62 62,64 C 66,65 72,65 104,65
+            L 112,65 C 118,65 120,5 126,5 C 132,5 138,48 140,48 C 142,48 144,38 146,38 C 148,38 156,62 166,64 C 170,65 176,65 208,65
+            L 216,65 C 222,65 224,5 230,5 C 236,5 242,48 244,48 C 246,48 248,38 250,38 C 252,38 260,62 270,64 C 274,65 280,65 312,65
+            L 320,65 C 326,65 328,5 334,5 C 340,5 346,48 348,48 C 350,48 352,38 354,38 C 356,38 364,62 374,64 C 378,65 384,65 416,65
+            L 424,65 C 430,65 432,5 438,5 C 444,5 450,48 452,48 C 454,48 456,38 458,38 C 460,38 468,62 478,64 C 482,65 488,65 520,65
+            L 528,65 C 534,65 536,5 542,5 C 548,5 554,48 556,48 C 558,48 560,38 562,38 C 564,38 572,62 582,64 C 586,65 592,65 624,65
+            L 632,65 C 638,65 640,5 646,5 C 652,5 658,48 660,48 C 662,48 664,38 666,38 C 668,38 676,62 686,64 C 690,65 696,65 728,65
+            L 736,65 C 742,65 744,5 750,5 C 756,5 762,48 764,48 C 766,48 768,38 770,38 C 772,38 780,62 790,64 C 794,65 800,65 836,65
+          " fill="none" stroke="#0ABFBC" stroke-width="2.4"
+             stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+      </div>
+
+      <div style="height:16px;"></div>
+
+      <!-- Poor pleth -->
+      <div class="wform-card">
+        <span class="wform-label" style="color:rgba(168,193,204,0.34);">Poor signal — verify clinically</span>
+        <svg width="836" height="80" viewBox="0 0 836 80" xmlns="http://www.w3.org/2000/svg">
+          <path d="
+            M 0,65 L 18,65 C 22,65 24,52 28,52 C 32,52 34,58 36,58 C 37,58 38,55 40,55 C 41,55 46,64 54,66
+            L 90,68 C 94,68 96,42 100,42 C 104,42 106,56 108,56 C 110,56 112,51 114,51 C 116,51 122,65 132,67
+            L 180,67 C 184,67 186,47 190,47 C 194,47 196,59 198,59 C 200,59 202,55 204,55 C 206,55 212,65 222,67
+            L 280,70 C 284,70 286,36 290,36 C 294,36 296,54 298,54 C 300,54 302,49 304,49 C 306,49 314,64 326,68
+            L 390,68 C 394,68 396,44 400,44 C 404,44 406,57 408,57 C 410,57 412,53 414,53 C 416,53 424,65 436,68
+            L 500,69 C 504,69 506,40 510,40 C 514,40 516,56 518,56 C 520,56 522,51 524,51 C 526,51 534,65 548,68
+            L 600,68 C 604,68 606,48 610,48 C 614,48 616,59 618,59 C 620,59 622,55 624,55 C 626,55 632,65 644,68
+            L 700,69 C 704,69 706,38 710,38 C 714,38 716,55 718,55 C 720,55 722,50 724,50 C 726,50 734,64 748,68
+            L 800,68 C 804,68 806,44 810,44 C 814,44 816,57 818,57 C 820,57 822,53 824,53 C 826,53 830,64 836,67
+          " fill="none" stroke="rgba(168,193,204,0.38)" stroke-width="2.0"
+             stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+      </div>
+
+    </div>
+
+  </div>
+  <div class="slide-footer">
+    <div class="footer-brand"><div class="footer-dot"></div><span class="fnd">Clinical Edge: Nursing Tools</span></div>
+    <span class="fhd">@clinicaledgeco</span>
+  </div>
+  <div class="slide-number">
+    <div class="dot"></div><div class="dot"></div><div class="dot"></div><div class="dot"></div>
+    <div class="dot"></div><div class="dot"></div><div class="dot active"></div><div class="dot"></div>
+  </div>
+</div>
+
+
+<!-- ═══ SLIDE 8 — THE POINT ══════════════════════════════════════════════════ -->
+<div class="slide-label"><span>Slide 08 — The Point</span></div>
+<div class="slide" id="slide-8">
+  <div class="slide-content" style="justify-content:flex-start;">
+
+    <div class="top-row">
+      <div class="badge">Clinical Edge</div>
+      <span class="ctr">08 / 08</span>
+    </div>
+
+    <div style="flex:1; display:flex; flex-direction:column; justify-content:center; gap:0;">
+
+      <div style="display:flex; flex-direction:column; gap:4px;">
+        <div style="font-size:84px; font-weight:900; line-height:1.0; letter-spacing:-3px; color:var(--td);">The number</div>
+        <div style="font-size:84px; font-weight:900; line-height:1.0; letter-spacing:-3px; color:var(--td);">is a clue.</div>
+      </div>
+
+      <div class="tbar" style="width:64px; margin-top:36px; margin-bottom:32px;"></div>
+
+      <div style="font-size:56px; font-weight:700; line-height:1.2; letter-spacing:-1.5px; color:var(--teal);">Not the verdict.</div>
+
+      <!-- 4-bullet card -->
+      <div style="margin-top:40px;" class="info-card">
+        <div style="display:flex; flex-direction:column; gap:20px;">
+          <div class="brow">
+            <div class="bdot" style="background:var(--teal);"></div>
+            <span style="font-size:38px; font-weight:400; line-height:1.35; color:var(--tdm);">Read the waveform</span>
+          </div>
+          <div class="brow">
+            <div class="bdot" style="background:var(--teal);"></div>
+            <span style="font-size:38px; font-weight:400; line-height:1.35; color:var(--tdm);">Think about perfusion</span>
+          </div>
+          <div class="brow">
+            <div class="bdot" style="background:var(--teal);"></div>
+            <span style="font-size:38px; font-weight:400; line-height:1.35; color:var(--tdm);">Think about hemoglobin</span>
+          </div>
+          <div class="brow">
+            <div class="bdot" style="background:var(--teal);"></div>
+            <span style="font-size:38px; font-weight:600; line-height:1.35; color:var(--td);">Trust the patient</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Brand tagline — no hard sell -->
+      <div style="margin-top:40px;">
+        <div style="font-size:36px; font-weight:500; letter-spacing:-0.3px; color:rgba(240,237,230,0.55);">Clinical Edge</div>
+        <div style="margin-top:8px; font-family:'IBM Plex Mono',monospace; font-size:24px; font-weight:500;
+                    letter-spacing:0.5px; color:rgba(168,193,204,0.36);">Clinical reasoning · Rhythm recognition · Bedside support</div>
+      </div>
+
+    </div>
+
+  </div>
+  <div class="slide-footer">
+    <div class="footer-brand"><div class="footer-dot"></div><span class="fnd">Clinical Edge: Nursing Tools</span></div>
+    <span class="fhd">@clinicaledgeco</span>
+  </div>
+  <div class="slide-number">
+    <div class="dot"></div><div class="dot"></div><div class="dot"></div><div class="dot"></div>
+    <div class="dot"></div><div class="dot"></div><div class="dot"></div><div class="dot active"></div>
+  </div>
+</div>
+
+
+</body>
+</html>

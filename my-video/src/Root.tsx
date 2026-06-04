@@ -7,8 +7,9 @@ import { qtcZofranScenario }       from "./scenarios/qtc-zofran";
 import { confusedPatientScenario } from "./scenarios/confused-patient";
 import { AppStoreShot }            from "./app-store-shots/AppStoreShot";
 import { CopilotAppStoreDemoComposition } from "./compositions/AppStoreDemo";
-import { ClinicalScenarioVideo }   from "./clinical-edge-video/ClinicalScenarioVideo";
-import { septicShockScenario }     from "./clinical-edge-video/data/scenarios";
+import { ClinicalScenarioVideo }    from "./clinical-edge-video/ClinicalScenarioVideo";
+import { septicShockScenario }      from "./clinical-edge-video/data/scenarios";
+import { RhythmLabPatternVideo }    from "./rhythm-lab-video/compositions/RhythmLabPatternVideo";
 
 // App Store screenshot dimensions — 6.7" iPhone display (iPhone 15 Pro Max)
 const AS_W = 1284;
@@ -67,7 +68,7 @@ export const Root: React.FC = () => {
         height={1920}
       />
 
-      {/* ── Clinical Edge vertical video — 1080×1920 TikTok/Reels ── */}
+      {/* ── Clinical Edge vertical videos — 1080×1920 TikTok/Reels ── */}
       <Composition
         id="ClinicalScenarioVideo"
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -77,6 +78,17 @@ export const Root: React.FC = () => {
         width={1080}
         height={1920}
         defaultProps={{ scenario: septicShockScenario }}
+      />
+
+      <Composition
+        id="RhythmLabPatternVideo"
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        component={RhythmLabPatternVideo as any}
+        durationInFrames={690}
+        fps={30}
+        width={1080}
+        height={1920}
+        defaultProps={{}}
       />
 
       {/* ── App Store stills — 1284×2778 (iPhone 15 Pro Max) ── */}

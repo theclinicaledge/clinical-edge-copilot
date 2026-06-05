@@ -1,0 +1,441 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Clinical Edge — Post 64 — The Lab Value Isn't the Problem</title>
+  <link
+    href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=IBM+Plex+Mono:wght@400;500;700&display=swap"
+    rel="stylesheet"
+  />
+  <style>
+    :root {
+      --bg:        #E7E1D6;
+      --card-warm: #FFFDF8;
+      --card-dark: #1E2A3A;
+      --elev:      #243040;
+      --teal:      #0ABFBC;
+      --tw:        #111827;
+      --twm:       #526174;
+      --td:        #F0EDE6;
+      --tdm:       #A8C1CC;
+      --border-w:  #D7D1C7;
+    }
+
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      background: #0D1117;
+      font-family: 'Inter', -apple-system, sans-serif;
+      padding: 48px 32px;
+      display: flex; flex-direction: column; align-items: center; gap: 56px;
+    }
+
+    /* ── Slide base — warm ──────────────────────────────────── */
+    .slide {
+      width: 1080px; height: 1350px;
+      background-color: var(--bg);
+      background-image:
+        radial-gradient(ellipse 90% 85% at 50% 50%, transparent 30%, rgba(0,0,0,0.09) 100%),
+        radial-gradient(ellipse 65% 52% at 18% 18%, rgba(255,232,180,0.13) 0%, transparent 58%);
+      position: relative; overflow: hidden; flex-shrink: 0;
+    }
+    .slide::before {
+      content: ''; position: absolute; inset: 0; z-index: 0; pointer-events: none;
+      background-image: url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' width='200' height='200'><filter id='g'><feTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/></filter><rect width='200' height='200' filter='url(%23g)' opacity='0.022'/></svg>");
+      background-size: 200px 200px; background-repeat: repeat;
+    }
+
+    /* Slide label — browser preview only */
+    .slide-label {
+      width: 1080px; display: flex; align-items: center; gap: 14px; margin-bottom: -40px;
+    }
+    .slide-label span {
+      font-family: 'IBM Plex Mono', monospace; font-size: 11px; font-weight: 500;
+      color: #9B8E7E; letter-spacing: 2px; text-transform: uppercase;
+    }
+    .slide-label::after { content: ''; flex: 1; height: 1px; background: #C4B8A8; opacity: 0.4; }
+
+    /* ── Footer ─────────────────────────────────────────────── */
+    .slide-footer {
+      position: absolute; bottom: 0; left: 0; right: 0; height: 96px;
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 0 80px; z-index: 2;
+      background: var(--card-warm);
+      border-top: 1px solid rgba(215,209,199,0.80);
+    }
+    .footer-brand { display: flex; align-items: center; gap: 14px; }
+    .footer-dot   { width: 10px; height: 10px; border-radius: 50%; background: var(--teal); }
+    .fnw { font-size: 28px; font-weight: 600; letter-spacing: -0.2px; color: var(--twm); }
+    .fhw { font-family: 'IBM Plex Mono', monospace; font-size: 26px; font-weight: 500;
+           letter-spacing: 1.5px; text-transform: uppercase; color: rgba(82,97,116,0.52); }
+
+    /* ── Counter dots ───────────────────────────────────────── */
+    .slide-number {
+      position: absolute; bottom: 33px; left: 50%; transform: translateX(-50%);
+      display: flex; gap: 7px; z-index: 3;
+    }
+    .slide-number .dot { width: 6px; height: 6px; border-radius: 50%; background: rgba(82,97,116,0.24); }
+    .slide-number .dot.active { background: var(--teal) !important; }
+
+    /* ── Badge ──────────────────────────────────────────────── */
+    .badge {
+      display: inline-flex; align-items: center;
+      padding: 14px 30px; border-radius: 100px;
+      background: rgba(10,191,188,0.10); border: 1px solid rgba(10,191,188,0.32);
+      font-family: 'IBM Plex Mono', monospace; font-size: 24px; font-weight: 700;
+      letter-spacing: 2px; text-transform: uppercase; color: var(--teal);
+      flex-shrink: 0; white-space: nowrap;
+    }
+
+    /* ── Counter label ──────────────────────────────────────── */
+    .ctr {
+      font-family: 'IBM Plex Mono', monospace; font-size: 26px; font-weight: 500;
+      letter-spacing: 1px; flex-shrink: 0; color: rgba(82,97,116,0.40);
+    }
+
+    /* ── Teal bar ───────────────────────────────────────────── */
+    .tbar { height: 2px; border-radius: 2px; background: var(--teal); }
+
+    /* ── Dark panel (slide 4) ───────────────────────────────── */
+    .dark-panel {
+      background: var(--card-dark); border-radius: 16px; padding: 44px 52px;
+      border: 1px solid rgba(255,255,255,0.05);
+      box-shadow: 0 4px 32px rgba(0,0,0,0.22);
+    }
+    .panel-row { display: flex; align-items: center; gap: 22px; }
+    .panel-dot { width: 6px; height: 6px; border-radius: 50%; background: var(--teal); flex-shrink: 0; }
+    .panel-text { font-size: 40px; font-weight: 400; line-height: 1.35; color: var(--tdm); }
+
+    /* ── Layout ─────────────────────────────────────────────── */
+    .slide-content {
+      position: relative; z-index: 1;
+      padding: 60px 80px 116px;
+      height: 100%; display: flex; flex-direction: column;
+    }
+    .top-row {
+      display: flex; align-items: center; justify-content: space-between; flex-shrink: 0;
+    }
+  </style>
+</head>
+<body>
+
+<!-- POST 64 — The Lab Value Isn't the Problem -->
+
+
+<!-- ═══ SLIDE 1 — HOOK ═══════════════════════════════════════════════════════ -->
+<div class="slide-label"><span>Slide 01 — Hook</span></div>
+<div class="slide" id="slide-1">
+  <div class="slide-content" style="justify-content:flex-start;">
+
+    <div class="top-row">
+      <div class="badge">Clinical Edge</div>
+      <span class="ctr">01 / 08</span>
+    </div>
+
+    <div style="flex:1; display:flex; flex-direction:column; justify-content:center; gap:0;">
+
+      <div style="display:flex; flex-direction:column; gap:6px;">
+        <div style="font-size:88px; font-weight:900; line-height:1.0; letter-spacing:-3.5px; color:var(--tw);">The lab value</div>
+        <div style="font-size:88px; font-weight:900; line-height:1.0; letter-spacing:-3.5px; color:var(--tw);">isn't the problem.</div>
+      </div>
+
+      <div class="tbar" style="width:64px; margin-top:40px; margin-bottom:36px;"></div>
+
+      <div style="font-size:56px; font-weight:500; line-height:1.3; letter-spacing:-0.5px; color:var(--teal);">It's usually the clue.</div>
+
+      <div style="margin-top:52px; display:flex; align-items:center; gap:16px;">
+        <span style="font-family:'IBM Plex Mono',monospace; font-size:23px; font-weight:500;
+                     letter-spacing:2px; color:rgba(82,97,116,0.36); text-transform:uppercase;">Swipe to read</span>
+        <div style="display:flex; gap:8px; align-items:center;">
+          <div style="width:28px; height:1px; background:rgba(82,97,116,0.18);"></div>
+          <div style="width:8px; height:8px; border-radius:50%; background:var(--teal);"></div>
+          <div style="width:10px; height:1px; background:rgba(82,97,116,0.18);"></div>
+        </div>
+      </div>
+
+    </div>
+
+  </div>
+  <div class="slide-footer">
+    <div class="footer-brand"><div class="footer-dot"></div><span class="fnw">Clinical Edge: Nursing Tools</span></div>
+    <span class="fhw">@clinicaledgeco</span>
+  </div>
+  <div class="slide-number">
+    <div class="dot active"></div><div class="dot"></div><div class="dot"></div><div class="dot"></div>
+    <div class="dot"></div><div class="dot"></div><div class="dot"></div><div class="dot"></div>
+  </div>
+</div>
+
+
+<!-- ═══ SLIDE 2 — THE TRAP ═══════════════════════════════════════════════════ -->
+<div class="slide-label"><span>Slide 02 — The Trap</span></div>
+<div class="slide" id="slide-2">
+  <div class="slide-content" style="justify-content:flex-start;">
+
+    <div class="top-row">
+      <div class="badge">The Trap</div>
+      <span class="ctr">02 / 08</span>
+    </div>
+
+    <div style="flex:1; display:flex; flex-direction:column; justify-content:center; gap:0;">
+
+      <div style="display:flex; flex-direction:column; gap:6px;">
+        <div style="font-size:80px; font-weight:900; line-height:1.0; letter-spacing:-3px; color:var(--tw);">A potassium of 2.9</div>
+        <div style="font-size:80px; font-weight:900; line-height:1.0; letter-spacing:-3px; color:var(--tw);">gets attention.</div>
+      </div>
+
+      <div class="tbar" style="width:64px; margin-top:40px; margin-bottom:36px;"></div>
+
+      <div style="font-size:52px; font-weight:400; line-height:1.35; color:var(--twm);">But potassium isn't the question.</div>
+
+    </div>
+
+  </div>
+  <div class="slide-footer">
+    <div class="footer-brand"><div class="footer-dot"></div><span class="fnw">Clinical Edge: Nursing Tools</span></div>
+    <span class="fhw">@clinicaledgeco</span>
+  </div>
+  <div class="slide-number">
+    <div class="dot"></div><div class="dot active"></div><div class="dot"></div><div class="dot"></div>
+    <div class="dot"></div><div class="dot"></div><div class="dot"></div><div class="dot"></div>
+  </div>
+</div>
+
+
+<!-- ═══ SLIDE 3 — THE REAL QUESTION ═════════════════════════════════════════ -->
+<div class="slide-label"><span>Slide 03 — The Real Question</span></div>
+<div class="slide" id="slide-3">
+  <div class="slide-content" style="justify-content:flex-start;">
+
+    <div class="top-row">
+      <div class="badge">The Real Question</div>
+      <span class="ctr">03 / 08</span>
+    </div>
+
+    <div style="flex:1; display:flex; flex-direction:column; justify-content:center; gap:0;">
+
+      <div style="font-size:116px; font-weight:900; line-height:1.0; letter-spacing:-5px; color:var(--teal);">Why is it 2.9?</div>
+
+      <div class="tbar" style="width:64px; margin-top:44px; margin-bottom:40px;"></div>
+
+      <div style="font-size:50px; font-weight:400; line-height:1.45; color:var(--twm);">The abnormal value points</div>
+      <div style="font-size:50px; font-weight:400; line-height:1.45; color:var(--twm);">toward a process.</div>
+
+    </div>
+
+  </div>
+  <div class="slide-footer">
+    <div class="footer-brand"><div class="footer-dot"></div><span class="fnw">Clinical Edge: Nursing Tools</span></div>
+    <span class="fhw">@clinicaledgeco</span>
+  </div>
+  <div class="slide-number">
+    <div class="dot"></div><div class="dot"></div><div class="dot active"></div><div class="dot"></div>
+    <div class="dot"></div><div class="dot"></div><div class="dot"></div><div class="dot"></div>
+  </div>
+</div>
+
+
+<!-- ═══ SLIDE 4 — CLINICAL REASONING ════════════════════════════════════════ -->
+<div class="slide-label"><span>Slide 04 — Clinical Reasoning</span></div>
+<div class="slide" id="slide-4">
+  <div class="slide-content" style="justify-content:flex-start;">
+
+    <div class="top-row">
+      <div class="badge">Clinical Reasoning</div>
+      <span class="ctr">04 / 08</span>
+    </div>
+
+    <div style="flex:1; display:flex; flex-direction:column; justify-content:center; gap:0;">
+
+      <div style="display:flex; flex-direction:column; gap:4px;">
+        <div style="font-size:72px; font-weight:900; line-height:1.02; letter-spacing:-2.5px; color:var(--tw);">The same number can</div>
+        <div style="font-size:72px; font-weight:900; line-height:1.02; letter-spacing:-2.5px; color:var(--tw);">come from very</div>
+        <div style="font-size:72px; font-weight:900; line-height:1.02; letter-spacing:-2.5px; color:var(--tw);">different problems.</div>
+      </div>
+
+      <div class="tbar" style="width:64px; margin-top:36px; margin-bottom:36px;"></div>
+
+      <div class="dark-panel">
+        <div style="font-family:'IBM Plex Mono',monospace; font-size:22px; font-weight:700;
+                    letter-spacing:2px; text-transform:uppercase; color:rgba(168,193,204,0.38);
+                    margin-bottom:24px;">For example</div>
+        <div style="display:flex; flex-direction:column; gap:20px;">
+          <div class="panel-row"><div class="panel-dot"></div><span class="panel-text">diuresis</span></div>
+          <div class="panel-row"><div class="panel-dot"></div><span class="panel-text">GI losses</span></div>
+          <div class="panel-row"><div class="panel-dot"></div><span class="panel-text">poor intake</span></div>
+          <div class="panel-row"><div class="panel-dot"></div><span class="panel-text">insulin shifts</span></div>
+        </div>
+      </div>
+
+    </div>
+
+  </div>
+  <div class="slide-footer">
+    <div class="footer-brand"><div class="footer-dot"></div><span class="fnw">Clinical Edge: Nursing Tools</span></div>
+    <span class="fhw">@clinicaledgeco</span>
+  </div>
+  <div class="slide-number">
+    <div class="dot"></div><div class="dot"></div><div class="dot"></div><div class="dot active"></div>
+    <div class="dot"></div><div class="dot"></div><div class="dot"></div><div class="dot"></div>
+  </div>
+</div>
+
+
+<!-- ═══ SLIDE 5 — THE SHIFT ══════════════════════════════════════════════════ -->
+<div class="slide-label"><span>Slide 05 — The Shift</span></div>
+<div class="slide" id="slide-5">
+  <div class="slide-content" style="justify-content:flex-start;">
+
+    <div class="top-row">
+      <div class="badge">The Shift</div>
+      <span class="ctr">05 / 08</span>
+    </div>
+
+    <div style="flex:1; display:flex; flex-direction:column; justify-content:center; gap:0;">
+
+      <div style="display:flex; flex-direction:column; gap:6px;">
+        <div style="font-size:80px; font-weight:900; line-height:1.0; letter-spacing:-3px; color:var(--tw);">Strong nurses don't</div>
+        <div style="font-size:80px; font-weight:900; line-height:1.0; letter-spacing:-3px; color:var(--tw);">stop at the result.</div>
+      </div>
+
+      <div class="tbar" style="width:64px; margin-top:40px; margin-bottom:36px;"></div>
+
+      <div style="font-size:52px; font-weight:600; line-height:1.3; letter-spacing:-0.5px; color:var(--teal);">They ask what created it.</div>
+
+    </div>
+
+  </div>
+  <div class="slide-footer">
+    <div class="footer-brand"><div class="footer-dot"></div><span class="fnw">Clinical Edge: Nursing Tools</span></div>
+    <span class="fhw">@clinicaledgeco</span>
+  </div>
+  <div class="slide-number">
+    <div class="dot"></div><div class="dot"></div><div class="dot"></div><div class="dot"></div>
+    <div class="dot active"></div><div class="dot"></div><div class="dot"></div><div class="dot"></div>
+  </div>
+</div>
+
+
+<!-- ═══ SLIDE 6 — BIGGER PICTURE ════════════════════════════════════════════ -->
+<div class="slide-label"><span>Slide 06 — Bigger Picture</span></div>
+<div class="slide" id="slide-6">
+  <div class="slide-content" style="justify-content:flex-start;">
+
+    <div class="top-row">
+      <div class="badge">Bigger Picture</div>
+      <span class="ctr">06 / 08</span>
+    </div>
+
+    <div style="flex:1; display:flex; flex-direction:column; justify-content:center; gap:0;">
+
+      <!-- Primary statement -->
+      <div style="display:flex; flex-direction:column; gap:4px;">
+        <div style="font-size:72px; font-weight:900; line-height:1.0; letter-spacing:-2.5px; color:var(--tw);">A lactate isn't</div>
+        <div style="font-size:72px; font-weight:900; line-height:1.0; letter-spacing:-2.5px; color:var(--tw);">the diagnosis.</div>
+      </div>
+
+      <!-- Continuation — muted -->
+      <div style="margin-top:24px; display:flex; flex-direction:column; gap:4px;">
+        <div style="font-size:46px; font-weight:400; line-height:1.4; color:rgba(82,97,116,0.54);">A creatinine isn't the diagnosis.</div>
+        <div style="font-size:46px; font-weight:400; line-height:1.4; color:rgba(82,97,116,0.54);">A hemoglobin isn't the diagnosis.</div>
+      </div>
+
+      <div class="tbar" style="width:64px; margin-top:40px; margin-bottom:36px;"></div>
+
+      <div style="font-size:64px; font-weight:700; line-height:1.1; letter-spacing:-2px; color:var(--teal);">They're clues.</div>
+
+    </div>
+
+  </div>
+  <div class="slide-footer">
+    <div class="footer-brand"><div class="footer-dot"></div><span class="fnw">Clinical Edge: Nursing Tools</span></div>
+    <span class="fhw">@clinicaledgeco</span>
+  </div>
+  <div class="slide-number">
+    <div class="dot"></div><div class="dot"></div><div class="dot"></div><div class="dot"></div>
+    <div class="dot"></div><div class="dot active"></div><div class="dot"></div><div class="dot"></div>
+  </div>
+</div>
+
+
+<!-- ═══ SLIDE 7 — THE SKILL ══════════════════════════════════════════════════ -->
+<div class="slide-label"><span>Slide 07 — The Skill</span></div>
+<div class="slide" id="slide-7">
+  <div class="slide-content" style="justify-content:flex-start;">
+
+    <div class="top-row">
+      <div class="badge">The Skill</div>
+      <span class="ctr">07 / 08</span>
+    </div>
+
+    <div style="flex:1; display:flex; flex-direction:column; justify-content:center; gap:0;">
+
+      <div style="font-size:96px; font-weight:900; line-height:1.0; letter-spacing:-4px; color:var(--tw);">Treat the patient.</div>
+
+      <div class="tbar" style="width:64px; margin-top:40px; margin-bottom:36px;"></div>
+
+      <div style="font-size:52px; font-weight:600; line-height:1.35; letter-spacing:-0.5px; color:var(--teal);">Interpret the numbers.</div>
+
+      <div style="margin-top:16px; font-size:44px; font-weight:400; line-height:1.35; color:var(--twm);">Not the other way around.</div>
+
+    </div>
+
+  </div>
+  <div class="slide-footer">
+    <div class="footer-brand"><div class="footer-dot"></div><span class="fnw">Clinical Edge: Nursing Tools</span></div>
+    <span class="fhw">@clinicaledgeco</span>
+  </div>
+  <div class="slide-number">
+    <div class="dot"></div><div class="dot"></div><div class="dot"></div><div class="dot"></div>
+    <div class="dot"></div><div class="dot"></div><div class="dot active"></div><div class="dot"></div>
+  </div>
+</div>
+
+
+<!-- ═══ SLIDE 8 — CLOSING ════════════════════════════════════════════════════ -->
+<div class="slide-label"><span>Slide 08 — Closing</span></div>
+<div class="slide" id="slide-8">
+  <div class="slide-content" style="justify-content:flex-start;">
+
+    <div class="top-row">
+      <div class="badge">Clinical Edge</div>
+      <span class="ctr">08 / 08</span>
+    </div>
+
+    <div style="flex:1; display:flex; flex-direction:column; justify-content:center; gap:0;">
+
+      <div style="display:flex; flex-direction:column; gap:6px;">
+        <div style="font-size:88px; font-weight:900; line-height:1.0; letter-spacing:-3.5px; color:var(--tw);">The value</div>
+        <div style="font-size:88px; font-weight:900; line-height:1.0; letter-spacing:-3.5px; color:var(--tw);">is the signal.</div>
+      </div>
+
+      <div class="tbar" style="width:64px; margin-top:40px; margin-bottom:36px;"></div>
+
+      <div style="font-size:52px; font-weight:600; line-height:1.3; letter-spacing:-0.5px; color:var(--teal);">The process is the story.</div>
+
+      <!-- Save note -->
+      <div style="margin-top:52px; font-family:'IBM Plex Mono',monospace; font-size:26px;
+                  font-weight:500; letter-spacing:1px; color:rgba(82,97,116,0.42);
+                  text-transform:uppercase;">Save this for your next shift.</div>
+
+      <!-- Soft brand mention -->
+      <div style="margin-top:24px; font-size:30px; font-weight:400; line-height:1.5;
+                  color:rgba(82,97,116,0.38);">This is the type of clinical reasoning<br>I built Clinical Edge around.</div>
+
+    </div>
+
+  </div>
+  <div class="slide-footer">
+    <div class="footer-brand"><div class="footer-dot"></div><span class="fnw">Clinical Edge: Nursing Tools</span></div>
+    <span class="fhw">@clinicaledgeco</span>
+  </div>
+  <div class="slide-number">
+    <div class="dot"></div><div class="dot"></div><div class="dot"></div><div class="dot"></div>
+    <div class="dot"></div><div class="dot"></div><div class="dot"></div><div class="dot active"></div>
+  </div>
+</div>
+
+
+</body>
+</html>

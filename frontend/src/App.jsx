@@ -527,7 +527,7 @@ A slow HR climb with new fatigue usually has a clear reason. Thinking it through
 
 // ─── Main App ──────────────────────────────────────────────────────────────────
 
-export default function App({ onGoHome }) {
+export default function App({ onGoHome, isOnline = true }) {
   const [question, setQuestion]         = useState(() => _ssParam === 'response' ? _SS_QUESTION : "");
   const [result, setResult]             = useState(() => {
     if (_ssParam !== 'response') return null;
@@ -652,6 +652,7 @@ export default function App({ onGoHome }) {
   // AbortController lets the visibility handler cancel and restart cleanly.
   const runQuery = async (q, { isFollowUp = false } = {}) => {
     if (!q.trim()) return;
+    if (!isOnline) return;
 
     // Cancel any previous in-flight request before starting a new one
     if (abortControllerRef.current) abortControllerRef.current.abort();
@@ -1127,6 +1128,32 @@ export default function App({ onGoHome }) {
           ))}
         </div>
 
+        {/* Offline notice — shown only when network is unavailable */}
+        {!isOnline && (
+          <div style={{
+            background: "rgba(77,163,255,0.06)",
+            border: "1px solid rgba(77,163,255,0.22)",
+            borderLeft: "3px solid #4da3ff",
+            borderRadius: 8,
+            padding: "14px 16px",
+            marginBottom: 14,
+            display: "flex",
+            alignItems: "flex-start",
+            gap: 10,
+          }}>
+            <span style={{
+              fontFamily: "'IBM Plex Mono', monospace",
+              fontSize: 11,
+              color: "#4da3ff",
+              flexShrink: 0,
+              marginTop: 1,
+            }}>OFFLINE</span>
+            <span style={{ fontSize: 13, color: "#526174", lineHeight: 1.55 }}>
+              Copilot requires internet. <strong style={{ color: "#4da3ff", fontWeight: 600 }}>Rhythm Lab</strong> and <strong style={{ color: "#4da3ff", fontWeight: 600 }}>ICU Drips</strong> are available offline once loaded.
+            </span>
+          </div>
+        )}
+
         {/* Input card */}
         <div className="input-card" style={{
           background: "#1E2A3A",
@@ -1175,16 +1202,16 @@ export default function App({ onGoHome }) {
             <button
               className="submit-btn"
               onClick={handleSubmit}
-              disabled={!question.trim() || isActive}
+              disabled={!question.trim() || isActive || !isOnline}
               style={{
-                background: (!question.trim() || isActive) ? "rgba(10,191,188,0.08)" : "#0ABFBC",
-                color: (!question.trim() || isActive) ? "#94A3B8" : "#0B1F2A",
+                background: (!question.trim() || isActive || !isOnline) ? "rgba(10,191,188,0.08)" : "#0ABFBC",
+                color: (!question.trim() || isActive || !isOnline) ? "#94A3B8" : "#0B1F2A",
                 border: "none",
                 borderRadius: 8,
                 padding: "10px 22px",
                 fontSize: 13,
                 fontWeight: 700,
-                cursor: (!question.trim() || isActive) ? "not-allowed" : "pointer",
+                cursor: (!question.trim() || isActive || !isOnline) ? "not-allowed" : "pointer",
                 display: "flex",
                 alignItems: "center",
                 gap: 8,

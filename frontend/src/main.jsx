@@ -40,6 +40,7 @@ function getPage() {
 
 function Root() {
   const [page, setPage] = useState(getPage);
+  const [isOnline, setIsOnline] = useState(() => navigator.onLine);
 
   // navigate() — pushes pathname and syncs React state without a reload
   const navigate = (path) => {
@@ -54,6 +55,17 @@ function Root() {
     return () => window.removeEventListener('popstate', onPop);
   }, []);
 
+  useEffect(() => {
+    const handleOnline  = () => setIsOnline(true);
+    const handleOffline = () => setIsOnline(false);
+    window.addEventListener('online',  handleOnline);
+    window.addEventListener('offline', handleOffline);
+    return () => {
+      window.removeEventListener('online',  handleOnline);
+      window.removeEventListener('offline', handleOffline);
+    };
+  }, []);
+
   const enterApp         = () => navigate('/copilot');
   const enterScenario    = () => navigate('/scenario');
   const enterQuickStart  = () => navigate('/quickstart');
@@ -63,7 +75,7 @@ function Root() {
   return (
     <>
       {page === 'home'       && <ClinicalEdgeHome onNavigate={navigate} />}
-      {page === 'app'        && <App onGoHome={() => navigate('/')} />}
+      {page === 'app'        && <App onGoHome={() => navigate('/')} isOnline={isOnline} />}
       {page === 'rhythmlab'  && <RhythmLabModule onGoHome={() => navigate('/')} />}
       {page === 'scenario'   && <Scenario onBack={goBack} onEnterApp={enterApp} onQuickStart={enterQuickStart} />}
       {page === 'quickstart' && <QuickStart onBack={goBackToScenario} onEnterApp={enterApp} />}

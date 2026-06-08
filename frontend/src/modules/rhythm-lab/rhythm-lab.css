@@ -130,26 +130,38 @@
   margin-left: auto;
   background: none;
   border: none;
-  color: #6A8898;
+  color: #7A95A5;
   font-size: 13px;
   font-weight: 500;
   cursor: pointer;
-  font-family: var(--font-mono);
-  letter-spacing: 0.01em;
+  font-family: -apple-system, BlinkMacSystemFont, 'Inter', sans-serif;
+  letter-spacing: 0;
   padding: 0;
   min-height: 40px;
   display: inline-flex;
   align-items: center;
+  gap: 5px;
   line-height: 1;
   transition: color 0.15s;
   white-space: nowrap;
   text-decoration: none;
   flex-shrink: 0;
 }
+.module-back-link .back-arrow {
+  font-size: 15px;
+  line-height: 1;
+  display: inline-flex;
+  align-items: center;
+  opacity: 0.75;
+  margin-top: -1px;
+}
 .module-back-link:hover,
 .module-back-link:focus-visible {
   color: #0ABFBC;
   outline: none;
+}
+.module-back-link:hover .back-arrow {
+  opacity: 1;
 }
 
 /* ─── Home: outer wrapper ────────────────────────────────────────────── */

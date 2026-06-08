@@ -900,26 +900,38 @@ export default function App({ onGoHome, isOnline = true }) {
           margin-left: auto;
           background: none;
           border: none;
-          color: #6A8898;
+          color: #7A95A5;
           font-size: 13px;
           font-weight: 500;
           cursor: pointer;
-          font-family: 'IBM Plex Mono', 'Courier New', monospace;
-          letter-spacing: 0.01em;
+          font-family: -apple-system, BlinkMacSystemFont, 'Inter', sans-serif;
+          letter-spacing: 0;
           padding: 0;
           min-height: 40px;
           display: inline-flex;
           align-items: center;
+          gap: 5px;
           line-height: 1;
           transition: color 0.15s;
           white-space: nowrap;
           text-decoration: none;
           flex-shrink: 0;
         }
+        .module-back-link .back-arrow {
+          font-size: 15px;
+          line-height: 1;
+          display: inline-flex;
+          align-items: center;
+          opacity: 0.75;
+          margin-top: -1px;
+        }
         .module-back-link:hover,
         .module-back-link:focus-visible {
           color: #0ABFBC;
           outline: none;
+        }
+        .module-back-link:hover .back-arrow {
+          opacity: 1;
         }
 
         @keyframes fadeUp { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
@@ -947,18 +959,10 @@ export default function App({ onGoHome, isOnline = true }) {
         @media (max-width: 768px) {
           .main-container { max-width: 800px !important; margin: 0 auto !important; padding: 18px 16px 0 !important; overflow-x: hidden !important; }
           .hero { margin-bottom: 12px !important; }
-          /* Reduce chip density — show max 3 per section */
-          .chips-recent button:nth-child(n+4) { display: none !important; }
+          /* Reduce try-asking chip density — show max 3 */
           .chips-try button:nth-child(n+4) { display: none !important; }
-          /* Prevent recent case chips from overflowing viewport */
-          .chips-recent { overflow: hidden !important; }
-          .chips-recent button {
-            font-size: 12px !important;
-            max-width: 160px !important;
-            overflow: hidden !important;
-            text-overflow: ellipsis !important;
-            white-space: nowrap !important;
-          }
+          /* Recent row: limit to 3 cards on mobile */
+          .recent-list > *:nth-child(n+4) { display: none !important; }
           /* Prevent iOS auto-zoom on textarea focus (requires font-size >= 16px) */
           textarea { font-size: 16px !important; }
         }
@@ -1029,7 +1033,8 @@ export default function App({ onGoHome, isOnline = true }) {
           {/* All tools — back navigation */}
           {onGoHome && (
             <button className="module-back-link" onClick={onGoHome}>
-              ← All tools
+              <span className="back-arrow">←</span>
+              All tools
             </button>
           )}
 
@@ -1206,45 +1211,50 @@ export default function App({ onGoHome, isOnline = true }) {
 
         {/* Recent Cases */}
         {history.length > 0 && (
-          <div style={{ marginBottom: 16 }}>
+          <div style={{ marginBottom: 14 }}>
             <div style={{
               fontSize: 10,
               fontWeight: 500,
               letterSpacing: "0.10em",
               textTransform: "uppercase",
               color: "#8A9BA8",
-              marginBottom: 8,
+              marginBottom: 6,
               fontFamily: "'IBM Plex Mono', monospace",
             }}>Recent</div>
-            <div className="chips-recent" style={{ display: "flex", flexWrap: "wrap", gap: 7 }}>
-              {history.map((item, i) => (
+            <div className="recent-list" style={{ display: "flex", flexDirection: "column", gap: 5 }}>
+              {history.slice(0, 5).map((item, i) => (
                 <button
                   key={i}
                   className="chip"
                   onClick={() => { track("recent_case_clicked"); runQuery(item); }}
                   style={{
-                    background: "#DDD6CA",
-                    border: "1px solid #C4BDB5",
-                    boxShadow: "none",
-                    color: "#111827",
-                    padding: "0 12px",
-                    height: 28,
+                    background: "rgba(0,0,0,0.04)",
+                    border: "1px solid rgba(0,0,0,0.08)",
+                    color: "#3D5166",
+                    padding: "7px 11px",
                     borderRadius: 6,
-                    fontSize: 13,
-                    fontWeight: 500,
+                    fontSize: 12,
+                    fontWeight: 400,
                     letterSpacing: "-0.01em",
                     cursor: "pointer",
-                    display: "inline-flex",
-                    alignItems: "center",
-                    maxWidth: 260,
+                    display: "flex",
+                    alignItems: "flex-start",
+                    gap: 8,
                     textAlign: "left",
-                    overflow: "hidden",
-                    textOverflow: "ellipsis",
-                    whiteSpace: "nowrap",
+                    lineHeight: 1.4,
                     transition: "all 0.15s",
+                    width: "100%",
+                    overflow: "hidden",
                   }}
                 >
-                  {item}
+                  <span style={{ color: "#9AA8B2", fontSize: 8, flexShrink: 0, marginTop: 3 }}>↩</span>
+                  <span style={{
+                    display: "-webkit-box",
+                    WebkitLineClamp: 2,
+                    WebkitBoxOrient: "vertical",
+                    overflow: "hidden",
+                    textOverflow: "ellipsis",
+                  }}>{item}</span>
                 </button>
               ))}
             </div>

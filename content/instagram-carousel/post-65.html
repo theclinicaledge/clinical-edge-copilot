@@ -1,0 +1,499 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Clinical Edge — Post 65 — Why Oxygen Isn't Just Oxygen</title>
+  <link
+    href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=IBM+Plex+Mono:wght@400;500;700&display=swap"
+    rel="stylesheet"
+  />
+  <style>
+    :root {
+      --bg:        #E7E1D6;
+      --card-warm: #FFFDF8;
+      --card-dark: #1E2A3A;
+      --elev:      #243040;
+      --teal:      #0ABFBC;
+      --tw:        #111827;
+      --twm:       #526174;
+      --td:        #F0EDE6;
+      --tdm:       #A8C1CC;
+      --border-w:  #D7D1C7;
+    }
+
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      background: #0D1117;
+      font-family: 'Inter', -apple-system, sans-serif;
+      padding: 48px 32px;
+      display: flex; flex-direction: column; align-items: center; gap: 56px;
+    }
+
+    /* ── Slide base — warm ──────────────────────────────────── */
+    .slide {
+      width: 1080px; height: 1350px;
+      background-color: var(--bg);
+      background-image:
+        radial-gradient(ellipse 90% 85% at 50% 50%, transparent 30%, rgba(0,0,0,0.09) 100%),
+        radial-gradient(ellipse 65% 52% at 18% 18%, rgba(255,232,180,0.13) 0%, transparent 58%);
+      position: relative; overflow: hidden; flex-shrink: 0;
+    }
+    .slide::before {
+      content: ''; position: absolute; inset: 0; z-index: 0; pointer-events: none;
+      background-image: url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' width='200' height='200'><filter id='g'><feTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/></filter><rect width='200' height='200' filter='url(%23g)' opacity='0.022'/></svg>");
+      background-size: 200px 200px; background-repeat: repeat;
+    }
+
+    /* Slide label — browser preview only */
+    .slide-label {
+      width: 1080px; display: flex; align-items: center; gap: 14px; margin-bottom: -40px;
+    }
+    .slide-label span {
+      font-family: 'IBM Plex Mono', monospace; font-size: 11px; font-weight: 500;
+      color: #9B8E7E; letter-spacing: 2px; text-transform: uppercase;
+    }
+    .slide-label::after { content: ''; flex: 1; height: 1px; background: #C4B8A8; opacity: 0.4; }
+
+    /* ── Footer ─────────────────────────────────────────────── */
+    .slide-footer {
+      position: absolute; bottom: 0; left: 0; right: 0; height: 96px;
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 0 80px; z-index: 2;
+      background: var(--card-warm);
+      border-top: 1px solid rgba(215,209,199,0.80);
+    }
+    .footer-brand { display: flex; align-items: center; gap: 14px; }
+    .footer-dot   { width: 10px; height: 10px; border-radius: 50%; background: var(--teal); }
+    .fnw { font-size: 28px; font-weight: 600; letter-spacing: -0.2px; color: var(--twm); }
+    .fhw { font-family: 'IBM Plex Mono', monospace; font-size: 26px; font-weight: 500;
+           letter-spacing: 1.5px; text-transform: uppercase; color: rgba(82,97,116,0.52); }
+
+    /* ── Counter dots ───────────────────────────────────────── */
+    .slide-number {
+      position: absolute; bottom: 33px; left: 50%; transform: translateX(-50%);
+      display: flex; gap: 7px; z-index: 3;
+    }
+    .slide-number .dot { width: 6px; height: 6px; border-radius: 50%; background: rgba(82,97,116,0.24); }
+    .slide-number .dot.active { background: var(--teal) !important; }
+
+    /* ── Badge ──────────────────────────────────────────────── */
+    .badge {
+      display: inline-flex; align-items: center;
+      padding: 14px 30px; border-radius: 100px;
+      background: rgba(10,191,188,0.10); border: 1px solid rgba(10,191,188,0.32);
+      font-family: 'IBM Plex Mono', monospace; font-size: 24px; font-weight: 700;
+      letter-spacing: 2px; text-transform: uppercase; color: var(--teal);
+      flex-shrink: 0; white-space: nowrap;
+    }
+
+    /* ── Counter label ──────────────────────────────────────── */
+    .ctr {
+      font-family: 'IBM Plex Mono', monospace; font-size: 26px; font-weight: 500;
+      letter-spacing: 1px; flex-shrink: 0; color: rgba(82,97,116,0.40);
+    }
+
+    /* ── Teal bar ───────────────────────────────────────────── */
+    .tbar { height: 2px; border-radius: 2px; background: var(--teal); }
+
+    /* ── Dark panel ─────────────────────────────────────────── */
+    .dark-panel {
+      background: var(--card-dark); border-radius: 16px; padding: 44px 52px;
+      border: 1px solid rgba(255,255,255,0.05);
+      box-shadow: 0 4px 32px rgba(0,0,0,0.22);
+    }
+
+    /* ── Warm quote card ────────────────────────────────────── */
+    .quote-card {
+      background: var(--card-warm); border-radius: 16px; padding: 40px 48px;
+      border: 1px solid rgba(215,209,199,0.80);
+      border-left: 4px solid var(--teal);
+      box-shadow: 0 4px 24px rgba(0,0,0,0.07);
+    }
+
+    /* ── Table row ──────────────────────────────────────────── */
+    .table-row {
+      display: flex; justify-content: space-between; align-items: center;
+      padding: 14px 0;
+    }
+    .table-divider { height: 1px; background: rgba(255,255,255,0.07); }
+
+    /* ── Bullet row ─────────────────────────────────────────── */
+    .brow { display: flex; align-items: center; gap: 20px; }
+    .bdot { width: 7px; height: 7px; border-radius: 50%; background: var(--teal); flex-shrink: 0; }
+
+    /* ── Layout ─────────────────────────────────────────────── */
+    .slide-content {
+      position: relative; z-index: 1;
+      padding: 60px 80px 116px;
+      height: 100%; display: flex; flex-direction: column;
+    }
+    .top-row {
+      display: flex; align-items: center; justify-content: space-between; flex-shrink: 0;
+    }
+  </style>
+</head>
+<body>
+
+<!-- POST 65 — Why Oxygen Isn't Just Oxygen -->
+
+
+<!-- ═══ SLIDE 1 — HOOK ═══════════════════════════════════════════════════════ -->
+<div class="slide-label"><span>Slide 01 — Hook</span></div>
+<div class="slide" id="slide-1">
+  <div class="slide-content" style="justify-content:flex-start;">
+
+    <div class="top-row">
+      <div class="badge">Clinical Edge</div>
+      <span class="ctr">01 / 08</span>
+    </div>
+
+    <div style="flex:1; display:flex; flex-direction:column; justify-content:center; gap:0;">
+
+      <div style="display:flex; flex-direction:column; gap:6px;">
+        <div style="font-size:88px; font-weight:900; line-height:1.0; letter-spacing:-3.5px; color:var(--tw);">Most nurses</div>
+        <div style="font-size:88px; font-weight:900; line-height:1.0; letter-spacing:-3.5px; color:var(--tw);">learn liters.</div>
+      </div>
+
+      <div class="tbar" style="width:64px; margin-top:40px; margin-bottom:36px;"></div>
+
+      <div style="font-size:52px; font-weight:500; line-height:1.3; letter-spacing:-0.5px; color:var(--teal);">The lungs care about FiO₂.</div>
+
+      <div style="margin-top:52px; display:flex; align-items:center; gap:16px;">
+        <span style="font-family:'IBM Plex Mono',monospace; font-size:23px; font-weight:500;
+                     letter-spacing:2px; color:rgba(82,97,116,0.36); text-transform:uppercase;">Swipe to read</span>
+        <div style="display:flex; gap:8px; align-items:center;">
+          <div style="width:28px; height:1px; background:rgba(82,97,116,0.18);"></div>
+          <div style="width:8px; height:8px; border-radius:50%; background:var(--teal);"></div>
+          <div style="width:10px; height:1px; background:rgba(82,97,116,0.18);"></div>
+        </div>
+      </div>
+
+    </div>
+
+  </div>
+  <div class="slide-footer">
+    <div class="footer-brand"><div class="footer-dot"></div><span class="fnw">Clinical Edge: Nursing Tools</span></div>
+    <span class="fhw">@clinicaledgeco</span>
+  </div>
+  <div class="slide-number">
+    <div class="dot active"></div><div class="dot"></div><div class="dot"></div><div class="dot"></div>
+    <div class="dot"></div><div class="dot"></div><div class="dot"></div><div class="dot"></div>
+  </div>
+</div>
+
+
+<!-- ═══ SLIDE 2 — OXYGEN BASICS ══════════════════════════════════════════════ -->
+<div class="slide-label"><span>Slide 02 — Oxygen Basics</span></div>
+<div class="slide" id="slide-2">
+  <div class="slide-content" style="justify-content:flex-start;">
+
+    <div class="top-row">
+      <div class="badge">Oxygen Basics</div>
+      <span class="ctr">02 / 08</span>
+    </div>
+
+    <div style="flex:1; display:flex; flex-direction:column; justify-content:center; gap:0;">
+
+      <div style="display:flex; flex-direction:column; gap:4px;">
+        <div style="font-size:72px; font-weight:900; line-height:1.05; letter-spacing:-2.5px; color:var(--tw);">2L nasal cannula.</div>
+        <div style="font-size:72px; font-weight:900; line-height:1.05; letter-spacing:-2.5px; color:var(--tw);">6L nasal cannula.</div>
+      </div>
+
+      <div class="tbar" style="width:64px; margin-top:40px; margin-bottom:36px;"></div>
+
+      <div style="font-size:48px; font-weight:400; line-height:1.5; color:var(--twm);">Same device.</div>
+      <div style="font-size:48px; font-weight:600; line-height:1.5; color:var(--teal);">Different oxygen delivery.</div>
+
+    </div>
+
+  </div>
+  <div class="slide-footer">
+    <div class="footer-brand"><div class="footer-dot"></div><span class="fnw">Clinical Edge: Nursing Tools</span></div>
+    <span class="fhw">@clinicaledgeco</span>
+  </div>
+  <div class="slide-number">
+    <div class="dot"></div><div class="dot active"></div><div class="dot"></div><div class="dot"></div>
+    <div class="dot"></div><div class="dot"></div><div class="dot"></div><div class="dot"></div>
+  </div>
+</div>
+
+
+<!-- ═══ SLIDE 3 — THE REAL NUMBER ════════════════════════════════════════════ -->
+<div class="slide-label"><span>Slide 03 — The Real Number</span></div>
+<div class="slide" id="slide-3">
+  <div class="slide-content" style="justify-content:flex-start;">
+
+    <div class="top-row">
+      <div class="badge">The Real Number</div>
+      <span class="ctr">03 / 08</span>
+    </div>
+
+    <div style="flex:1; display:flex; flex-direction:column; justify-content:center; gap:0;">
+
+      <div style="display:flex; flex-direction:column; gap:4px;">
+        <div style="font-size:96px; font-weight:900; line-height:1.0; letter-spacing:-4px; color:var(--tw);">FiO₂ is</div>
+        <div style="font-size:96px; font-weight:900; line-height:1.0; letter-spacing:-4px; color:var(--teal);">the dose.</div>
+      </div>
+
+      <div class="tbar" style="width:64px; margin-top:40px; margin-bottom:36px;"></div>
+
+      <div style="font-size:46px; font-weight:400; line-height:1.5; color:var(--twm);">It means the percentage of oxygen</div>
+      <div style="font-size:46px; font-weight:400; line-height:1.5; color:var(--twm);">being delivered.</div>
+
+    </div>
+
+  </div>
+  <div class="slide-footer">
+    <div class="footer-brand"><div class="footer-dot"></div><span class="fnw">Clinical Edge: Nursing Tools</span></div>
+    <span class="fhw">@clinicaledgeco</span>
+  </div>
+  <div class="slide-number">
+    <div class="dot"></div><div class="dot"></div><div class="dot active"></div><div class="dot"></div>
+    <div class="dot"></div><div class="dot"></div><div class="dot"></div><div class="dot"></div>
+  </div>
+</div>
+
+
+<!-- ═══ SLIDE 4 — QUICK REFERENCE ════════════════════════════════════════════ -->
+<div class="slide-label"><span>Slide 04 — Quick Reference</span></div>
+<div class="slide" id="slide-4">
+  <div class="slide-content" style="justify-content:flex-start;">
+
+    <div class="top-row">
+      <div class="badge">Quick Reference</div>
+      <span class="ctr">04 / 08</span>
+    </div>
+
+    <div style="flex:1; display:flex; flex-direction:column; justify-content:center; gap:0;">
+
+      <div style="font-size:68px; font-weight:900; line-height:1.0; letter-spacing:-2.5px; color:var(--tw);">Nasal cannula estimates.</div>
+
+      <div class="tbar" style="width:64px; margin-top:36px; margin-bottom:36px;"></div>
+
+      <!-- Reference table in dark card -->
+      <div class="dark-panel">
+        <div style="font-family:'IBM Plex Mono',monospace; font-size:22px; font-weight:700;
+                    letter-spacing:2px; text-transform:uppercase; color:rgba(168,193,204,0.38);
+                    margin-bottom:20px;">FiO₂ estimates</div>
+
+        <div class="table-row">
+          <span style="font-size:40px; font-weight:400; color:var(--tdm);">Room air</span>
+          <span style="font-family:'IBM Plex Mono',monospace; font-size:40px; font-weight:700; color:var(--teal);">21%</span>
+        </div>
+        <div class="table-divider"></div>
+        <div class="table-row">
+          <span style="font-size:40px; font-weight:400; color:var(--tdm);">2L NC</span>
+          <span style="font-family:'IBM Plex Mono',monospace; font-size:40px; font-weight:700; color:var(--teal);">~28%</span>
+        </div>
+        <div class="table-divider"></div>
+        <div class="table-row">
+          <span style="font-size:40px; font-weight:400; color:var(--tdm);">4L NC</span>
+          <span style="font-family:'IBM Plex Mono',monospace; font-size:40px; font-weight:700; color:var(--teal);">~36%</span>
+        </div>
+        <div class="table-divider"></div>
+        <div class="table-row">
+          <span style="font-size:40px; font-weight:400; color:var(--tdm);">6L NC</span>
+          <span style="font-family:'IBM Plex Mono',monospace; font-size:40px; font-weight:700; color:var(--teal);">~44%</span>
+        </div>
+
+        <div style="margin-top:20px; font-size:26px; font-weight:400; line-height:1.5;
+                    color:rgba(168,193,204,0.42);">Approximate values. Breathing pattern affects delivery.</div>
+      </div>
+
+    </div>
+
+  </div>
+  <div class="slide-footer">
+    <div class="footer-brand"><div class="footer-dot"></div><span class="fnw">Clinical Edge: Nursing Tools</span></div>
+    <span class="fhw">@clinicaledgeco</span>
+  </div>
+  <div class="slide-number">
+    <div class="dot"></div><div class="dot"></div><div class="dot"></div><div class="dot active"></div>
+    <div class="dot"></div><div class="dot"></div><div class="dot"></div><div class="dot"></div>
+  </div>
+</div>
+
+
+<!-- ═══ SLIDE 5 — THE TRAP ═══════════════════════════════════════════════════ -->
+<div class="slide-label"><span>Slide 05 — The Trap</span></div>
+<div class="slide" id="slide-5">
+  <div class="slide-content" style="justify-content:flex-start;">
+
+    <div class="top-row">
+      <div class="badge">The Trap</div>
+      <span class="ctr">05 / 08</span>
+    </div>
+
+    <div style="flex:1; display:flex; flex-direction:column; justify-content:center; gap:0;">
+
+      <!-- Warm quote callout card -->
+      <div class="quote-card">
+        <div style="font-size:40px; font-weight:700; color:var(--teal); line-height:1.0; margin-bottom:16px;">"</div>
+        <div style="font-size:72px; font-weight:900; line-height:1.02; letter-spacing:-2.5px; color:var(--tw);">They're only</div>
+        <div style="font-size:72px; font-weight:900; line-height:1.02; letter-spacing:-2.5px; color:var(--tw);">on 4 liters.</div>
+      </div>
+
+      <div class="tbar" style="width:64px; margin-top:40px; margin-bottom:36px;"></div>
+
+      <div style="font-size:52px; font-weight:500; line-height:1.35; color:var(--teal);">doesn't tell the whole story.</div>
+
+    </div>
+
+  </div>
+  <div class="slide-footer">
+    <div class="footer-brand"><div class="footer-dot"></div><span class="fnw">Clinical Edge: Nursing Tools</span></div>
+    <span class="fhw">@clinicaledgeco</span>
+  </div>
+  <div class="slide-number">
+    <div class="dot"></div><div class="dot"></div><div class="dot"></div><div class="dot"></div>
+    <div class="dot active"></div><div class="dot"></div><div class="dot"></div><div class="dot"></div>
+  </div>
+</div>
+
+
+<!-- ═══ SLIDE 6 — DEVICE MATTERS ═════════════════════════════════════════════ -->
+<div class="slide-label"><span>Slide 06 — Device Matters</span></div>
+<div class="slide" id="slide-6">
+  <div class="slide-content" style="justify-content:flex-start;">
+
+    <div class="top-row">
+      <div class="badge">Device Matters</div>
+      <span class="ctr">06 / 08</span>
+    </div>
+
+    <div style="flex:1; display:flex; flex-direction:column; justify-content:center; gap:0;">
+
+      <div style="font-size:76px; font-weight:900; line-height:1.0; letter-spacing:-3px; color:var(--tw);">4L is not always 4L.</div>
+
+      <div class="tbar" style="width:64px; margin-top:36px; margin-bottom:36px;"></div>
+
+      <!-- Three-way comparison in dark panel -->
+      <div class="dark-panel">
+        <div style="display:flex; flex-direction:column; gap:0;">
+
+          <div style="font-size:44px; font-weight:600; line-height:1.2; color:var(--td);">4L nasal cannula</div>
+
+          <div style="padding:10px 0; font-size:38px; font-weight:700;
+                      color:rgba(10,191,188,0.50); font-family:'IBM Plex Mono',monospace;">≠</div>
+
+          <div style="font-size:44px; font-weight:600; line-height:1.2; color:var(--td);">4L simple mask</div>
+
+          <div style="padding:10px 0; font-size:38px; font-weight:700;
+                      color:rgba(10,191,188,0.50); font-family:'IBM Plex Mono',monospace;">≠</div>
+
+          <div style="font-size:44px; font-weight:600; line-height:1.2; color:var(--td);">4L high flow</div>
+
+        </div>
+      </div>
+
+      <div style="margin-top:28px; font-size:38px; font-weight:400; line-height:1.5; color:var(--twm);">The device changes what the patient actually receives.</div>
+
+    </div>
+
+  </div>
+  <div class="slide-footer">
+    <div class="footer-brand"><div class="footer-dot"></div><span class="fnw">Clinical Edge: Nursing Tools</span></div>
+    <span class="fhw">@clinicaledgeco</span>
+  </div>
+  <div class="slide-number">
+    <div class="dot"></div><div class="dot"></div><div class="dot"></div><div class="dot"></div>
+    <div class="dot"></div><div class="dot active"></div><div class="dot"></div><div class="dot"></div>
+  </div>
+</div>
+
+
+<!-- ═══ SLIDE 7 — CLINICAL JUDGMENT ══════════════════════════════════════════ -->
+<div class="slide-label"><span>Slide 07 — Clinical Judgment</span></div>
+<div class="slide" id="slide-7">
+  <div class="slide-content" style="justify-content:flex-start;">
+
+    <div class="top-row">
+      <div class="badge">Clinical Judgment</div>
+      <span class="ctr">07 / 08</span>
+    </div>
+
+    <div style="flex:1; display:flex; flex-direction:column; justify-content:center; gap:0;">
+
+      <div style="display:flex; flex-direction:column; gap:4px;">
+        <div style="font-size:76px; font-weight:900; line-height:1.02; letter-spacing:-2.5px; color:var(--tw);">Strong nurses think</div>
+        <div style="font-size:76px; font-weight:900; line-height:1.02; letter-spacing:-2.5px; color:var(--tw);">beyond liters.</div>
+      </div>
+
+      <div class="tbar" style="width:64px; margin-top:40px; margin-bottom:36px;"></div>
+
+      <div style="display:flex; flex-direction:column; gap:20px;">
+        <div class="brow">
+          <div class="bdot"></div>
+          <span style="font-size:48px; font-weight:400; line-height:1.35; color:var(--twm);">Device.</span>
+        </div>
+        <div class="brow">
+          <div class="bdot"></div>
+          <span style="font-size:48px; font-weight:400; line-height:1.35; color:var(--twm);">FiO₂.</span>
+        </div>
+        <div class="brow">
+          <div class="bdot"></div>
+          <span style="font-size:48px; font-weight:400; line-height:1.35; color:var(--twm);">Work of breathing.</span>
+        </div>
+        <div class="brow">
+          <div class="bdot"></div>
+          <span style="font-size:48px; font-weight:600; line-height:1.35; color:var(--tw);">Patient response.</span>
+        </div>
+      </div>
+
+    </div>
+
+  </div>
+  <div class="slide-footer">
+    <div class="footer-brand"><div class="footer-dot"></div><span class="fnw">Clinical Edge: Nursing Tools</span></div>
+    <span class="fhw">@clinicaledgeco</span>
+  </div>
+  <div class="slide-number">
+    <div class="dot"></div><div class="dot"></div><div class="dot"></div><div class="dot"></div>
+    <div class="dot"></div><div class="dot"></div><div class="dot active"></div><div class="dot"></div>
+  </div>
+</div>
+
+
+<!-- ═══ SLIDE 8 — TAKEAWAY ════════════════════════════════════════════════════ -->
+<div class="slide-label"><span>Slide 08 — Takeaway</span></div>
+<div class="slide" id="slide-8">
+  <div class="slide-content" style="justify-content:flex-start;">
+
+    <div class="top-row">
+      <div class="badge">Takeaway</div>
+      <span class="ctr">08 / 08</span>
+    </div>
+
+    <div style="flex:1; display:flex; flex-direction:column; justify-content:center; gap:0;">
+
+      <div style="display:flex; flex-direction:column; gap:6px;">
+        <div style="font-size:88px; font-weight:900; line-height:1.0; letter-spacing:-3.5px; color:var(--tw);">Oxygen is</div>
+        <div style="font-size:88px; font-weight:900; line-height:1.0; letter-spacing:-3.5px; color:var(--tw);">a medication.</div>
+      </div>
+
+      <div class="tbar" style="width:64px; margin-top:40px; margin-bottom:36px;"></div>
+
+      <div style="font-size:56px; font-weight:600; line-height:1.3; letter-spacing:-1px; color:var(--teal);">Understand the dose.</div>
+
+      <div style="margin-top:56px; font-family:'IBM Plex Mono',monospace; font-size:26px;
+                  font-weight:500; letter-spacing:1px; color:rgba(82,97,116,0.44);
+                  text-transform:uppercase;">Save this for your next shift.</div>
+
+    </div>
+
+  </div>
+  <div class="slide-footer">
+    <div class="footer-brand"><div class="footer-dot"></div><span class="fnw">Clinical Edge: Nursing Tools</span></div>
+    <span class="fhw">@clinicaledgeco</span>
+  </div>
+  <div class="slide-number">
+    <div class="dot"></div><div class="dot"></div><div class="dot"></div><div class="dot"></div>
+    <div class="dot"></div><div class="dot"></div><div class="dot"></div><div class="dot active"></div>
+  </div>
+</div>
+
+
+</body>
+</html>

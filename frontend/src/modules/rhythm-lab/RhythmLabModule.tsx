@@ -74,24 +74,7 @@ export default function RhythmLabModule({ onGoHome }: RhythmLabModuleProps) {
             <span className="site-header__brand">Clinical Edge</span>
             <span className="site-header__sep" aria-hidden="true">/</span>
             <span className="site-header__module">Rhythm Lab</span>
-            <button
-              onClick={onGoHome}
-              onMouseEnter={(e) => { (e.currentTarget as HTMLButtonElement).style.color = '#0ABFBC'; }}
-              onMouseLeave={(e) => { (e.currentTarget as HTMLButtonElement).style.color = '#4A6978'; }}
-              style={{
-                marginLeft: 'auto',
-                background: 'none',
-                border: 'none',
-                color: '#4A6978',
-                fontSize: 12,
-                cursor: 'pointer',
-                fontFamily: 'var(--font-mono)',
-                letterSpacing: '0.03em',
-                padding: '4px 0',
-                lineHeight: 1,
-                transition: 'color 0.15s',
-              }}
-            >
+            <button className="module-back-link" onClick={onGoHome}>
               ← All tools
             </button>
           </div>

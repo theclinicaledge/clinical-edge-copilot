@@ -895,6 +895,33 @@ export default function App({ onGoHome, isOnline = true }) {
           color: #526174 !important;
         }
 
+        /* ─── Back / navigation link — shared across module headers ── */
+        .module-back-link {
+          margin-left: auto;
+          background: none;
+          border: none;
+          color: #6A8898;
+          font-size: 13px;
+          font-weight: 500;
+          cursor: pointer;
+          font-family: 'IBM Plex Mono', 'Courier New', monospace;
+          letter-spacing: 0.01em;
+          padding: 0;
+          min-height: 40px;
+          display: inline-flex;
+          align-items: center;
+          line-height: 1;
+          transition: color 0.15s;
+          white-space: nowrap;
+          text-decoration: none;
+          flex-shrink: 0;
+        }
+        .module-back-link:hover,
+        .module-back-link:focus-visible {
+          color: #0ABFBC;
+          outline: none;
+        }
+
         @keyframes fadeUp { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
         @keyframes spin { to { transform: rotate(360deg); } }
         .fade-up { animation: fadeUp 0.35s ease forwards; }
@@ -999,26 +1026,9 @@ export default function App({ onGoHome, isOnline = true }) {
             </span>
           </div>
 
-          {/* All tools — subtle back link */}
+          {/* All tools — back navigation */}
           {onGoHome && (
-            <button
-              onClick={onGoHome}
-              onMouseEnter={(e) => { e.currentTarget.style.color = "#0ABFBC"; }}
-              onMouseLeave={(e) => { e.currentTarget.style.color = "#4A6978"; }}
-              style={{
-                marginLeft: "auto",
-                background: "none",
-                border: "none",
-                color: "#4A6978",
-                fontSize: 12,
-                cursor: "pointer",
-                fontFamily: "'IBM Plex Mono', 'Courier New', monospace",
-                letterSpacing: "0.03em",
-                padding: "4px 0",
-                lineHeight: 1,
-                transition: "color 0.15s",
-              }}
-            >
+            <button className="module-back-link" onClick={onGoHome}>
               ← All tools
             </button>
           )}

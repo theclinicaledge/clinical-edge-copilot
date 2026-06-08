@@ -918,15 +918,16 @@ export default function App({ onGoHome, isOnline = true }) {
 
         /* ─── Mobile refinements (≤ 768px only) ──────────────── */
         @media (max-width: 768px) {
-          .main-container { max-width: 800px !important; margin: 0 auto !important; padding: 20px 16px 0 !important; }
-          .hero { margin-bottom: 14px !important; }
+          .main-container { max-width: 800px !important; margin: 0 auto !important; padding: 18px 16px 0 !important; overflow-x: hidden !important; }
+          .hero { margin-bottom: 12px !important; }
           /* Reduce chip density — show max 3 per section */
           .chips-recent button:nth-child(n+4) { display: none !important; }
           .chips-try button:nth-child(n+4) { display: none !important; }
-          /* Prevent recent case chips from overflowing their row */
+          /* Prevent recent case chips from overflowing viewport */
+          .chips-recent { overflow: hidden !important; }
           .chips-recent button {
-            font-size: 13px !important;
-            max-width: 200px !important;
+            font-size: 12px !important;
+            max-width: 160px !important;
             overflow: hidden !important;
             text-overflow: ellipsis !important;
             white-space: nowrap !important;
@@ -1081,13 +1082,10 @@ export default function App({ onGoHome, isOnline = true }) {
           border: inputFocused
             ? "1px solid #0ABFBC"
             : "1px solid rgba(240,237,230,0.10)",
-          borderTopLeftRadius: 8,
-          borderTopRightRadius: 8,
-          borderBottomLeftRadius: 8,
-          borderBottomRightRadius: 8,
-          padding: "22px",
-          boxShadow: "0 8px 24px rgba(0,0,0,0.22)",
-          marginBottom: 14,
+          borderRadius: 8,
+          padding: "14px 16px 12px",
+          boxShadow: "0 6px 18px rgba(0,0,0,0.18)",
+          marginBottom: 10,
           transition: "border-color 0.2s ease",
         }}>
           <textarea
@@ -1098,17 +1096,17 @@ export default function App({ onGoHome, isOnline = true }) {
             onFocus={() => setInputFocused(true)}
             onBlur={() => setInputFocused(false)}
             placeholder="What are you thinking through right now?"
-            rows={3}
+            rows={2}
             style={{
               width: "100%",
               background: "transparent",
               border: "none",
               color: "#F0EDE6",
               fontSize: 15,
-              lineHeight: 1.65,
+              lineHeight: 1.6,
               resize: "none",
               fontFamily: "inherit",
-              minHeight: 72,
+              minHeight: 56,
               display: "block",
             }}
           />
@@ -1116,8 +1114,8 @@ export default function App({ onGoHome, isOnline = true }) {
             display: "flex",
             justifyContent: "flex-end",
             alignItems: "center",
-            marginTop: 12,
-            paddingTop: 12,
+            marginTop: 8,
+            paddingTop: 8,
             borderTop: "1px solid rgba(240,237,230,0.09)",
           }}>
             <button
@@ -1148,10 +1146,10 @@ export default function App({ onGoHome, isOnline = true }) {
 
         {/* PHI note — muted inline */}
         <div style={{
-          fontSize: 11.5,
-          color: "#7A8D9A",
-          marginTop: 8,
-          marginBottom: 18,
+          fontSize: 11,
+          color: "#8A9BA8",
+          marginTop: 6,
+          marginBottom: 14,
           paddingLeft: 2,
           lineHeight: 1.5,
         }}>
@@ -1159,7 +1157,7 @@ export default function App({ onGoHome, isOnline = true }) {
         </div>
 
         {/* Guidance chips — lightweight */}
-        <div style={{ marginBottom: 20 }}>
+        <div style={{ marginBottom: 14 }}>
           <div style={{
             fontSize: 10,
             color: "#8A9BA8",
@@ -1280,17 +1278,17 @@ export default function App({ onGoHome, isOnline = true }) {
             color: "#8A9BA8",
             marginBottom: 8,
           }}>Examples</div>
-          <div className="chips-try" style={{ display: "flex", flexDirection: "column", gap: 7 }}>
+          <div className="chips-try" style={{ display: "flex", flexDirection: "column", gap: 5 }}>
             {EXAMPLES.map((ex) => (
               <button
                 key={ex}
                 className="chip"
                 onClick={() => { setQuestion(ex); setTimeout(() => textareaRef.current?.focus(), 0); }}
                 style={{
-                  background: "#1E2A3A",
-                  border: "1px solid #2D3B4E",
-                  color: "#94A3B8",
-                  padding: "8px 12px",
+                  background: "rgba(0,0,0,0.05)",
+                  border: "1px solid rgba(0,0,0,0.09)",
+                  color: "#526174",
+                  padding: "7px 11px",
                   borderRadius: 6,
                   fontSize: 12,
                   fontWeight: 400,
@@ -1305,7 +1303,7 @@ export default function App({ onGoHome, isOnline = true }) {
                   width: "100%",
                 }}
               >
-                <span style={{ color: "#0ABFBC", fontSize: 9, flexShrink: 0 }}>▶</span>
+                <span style={{ color: "#9AA8B2", fontSize: 8, flexShrink: 0 }}>▶</span>
                 {ex}
               </button>
             ))}
@@ -1737,18 +1735,17 @@ export default function App({ onGoHome, isOnline = true }) {
 
         {/* Disclaimer */}
         <div style={{
-          marginTop: 48,
-          padding: "14px 16px",
-          borderTop: "1px solid rgba(0,0,0,0.10)",
-          fontSize: 11,
-          color: "#526174",
+          marginTop: 32,
+          padding: "12px 0 0",
+          borderTop: "1px solid rgba(0,0,0,0.08)",
+          fontSize: 10,
+          color: "#8A9BA8",
           textAlign: "center",
-          lineHeight: 1.75,
+          lineHeight: 1.6,
           fontFamily: "'IBM Plex Mono', monospace",
         }}>
-          Your clinical judgment comes first — use this to organize thinking, not replace decision-making.<br />
-          Clinical Edge Copilot does not replace institutional protocols, provider orders, or your assessment.<br />
-          Always escalate per your facility's policies.
+          Educational and clinical reasoning support only. Not a diagnostic tool.<br />
+          Always follow your facility's protocols, provider orders, and your own assessment.
         </div>
 
         {/* Footer links */}
@@ -1756,19 +1753,19 @@ export default function App({ onGoHome, isOnline = true }) {
           display: "flex",
           justifyContent: "center",
           gap: 20,
-          marginTop: 20,
+          marginTop: 12,
           paddingBottom: 4,
         }}>
           {[["Privacy", "/privacy"], ["Support", "/support"]].map(([label, href]) => (
             <a key={label} href={href} style={{
-              fontSize: 11,
-              color: "#526174",
+              fontSize: 10,
+              color: "#8A9BA8",
               textDecoration: "none",
-              fontFamily: "'DM Sans', sans-serif",
+              fontFamily: "'IBM Plex Mono', monospace",
               letterSpacing: "0.01em",
             }}
             onMouseEnter={e => e.currentTarget.style.color = "#0A9E9B"}
-            onMouseLeave={e => e.currentTarget.style.color = "#526174"}
+            onMouseLeave={e => e.currentTarget.style.color = "#8A9BA8"}
             >{label}</a>
           ))}
         </div>

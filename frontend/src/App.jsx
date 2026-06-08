@@ -918,40 +918,9 @@ export default function App({ onGoHome, isOnline = true }) {
 
         /* ─── Mobile refinements (≤ 768px only) ──────────────── */
         @media (max-width: 768px) {
-          /* 1: Hide preview strip — input is the first visible element */
-          .preview-scroll { display: none !important; }
-          /* Restore full top radius on input card when preview strip is hidden */
-          .input-card {
-            border-top-left-radius: 8px !important;
-            border-top-right-radius: 8px !important;
-          }
-          /* 2: Soften warning box — guidance tone, not alert tone */
-          .privacy-notice {
-            background: rgba(176,128,38,0.06) !important;
-            border: 1px solid rgba(233,186,75,0.14) !important;
-            border-radius: 6px !important;
-            padding: 12px 14px !important;
-            font-size: 13px !important;
-            line-height: 1.4 !important;
-            color: #8A6A22 !important;
-          }
-          /* 3 + 4: Tighten hero spacing + pull input closer */
-          .main-container { max-width: 800px !important; margin: 0 auto !important; padding: 24px 18px 0 !important; }
-          .hero { margin-bottom: 18px !important; }
-          .hero h1 { margin-bottom: 10px !important; }
-          /* Bridge line — tighter rhythm, full width on mobile */
-          .hero p:first-of-type {
-            font-size: 15px !important;
-            line-height: 1.35 !important;
-            letter-spacing: -0.01em !important;
-            margin: 0 0 6px !important;
-            color: #526174 !important;
-          }
-          /* Subline — hidden on mobile (redundant at small size; visible on desktop) */
-          .hero p:last-of-type {
-            display: none !important;
-          }
-          /* 5: Reduce chip density — show max 3 per section */
+          .main-container { max-width: 800px !important; margin: 0 auto !important; padding: 20px 16px 0 !important; }
+          .hero { margin-bottom: 14px !important; }
+          /* Reduce chip density — show max 3 per section */
           .chips-recent button:nth-child(n+4) { display: none !important; }
           .chips-try button:nth-child(n+4) { display: none !important; }
           /* Prevent recent case chips from overflowing their row */
@@ -1063,69 +1032,21 @@ export default function App({ onGoHome, isOnline = true }) {
       <div className="main-container" style={{ maxWidth: 800, margin: "0 auto", width: "100%", padding: "40px 20px 0", display: "flex", flexDirection: "column", alignItems: "stretch" }}>
 
         {/* Hero */}
-        <div className="hero" style={{ textAlign: "center", marginBottom: 26 }}>
-          <h1 style={{
+        <div className="hero" style={{ marginBottom: 18 }}>
+          <h2 style={{
             fontFamily: "'Inter', sans-serif",
-            fontWeight: 800,
-            fontSize: "clamp(24px, 5.5vw, 36px)",
+            fontWeight: 700,
+            fontSize: "clamp(20px, 4.5vw, 26px)",
             color: "#111827",
-            margin: "0 0 16px",
-            lineHeight: 1.1,
-            letterSpacing: "-0.04em",
+            margin: "0 0 6px",
+            lineHeight: 1.15,
+            letterSpacing: "-0.03em",
           }}>
-            Clinical reasoning support. Built for nurses.
-          </h1>
-          <p style={{ fontSize: "clamp(15px, 3.5vw, 17px)", color: "#526174", margin: "0 0 10px", lineHeight: 1.4, fontWeight: 500 }}>
-            When something feels off. Before you call. Quick clinical questions.
+            What are you thinking through?
+          </h2>
+          <p style={{ fontSize: 13, color: "#7A8D9A", margin: 0, lineHeight: 1.5, fontWeight: 400 }}>
+            Ask a clinical reasoning question. No patient identifiers.
           </p>
-          <p style={{ fontSize: "clamp(14px, 3vw, 15px)", color: "#526174", margin: 0, lineHeight: 1.45, fontWeight: 400 }}>
-            For real-world questions and practice scenarios. Not a diagnosis.
-          </p>
-        </div>
-
-        {/* Output preview block */}
-        <div
-          className="preview-scroll"
-          style={{
-            background: "#17222D",
-            borderTop: "1px solid #2D3B4E",
-            borderLeft: "1px solid #2D3B4E",
-            borderRight: "1px solid #2D3B4E",
-            borderBottom: "none",
-            borderTopLeftRadius: 8,
-            borderTopRightRadius: 8,
-            borderBottomLeftRadius: 0,
-            borderBottomRightRadius: 0,
-            padding: "10px 16px",
-            marginBottom: 0,
-            display: "flex",
-            flexWrap: "nowrap",
-            alignItems: "center",
-            gap: "0 10px",
-            overflowX: "auto",
-            scrollbarWidth: "none",
-            msOverflowStyle: "none",
-          }}
-        >
-          <span style={{ fontSize: 11, color: "#4F6D7A", fontFamily: "'IBM Plex Mono', monospace", whiteSpace: "nowrap", flexShrink: 0, marginRight: 2 }}>
-            You'll get:
-          </span>
-          {["What this could be", "Possible concerns", "What to assess next", "What to consider next"].map((item) => (
-            <span key={item} style={{
-              fontSize: 11,
-              color: "#5A7A8A",
-              background: "rgba(255,255,255,0.04)",
-              border: "1px solid rgba(255,255,255,0.07)",
-              borderRadius: 4,
-              padding: "2px 7px",
-              whiteSpace: "nowrap",
-              flexShrink: 0,
-              fontWeight: 500,
-              letterSpacing: "-0.01em",
-            }}>
-              {item}
-            </span>
-          ))}
         </div>
 
         {/* Offline notice — shown only when network is unavailable */}
@@ -1160,8 +1081,8 @@ export default function App({ onGoHome, isOnline = true }) {
           border: inputFocused
             ? "1px solid #0ABFBC"
             : "1px solid rgba(240,237,230,0.10)",
-          borderTopLeftRadius: 0,
-          borderTopRightRadius: 0,
+          borderTopLeftRadius: 8,
+          borderTopRightRadius: 8,
           borderBottomLeftRadius: 8,
           borderBottomRightRadius: 8,
           padding: "22px",
@@ -1225,98 +1146,68 @@ export default function App({ onGoHome, isOnline = true }) {
           </div>
         </div>
 
-        {/* Helper line */}
+        {/* PHI note — muted inline */}
         <div style={{
-          fontSize: 13,
-          color: "#526174",
-          lineHeight: 1.5,
+          fontSize: 11.5,
+          color: "#7A8D9A",
+          marginTop: 8,
           marginBottom: 18,
-          marginTop: 0,
+          paddingLeft: 2,
+          lineHeight: 1.5,
         }}>
-          Good for thinking it through — especially right before you call.{" "}
-          <span style={{ color: "rgba(82,97,116,0.65)" }}>Also useful right after report — when you're sorting out what actually matters first.</span>
+          No names, MRNs, dates of birth, phone numbers, or identifiers.
         </div>
 
-        {/* Guidance chips — lightweight, no mode-locking */}
-        <div style={{ marginBottom: 14 }}>
+        {/* Guidance chips — lightweight */}
+        <div style={{ marginBottom: 20 }}>
           <div style={{
-            fontSize: 11,
-            color: "#526174",
+            fontSize: 10,
+            color: "#8A9BA8",
             fontFamily: "'IBM Plex Mono', monospace",
             letterSpacing: "0.06em",
             textTransform: "uppercase",
             marginBottom: 7,
           }}>
-            Common ways nurses use Copilot
+            Try asking
           </div>
-          <div style={{ display: "flex", flexWrap: "wrap", gap: 5 }}>
-            {CONTEXT_CHIPS.map(({ label }) => (
-              <span key={label} style={{
-                background: "transparent",
-                border: "1px solid #C4BDB5",
-                color: "#526174",
-                borderRadius: 6,
-                padding: "3px 10px",
-                fontSize: 11.5,
-                fontWeight: 400,
-                letterSpacing: "0.005em",
-                whiteSpace: "nowrap",
-                userSelect: "none",
-              }}>
+          <div className="chips-try" style={{ display: "flex", flexWrap: "wrap", gap: 5 }}>
+            {CONTEXT_CHIPS.map(({ label, placeholder }) => (
+              <button
+                key={label}
+                className="chip"
+                onClick={() => { if (textareaRef.current) { textareaRef.current.placeholder = placeholder; textareaRef.current.focus(); } }}
+                style={{
+                  background: "transparent",
+                  border: "1px solid #C4BDB5",
+                  color: "#6A7D8A",
+                  borderRadius: 5,
+                  padding: "3px 9px",
+                  fontSize: 11,
+                  fontWeight: 400,
+                  letterSpacing: "0.005em",
+                  whiteSpace: "nowrap",
+                  cursor: "pointer",
+                  fontFamily: "inherit",
+                }}
+              >
                 {label}
-              </span>
+              </button>
             ))}
           </div>
-        </div>
-
-        {/* Privacy notice */}
-        <div className="privacy-notice" style={{
-          background: "#FFFDF8",
-          border: "1px solid rgba(212,168,75,0.30)",
-          borderLeft: "3px solid #D4A84B",
-          borderRadius: 8,
-          padding: "12px 15px",
-          fontSize: 12,
-          color: "#8A6A22",
-          marginBottom: 20,
-          display: "flex",
-          gap: 9,
-          alignItems: "flex-start",
-        }}>
-          <span style={{
-            fontFamily: "'IBM Plex Mono', monospace",
-            fontSize: 10,
-            color: "#D4A84B",
-            flexShrink: 0,
-            marginTop: 1,
-          }}>&#9888;</span>
-          <span>Do not enter names, MRNs, dates of birth, SSNs, phone numbers, or any patient identifiers. Describe the clinical situation only.</span>
-        </div>
-
-        {/* Educational disclaimer */}
-        <div style={{
-          fontSize: 11,
-          color: "#526174",
-          marginBottom: 20,
-          marginTop: -12,
-          paddingLeft: 3,
-          lineHeight: 1.55,
-        }}>
-          Educational and clinical reasoning support only. Not a diagnostic tool. Follow local protocol, provider guidance, and institutional policy.
         </div>
 
         {/* Recent Cases */}
         {history.length > 0 && (
           <div style={{ marginBottom: 16 }}>
             <div style={{
-              fontSize: 12,
+              fontSize: 10,
               fontWeight: 500,
               letterSpacing: "0.10em",
               textTransform: "uppercase",
-              color: "#526174",
-              marginBottom: 10,
+              color: "#8A9BA8",
+              marginBottom: 8,
               fontFamily: "'IBM Plex Mono', monospace",
-            }}>Recent Cases</div>
+            }}>Recent</div>
             <div className="chips-recent" style={{ display: "flex", flexWrap: "wrap", gap: 7 }}>
               {history.map((item, i) => (
                 <button
@@ -1382,11 +1273,11 @@ export default function App({ onGoHome, isOnline = true }) {
         <div style={{ marginBottom: 28 }}>
           <div style={{
             fontFamily: "'IBM Plex Mono', monospace",
-            fontSize: 11,
+            fontSize: 10,
             fontWeight: 500,
             letterSpacing: "0.09em",
             textTransform: "uppercase",
-            color: "#526174",
+            color: "#8A9BA8",
             marginBottom: 8,
           }}>Examples</div>
           <div className="chips-try" style={{ display: "flex", flexDirection: "column", gap: 7 }}>

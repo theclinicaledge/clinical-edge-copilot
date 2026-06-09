@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { PEARLS } from '../data/phase1';
 
-const PREVIEW_COUNT = 4;
+const PREVIEW_COUNT = 5;
 
 export function PearlsSection() {
   const [expanded, setExpanded] = useState(false);

@@ -18,6 +18,7 @@ export function RhythmDetail({ rhythm, onBack }: RhythmDetailProps) {
   const urgencyContext = URGENCY_CONTEXT[rhythm.urgency];
   const [caliperOn, setCaliperOn] = useState(false);
   const [bookmarked, setBookmarked] = useState(() => isFavorite(rhythm.id));
+  const [breakdownOpen, setBreakdownOpen] = useState(false);
   const pearl = getPearlForRhythm(rhythm.id);
 
   return (
@@ -126,7 +127,19 @@ export function RhythmDetail({ rhythm, onBack }: RhythmDetailProps) {
             </div>
           </div>
 
-          <RecognitionBreakdown rhythm={rhythm} />
+          <div className="breakdown-collapsible">
+            <button
+              className="breakdown-toggle"
+              onClick={() => setBreakdownOpen(v => !v)}
+              aria-expanded={breakdownOpen}
+            >
+              <span className="breakdown-toggle__title">Strip Reading Guide</span>
+              <span className="breakdown-toggle__chevron" aria-hidden="true">
+                {breakdownOpen ? '▲' : '▼'}
+              </span>
+            </button>
+            {breakdownOpen && <RecognitionBreakdown rhythm={rhythm} />}
+          </div>
 
           <div className="bedside-editorial">
             <p className="bedside-editorial__heading">Bedside perspective</p>

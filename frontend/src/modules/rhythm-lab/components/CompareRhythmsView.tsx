@@ -1,9 +1,63 @@
 import { useState } from 'react';
 import { CONFUSABLE_PAIRS } from '../data/compareRhythms';
-import type { ConfusablePair } from '../data/compareRhythms';
+import type { ConfusablePair, RhythmSide } from '../data/compareRhythms';
 
 interface CompareRhythmsViewProps {
   onBack: () => void;
+}
+
+const MATRIX_ROWS: Array<{ label: string; key: keyof RhythmSide }> = [
+  { label: 'Visual clue',  key: 'visualClue' },
+  { label: 'Regularity',  key: 'regularity' },
+  { label: 'P waves',     key: 'pWaveStory' },
+  { label: 'QRS width',   key: 'qrsWidth' },
+];
+
+const MATRIX_SIDES = [
+  { which: 'a' as const },
+  { which: 'b' as const },
+] as const;
+
+function QuickMatrix({ pair }: { pair: ConfusablePair }) {
+  return (
+    <div className="crv-matrix">
+      <p className="crv-matrix__heading">Quick difference</p>
+
+      {/* ≥500px — 3-column side-by-side grid */}
+      <div className="crv-matrix__grid">
+        <div className="crv-matrix__header-row">
+          <div className="crv-matrix__corner" />
+          <div className="crv-matrix__col-head crv-matrix__col-head--a">{pair.a.short}</div>
+          <div className="crv-matrix__col-head crv-matrix__col-head--b">{pair.b.short}</div>
+        </div>
+        {MATRIX_ROWS.map(({ label, key }) => (
+          <div key={key} className="crv-matrix__row">
+            <div className="crv-matrix__row-label">{label}</div>
+            <div className="crv-matrix__cell crv-matrix__cell--a">{pair.a[key]}</div>
+            <div className="crv-matrix__cell crv-matrix__cell--b">{pair.b[key]}</div>
+          </div>
+        ))}
+      </div>
+
+      {/* <500px — stacked A then B cards */}
+      <div className="crv-matrix__stack">
+        {MATRIX_SIDES.map(({ which }) => {
+          const side = pair[which];
+          return (
+            <div key={which} className={`crv-matrix__stack-side crv-matrix__stack-side--${which}`}>
+              <p className={`crv-matrix__stack-head crv-matrix__stack-head--${which}`}>{side.short}</p>
+              {MATRIX_ROWS.map(({ label, key }) => (
+                <div key={key} className="crv-matrix__stack-row">
+                  <span className="crv-matrix__stack-label">{label}</span>
+                  <span className="crv-matrix__stack-value">{side[key]}</span>
+                </div>
+              ))}
+            </div>
+          );
+        })}
+      </div>
+    </div>
+  );
 }
 
 function SideCard({ side, letter }: { side: ConfusablePair['a']; letter: 'A' | 'B' }) {
@@ -69,6 +123,9 @@ export function CompareRhythmsView({ onBack }: CompareRhythmsViewProps) {
           ))}
         </div>
       </div>
+
+      {/* Quick difference matrix */}
+      <QuickMatrix pair={pair} />
 
       {/* Comparison cards */}
       <div className="crv-cards">

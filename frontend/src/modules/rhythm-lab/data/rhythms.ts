@@ -131,7 +131,7 @@ export const RHYTHMS: Rhythm[] = [
     bedsideRelevance:
       "The rate is rarely the problem — sinus tachycardia is almost always a physiological response to something else. Pain, fever, anxiety, dehydration, bleeding, hypoxia, and medication effects are common drivers. Treating the rate without finding the cause delays the right intervention. This is the rhythm where the clinical question is not \"what is the rhythm?\" but \"what is the body reacting to?\"",
     whenMoreUrgent:
-      "Persistent tachycardia without an identifiable cause, or a rate that continues to rise despite treatment of a presumed cause, warrants escalation. Tachycardia in the setting of low blood pressure, poor perfusion, or altered mental status changes the urgency regardless of where the rhythm originates.",
+      "Persistent tachycardia without an identifiable cause, or a rate that continues to rise despite management of a presumed cause, warrants escalation. Tachycardia in the setting of low blood pressure, poor perfusion, or altered mental status changes the urgency regardless of where the rhythm originates.",
     urgency: "monitor",
     urgencyLabel: "Monitor",
   },
@@ -795,7 +795,7 @@ export const RHYTHMS: Rhythm[] = [
     bedsideRelevance:
       "MAT is almost always a sign of significant underlying disease rather than a primary arrhythmia. It is classically associated with severe COPD exacerbation, pulmonary hypertension, heart failure, and critical illness with metabolic derangements including hypomagnesemia and hypokalemia. Treating the arrhythmia without identifying the underlying cause will not work — the focus is on treating hypoxia, optimizing electrolytes, and managing the driving illness. Patients in MAT are usually sick for reasons beyond the rhythm itself.",
     whenMoreUrgent:
-      "MAT at a rate that is compromising hemodynamics — causing hypotension, altered mentation, or worsening respiratory status — warrants prompt provider notification. Any patient whose MAT is worsening rather than improving with treatment of the underlying cause should be escalated. Electrolyte levels, particularly magnesium, should be reviewed promptly. MAT that is new in a patient without a known lung or cardiac history requires urgent evaluation.",
+      "MAT at a rate that is compromising hemodynamics — causing hypotension, altered mentation, or worsening respiratory status — warrants prompt provider notification. Any patient whose MAT is worsening rather than improving with management of the underlying cause should be escalated. Electrolyte levels, particularly magnesium, should be reviewed promptly. MAT that is new in a patient without a known lung or cardiac history requires urgent evaluation.",
     urgency: "urgent",
     urgencyLabel: "Urgent",
   },
@@ -819,7 +819,7 @@ export const RHYTHMS: Rhythm[] = [
     confusedWith:
       "Any organized rhythm in a perfusing patient: the ECG appearance of PEA is indistinguishable from a normal rhythm in a patient who is perfusing normally. The only distinguishing feature is the clinical assessment — is there a palpable pulse? If yes, the rhythm is not PEA. If no, it is PEA until proven otherwise. Artifact mimicking a normal rhythm: occasionally artifact from patient movement or a malfunctioning lead can look like an organized rhythm in a patient with a true arrest. Always correlate with the patient — never rely on the monitor alone to rule out arrest.",
     bedsideRelevance:
-      "PEA is one of the four cardiac arrest rhythms (alongside VFib, pulseless VTach, and asystole). Unlike VFib, it is not shockable — defibrillation has no role. The treatment is high-quality CPR and identifying and reversing the cause. The reversible causes are summarized as the H's and T's: hypovolemia, hypoxia, hydrogen ion (acidosis), hypo/hyperkalemia, hypothermia, tension pneumothorax, tamponade, toxins, thrombosis (pulmonary), and thrombosis (coronary). A patient in PEA is in full cardiac arrest — the organized electrical activity on the monitor is not a reason for reassurance or hesitation.",
+      "PEA is one of the four cardiac arrest rhythms (alongside VFib, pulseless VTach, and asystole). Unlike VFib, it is not shockable — defibrillation has no role in PEA. The focus is high-quality CPR and identifying and reversing the cause. The reversible causes are summarized as the H's and T's: hypovolemia, hypoxia, hydrogen ion (acidosis), hypo/hyperkalemia, hypothermia, tension pneumothorax, tamponade, toxins, thrombosis (pulmonary), and thrombosis (coronary). A patient in PEA is in full cardiac arrest — the organized electrical activity on the monitor is not a reason for reassurance or hesitation.",
     whenMoreUrgent:
       "PEA is always the highest urgency — it is cardiac arrest. Call the code, begin CPR immediately, and identify reversible causes. The most rapidly reversible causes (tension pneumothorax, hypovolemia, tamponade, hypoxia) should be addressed without waiting for laboratory results. Do not be reassured by the organized monitor pattern — the patient determines urgency, not the strip.",
     urgency: "critical",
@@ -847,7 +847,7 @@ export const RHYTHMS: Rhythm[] = [
     bedsideRelevance:
       "Peaked T waves are the earliest ECG change in hyperkalemia and the stage at which the rhythm is still stable. However, the strip tells you where the patient is on the progression curve — not how fast they are moving along it. A potassium that is rising will progress through these changes: peaked T waves, then QRS widening, then the sine wave pattern, then cardiac arrest. The strip is a snapshot, not a prediction. The trend in potassium levels and the clinical context are as important as the pattern you see now.",
     whenMoreUrgent:
-      "Peaked T waves with a confirmed or suspected elevated potassium require provider notification regardless of how stable the patient looks. Prompt potassium level confirmation, repeat ECG at a defined interval, and provider-directed treatment should begin without delay. A patient whose T waves are changing on serial ECGs — getting taller, or beginning to widen — is progressing and needs escalation now, not at the next scheduled assessment.",
+      "Peaked T waves with a confirmed or suspected elevated potassium require provider notification regardless of how stable the patient looks. Prompt potassium level confirmation, repeat ECG at a defined interval, and provider-directed management should begin without delay. A patient whose T waves are changing on serial ECGs — getting taller, or beginning to widen — is progressing and needs escalation now, not at the next scheduled assessment.",
     urgency: "urgent",
     urgencyLabel: "Urgent",
   },

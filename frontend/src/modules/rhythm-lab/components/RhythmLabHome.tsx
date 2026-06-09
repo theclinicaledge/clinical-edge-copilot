@@ -2,6 +2,7 @@ import { useState } from 'react';
 import type { Rhythm } from '../data/rhythms';
 import { RHYTHMS, RHYTHM_ALIASES } from '../data/rhythms';
 import { RhythmCard } from './RhythmCard';
+import { RhythmStrip } from './RhythmStrip';
 import { FoundationsSection } from './FoundationsSection';
 import { PearlsSection } from './PearlsSection';
 import { getRecentRhythms, getFavorites, getStreakText } from '../utils/localProgress';
@@ -69,6 +70,9 @@ export function RhythmLabHome({ rhythms, onSelect, onCompare, onPractice, onSpri
             Learn to recognize common cardiac rhythms the way they appear at the bedside —
             strip pattern, clinical context, and what matters for patient care.
           </p>
+          <div className="home-hero-strip" aria-hidden="true">
+            <RhythmStrip rhythmId="nsr" preview />
+          </div>
         </div>
 
         <div className="teaching-panel">

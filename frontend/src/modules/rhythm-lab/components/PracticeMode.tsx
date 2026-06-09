@@ -136,11 +136,17 @@ export function PracticeMode({ onBack }: PracticeModeProps) {
 
             {/* Action button — advances through clue states then reveals */}
             <div className="practice-identify__action">
-              {cluesShown < 2 ? (
-                <button className="practice-clue-btn" onClick={() => setCluesShown(n => n + 1)}>
-                  {cluesShown === 0 ? 'Show first clue' : 'Show another clue'}
+              {cluesShown === 0 && (
+                <button className="practice-clue-btn practice-clue-btn--primary" onClick={() => setCluesShown(1)}>
+                  Show first clue
                 </button>
-              ) : (
+              )}
+              {cluesShown === 1 && (
+                <button className="practice-clue-btn" onClick={() => setCluesShown(2)}>
+                  Show another clue
+                </button>
+              )}
+              {cluesShown >= 2 && (
                 <button className="practice-reveal-btn" onClick={() => { addRecentRhythm(rhythm.id); setRevealed(true); }}>
                   Reveal rhythm
                 </button>

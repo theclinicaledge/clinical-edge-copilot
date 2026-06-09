@@ -38,7 +38,7 @@ export const RHYTHMS: Rhythm[] = [
     id: "nsr",
     name: "Normal Sinus Rhythm",
     shortName: "NSR",
-    tagline: "Every component in sequence, every time — the baseline everything else is compared to.",
+    tagline: "One P before every QRS, right on time — the baseline you compare everything else to.",
     rate: "60–100 bpm",
     regularity: "Regular — RR intervals are consistent throughout",
     pWave: "Upright, uniform, one before every QRS complex",
@@ -87,7 +87,7 @@ export const RHYTHMS: Rhythm[] = [
     id: "sinus_bradycardia",
     name: "Sinus Bradycardia",
     shortName: "Brady",
-    tagline: "Organized sinus rhythm at a slow rate — the patient's clinical status determines significance.",
+    tagline: "Often tolerated if perfusing well — context matters more than the number.",
     rate: "< 60 bpm",
     regularity: "Regular — RR intervals are wide but consistent",
     pWave: "Upright, uniform, one before every QRS complex",
@@ -113,7 +113,7 @@ export const RHYTHMS: Rhythm[] = [
     id: "sinus_tachycardia",
     name: "Sinus Tachycardia",
     shortName: "S-Tachy",
-    tagline: "Fast sinus rhythm — always ask what the body is responding to.",
+    tagline: "Usually a response to something else — pain, fever, volume, anxiety, hypoxia.",
     rate: "> 100 bpm",
     regularity: "Regular — RR intervals are short but consistent",
     pWave: "Upright, uniform, one before every QRS — may merge into the preceding T wave at higher rates",
@@ -139,7 +139,7 @@ export const RHYTHMS: Rhythm[] = [
     id: "afib",
     name: "Atrial Fibrillation",
     shortName: "A-Fib",
-    tagline: "Chaotic atrial electrical activity with an irregularly irregular ventricular response.",
+    tagline: "Irregularly irregular with no organized P waves — you cannot tap along with this rhythm.",
     rate: "Ventricular: 60–150 bpm — variable and unpredictable",
     regularity: "Irregularly irregular — no two RR intervals are the same",
     pWave: "Absent — replaced by chaotic fibrillatory baseline (f-waves)",
@@ -188,7 +188,7 @@ export const RHYTHMS: Rhythm[] = [
     id: "aflutter",
     name: "Atrial Flutter",
     shortName: "Flutter",
-    tagline: "Organized rapid atrial activity with a repetitive sawtooth baseline.",
+    tagline: "Regular rate near 150? Look hard for hidden flutter waves — the sawtooth never stops.",
     rate: "Atrial: ~300 bpm · Ventricular: 75–150 bpm (depends on conduction ratio)",
     regularity: "Regular ventricular response when the conduction ratio is fixed",
     pWave: "Sawtooth flutter waves (F-waves) at ~300/min — no true P waves. Most visible in leads II, III, aVF.",
@@ -214,7 +214,7 @@ export const RHYTHMS: Rhythm[] = [
     id: "pac",
     name: "Premature Atrial Contraction",
     shortName: "PAC",
-    tagline: "An early beat from outside the sinus node — the P wave is the clue, the narrow QRS is the reassurance.",
+    tagline: "An early beat with a different-looking P wave — narrow QRS confirms atrial, not ventricular, origin.",
     rate: "Underlying sinus rate — usually 60–100 bpm",
     regularity: "Predominantly regular with one or more early beats interrupting the pattern",
     pWave: "Early P wave with different morphology — may be smaller, taller, biphasic, or inverted. Normal P waves on all other beats.",
@@ -240,7 +240,7 @@ export const RHYTHMS: Rhythm[] = [
     id: "pvc",
     name: "Premature Ventricular Contraction",
     shortName: "PVC",
-    tagline: "A wide, bizarre early beat originating in the ventricles — the compensatory pause after is as telling as the beat itself.",
+    tagline: "Early wide beat interrupting the underlying rhythm — no P wave before it, long pause after it.",
     rate: "Underlying sinus rate — usually 60–100 bpm",
     regularity: "Predominantly regular with one or more early wide beats interrupting the pattern",
     pWave: "No P wave before the PVC — the ventricle fires independently. Normal P waves present on all surrounding sinus beats.",
@@ -520,7 +520,7 @@ export const RHYTHMS: Rhythm[] = [
     id: "vtach",
     name: "Ventricular Tachycardia",
     shortName: "V-Tach",
-    tagline: "Wide-complex tachycardia originating below the bundle of His — assess for pulse immediately.",
+    tagline: "Wide, fast, organized rhythm — respect it until proven otherwise, and correlate with the patient immediately.",
     rate: "> 100 bpm — often 140–250 bpm",
     regularity: "Regular — RR intervals are consistent despite grossly abnormal morphology",
     pWave: "Absent or dissociated — P waves may be present but bear no relationship to the QRS",
@@ -532,11 +532,11 @@ export const RHYTHMS: Rhythm[] = [
       "Regular rhythm despite grossly abnormal morphology",
     ],
     nursesNotice:
-      "The strip is visually striking — every complex is wide, deformed, and unfamiliar. Nothing about the morphology looks like anything you see in normal sinus. The regular spacing is there, but the shape of each beat looks fundamentally wrong. This is the rhythm that demands a pulse check before anything else happens.",
+      "The strip is visually striking — every complex is wide, deformed, and unfamiliar. Nothing about the morphology looks like anything you see in normal sinus. The regular spacing is there, but the shape of each beat looks fundamentally wrong. This is the rhythm that demands immediate patient correlation before anything else happens.",
     confusedWith:
       "SVT with aberrant conduction: also wide and fast, and can look morphologically identical on the strip. The rule that has held for decades: any wide-complex tachycardia with an uncertain origin should be treated as VTach until definitively proven otherwise. Patient history, hemodynamics, and provider assessment — not strip interpretation alone — determine the next step. Do not delay assessment to debate morphology.",
     bedsideRelevance:
-      "VTach can be perfusing or pulseless — the strip does not tell you which. Only a hands-on assessment does. A patient talking to you in VTach and a patient unresponsive in VTach are on completely different response pathways. Pulse check is the first clinical act. Morphology, rate, and duration all matter for the provider's decision-making, but the physical exam comes first every time.",
+      "VTach can be perfusing or pulseless — the strip does not tell you which. Only a hands-on assessment does. A patient talking to you in VTach and a patient unresponsive in VTach are on completely different response pathways. Clinical correlation comes before strip analysis, every time. Morphology, rate, and duration all matter for the provider's decision-making, but the patient tells you the urgency — not the monitor.",
     whenMoreUrgent:
       "Pulseless VTach is cardiac arrest — follow your local emergency protocol immediately. Perfusing VTach with any sign of hemodynamic compromise — hypotension, chest pain, altered mentation, signs of poor perfusion — requires immediate escalation. Even a hemodynamically stable patient in sustained VTach is not a situation to observe and wait on. Notify the provider.",
     urgency: "critical",
@@ -544,7 +544,7 @@ export const RHYTHMS: Rhythm[] = [
     breakdown: {
       rate: {
         finding: "> 100 bpm — often 140–250 bpm",
-        whyItMatters: "The fast rate limits ventricular filling. Combined with abnormal contraction, cardiac output may drop rapidly. Rate does not tell you perfusion status — only a pulse check does.",
+        whyItMatters: "The fast rate limits ventricular filling. Combined with abnormal contraction, cardiac output may drop rapidly. Rate does not tell you perfusion status — only a clinical assessment does.",
       },
       regularity: {
         finding: "Regular — consistent RR intervals despite grossly abnormal morphology",
@@ -562,7 +562,7 @@ export const RHYTHMS: Rhythm[] = [
         finding: "Wide (≥ 0.12 sec), bizarre — the dominant visual feature of the strip",
         whyItMatters: "Every complex is activated outside the normal His-Purkinje pathway. Fast + wide + bizarre = VTach until the strip and clinical picture prove otherwise.",
       },
-      firstClue: "Every complex is wide and visually wrong. That immediate recognition — the whole strip looks abnormal — is the trigger for a pulse check before anything else happens.",
+      firstClue: "Every complex is wide and visually wrong. That immediate recognition — the whole strip looks abnormal — is the trigger for immediate patient assessment before anything else happens.",
     },
   },
   {
@@ -581,11 +581,11 @@ export const RHYTHMS: Rhythm[] = [
       "Regular ventricular rhythm — the slow wide complexes arrive at a predictable but dangerously slow cadence",
     ],
     nursesNotice:
-      "The strip is strikingly slow — wide, unfamiliar complexes appearing every two to three seconds with long flat stretches between them. Nothing about the QRS morphology looks normal. If you know this patient's baseline strip, this looks fundamentally different. The rate alone — 20 to 40 beats per minute — is enough to prompt an immediate pulse check and provider alert. Do not wait for additional findings before acting.",
+      "The strip is strikingly slow — wide, unfamiliar complexes appearing every two to three seconds with long flat stretches between them. Nothing about the QRS morphology looks normal. If you know this patient's baseline strip, this looks fundamentally different. The rate alone — 20 to 40 beats per minute — is enough to prompt immediate clinical correlation and provider alert. Do not wait for additional findings before acting.",
     confusedWith:
       "Complete heart block with ventricular escape: both produce a very slow wide-complex rhythm with dissociated P waves, and the strip appearance can be nearly identical. The distinction is not always clinically urgent at the bedside — both require immediate escalation. In complete heart block the sinus node is still firing and no conduction reaches the ventricles; in idioventricular rhythm the ventricle itself is the only functioning pacemaker. The response is the same for both: notify the provider immediately and prepare for potential pacing.",
     bedsideRelevance:
-      "Idioventricular rhythm means the heart is relying on the ventricle as its only pacemaker. At 20 to 40 beats per minute, most patients are not maintaining adequate perfusion. This rhythm appears in severe bradycardia, post-cardiac arrest states, advanced conduction disease, and situations where every upstream pacemaker has failed. A pulse check is not optional — this rhythm can be perfusing or pulseless, and the monitor cannot tell you which. If the patient has a pulse, they will very likely need immediate pacing. If they do not, you are in a resuscitation.",
+      "Idioventricular rhythm means the heart is relying on the ventricle as its only pacemaker. At 20 to 40 beats per minute, most patients are not maintaining adequate perfusion. This rhythm appears in severe bradycardia, post-cardiac arrest states, advanced conduction disease, and situations where every upstream pacemaker has failed. Clinical correlation is immediate — this rhythm can be perfusing or pulseless, and the monitor cannot tell you which. The patient's condition determines the urgency and the response pathway.",
     whenMoreUrgent:
       "Any hemodynamic compromise — hypotension, altered mentation, absent peripheral pulses, or signs of poor perfusion — requires emergency escalation. If the patient is pulseless, this is a cardiac arrest and your local emergency protocol applies immediately. Even a perfusing idioventricular rhythm at these rates is a critical finding. Do not wait for the patient to deteriorate further before notifying the provider and beginning preparation for transcutaneous pacing.",
     urgency: "critical",
@@ -647,7 +647,7 @@ export const RHYTHMS: Rhythm[] = [
     id: "torsades",
     name: "Torsades de Pointes",
     shortName: "TdP",
-    tagline: "A twisting polymorphic ventricular tachycardia where the QRS amplitude spirals above and below the baseline — fast, unstable, and prone to deteriorating into ventricular fibrillation.",
+    tagline: "Polymorphic VT with a twisting baseline — the QRS amplitude cycles above and below the line, fast and unstable.",
     rate: "> 150 bpm — often 200–250 bpm, highly variable beat to beat",
     regularity: "Irregular — the rate and morphology vary continuously throughout the episode",
     pWave: "Absent — no organized atrial activity visible during the arrhythmia",
@@ -663,7 +663,7 @@ export const RHYTHMS: Rhythm[] = [
     confusedWith:
       "Monomorphic ventricular tachycardia: also fast and wide, but every complex in monomorphic VT has the same morphology and points the same direction. The shifting amplitude and axis of TdP — especially the groups of upward complexes transitioning through small beats to groups of downward complexes — is the visual distinction. Coarse ventricular fibrillation: also chaotic, but VFib has no identifiable QRS complexes at all. TdP still has a discernible, if twisting, QRS structure within the chaos.",
     bedsideRelevance:
-      "Torsades de Pointes occurs in the setting of a prolonged QT interval — from medications (antiarrhythmics, antibiotics, antipsychotics, antiemetics), electrolyte disturbances (low potassium, low magnesium), or underlying cardiac disease. It often starts with a long-short RR sequence and may terminate spontaneously before recurring in longer runs. A patient in TdP may be conscious, confused, or pulseless — pulse check is immediate. This rhythm has a strong tendency to deteriorate into ventricular fibrillation if not addressed.",
+      "Torsades de Pointes occurs in the setting of a prolonged QT interval — from medications (antiarrhythmics, antibiotics, antipsychotics, antiemetics), electrolyte disturbances (low potassium, low magnesium), or underlying cardiac disease. It often starts with a long-short RR sequence and may terminate spontaneously before recurring in longer runs. A patient in TdP may be conscious, confused, or pulseless — correlate immediately with the patient. This rhythm has a strong tendency to deteriorate into ventricular fibrillation if not addressed.",
     whenMoreUrgent:
       "Torsades de Pointes is always urgent. If the patient has a pulse, notify the provider immediately — review the medication list for QT-prolonging agents, check electrolytes, and prepare for the rhythm to deteriorate. If the patient is pulseless, this is a cardiac arrest. Recurrent or sustained TdP requires immediate provider intervention. Do not observe and wait.",
     urgency: "critical",
@@ -673,7 +673,7 @@ export const RHYTHMS: Rhythm[] = [
     id: "vfib_coarse",
     name: "Coarse Ventricular Fibrillation",
     shortName: "VFib",
-    tagline: "Chaotic high-amplitude electrical activity with no organized ventricular contraction — pulseless by definition.",
+    tagline: "Chaotic ventricular activity with no organized complexes — pulseless by definition.",
     rate: "Not measurable — no organized ventricular rate exists",
     regularity: "Completely chaotic — no two deflections are alike in width, height, or timing",
     pWave: "Absent — no organized atrial or ventricular electrical activity of any kind",
@@ -682,16 +682,16 @@ export const RHYTHMS: Rhythm[] = [
       "Completely chaotic baseline — no organized QRS complexes anywhere on the strip",
       "High-amplitude fibrillatory waves — larger and more energetic than fine VFib",
       "No regularity of any kind — width, height, and spacing all vary continuously",
-      "Patient is always pulseless — pulse check comes before strip analysis, every time",
+      "Patient is always pulseless — clinical assessment comes before strip analysis, every time",
     ],
     nursesNotice:
-      "The strip shows nothing but chaotic, disorganized electrical activity — no QRS complexes, no P waves, no organized rhythm of any kind. The waveform is large and irregular, with unpredictable deflections that fill the strip. You will not find a pattern because there is none. When you see this strip, the physical examination comes before any analysis: check for a pulse.",
+      "The strip shows nothing but chaotic, disorganized electrical activity — no QRS complexes, no P waves, no organized rhythm of any kind. The waveform is large and irregular, with unpredictable deflections that fill the strip. You will not find a pattern because there is none. When you see this strip, the physical examination comes before any analysis: correlate with the patient immediately.",
     confusedWith:
       "Fine ventricular fibrillation: also chaotic with no organized QRS, but the fibrillatory wave amplitude is much smaller — fine VFib waves are subtle and low, coarse VFib waves are large. Torsades de Pointes: also fast and visually chaotic, but TdP still has identifiable QRS complexes with a twisting envelope. VFib has no QRS complexes at all. Loose electrode or motion artifact: can produce a chaotic-looking strip, but the patient will have a pulse and the artifact typically resolves with repositioning. Confirm in two leads.",
     bedsideRelevance:
       "Coarse ventricular fibrillation is cardiac arrest. The ventricles are quivering chaotically with no effective contraction and no cardiac output. Coarse VFib is often seen in earlier or more electrically active arrest states and is generally considered more responsive to defibrillation than fine VFib. The amplitude of the fibrillatory waves is not a reliable predictor of outcome — the duration of the arrest and the speed of response are what matter.",
     whenMoreUrgent:
-      "This is always the highest urgency finding. Follow your local emergency protocol immediately. Every minute in VFib without defibrillation reduces the chance of successful conversion. Pulse check, calling for help, CPR, and preparation for defibrillation occur without delay. Do not spend time analyzing the strip — this is a call-the-code rhythm.",
+      "This is always the highest urgency finding. Follow your local emergency protocol immediately. Time from recognition to escalation is the critical variable. Do not spend time analyzing the strip — correlate with the patient, call for help, and follow your local code protocol without delay.",
     urgency: "critical",
     urgencyLabel: "Critical",
   },
@@ -699,7 +699,7 @@ export const RHYTHMS: Rhythm[] = [
     id: "vfib_fine",
     name: "Fine Ventricular Fibrillation",
     shortName: "Fine VFib",
-    tagline: "Low-amplitude chaotic electrical activity — still ventricular fibrillation, but the waveform has become nearly flat as myocardial energy depletes.",
+    tagline: "Nearly flat chaos — fine VFib and asystole look almost identical; confirm in two leads before concluding.",
     rate: "Not measurable — no organized ventricular rate",
     regularity: "Completely chaotic — no organized electrical pattern of any kind",
     pWave: "Absent — no organized atrial or ventricular electrical activity",
@@ -715,7 +715,7 @@ export const RHYTHMS: Rhythm[] = [
     confusedWith:
       "Asystole: the most critical distinction. Fine VFib has continuous low chaotic oscillations — the baseline moves, even if subtly. Asystole has a near-flat line with only rare isolated artifact. Confirm in at least two leads — a truly flat line in two leads points toward asystole. Any consistent irregular oscillation in any lead should prompt consideration of fine VFib. Coarse ventricular fibrillation: also VFib, but with large high-amplitude waves — fine VFib waves are barely visible by comparison.",
     bedsideRelevance:
-      "Fine VFib typically appears after a prolonged arrest, after multiple defibrillation attempts, or when myocardial energy stores are severely depleted. The small fibrillatory waves suggest the ventricles retain some electrical activity but have lost the amplitude of coarse VFib. Regardless of wave size, the patient is pulseless. Whether defibrillation remains appropriate depends on the clinical situation and elapsed arrest time — provider judgment and local protocol guide the decision.",
+      "Fine VFib typically appears after a prolonged arrest or when myocardial energy stores are severely depleted. The small fibrillatory waves suggest the ventricles retain some electrical activity but have lost the amplitude of coarse VFib. Regardless of wave size, the patient is pulseless. The appropriate response depends on the clinical situation and elapsed arrest time — provider judgment and local protocol guide the decision.",
     whenMoreUrgent:
       "Fine VFib is always a cardiac arrest. Follow your local emergency protocol. Confirm in two leads before concluding the rhythm is asystole. CPR should be ongoing without interruption for rhythm analysis. The distinction between fine VFib and asystole matters for the next clinical decision — but it is a provider decision, not a bedside nurse decision in isolation.",
     urgency: "critical",
@@ -725,7 +725,7 @@ export const RHYTHMS: Rhythm[] = [
     id: "asystole",
     name: "Asystole",
     shortName: "Asystole",
-    tagline: "Absence of organized cardiac electrical activity — a near-flat line representing the end of effective ventricular depolarization.",
+    tagline: "Flatline pattern — confirm leads and patient before trusting the screen.",
     rate: "None — no measurable cardiac electrical rate",
     regularity: "None — no electrical activity to form a pattern",
     pWave: "Absent — no atrial or ventricular electrical activity. Rare P waves without QRS (ventricular standstill) should be reported specifically.",
@@ -734,7 +734,7 @@ export const RHYTHMS: Rhythm[] = [
       "Near-flat line — no organized electrical complexes of any kind",
       "Only very occasional minor baseline artifact — no consistent oscillations",
       "Confirmed in at least two leads — true asystole is flat in every lead",
-      "Patient is always pulseless — do not delay clinical response to confirm strip findings",
+      "Patient is always pulseless — do not delay clinical response to analyze strip findings",
     ],
     nursesNotice:
       "The strip is essentially flat. There are no complexes, no P waves, no organized deflections of any kind — only an occasional subtle baseline artifact. Unlike fine VFib, the line is still between those artifacts. The near-absence of any waveform is the hallmark. Before treating as asystole, confirm the lead is attached and check at least one other lead — a loose electrode can produce a flat line in a patient with a perfusing rhythm.",
@@ -815,9 +815,9 @@ export const RHYTHMS: Rhythm[] = [
       "The monitor provides false reassurance — this patient is in cardiac arrest",
     ],
     nursesNotice:
-      "This is the rhythm that kills patients who are not examined. The monitor shows a regular organized rhythm — P waves, QRS complexes, T waves — and everything on the screen looks like it should be fine. It is not fine. The patient has no pulse. Effective cardiac output is absent. PEA cannot be diagnosed by looking at a monitor; it requires a hands-on pulse check. Any patient who becomes unresponsive, loses blood pressure, or appears to be in arrest must have a pulse check immediately — regardless of what the monitor shows.",
+      "This is the rhythm that kills patients who are not examined. The monitor shows a regular organized rhythm — P waves, QRS complexes, T waves — and everything on the screen looks like it should be fine. It is not fine. The patient has no pulse. Effective cardiac output is absent. PEA cannot be diagnosed by looking at a monitor; it requires a hands-on clinical assessment. Any patient who becomes unresponsive, loses blood pressure, or appears to be in arrest must be assessed immediately — regardless of what the monitor shows.",
     confusedWith:
-      "Any organized rhythm in a perfusing patient: the ECG appearance of PEA is indistinguishable from a normal rhythm in a patient who is perfusing normally. The only distinguishing feature is the clinical assessment — is there a palpable pulse? If yes, the rhythm is not PEA. If no, it is PEA until proven otherwise. Artifact mimicking a normal rhythm: occasionally artifact from patient movement or a malfunctioning lead can look like an organized rhythm in a patient with a true pulseless arrest. Always confirm with a pulse check — never rely on the monitor alone to rule out arrest.",
+      "Any organized rhythm in a perfusing patient: the ECG appearance of PEA is indistinguishable from a normal rhythm in a patient who is perfusing normally. The only distinguishing feature is the clinical assessment — is there a palpable pulse? If yes, the rhythm is not PEA. If no, it is PEA until proven otherwise. Artifact mimicking a normal rhythm: occasionally artifact from patient movement or a malfunctioning lead can look like an organized rhythm in a patient with a true arrest. Always correlate with the patient — never rely on the monitor alone to rule out arrest.",
     bedsideRelevance:
       "PEA is one of the four cardiac arrest rhythms (alongside VFib, pulseless VTach, and asystole). Unlike VFib, it is not shockable — defibrillation has no role. The treatment is high-quality CPR and identifying and reversing the cause. The reversible causes are summarized as the H's and T's: hypovolemia, hypoxia, hydrogen ion (acidosis), hypo/hyperkalemia, hypothermia, tension pneumothorax, tamponade, toxins, thrombosis (pulmonary), and thrombosis (coronary). A patient in PEA is in full cardiac arrest — the organized electrical activity on the monitor is not a reason for reassurance or hesitation.",
     whenMoreUrgent:
@@ -871,9 +871,9 @@ export const RHYTHMS: Rhythm[] = [
     confusedWith:
       "Bundle branch block: also produces wide QRS complexes in an otherwise normal-looking rhythm, but with a consistent and characteristic morphology (RBBB or LBBB pattern). Hyperkalemia QRS widening is diffuse and non-specific — it does not fit the clean template of a right or left bundle block. The absence of P waves, the peaked T wave, and the progressive nature of the change (compared to a prior strip) point toward hyperkalemia. Ventricular tachycardia: also wide bizarre QRS, but fast. Hyperkalemia QRS widening occurs at the underlying sinus rate or slower.",
     bedsideRelevance:
-      "QRS widening in the setting of hyperkalemia represents significant toxicity. The cardiac conduction system is now directly impaired, not just repolarization. At this stage, the risk of progression to the sine wave pattern and then ventricular fibrillation or asystole is real and the timeline is unpredictable. This is a medical emergency requiring immediate treatment — calcium gluconate or calcium chloride to stabilize the myocardium, followed by measures to shift and then eliminate potassium. A patient whose strip shows this pattern should not be left without a provider actively managing the situation.",
+      "QRS widening in the setting of hyperkalemia represents significant toxicity. The cardiac conduction system is now directly impaired, not just repolarization. At this stage, the risk of progression to the sine wave pattern and then cardiac arrest is real and the timeline is unpredictable. The strip is changing faster than the labs can confirm what you are already seeing. A patient whose strip shows this pattern needs a provider actively at the bedside, not a routine notification.",
     whenMoreUrgent:
-      "QRS widening from hyperkalemia is already an urgent finding — there is no stable version of this pattern. Notify the provider immediately and have calcium at the bedside. If the QRS continues to widen on serial ECGs, or if the rate slows, or if any hemodynamic instability develops, this becomes an emergent resuscitation situation. Prepare for rapid deterioration: the sine wave and cardiac arrest can follow without further warning.",
+      "QRS widening from hyperkalemia is already an urgent finding — there is no stable version of this pattern. Notify the provider immediately. If the QRS continues to widen on serial ECGs, the rate slows, or any hemodynamic instability develops, this becomes an emergent resuscitation situation. Prepare for rapid deterioration: the sine wave and cardiac arrest can follow without further warning.",
     urgency: "critical",
     urgencyLabel: "Critical",
   },
@@ -881,7 +881,7 @@ export const RHYTHMS: Rhythm[] = [
     id: "hyperkalemia_sine",
     name: "Hyperkalemia: Sine Wave",
     shortName: "HyperK-Sine",
-    tagline: "Extreme potassium toxicity has dissolved all cardiac landmarks — a smooth sinusoidal wave where no P, QRS, or T can be identified. Pre-arrest.",
+    tagline: "Severe potassium toxicity — all landmarks gone, smooth sine wave remains. This is a pre-arrest rhythm.",
     rate: "40–80 bpm — rate is unreliable at this stage; cardiac arrest imminent",
     regularity: "Regular in appearance but mechanically failing — effective cardiac output is minimal or absent",
     pWave: "Absent — atrial standstill is complete; no organized atrial electrical activity",
@@ -893,13 +893,13 @@ export const RHYTHMS: Rhythm[] = [
       "Regular but dangerously abnormal — this pattern is immediately pre-arrest",
     ],
     nursesNotice:
-      "The strip looks like nothing you have been taught to recognize — because the normal landmarks are gone. There is no P wave, no sharp QRS spike, no T wave. What remains is a smooth, slow, sinusoidal wave that rises above baseline and falls below it in a continuous, undulating pattern. It can look almost organized, which is what makes it deceptive. This rhythm represents the heart's conduction system at the edge of total failure. Pulse check is immediate — this patient may have a pulse, but they are moments from not having one.",
+      "The strip looks like nothing you have been taught to recognize — because the normal landmarks are gone. There is no P wave, no sharp QRS spike, no T wave. What remains is a smooth, slow, sinusoidal wave that rises above baseline and falls below it in a continuous, undulating pattern. It can look almost organized, which is what makes it deceptive. This rhythm represents the heart's conduction system at the edge of total failure. Correlate with the patient immediately — this patient may have a pulse, but they are moments from not having one.",
     confusedWith:
       "Atrial flutter: also shows a regular undulating baseline, but flutter waves are sharp sawtooth deflections at ~300/min with distinct QRS complexes superimposed. The sine wave pattern has no discrete QRS complexes at any rate and the wave is smooth, not sawtooth. Ventricular fibrillation: chaotic, high-amplitude, completely irregular — the opposite of the organized sine wave. The sine wave is terrifyingly regular and smooth. Artifact or lead noise: motion artifact is irregular and does not have the consistent smooth sinusoidal morphology. Confirm in two leads.",
     bedsideRelevance:
-      "The sine wave pattern is a pre-arrest rhythm. It does not represent stable hyperkalemia — it represents the moment before cardiac arrest from hyperkalemia. Effective mechanical contraction at this stage is minimal or absent even if the monitor shows a rhythm. Treat this as you would a pulseless rhythm: check for a pulse, call for help, and begin resuscitation if the pulse is absent. If the patient has a pulse, treatment is emergent — intravenous calcium immediately, simultaneous sodium bicarbonate, continuous monitoring, and provider at the bedside now. This is not a rhythm to watch and trend.",
+      "The sine wave pattern is a pre-arrest rhythm. It does not represent stable hyperkalemia — it represents the moment before cardiac arrest from hyperkalemia. Effective mechanical contraction at this stage is minimal or absent even if the monitor shows a rhythm. Correlate with the patient immediately, call for help, and be ready to initiate resuscitation. If the patient has a pulse, this requires a provider response within minutes, not a scheduled follow-up. This is not a rhythm to watch and trend.",
     whenMoreUrgent:
-      "The sine wave pattern IS the most urgent non-arrest hyperkalemia finding. If the patient has a pulse, this is an immediate code-level emergency requiring treatment within minutes. If the patient is pulseless, follow your cardiac arrest protocol — hyperkalemia is one of the reversible 'H's' and calcium should be given during resuscitation. Do not wait for a potassium level to confirm the diagnosis when this pattern is on the monitor and the clinical picture fits.",
+      "The sine wave pattern is the most urgent non-arrest hyperkalemia finding. If the patient has a pulse, this is an immediate code-level emergency — provider and response team at the bedside now. If the patient is pulseless, follow your local cardiac arrest protocol: hyperkalemia is one of the reversible H's and is addressed during resuscitation. Do not wait for a potassium level to confirm what the strip is already telling you.",
     urgency: "critical",
     urgencyLabel: "Critical",
   },
@@ -949,7 +949,7 @@ export const RHYTHMS: Rhythm[] = [
     confusedWith:
       "Right bundle branch block: also wide QRS in sinus rhythm, but RBBB has a clear initial R spike, a broad S dip below baseline, and an upright T wave — the opposite pattern. LBBB has no S below baseline, no visible Q, and an inverted T. Ventricular paced rhythm: the QRS morphology is nearly identical to LBBB because right ventricular pacing creates a left-sided delay identical to LBBB. The distinction is the pacing spike — a sharp vertical artifact before the QRS that is absent in intrinsic LBBB. If no spike is visible, it is LBBB.",
     bedsideRelevance:
-      "New LBBB is the rhythm where context defines the urgency. In a patient with chest pain, new LBBB is treated as an ST-elevation equivalent — a possible acute anterior MI that requires the same emergent response pathway as STEMI because the block obscures the ST-segment changes that would otherwise be visible. Chronic LBBB in a known patient without symptoms is a monitoring finding. The word 'new' in front of LBBB changes everything. If you cannot confirm prior ECGs, treat it as new until proven otherwise.",
+      "New LBBB is the rhythm where context defines the urgency. In a patient with chest pain, new LBBB is treated as an ST-elevation equivalent — a possible acute anterior MI that requires the same emergent response pathway as STEMI because the block obscures the ST-segment changes that would otherwise be visible. Chronic LBBB in a known patient without symptoms is a monitoring finding. The word 'new' in front of LBBB changes everything. If you cannot confirm prior ECGs, escalate as new until proven otherwise.",
     whenMoreUrgent:
       "New LBBB in any patient with chest pain, shortness of breath, or any symptoms of acute coronary syndrome is an emergent finding — notify the provider and activate your institution's STEMI response if that is protocol. Even in the absence of typical symptoms, new LBBB that cannot be confirmed as chronic warrants immediate provider evaluation. LBBB makes the ECG difficult to interpret for ischemia — it is not a reason to defer the workup, but a reason to escalate it.",
     urgency: "urgent",
@@ -959,7 +959,7 @@ export const RHYTHMS: Rhythm[] = [
     id: "atrial_paced",
     name: "Atrial Paced Rhythm",
     shortName: "A-Paced",
-    tagline: "The pacemaker fires the atrium — a spike before each P wave, narrow QRS, normal ventricular conduction.",
+    tagline: "Find the spike before naming the rhythm — one spike before each P wave, narrow QRS follows.",
     rate: "Set by pacemaker — typically 60–80 bpm",
     regularity: "Regular — pacemaker fires at a fixed programmed rate",
     pWave: "Present after each pacing spike — upright but slightly different morphology than intrinsic sinus P waves",
@@ -1209,5 +1209,5 @@ export const URGENCY_CONTEXT: Record<UrgencyLevel, string> = {
   urgent:
     "Notify the provider based on your clinical assessment, the patient's symptoms, and local protocol. The rhythm is one piece of the picture — perfusion, mental status, and the patient's baseline are the others.",
   critical:
-    "Assess for a pulse before anything else. The monitor does not tell you whether the patient has a palpable pulse — only a physical assessment does. Follow your local emergency protocol.",
+    "Correlate with the patient before anything else. The monitor does not tell you whether the patient has a palpable pulse — only a physical assessment does. Follow your local emergency protocol.",
 };

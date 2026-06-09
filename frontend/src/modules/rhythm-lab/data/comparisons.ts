@@ -37,9 +37,9 @@ export const COMPARISONS: ComparisonPair[] = [
       'AIVR typically self-terminates; VTach can deteriorate to VFib',
     ],
     nursesNotice:
-      'The rate. Wide complex slow enough to count comfortably — tap it out, under 100? Think AIVR. Wide complex running fast with no P waves? Treat as VTach. Assess for pulse with both.',
+      'The rate. Wide complex slow enough to count comfortably — tap it out, under 100? Think AIVR. Wide complex running fast with no P waves? Flag as VTach and correlate immediately with the patient.',
     teachingNote:
-      'AIVR at 65 bpm in a post-cath patient is often a sign reperfusion worked and usually needs no treatment. The same-looking wide complex at 150 bpm in a symptomatic patient is a different emergency. Count before you treat.',
+      'AIVR at 65 bpm in a post-cath patient is often a sign reperfusion worked and usually self-limiting. The same-looking wide complex at 150 bpm in a symptomatic patient is a different emergency. Count before you classify.',
   },
   {
     id: 'fine-vfib-vs-asystole',
@@ -49,13 +49,13 @@ export const COMPARISONS: ComparisonPair[] = [
     keyDiffs: [
       'Fine VFib has continuous low-amplitude irregular oscillations throughout — the baseline is active, not still',
       'Asystole is near-flatline with only rare artifact; the baseline does not move continuously',
-      'Fine VFib is still shockable electrical activity; asystole is not — treatment differs completely',
+      'Fine VFib retains organized electrical activity; asystole does not — the escalation pathway differs completely',
       'Both can be mimicked by a loose lead — always confirm in two leads before concluding either rhythm',
     ],
     nursesNotice:
-      'Whether the baseline moves. A completely flat line that is perfectly still is asystole. A line that barely wiggles and shimmers continuously — even at tiny amplitude — is fine VFib. The difference is life-or-death for treatment choice.',
+      'Whether the baseline moves. A completely flat line that is perfectly still is asystole. A line that barely wiggles and shimmers continuously — even at tiny amplitude — is fine VFib. The difference is life-or-death for the escalation pathway.',
     teachingNote:
-      'Never shock asystole. Fine VFib may be shockable if confirmed in multiple leads — defibrillate before the energy fades further. When genuinely uncertain between the two, treat as VFib: shock first, ask questions later.',
+      'The strip distinction matters because the two rhythms have different clinical responses. Fine VFib retains active electrical fibrillation; asystole does not. Always confirm in two leads — a loose electrode can produce a false flatline. Correlate with the patient and escalate; provider judgment and local protocol determine the response.',
   },
   {
     id: 'svt-vs-sinus-tachy',
@@ -71,7 +71,7 @@ export const COMPARISONS: ComparisonPair[] = [
     nursesNotice:
       'A visible P wave before each QRS. Sinus tachycardia has one — find it. SVT does not, or the P is buried in the T wave of the previous beat. Ask the patient if it came on suddenly.',
     teachingNote:
-      'Sinus tachycardia always has a reason — fever, pain, hypovolemia, sepsis, pulmonary embolism. Treat the cause, not the rate. SVT is a re-entry circuit problem. Vagal maneuvers, then adenosine if indicated.',
+      'Sinus tachycardia always has a reason — fever, pain, hypovolemia, sepsis, pulmonary embolism. Identifying the underlying driver is the priority; the rate is the symptom, not the diagnosis. SVT is a re-entry circuit problem with an abrupt onset — recognizing that distinction is what guides provider-directed management.',
   },
   {
     id: 'vpaced-vs-vtach',
@@ -85,9 +85,9 @@ export const COMPARISONS: ComparisonPair[] = [
       'V-Paced is an expected, controlled rhythm; VTach is an emergency',
     ],
     nursesNotice:
-      'A tiny vertical spike artifact just before each QRS. Easy to miss at small monitor scale — zoom in. Spikes present → paced rhythm. No spikes + fast rate + wide complex → treat as VTach until proven otherwise.',
+      'A tiny vertical spike artifact just before each QRS. Easy to miss at small monitor scale — zoom in. Spikes present → paced rhythm. No spikes + fast rate + wide complex → flag as VTach and escalate immediately.',
     teachingNote:
-      'Never assume a wide complex rhythm is VTach in a patient with a known pacemaker. Check for spikes first. If spikes are absent and the patient is symptomatic, treat for VTach. Pacemaker failure can also cause a slow wide complex — different problem.',
+      'Never assume a wide complex rhythm is paced in a patient with a known pacemaker without confirming the spikes. If spikes are absent and the patient is symptomatic, escalate as VTach — provider assessment determines the response. Pacemaker failure can also cause a slow wide complex, which is a different recognition pattern entirely.',
   },
   {
     id: 'afib-vs-mat',
@@ -103,7 +103,7 @@ export const COMPARISONS: ComparisonPair[] = [
     nursesNotice:
       'Whether I can see distinct P waves. MAT has identifiable P waves — they just look different from each other. AFib has none. There is no organized atrial activity, only a chaotic wobbling baseline. If you can find P waves, it is not AFib.',
     teachingNote:
-      'MAT is not treated with cardioversion — it is not a re-entry rhythm. Treating the underlying cause (hypoxia, bronchospasm, electrolyte deficiency) is the intervention. AFib may be cardioverted depending on hemodynamic stability and duration.',
+      'MAT is not a re-entry rhythm — recognizing that distinction matters because the clinical approach is different from AFib. The driving process (hypoxia, bronchospasm, electrolyte disturbance) is what providers focus on, not the rhythm in isolation. AFib has its own provider-guided management pathway depending on hemodynamic status and duration.',
   },
   {
     id: 'rbbb-vs-lbbb',
@@ -119,7 +119,7 @@ export const COMPARISONS: ComparisonPair[] = [
     nursesNotice:
       'After the main spike, does the complex dip below the baseline and then bump back up? That dip-then-bump is RBBB. If the complex just makes one broad wide peak and stays above the line, that is LBBB.',
     teachingNote:
-      'New LBBB in a patient with chest pain is treated as a STEMI equivalent — activate the cath lab. RBBB is common as a chronic finding and usually does not change acute management. Always compare to a prior ECG if one exists.',
+      'New LBBB in a patient with chest pain is recognized as a STEMI equivalent — escalate immediately and follow your institution\'s STEMI response pathway. RBBB is common as a chronic finding and less acutely urgent. Always compare to a prior ECG if one exists.',
   },
   {
     id: 'hyperk-qrs-vs-sine',
@@ -135,6 +135,6 @@ export const COMPARISONS: ComparisonPair[] = [
     nursesNotice:
       'Whether I can find any QRS complexes or T waves. QRS widening still has identifiable (though abnormal) complexes. The sine wave has none — the tracing just undulates like a slow smooth wave. No landmarks at all means cardiac arrest is imminent.',
     teachingNote:
-      'Hyperkalemia sine wave is a pre-arrest pattern. Intravenous calcium (gluconate or chloride) is the first intervention — it stabilizes the cardiac membrane within minutes. Do not wait for insulin or dialysis to work before giving calcium. Call for help immediately.',
+      'The sine wave is a pre-arrest pattern — not a stable version of hyperkalemia but a rhythm moments from cardiac arrest. Recognizing the transition from QRS widening to sine wave is the critical escalation trigger. Correlate immediately with the patient, call for help, and follow local emergency protocol. Provider-directed intervention is urgent.',
   },
 ];

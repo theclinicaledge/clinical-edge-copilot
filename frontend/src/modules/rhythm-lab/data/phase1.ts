@@ -70,10 +70,10 @@ export const PEARLS: Pearl[] = [
   { id: 'p12', text: 'Early wide bizarre beat = premature (PVC). Late wide beat after a pause = escape. Timing is everything.' },
   { id: 'p13', text: 'PAC or PVC? Check QRS width. Narrow early beat = PAC. Wide early beat = PVC.' },
   { id: 'p14', text: 'Sinus bradycardia has an upright P before every QRS. Junctional rhythm does not — or the P is inverted.' },
-  { id: 'p15', text: 'AIVR looks like VTach but runs slow — under 100 bpm. Count before you treat.' },
+  { id: 'p15', text: 'AIVR looks like VTach but runs slow — under 100 bpm. Count before you classify.' },
   { id: 'p16', text: 'NSR is your anchor. Every other rhythm is a variation from this baseline.' },
   { id: 'p17', text: 'Torsades twists around the isoelectric line. The QRS axis rotates — it is unmistakable.' },
-  { id: 'p18', text: 'Sinus tachycardia always has a cause. Treat the trigger, not the number.' },
+  { id: 'p18', text: 'Sinus tachycardia always has a cause. Look for the trigger — the rate is the symptom, not the diagnosis.' },
   { id: 'p19', text: 'First-degree block alone is rarely the problem — it is a sign to look harder for the cause.' },
   { id: 'p20', text: 'PEA: organized electrical activity, no mechanical pulse. The strip is deceptive.' },
 ];

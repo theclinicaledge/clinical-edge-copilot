@@ -87,7 +87,7 @@ export const CONFUSABLE_PAIRS: ConfusablePair[] = [
       pWaveStory: 'Retrograde P waves may be visible after the QRS, or buried in it. No independent P-wave march.',
       qrsWidth: 'Wide, but due to aberrant conduction — morphology matches a bundle branch block pattern',
     },
-    recognitionPearl: 'When in doubt, treat as VT. SVT with aberrancy is the safer miss. AV dissociation on the strip confirms VT — look for independent P waves.',
+    recognitionPearl: 'When in doubt, flag as VT and escalate. SVT with aberrancy is the safer miss. AV dissociation on the strip confirms VT — look for independent P waves marching at their own rate.',
     commonMistake: 'Assuming wide + fast = VT without looking for AV dissociation. Fusion beats are pathognomonic of VT and end the debate.',
   },
   {
@@ -160,7 +160,7 @@ export const CONFUSABLE_PAIRS: ConfusablePair[] = [
       qrsWidth: 'None',
     },
     recognitionPearl: 'Does the baseline move continuously? Fine VF shimmers — it is never still. Asystole is nearly flat. Always confirm in two leads before concluding either.',
-    commonMistake: 'Shocking asystole. Fine VF may be shockable; asystole is not. A lead artifact can mimic a flat line — check the patient and confirm in a second lead before calling asystole.',
+    commonMistake: 'Calling asystole without confirming in two leads. Fine VFib has continuous low oscillations; asystole is truly flat. A loose electrode can mimic a flatline — always correlate with the patient and confirm in a second lead before concluding the rhythm.',
   },
   {
     id: 'junctional-vs-sinus-brady',

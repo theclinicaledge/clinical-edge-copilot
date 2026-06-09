@@ -1,60 +1,62 @@
 import { useState } from 'react';
 import { CONFUSABLE_PAIRS } from '../data/compareRhythms';
-import type { ConfusablePair, RhythmSide } from '../data/compareRhythms';
+import type { ConfusablePair } from '../data/compareRhythms';
 
 interface CompareRhythmsViewProps {
   onBack: () => void;
 }
 
-const MATRIX_ROWS: Array<{ label: string; key: keyof RhythmSide }> = [
-  { label: 'Visual clue',  key: 'visualClue' },
-  { label: 'Regularity',  key: 'regularity' },
-  { label: 'P waves',     key: 'pWaveStory' },
-  { label: 'QRS width',   key: 'qrsWidth' },
-];
-
-const MATRIX_SIDES = [
-  { which: 'a' as const },
-  { which: 'b' as const },
-] as const;
+/** Returns text up to (and including) the first period-terminated sentence. */
+function firstSentence(text: string): string {
+  const idx = text.indexOf('. ');
+  return idx !== -1 ? text.slice(0, idx + 1) : text;
+}
 
 function QuickMatrix({ pair }: { pair: ConfusablePair }) {
+  const rows = [
+    { label: 'Pattern',       a: pair.a.regularity,                    b: pair.b.regularity },
+    { label: 'P waves',       a: firstSentence(pair.a.pWaveStory),     b: firstSentence(pair.b.pWaveStory) },
+    { label: 'QRS',           a: pair.a.qrsWidth,                      b: pair.b.qrsWidth },
+    { label: 'Key tell',      a: pair.keyDistinction.a,                b: pair.keyDistinction.b },
+  ];
+
   return (
     <div className="crv-matrix">
       <p className="crv-matrix__heading">Quick difference</p>
 
-      {/* ≥500px — 3-column side-by-side grid */}
+      {/* ≥500px — 3-col side-by-side grid */}
       <div className="crv-matrix__grid">
         <div className="crv-matrix__header-row">
           <div className="crv-matrix__corner" />
           <div className="crv-matrix__col-head crv-matrix__col-head--a">{pair.a.short}</div>
           <div className="crv-matrix__col-head crv-matrix__col-head--b">{pair.b.short}</div>
         </div>
-        {MATRIX_ROWS.map(({ label, key }) => (
-          <div key={key} className="crv-matrix__row">
+        {rows.map(({ label, a, b }) => (
+          <div key={label} className="crv-matrix__row">
             <div className="crv-matrix__row-label">{label}</div>
-            <div className="crv-matrix__cell crv-matrix__cell--a">{pair.a[key]}</div>
-            <div className="crv-matrix__cell crv-matrix__cell--b">{pair.b[key]}</div>
+            <div className="crv-matrix__cell crv-matrix__cell--a">{a}</div>
+            <div className="crv-matrix__cell crv-matrix__cell--b">{b}</div>
           </div>
         ))}
       </div>
 
-      {/* <500px — stacked A then B cards */}
+      {/* <500px — feature-row stacking (label / A: value / B: value) */}
       <div className="crv-matrix__stack">
-        {MATRIX_SIDES.map(({ which }) => {
-          const side = pair[which];
-          return (
-            <div key={which} className={`crv-matrix__stack-side crv-matrix__stack-side--${which}`}>
-              <p className={`crv-matrix__stack-head crv-matrix__stack-head--${which}`}>{side.short}</p>
-              {MATRIX_ROWS.map(({ label, key }) => (
-                <div key={key} className="crv-matrix__stack-row">
-                  <span className="crv-matrix__stack-label">{label}</span>
-                  <span className="crv-matrix__stack-value">{side[key]}</span>
-                </div>
-              ))}
+        {rows.map(({ label, a, b }) => (
+          <div key={label} className="crv-matrix__stack-row">
+            <span className="crv-matrix__stack-label">{label}</span>
+            <div className="crv-matrix__stack-vals">
+              <div className="crv-matrix__stack-val crv-matrix__stack-val--a">
+                <span className="crv-matrix__stack-side-tag">A</span>
+                <span className="crv-matrix__stack-val-text">{a}</span>
+              </div>
+              <div className="crv-matrix__stack-val crv-matrix__stack-val--b">
+                <span className="crv-matrix__stack-side-tag">B</span>
+                <span className="crv-matrix__stack-val-text">{b}</span>
+              </div>
             </div>
-          );
-        })}
+          </div>
+        ))}
       </div>
     </div>
   );
@@ -95,7 +97,14 @@ function SideCard({ side, letter }: { side: ConfusablePair['a']; letter: 'A' | '
 
 export function CompareRhythmsView({ onBack }: CompareRhythmsViewProps) {
   const [activeId, setActiveId] = useState(CONFUSABLE_PAIRS[0].id);
+  const [breakdownOpen, setBreakdownOpen] = useState(false);
   const pair = CONFUSABLE_PAIRS.find(p => p.id === activeId)!;
+
+  // Reset breakdown collapse when pair changes
+  function handlePairChange(id: string) {
+    setActiveId(id);
+    setBreakdownOpen(false);
+  }
 
   return (
     <div className="crv-page">
@@ -116,7 +125,7 @@ export function CompareRhythmsView({ onBack }: CompareRhythmsViewProps) {
             <button
               key={p.id}
               className={`crv-selector-btn${p.id === activeId ? ' crv-selector-btn--active' : ''}`}
-              onClick={() => setActiveId(p.id)}
+              onClick={() => handlePairChange(p.id)}
             >
               {p.label}
             </button>
@@ -124,20 +133,11 @@ export function CompareRhythmsView({ onBack }: CompareRhythmsViewProps) {
         </div>
       </div>
 
-      {/* Quick difference matrix */}
+      {/* 1 — Quick difference matrix */}
       <QuickMatrix pair={pair} />
 
-      {/* Comparison cards */}
-      <div className="crv-cards">
-        <SideCard side={pair.a} letter="A" />
-        <div className="crv-divider" aria-hidden="true">
-          <span className="crv-divider__vs">vs</span>
-        </div>
-        <SideCard side={pair.b} letter="B" />
-      </div>
-
-      {/* Pearl + mistake */}
-      <div className="crv-bottom">
+      {/* 2 — Pearl + mistake */}
+      <div className="crv-callouts">
         <div className="crv-pearl">
           <span className="crv-pearl__label">Recognition Pearl</span>
           <p className="crv-pearl__text">{pair.recognitionPearl}</p>
@@ -146,6 +146,32 @@ export function CompareRhythmsView({ onBack }: CompareRhythmsViewProps) {
           <span className="crv-mistake__label">Most common mistake</span>
           <p className="crv-mistake__text">{pair.commonMistake}</p>
         </div>
+      </div>
+
+      {/* 3 — Full breakdown toggle + A/B cards */}
+      <div className="crv-breakdown-section">
+        <button
+          className="crv-breakdown-toggle"
+          onClick={() => setBreakdownOpen(v => !v)}
+          aria-expanded={breakdownOpen}
+        >
+          <span className="crv-breakdown-toggle__label">
+            {breakdownOpen ? 'Hide full breakdown' : 'View full breakdown'}
+          </span>
+          <span className="crv-breakdown-toggle__chevron" aria-hidden="true">
+            {breakdownOpen ? '▲' : '▼'}
+          </span>
+        </button>
+
+        {breakdownOpen && (
+          <div className="crv-cards">
+            <SideCard side={pair.a} letter="A" />
+            <div className="crv-divider" aria-hidden="true">
+              <span className="crv-divider__vs">vs</span>
+            </div>
+            <SideCard side={pair.b} letter="B" />
+          </div>
+        )}
       </div>
 
     </div>

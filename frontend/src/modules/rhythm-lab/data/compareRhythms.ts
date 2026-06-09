@@ -15,6 +15,7 @@ export interface ConfusablePair {
   b: RhythmSide;
   recognitionPearl: string;
   commonMistake: string;
+  keyDistinction: { a: string; b: string };
 }
 
 export const CONFUSABLE_PAIRS: ConfusablePair[] = [
@@ -41,6 +42,10 @@ export const CONFUSABLE_PAIRS: ConfusablePair[] = [
     },
     recognitionPearl: 'If you can find organized P waves — even ugly, different-shaped ones — it is not AFib. AFib has no P waves at all.',
     commonMistake: 'Calling MAT "AFib with weird P waves." They look identically irregular at a glance, but P waves are the whole story.',
+    keyDistinction: {
+      a: 'No organized atrial activity — only electrical chaos',
+      b: 'Multiple foci, each producing a distinct P wave',
+    },
   },
   {
     id: 'flutter-vs-sinus-tachy',
@@ -65,6 +70,10 @@ export const CONFUSABLE_PAIRS: ConfusablePair[] = [
     },
     recognitionPearl: 'A rate near 150 that is perfectly regular deserves a flutter hunt. Calipers on the baseline — if it never goes flat between beats, that is flutter.',
     commonMistake: 'Missing flutter waves buried in T waves at a 2:1 ratio. Look for a rate of exactly 150 and scrutinize every T wave for a hidden F-wave.',
+    keyDistinction: {
+      a: 'Sawtooth F-waves — baseline never returns to flat',
+      b: 'Clear upright P before every QRS, clean isoelectric baseline',
+    },
   },
   {
     id: 'vt-vs-svt-aberrancy',
@@ -89,6 +98,10 @@ export const CONFUSABLE_PAIRS: ConfusablePair[] = [
     },
     recognitionPearl: 'When in doubt, flag as VT and escalate. SVT with aberrancy is the safer miss. AV dissociation on the strip confirms VT — look for independent P waves marching at their own rate.',
     commonMistake: 'Assuming wide + fast = VT without looking for AV dissociation. Fusion beats are pathognomonic of VT and end the debate.',
+    keyDistinction: {
+      a: 'AV dissociation — P waves march at their own independent rate',
+      b: 'P waves relate to QRS — no independent P-wave march',
+    },
   },
   {
     id: 'pac-vs-pvc',
@@ -113,6 +126,10 @@ export const CONFUSABLE_PAIRS: ConfusablePair[] = [
     },
     recognitionPearl: 'QRS width decides it. Early narrow beat with an odd P wave is a PAC. Early wide bizarre beat with no P wave is a PVC.',
     commonMistake: 'Calling every early beat a PVC. Check QRS width first. A narrow early beat with a different-looking P wave is a PAC — a much more benign finding.',
+    keyDistinction: {
+      a: 'Narrow QRS with a different-shaped P wave preceding it',
+      b: 'Wide bizarre QRS with no preceding P wave',
+    },
   },
   {
     id: 'wenckebach-vs-mobitz-ii',
@@ -137,6 +154,10 @@ export const CONFUSABLE_PAIRS: ConfusablePair[] = [
     },
     recognitionPearl: 'PR stretches before it drops → Mobitz I (the PR is your warning). PR stays fixed then drops → Mobitz II (no warning). Width of QRS confirms the level.',
     commonMistake: 'Mistaking 2:1 block for Wenckebach. With only two beats before the drop, you cannot see PR lengthening. Count three or more conducted beats to assess PR behavior.',
+    keyDistinction: {
+      a: 'PR visibly stretches before each dropped beat — the warning is written in the PR',
+      b: 'PR is constant on every conducted beat, then QRS drops without any warning',
+    },
   },
   {
     id: 'fine-vf-vs-asystole',
@@ -161,6 +182,10 @@ export const CONFUSABLE_PAIRS: ConfusablePair[] = [
     },
     recognitionPearl: 'Does the baseline move continuously? Fine VF shimmers — it is never still. Asystole is nearly flat. Always confirm in two leads before concluding either.',
     commonMistake: 'Calling asystole without confirming in two leads. Fine VFib has continuous low oscillations; asystole is truly flat. A loose electrode can mimic a flatline — always correlate with the patient and confirm in a second lead before concluding the rhythm.',
+    keyDistinction: {
+      a: 'Baseline shimmers continuously — never fully flat',
+      b: 'Baseline essentially still — only occasional isolated artifact',
+    },
   },
   {
     id: 'junctional-vs-sinus-brady',
@@ -185,6 +210,10 @@ export const CONFUSABLE_PAIRS: ConfusablePair[] = [
     },
     recognitionPearl: 'Find an upright P wave before the QRS. If it is there and the PR is normal, the SA node is in charge — sinus bradycardia. No upright P, or P is inverted → junction is the pacemaker.',
     commonMistake: 'Missing an inverted P wave hidden just before or inside the QRS complex and assuming there are no P waves at all.',
+    keyDistinction: {
+      a: 'No upright P before QRS — retrograde, buried, or absent',
+      b: 'Upright P wave before every QRS — SA node is in charge',
+    },
   },
   {
     id: 'flutter-fixed-vs-variable',
@@ -209,6 +238,10 @@ export const CONFUSABLE_PAIRS: ConfusablePair[] = [
     },
     recognitionPearl: 'The sawtooth baseline is the constant — it never changes. What changes is how many F-waves conduct. Count the waves between each QRS to find the ratio.',
     commonMistake: 'Calling variable-block flutter "AFib" because the RR intervals are irregular. The sawtooth baseline is organized; AFib is chaotic. Look at the baseline between QRS complexes.',
+    keyDistinction: {
+      a: 'Regular ~150 bpm — one F-wave hides in every T wave',
+      b: 'Irregular QRS as conduction ratio shifts (2:1, 3:1, 4:1)',
+    },
   },
   {
     id: 'unifocal-vs-multifocal-pvc',
@@ -233,6 +266,10 @@ export const CONFUSABLE_PAIRS: ConfusablePair[] = [
     },
     recognitionPearl: 'Do the ectopic beats all look the same? One shape = one irritable focus (unifocal). Different shapes = multiple foci irritable (multifocal) — a sign of more diffuse electrical instability.',
     commonMistake: 'Not comparing PVC morphologies to each other. All PVCs look wide and bizarre — the distinction is whether they are wide-bizarre in the same way or different ways.',
+    keyDistinction: {
+      a: 'All ectopic beats are identical — one irritable focus',
+      b: 'Ectopic beats vary in shape — multiple ventricular foci',
+    },
   },
   {
     id: 'escape-vs-premature',
@@ -256,6 +293,10 @@ export const CONFUSABLE_PAIRS: ConfusablePair[] = [
       qrsWidth: 'Wide, bizarre morphology',
     },
     recognitionPearl: 'Timing is everything. Early wide beat = ectopic (premature). Late wide beat after a pause = escape (rescue). They look similar but mean the opposite thing clinically.',
-    commonMistake: 'Treating an escape beat as PVC and suppressing it. An escape beat is a safety mechanism — it keeps the heart going when the dominant pacemaker fails. Never suppress an escape rhythm.',
+    commonMistake: 'Misidentifying an escape beat as a PVC. An escape beat is a safety mechanism — it keeps the heart going when the dominant pacemaker fails. Recognizing it correctly changes the entire clinical picture.',
+    keyDistinction: {
+      a: 'Arrives late after a pause — rescues the rhythm',
+      b: 'Arrives early before the next expected beat',
+    },
   },
 ];

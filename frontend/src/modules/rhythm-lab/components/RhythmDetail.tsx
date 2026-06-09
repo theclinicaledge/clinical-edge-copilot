@@ -97,6 +97,14 @@ export function RhythmDetail({ rhythm, onBack }: RhythmDetailProps) {
       <div className="detail-content">
         <div className="detail-main">
 
+          {/* First Clue callout — most important recognition cue, surfaced above the snapshot */}
+          <div className="detail-first-clue">
+            <span className="detail-first-clue__label">First clue</span>
+            <p className="detail-first-clue__text">
+              {rhythm.breakdown?.firstClue ?? rhythm.recognitionCues[0]}
+            </p>
+          </div>
+
           <div className="warm-panel">
             <p className="warm-panel__heading">Recognition snapshot</p>
             <div className="recog-cues">

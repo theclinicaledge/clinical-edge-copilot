@@ -3522,62 +3522,66 @@
 .crv-matrix__cell--a { background: rgba(10, 191, 188, 0.03); }
 .crv-matrix__cell--b { background: rgba(212, 168, 75, 0.03); }
 
-/* ── Stacked A/B layout (<500px) ── */
+/* ── Feature-row stacking (<500px): label → A value → B value per feature ── */
 
 @media (max-width: 499px) {
   .crv-matrix__grid  { display: none; }
   .crv-matrix__stack { display: flex; flex-direction: column; }
 
-  .crv-matrix__stack-side {
-    padding: 10px 14px 12px;
-    box-sizing: border-box;
-  }
-
-  .crv-matrix__stack-side--a {
-    border-bottom: 1px solid rgba(214, 208, 196, 0.6);
-    background: rgba(10, 191, 188, 0.03);
-  }
-
-  .crv-matrix__stack-side--b {
-    background: rgba(212, 168, 75, 0.03);
-  }
-
-  .crv-matrix__stack-head {
-    font-family: var(--font-mono);
-    font-size: 9px;
-    font-weight: 700;
-    letter-spacing: 0.1em;
-    text-transform: uppercase;
-    margin-bottom: 8px;
-  }
-
-  .crv-matrix__stack-head--a { color: var(--accent-teal); }
-  .crv-matrix__stack-head--b { color: var(--accent-gold); }
-
   .crv-matrix__stack-row {
-    display: grid;
-    grid-template-columns: 72px 1fr;
-    gap: 8px;
-    padding: 5px 0;
-    border-bottom: 1px solid rgba(214, 208, 196, 0.35);
-    min-width: 0;
+    padding: 9px 14px;
+    border-bottom: 1px solid rgba(214, 208, 196, 0.45);
     box-sizing: border-box;
   }
 
   .crv-matrix__stack-row:last-child { border-bottom: none; }
 
   .crv-matrix__stack-label {
+    display: block;
     font-family: var(--font-mono);
     font-size: 9px;
     font-weight: 600;
-    letter-spacing: 0.06em;
+    letter-spacing: 0.08em;
     text-transform: uppercase;
     color: var(--text-dark-muted);
-    padding-top: 2px;
-    flex-shrink: 0;
+    margin-bottom: 6px;
   }
 
-  .crv-matrix__stack-value {
+  .crv-matrix__stack-vals {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+  }
+
+  .crv-matrix__stack-val {
+    display: flex;
+    gap: 6px;
+    align-items: baseline;
+    min-width: 0;
+  }
+
+  .crv-matrix__stack-side-tag {
+    font-family: var(--font-mono);
+    font-size: 8px;
+    font-weight: 700;
+    letter-spacing: 0.06em;
+    flex-shrink: 0;
+    padding: 1px 4px;
+    border-radius: 2px;
+    line-height: 1.4;
+  }
+
+  .crv-matrix__stack-val--a .crv-matrix__stack-side-tag {
+    background: rgba(10, 191, 188, 0.12);
+    color: var(--accent-teal);
+  }
+
+  .crv-matrix__stack-val--b .crv-matrix__stack-side-tag {
+    background: rgba(212, 168, 75, 0.12);
+    color: var(--accent-gold);
+  }
+
+  .crv-matrix__stack-val-text {
     font-size: 12px;
     color: var(--text-dark);
     line-height: 1.45;
@@ -3585,5 +3589,112 @@
     overflow-wrap: break-word;
     min-width: 0;
   }
+}
+
+/* ─── Confusables: callouts (pearl + mistake) ─────────────────────────────── */
+
+.crv-callouts {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+  padding: 0 16px 14px;
+  box-sizing: border-box;
+  width: 100%;
+}
+
+@media (max-width: 700px) {
+  .crv-callouts {
+    grid-template-columns: 1fr;
+    padding: 0 14px 14px;
+  }
+}
+
+/* ─── Confusables: "View full breakdown" toggle + A/B cards ──────────────── */
+
+.crv-breakdown-section {
+  padding: 0 16px 20px;
+  box-sizing: border-box;
+}
+
+@media (max-width: 700px) {
+  .crv-breakdown-section {
+    padding: 0 14px 20px;
+  }
+}
+
+.crv-breakdown-toggle {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+  padding: 10px 14px;
+  background: var(--surface-warm-deep);
+  border: 1px solid rgba(214, 208, 196, 0.7);
+  border-radius: 5px;
+  cursor: pointer;
+  box-sizing: border-box;
+  gap: 10px;
+}
+
+.crv-breakdown-toggle[aria-expanded="true"] {
+  border-bottom-left-radius: 0;
+  border-bottom-right-radius: 0;
+  border-bottom-color: transparent;
+}
+
+.crv-breakdown-toggle__label {
+  font-family: var(--font-mono);
+  font-size: 9px;
+  font-weight: 600;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--text-dark-muted);
+}
+
+.crv-breakdown-toggle__chevron {
+  font-size: 8px;
+  color: var(--text-dark-muted);
+  opacity: 0.6;
+  flex-shrink: 0;
+}
+
+/* A/B cards appear directly below the toggle when open */
+.crv-breakdown-section .crv-cards {
+  border-radius: 0 0 5px 5px;
+  border: 1px solid rgba(214, 208, 196, 0.7);
+  border-top: none;
+  padding: 14px 0;
+  margin-top: 0;
+}
+
+/* ─── Detail: first-clue callout ─────────────────────────────────────────── */
+
+.detail-first-clue {
+  border-left: 3px solid var(--accent-teal);
+  border-radius: 0 5px 5px 0;
+  background: rgba(10, 191, 188, 0.05);
+  border-top: 1px solid rgba(10, 191, 188, 0.18);
+  border-right: 1px solid rgba(10, 191, 188, 0.18);
+  border-bottom: 1px solid rgba(10, 191, 188, 0.18);
+  padding: 11px 14px;
+}
+
+.detail-first-clue__label {
+  display: block;
+  font-family: var(--font-mono);
+  font-size: 9px;
+  font-weight: 600;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--accent-teal);
+  margin-bottom: 5px;
+  opacity: 0.85;
+}
+
+.detail-first-clue__text {
+  font-size: 13px;
+  line-height: 1.55;
+  color: var(--text-dark);
+  overflow-wrap: break-word;
 }
 

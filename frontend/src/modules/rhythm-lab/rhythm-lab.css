@@ -3692,9 +3692,57 @@
 }
 
 .detail-first-clue__text {
-  font-size: 13px;
-  line-height: 1.55;
+  font-size: 13.5px;
+  line-height: 1.6;
   color: var(--text-dark);
+  font-weight: 500;
   overflow-wrap: break-word;
+}
+
+/* ─── Detail: first-clue polish — slightly more weight ──────────────────── */
+
+.detail-first-clue {
+  border-left-width: 4px;
+  padding: 12px 16px;
+}
+
+.detail-first-clue__label {
+  opacity: 1;
+  letter-spacing: 0.14em;
+}
+
+/* ─── Detail: bedside collapsible body ───────────────────────────────────── */
+
+.bedside-collapsible__body {
+  border-top: 1px solid rgba(214, 208, 196, 0.7);
+}
+
+.bedside-collapsible__body .bedside-editorial {
+  padding: 2px 16px 0;
+}
+
+/* Re-add bottom border on last item so urgency block is separated */
+.bedside-collapsible__body .bedside-item:last-child {
+  border-bottom: 1px solid rgba(214, 208, 196, 0.55);
+  padding-bottom: 13px;
+}
+
+/* Urgency callout inset: flush inside collapsible, keep left border */
+.urgency-callout--inset {
+  border-radius: 0;
+  border: none;
+  border-left: 4px solid; /* color set via inline style */
+  background: rgba(10, 191, 188, 0.02);
+  padding: 12px 16px;
+  margin: 0;
+}
+
+/* Tighten detail-main gap now that two sections are collapsed */
+.detail-main {
+  gap: 16px;
+}
+
+@media (max-width: 640px) {
+  .detail-main { gap: 14px; }
 }
 

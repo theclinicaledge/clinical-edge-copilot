@@ -19,6 +19,7 @@ export function RhythmDetail({ rhythm, onBack }: RhythmDetailProps) {
   const [caliperOn, setCaliperOn] = useState(false);
   const [bookmarked, setBookmarked] = useState(() => isFavorite(rhythm.id));
   const [breakdownOpen, setBreakdownOpen] = useState(false);
+  const [bedsideOpen,   setBedsideOpen]   = useState(false);
   const pearl = getPearlForRhythm(rhythm.id);
 
   return (
@@ -141,7 +142,7 @@ export function RhythmDetail({ rhythm, onBack }: RhythmDetailProps) {
               onClick={() => setBreakdownOpen(v => !v)}
               aria-expanded={breakdownOpen}
             >
-              <span className="breakdown-toggle__title">Strip Reading Guide</span>
+              <span className="breakdown-toggle__title">How to read any rhythm</span>
               <span className="breakdown-toggle__chevron" aria-hidden="true">
                 {breakdownOpen ? '▲' : '▼'}
               </span>
@@ -149,34 +150,48 @@ export function RhythmDetail({ rhythm, onBack }: RhythmDetailProps) {
             {breakdownOpen && <RecognitionBreakdown rhythm={rhythm} />}
           </div>
 
-          <div className="bedside-editorial">
-            <p className="bedside-editorial__heading">Bedside perspective</p>
-            <div className="bedside-item">
-              <p className="bedside-item__label">What nurses notice first</p>
-              <p className="bedside-item__text">{rhythm.nursesNotice}</p>
-            </div>
-            <div className="bedside-item">
-              <p className="bedside-item__label">Common confusion</p>
-              <p className="bedside-item__text">{rhythm.confusedWith}</p>
-            </div>
-            <div className="bedside-item">
-              <p className="bedside-item__label">Bedside relevance</p>
-              <p className="bedside-item__text">{rhythm.bedsideRelevance}</p>
-            </div>
-            <div className="bedside-item">
-              <p className="bedside-item__label">When it becomes more urgent</p>
-              <p className="bedside-item__text">{rhythm.whenMoreUrgent}</p>
-            </div>
-          </div>
-
-          <div
-            className="urgency-callout"
-            style={{ borderLeftColor: urgencyColor }}
-          >
-            <p className="urgency-callout__label" style={{ color: urgencyColor }}>
-              {rhythm.urgencyLabel} — Bedside context
-            </p>
-            <p className="urgency-callout__text">{urgencyContext}</p>
+          <div className="breakdown-collapsible bedside-collapsible">
+            <button
+              className="breakdown-toggle"
+              onClick={() => setBedsideOpen(v => !v)}
+              aria-expanded={bedsideOpen}
+            >
+              <span className="breakdown-toggle__title">Bedside perspective</span>
+              <span className="breakdown-toggle__chevron" aria-hidden="true">
+                {bedsideOpen ? '▲' : '▼'}
+              </span>
+            </button>
+            {bedsideOpen && (
+              <div className="bedside-collapsible__body">
+                <div className="bedside-editorial">
+                  <div className="bedside-item">
+                    <p className="bedside-item__label">What nurses notice first</p>
+                    <p className="bedside-item__text">{rhythm.nursesNotice}</p>
+                  </div>
+                  <div className="bedside-item">
+                    <p className="bedside-item__label">Common confusion</p>
+                    <p className="bedside-item__text">{rhythm.confusedWith}</p>
+                  </div>
+                  <div className="bedside-item">
+                    <p className="bedside-item__label">Bedside relevance</p>
+                    <p className="bedside-item__text">{rhythm.bedsideRelevance}</p>
+                  </div>
+                  <div className="bedside-item">
+                    <p className="bedside-item__label">When it becomes more urgent</p>
+                    <p className="bedside-item__text">{rhythm.whenMoreUrgent}</p>
+                  </div>
+                </div>
+                <div
+                  className="urgency-callout urgency-callout--inset"
+                  style={{ borderLeftColor: urgencyColor }}
+                >
+                  <p className="urgency-callout__label" style={{ color: urgencyColor }}>
+                    {rhythm.urgencyLabel} — Bedside context
+                  </p>
+                  <p className="urgency-callout__text">{urgencyContext}</p>
+                </div>
+              </div>
+            )}
           </div>
 
         </div>

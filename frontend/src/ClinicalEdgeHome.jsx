@@ -1,5 +1,13 @@
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { trackEvent } from "./analytics";
+
+// Maps module.key → explicit analytics event name.
+// Explicit names are easier to filter in Vercel Analytics than payload fields.
+const MODULE_OPEN_EVENTS = {
+  copilot:   'copilot_module_opened',
+  rhythmlab: 'rhythm_lab_module_opened',
+  icudrips:  'icu_drips_module_opened',
+};
 
 // ─── CE Logo ──────────────────────────────────────────────────────────────────
 function CELogo() {
@@ -91,7 +99,7 @@ function ModuleEntry({ module, isLast, onNavigate }) {
     <div
       onMouseEnter={() => isActive && setHovered(true)}
       onMouseLeave={() => setHovered(false)}
-      onClick={isActive ? () => { trackEvent('module_opened', { module: module.key }); onNavigate(module.path); } : undefined}
+      onClick={isActive ? () => { trackEvent(MODULE_OPEN_EVENTS[module.key] ?? 'module_opened', { route: '/' }); onNavigate(module.path); } : undefined}
       style={{
         paddingTop: s.paddingTop,
         paddingBottom: s.paddingBottom,

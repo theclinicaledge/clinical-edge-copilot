@@ -52,7 +52,7 @@ export default function RhythmLabModule({ onGoHome }: RhythmLabModuleProps) {
 
   // Track module opened once on mount
   useEffect(() => {
-    trackEvent('rhythm_lab_opened');
+    trackEvent('rhythm_lab_opened', { route: '/rhythm-lab' });
   }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
   useEffect(() => {

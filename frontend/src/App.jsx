@@ -564,7 +564,7 @@ export default function App({ onGoHome, isOnline = true }) {
 
   // Track module open — fires once on mount
   useEffect(() => {
-    trackEvent('copilot_opened');
+    trackEvent('copilot_opened', { route: '/copilot' });
   }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
   // Auto-resize textarea

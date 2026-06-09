@@ -663,7 +663,7 @@ export default function IcuDripsModule({ onGoHome }) {
 
   // Track module opened once on mount
   useEffect(() => {
-    trackEvent('icu_drips_opened');
+    trackEvent('icu_drips_opened', { route: '/icu-drips' });
   }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
   // Scroll to top on view change

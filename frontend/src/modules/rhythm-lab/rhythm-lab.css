@@ -3077,9 +3077,27 @@
   color: var(--text-primary);
 }
 
-/* Inline pearl sits inside detail-main — margin handled by gap */
+/* Inline pearl sits inside detail-main — visual peer of First Clue card */
 .detail-pearl--inline {
   margin: 0;
+  display: block;                          /* stack label above text, like First Clue */
+  padding: 12px 16px;
+  background: rgba(212, 168, 75, 0.11);   /* stronger gold tint (was 0.07) */
+  border-color: rgba(212, 168, 75, 0.32); /* stronger border (was 0.22) */
+}
+
+.detail-pearl--inline .detail-pearl__label {
+  display: block;
+  margin-bottom: 5px;
+  letter-spacing: 0.14em;
+}
+
+.detail-pearl--inline .detail-pearl__text {
+  font-size: 13.5px;
+  line-height: 1.6;
+  font-weight: 500;
+  color: var(--text-dark);
+  opacity: 1;
 }
 
 @media (max-width: 640px) {

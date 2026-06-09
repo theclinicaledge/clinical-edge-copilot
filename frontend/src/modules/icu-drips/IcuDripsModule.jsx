@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { trackEvent } from '../../analytics';
 import './icu-drips.css';
 import {
   DRIPS, CATEGORIES, FAMILIES, FOUNDATIONS,
@@ -452,7 +453,7 @@ function QuickCompare({ onBackToHome, onNavigateToDrip, initialPairId }) {
           <button
             key={pair.id}
             className="id-compare-pair-row"
-            onClick={() => setSelectedPair(pair)}
+            onClick={() => { trackEvent('drip_compare_pair_selected', { pair_id: pair.id }); setSelectedPair(pair); }}
           >
             <span className="id-compare-pair-row__label">{pair.label}</span>
             <span className="id-compare-pair-row__arrow">→</span>
@@ -546,7 +547,7 @@ function DripsHome({ onSelect, onShowCompare }) {
             <button
               key={cat.key}
               className={`id-filter-btn${category === cat.key ? ' active' : ''}`}
-              onClick={() => setCategory(cat.key)}
+              onClick={() => { if (cat.key !== 'all') trackEvent('drip_category_filter_used', { category: cat.key }); setCategory(cat.key); }}
             >
               {cat.label}
             </button>
@@ -660,12 +661,19 @@ export default function IcuDripsModule({ onGoHome }) {
   const [selected,      setSelected]      = useState(null);
   const [comparePairId, setComparePairId] = useState(null);
 
+  // Track module opened once on mount
+  useEffect(() => {
+    trackEvent('icu_drips_opened');
+  }, []); // eslint-disable-line react-hooks/exhaustive-deps
+
   // Scroll to top on view change
   useEffect(() => {
     window.scrollTo({ top: 0, left: 0, behavior: 'instant' });
   }, [view]);
 
   function handleSelect(drip) {
+    trackEvent('drip_selected', { drip_id: drip.id, family: drip.family ?? '', category: drip.category ?? '' });
+    trackEvent('drip_detail_viewed', { drip_id: drip.id });
     setSelected(drip);
     setView('detail');
   }
@@ -676,11 +684,13 @@ export default function IcuDripsModule({ onGoHome }) {
   }
 
   function handleShowCompare(pairId = null) {
+    trackEvent('drip_compare_opened');
     setComparePairId(pairId);
     setView('compare');
   }
 
   function handleNavigateToDrip(drip) {
+    trackEvent('drip_detail_viewed', { drip_id: drip.id });
     setSelected(drip);
     setView('detail');
   }

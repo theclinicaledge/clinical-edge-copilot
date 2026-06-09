@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { trackEvent } from '../../analytics';
 import './rhythm-lab.css';
 import { RHYTHMS } from './data/rhythms';
 import type { Rhythm } from './data/rhythms';
@@ -49,12 +50,18 @@ export default function RhythmLabModule({ onGoHome }: RhythmLabModuleProps) {
   });
   const [selected, setSelected] = useState<Rhythm | null>(null);
 
+  // Track module opened once on mount
+  useEffect(() => {
+    trackEvent('rhythm_lab_opened');
+  }, []); // eslint-disable-line react-hooks/exhaustive-deps
+
   useEffect(() => {
     window.scrollTo({ top: 0, left: 0, behavior: 'instant' });
   }, [view, selected]);
 
   function handleSelect(rhythm: Rhythm) {
     addRecentRhythm(rhythm.id);
+    trackEvent('rhythm_selected', { rhythm_id: rhythm.id, urgency: rhythm.urgency });
     setSelected(rhythm);
     setView('detail');
   }
@@ -96,10 +103,10 @@ export default function RhythmLabModule({ onGoHome }: RhythmLabModuleProps) {
             <RhythmLabHome
               rhythms={RHYTHMS}
               onSelect={handleSelect}
-              onCompare={() => setView('compare')}
-              onPractice={() => setView('practice')}
-              onSprint={() => setView('sprint')}
-              onConfusables={() => setView('confusables')}
+              onCompare={() => { trackEvent('rhythm_compare_opened'); setView('compare'); }}
+              onPractice={() => { trackEvent('rhythm_practice_opened'); setView('practice'); }}
+              onSprint={() => { trackEvent('rhythm_sprint_opened'); setView('sprint'); }}
+              onConfusables={() => { trackEvent('rhythm_confusables_opened'); setView('confusables'); }}
             />
           )}
         </div>

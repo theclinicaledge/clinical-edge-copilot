@@ -1,4 +1,5 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
+import { trackEvent } from '../../../analytics';
 import { URGENCY_COLORS, URGENCY_CONTEXT } from '../data/rhythms';
 import type { Rhythm } from '../data/rhythms';
 import { RhythmStrip } from './RhythmStrip';
@@ -21,6 +22,11 @@ export function RhythmDetail({ rhythm, onBack }: RhythmDetailProps) {
   const [breakdownOpen, setBreakdownOpen] = useState(false);
   const [bedsideOpen,   setBedsideOpen]   = useState(false);
   const pearl = getPearlForRhythm(rhythm.id);
+
+  // Track once per rhythm viewed
+  useEffect(() => {
+    trackEvent('rhythm_detail_viewed', { rhythm_id: rhythm.id });
+  }, [rhythm.id]);
 
   return (
     <div className="detail-page">

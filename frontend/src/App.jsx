@@ -1,5 +1,5 @@
 import { useState, useRef, useEffect, useCallback } from "react";
-import { track } from "@vercel/analytics";
+import { trackEvent, promptLengthBucket } from "./analytics";
 
 // ─── API Config ───────────────────────────────────────────────────────────────
 
@@ -562,6 +562,11 @@ export default function App({ onGoHome, isOnline = true }) {
   const isActiveRef           = useRef(false);
   const runQueryRef           = useRef(null);
 
+  // Track module open — fires once on mount
+  useEffect(() => {
+    trackEvent('copilot_opened');
+  }, []); // eslint-disable-line react-hooks/exhaustive-deps
+
   // Auto-resize textarea
   useEffect(() => {
     const el = textareaRef.current;
@@ -652,7 +657,10 @@ export default function App({ onGoHome, isOnline = true }) {
   // AbortController lets the visibility handler cancel and restart cleanly.
   const runQuery = async (q, { isFollowUp = false } = {}) => {
     if (!q.trim()) return;
-    if (!isOnline) return;
+    if (!isOnline) {
+      trackEvent('copilot_offline_blocked');
+      return;
+    }
 
     // Cancel any previous in-flight request before starting a new one
     if (abortControllerRef.current) abortControllerRef.current.abort();
@@ -664,7 +672,7 @@ export default function App({ onGoHome, isOnline = true }) {
     setQuestion(q);
     setFollowUp("");
     lastSubmittedRef.current = q;
-    track("query_submitted", { mode });
+    trackEvent('copilot_prompt_submitted', { mode, prompt_length_bucket: promptLengthBucket(q) });
     setLoading(true);
     setStreaming(false);
     setError(null);
@@ -686,7 +694,7 @@ export default function App({ onGoHome, isOnline = true }) {
 
       if (!res.ok) {
         const data = await res.json().catch(() => ({}));
-        track("response_error", { reason: "http_error", status: res.status });
+        trackEvent('copilot_response_error', { reason: 'http_error', status: res.status });
         setError(data.message || (typeof data.error === "string" ? data.error : null) || "Something went wrong. Please try again.");
         setLoading(false);
         isActiveRef.current = false;
@@ -718,7 +726,7 @@ export default function App({ onGoHome, isOnline = true }) {
           try { parsed = JSON.parse(jsonStr); } catch { continue; }
 
           if (parsed.error) {
-            track("response_error", { reason: "api_error" });
+            trackEvent('copilot_response_error', { reason: 'api_error' });
             setError(parsed.message || (typeof parsed.error === "string" ? parsed.error : null) || "Something went wrong. Please try again.");
             setStreaming(false);
             isActiveRef.current = false;
@@ -726,7 +734,7 @@ export default function App({ onGoHome, isOnline = true }) {
           }
 
           if (parsed.done) {
-            track("response_completed", { mode });
+            trackEvent('copilot_response_completed', { mode });
             setStreaming(false);
             setStreamBuffer("");
             setRawText(accumulatedRef.current);
@@ -754,7 +762,7 @@ export default function App({ onGoHome, isOnline = true }) {
         isActiveRef.current = false;
         return;
       }
-      track("response_error", { reason: "network_error" });
+      trackEvent('copilot_response_error', { reason: 'network_error' });
       // Suppress the error when backgrounding caused the failure — the visibility
       // handler will attempt a retry or silently restore idle state.
       if (!wasRecentlyHiddenRef.current) {
@@ -774,7 +782,7 @@ export default function App({ onGoHome, isOnline = true }) {
 
   const handleFollowUp = () => {
     if (!followUp.trim()) return;
-    track("continue_thinking_used", { mode });
+    trackEvent('copilot_continue_thinking', { mode });
     const combined = `Original situation: ${lastSubmittedRef.current}\n\nUpdate: ${followUp.trim()}`;
     runQuery(combined, { isFollowUp: true });
   };
@@ -1226,7 +1234,7 @@ export default function App({ onGoHome, isOnline = true }) {
                 <button
                   key={i}
                   className="chip"
-                  onClick={() => { track("recent_case_clicked"); runQuery(item); }}
+                  onClick={() => { trackEvent('copilot_recent_case_used'); runQuery(item); }}
                   style={{
                     background: "rgba(0,0,0,0.04)",
                     border: "1px solid rgba(0,0,0,0.08)",

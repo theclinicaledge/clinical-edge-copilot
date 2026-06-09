@@ -1,4 +1,5 @@
 import { useState, useEffect, useRef } from 'react';
+import { trackEvent } from '../../../analytics';
 import { RHYTHMS, PRACTICE_CATEGORIES, URGENCY_COLORS } from '../data/rhythms';
 import { RhythmStrip } from './RhythmStrip';
 import {
@@ -147,7 +148,7 @@ export function PracticeMode({ onBack }: PracticeModeProps) {
                 </button>
               )}
               {cluesShown >= 2 && (
-                <button className="practice-reveal-btn" onClick={() => { addRecentRhythm(rhythm.id); setRevealed(true); }}>
+                <button className="practice-reveal-btn" onClick={() => { addRecentRhythm(rhythm.id); trackEvent('rhythm_practice_reveal', { rhythm_id: rhythm.id, clues_shown: cluesShown }); setRevealed(true); }}>
                   Reveal rhythm
                 </button>
               )}

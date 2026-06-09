@@ -1,4 +1,5 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import { trackEvent } from "./analytics";
 
 // ─── CE Logo ──────────────────────────────────────────────────────────────────
 function CELogo() {
@@ -90,7 +91,7 @@ function ModuleEntry({ module, isLast, onNavigate }) {
     <div
       onMouseEnter={() => isActive && setHovered(true)}
       onMouseLeave={() => setHovered(false)}
-      onClick={isActive ? () => onNavigate(module.path) : undefined}
+      onClick={isActive ? () => { trackEvent('module_opened', { module: module.key }); onNavigate(module.path); } : undefined}
       style={{
         paddingTop: s.paddingTop,
         paddingBottom: s.paddingBottom,

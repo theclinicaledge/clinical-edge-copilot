@@ -1,4 +1,5 @@
 import { useState, useCallback } from 'react';
+import { trackEvent } from '../../../analytics';
 import { RHYTHMS } from '../data/rhythms';
 import { RhythmStrip } from './RhythmStrip';
 import { getPearlForRhythm } from '../data/phase1';
@@ -44,7 +45,14 @@ export function TwoQuestionSprint({ onBack }: TwoQuestionSprintProps) {
   const correctReg  = getRhythmRegCategory(rhythm.regularity);
   const bothAnswered = rateAns !== null && regAns !== null;
 
-  const handleReveal = useCallback(() => setRevealed(true), []);
+  const handleReveal = useCallback(() => {
+    trackEvent('rhythm_sprint_reveal', {
+      rhythm_id:        rhythm.id,
+      selected_rate:    rateAns ?? 'none',
+      selected_regular: regAns === 'regular',
+    });
+    setRevealed(true);
+  }, [rhythm.id, rateAns, regAns]);
 
   function next() {
     if (cardIdx + 1 >= SPRINT_LENGTH) {

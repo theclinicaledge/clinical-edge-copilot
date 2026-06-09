@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { trackEvent } from '../../../analytics';
 import { CONFUSABLE_PAIRS } from '../data/compareRhythms';
 import type { ConfusablePair } from '../data/compareRhythms';
 
@@ -100,8 +101,9 @@ export function CompareRhythmsView({ onBack }: CompareRhythmsViewProps) {
   const [breakdownOpen, setBreakdownOpen] = useState(false);
   const pair = CONFUSABLE_PAIRS.find(p => p.id === activeId)!;
 
-  // Reset breakdown collapse when pair changes
+  // Reset breakdown collapse when pair changes; track selection (not initial mount)
   function handlePairChange(id: string) {
+    trackEvent('rhythm_confusable_pair_selected', { pair_id: id });
     setActiveId(id);
     setBreakdownOpen(false);
   }
@@ -152,7 +154,10 @@ export function CompareRhythmsView({ onBack }: CompareRhythmsViewProps) {
       <div className="crv-breakdown-section">
         <button
           className="crv-breakdown-toggle"
-          onClick={() => setBreakdownOpen(v => !v)}
+          onClick={() => {
+            if (!breakdownOpen) trackEvent('rhythm_confusable_breakdown_opened', { pair_id: activeId });
+            setBreakdownOpen(v => !v);
+          }}
           aria-expanded={breakdownOpen}
         >
           <span className="crv-breakdown-toggle__label">

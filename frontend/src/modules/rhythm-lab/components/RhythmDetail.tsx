@@ -106,6 +106,12 @@ export function RhythmDetail({ rhythm, onBack }: RhythmDetailProps) {
             </p>
           </div>
 
+          {/* Recognition Pearl — teaching takeaway, follows First Clue as a pair */}
+          <div className="detail-pearl detail-pearl--inline">
+            <span className="detail-pearl__label">Recognition Pearl</span>
+            <p className="detail-pearl__text">{pearl.text}</p>
+          </div>
+
           <div className="warm-panel">
             <p className="warm-panel__heading">Recognition snapshot</p>
             <div className="recog-cues">
@@ -199,11 +205,6 @@ export function RhythmDetail({ rhythm, onBack }: RhythmDetailProps) {
         <aside className="detail-sidebar">
           <RecognitionSidebar />
         </aside>
-      </div>
-
-      <div className="detail-pearl">
-        <span className="detail-pearl__label">Recognition Pearl</span>
-        <p className="detail-pearl__text">{pearl.text}</p>
       </div>
 
       <div className="disclaimer">

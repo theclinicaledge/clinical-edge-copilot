@@ -3077,9 +3077,17 @@
   color: var(--text-primary);
 }
 
+/* Inline pearl sits inside detail-main — margin handled by gap */
+.detail-pearl--inline {
+  margin: 0;
+}
+
 @media (max-width: 640px) {
   .detail-pearl {
     margin: 0 16px 20px;
+  }
+  .detail-pearl--inline {
+    margin: 0;
   }
   .practice-pearl {
     margin: 12px 16px 0;

@@ -6,6 +6,25 @@ import {
   SAFETY_DISCLAIMER, COMPARE_PAIRS, CLINICAL_PEARLS,
 } from './data/drips.js';
 
+// ─── Urgency config ───────────────────────────────────────────────────────────
+const URGENCY_CONFIG = {
+  watch:     { label: 'Watch',     color: '#F59E0B', bg: 'rgba(245,158,11,0.10)', border: 'rgba(245,158,11,0.28)' },
+  caution:   { label: 'Caution',   color: '#EF4444', bg: 'rgba(239,68,68,0.10)',  border: 'rgba(239,68,68,0.26)'  },
+  reference: { label: 'Reference', color: '#60A5FA', bg: 'rgba(96,165,250,0.09)', border: 'rgba(96,165,250,0.22)' },
+};
+
+// ─── Recently viewed helpers (localStorage, max 5) ────────────────────────────
+function getRecentDripIds() {
+  try { return JSON.parse(localStorage.getItem('ce_id_recent') || '[]'); }
+  catch { return []; }
+}
+function addRecentDripId(id) {
+  try {
+    const updated = [id, ...getRecentDripIds().filter(x => x !== id)].slice(0, 5);
+    localStorage.setItem('ce_id_recent', JSON.stringify(updated));
+  } catch { /* fail silently */ }
+}
+
 // ─── CE Logo ──────────────────────────────────────────────────────────────────
 function CELogo() {
   return (
@@ -194,6 +213,41 @@ function RefRow({ iconType, label, variant, count, isOpen, onToggle, children })
   );
 }
 
+// ─── Hemodynamic Effect card ──────────────────────────────────────────────────
+const DIRECTION_DISPLAY = {
+  up:          { symbol: '↑',        cls: 'id-hemo-val--up'       },
+  up_strong:   { symbol: '↑↑',       cls: 'id-hemo-val--up'       },
+  down:        { symbol: '↓',        cls: 'id-hemo-val--down'     },
+  down_strong: { symbol: '↓↓',       cls: 'id-hemo-val--down'     },
+  neutral:     { symbol: '↔',        cls: 'id-hemo-val--neutral'  },
+  variable:    { symbol: 'variable', cls: 'id-hemo-val--variable' },
+};
+
+function HemodynamicCard({ hemodynamics }) {
+  if (!hemodynamics) return null;
+  const { rows, note } = hemodynamics;
+  return (
+    <div className="id-hemo-card">
+      <div className="id-hemo-card__header">
+        <span className="id-hemo-card__eyebrow">Hemodynamic Effect</span>
+        <span className="id-hemo-card__sub">Typical direction · not a protocol target</span>
+      </div>
+      <div className="id-hemo-grid">
+        {rows.map(row => {
+          const disp = DIRECTION_DISPLAY[row.direction] ?? DIRECTION_DISPLAY.neutral;
+          return (
+            <div key={row.key} className="id-hemo-cell">
+              <span className="id-hemo-cell__key">{row.label}</span>
+              <span className={`id-hemo-cell__val ${disp.cls}`}>{disp.symbol}</span>
+            </div>
+          );
+        })}
+      </div>
+      {note && <p className="id-hemo-card__note">{note}</p>}
+    </div>
+  );
+}
+
 // ─── Default accordion state ──────────────────────────────────────────────────
 const DEFAULT_OPEN = {
   commonlyUsedFor:   true,
@@ -209,8 +263,11 @@ const DEFAULT_OPEN = {
 function DripsDetail({ drip, onBack, onNavigate }) {
   const [open, setOpen] = useState(DEFAULT_OPEN);
 
-  // Reset accordion when drip changes
-  useEffect(() => { setOpen(DEFAULT_OPEN); }, [drip.id]);
+  // Reset accordion + record view when drip changes
+  useEffect(() => {
+    setOpen(DEFAULT_OPEN);
+    addRecentDripId(drip.id);
+  }, [drip.id]);
 
   function toggle(key) {
     setOpen(prev => ({ ...prev, [key]: !prev[key] }));
@@ -230,6 +287,17 @@ function DripsDetail({ drip, onBack, onNavigate }) {
       <div className={`id-hero-card id-hero-card--${drip.category}`}>
         <div className="id-hero-card__top">
           <span className="id-hero-card__category">{drip.categoryLabel}</span>
+          {drip.urgency && (() => {
+            const u = URGENCY_CONFIG[drip.urgency];
+            return (
+              <span
+                className="id-urgency-tag"
+                style={{ color: u.color, background: u.bg, borderColor: u.border }}
+              >
+                {u.label}
+              </span>
+            );
+          })()}
           {drip.badge && (
             <span className="id-hero-card__badge">{drip.badge}</span>
           )}
@@ -243,6 +311,25 @@ function DripsDetail({ drip, onBack, onNavigate }) {
           ))}
         </div>
       </div>
+
+      {/* Lead Finding — single most important bedside observation */}
+      {drip.leadFinding && (
+        <div className="id-lead-finding">
+          <span className="id-lead-finding__label">Lead Finding</span>
+          <p className="id-lead-finding__text">{drip.leadFinding}</p>
+        </div>
+      )}
+
+      {/* Per-drip Clinical Pearl */}
+      {drip.pearl && (
+        <div className="id-drip-pearl">
+          <span className="id-drip-pearl__label">Clinical Pearl</span>
+          <p className="id-drip-pearl__text">{drip.pearl}</p>
+        </div>
+      )}
+
+      {/* Hemodynamic Effect card */}
+      <HemodynamicCard hemodynamics={drip.hemodynamics} />
 
       {/* Clinical pearl / nurse mental model */}
       <div className="id-pearl">
@@ -473,6 +560,12 @@ function DripsHome({ onSelect, onShowCompare }) {
   const [query,    setQuery]    = useState('');
   const [category, setCategory] = useState('all');
 
+  // Load recently viewed from localStorage on mount (DripsHome remounts on each back-nav)
+  const recentIds = getRecentDripIds();
+  const recentDrips = recentIds
+    .map(id => DRIPS.find(d => d.id === id))
+    .filter(Boolean);
+
   const q             = norm(query);
   const isFiltering   = q || category !== 'all';
 
@@ -529,6 +622,24 @@ function DripsHome({ onSelect, onShowCompare }) {
           common critical care infusions. Educational reference, not a dosing guide.
         </p>
       </div>
+
+      {/* Recently viewed chips */}
+      {recentDrips.length > 0 && (
+        <div className="id-recent-drips">
+          <span className="id-recent-drips__label">Recently viewed</span>
+          <div className="id-recent-drips__chips">
+            {recentDrips.map(drip => (
+              <button
+                key={drip.id}
+                className="id-recent-chip"
+                onClick={() => onSelect(drip)}
+              >
+                {drip.name}
+              </button>
+            ))}
+          </div>
+        </div>
+      )}
 
       {/* Search + filter */}
       <div className="id-search-bar">

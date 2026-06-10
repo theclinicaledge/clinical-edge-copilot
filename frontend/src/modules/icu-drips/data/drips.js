@@ -87,6 +87,18 @@ export const DRIPS = [
     family: "Pressors & Vasoactives",
     badge: "Common ICU pressor",
     related: ["vasopressin", "epinephrine"],
+    urgency: "watch",
+    leadFinding: "MAP is the target number, but peripheral perfusion — skin, urine, and mentation — tells the fuller clinical story.",
+    pearl: "MAP up does not always mean the patient is better. Skin, urine, and mentation tell the rest of the story.",
+    hemodynamics: {
+      rows: [
+        { key: 'MAP', label: 'MAP', direction: 'up_strong' },
+        { key: 'SVR', label: 'SVR', direction: 'up_strong' },
+        { key: 'CO',  label: 'CO',  direction: 'variable'  },
+        { key: 'CI',  label: 'CI',  direction: 'variable'  },
+        { key: 'HR',  label: 'HR',  direction: 'neutral'   },
+      ],
+    },
 
     snapshot:
       "The first-line pressor. Squeezes the vessels to bring MAP up, with a small assist to the heart's squeeze. Less tachycardia than most options.",
@@ -163,6 +175,18 @@ export const DRIPS = [
     family: "Pressors & Vasoactives",
     badge: "Non-catecholamine pressor",
     related: ["norepinephrine", "phenylephrine"],
+    urgency: "watch",
+    leadFinding: "Potent vessel squeeze through a non-catecholamine pathway — skin color, warmth, and urine output signal how peripheral perfusion is holding.",
+    pearl: "This one does not behave like norepinephrine. Rate adjustment patterns differ, and sodium and urine output trends tell you things the MAP does not.",
+    hemodynamics: {
+      rows: [
+        { key: 'MAP', label: 'MAP', direction: 'up_strong' },
+        { key: 'SVR', label: 'SVR', direction: 'up_strong' },
+        { key: 'CO',  label: 'CO',  direction: 'variable'  },
+        { key: 'CI',  label: 'CI',  direction: 'variable'  },
+        { key: 'HR',  label: 'HR',  direction: 'neutral'   },
+      ],
+    },
 
     snapshot:
       "A different kind of pressor. Works through its own receptor pathway, not the catecholamine route. Usually added alongside another pressor rather than replacing it.",
@@ -240,6 +264,19 @@ export const DRIPS = [
     family: "Pressors & Vasoactives",
     badge: "Pure alpha agonist",
     related: ["norepinephrine", "vasopressin"],
+    urgency: "watch",
+    leadFinding: "Pure vessel squeeze with no direct cardiac effect — reflex bradycardia alongside the rising BP is expected and worth tracking throughout.",
+    pearl: "Heart rate and blood pressure move in opposite directions here. That is the expected pattern on this drug, not a reason for alarm.",
+    hemodynamics: {
+      rows: [
+        { key: 'MAP', label: 'MAP', direction: 'up_strong' },
+        { key: 'SVR', label: 'SVR', direction: 'up_strong' },
+        { key: 'CO',  label: 'CO',  direction: 'variable'  },
+        { key: 'CI',  label: 'CI',  direction: 'variable'  },
+        { key: 'HR',  label: 'HR',  direction: 'down'      },
+      ],
+      note: 'Reflex bradycardia is the expected HR response. CO can fall if increased afterload is not offset.',
+    },
 
     snapshot:
       "Squeezes the vessels without touching the heart directly. The go-to when the pressure is low and the heart rate is already fast.",
@@ -317,6 +354,18 @@ export const DRIPS = [
     family: "Pressors & Vasoactives",
     badge: "ACLS agent",
     related: ["norepinephrine", "dobutamine"],
+    urgency: "watch",
+    leadFinding: "Everything moves at once — heart rate, squeeze, and vascular tone — and rhythm can deteriorate quickly.",
+    pearl: "Watch the rhythm continuously. Arrhythmia is the most common reason this drug demands immediate attention from the team.",
+    hemodynamics: {
+      rows: [
+        { key: 'MAP', label: 'MAP', direction: 'up_strong' },
+        { key: 'SVR', label: 'SVR', direction: 'variable'  },
+        { key: 'CO',  label: 'CO',  direction: 'up_strong' },
+        { key: 'CI',  label: 'CI',  direction: 'up_strong' },
+        { key: 'HR',  label: 'HR',  direction: 'up_strong' },
+      ],
+    },
 
     snapshot:
       "The full-force agent. Rate, squeeze, and vascular tone — all at once. That scope is what makes it essential in arrest and what demands continuous monitoring when it is running as a drip.",
@@ -401,6 +450,18 @@ export const DRIPS = [
     family: "Inotropes",
     badge: "Cardiac output support",
     related: ["milrinone", "norepinephrine"],
+    urgency: "watch",
+    leadFinding: "Blood pressure may fall while cardiac output improves — these are separate signals, and a dropping BP here is not always bad news.",
+    pearl: "Falling blood pressure on dobutamine does not always mean the patient is worse. Output and pressure are different things — context matters.",
+    hemodynamics: {
+      rows: [
+        { key: 'MAP', label: 'MAP', direction: 'variable'  },
+        { key: 'SVR', label: 'SVR', direction: 'down'      },
+        { key: 'CO',  label: 'CO',  direction: 'up_strong' },
+        { key: 'CI',  label: 'CI',  direction: 'up_strong' },
+        { key: 'HR',  label: 'HR',  direction: 'up'        },
+      ],
+    },
 
     snapshot:
       "The pump booster. Helps a weakened heart push more blood out, but it can soften the blood pressure while it does.",
@@ -478,6 +539,18 @@ export const DRIPS = [
     family: "Inotropes",
     badge: "PDE-3 inhibitor",
     related: ["dobutamine", "norepinephrine"],
+    urgency: "watch",
+    leadFinding: "Vessel relaxation alongside inotropic support can drop blood pressure significantly, and effects take time to settle after any rate change.",
+    pearl: "There is a time lag with milrinone. After any rate change, give it time before reassessing — chasing numbers too soon leads to overcorrection.",
+    hemodynamics: {
+      rows: [
+        { key: 'MAP', label: 'MAP', direction: 'down'       },
+        { key: 'SVR', label: 'SVR', direction: 'down_strong' },
+        { key: 'CO',  label: 'CO',  direction: 'up'         },
+        { key: 'CI',  label: 'CI',  direction: 'up'         },
+        { key: 'HR',  label: 'HR',  direction: 'neutral'    },
+      ],
+    },
 
     snapshot:
       "Stronger squeeze, looser vessels. The pressure can drop while the pump gets better. And its effects linger well after any rate change.",
@@ -559,6 +632,19 @@ export const DRIPS = [
     family: "Sedation & Analgesia",
     badge: "Sedation, not analgesia",
     related: ["dexmedetomidine", "midazolam"],
+    urgency: "caution",
+    leadFinding: "No analgesic effect — a deeply sedated patient can still be in significant pain, and pain assessment runs separately from sedation scoring.",
+    pearl: "Sedated does not mean comfortable. Pain assessment and sedation scoring are separate responsibilities running in parallel.",
+    hemodynamics: {
+      rows: [
+        { key: 'MAP', label: 'MAP', direction: 'down'     },
+        { key: 'SVR', label: 'SVR', direction: 'down'     },
+        { key: 'CO',  label: 'CO',  direction: 'variable' },
+        { key: 'CI',  label: 'CI',  direction: 'variable' },
+        { key: 'HR',  label: 'HR',  direction: 'neutral'  },
+      ],
+      note: 'Hypotension is most common in hypovolemic or hemodynamically fragile patients.',
+    },
 
     snapshot:
       "The on/off sedative. Works fast, clears fast. Does nothing for pain — analgesia needs its own plan alongside it.",
@@ -638,6 +724,19 @@ export const DRIPS = [
     family: "Sedation & Analgesia",
     badge: "Arousable sedation",
     related: ["propofol", "midazolam"],
+    urgency: "reference",
+    leadFinding: "Arousable and cooperative is the intended state on this drug — bradycardia is the main hemodynamic watch throughout the infusion.",
+    pearl: "A patient who wakes up and follows commands is not under-sedated. That is the design. Bradycardia is the bedside concern to watch for.",
+    hemodynamics: {
+      rows: [
+        { key: 'MAP', label: 'MAP', direction: 'variable' },
+        { key: 'SVR', label: 'SVR', direction: 'variable' },
+        { key: 'CO',  label: 'CO',  direction: 'variable' },
+        { key: 'CI',  label: 'CI',  direction: 'variable' },
+        { key: 'HR',  label: 'HR',  direction: 'down'     },
+      ],
+      note: 'Bradycardia is the most consistent effect. MAP can go either direction depending on the clinical context.',
+    },
 
     snapshot:
       "The shoulder-tap sedative. Calm but usually still rousable and cooperative. Breathing mostly stays intact. Bradycardia is the constant bedside watch.",
@@ -716,6 +815,18 @@ export const DRIPS = [
     family: "Sedation & Analgesia",
     badge: "Benzodiazepine",
     related: ["propofol", "dexmedetomidine"],
+    urgency: "caution",
+    leadFinding: "This drug accumulates on prolonged infusions — wake-up times run longer than expected, especially when organ clearance is impaired.",
+    pearl: "Extended wake-up times are common and expected, not a one-time anomaly. The drug builds up quietly over time.",
+    hemodynamics: {
+      rows: [
+        { key: 'MAP', label: 'MAP', direction: 'down'     },
+        { key: 'SVR', label: 'SVR', direction: 'down'     },
+        { key: 'CO',  label: 'CO',  direction: 'variable' },
+        { key: 'CI',  label: 'CI',  direction: 'variable' },
+        { key: 'HR',  label: 'HR',  direction: 'neutral'  },
+      ],
+    },
 
     snapshot:
       "Sedates and calms, but stacks up quietly on long infusions. Wake-up time runs longer than expected, especially when the liver or kidneys are not clearing it well.",
@@ -793,6 +904,19 @@ export const DRIPS = [
     family: "Sedation & Analgesia",
     badge: "Opioid analgesic",
     related: ["midazolam", "ketamine"],
+    urgency: "reference",
+    leadFinding: "Respiratory rate is the leading safety signal — rate and effort often change before oxygen saturation registers a drop.",
+    pearl: "Pain and sedation are different things. A patient can be deeply sedated and still in significant pain if no dedicated analgesic is running.",
+    hemodynamics: {
+      rows: [
+        { key: 'MAP', label: 'MAP', direction: 'neutral' },
+        { key: 'SVR', label: 'SVR', direction: 'neutral' },
+        { key: 'CO',  label: 'CO',  direction: 'neutral' },
+        { key: 'CI',  label: 'CI',  direction: 'neutral' },
+        { key: 'HR',  label: 'HR',  direction: 'neutral' },
+      ],
+      note: 'Hemodynamically gentle at typical infusion parameters.',
+    },
 
     snapshot:
       "The pain reliever, not the sedative. Fast onset, relatively gentle on blood pressure. Respiratory monitoring is the constant bedside responsibility.",
@@ -868,6 +992,19 @@ export const DRIPS = [
     family: "Sedation & Analgesia",
     badge: "Dissociative agent",
     related: ["fentanyl", "midazolam"],
+    urgency: "reference",
+    leadFinding: "Blood pressure typically holds or rises on this drug — the emergence phase with confusion or agitation on waking is real and needs anticipation.",
+    pearl: "The hemodynamic stability is the advantage. The emergence reaction is the bedside responsibility — prepare for it, do not be surprised by it.",
+    hemodynamics: {
+      rows: [
+        { key: 'MAP', label: 'MAP', direction: 'up'      },
+        { key: 'SVR', label: 'SVR', direction: 'variable' },
+        { key: 'CO',  label: 'CO',  direction: 'up'       },
+        { key: 'CI',  label: 'CI',  direction: 'up'       },
+        { key: 'HR',  label: 'HR',  direction: 'up'       },
+      ],
+      note: 'Sympathomimetic effect typically supports BP and HR. Paradoxical depression can occur in catecholamine-depleted states.',
+    },
 
     snapshot:
       "The pressure-friendly sedative. Blood pressure tends to hold or climb rather than drop. But recovery can be vivid and disorienting — emergence is part of the monitoring plan.",
@@ -946,6 +1083,19 @@ export const DRIPS = [
     family: "Rhythm & Rate",
     badge: "Rhythm + rate support",
     related: ["diltiazem", "esmolol"],
+    urgency: "watch",
+    leadFinding: "Drug effects and interactions persist for weeks after the drip ends — every medication decision made afterward is still influenced by this drug.",
+    pearl: "A better-looking rhythm does not always mean better perfusion. And amiodarone stays in the picture long after the bag is gone.",
+    hemodynamics: {
+      rows: [
+        { key: 'MAP', label: 'MAP', direction: 'down'     },
+        { key: 'SVR', label: 'SVR', direction: 'down'     },
+        { key: 'CO',  label: 'CO',  direction: 'variable' },
+        { key: 'CI',  label: 'CI',  direction: 'variable' },
+        { key: 'HR',  label: 'HR',  direction: 'down'     },
+      ],
+      note: 'Hypotension is most common during IV loading. Hemodynamic effect depends heavily on baseline rhythm and volume status.',
+    },
 
     snapshot:
       "The rhythm stabilizer with the longest memory. Works on multiple channels at once, and its effects and interactions stay active for weeks after the drip ends.",
@@ -1027,6 +1177,19 @@ export const DRIPS = [
     family: "Rhythm & Rate",
     badge: "Rate control",
     related: ["amiodarone", "esmolol"],
+    urgency: "watch",
+    leadFinding: "Rate control here does not restore sinus rhythm — rate and rhythm are different things — and blood pressure can drop quickly.",
+    pearl: "Rate control and rhythm control are not the same. The monitor may look calmer while the underlying problem is still there.",
+    hemodynamics: {
+      rows: [
+        { key: 'MAP', label: 'MAP', direction: 'down'     },
+        { key: 'SVR', label: 'SVR', direction: 'down'     },
+        { key: 'CO',  label: 'CO',  direction: 'variable' },
+        { key: 'CI',  label: 'CI',  direction: 'variable' },
+        { key: 'HR',  label: 'HR',  direction: 'down'     },
+      ],
+      note: 'CO can fall if negative inotropy is significant. Effect depends on baseline cardiac function.',
+    },
 
     snapshot:
       "The rate brake for AFib and flutter. Slows how fast the ventricles respond, not the underlying rhythm. Rate control and rhythm control are different things.",
@@ -1102,6 +1265,18 @@ export const DRIPS = [
     family: "Rhythm & Rate",
     badge: "Ultra-short beta-blocker",
     related: ["diltiazem", "amiodarone"],
+    urgency: "watch",
+    leadFinding: "Fast on, fast off — hemodynamics can shift quickly in either direction, and every rate change deserves close watching.",
+    pearl: "The rapid offset is the defining feature. Effects clear in minutes after stopping — that is both the advantage and the reason close monitoring matters.",
+    hemodynamics: {
+      rows: [
+        { key: 'MAP', label: 'MAP', direction: 'down'       },
+        { key: 'SVR', label: 'SVR', direction: 'neutral'    },
+        { key: 'CO',  label: 'CO',  direction: 'down'       },
+        { key: 'CI',  label: 'CI',  direction: 'down'       },
+        { key: 'HR',  label: 'HR',  direction: 'down_strong' },
+      ],
+    },
 
     snapshot:
       "The fast-on, fast-off beta-blocker. Rate and pressure respond quickly, and they recover just as fast when the drip stops. Every change deserves close hemodynamic watching.",
@@ -1181,6 +1356,19 @@ export const DRIPS = [
     family: "Vasodilators",
     badge: "Calcium channel vasodilator",
     related: ["nitroprusside", "nitroglycerin"],
+    urgency: "watch",
+    leadFinding: "Effect takes several minutes to fully stabilize after a rate change — reassessing too soon leads to unnecessary overcorrection.",
+    pearl: "Wait before adjusting again. The full effect of a rate change takes several minutes to land — patience prevents overshoot.",
+    hemodynamics: {
+      rows: [
+        { key: 'MAP', label: 'MAP', direction: 'down_strong' },
+        { key: 'SVR', label: 'SVR', direction: 'down_strong' },
+        { key: 'CO',  label: 'CO',  direction: 'neutral'     },
+        { key: 'CI',  label: 'CI',  direction: 'neutral'     },
+        { key: 'HR',  label: 'HR',  direction: 'up'          },
+      ],
+      note: 'Reflex tachycardia may accompany BP reduction. CO is generally preserved.',
+    },
 
     snapshot:
       "The arterial pressure controller. Relaxes vessel walls to bring BP down. Response takes a few minutes to settle after any rate change — worth keeping in mind when reassessing.",
@@ -1257,6 +1445,19 @@ export const DRIPS = [
     family: "Vasodilators",
     badge: "Potent vasodilator",
     related: ["nitroglycerin", "nicardipine"],
+    urgency: "watch",
+    leadFinding: "Pressure changes can be abrupt and dramatic — and cyanide accumulation on prolonged infusions is a serious safety concern the whole team needs to know about.",
+    pearl: "Potent, fast, and carries a toxicity risk that builds with time. Cyanide toxicity requires team awareness — not just nurse awareness.",
+    hemodynamics: {
+      rows: [
+        { key: 'MAP', label: 'MAP', direction: 'down_strong' },
+        { key: 'SVR', label: 'SVR', direction: 'down_strong' },
+        { key: 'CO',  label: 'CO',  direction: 'variable'    },
+        { key: 'CI',  label: 'CI',  direction: 'variable'    },
+        { key: 'HR',  label: 'HR',  direction: 'up'          },
+      ],
+      note: 'CO can improve through afterload reduction in patients with elevated SVR. Response is rapid and can be dramatic.',
+    },
 
     snapshot:
       "One of the most powerful BP-lowering drips in the ICU. Fast in, fast out. On long infusions, cyanide buildup is a serious safety concern the whole team needs to know about.",
@@ -1335,6 +1536,19 @@ export const DRIPS = [
     family: "Vasodilators",
     badge: "Nitrate vasodilator",
     related: ["nitroprusside", "nicardipine"],
+    urgency: "watch",
+    leadFinding: "Headache is almost universal and expected — blood pressure drop, especially with volume depletion, is the real hemodynamic watch.",
+    pearl: "The headache is nearly a certainty. The blood pressure drop is the real concern. And the phosphodiesterase inhibitor interaction can be severe.",
+    hemodynamics: {
+      rows: [
+        { key: 'MAP', label: 'MAP', direction: 'down'     },
+        { key: 'SVR', label: 'SVR', direction: 'down'     },
+        { key: 'CO',  label: 'CO',  direction: 'variable' },
+        { key: 'CI',  label: 'CI',  direction: 'variable' },
+        { key: 'HR',  label: 'HR',  direction: 'up'       },
+      ],
+      note: 'Predominantly venodilatory at lower parameters; arterial vasodilation becomes more significant at higher parameters.',
+    },
 
     snapshot:
       "The preload reliever. Mainly relaxes the veins to reduce the blood returning to the heart. Headache is common and expected. Blood pressure drop is the real watch.",
@@ -1415,6 +1629,19 @@ export const DRIPS = [
     family: "Diuretics",
     badge: "Loop diuretic",
     related: ["bumetanide"],
+    urgency: "reference",
+    leadFinding: "Output is only half the picture — potassium and magnesium going out in the urine matter just as much as the volume coming off.",
+    pearl: "Watch the electrolytes alongside the output. The volume removal is the goal; the potassium and magnesium depletion is the cost.",
+    hemodynamics: {
+      rows: [
+        { key: 'MAP', label: 'MAP', direction: 'variable' },
+        { key: 'SVR', label: 'SVR', direction: 'neutral'  },
+        { key: 'CO',  label: 'CO',  direction: 'variable' },
+        { key: 'CI',  label: 'CI',  direction: 'variable' },
+        { key: 'HR',  label: 'HR',  direction: 'variable' },
+      ],
+      note: 'Indirect hemodynamic effects through volume changes. No direct cardiac or vascular action.',
+    },
 
     snapshot:
       "The volume-puller. Signals the kidneys to let go of sodium and water. Output is only half the picture — the potassium and magnesium going with it matter just as much.",
@@ -1491,6 +1718,19 @@ export const DRIPS = [
     family: "Diuretics",
     badge: "Potent loop diuretic",
     related: ["furosemide"],
+    urgency: "reference",
+    leadFinding: "Electrolyte depletion follows the volume — potassium and magnesium monitoring runs alongside urine output tracking.",
+    pearl: "Same monitoring priorities as furosemide. Output, electrolytes, volume status, and kidney function are watched as a set, not individually.",
+    hemodynamics: {
+      rows: [
+        { key: 'MAP', label: 'MAP', direction: 'variable' },
+        { key: 'SVR', label: 'SVR', direction: 'neutral'  },
+        { key: 'CO',  label: 'CO',  direction: 'variable' },
+        { key: 'CI',  label: 'CI',  direction: 'variable' },
+        { key: 'HR',  label: 'HR',  direction: 'variable' },
+      ],
+      note: 'Indirect hemodynamic effects through volume changes. No direct cardiac or vascular action.',
+    },
 
     snapshot:
       "Same job as furosemide, different potency per milligram. The monitoring priorities are identical: output, electrolytes, volume status, and kidney function — all watched together.",
@@ -1571,6 +1811,19 @@ export const DRIPS = [
     family: "Anticoagulation",
     badge: "High-alert medication",
     related: ["argatroban", "bivalirudin"],
+    urgency: "caution",
+    leadFinding: "Lab values are the window into where the patient sits — aPTT or anti-Xa tells you whether the drug is therapeutic, subtherapeutic, or accumulating.",
+    pearl: "Heparin does two things: prevents clots from growing, and occasionally causes new ones through HIT. Both need to stay on the radar.",
+    hemodynamics: {
+      rows: [
+        { key: 'MAP', label: 'MAP', direction: 'neutral' },
+        { key: 'SVR', label: 'SVR', direction: 'neutral' },
+        { key: 'CO',  label: 'CO',  direction: 'neutral' },
+        { key: 'CI',  label: 'CI',  direction: 'neutral' },
+        { key: 'HR',  label: 'HR',  direction: 'neutral' },
+      ],
+      note: 'No primary direct hemodynamic effect.',
+    },
 
     snapshot:
       "The steering-wheel anticoagulant. Keeps clots from growing, not from dissolving. The lab value is the window into where the patient sits on the anticoagulation spectrum.",
@@ -1651,6 +1904,19 @@ export const DRIPS = [
     family: "Anticoagulation",
     badge: "Direct thrombin inhibitor",
     related: ["bivalirudin", "heparin"],
+    urgency: "caution",
+    leadFinding: "No reversal agent is available — stopping the infusion is the first management step when bleeding becomes a clinical concern.",
+    pearl: "When bleeding happens, the only tool is stopping the drug. Early recognition of bleeding signs is the most important bedside responsibility.",
+    hemodynamics: {
+      rows: [
+        { key: 'MAP', label: 'MAP', direction: 'neutral' },
+        { key: 'SVR', label: 'SVR', direction: 'neutral' },
+        { key: 'CO',  label: 'CO',  direction: 'neutral' },
+        { key: 'CI',  label: 'CI',  direction: 'neutral' },
+        { key: 'HR',  label: 'HR',  direction: 'neutral' },
+      ],
+      note: 'No primary direct hemodynamic effect.',
+    },
 
     snapshot:
       "The HIT alternative. When heparin has to stop, argatroban takes over. The liver handles most of the clearance, so hepatic function shapes how the drug behaves and how the lab values read.",
@@ -1728,6 +1994,19 @@ export const DRIPS = [
     family: "Anticoagulation",
     badge: "Direct thrombin inhibitor",
     related: ["argatroban", "heparin"],
+    urgency: "caution",
+    leadFinding: "Renal function shapes how this drug clears — when kidney function shifts, so do the drug's behavior and the coagulation values.",
+    pearl: "Kidney trends and coagulation monitoring go together here. A creatinine change is a reason to reconsider what the lab values mean.",
+    hemodynamics: {
+      rows: [
+        { key: 'MAP', label: 'MAP', direction: 'neutral' },
+        { key: 'SVR', label: 'SVR', direction: 'neutral' },
+        { key: 'CO',  label: 'CO',  direction: 'neutral' },
+        { key: 'CI',  label: 'CI',  direction: 'neutral' },
+        { key: 'HR',  label: 'HR',  direction: 'neutral' },
+      ],
+      note: 'No primary direct hemodynamic effect.',
+    },
 
     snapshot:
       "Another HIT-safe anticoagulant. Clears through the kidneys and through the bloodstream itself. When kidney function changes, so can the drug's behavior and the lab values.",
@@ -1807,6 +2086,19 @@ export const DRIPS = [
     family: "Glycemic",
     badge: "High-alert medication",
     related: ["heparin"],
+    urgency: "caution",
+    leadFinding: "Glucose and potassium move together — the potassium trend matters just as much as the glucose target.",
+    pearl: "Two trends, one drug. Missing the potassium while focused on glucose is where safety gaps appear on insulin infusions.",
+    hemodynamics: {
+      rows: [
+        { key: 'MAP', label: 'MAP', direction: 'neutral' },
+        { key: 'SVR', label: 'SVR', direction: 'neutral' },
+        { key: 'CO',  label: 'CO',  direction: 'neutral' },
+        { key: 'CI',  label: 'CI',  direction: 'neutral' },
+        { key: 'HR',  label: 'HR',  direction: 'neutral' },
+      ],
+      note: 'No primary direct hemodynamic effect.',
+    },
 
     snapshot:
       "The glucose drip with a potassium shadow. Watch both numbers, not one. The same mechanism that lowers glucose also pulls potassium into cells.",

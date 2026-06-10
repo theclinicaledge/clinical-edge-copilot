@@ -1135,3 +1135,204 @@
   font-style: italic;
   letter-spacing: -0.008em;
 }
+
+/* ── Hemodynamic Effect card ─────────────────────────────────────────────────── */
+.id-hemo-card {
+  background: var(--id-bg-card);
+  border: 1px solid var(--id-border-card);
+  border-radius: 9px;
+  padding: 13px 15px 11px;
+  margin-bottom: 10px;
+}
+.id-hemo-card__header {
+  display: flex;
+  align-items: baseline;
+  gap: 10px;
+  margin-bottom: 11px;
+  flex-wrap: wrap;
+}
+.id-hemo-card__eyebrow {
+  font-size: 8.5px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 1.5px;
+  color: var(--id-text-mid);
+  font-family: var(--id-font-mono);
+  flex-shrink: 0;
+}
+.id-hemo-card__sub {
+  font-size: 9px;
+  color: var(--id-text-dim);
+  font-family: var(--id-font-mono);
+  letter-spacing: 0.01em;
+}
+/* 5-column grid — equal width cells, separator lines between */
+.id-hemo-grid {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  border: 1px solid var(--id-border-warm);
+  border-radius: 6px;
+  overflow: hidden;
+}
+.id-hemo-cell {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 8px 4px;
+  gap: 5px;
+  border-right: 1px solid var(--id-border-warm);
+}
+.id-hemo-cell:last-child { border-right: none; }
+.id-hemo-cell__key {
+  font-size: 8px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  color: var(--id-text-dim);
+  font-family: var(--id-font-mono);
+  line-height: 1;
+}
+.id-hemo-cell__val {
+  font-size: 14px;
+  font-weight: 700;
+  line-height: 1;
+  font-family: var(--id-font-sans);
+  letter-spacing: -0.01em;
+}
+/* Direction color classes */
+.id-hemo-val--up       { color: #0ABFBC; }
+.id-hemo-val--down     { color: #C09030; }
+.id-hemo-val--neutral  { color: #8096A0; }
+.id-hemo-val--variable {
+  font-size: 8.5px;
+  font-family: var(--id-font-mono);
+  font-style: italic;
+  font-weight: 500;
+  color: #8B7EC0;
+  letter-spacing: 0.01em;
+}
+/* Optional note below grid */
+.id-hemo-card__note {
+  margin: 9px 0 0;
+  font-size: 10.5px;
+  color: var(--id-text-muted);
+  font-family: var(--id-font-mono);
+  line-height: 1.6;
+  letter-spacing: 0.005em;
+}
+
+/* ── Urgency badge (detail page hero header) ─────────────────────────────────── */
+.id-urgency-tag {
+  display: inline-flex;
+  align-items: center;
+  font-size: 9px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 1.2px;
+  font-family: var(--id-font-mono);
+  border: 1px solid;
+  border-radius: 20px;
+  padding: 2px 9px;
+  line-height: 1.6;
+  flex-shrink: 0;
+}
+
+/* ── Lead Finding callout (detail page, below hero card) ─────────────────────── */
+.id-lead-finding {
+  background: rgba(10,191,188,0.07);
+  border: 1px solid rgba(10,191,188,0.18);
+  border-left: 3px solid var(--id-teal);
+  border-radius: 8px;
+  padding: 12px 15px;
+  margin-bottom: 10px;
+}
+.id-lead-finding__label {
+  display: block;
+  font-size: 8px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 1.5px;
+  color: #0A8F8D;
+  font-family: var(--id-font-mono);
+  margin-bottom: 5px;
+}
+.id-lead-finding__text {
+  font-size: 13.5px;
+  color: #0B2E2E;
+  line-height: 1.68;
+  margin: 0;
+  font-weight: 500;
+}
+
+/* ── Per-drip Clinical Pearl (detail page, below Lead Finding) ───────────────── */
+.id-drip-pearl {
+  background: #F5F0FF;
+  border: 1px solid rgba(139,92,246,0.18);
+  border-left: 3px solid #8B5CF6;
+  border-radius: 8px;
+  padding: 12px 15px;
+  margin-bottom: 10px;
+}
+.id-drip-pearl__label {
+  display: block;
+  font-size: 8px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 1.5px;
+  color: #5B3BAA;
+  font-family: var(--id-font-mono);
+  margin-bottom: 5px;
+}
+.id-drip-pearl__text {
+  font-size: 13.5px;
+  color: #2D1A5C;
+  line-height: 1.70;
+  margin: 0;
+  font-style: italic;
+}
+
+/* ── Recently viewed chips (home page, below hero) ───────────────────────────── */
+.id-recent-drips {
+  display: flex;
+  align-items: baseline;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-bottom: 20px;
+  padding-bottom: 16px;
+  border-bottom: 1px solid var(--id-border-warm);
+}
+.id-recent-drips__label {
+  font-size: 9px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 1.4px;
+  color: var(--id-text-dim);
+  font-family: var(--id-font-mono);
+  flex-shrink: 0;
+  margin-right: 2px;
+}
+.id-recent-drips__chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+.id-recent-chip {
+  font-size: 11.5px;
+  font-weight: 500;
+  font-family: var(--id-font-sans);
+  color: var(--id-text-mid);
+  background: var(--id-bg-card);
+  border: 1px solid var(--id-border-card);
+  border-radius: 20px;
+  padding: 4px 12px;
+  cursor: pointer;
+  transition: background 0.12s, color 0.12s, border-color 0.12s;
+  letter-spacing: -0.01em;
+  line-height: 1.4;
+  white-space: nowrap;
+}
+.id-recent-chip:hover {
+  background: var(--id-teal);
+  color: #fff;
+  border-color: var(--id-teal);
+}

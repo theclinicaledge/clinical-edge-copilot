@@ -1,4 +1,4 @@
-@import url('https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:ital,wght@0,400;0,500;0,600;0,700;1,400&family=IBM+Plex+Mono:wght@400;500;600&display=swap');
+/* Fonts are loaded globally in index.html (Inter + IBM Plex Mono). */
 
 /* ─── Reset ──────────────────────────────────────────────────────────── */
 
@@ -11,23 +11,26 @@
 /* ─── Design tokens ──────────────────────────────────────────────────── */
 /* Variables stay global (harmless). Typography/colors scoped to .rhythm-lab-root */
 
+/* Module variables alias the shared Clinical Edge tokens (src/styles/tokens.css).
+   The warm surfaces stay module-local for now — they intentionally differ from
+   --ce-warm-bg until the Phase 2 warm-surface unification. */
 :root {
-  --bg-base:          #111827;
-  --bg-surface:       #1E2A3A;
-  --bg-elevated:      #243040;
+  --bg-base:          var(--ce-navy-900);
+  --bg-surface:       var(--ce-navy-700);
+  --bg-elevated:      var(--ce-navy-600);
   --surface-warm:     #F0EDE6;
   --surface-warm-deep: #E8E3D8;
-  --text-primary:     #F0EDE6;
-  --text-secondary:   #94A3B8;
-  --text-dark:        #111827;
-  --text-dark-muted:  #526174;
-  --accent-teal:      #0ABFBC;
-  --accent-gold:      #D4A84B;
-  --border:           #2D3B4E;
-  --border-warm:      #D6D0C4;
+  --text-primary:     var(--ce-text-light);
+  --text-secondary:   var(--ce-text-light-sec);
+  --text-dark:        var(--ce-text-dark);
+  --text-dark-muted:  var(--ce-text-muted);
+  --accent-teal:      var(--ce-teal);
+  --accent-gold:      var(--ce-gold);
+  --border:           var(--ce-line-navy);
+  --border-warm:      var(--ce-warm-line);
 
-  --font-sans: 'IBM Plex Sans', system-ui, sans-serif;
-  --font-mono: 'IBM Plex Mono', 'Courier New', monospace;
+  --font-sans: var(--ce-font-sans);
+  --font-mono: var(--ce-font-mono);
 }
 
 .rhythm-lab-root {

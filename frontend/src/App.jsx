@@ -413,7 +413,7 @@ function SavedCaseRow({ sc, onReopen, onDelete, onCopy, onSaveNote }) {
           <button onClick={() => setExpanded(!expanded)} title={expanded ? "Collapse" : "Expand"} style={iconBtnStyle("#4A6978")}>{expanded ? "\u25b2" : "\u25bc"}</button>
           <button onClick={() => onReopen(sc.question)} title="Reopen in input" style={iconBtnStyle("#0ABFBC")}>&crarr;</button>
           <button onClick={handleCopy} title="Copy response" style={iconBtnStyle(copied ? "#1FBF75" : "#0ABFBC")}>{copied ? "\u2713" : "\u2398"}</button>
-          <button onClick={() => { setEditNote(true); setExpanded(true); }} title="Add/edit note" style={iconBtnStyle("#F2B94B")}>Copy</button>
+          <button onClick={() => { setEditNote(true); setExpanded(true); }} title="Add/edit note" aria-label="Add or edit note" style={iconBtnStyle("#F2B94B")}>{"✎"}</button>
           <button onClick={() => onDelete(sc.id)} title="Delete case" style={iconBtnStyle("#E96B6B")}>&times;</button>
         </div>
       </div>
@@ -869,7 +869,6 @@ export default function App({ onGoHome, isOnline = true }) {
       padding: "0 0 calc(80px + env(safe-area-inset-bottom))",
     }}>
       <style>{`
-        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap');
         *, *::before, *::after { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
         body { margin: 0; background: #111827; -webkit-font-smoothing: antialiased; overscroll-behavior: none; -webkit-text-size-adjust: 100%; }
         textarea { outline: none; touch-action: pan-y; }

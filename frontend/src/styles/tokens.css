@@ -1,0 +1,89 @@
+/* ─── Clinical Edge — Shared Design Tokens ──────────────────────────────────
+   Phase 1A: values match the current shipped UI exactly (no visual change).
+   Module stylesheets alias their local variables to these tokens.
+   The navy base intentionally stays #111827 until the true-navy migration. */
+
+:root {
+  /* ── Surfaces — navy shell ── */
+  --ce-navy-900:   #111827;                 /* page base */
+  --ce-navy-800:   #0C1E2C;                 /* hero cards */
+  --ce-navy-700:   #1E2A3A;                 /* raised cards */
+  --ce-navy-600:   #243040;                 /* elevated / hover */
+  --ce-navy-header: rgba(11, 31, 42, 0.97); /* sticky header backdrop */
+  --ce-line-dark:  rgba(255, 255, 255, 0.07);
+  --ce-line-navy:  #2D3B4E;                 /* borders on navy surfaces */
+
+  /* ── Surfaces — warm learning ── */
+  --ce-warm-bg:        #E7E1D6;
+  --ce-warm-card:      #FFFDF8;
+  --ce-warm-line:      #D6D0C4;
+  --ce-warm-line-soft: rgba(17, 24, 39, 0.09);
+
+  /* ── Brand accents ── */
+  --ce-teal:      #0ABFBC;
+  --ce-teal-deep: #0A8F8D;   /* teal text on warm surfaces */
+  --ce-gold:      #D4A84B;
+  --ce-blue:      #4da3ff;   /* informational accent */
+
+  /* ── Urgency — desaturated clinical palette ── */
+  /* On warm/light surfaces */
+  --ce-urgency-high:     #8E2F2F;
+  --ce-urgency-high-bg:  rgba(190, 70, 70, 0.10);
+  --ce-urgency-high-line: #B45454;
+  --ce-urgency-mod:      #9A6F1F;
+  --ce-urgency-mod-bg:   rgba(212, 168, 75, 0.10);
+  --ce-urgency-mod-line: #C79A3B;
+  --ce-urgency-low:      #0F766E;
+  --ce-urgency-low-bg:   rgba(10, 191, 188, 0.08);
+  --ce-urgency-low-line: rgba(10, 191, 188, 0.30);
+  /* On dark navy surfaces */
+  --ce-urgency-high-dark: #f4a4a4;
+  --ce-urgency-mod-dark:  #e8c060;
+  --ce-urgency-low-dark:  #5eead4;
+
+  /* ── Text ── */
+  --ce-text-dark:      #111827;  /* headings on warm */
+  --ce-text-mid:       #2E3B4A;  /* body on warm */
+  --ce-text-muted:     #526174;  /* secondary on warm */
+  --ce-text-dim:       #7F99A5;  /* tertiary / labels */
+  --ce-text-light:     #F0EDE6;  /* headings on navy */
+  --ce-text-light-sec: #94A3B8;  /* secondary on navy */
+
+  /* ── Typography ── */
+  --ce-font-sans: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+  --ce-font-mono: 'IBM Plex Mono', 'Courier New', monospace;
+  --ce-fs-eyebrow:  10px;
+  --ce-fs-caption:  11px;
+  --ce-fs-body-sm:  12px;
+  --ce-fs-body:     14px;
+  --ce-fs-lead:     15px;
+  --ce-fs-h3:       17px;
+  --ce-fs-h2:       22px;
+  --ce-fs-h1:       clamp(24px, 5vw, 32px);
+  --ce-track-eyebrow: 0.12em;
+
+  /* ── Shape ── */
+  --ce-r-sm:   4px;
+  --ce-r-md:   8px;
+  --ce-r-lg:   12px;
+  --ce-r-pill: 999px;
+
+  /* ── Elevation ── */
+  --ce-shadow-card:  0 1px 6px rgba(0, 0, 0, 0.05);
+  --ce-shadow-float: 0 6px 18px rgba(0, 0, 0, 0.18);
+  --ce-shadow-hero:  0 4px 28px rgba(0, 0, 0, 0.30), inset 0 1px 0 rgba(255, 255, 255, 0.06);
+
+  /* ── Spacing — 4px base ── */
+  --ce-sp-1:  4px;
+  --ce-sp-2:  8px;
+  --ce-sp-3:  12px;
+  --ce-sp-4:  16px;
+  --ce-sp-5:  20px;
+  --ce-sp-6:  24px;
+  --ce-sp-8:  32px;
+  --ce-sp-10: 40px;
+
+  /* ── Layout ── */
+  --ce-content-narrow: 700px;
+  --ce-content:        860px;
+}

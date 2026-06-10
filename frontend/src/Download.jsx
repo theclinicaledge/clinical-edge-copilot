@@ -140,7 +140,6 @@ export default function Download() {
       fontFamily: "'Inter', -apple-system, BlinkMacSystemFont, sans-serif",
     }}>
       <style>{`
-        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap');
         *, *::before, *::after { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
         a { outline: none; -webkit-tap-highlight-color: transparent; }
         .dl-badge-link { display: inline-block; border-radius: 8px; transition: opacity 0.15s; }

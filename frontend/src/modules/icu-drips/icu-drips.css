@@ -1,21 +1,22 @@
 /* ─── Clinical Edge — ICU Drips Module ──────────────────────────────────────── */
 
+/* Module variables alias the shared Clinical Edge tokens (src/styles/tokens.css) */
 :root {
-  --id-bg-dark:       #111827;
-  --id-bg-hero:       #0C1E2C;
-  --id-bg-header:     rgba(11, 31, 42, 0.97);
-  --id-bg-warm:       #E7E1D6;
-  --id-bg-card:       #FFFDF8;
-  --id-border-warm:   rgba(17, 24, 39, 0.09);
-  --id-border-card:   #D6D0C4;
-  --id-teal:          #0ABFBC;
-  --id-gold:          #D4A84B;
-  --id-text-dark:     #111827;
-  --id-text-mid:      #2E3B4A;
-  --id-text-muted:    #526174;
-  --id-text-dim:      #7F99A5;
-  --id-font-sans:     'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
-  --id-font-mono:     'IBM Plex Mono', 'Courier New', monospace;
+  --id-bg-dark:       var(--ce-navy-900);
+  --id-bg-hero:       var(--ce-navy-800);
+  --id-bg-header:     var(--ce-navy-header);
+  --id-bg-warm:       var(--ce-warm-bg);
+  --id-bg-card:       var(--ce-warm-card);
+  --id-border-warm:   var(--ce-warm-line-soft);
+  --id-border-card:   var(--ce-warm-line);
+  --id-teal:          var(--ce-teal);
+  --id-gold:          var(--ce-gold);
+  --id-text-dark:     var(--ce-text-dark);
+  --id-text-mid:      var(--ce-text-mid);
+  --id-text-muted:    var(--ce-text-muted);
+  --id-text-dim:      var(--ce-text-dim);
+  --id-font-sans:     var(--ce-font-sans);
+  --id-font-mono:     var(--ce-font-mono);
 }
 
 /* ── Category accent system ──────────────────────────────────────────────────── */
@@ -1136,6 +1137,140 @@
   letter-spacing: -0.008em;
 }
 
+/* ── Hemodynamic Compare Matrix ──────────────────────────────────────────────── */
+.id-hcm {
+  background: var(--id-bg-card);
+  border: 1px solid var(--id-border-card);
+  border-radius: 9px;
+  overflow: hidden;
+  margin-bottom: 16px;
+}
+.id-hcm__header {
+  display: flex;
+  align-items: baseline;
+  gap: 10px;
+  flex-wrap: wrap;
+  padding: 11px 14px 10px;
+  border-bottom: 1.5px solid var(--id-border-card);
+  background: rgba(17,24,39,0.025);
+}
+.id-hcm__eyebrow {
+  font-size: 8.5px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 1.5px;
+  color: var(--id-text-mid);
+  font-family: var(--id-font-mono);
+  flex-shrink: 0;
+}
+.id-hcm__sub {
+  font-size: 9px;
+  color: var(--id-text-dim);
+  font-family: var(--id-font-mono);
+  letter-spacing: 0.01em;
+}
+/* ── Table rows ── */
+.id-hcm__table { display: flex; flex-direction: column; }
+
+.id-hcm__row {
+  display: flex;
+  align-items: stretch;
+  border-bottom: 1px solid var(--id-border-warm);
+}
+.id-hcm__row:last-child { border-bottom: none; }
+
+/* Header row */
+.id-hcm__row--head {
+  background: rgba(17,24,39,0.02);
+  border-bottom: 1.5px solid var(--id-border-card);
+}
+
+/* Rows where A ≠ B — subtle teal tint to draw attention */
+.id-hcm__row--differs {
+  background: rgba(10,191,188,0.04);
+}
+
+/* ── Cells ── */
+.id-hcm__cell {
+  padding: 9px 12px;
+  display: flex;
+  align-items: center;
+  flex: 1;
+  border-right: 1px solid var(--id-border-warm);
+  min-width: 0; /* allow shrink */
+}
+.id-hcm__cell:last-child { border-right: none; }
+
+/* Metric label cell — fixed narrow width */
+.id-hcm__cell--metric {
+  flex: 0 0 46px;
+  font-family: var(--id-font-mono);
+  font-size: 8.5px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.8px;
+  color: var(--id-text-dim);
+}
+
+/* Column header cells */
+.id-hcm__cell--colhead {
+  gap: 7px;
+  padding: 8px 12px;
+}
+
+/* Column letter tag — A / B */
+.id-hcm__col-tag {
+  font-size: 8px;
+  font-weight: 800;
+  font-family: var(--id-font-mono);
+  border-radius: 3px;
+  padding: 1px 5px;
+  line-height: 1.5;
+  flex-shrink: 0;
+}
+.id-hcm__col-tag--a {
+  background: rgba(10,191,188,0.14);
+  color: #0A8F8D;
+}
+.id-hcm__col-tag--b {
+  background: rgba(212,168,75,0.18);
+  color: #8A6A22;
+}
+
+/* Drug name in column header */
+.id-hcm__col-name {
+  font-size: 10.5px;
+  font-weight: 600;
+  color: var(--id-text-dark);
+  letter-spacing: -0.01em;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  min-width: 0;
+}
+
+/* Value cell alignment */
+.id-hcm__cell--val { justify-content: center; }
+
+/* Direction value — reuses the same colour classes as the detail HemodynamicCard */
+.id-hcm__val {
+  font-size: 15px;
+  font-weight: 700;
+  line-height: 1;
+  font-family: var(--id-font-sans);
+}
+/* Inherit colour classes from the detail card:
+   .id-hemo-val--up / --down / --neutral / --variable
+   These are already defined above and apply here unchanged. */
+
+/* Tight mobile: keep 3 columns but compress slightly */
+@media (max-width: 400px) {
+  .id-hcm__cell--metric { flex: 0 0 36px; font-size: 7.5px; }
+  .id-hcm__cell { padding: 8px 8px; }
+  .id-hcm__col-name { font-size: 9.5px; }
+  .id-hcm__val { font-size: 13px; }
+}
+
 /* ── Hemodynamic Effect card ─────────────────────────────────────────────────── */
 .id-hemo-card {
   background: var(--id-bg-card);
@@ -1265,10 +1400,11 @@
 }
 
 /* ── Per-drip Clinical Pearl (detail page, below Lead Finding) ───────────────── */
+/* Matches the gold pearl treatment (.id-pearl) — the brand's pearl language. */
 .id-drip-pearl {
-  background: #F5F0FF;
-  border: 1px solid rgba(139,92,246,0.18);
-  border-left: 3px solid #8B5CF6;
+  background: #FFF8EE;
+  border: 1px solid rgba(212,168,75,0.2);
+  border-left: 3px solid var(--id-gold);
   border-radius: 8px;
   padding: 12px 15px;
   margin-bottom: 10px;
@@ -1279,13 +1415,13 @@
   font-weight: 700;
   text-transform: uppercase;
   letter-spacing: 1.5px;
-  color: #5B3BAA;
+  color: #9A7520;
   font-family: var(--id-font-mono);
   margin-bottom: 5px;
 }
 .id-drip-pearl__text {
   font-size: 13.5px;
-  color: #2D1A5C;
+  color: #3A2600;
   line-height: 1.70;
   margin: 0;
   font-style: italic;

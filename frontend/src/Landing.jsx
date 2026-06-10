@@ -212,7 +212,6 @@ export default function Landing({ onEnterApp, onEnterScenario }) {
     }}>
       {/* ── Global styles ────────────────────────────────────────────────────── */}
       <style>{`
-        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=IBM+Plex+Mono:wght@400;500;700&display=swap');
         *, *::before, *::after { box-sizing: border-box; }
         body { margin: 0; }
 

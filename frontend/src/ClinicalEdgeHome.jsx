@@ -167,10 +167,6 @@ export default function ClinicalEdgeHome({ onNavigate }) {
       display: "flex",
       flexDirection: "column",
     }}>
-      <style>{`
-        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=IBM+Plex+Mono:wght@400;500&display=swap');
-      `}</style>
-
       {/* ── Sticky header ────────────────────────────────────────────────── */}
       <div style={{
         borderBottom: "1px solid rgba(255,255,255,0.05)",

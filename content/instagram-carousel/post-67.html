@@ -1,0 +1,552 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Clinical Edge — Post 67 — Ventricular Bigeminy</title>
+  <link
+    href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=IBM+Plex+Mono:wght@400;500;700&display=swap"
+    rel="stylesheet"
+  />
+  <style>
+    :root {
+      --bg:   #111827;
+      --c1:   #1E2A3A;
+      --c2:   #243040;
+      --teal: #0ABFBC;
+      --td:   #F0EDE6;
+      --tdm:  #A8C1CC;
+    }
+
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      background: #07090F;
+      font-family: 'Inter', -apple-system, sans-serif;
+      padding: 48px 32px;
+      display: flex; flex-direction: column; align-items: center; gap: 56px;
+    }
+
+    /* ── Slide base ─────────────────────────────────────────── */
+    .slide {
+      width: 1080px; height: 1350px;
+      background-color: var(--bg);
+      background-image:
+        radial-gradient(ellipse 92% 82% at 50% 46%, transparent 32%, rgba(0,0,0,0.42) 100%),
+        radial-gradient(ellipse 62% 50% at 19% 16%, rgba(10,191,188,0.08) 0%, transparent 56%);
+      position: relative; overflow: hidden; flex-shrink: 0;
+    }
+    .slide::before {
+      content: ''; position: absolute; inset: 0; z-index: 0; pointer-events: none;
+      background-image: url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' width='200' height='200'><filter id='g'><feTurbulence type='fractalNoise' baseFrequency='0.62' numOctaves='3' stitchTiles='stitch'/></filter><rect width='200' height='200' filter='url(%23g)' opacity='0.028'/></svg>");
+      background-size: 200px 200px; background-repeat: repeat;
+    }
+
+    /* Slide label — browser preview only */
+    .slide-label {
+      width: 1080px; display: flex; align-items: center; gap: 14px; margin-bottom: -40px;
+    }
+    .slide-label span {
+      font-family: 'IBM Plex Mono', monospace; font-size: 11px; font-weight: 500;
+      color: #5A6B7A; letter-spacing: 2px; text-transform: uppercase;
+    }
+    .slide-label::after { content: ''; flex: 1; height: 1px; background: #2A3645; opacity: 0.6; }
+
+    /* ── Footer ─────────────────────────────────────────────── */
+    .slide-footer {
+      position: absolute; bottom: 0; left: 0; right: 0; height: 96px;
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 0 80px; z-index: 2;
+      background: #1A2433;
+      border-top: 1px solid rgba(255,255,255,0.06);
+    }
+    .footer-brand { display: flex; align-items: center; gap: 14px; }
+    .footer-dot   { width: 10px; height: 10px; border-radius: 50%; background: var(--teal); }
+    .fnd { font-size: 28px; font-weight: 600; letter-spacing: -0.2px; color: var(--tdm); }
+    .fhd { font-family: 'IBM Plex Mono', monospace; font-size: 26px; font-weight: 500;
+           letter-spacing: 1.5px; text-transform: uppercase; color: rgba(168,193,204,0.48); }
+
+    /* ── Counter dots ───────────────────────────────────────── */
+    .slide-number {
+      position: absolute; bottom: 33px; left: 50%; transform: translateX(-50%);
+      display: flex; gap: 7px; z-index: 3;
+    }
+    .slide-number .dot { width: 6px; height: 6px; border-radius: 50%; background: rgba(168,193,204,0.20); }
+    .slide-number .dot.active { background: var(--teal) !important; }
+
+    /* ── Badge ──────────────────────────────────────────────── */
+    .badge {
+      display: inline-flex; align-items: center;
+      padding: 14px 30px; border-radius: 100px;
+      background: rgba(10,191,188,0.12); border: 1px solid rgba(10,191,188,0.30);
+      font-family: 'IBM Plex Mono', monospace; font-size: 24px; font-weight: 700;
+      letter-spacing: 2px; text-transform: uppercase; color: var(--teal);
+      flex-shrink: 0; white-space: nowrap;
+    }
+
+    /* ── Counter ────────────────────────────────────────────── */
+    .ctr {
+      font-family: 'IBM Plex Mono', monospace; font-size: 26px; font-weight: 500;
+      letter-spacing: 1px; flex-shrink: 0; color: rgba(168,193,204,0.35);
+    }
+
+    /* ── Teal bar ───────────────────────────────────────────── */
+    .tbar { height: 2px; border-radius: 2px; background: var(--teal); }
+
+    /* ── Dark cards ─────────────────────────────────────────── */
+    .card1 {
+      background: var(--c1); border-radius: 16px; padding: 40px 48px;
+      border: 1px solid rgba(255,255,255,0.05);
+    }
+    .card2 {
+      background: var(--c2); border-radius: 14px; padding: 36px 44px;
+      border: 1px solid rgba(255,255,255,0.05);
+    }
+
+    /* ── Bullet row ─────────────────────────────────────────── */
+    .brow { display: flex; align-items: center; gap: 20px; }
+    .bdot { width: 7px; height: 7px; border-radius: 50%; background: var(--teal); flex-shrink: 0; }
+
+    /* ── Layout ─────────────────────────────────────────────── */
+    .slide-content {
+      position: relative; z-index: 1;
+      padding: 60px 80px 116px;
+      height: 100%; display: flex; flex-direction: column;
+    }
+    .top-row {
+      display: flex; align-items: center; justify-content: space-between; flex-shrink: 0;
+    }
+
+    /* ── ECG Strip container ────────────────────────────────── */
+    .strip-wrap {
+      background: #080F1E;
+      border-radius: 12px;
+      border: 1px solid rgba(10,191,188,0.14);
+      position: relative; overflow: hidden;
+      flex-shrink: 0;
+    }
+    .strip-grid {
+      position: absolute; inset: 0; pointer-events: none;
+      background-image:
+        linear-gradient(rgba(10,191,188,0.048) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(10,191,188,0.048) 1px, transparent 1px);
+      background-size: 44px 30px;
+    }
+    .strip-label {
+      position: absolute; top: 13px; left: 20px; z-index: 2;
+      font-family: 'IBM Plex Mono', monospace; font-size: 18px; font-weight: 500;
+      letter-spacing: 2.5px; text-transform: uppercase; color: rgba(10,191,188,0.36);
+    }
+  </style>
+</head>
+<body>
+
+<!-- POST 67 — Ventricular Bigeminy -->
+
+
+<!-- ═══ SLIDE 1 — HOOK ═══════════════════════════════════════════════════════ -->
+<div class="slide-label"><span>Slide 01 — Hook</span></div>
+<div class="slide" id="slide-1">
+  <div class="slide-content" style="justify-content:flex-start;">
+
+    <div class="top-row">
+      <div class="badge">Rhythm Lab</div>
+      <span class="ctr">01 / 08</span>
+    </div>
+
+    <div style="flex:1; display:flex; flex-direction:column; justify-content:space-between; margin-top:52px;">
+
+      <div style="display:flex; flex-direction:column; gap:0;">
+
+        <div style="display:flex; flex-direction:column; gap:2px;">
+          <div style="font-size:78px; font-weight:900; line-height:1.02; letter-spacing:-3px; color:var(--td);">Can you recognize</div>
+          <div style="font-size:78px; font-weight:900; line-height:1.02; letter-spacing:-3px; color:var(--td);">this rhythm</div>
+          <div style="font-size:78px; font-weight:900; line-height:1.02; letter-spacing:-3px; color:var(--teal);">before the alarm?</div>
+        </div>
+
+        <div class="tbar" style="width:48px; margin-top:40px; margin-bottom:44px;"></div>
+
+        <!-- ECG Strip -->
+        <div class="strip-wrap">
+          <div class="strip-grid"></div>
+          <div class="strip-label">Lead II</div>
+          <svg width="920" height="140" viewBox="0 0 920 140"
+            style="display:block; position:relative; z-index:1; margin-top:16px; margin-bottom:16px;">
+            <!-- Bigeminy: N1@90 PVC1@215 N2@390 PVC2@515 N3@690 PVC3@815 baseline y=88 -->
+            <path d="
+              M 0,88 L 47,88
+              C 51,88 57,80 62,80 C 67,80 73,88 75,88
+              L 81,88 L 84,93 L 90,34 L 96,93 L 100,88
+              L 108,88 C 112,88 118,78 124,78 C 130,78 134,88 136,88
+
+              L 197,88
+              C 201,88 207,65 211,48 L 215,16
+              C 221,38 227,78 231,90 L 233,98
+              C 237,98 241,88 245,88
+              L 253,88 C 257,88 261,102 267,102 C 273,102 277,88 281,88
+
+              L 347,88
+              C 351,88 357,80 362,80 C 367,80 373,88 375,88
+              L 381,88 L 384,93 L 390,34 L 396,93 L 400,88
+              L 408,88 C 412,88 418,78 424,78 C 430,78 434,88 436,88
+
+              L 497,88
+              C 501,88 507,65 511,48 L 515,16
+              C 521,38 527,78 531,90 L 533,98
+              C 537,98 541,88 545,88
+              L 553,88 C 557,88 561,102 567,102 C 573,102 577,88 581,88
+
+              L 647,88
+              C 651,88 657,80 662,80 C 667,80 673,88 675,88
+              L 681,88 L 684,93 L 690,34 L 696,93 L 700,88
+              L 708,88 C 712,88 718,78 724,78 C 730,78 734,88 736,88
+
+              L 797,88
+              C 801,88 807,65 811,48 L 815,16
+              C 821,38 827,78 831,90 L 833,98
+              C 837,98 841,88 845,88
+              L 853,88 C 857,88 861,102 867,102 C 873,102 877,88 881,88
+
+              L 920,88"
+              fill="none" stroke="#0ABFBC" stroke-width="2.4"
+              stroke-linejoin="round" stroke-linecap="round"/>
+          </svg>
+        </div>
+
+      </div>
+
+      <!-- Swipe indicator -->
+      <div style="display:flex; align-items:center; gap:16px;">
+        <span style="font-family:'IBM Plex Mono',monospace; font-size:23px; font-weight:500;
+                     letter-spacing:2px; color:rgba(168,193,204,0.30); text-transform:uppercase;">Swipe to read</span>
+        <div style="display:flex; gap:8px; align-items:center;">
+          <div style="width:28px; height:1px; background:rgba(168,193,204,0.14);"></div>
+          <div style="width:8px; height:8px; border-radius:50%; background:var(--teal);"></div>
+          <div style="width:10px; height:1px; background:rgba(168,193,204,0.14);"></div>
+        </div>
+      </div>
+
+    </div>
+
+  </div>
+  <div class="slide-footer">
+    <div class="footer-brand"><div class="footer-dot"></div><span class="fnd">Clinical Edge: Nursing Tools</span></div>
+    <span class="fhd">@clinicaledgeco</span>
+  </div>
+  <div class="slide-number">
+    <div class="dot active"></div><div class="dot"></div><div class="dot"></div><div class="dot"></div>
+    <div class="dot"></div><div class="dot"></div><div class="dot"></div><div class="dot"></div>
+  </div>
+</div>
+
+
+<!-- ═══ SLIDE 2 — FIRST LOOK ══════════════════════════════════════════════════ -->
+<div class="slide-label"><span>Slide 02 — First Look</span></div>
+<div class="slide" id="slide-2">
+  <div class="slide-content" style="justify-content:flex-start;">
+
+    <div class="top-row">
+      <div class="badge">First Look</div>
+      <span class="ctr">02 / 08</span>
+    </div>
+
+    <div style="flex:1; display:flex; flex-direction:column; justify-content:center; gap:0;">
+
+      <div style="display:flex; flex-direction:column; gap:4px;">
+        <div style="font-size:82px; font-weight:900; line-height:1.02; letter-spacing:-3px; color:var(--td);">Most nurses notice</div>
+        <div style="font-size:82px; font-weight:900; line-height:1.02; letter-spacing:-3px; color:var(--td);">the wide beats.</div>
+      </div>
+
+      <div class="tbar" style="width:48px; margin-top:44px; margin-bottom:44px;"></div>
+
+      <div style="font-size:54px; font-weight:600; line-height:1.3; letter-spacing:-1px; color:var(--teal);">That's not the whole rhythm.</div>
+
+    </div>
+
+  </div>
+  <div class="slide-footer">
+    <div class="footer-brand"><div class="footer-dot"></div><span class="fnd">Clinical Edge: Nursing Tools</span></div>
+    <span class="fhd">@clinicaledgeco</span>
+  </div>
+  <div class="slide-number">
+    <div class="dot"></div><div class="dot active"></div><div class="dot"></div><div class="dot"></div>
+    <div class="dot"></div><div class="dot"></div><div class="dot"></div><div class="dot"></div>
+  </div>
+</div>
+
+
+<!-- ═══ SLIDE 3 — THE PATTERN ════════════════════════════════════════════════ -->
+<div class="slide-label"><span>Slide 03 — The Pattern</span></div>
+<div class="slide" id="slide-3">
+  <div class="slide-content" style="justify-content:flex-start;">
+
+    <div class="top-row">
+      <div class="badge">The Pattern</div>
+      <span class="ctr">03 / 08</span>
+    </div>
+
+    <div style="flex:1; display:flex; flex-direction:column; justify-content:center; gap:0;">
+
+      <div style="font-size:96px; font-weight:900; line-height:1.0; letter-spacing:-4px; color:var(--td);">What repeats?</div>
+
+      <div class="tbar" style="width:48px; margin-top:44px; margin-bottom:44px;"></div>
+
+      <!-- ECG Strip — same rhythm, fresh look -->
+      <div class="strip-wrap">
+        <div class="strip-grid"></div>
+        <div class="strip-label">Lead II</div>
+        <svg width="920" height="140" viewBox="0 0 920 140"
+          style="display:block; position:relative; z-index:1; margin-top:16px; margin-bottom:16px;">
+          <path d="
+            M 0,88 L 47,88
+            C 51,88 57,80 62,80 C 67,80 73,88 75,88
+            L 81,88 L 84,93 L 90,34 L 96,93 L 100,88
+            L 108,88 C 112,88 118,78 124,78 C 130,78 134,88 136,88
+
+            L 197,88
+            C 201,88 207,65 211,48 L 215,16
+            C 221,38 227,78 231,90 L 233,98
+            C 237,98 241,88 245,88
+            L 253,88 C 257,88 261,102 267,102 C 273,102 277,88 281,88
+
+            L 347,88
+            C 351,88 357,80 362,80 C 367,80 373,88 375,88
+            L 381,88 L 384,93 L 390,34 L 396,93 L 400,88
+            L 408,88 C 412,88 418,78 424,78 C 430,78 434,88 436,88
+
+            L 497,88
+            C 501,88 507,65 511,48 L 515,16
+            C 521,38 527,78 531,90 L 533,98
+            C 537,98 541,88 545,88
+            L 553,88 C 557,88 561,102 567,102 C 573,102 577,88 581,88
+
+            L 647,88
+            C 651,88 657,80 662,80 C 667,80 673,88 675,88
+            L 681,88 L 684,93 L 690,34 L 696,93 L 700,88
+            L 708,88 C 712,88 718,78 724,78 C 730,78 734,88 736,88
+
+            L 797,88
+            C 801,88 807,65 811,48 L 815,16
+            C 821,38 827,78 831,90 L 833,98
+            C 837,98 841,88 845,88
+            L 853,88 C 857,88 861,102 867,102 C 873,102 877,88 881,88
+
+            L 920,88"
+            fill="none" stroke="#0ABFBC" stroke-width="2.4"
+            stroke-linejoin="round" stroke-linecap="round"/>
+        </svg>
+      </div>
+
+      <div style="margin-top:32px; font-family:'IBM Plex Mono',monospace; font-size:24px; font-weight:500;
+                  letter-spacing:1.5px; color:rgba(168,193,204,0.36); text-transform:uppercase;">
+        Look at the space between beats.
+      </div>
+
+    </div>
+
+  </div>
+  <div class="slide-footer">
+    <div class="footer-brand"><div class="footer-dot"></div><span class="fnd">Clinical Edge: Nursing Tools</span></div>
+    <span class="fhd">@clinicaledgeco</span>
+  </div>
+  <div class="slide-number">
+    <div class="dot"></div><div class="dot"></div><div class="dot active"></div><div class="dot"></div>
+    <div class="dot"></div><div class="dot"></div><div class="dot"></div><div class="dot"></div>
+  </div>
+</div>
+
+
+<!-- ═══ SLIDE 4 — LOOK AGAIN ══════════════════════════════════════════════════ -->
+<div class="slide-label"><span>Slide 04 — Look Again</span></div>
+<div class="slide" id="slide-4">
+  <div class="slide-content" style="justify-content:flex-start;">
+
+    <div class="top-row">
+      <div class="badge">Look Again</div>
+      <span class="ctr">04 / 08</span>
+    </div>
+
+    <div style="flex:1; display:flex; flex-direction:column; justify-content:center; gap:0;">
+
+      <div style="display:flex; flex-direction:column; gap:4px;">
+        <div style="font-size:82px; font-weight:900; line-height:1.02; letter-spacing:-3px; color:var(--td);">Every normal beat</div>
+        <div style="font-size:82px; font-weight:900; line-height:1.02; letter-spacing:-3px; color:var(--td);">has company.</div>
+      </div>
+
+      <div class="tbar" style="width:48px; margin-top:44px; margin-bottom:44px;"></div>
+
+      <div style="font-size:50px; font-weight:400; line-height:1.45; color:var(--tdm);">The rhythm is hiding</div>
+      <div style="font-size:50px; font-weight:400; line-height:1.45; color:var(--tdm);">in the repetition.</div>
+
+    </div>
+
+  </div>
+  <div class="slide-footer">
+    <div class="footer-brand"><div class="footer-dot"></div><span class="fnd">Clinical Edge: Nursing Tools</span></div>
+    <span class="fhd">@clinicaledgeco</span>
+  </div>
+  <div class="slide-number">
+    <div class="dot"></div><div class="dot"></div><div class="dot"></div><div class="dot active"></div>
+    <div class="dot"></div><div class="dot"></div><div class="dot"></div><div class="dot"></div>
+  </div>
+</div>
+
+
+<!-- ═══ SLIDE 5 — THE CLUE ════════════════════════════════════════════════════ -->
+<div class="slide-label"><span>Slide 05 — The Clue</span></div>
+<div class="slide" id="slide-5">
+  <div class="slide-content" style="justify-content:flex-start;">
+
+    <div class="top-row">
+      <div class="badge">The Clue</div>
+      <span class="ctr">05 / 08</span>
+    </div>
+
+    <div style="flex:1; display:flex; flex-direction:column; justify-content:center; gap:0;">
+
+      <!-- Pattern block 1 -->
+      <div class="card1" style="display:flex; flex-direction:column; gap:4px;">
+        <div style="font-size:68px; font-weight:700; line-height:1.08; letter-spacing:-2px; color:var(--td);">Normal beat.</div>
+        <div style="font-size:68px; font-weight:700; line-height:1.08; letter-spacing:-2px; color:var(--teal);">PVC.</div>
+        <div style="height:1px; background:rgba(255,255,255,0.06); margin:20px 0;"></div>
+        <div style="font-size:68px; font-weight:700; line-height:1.08; letter-spacing:-2px; color:var(--td);">Normal beat.</div>
+        <div style="font-size:68px; font-weight:700; line-height:1.08; letter-spacing:-2px; color:var(--teal);">PVC.</div>
+      </div>
+
+      <div class="tbar" style="width:48px; margin-top:44px; margin-bottom:32px;"></div>
+
+      <div style="font-size:44px; font-weight:400; line-height:1.5; color:rgba(168,193,204,0.56); font-style:italic;">Again and again.</div>
+
+    </div>
+
+  </div>
+  <div class="slide-footer">
+    <div class="footer-brand"><div class="footer-dot"></div><span class="fnd">Clinical Edge: Nursing Tools</span></div>
+    <span class="fhd">@clinicaledgeco</span>
+  </div>
+  <div class="slide-number">
+    <div class="dot"></div><div class="dot"></div><div class="dot"></div><div class="dot"></div>
+    <div class="dot active"></div><div class="dot"></div><div class="dot"></div><div class="dot"></div>
+  </div>
+</div>
+
+
+<!-- ═══ SLIDE 6 — REVEAL ══════════════════════════════════════════════════════ -->
+<div class="slide-label"><span>Slide 06 — Reveal</span></div>
+<div class="slide" id="slide-6">
+  <div class="slide-content" style="justify-content:flex-start;">
+
+    <div class="top-row">
+      <div class="badge">Reveal</div>
+      <span class="ctr">06 / 08</span>
+    </div>
+
+    <div style="flex:1; display:flex; flex-direction:column; justify-content:center; gap:0;">
+
+      <div style="font-family:'IBM Plex Mono',monospace; font-size:26px; font-weight:500;
+                  letter-spacing:2px; text-transform:uppercase; color:rgba(168,193,204,0.38);
+                  margin-bottom:28px;">The answer is</div>
+
+      <div style="display:flex; flex-direction:column; gap:0px;">
+        <div style="font-size:90px; font-weight:900; line-height:1.0; letter-spacing:-4px; color:var(--td);">Ventricular</div>
+        <div style="font-size:90px; font-weight:900; line-height:1.0; letter-spacing:-4px; color:var(--teal);">Bigeminy.</div>
+      </div>
+
+      <div class="tbar" style="width:48px; margin-top:44px; margin-bottom:44px;"></div>
+
+      <div style="font-size:48px; font-weight:400; line-height:1.45; color:var(--tdm);">Every normal beat is</div>
+      <div style="font-size:48px; font-weight:500; line-height:1.45; color:var(--td);">followed by a PVC.</div>
+
+    </div>
+
+  </div>
+  <div class="slide-footer">
+    <div class="footer-brand"><div class="footer-dot"></div><span class="fnd">Clinical Edge: Nursing Tools</span></div>
+    <span class="fhd">@clinicaledgeco</span>
+  </div>
+  <div class="slide-number">
+    <div class="dot"></div><div class="dot"></div><div class="dot"></div><div class="dot"></div>
+    <div class="dot"></div><div class="dot active"></div><div class="dot"></div><div class="dot"></div>
+  </div>
+</div>
+
+
+<!-- ═══ SLIDE 7 — CLINICAL PEARL ══════════════════════════════════════════════ -->
+<div class="slide-label"><span>Slide 07 — Clinical Pearl</span></div>
+<div class="slide" id="slide-7">
+  <div class="slide-content" style="justify-content:flex-start;">
+
+    <div class="top-row">
+      <div class="badge">Clinical Pearl</div>
+      <span class="ctr">07 / 08</span>
+    </div>
+
+    <div style="flex:1; display:flex; flex-direction:column; justify-content:center; gap:0;">
+
+      <div style="display:flex; flex-direction:column; gap:4px;">
+        <div style="font-size:88px; font-weight:900; line-height:1.0; letter-spacing:-3.5px; color:var(--td);">The pattern</div>
+        <div style="font-size:88px; font-weight:900; line-height:1.0; letter-spacing:-3.5px; color:var(--td);">matters.</div>
+      </div>
+
+      <div class="tbar" style="width:48px; margin-top:44px; margin-bottom:44px;"></div>
+
+      <div style="font-size:50px; font-weight:400; line-height:1.45; color:var(--tdm);">Recognition comes</div>
+      <div style="font-size:50px; font-weight:400; line-height:1.45; color:var(--tdm);">before memorization.</div>
+
+    </div>
+
+  </div>
+  <div class="slide-footer">
+    <div class="footer-brand"><div class="footer-dot"></div><span class="fnd">Clinical Edge: Nursing Tools</span></div>
+    <span class="fhd">@clinicaledgeco</span>
+  </div>
+  <div class="slide-number">
+    <div class="dot"></div><div class="dot"></div><div class="dot"></div><div class="dot"></div>
+    <div class="dot"></div><div class="dot"></div><div class="dot active"></div><div class="dot"></div>
+  </div>
+</div>
+
+
+<!-- ═══ SLIDE 8 — RHYTHM LAB CLOSE ═══════════════════════════════════════════ -->
+<div class="slide-label"><span>Slide 08 — Rhythm Lab</span></div>
+<div class="slide" id="slide-8">
+  <div class="slide-content" style="justify-content:flex-start;">
+
+    <div class="top-row">
+      <div class="badge">Rhythm Lab</div>
+      <span class="ctr">08 / 08</span>
+    </div>
+
+    <div style="flex:1; display:flex; flex-direction:column; justify-content:center; gap:0;">
+
+      <div style="display:flex; flex-direction:column; gap:4px;">
+        <div style="font-size:88px; font-weight:900; line-height:1.0; letter-spacing:-3.5px; color:var(--td);">Learn the pattern.</div>
+      </div>
+
+      <div class="tbar" style="width:48px; margin-top:44px; margin-bottom:44px;"></div>
+
+      <div style="font-size:72px; font-weight:900; line-height:1.02; letter-spacing:-2.5px; color:var(--teal);">Then learn the name.</div>
+
+      <div style="margin-top:64px; font-family:'IBM Plex Mono',monospace; font-size:26px;
+                  font-weight:500; letter-spacing:1px; text-transform:uppercase;
+                  color:rgba(168,193,204,0.40);">Save this for your next strip.</div>
+
+      <div style="margin-top:24px; font-size:30px; font-weight:400; line-height:1.55;
+                  color:rgba(168,193,204,0.30);">This became one of the first rhythm<br>patterns inside Clinical Edge.</div>
+
+    </div>
+
+  </div>
+  <div class="slide-footer">
+    <div class="footer-brand"><div class="footer-dot"></div><span class="fnd">Clinical Edge: Nursing Tools</span></div>
+    <span class="fhd">@clinicaledgeco</span>
+  </div>
+  <div class="slide-number">
+    <div class="dot"></div><div class="dot"></div><div class="dot"></div><div class="dot"></div>
+    <div class="dot"></div><div class="dot"></div><div class="dot"></div><div class="dot active"></div>
+  </div>
+</div>
+
+
+</body>
+</html>

@@ -7,10 +7,11 @@ import {
 } from './data/drips.js';
 
 // ─── Urgency config ───────────────────────────────────────────────────────────
+// Brand palette (tags sit on the dark navy hero card): gold, soft red, info blue.
 const URGENCY_CONFIG = {
-  watch:     { label: 'Watch',     color: '#F59E0B', bg: 'rgba(245,158,11,0.10)', border: 'rgba(245,158,11,0.28)' },
-  caution:   { label: 'Caution',   color: '#EF4444', bg: 'rgba(239,68,68,0.10)',  border: 'rgba(239,68,68,0.26)'  },
-  reference: { label: 'Reference', color: '#60A5FA', bg: 'rgba(96,165,250,0.09)', border: 'rgba(96,165,250,0.22)' },
+  watch:     { label: 'Watch',     color: '#D4A84B', bg: 'rgba(212,168,75,0.12)', border: 'rgba(212,168,75,0.30)' },
+  caution:   { label: 'Caution',   color: '#E96B6B', bg: 'rgba(233,107,107,0.10)', border: 'rgba(233,107,107,0.28)' },
+  reference: { label: 'Reference', color: '#4da3ff', bg: 'rgba(77,163,255,0.09)', border: 'rgba(77,163,255,0.22)' },
 };
 
 // ─── Recently viewed helpers (localStorage, max 5) ────────────────────────────
@@ -248,6 +249,75 @@ function HemodynamicCard({ hemodynamics }) {
   );
 }
 
+// ─── Hemodynamic Compare Matrix ───────────────────────────────────────────────
+const HEMO_METRICS = ['MAP', 'SVR', 'CO', 'CI', 'HR'];
+
+function HemodynamicCompareMatrix({ aDrip, bDrip, aLabel, bLabel, pairId }) {
+  // Fire analytics when a pair with hemodynamics data is viewed
+  useEffect(() => {
+    if (aDrip?.hemodynamics && bDrip?.hemodynamics) {
+      trackEvent('drip_hemodynamic_compare_viewed', { pair_id: pairId ?? '' });
+    }
+  }, [pairId]); // eslint-disable-line react-hooks/exhaustive-deps
+
+  // Fail gracefully if either drip is missing hemodynamics
+  if (!aDrip?.hemodynamics || !bDrip?.hemodynamics) return null;
+
+  const aRows = aDrip.hemodynamics.rows ?? [];
+  const bRows = bDrip.hemodynamics.rows ?? [];
+
+  function getDir(rows, key) {
+    return rows.find(r => r.key === key)?.direction ?? 'neutral';
+  }
+
+  return (
+    <div className="id-hcm">
+      <div className="id-hcm__header">
+        <span className="id-hcm__eyebrow">Hemodynamic Direction</span>
+        <span className="id-hcm__sub">Typical pattern · not a protocol target</span>
+      </div>
+
+      <div className="id-hcm__table">
+        {/* Column headers */}
+        <div className="id-hcm__row id-hcm__row--head">
+          <div className="id-hcm__cell id-hcm__cell--metric" aria-hidden="true" />
+          <div className="id-hcm__cell id-hcm__cell--colhead">
+            <span className="id-hcm__col-tag id-hcm__col-tag--a">A</span>
+            <span className="id-hcm__col-name">{aLabel}</span>
+          </div>
+          <div className="id-hcm__cell id-hcm__cell--colhead">
+            <span className="id-hcm__col-tag id-hcm__col-tag--b">B</span>
+            <span className="id-hcm__col-name">{bLabel}</span>
+          </div>
+        </div>
+
+        {/* One row per metric */}
+        {HEMO_METRICS.map(key => {
+          const aDir  = getDir(aRows, key);
+          const bDir  = getDir(bRows, key);
+          const aDisp = DIRECTION_DISPLAY[aDir]  ?? DIRECTION_DISPLAY.neutral;
+          const bDisp = DIRECTION_DISPLAY[bDir]  ?? DIRECTION_DISPLAY.neutral;
+          const differs = aDir !== bDir;
+          return (
+            <div
+              key={key}
+              className={`id-hcm__row${differs ? ' id-hcm__row--differs' : ''}`}
+            >
+              <div className="id-hcm__cell id-hcm__cell--metric">{key}</div>
+              <div className="id-hcm__cell id-hcm__cell--val">
+                <span className={`id-hcm__val ${aDisp.cls}`}>{aDisp.symbol}</span>
+              </div>
+              <div className="id-hcm__cell id-hcm__cell--val">
+                <span className={`id-hcm__val ${bDisp.cls}`}>{bDisp.symbol}</span>
+              </div>
+            </div>
+          );
+        })}
+      </div>
+    </div>
+  );
+}
+
 // ─── Default accordion state ──────────────────────────────────────────────────
 const DEFAULT_OPEN = {
   commonlyUsedFor:   true,
@@ -454,6 +524,15 @@ function CompareDetail({ pair, onBack, onNavigateToDrip }) {
       </button>
 
       <h2 className="id-compare-detail__title">{pair.label}</h2>
+
+      {/* Hemodynamic Compare Matrix — quick direction scan before the narrative */}
+      <HemodynamicCompareMatrix
+        aDrip={aDrip}
+        bDrip={bDrip}
+        aLabel={pair.aLabel}
+        bLabel={pair.bLabel}
+        pairId={pair.id}
+      />
 
       <table className="id-compare-table">
         <thead>
@@ -808,10 +887,6 @@ export default function IcuDripsModule({ onGoHome }) {
 
   return (
     <div className="icu-drips-root">
-      <style>{`
-        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=IBM+Plex+Mono:wght@400;500;700&display=swap');
-      `}</style>
-
       {/* Sticky header */}
       <header className="id-header">
         <div className="id-header__inner">

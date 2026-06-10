@@ -87,7 +87,7 @@ export default function RhythmLabModule({ onGoHome }: RhythmLabModuleProps) {
           </div>
         </header>
 
-        <div className="app-body">
+        <div className="app-body ce-page-enter">
           {view === 'detail' && selected ? (
             <RhythmDetail rhythm={selected} onBack={handleBack} />
           ) : view === 'compare' ? (

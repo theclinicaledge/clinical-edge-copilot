@@ -86,6 +86,7 @@
   flex-shrink: 0;
   background: var(--bg-base);
   border-bottom: 1px solid var(--border);
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.18);
 }
 
 .site-header__inner {
@@ -2571,6 +2572,10 @@
   color: var(--text-secondary);
   flex-shrink: 0;
   opacity: 0.5;
+  transition: transform 0.18s var(--ce-ease-out);
+}
+.foundations-toggle[aria-expanded="true"] .foundations-toggle__chevron {
+  transform: rotate(90deg);
 }
 
 .foundations-grid {
@@ -2578,6 +2583,7 @@
   grid-template-columns: 1fr 1fr;
   gap: 1px;
   background: var(--border);
+  animation: ce-fade-in var(--ce-dur-base) var(--ce-ease-out) both;
 }
 
 .foundation-card {
@@ -3405,6 +3411,10 @@
   color: var(--text-dark-muted);
   opacity: 0.6;
   flex-shrink: 0;
+  transition: transform 0.18s var(--ce-ease-out);
+}
+.breakdown-toggle[aria-expanded="true"] .breakdown-toggle__chevron {
+  transform: rotate(90deg);
 }
 
 .breakdown-collapsible .warm-panel {
@@ -3648,6 +3658,10 @@
   color: var(--text-dark-muted);
   opacity: 0.6;
   flex-shrink: 0;
+  transition: transform 0.18s var(--ce-ease-out);
+}
+.crv-breakdown-toggle[aria-expanded="true"] .crv-breakdown-toggle__chevron {
+  transform: rotate(90deg);
 }
 
 /* A/B cards appear directly below the toggle when open */
@@ -3742,5 +3756,12 @@
 @media (prefers-reduced-motion: reduce) {
   .rhythm-item { transition: background 0.16s ease; }
   .rhythm-item:hover { transform: none; }
+  .foundations-toggle__chevron,
+  .breakdown-toggle__chevron,
+  .crv-breakdown-toggle__chevron { transition: none; }
+  .foundations-toggle[aria-expanded="true"] .foundations-toggle__chevron,
+  .breakdown-toggle[aria-expanded="true"] .breakdown-toggle__chevron,
+  .crv-breakdown-toggle[aria-expanded="true"] .crv-breakdown-toggle__chevron { transform: none; }
+  .foundations-grid { animation: none; opacity: 1; }
 }
 

@@ -13,9 +13,7 @@ export function FoundationsSection() {
       >
         <span className="foundations-toggle__eyebrow">Start here</span>
         <span className="foundations-toggle__title">Strip Reading Foundations</span>
-        <span className="foundations-toggle__chevron" aria-hidden="true">
-          {open ? '▲' : '▼'}
-        </span>
+        <span className="foundations-toggle__chevron" aria-hidden="true">›</span>
       </button>
 
       {open && (

@@ -90,6 +90,7 @@
   /* ── Motion ── */
   --ce-dur-fast:    120ms;
   --ce-dur-base:    160ms;
+  --ce-dur-slow:    220ms;
   --ce-ease-out:    cubic-bezier(0.16, 1, 0.3, 1);
   --ce-ease-in-out: cubic-bezier(0.4, 0, 0.2, 1);
 }
@@ -157,19 +158,80 @@
   transition-duration: 80ms;
 }
 
+/* ─── Page & section entrance ───────────────────────────────────────────────── */
+.ce-page-enter    { animation: ce-slide-up var(--ce-dur-slow) var(--ce-ease-out) both; }
+.ce-section-enter { animation: ce-slide-up var(--ce-dur-base) var(--ce-ease-out) both; }
+.ce-card-enter    { animation: ce-fade-in  var(--ce-dur-base) var(--ce-ease-out) both; }
+
+/* Stagger children — works when combined with .ce-card-enter on children */
+.ce-stagger-children > *:nth-child(1) { animation-delay:   0ms; }
+.ce-stagger-children > *:nth-child(2) { animation-delay:  50ms; }
+.ce-stagger-children > *:nth-child(3) { animation-delay: 100ms; }
+.ce-stagger-children > *:nth-child(4) { animation-delay: 150ms; }
+.ce-stagger-children > *:nth-child(5) { animation-delay: 200ms; }
+
+/* Pressable — subtle scale-down press state for chips and icon buttons */
+.ce-pressable {
+  -webkit-tap-highlight-color: transparent;
+  transition:
+    transform var(--ce-dur-fast) var(--ce-ease-out),
+    opacity  var(--ce-dur-fast) var(--ce-ease-out);
+}
+.ce-pressable:active {
+  transform: scale(0.97);
+  opacity: 0.85;
+  transition-duration: 60ms;
+}
+
+/* Interactive card — dark-surface tappable cards: hover lift + press + focus */
+.ce-interactive-card {
+  -webkit-tap-highlight-color: transparent;
+  transition:
+    box-shadow   var(--ce-dur-fast) var(--ce-ease-out),
+    border-color var(--ce-dur-fast) var(--ce-ease-out),
+    transform    var(--ce-dur-fast) var(--ce-ease-out);
+}
+.ce-interactive-card:hover  { transform: translateY(-1px); box-shadow: var(--ce-shadow-float); }
+.ce-interactive-card:active { transform: translateY(0) scale(0.998); transition-duration: 60ms; }
+.ce-interactive-card:focus-visible {
+  outline: 2px solid var(--ce-teal);
+  outline-offset: 2px;
+  border-radius: var(--ce-r-md);
+}
+.ce-interactive-card:focus:not(:focus-visible) { outline: none; }
+
 /* ─── Reduced motion ────────────────────────────────────────────────────────── */
 @media (prefers-reduced-motion: reduce) {
   .ce-fade-in,
-  .ce-slide-up {
+  .ce-slide-up,
+  .ce-page-enter,
+  .ce-section-enter,
+  .ce-card-enter {
     animation: none;
     opacity: 1;
     transform: none;
   }
+  .ce-stagger-children > * { animation-delay: 0ms; }
   .ce-card-lift,
   .ce-card-lift:hover,
-  .ce-card-lift:active {
+  .ce-card-lift:active,
+  .ce-interactive-card,
+  .ce-interactive-card:hover,
+  .ce-interactive-card:active,
+  .ce-pressable,
+  .ce-pressable:active {
     transform: none;
     transition: none;
   }
   .ce-back-link { transition: none; }
+}
+
+/* ─── Global reduced-motion override ───────────────────────────────────────── */
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration:        1ms !important;
+    animation-iteration-count: 1  !important;
+    transition-duration:       1ms !important;
+    scroll-behavior:           auto !important;
+  }
 }

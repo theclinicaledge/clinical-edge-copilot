@@ -883,6 +883,11 @@ export default function App({ onGoHome, isOnline = true }) {
           background: rgba(10,191,188,0.07) !important;
           border-color: rgba(10,191,188,0.22) !important;
         }
+        .chip:active {
+          transform: scale(0.97);
+          opacity: 0.85;
+          transition-duration: 60ms !important;
+        }
         .mode-btn:hover:not(.mode-active) {
           border-color: rgba(10,191,188,0.22) !important;
           color: #94A3B8 !important;
@@ -938,7 +943,8 @@ export default function App({ onGoHome, isOnline = true }) {
 
       {/* ── Header ───────────────────────────────────────────────────────── */}
       <div style={{
-        borderBottom: "1px solid rgba(255,255,255,0.05)",
+        borderBottom: "1px solid rgba(255,255,255,0.07)",
+        boxShadow: "0 4px 20px rgba(0,0,0,0.18)",
         paddingTop: "env(safe-area-inset-top)",
         paddingLeft: "max(14px, env(safe-area-inset-left))",
         paddingRight: "max(14px, env(safe-area-inset-right))",
@@ -1011,7 +1017,7 @@ export default function App({ onGoHome, isOnline = true }) {
       </div>
 
       {/* ── Warm clinical workspace ──────────────────────────────────────── */}
-      <div style={{ background: "#E7E1D6", minHeight: "100vh" }}>
+      <div className="ce-page-enter" style={{ background: "#E7E1D6", minHeight: "100vh" }}>
 
       {/* ── Main ─────────────────────────────────────────────────────────── */}
       <div className="main-container" style={{ maxWidth: 800, margin: "0 auto", width: "100%", padding: "40px 20px 0", display: "flex", flexDirection: "column", alignItems: "stretch" }}>
@@ -1068,9 +1074,11 @@ export default function App({ onGoHome, isOnline = true }) {
             : "1px solid rgba(240,237,230,0.10)",
           borderRadius: 8,
           padding: "14px 16px 12px",
-          boxShadow: "0 6px 18px rgba(0,0,0,0.18)",
+          boxShadow: inputFocused
+            ? "0 0 0 3px rgba(10,191,188,0.12), 0 6px 18px rgba(0,0,0,0.18)"
+            : "0 6px 18px rgba(0,0,0,0.18)",
           marginBottom: 10,
-          transition: "border-color 0.2s ease",
+          transition: "border-color 0.2s ease, box-shadow 0.2s ease",
         }}>
           <textarea
             ref={textareaRef}

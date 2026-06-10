@@ -163,9 +163,7 @@ export function CompareRhythmsView({ onBack }: CompareRhythmsViewProps) {
           <span className="crv-breakdown-toggle__label">
             {breakdownOpen ? 'Hide complete comparison' : 'See complete comparison'}
           </span>
-          <span className="crv-breakdown-toggle__chevron" aria-hidden="true">
-            {breakdownOpen ? '▲' : '▼'}
-          </span>
+          <span className="crv-breakdown-toggle__chevron" aria-hidden="true">›</span>
         </button>
 
         {breakdownOpen && (

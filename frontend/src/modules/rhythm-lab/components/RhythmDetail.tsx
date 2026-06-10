@@ -155,9 +155,7 @@ export function RhythmDetail({ rhythm, onBack }: RhythmDetailProps) {
               aria-expanded={breakdownOpen}
             >
               <span className="breakdown-toggle__title">How to read any rhythm</span>
-              <span className="breakdown-toggle__chevron" aria-hidden="true">
-                {breakdownOpen ? '▲' : '▼'}
-              </span>
+              <span className="breakdown-toggle__chevron" aria-hidden="true">›</span>
             </button>
             {breakdownOpen && <RecognitionBreakdown rhythm={rhythm} />}
           </div>
@@ -169,9 +167,7 @@ export function RhythmDetail({ rhythm, onBack }: RhythmDetailProps) {
               aria-expanded={bedsideOpen}
             >
               <span className="breakdown-toggle__title">Bedside perspective</span>
-              <span className="breakdown-toggle__chevron" aria-hidden="true">
-                {bedsideOpen ? '▲' : '▼'}
-              </span>
+              <span className="breakdown-toggle__chevron" aria-hidden="true">›</span>
             </button>
             {bedsideOpen && (
               <div className="bedside-collapsible__body">

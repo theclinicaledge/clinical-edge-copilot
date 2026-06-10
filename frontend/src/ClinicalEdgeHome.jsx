@@ -139,7 +139,8 @@ function ModuleEntry({ module, isLast, onNavigate }) {
         letterSpacing: s.titleTracking,
         lineHeight: 1.12,
         marginBottom: 8,
-        transition: "color 0.15s",
+        transition: "color 0.15s, transform 0.18s",
+        transform: isActive && hovered ? "translateX(3px)" : "none",
       }}>
         {module.title}
       </div>
@@ -169,7 +170,8 @@ export default function ClinicalEdgeHome({ onNavigate }) {
     }}>
       {/* ── Sticky header ────────────────────────────────────────────────── */}
       <div style={{
-        borderBottom: "1px solid rgba(255,255,255,0.05)",
+        borderBottom: "1px solid rgba(255,255,255,0.07)",
+        boxShadow: "0 4px 20px rgba(0,0,0,0.18)",
         paddingTop: "env(safe-area-inset-top)",
         paddingLeft: "max(14px, env(safe-area-inset-left))",
         paddingRight: "max(14px, env(safe-area-inset-right))",
@@ -208,7 +210,7 @@ export default function ClinicalEdgeHome({ onNavigate }) {
       </div>
 
       {/* ── Warm surface ─────────────────────────────────────────────────── */}
-      <div style={{ background: "#E7E1D6", flex: 1 }}>
+      <div className="ce-page-enter" style={{ background: "#E7E1D6", flex: 1 }}>
         <div
           className="ce-home-content"
           style={{ maxWidth: 750, margin: "0 auto", width: "100%" }}

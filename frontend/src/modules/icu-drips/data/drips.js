@@ -1839,10 +1839,10 @@ export const DRIPS = [
       "Heparin does not dissolve clots — it prevents new clot formation and existing clots from extending. The lab values (aPTT or anti-Xa) are the window into where the patient is in their anticoagulation. Those results, combined with the clinical picture, guide any adjustments the provider orders.",
 
     commonlyUsedFor: [
-      "Venous thromboembolism treatment and prophylaxis",
+      "Venous thromboembolism: clot-related management and prophylaxis",
       "Acute coronary syndrome management, per cardiology and provider orders",
       "Anticoagulation during procedures requiring systemic anticoagulation",
-      "Bridging anticoagulation during treatment transitions",
+      "Bridging anticoagulation during clinical transitions",
     ],
 
     whatItIsDoing: [
@@ -2207,6 +2207,12 @@ export const COMPARE_PAIRS = [
         b: "Peripheral acceptable short-term",
       },
     ],
+    keyDistinction:
+      "Norepinephrine has a mild cardiac component; phenylephrine is pure vasoconstriction. When cardiac support matters alongside pressure, they are not interchangeable.",
+    commonConfusion:
+      "Nurses sometimes expect phenylephrine to behave like norepinephrine. The reflex bradycardia with phenylephrine catches teams off guard, especially in patients already on the slower side.",
+    bedsidePearl:
+      "If the heart rate dips noticeably after phenylephrine goes up, reflex bradycardia from pure vasoconstriction is the likely driver.",
     bottomLine:
       "Both raise MAP through vasoconstriction. Norepinephrine adds a modest cardiac component; phenylephrine acts on vessels only, which can reflexively slow the heart.",
   },
@@ -2244,6 +2250,12 @@ export const COMPARE_PAIRS = [
         b: "Peripheral perfusion, sodium, urine output",
       },
     ],
+    keyDistinction:
+      "Vasopressin works through a completely different receptor system. It is not a stronger norepinephrine — it is a different class of pressor with a different physiologic role.",
+    commonConfusion:
+      "Nurses used to norepinephrine sometimes expect the same dose-response pattern from vasopressin. Adjustment patterns and clinical behavior differ meaningfully between the two.",
+    bedsidePearl:
+      "When both are running simultaneously, peripheral perfusion monitoring becomes especially important — ischemic risk at the extremities compounds when multiple vasoconstrictors are active.",
     bottomLine:
       "Vasopressin works through a different receptor system and is often added alongside norepinephrine rather than replacing it. Adjustment patterns and monitoring priorities differ.",
   },
@@ -2283,6 +2295,12 @@ export const COMPARE_PAIRS = [
         b: "Hypotension, arrhythmia, renal function",
       },
     ],
+    keyDistinction:
+      "Milrinone's longer half-life means hemodynamic changes linger well after any rate adjustment. What you are seeing now reflects what was running hours ago.",
+    commonConfusion:
+      "Both support cardiac output, so nurses sometimes think of them as interchangeable. Milrinone's renal elimination makes it behave very differently in patients with impaired kidney function — effects accumulate.",
+    bedsidePearl:
+      "With milrinone, vasodilatory hypotension can be more pronounced and longer-lasting than expected. Trending BP closely after any rate change is essential — the effect does not resolve quickly.",
     bottomLine:
       "Both support cardiac output in low-output presentations, but through different mechanisms. Milrinone's longer half-life means hemodynamic changes take longer to stabilize after any rate adjustment.",
   },
@@ -2322,6 +2340,12 @@ export const COMPARE_PAIRS = [
         b: "Bradycardia; rebound with abrupt discontinuation",
       },
     ],
+    keyDistinction:
+      "Propofol can achieve deep sedation and suppresses respiratory drive significantly. Dexmedetomidine keeps patients arousable with relatively preserved breathing — it is not a substitute when deep sedation is the clinical goal.",
+    commonConfusion:
+      "Dexmedetomidine's bradycardia effect is frequently underestimated. Nurses focused on its arousability benefit are sometimes caught off guard when heart rate trends down significantly over time.",
+    bedsidePearl:
+      "With dexmedetomidine, bradycardia tends to be gradual and creeping. Trending the heart rate over 30-minute intervals catches the pattern before it becomes a hemodynamic concern.",
     bottomLine:
       "Propofol offers deep, adjustable sedation but suppresses breathing and has no analgesic effect. Dexmedetomidine keeps patients more arousable with preserved breathing — bradycardia monitoring is essential.",
   },
@@ -2476,6 +2500,50 @@ export const COMPARE_PAIRS = [
     ],
     bottomLine:
       "Nitroprusside is more potent and faster, with both arterial and venous effects. Nitroglycerin works predominantly on the venous system at lower parameters. Cyanide risk makes nitroprusside the more complex agent for prolonged use.",
+  },
+
+  {
+    id: "nicardipine-vs-ntg",
+    label: "Nicardipine vs Nitroglycerin",
+    aId: "nicardipine",
+    aLabel: "Nicardipine",
+    bId: "nitroglycerin",
+    bLabel: "Nitroglycerin",
+    rows: [
+      {
+        aspect: "Primary vascular effect",
+        a: "Arterial vasodilation (afterload reduction)",
+        b: "Venodilation (preload reduction)",
+      },
+      {
+        aspect: "MAP lowering profile",
+        a: "Reliable, arterial-driven",
+        b: "More gradual; venous return dependent",
+      },
+      {
+        aspect: "Heart rate pattern",
+        a: "Reflex tachycardia more prominent",
+        b: "Mild reflex tachycardia; less pronounced",
+      },
+      {
+        aspect: "Clinical role",
+        a: "Hypertensive urgency / emergency",
+        b: "Cardiac offloading; elevated filling pressures",
+      },
+      {
+        aspect: "Tubing consideration",
+        a: "Standard IV tubing",
+        b: "Non-PVC tubing recommended (absorption)",
+      },
+    ],
+    keyDistinction:
+      "Nicardipine reduces afterload through arterial vasodilation. Nitroglycerin reduces preload through venodilation. The same MAP number can mask very different mechanisms and clinical pathways.",
+    commonConfusion:
+      "Both lower MAP, so they can look equivalent at a glance. The distinction matters: nicardipine when arterial resistance is the target, nitroglycerin when venous decongestion and cardiac offloading is the bedside pattern.",
+    bedsidePearl:
+      "Reflex tachycardia is more prominent with nicardipine. If the heart rate climbs alongside falling BP, nicardipine's arterial vasodilation is the likely driver — worth flagging to the provider.",
+    bottomLine:
+      "Nicardipine targets arterial resistance and is the more appropriate choice in hypertensive urgency when preload is not the concern. Nitroglycerin offloads the heart through venodilation, making it more appropriate when cardiac filling pressures are elevated.",
   },
 
   // ── Anticoagulation ────────────────────────────────────────────────────────

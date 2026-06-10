@@ -1451,7 +1451,7 @@
 }
 
 /* ── Per-drip Clinical Pearl (detail page, below Lead Finding) ───────────────── */
-/* Matches the gold pearl treatment (.id-pearl) — the brand's pearl language. */
+/* Matches the gold pearl styling (.id-pearl) — the brand's pearl language. */
 .id-drip-pearl {
   background: #FFF8EE;
   border: 1px solid rgba(212,168,75,0.2);
@@ -1526,6 +1526,96 @@
 .id-recent-chip:active {
   transform: scale(0.97);
   transition-duration: 60ms;
+}
+
+/* ─── Key Difference card ────────────────────────────────────────────────────── */
+.id-key-diff {
+  background: var(--id-bg-card);
+  border: 1px solid var(--id-border-card);
+  border-left: 3px solid var(--id-teal);
+  border-radius: 8px;
+  padding: 14px 16px 12px;
+  margin-bottom: 16px;
+}
+.id-key-diff__eyebrow {
+  font-size: 9px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 1.4px;
+  color: var(--id-teal);
+  font-family: var(--id-font-mono);
+  margin-bottom: 8px;
+}
+.id-key-diff__distinction {
+  font-size: 13.5px;
+  font-weight: 600;
+  color: var(--id-text-dark);
+  line-height: 1.5;
+  margin: 0 0 10px;
+}
+.id-key-diff__row {
+  border-top: 1px solid var(--id-border-warm);
+  padding-top: 8px;
+  margin-top: 8px;
+}
+.id-key-diff__row-label {
+  display: block;
+  font-size: 9px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 1.2px;
+  color: var(--id-text-dim);
+  font-family: var(--id-font-mono);
+  margin-bottom: 3px;
+}
+.id-key-diff__row--pearl .id-key-diff__row-label {
+  color: #8B5CF6;
+}
+.id-key-diff__row-text {
+  font-size: 12.5px;
+  color: var(--id-text-mid);
+  line-height: 1.5;
+  margin: 0;
+}
+
+/* ─── Collapsible detailed comparison toggle ──────────────────────────────────── */
+.id-compare-detail-toggle {
+  margin-bottom: 16px;
+}
+.id-compare-detail-toggle__btn {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+  background: var(--id-bg-card);
+  border: 1px solid var(--id-border-card);
+  border-radius: 6px;
+  padding: 9px 14px;
+  font-size: 12px;
+  font-weight: 600;
+  font-family: var(--id-font-sans);
+  color: var(--id-text-mid);
+  cursor: pointer;
+  text-align: left;
+  transition: background 0.12s, border-color 0.12s;
+}
+.id-compare-detail-toggle__btn:hover {
+  background: #F0F7F7;
+  border-color: var(--id-teal);
+  color: var(--id-text-dark);
+}
+.id-compare-detail-toggle__arrow {
+  font-size: 9px;
+  color: var(--id-text-dim);
+  margin-left: 8px;
+  flex-shrink: 0;
+}
+.id-compare-detail-toggle .id-compare-table {
+  margin-top: 0;
+  border-top: none;
+  border-radius: 0 0 6px 6px;
+  border: 1px solid var(--id-border-card);
+  border-top: none;
 }
 
 /* ─── Reduced motion ─────────────────────────────────────────────────────────── */

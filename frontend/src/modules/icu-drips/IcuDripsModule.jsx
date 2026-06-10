@@ -512,10 +512,43 @@ function DripsDetail({ drip, onBack, onNavigate }) {
   );
 }
 
+// ─── Key Difference card ─────────────────────────────────────────────────────
+function KeyDifferenceCard({ pair }) {
+  if (!pair.keyDistinction && !pair.commonConfusion && !pair.bedsidePearl) return null;
+  return (
+    <div className="id-key-diff">
+      <div className="id-key-diff__eyebrow">Key Difference</div>
+      {pair.keyDistinction && (
+        <p className="id-key-diff__distinction">{pair.keyDistinction}</p>
+      )}
+      {pair.commonConfusion && (
+        <div className="id-key-diff__row">
+          <span className="id-key-diff__row-label">Common confusion</span>
+          <p className="id-key-diff__row-text">{pair.commonConfusion}</p>
+        </div>
+      )}
+      {pair.bedsidePearl && (
+        <div className="id-key-diff__row id-key-diff__row--pearl">
+          <span className="id-key-diff__row-label">Bedside pearl</span>
+          <p className="id-key-diff__row-text">{pair.bedsidePearl}</p>
+        </div>
+      )}
+    </div>
+  );
+}
+
 // ─── Compare detail ───────────────────────────────────────────────────────────
 function CompareDetail({ pair, onBack, onNavigateToDrip }) {
   const aDrip = pair.aId ? DRIPS.find(d => d.id === pair.aId) : null;
   const bDrip = pair.bId ? DRIPS.find(d => d.id === pair.bId) : null;
+  const [tableOpen, setTableOpen] = useState(false);
+
+  function handleToggleTable() {
+    if (!tableOpen) {
+      trackEvent('hemodynamic_compare_detail_expanded', { pair_id: pair.id });
+    }
+    setTableOpen(prev => !prev);
+  }
 
   return (
     <>
@@ -525,7 +558,7 @@ function CompareDetail({ pair, onBack, onNavigateToDrip }) {
 
       <h2 className="id-compare-detail__title">{pair.label}</h2>
 
-      {/* Hemodynamic Compare Matrix — quick direction scan before the narrative */}
+      {/* Hemodynamic Compare Matrix — quick direction scan */}
       <HemodynamicCompareMatrix
         aDrip={aDrip}
         bDrip={bDrip}
@@ -534,24 +567,40 @@ function CompareDetail({ pair, onBack, onNavigateToDrip }) {
         pairId={pair.id}
       />
 
-      <table className="id-compare-table">
-        <thead>
-          <tr>
-            <th> </th>
-            <th>{pair.aLabel}</th>
-            <th>{pair.bLabel}</th>
-          </tr>
-        </thead>
-        <tbody>
-          {pair.rows.map((row, i) => (
-            <tr key={i}>
-              <td>{row.aspect}</td>
-              <td>{row.a}</td>
-              <td>{row.b}</td>
-            </tr>
-          ))}
-        </tbody>
-      </table>
+      {/* Key Difference — scannable in under 10 seconds */}
+      <KeyDifferenceCard pair={pair} />
+
+      {/* Collapsible detailed comparison table */}
+      <div className="id-compare-detail-toggle">
+        <button
+          className="id-compare-detail-toggle__btn"
+          onClick={handleToggleTable}
+          aria-expanded={tableOpen}
+        >
+          <span>Detailed comparison</span>
+          <span className="id-compare-detail-toggle__arrow">{tableOpen ? '▲' : '▼'}</span>
+        </button>
+        {tableOpen && (
+          <table className="id-compare-table">
+            <thead>
+              <tr>
+                <th> </th>
+                <th>{pair.aLabel}</th>
+                <th>{pair.bLabel}</th>
+              </tr>
+            </thead>
+            <tbody>
+              {pair.rows.map((row, i) => (
+                <tr key={i}>
+                  <td>{row.aspect}</td>
+                  <td>{row.a}</td>
+                  <td>{row.b}</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        )}
+      </div>
 
       <div className="id-compare-bottom-line">
         <span className="id-compare-bottom-line__label">Bottom line</span>
@@ -619,7 +668,7 @@ function QuickCompare({ onBackToHome, onNavigateToDrip, initialPairId }) {
           <button
             key={pair.id}
             className="id-compare-pair-row"
-            onClick={() => { trackEvent('drip_compare_pair_selected', { pair_id: pair.id }); setSelectedPair(pair); }}
+            onClick={() => { trackEvent('drip_compare_pair_selected', { pair_id: pair.id }); trackEvent('hemodynamic_compare_pair_selected', { pair_id: pair.id }); setSelectedPair(pair); }}
           >
             <span className="id-compare-pair-row__label">{pair.label}</span>
             <span className="id-compare-pair-row__arrow">→</span>
@@ -875,6 +924,7 @@ export default function IcuDripsModule({ onGoHome }) {
 
   function handleShowCompare(pairId = null) {
     trackEvent('drip_compare_opened');
+    trackEvent('hemodynamic_compare_opened');
     setComparePairId(pairId);
     setView('compare');
   }

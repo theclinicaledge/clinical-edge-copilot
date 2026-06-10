@@ -105,7 +105,7 @@ function ModuleEntry({ module, isLast, onNavigate }) {
         paddingBottom: s.paddingBottom,
         borderBottom: isLast ? "none" : "1px solid rgba(17,24,39,0.08)",
         cursor: isActive ? "pointer" : "default",
-        background: hovered ? "rgba(17,24,39,0.03)" : "transparent",
+        background: hovered ? "rgba(17,24,39,0.05)" : "transparent",
         transition: "background 0.18s",
       }}
     >

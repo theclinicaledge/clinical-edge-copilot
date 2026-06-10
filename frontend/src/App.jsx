@@ -201,7 +201,7 @@ function SectionCard({ title, content }) {
         padding: "14px 20px",
         marginTop: 10,
         marginBottom: 6,
-        background: "#FFFFFF",
+        background: "var(--ce-warm-card)",
         borderRadius: "0 8px 8px 0",
       }}>
         <p style={{
@@ -221,8 +221,8 @@ function SectionCard({ title, content }) {
   const lines = content.split("\n").filter((l) => l.trim());
   return (
     <div style={{
-      background: "#FFFFFF",
-      border: "1px solid #D6D0C4",
+      background: "var(--ce-warm-card)",
+      border: "1px solid var(--ce-warm-line)",
       borderLeft: "3px solid " + cfg.accent,
       borderRadius: 8,
       padding: "18px 20px",
@@ -902,45 +902,6 @@ export default function App({ onGoHome, isOnline = true }) {
           color: #526174 !important;
         }
 
-        /* ─── Back / navigation link — shared across module headers ── */
-        .module-back-link {
-          margin-left: auto;
-          background: none;
-          border: none;
-          color: #7A95A5;
-          font-size: 13px;
-          font-weight: 500;
-          cursor: pointer;
-          font-family: -apple-system, BlinkMacSystemFont, 'Inter', sans-serif;
-          letter-spacing: 0;
-          padding: 0;
-          min-height: 40px;
-          display: inline-flex;
-          align-items: center;
-          gap: 5px;
-          line-height: 1;
-          transition: color 0.15s;
-          white-space: nowrap;
-          text-decoration: none;
-          flex-shrink: 0;
-        }
-        .module-back-link .back-arrow {
-          font-size: 15px;
-          line-height: 1;
-          display: inline-flex;
-          align-items: center;
-          opacity: 0.75;
-          margin-top: -1px;
-        }
-        .module-back-link:hover,
-        .module-back-link:focus-visible {
-          color: #0ABFBC;
-          outline: none;
-        }
-        .module-back-link:hover .back-arrow {
-          opacity: 1;
-        }
-
         @keyframes fadeUp { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
         @keyframes spin { to { transform: rotate(360deg); } }
         .fade-up { animation: fadeUp 0.35s ease forwards; }
@@ -989,11 +950,13 @@ export default function App({ onGoHome, isOnline = true }) {
         zIndex: 50,
       }}>
         <div style={{
+          maxWidth: 800,
+          margin: "0 auto",
           width: "100%",
           display: "flex",
           alignItems: "center",
-          paddingTop: 26,
-          paddingBottom: 18,
+          paddingTop: 22,
+          paddingBottom: 16,
           gap: 11,
         }}>
 
@@ -1039,9 +1002,8 @@ export default function App({ onGoHome, isOnline = true }) {
 
           {/* All tools — back navigation */}
           {onGoHome && (
-            <button className="module-back-link" onClick={onGoHome}>
-              <span className="back-arrow">←</span>
-              All tools
+            <button className="ce-back-link" onClick={onGoHome}>
+              ← All tools
             </button>
           )}
 

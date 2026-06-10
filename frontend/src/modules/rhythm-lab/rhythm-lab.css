@@ -128,44 +128,7 @@
 }
 
 /* ─── Back / navigation link ─────────────────────────────────────────── */
-
-.module-back-link {
-  margin-left: auto;
-  background: none;
-  border: none;
-  color: #7A95A5;
-  font-size: 13px;
-  font-weight: 500;
-  cursor: pointer;
-  font-family: -apple-system, BlinkMacSystemFont, 'Inter', sans-serif;
-  letter-spacing: 0;
-  padding: 0;
-  min-height: 40px;
-  display: inline-flex;
-  align-items: center;
-  gap: 5px;
-  line-height: 1;
-  transition: color 0.15s;
-  white-space: nowrap;
-  text-decoration: none;
-  flex-shrink: 0;
-}
-.module-back-link .back-arrow {
-  font-size: 15px;
-  line-height: 1;
-  display: inline-flex;
-  align-items: center;
-  opacity: 0.75;
-  margin-top: -1px;
-}
-.module-back-link:hover,
-.module-back-link:focus-visible {
-  color: #0ABFBC;
-  outline: none;
-}
-.module-back-link:hover .back-arrow {
-  opacity: 1;
-}
+/* Shared .ce-back-link styles live in src/styles/tokens.css */
 
 /* ─── Home: outer wrapper ────────────────────────────────────────────── */
 
@@ -3773,5 +3736,11 @@
 
 @media (max-width: 640px) {
   .detail-main { gap: 14px; }
+}
+
+/* ─── Reduced motion — disable hover transforms ──────────────────────── */
+@media (prefers-reduced-motion: reduce) {
+  .rhythm-item { transition: background 0.16s ease; }
+  .rhythm-item:hover { transform: none; }
 }
 

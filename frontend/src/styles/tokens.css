@@ -86,4 +86,90 @@
   /* ── Layout ── */
   --ce-content-narrow: 700px;
   --ce-content:        860px;
+
+  /* ── Motion ── */
+  --ce-dur-fast:    120ms;
+  --ce-dur-base:    160ms;
+  --ce-ease-out:    cubic-bezier(0.16, 1, 0.3, 1);
+  --ce-ease-in-out: cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* ─── Shared back-link ──────────────────────────────────────────────────────── */
+/* Used across Copilot, Rhythm Lab, and ICU Drips module headers. */
+.ce-back-link {
+  margin-left: auto;
+  background: none;
+  border: none;
+  color: var(--ce-text-dim);
+  font-size: 13px;
+  font-weight: 500;
+  cursor: pointer;
+  font-family: var(--ce-font-sans);
+  letter-spacing: 0;
+  padding: 0;
+  min-height: 40px;
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  line-height: 1;
+  transition: color var(--ce-dur-fast);
+  white-space: nowrap;
+  text-decoration: none;
+  flex-shrink: 0;
+}
+.ce-back-link:hover { color: var(--ce-teal); }
+.ce-back-link:focus-visible {
+  color: var(--ce-teal);
+  outline: 2px solid var(--ce-teal);
+  outline-offset: 3px;
+  border-radius: 3px;
+}
+.ce-back-link:focus:not(:focus-visible) { outline: none; }
+
+/* ─── Motion utilities ──────────────────────────────────────────────────────── */
+@keyframes ce-fade-in {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+@keyframes ce-slide-up {
+  from { opacity: 0; transform: translateY(8px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+.ce-fade-in {
+  animation: ce-fade-in var(--ce-dur-base) var(--ce-ease-out) both;
+}
+.ce-slide-up {
+  animation: ce-slide-up var(--ce-dur-base) var(--ce-ease-out) both;
+}
+
+/* Warm-surface card lift — for tappable cards on light backgrounds */
+.ce-card-lift {
+  transition:
+    box-shadow var(--ce-dur-fast) var(--ce-ease-out),
+    transform  var(--ce-dur-fast) var(--ce-ease-out);
+}
+.ce-card-lift:hover {
+  box-shadow: 0 3px 14px rgba(0, 0, 0, 0.09);
+  transform: translateY(-1px);
+}
+.ce-card-lift:active {
+  transform: translateY(0);
+  transition-duration: 80ms;
+}
+
+/* ─── Reduced motion ────────────────────────────────────────────────────────── */
+@media (prefers-reduced-motion: reduce) {
+  .ce-fade-in,
+  .ce-slide-up {
+    animation: none;
+    opacity: 1;
+    transform: none;
+  }
+  .ce-card-lift,
+  .ce-card-lift:hover,
+  .ce-card-lift:active {
+    transform: none;
+    transition: none;
+  }
+  .ce-back-link { transition: none; }
 }

@@ -81,9 +81,8 @@ export default function RhythmLabModule({ onGoHome }: RhythmLabModuleProps) {
             <span className="site-header__brand">Clinical Edge</span>
             <span className="site-header__sep" aria-hidden="true">/</span>
             <span className="site-header__module">Rhythm Lab</span>
-            <button className="module-back-link" onClick={onGoHome}>
-              <span className="back-arrow">←</span>
-              All tools
+            <button className="ce-back-link" onClick={onGoHome}>
+              ← All tools
             </button>
           </div>
         </header>

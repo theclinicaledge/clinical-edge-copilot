@@ -115,11 +115,11 @@
   margin-left: auto;
   background: none;
   border: none;
-  color: #7A95A5;
+  color: var(--ce-text-dim);
   font-size: 13px;
   font-weight: 500;
   cursor: pointer;
-  font-family: -apple-system, BlinkMacSystemFont, 'Inter', sans-serif;
+  font-family: var(--id-font-sans);
   letter-spacing: 0;
   padding: 0;
   min-height: 40px;
@@ -127,12 +127,18 @@
   align-items: center;
   gap: 5px;
   line-height: 1;
-  transition: color 0.15s;
+  transition: color var(--ce-dur-fast);
   white-space: nowrap;
   flex-shrink: 0;
 }
-.id-header__back:hover,
-.id-header__back:focus-visible { color: var(--id-teal); outline: none; }
+.id-header__back:hover { color: var(--id-teal); }
+.id-header__back:focus-visible {
+  color: var(--id-teal);
+  outline: 2px solid var(--id-teal);
+  outline-offset: 3px;
+  border-radius: 3px;
+}
+.id-header__back:focus:not(:focus-visible) { outline: none; }
 
 /* ── Body ────────────────────────────────────────────────────────────────────── */
 .id-body {
@@ -303,13 +309,21 @@
   padding: 12px 13px 10px;
   margin-bottom: 5px;
   cursor: pointer;
-  transition: box-shadow 0.15s, border-color 0.15s, border-left-color 0.15s;
+  transition: box-shadow var(--ce-dur-fast) var(--ce-ease-out),
+              border-color var(--ce-dur-fast) var(--ce-ease-out),
+              border-left-color var(--ce-dur-fast) var(--ce-ease-out),
+              transform var(--ce-dur-fast) var(--ce-ease-out);
   border-left: 3px solid transparent;
 }
 .id-drip-row:hover {
-  box-shadow: 0 2px 12px rgba(0,0,0,0.08);
+  box-shadow: 0 3px 14px rgba(0,0,0,0.09);
   border-color: rgba(17,24,39,0.14);
   border-left-color: var(--id-cat-accent, var(--id-teal));
+  transform: translateY(-1px);
+}
+.id-drip-row:active {
+  transform: translateY(0);
+  transition-duration: 80ms;
 }
 .id-drip-row:focus-visible {
   outline: 2px solid var(--id-teal);
@@ -555,20 +569,26 @@
   gap: 5px;
   font-size: 13px;
   font-weight: 500;
-  font-family: var(--id-font-mono);
-  color: #6A8898;
+  font-family: var(--id-font-sans);
+  color: var(--ce-text-dim);
   cursor: pointer;
   background: none;
   border: none;
   padding: 4px 0;
   margin-bottom: 18px;
-  letter-spacing: 0.01em;
-  transition: color 0.15s;
+  letter-spacing: 0;
+  transition: color var(--ce-dur-fast);
   line-height: 1;
   min-height: 40px;
 }
-.id-detail__back:hover,
-.id-detail__back:focus-visible { color: var(--id-teal); outline: none; }
+.id-detail__back:hover { color: var(--id-teal); }
+.id-detail__back:focus-visible {
+  color: var(--id-teal);
+  outline: 2px solid var(--id-teal);
+  outline-offset: 3px;
+  border-radius: 3px;
+}
+.id-detail__back:focus:not(:focus-visible) { outline: none; }
 
 /* ── Dark navy hero card ─────────────────────────────────────────────────────── */
 .id-hero-card {
@@ -920,20 +940,26 @@
   gap: 5px;
   font-size: 13px;
   font-weight: 500;
-  font-family: var(--id-font-mono);
-  color: #6A8898;
+  font-family: var(--id-font-sans);
+  color: var(--ce-text-dim);
   cursor: pointer;
   background: none;
   border: none;
   padding: 4px 0;
   margin-bottom: 18px;
-  letter-spacing: 0.01em;
-  transition: color 0.15s;
+  letter-spacing: 0;
+  transition: color var(--ce-dur-fast);
   line-height: 1;
   min-height: 40px;
 }
-.id-compare__back:hover,
-.id-compare__back:focus-visible { color: var(--id-teal); outline: none; }
+.id-compare__back:hover { color: var(--id-teal); }
+.id-compare__back:focus-visible {
+  color: var(--id-teal);
+  outline: 2px solid var(--id-teal);
+  outline-offset: 3px;
+  border-radius: 3px;
+}
+.id-compare__back:focus:not(:focus-visible) { outline: none; }
 
 .id-compare__eyebrow {
   display: block;
@@ -1471,4 +1497,19 @@
   background: var(--id-teal);
   color: #fff;
   border-color: var(--id-teal);
+}
+
+/* ─── Reduced motion ─────────────────────────────────────────────────────────── */
+@media (prefers-reduced-motion: reduce) {
+  .id-drip-row,
+  .id-drip-row:hover,
+  .id-drip-row:active {
+    transform: none;
+    transition: box-shadow 0.15s, border-color 0.15s, border-left-color 0.15s;
+  }
+  .id-header__back,
+  .id-detail__back,
+  .id-compare__back {
+    transition: none;
+  }
 }

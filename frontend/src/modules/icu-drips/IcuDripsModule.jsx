@@ -955,13 +955,23 @@ function DripsHome({ onSelect, onShowCompare, onShowPractice }) {
         </div>
       )}
 
-      {/* Practice entry */}
-      <button className="id-practice-entry" onClick={onShowPractice}>
-        <span className="id-practice-entry__icon">◎</span>
-        <span className="id-practice-entry__label">Practice hemodynamics</span>
-        <span className="id-practice-entry__sub">Pattern recognition · {PRACTICE_DECK.length} questions</span>
-        <span className="id-practice-entry__arrow">→</span>
-      </button>
+      {/* Home actions — practice + compare */}
+      <div className="id-home-actions">
+        <button className="id-home-action id-home-action--practice" onClick={onShowPractice}>
+          <div className="id-home-action__body">
+            <span className="id-home-action__label">Practice hemodynamics</span>
+            <span className="id-home-action__sub">Pattern recognition · {PRACTICE_DECK.length} questions</span>
+          </div>
+          <span className="id-home-action__arrow">→</span>
+        </button>
+        <button className="id-home-action id-home-action--compare" onClick={() => { trackEvent('icu_drips_compare_entry_clicked', { source: 'home_action' }); onShowCompare(); }}>
+          <div className="id-home-action__body">
+            <span className="id-home-action__label">Common ICU confusions</span>
+            <span className="id-home-action__sub">Compare drip patterns</span>
+          </div>
+          <span className="id-home-action__arrow">→</span>
+        </button>
+      </div>
 
       {/* Search + filter */}
       <div className="id-search-bar">
@@ -1090,10 +1100,11 @@ function DripsHome({ onSelect, onShowCompare, onShowPractice }) {
 
 // ─── Practice mode ────────────────────────────────────────────────────────────
 function PracticeMode({ onBack, onNavigateToDrip }) {
-  const [index,    setIndex]    = useState(0);
-  const [selected, setSelected] = useState(null); // index of chosen option
-  const [score,    setScore]    = useState(0);
-  const [done,     setDone]     = useState(false);
+  const [index,         setIndex]         = useState(0);
+  const [selected,      setSelected]      = useState(null); // index of chosen option
+  const [score,         setScore]         = useState(0);
+  const [done,          setDone]          = useState(false);
+  const [missedDripIds, setMissedDripIds] = useState([]);
 
   const total = PRACTICE_DECK.length;
 
@@ -1106,11 +1117,12 @@ function PracticeMode({ onBack, onNavigateToDrip }) {
     const q = PRACTICE_DECK[index];
     const correct = optionIndex === q.correctOption;
     setSelected(optionIndex);
-    if (correct) setScore(s => s + 1);
-    trackEvent('icu_drips_practice_answered', {
-      question_id: q.id,
-      correct,
-    });
+    if (correct) {
+      setScore(s => s + 1);
+    } else if (q.relatedDripId) {
+      setMissedDripIds(prev => prev.includes(q.relatedDripId) ? prev : [...prev, q.relatedDripId]);
+    }
+    trackEvent('icu_drips_practice_answered', { question_id: q.id, correct });
   }
 
   function handleNext() {
@@ -1128,6 +1140,7 @@ function PracticeMode({ onBack, onNavigateToDrip }) {
     setSelected(null);
     setScore(0);
     setDone(false);
+    setMissedDripIds([]);
     trackEvent('icu_drips_practice_opened');
   }
 
@@ -1139,6 +1152,9 @@ function PracticeMode({ onBack, onNavigateToDrip }) {
       : pct >= 70
         ? 'Solid work. A few patterns worth a second look.'
         : 'Keep going — each pass sharpens the pattern.';
+    const reviewDrips = missedDripIds.slice(0, 3)
+      .map(id => DRIPS.find(d => d.id === id))
+      .filter(Boolean);
     return (
       <div className="id-practice">
         <button className="id-practice__back" onClick={onBack}>← Back to ICU Drips</button>
@@ -1146,6 +1162,27 @@ function PracticeMode({ onBack, onNavigateToDrip }) {
           <div className="id-practice-end__eyebrow">Practice complete</div>
           <div className="id-practice-end__score">{finalScore} / {total}</div>
           <p className="id-practice-end__msg">{msg}</p>
+          {reviewDrips.length > 0 ? (
+            <div className="id-practice-end__review">
+              <span className="id-practice-end__review-label">Review next</span>
+              {reviewDrips.map(drip => (
+                <button
+                  key={drip.id}
+                  className="id-practice-end__review-link"
+                  onClick={() => {
+                    trackEvent('icu_drips_practice_review_drip_clicked', { drip_id: drip.id });
+                    onNavigateToDrip(drip);
+                  }}
+                >
+                  {drip.name} →
+                </button>
+              ))}
+            </div>
+          ) : (
+            <p className="id-practice-end__review-clean">
+              Clean pass — review any drip from the library when you're ready.
+            </p>
+          )}
           <button className="id-practice-btn id-practice-btn--primary" onClick={handleRestart}>
             Practice again
           </button>

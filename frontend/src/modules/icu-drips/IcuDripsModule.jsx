@@ -168,6 +168,199 @@ const PRACTICE_DECK = [
   },
 ];
 
+// ─── Shift challenges ─────────────────────────────────────────────────────────
+const SHIFT_CHALLENGES = [
+  {
+    id: 'pressor-map-vs-perfusion',
+    title: 'MAP improved, perfusion did not',
+    patientSnapshot: 'Patient on norepinephrine. MAP is now within the ordered goal range, but urine output is falling and extremities remain cool.',
+    prompt: 'What should this pattern remind you?',
+    options: [
+      'MAP alone does not prove perfusion improved',
+      'Cool extremities are expected and do not matter',
+      'Urine output only matters in kidney disease',
+      'The blood pressure number is the only trend that matters',
+    ],
+    correctOption: 0,
+    explanation: 'MAP is important, but bedside perfusion markers — urine output, skin temperature, capillary refill, and mentation — help show whether circulation is actually reaching the tissues.',
+    pearl: 'Pressure is a number. Perfusion is a patient picture.',
+    relatedDripIds: ['norepinephrine'],
+  },
+  {
+    id: 'phenyl-hr-drop',
+    title: 'Pressure up, heart rate down',
+    patientSnapshot: 'Patient on a vasopressor. Blood pressure improves while heart rate trends from 88 to 52 over the last 30 minutes.',
+    prompt: 'Which pattern fits best?',
+    options: [
+      'Pure alpha vasoconstriction with reflex bradycardia',
+      'Direct beta-1 stimulation',
+      'Improved cardiac output',
+      'This pattern has no hemodynamic meaning',
+    ],
+    correctOption: 0,
+    explanation: 'Phenylephrine is a predominantly alpha-1 agent. When vascular tone rises without beta stimulation, reflex slowing of the heart rate can become the visible bedside pattern.',
+    pearl: 'When pressure rises and the heart slows, think about the receptor profile.',
+    relatedDripIds: ['phenylephrine'],
+  },
+  {
+    id: 'milrinone-output-pressure',
+    title: 'Output better, pressure softer',
+    patientSnapshot: 'Cardiac output and cardiac index look improved, but the blood pressure remains soft after an inotrope change.',
+    prompt: 'Which interpretation fits best?',
+    options: [
+      'Inotropy and vasodilation can move in opposite directions',
+      'Improved output always raises MAP',
+      'SVR is unrelated to blood pressure',
+      'Heart rate is the only useful trend',
+    ],
+    correctOption: 0,
+    explanation: 'Some inotropes can improve pump performance while lowering vascular resistance. The result can be better output with softer pressure — both trends matter at the same time.',
+    pearl: 'Better pump function does not always mean higher pressure.',
+    relatedDripIds: ['milrinone', 'dobutamine'],
+  },
+  {
+    id: 'sedation-monitor-pattern',
+    title: 'Calm patient, different monitor story',
+    patientSnapshot: 'Two sedated patients appear calm. One has softer blood pressure. The other has a gradually slowing heart rate.',
+    prompt: 'What should this pattern remind you?',
+    options: [
+      'Sedation depth and hemodynamic pattern are separate bedside stories',
+      'Calm appearance means the hemodynamics are stable',
+      'Heart rate trends do not matter during sedation',
+      'Blood pressure changes only matter with vasopressors',
+    ],
+    correctOption: 0,
+    explanation: 'Different sedatives can create different hemodynamic patterns. Calm appearance does not replace trending pressure, heart rate, rhythm, and respiratory status throughout the shift.',
+    pearl: 'Stillness is not the same thing as stability.',
+    relatedDripIds: ['propofol', 'dexmedetomidine'],
+  },
+  {
+    id: 'insulin-potassium',
+    title: 'Glucose drip, potassium story',
+    patientSnapshot: 'Patient is on an insulin infusion. Glucose is improving, but potassium is trending lower.',
+    prompt: 'Which monitoring focus fits best?',
+    options: [
+      'Glucose and potassium both matter',
+      'Only glucose matters during insulin infusion',
+      'Potassium does not change with insulin',
+      'Hemodynamics are the primary direct effect',
+    ],
+    correctOption: 0,
+    explanation: 'Insulin shifts glucose into cells and can shift potassium into cells too. The glucose trend matters, but potassium is part of the bedside watch throughout the infusion.',
+    pearl: 'Insulin infusions are really two labs: glucose and potassium.',
+    relatedDripIds: ['insulin-infusion'],
+  },
+];
+
+// ─── Clinical pearls ──────────────────────────────────────────────────────────
+const ICU_PEARLS = [
+  {
+    id: 'phenyl-reflex-brady',
+    title: 'Pressure up, heart rate down',
+    pearl: 'Pure alpha vasoconstriction can be followed by reflex bradycardia as MAP rises.',
+    whyItMatters: 'The bedside clue may appear in the heart rate trend, not just the MAP number.',
+    relatedDripIds: ['phenylephrine'],
+  },
+  {
+    id: 'map-vs-perfusion',
+    title: 'MAP is a number, not the whole story',
+    pearl: 'A blood pressure within the goal range does not confirm that circulation is reaching the tissues.',
+    whyItMatters: 'Urine output, skin temperature, and mentation give the rest of the perfusion picture that MAP alone cannot.',
+    relatedDripIds: ['norepinephrine'],
+  },
+  {
+    id: 'milrinone-delayed',
+    title: "Milrinone's effects linger",
+    pearl: "Milrinone has a longer half-life than most inotropes — its hemodynamic footprint outlasts recent rate changes.",
+    whyItMatters: "What the monitor shows now may reflect what was running hours ago, not just the current rate.",
+    relatedDripIds: ['milrinone'],
+  },
+  {
+    id: 'dobutamine-hr',
+    title: 'Dobutamine and heart rate',
+    pearl: 'Beta-1 stimulation from dobutamine can raise heart rate alongside improving cardiac output.',
+    whyItMatters: 'A climbing heart rate on an inotrope may be the drug working, not a new arrhythmia — but both need trending.',
+    relatedDripIds: ['dobutamine'],
+  },
+  {
+    id: 'vasopressin-not-catecolamine',
+    title: 'Vasopressin is a different class',
+    pearl: 'Vasopressin acts on V1 receptors, not adrenergic receptors — it is not a stronger norepinephrine.',
+    whyItMatters: 'Expecting the same dose-response pattern as catecholamine vasopressors can lead to misreading the hemodynamic trend.',
+    relatedDripIds: ['vasopressin'],
+  },
+  {
+    id: 'dex-gradual-brady',
+    title: 'Dexmedetomidine and creeping bradycardia',
+    pearl: 'Heart rate slowing on dexmedetomidine is often gradual rather than abrupt.',
+    whyItMatters: 'Trending the heart rate over 30-minute windows helps catch the pattern before it becomes hemodynamically significant.',
+    relatedDripIds: ['dexmedetomidine'],
+  },
+  {
+    id: 'propofol-soft-bp',
+    title: 'Propofol and softer blood pressure',
+    pearl: 'Propofol can cause hypotension through vasodilation, especially at higher infusion parameters.',
+    whyItMatters: 'Blood pressure softening during or after a propofol adjustment is a pattern worth anticipating, not just reacting to.',
+    relatedDripIds: ['propofol'],
+  },
+  {
+    id: 'nicardipine-afterload',
+    title: 'Nicardipine reduces afterload',
+    pearl: 'Nicardipine lowers blood pressure primarily through arterial vasodilation — it targets systemic vascular resistance.',
+    whyItMatters: 'Reflex tachycardia is a more common bedside pattern with nicardipine than with venodilators like nitroglycerin.',
+    relatedDripIds: ['nicardipine'],
+  },
+  {
+    id: 'ntg-preload',
+    title: 'Nitroglycerin reduces preload',
+    pearl: 'Nitroglycerin works predominantly through venodilation at lower infusion parameters — reducing venous return to the heart.',
+    whyItMatters: 'The same MAP drop from nitroglycerin and nicardipine represents different hemodynamic mechanisms and different monitoring priorities.',
+    relatedDripIds: ['nitroglycerin'],
+  },
+  {
+    id: 'insulin-potassium',
+    title: 'Insulin moves more than glucose',
+    pearl: 'Insulin shifts glucose into cells and shifts potassium into cells at the same time.',
+    whyItMatters: 'Glucose checks alone may miss a falling potassium level — both trends matter throughout the infusion.',
+    relatedDripIds: ['insulin-infusion'],
+  },
+  {
+    id: 'heparin-lab-not-hemo',
+    title: 'Heparin is lab-guided, not hemodynamic',
+    pearl: 'Heparin has no direct effect on MAP, SVR, CO, or heart rate — its effect is entirely anticoagulation.',
+    whyItMatters: 'Monitoring attention appropriately shifts to lab values and bleeding signs rather than vital sign trends.',
+    relatedDripIds: ['heparin'],
+  },
+  {
+    id: 'amiodarone-long-tail',
+    title: "Amiodarone's effects outlast the infusion",
+    pearl: 'Amiodarone has an exceptionally long half-life — rhythm, QTc, thyroid, and drug interaction effects persist for weeks after stopping.',
+    whyItMatters: 'Stopping the infusion does not stop the monitoring — effects and interactions remain relevant long after discontinuation.',
+    relatedDripIds: ['amiodarone'],
+  },
+  {
+    id: 'peripheral-perfusion',
+    title: 'Peripheral perfusion is a bedside exam',
+    pearl: 'Skin temperature, capillary refill, and urine output reflect peripheral perfusion in a way that blood pressure alone cannot.',
+    whyItMatters: 'A vasopressor achieving its MAP target does not guarantee that end-organ perfusion has improved.',
+    relatedDripIds: ['norepinephrine', 'vasopressin'],
+  },
+  {
+    id: 'co-vs-map',
+    title: 'Cardiac output and MAP are not the same',
+    pearl: 'CO and MAP can move in opposite directions — improved output with softer pressure is a real hemodynamic pattern.',
+    whyItMatters: 'Trending both together gives a more accurate picture of what is happening hemodynamically than either number alone.',
+    relatedDripIds: ['dobutamine', 'milrinone'],
+  },
+  {
+    id: 'trending-beats-isolated',
+    title: 'Trending beats isolated numbers',
+    pearl: 'A single value tells you where the patient is; a trend tells you which direction they are heading.',
+    whyItMatters: 'Patterns over time — in MAP, heart rate, urine output, and labs — are more actionable than any one data point.',
+    relatedDripIds: [],
+  },
+];
+
 // ─── Recently viewed helpers (localStorage, max 5) ────────────────────────────
 function getRecentDripIds() {
   try { return JSON.parse(localStorage.getItem('ce_id_recent') || '[]'); }
@@ -870,7 +1063,7 @@ function QuickCompare({ onBackToHome, onNavigateToDrip, initialPairId }) {
 }
 
 // ─── Landing page ─────────────────────────────────────────────────────────────
-function DripsHome({ onSelect, onShowCompare, onShowPractice }) {
+function DripsHome({ onSelect, onShowCompare, onShowPractice, onShowChallenge, onShowPearl }) {
   const [query,    setQuery]    = useState('');
   const [category, setCategory] = useState('all');
 
@@ -955,8 +1148,28 @@ function DripsHome({ onSelect, onShowCompare, onShowPractice }) {
         </div>
       )}
 
-      {/* Home actions — practice + compare */}
+      {/* Today's Clinical Pearl */}
+      {ICU_PEARLS[0] && (
+        <button
+          className="id-pearl-home-card"
+          onClick={() => { trackEvent('icu_drips_pearl_opened', { pearl_id: ICU_PEARLS[0].id }); onShowPearl(ICU_PEARLS[0].id); }}
+        >
+          <span className="id-pearl-home-card__eyebrow">Clinical Pearl</span>
+          <p className="id-pearl-home-card__title">{ICU_PEARLS[0].title}</p>
+          <p className="id-pearl-home-card__body">{ICU_PEARLS[0].pearl}</p>
+          <span className="id-pearl-home-card__cta">Learn more →</span>
+        </button>
+      )}
+
+      {/* Home actions — challenge + practice + compare */}
       <div className="id-home-actions">
+        <button className="id-home-action id-home-action--challenge" onClick={onShowChallenge}>
+          <div className="id-home-action__body">
+            <span className="id-home-action__label">Shift Challenge</span>
+            <span className="id-home-action__sub">1 quick bedside pattern</span>
+          </div>
+          <span className="id-home-action__arrow">→</span>
+        </button>
         <button className="id-home-action id-home-action--practice" onClick={onShowPractice}>
           <div className="id-home-action__body">
             <span className="id-home-action__label">Practice hemodynamics</span>
@@ -1041,33 +1254,6 @@ function DripsHome({ onSelect, onShowCompare, onShowPractice }) {
           );
         })
       )}
-
-      {/* Quick Compare section — dark navy pair cards */}
-      <div className="id-compare-section">
-        <div className="id-compare-section__header">
-          <span className="id-compare-section__icon">
-            <Icon type="compare" size={13} />
-          </span>
-          <span className="id-compare-section__eyebrow">Quick Compare</span>
-        </div>
-        <p className="id-compare-section__sub">
-          Side-by-side reference for common drip pairs
-        </p>
-        {COMPARE_PAIRS.map(pair => (
-          <button
-            key={pair.id}
-            className="id-compare-pair-card"
-            onClick={() => onShowCompare(pair.id)}
-          >
-            <div className="id-compare-pair-card__names">
-              <span className="id-compare-pair-card__name">{pair.aLabel}</span>
-              <span className="id-compare-pair-card__vs">vs</span>
-              <span className="id-compare-pair-card__name">{pair.bLabel}</span>
-            </div>
-            <span className="id-compare-pair-card__arrow">›</span>
-          </button>
-        ))}
-      </div>
 
       {/* Foundations — compact rows */}
       <div className="id-foundations">
@@ -1273,11 +1459,226 @@ function PracticeMode({ onBack, onNavigateToDrip }) {
   );
 }
 
+// ─── Shift Challenge ──────────────────────────────────────────────────────────
+function ShiftChallenge({ onBack, onNavigateToDrip }) {
+  const [index,    setIndex]    = useState(0);
+  const [selected, setSelected] = useState(null);
+  const [done,     setDone]     = useState(false);
+
+  const total = SHIFT_CHALLENGES.length;
+
+  useEffect(() => {
+    trackEvent('icu_drips_shift_challenge_opened');
+  }, []);
+
+  function handleAnswer(optionIndex) {
+    if (selected !== null) return;
+    const ch = SHIFT_CHALLENGES[index];
+    const correct = optionIndex === ch.correctOption;
+    setSelected(optionIndex);
+    trackEvent('icu_drips_shift_challenge_answered', { challenge_id: ch.id, correct });
+  }
+
+  function handleNext() {
+    if (index + 1 >= total) {
+      trackEvent('icu_drips_shift_challenge_completed', { total });
+      setDone(true);
+    } else {
+      setIndex(i => i + 1);
+      setSelected(null);
+    }
+  }
+
+  function handleRestart() {
+    setIndex(0);
+    setSelected(null);
+    setDone(false);
+    trackEvent('icu_drips_shift_challenge_opened');
+  }
+
+  if (done) {
+    return (
+      <div className="id-challenge">
+        <button className="id-challenge__back" onClick={onBack}>← Back to ICU Drips</button>
+        <div className="id-challenge-end">
+          <div className="id-challenge-end__eyebrow">Shift complete</div>
+          <p className="id-challenge-end__msg">All {total} patterns reviewed.</p>
+          <button className="id-challenge-btn id-challenge-btn--primary" onClick={handleRestart}>
+            Start over
+          </button>
+          <button className="id-challenge-btn id-challenge-btn--ghost" onClick={onBack}>
+            Back to ICU Drips
+          </button>
+        </div>
+        <div className="id-detail__disclaimer" style={{ marginTop: 24 }}>{SAFETY_DISCLAIMER}</div>
+      </div>
+    );
+  }
+
+  const ch = SHIFT_CHALLENGES[index];
+  const answered = selected !== null;
+  const correct = answered && selected === ch.correctOption;
+
+  return (
+    <div className="id-challenge">
+      <button className="id-challenge__back" onClick={onBack}>← Back to ICU Drips</button>
+
+      {/* Header */}
+      <div className="id-challenge-header">
+        <div className="id-challenge-header__top">
+          <span className="id-challenge-header__title">Shift Challenge</span>
+          <span className="id-challenge-header__count">{index + 1} of {total}</span>
+        </div>
+        <p className="id-challenge-header__sub">One quick bedside pattern.</p>
+        <div className="id-challenge-progress-bar">
+          <div className="id-challenge-progress-bar__fill" style={{ width: `${(index / total) * 100}%` }} />
+        </div>
+      </div>
+
+      {/* Scenario card */}
+      <div className="id-challenge-card">
+        <div className="id-challenge-card__title">{ch.title}</div>
+        <p className="id-challenge-card__snapshot">{ch.patientSnapshot}</p>
+        <p className="id-challenge-card__prompt">{ch.prompt}</p>
+      </div>
+
+      {/* Options */}
+      <div className="id-challenge-options">
+        {ch.options.map((opt, i) => {
+          let cls = 'id-challenge-option';
+          if (answered) {
+            if (i === ch.correctOption)  cls += ' id-challenge-option--correct';
+            else if (i === selected)     cls += ' id-challenge-option--incorrect';
+            else                         cls += ' id-challenge-option--dim';
+          }
+          return (
+            <button key={i} className={cls} onClick={() => handleAnswer(i)} disabled={answered}>
+              <span className="id-challenge-option__letter">{String.fromCharCode(65 + i)}</span>
+              <span className="id-challenge-option__text">{opt}</span>
+            </button>
+          );
+        })}
+      </div>
+
+      {/* Feedback */}
+      {answered && (
+        <div className="id-challenge-feedback">
+          <div className={`id-challenge-feedback__verdict ${correct ? 'id-challenge-feedback__verdict--correct' : 'id-challenge-feedback__verdict--incorrect'}`}>
+            {correct ? 'Correct' : 'Not quite'}
+          </div>
+          <p className="id-challenge-feedback__explanation">{ch.explanation}</p>
+          <div className="id-challenge-pearl">
+            <span className="id-challenge-pearl__label">Pearl</span>
+            <p className="id-challenge-pearl__text">{ch.pearl}</p>
+          </div>
+          {ch.relatedDripIds?.length > 0 && (
+            <div className="id-challenge-feedback__drip-links">
+              {ch.relatedDripIds.map(dripId => {
+                const drip = DRIPS.find(d => d.id === dripId);
+                if (!drip) return null;
+                return (
+                  <button
+                    key={dripId}
+                    className="id-challenge-feedback__drip-link"
+                    onClick={() => {
+                      trackEvent('icu_drips_shift_challenge_review_drip_clicked', { drip_id: drip.id });
+                      onNavigateToDrip(drip);
+                    }}
+                  >
+                    Review {drip.name} →
+                  </button>
+                );
+              })}
+            </div>
+          )}
+          <button className="id-challenge-btn id-challenge-btn--primary" onClick={handleNext}>
+            {index + 1 >= total ? 'See results' : 'Next challenge'}
+          </button>
+        </div>
+      )}
+    </div>
+  );
+}
+
+// ─── Pearl view ───────────────────────────────────────────────────────────────
+function PearlView({ initialPearlId, onBack, onNavigateToDrip }) {
+  const [pearlId, setPearlId] = useState(initialPearlId);
+
+  useEffect(() => {
+    trackEvent('icu_drips_pearl_viewed', { pearl_id: pearlId });
+  }, [pearlId]);
+
+  const pearl = ICU_PEARLS.find(p => p.id === pearlId);
+  if (!pearl) return null;
+
+  const currentIndex = ICU_PEARLS.findIndex(p => p.id === pearlId);
+  const morePearls = [1, 2, 3]
+    .map(offset => ICU_PEARLS[(currentIndex + offset) % ICU_PEARLS.length])
+    .filter(Boolean);
+
+  return (
+    <div className="id-pearl-view">
+      <button className="id-pearl-view__back" onClick={onBack}>← Back to ICU Drips</button>
+
+      <div className="id-pearl-view__header">
+        <span className="id-pearl-view__eyebrow">Clinical Pearl</span>
+      </div>
+
+      <div className="id-pearl-view__card">
+        <h2 className="id-pearl-view__title">{pearl.title}</h2>
+        <p className="id-pearl-view__body">{pearl.pearl}</p>
+        <div className="id-pearl-view__why">
+          <span className="id-pearl-view__why-label">Why it matters</span>
+          <p className="id-pearl-view__why-text">{pearl.whyItMatters}</p>
+        </div>
+      </div>
+
+      {pearl.relatedDripIds?.length > 0 && (
+        <div className="id-pearl-view__related">
+          <span className="id-pearl-view__related-label">Related drips</span>
+          {pearl.relatedDripIds.map(dripId => {
+            const drip = DRIPS.find(d => d.id === dripId);
+            if (!drip) return null;
+            return (
+              <button
+                key={dripId}
+                className="id-pearl-view__drip-link"
+                onClick={() => {
+                  trackEvent('icu_drips_pearl_related_drip_clicked', { drip_id: drip.id });
+                  onNavigateToDrip(drip);
+                }}
+              >
+                Review {drip.name} →
+              </button>
+            );
+          })}
+        </div>
+      )}
+
+      <div className="id-pearl-view__more">
+        <span className="id-pearl-view__more-label">More pearls</span>
+        {morePearls.map(p => (
+          <button
+            key={p.id}
+            className="id-pearl-view__more-link"
+            onClick={() => { trackEvent('icu_drips_pearl_opened', { pearl_id: p.id }); setPearlId(p.id); }}
+          >
+            {p.title} →
+          </button>
+        ))}
+      </div>
+
+      <div className="id-detail__disclaimer" style={{ marginTop: 24 }}>{SAFETY_DISCLAIMER}</div>
+    </div>
+  );
+}
+
 // ─── Module shell ─────────────────────────────────────────────────────────────
 export default function IcuDripsModule({ onGoHome }) {
-  const [view,          setView]          = useState('home');
-  const [selected,      setSelected]      = useState(null);
-  const [comparePairId, setComparePairId] = useState(null);
+  const [view,           setView]           = useState('home');
+  const [selected,       setSelected]       = useState(null);
+  const [comparePairId,  setComparePairId]  = useState(null);
+  const [activePearlId,  setActivePearlId]  = useState(null);
 
   // Track module opened once on mount
   useEffect(() => {
@@ -1310,6 +1711,15 @@ export default function IcuDripsModule({ onGoHome }) {
 
   function handleShowPractice() {
     setView('practice');
+  }
+
+  function handleShowChallenge() {
+    setView('challenge');
+  }
+
+  function handleShowPearl(pearlId) {
+    setActivePearlId(pearlId);
+    setView('pearl');
   }
 
   function handleNavigateToDrip(drip) {
@@ -1352,11 +1762,24 @@ export default function IcuDripsModule({ onGoHome }) {
             onBack={() => setView('home')}
             onNavigateToDrip={handleNavigateToDrip}
           />
+        ) : view === 'challenge' ? (
+          <ShiftChallenge
+            onBack={() => setView('home')}
+            onNavigateToDrip={handleNavigateToDrip}
+          />
+        ) : view === 'pearl' && activePearlId ? (
+          <PearlView
+            initialPearlId={activePearlId}
+            onBack={() => setView('home')}
+            onNavigateToDrip={handleNavigateToDrip}
+          />
         ) : (
           <DripsHome
             onSelect={handleSelect}
             onShowCompare={handleShowCompare}
             onShowPractice={handleShowPractice}
+            onShowChallenge={handleShowChallenge}
+            onShowPearl={handleShowPearl}
           />
         )}
       </div>

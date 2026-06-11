@@ -4,9 +4,10 @@ import { trackEvent } from "./analytics";
 // Maps module.key → explicit analytics event name.
 // Explicit names are easier to filter in Vercel Analytics than payload fields.
 const MODULE_OPEN_EVENTS = {
-  copilot:   'copilot_module_opened',
-  rhythmlab: 'rhythm_lab_module_opened',
-  icudrips:  'icu_drips_module_opened',
+  copilot:      'copilot_module_opened',
+  rhythmlab:    'rhythm_lab_module_opened',
+  icudrips:     'icu_drips_module_opened',
+  referencehub: 'reference_hub_opened',
 };
 
 // ─── CE Logo ──────────────────────────────────────────────────────────────────
@@ -58,6 +59,15 @@ const MODULES = [
       "Clinical context, monitoring essentials, and bedside awareness for common critical care infusions.",
     status: "active",
     path: "/icu-drips",
+  },
+  {
+    key: "referencehub",
+    tag: "Bedside Reference",
+    title: "Reference Hub",
+    description:
+      "Fast bedside answers for hemodynamics, labs, ABGs, ventilation, and devices. No dosing. No diagnosis.",
+    status: "active",
+    path: "/reference-hub",
   },
 ];
 

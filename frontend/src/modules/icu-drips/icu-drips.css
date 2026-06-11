@@ -1666,6 +1666,323 @@
   margin: 0;
 }
 
+/* ─── Practice entry button (home page) ──────────────────────────────────────── */
+.id-practice-entry {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  width: 100%;
+  background: var(--id-bg-card);
+  border: 1px solid var(--id-border-card);
+  border-radius: 8px;
+  padding: 11px 14px;
+  margin-bottom: 12px;
+  cursor: pointer;
+  text-align: left;
+  transition: background 0.12s, border-color 0.12s;
+}
+.id-practice-entry:hover {
+  background: #F0F7F7;
+  border-color: var(--id-teal);
+}
+.id-practice-entry__icon {
+  font-size: 14px;
+  color: var(--id-teal);
+  flex-shrink: 0;
+  line-height: 1;
+}
+.id-practice-entry__label {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--id-text-dark);
+  font-family: var(--id-font-sans);
+}
+.id-practice-entry__sub {
+  font-size: 11px;
+  color: var(--id-text-dim);
+  font-family: var(--id-font-sans);
+  margin-left: 2px;
+}
+.id-practice-entry__arrow {
+  font-size: 13px;
+  color: var(--id-teal);
+  margin-left: auto;
+  flex-shrink: 0;
+}
+
+/* ─── Practice view wrapper ──────────────────────────────────────────────────── */
+.id-practice {
+  padding: 0 0 40px;
+  animation: id-fade-up 0.18s ease both;
+}
+.id-practice__back {
+  background: none;
+  border: none;
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--id-text-dim);
+  cursor: pointer;
+  padding: 4px 0 16px;
+  font-family: var(--id-font-sans);
+  transition: color 0.1s;
+}
+.id-practice__back:hover { color: var(--id-teal); }
+
+/* ─── Practice header ─────────────────────────────────────────────────────────── */
+.id-practice-header {
+  margin-bottom: 16px;
+}
+.id-practice-header__top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 3px;
+}
+.id-practice-header__title {
+  font-size: 17px;
+  font-weight: 700;
+  color: var(--id-text-dark);
+  font-family: var(--id-font-sans);
+}
+.id-practice-header__progress {
+  font-size: 11px;
+  font-family: var(--id-font-mono);
+  color: var(--id-text-dim);
+  font-weight: 600;
+  letter-spacing: 0.5px;
+}
+.id-practice-header__sub {
+  font-size: 12px;
+  color: var(--id-text-muted);
+  margin: 0 0 10px;
+  font-family: var(--id-font-sans);
+}
+.id-practice-progress-bar {
+  height: 3px;
+  background: var(--id-border-card);
+  border-radius: 2px;
+  overflow: hidden;
+}
+.id-practice-progress-bar__fill {
+  height: 100%;
+  background: var(--id-teal);
+  border-radius: 2px;
+  transition: width 0.3s ease;
+}
+
+/* ─── Question card ──────────────────────────────────────────────────────────── */
+.id-practice-card {
+  background: var(--id-bg-card);
+  border: 1px solid var(--id-border-card);
+  border-radius: 10px;
+  padding: 16px;
+  margin-bottom: 12px;
+}
+.id-practice-card__context {
+  font-size: 12px;
+  color: var(--id-text-muted);
+  line-height: 1.5;
+  margin: 0 0 10px;
+  font-style: italic;
+  border-bottom: 1px solid var(--id-border-warm);
+  padding-bottom: 10px;
+}
+.id-practice-card__prompt {
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--id-text-dark);
+  line-height: 1.5;
+  margin: 0;
+}
+
+/* ─── Answer options ─────────────────────────────────────────────────────────── */
+.id-practice-options {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-bottom: 16px;
+}
+.id-practice-option {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  width: 100%;
+  background: var(--id-bg-card);
+  border: 1.5px solid var(--id-border-card);
+  border-radius: 8px;
+  padding: 11px 14px;
+  cursor: pointer;
+  text-align: left;
+  font-family: var(--id-font-sans);
+  transition: border-color 0.1s, background 0.1s;
+  min-height: 48px;
+}
+.id-practice-option:hover:not(:disabled) {
+  border-color: var(--id-teal);
+  background: #F0F7F7;
+}
+.id-practice-option:disabled { cursor: default; }
+.id-practice-option__letter {
+  font-size: 11px;
+  font-weight: 700;
+  font-family: var(--id-font-mono);
+  color: var(--id-text-dim);
+  min-width: 16px;
+  padding-top: 1px;
+  flex-shrink: 0;
+}
+.id-practice-option__text {
+  font-size: 13px;
+  color: var(--id-text-dark);
+  line-height: 1.5;
+}
+.id-practice-option--correct {
+  border-color: var(--id-teal);
+  background: rgba(10,191,188,0.07);
+}
+.id-practice-option--correct .id-practice-option__letter,
+.id-practice-option--correct .id-practice-option__text {
+  color: #0a8c8a;
+  font-weight: 600;
+}
+.id-practice-option--incorrect {
+  border-color: #D97C7C;
+  background: rgba(217,124,124,0.07);
+}
+.id-practice-option--incorrect .id-practice-option__letter,
+.id-practice-option--incorrect .id-practice-option__text {
+  color: #b05050;
+}
+.id-practice-option--dim {
+  opacity: 0.45;
+}
+.id-practice-option--selected {
+  border-color: var(--id-teal);
+  background: rgba(10,191,188,0.05);
+}
+
+/* ─── Feedback block ─────────────────────────────────────────────────────────── */
+.id-practice-feedback {
+  background: var(--id-bg-card);
+  border: 1px solid var(--id-border-card);
+  border-radius: 10px;
+  padding: 16px;
+  margin-bottom: 12px;
+}
+.id-practice-feedback__verdict {
+  font-size: 13px;
+  font-weight: 700;
+  font-family: var(--id-font-sans);
+  margin-bottom: 8px;
+}
+.id-practice-feedback__verdict--correct { color: #0a8c8a; }
+.id-practice-feedback__verdict--incorrect { color: #b05050; }
+.id-practice-feedback__explanation {
+  font-size: 13px;
+  color: var(--id-text-mid);
+  line-height: 1.6;
+  margin: 0 0 12px;
+}
+.id-practice-feedback__pearl {
+  background: rgba(212,168,75,0.08);
+  border-left: 3px solid var(--id-gold);
+  border-radius: 0 6px 6px 0;
+  padding: 8px 12px;
+  margin-bottom: 12px;
+}
+.id-practice-feedback__pearl-label {
+  display: block;
+  font-size: 9px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 1.2px;
+  color: var(--id-gold);
+  font-family: var(--id-font-mono);
+  margin-bottom: 3px;
+}
+.id-practice-feedback__pearl-text {
+  font-size: 12.5px;
+  color: var(--id-text-mid);
+  line-height: 1.5;
+  margin: 0;
+  font-style: italic;
+}
+.id-practice-feedback__drip-link {
+  display: inline-block;
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--id-teal);
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 0;
+  margin-bottom: 14px;
+  font-family: var(--id-font-sans);
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
+.id-practice-feedback__drip-link:hover { color: #089e9b; }
+
+/* ─── Practice buttons ───────────────────────────────────────────────────────── */
+.id-practice-btn {
+  display: block;
+  width: 100%;
+  padding: 13px 16px;
+  border-radius: 8px;
+  font-size: 14px;
+  font-weight: 600;
+  font-family: var(--id-font-sans);
+  cursor: pointer;
+  text-align: center;
+  transition: background 0.12s, border-color 0.12s, color 0.12s;
+  margin-top: 8px;
+}
+.id-practice-btn--primary {
+  background: var(--id-teal);
+  border: 1.5px solid var(--id-teal);
+  color: #fff;
+}
+.id-practice-btn--primary:hover { background: #089e9b; border-color: #089e9b; }
+.id-practice-btn--ghost {
+  background: var(--id-bg-card);
+  border: 1.5px solid var(--id-border-card);
+  color: var(--id-text-mid);
+}
+.id-practice-btn--ghost:hover { border-color: var(--id-teal); color: var(--id-teal); }
+
+/* ─── Practice end / score screen ────────────────────────────────────────────── */
+.id-practice-end {
+  background: var(--id-bg-card);
+  border: 1px solid var(--id-border-card);
+  border-radius: 10px;
+  padding: 24px 20px 20px;
+  text-align: center;
+  margin-bottom: 16px;
+}
+.id-practice-end__eyebrow {
+  font-size: 10px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 1.4px;
+  color: var(--id-teal);
+  font-family: var(--id-font-mono);
+  margin-bottom: 8px;
+}
+.id-practice-end__score {
+  font-size: 40px;
+  font-weight: 800;
+  color: var(--id-text-dark);
+  font-family: var(--id-font-sans);
+  line-height: 1.1;
+  margin-bottom: 10px;
+}
+.id-practice-end__msg {
+  font-size: 13.5px;
+  color: var(--id-text-muted);
+  line-height: 1.5;
+  margin: 0 0 20px;
+}
+
 /* ─── Reduced motion ─────────────────────────────────────────────────────────── */
 @media (prefers-reduced-motion: reduce) {
   .id-drip-row,

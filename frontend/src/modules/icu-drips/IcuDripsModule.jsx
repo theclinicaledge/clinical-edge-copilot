@@ -14,6 +14,160 @@ const URGENCY_CONFIG = {
   reference: { label: 'Reference', color: '#4da3ff', bg: 'rgba(77,163,255,0.09)', border: 'rgba(77,163,255,0.22)' },
 };
 
+// ─── Practice deck ────────────────────────────────────────────────────────────
+const PRACTICE_DECK = [
+  {
+    id: 'q-norepi-perfusion',
+    prompt: 'MAP improves, but skin remains cool and urine output is still low. What should this pattern remind you?',
+    context: 'A patient on norepinephrine reaches the MAP target, but the peripheral exam tells a different story.',
+    options: [
+      'MAP improvement alone confirms that perfusion has improved',
+      'MAP is one signal — peripheral perfusion markers tell a fuller picture',
+      'Cool extremities are not meaningful while on a vasopressor',
+      'Low urine output is only relevant in kidney disease',
+    ],
+    correctOption: 1,
+    explanation: 'MAP is a target, but skin temperature, urine output, and mentation together indicate whether perfusion is actually improving. A rising MAP number does not automatically mean the organs are perfusing better.',
+    relatedDripId: 'norepinephrine',
+    learningPearl: 'Peripheral perfusion — not just MAP — tells the fuller clinical story on vasopressors.',
+  },
+  {
+    id: 'q-phenyl-bradycardia',
+    prompt: 'Blood pressure improves while the heart rate drifts down. Which hemodynamic pattern fits best?',
+    context: 'A patient\'s MAP rises after a vasopressor adjustment. The heart rate has been trending down over the past 30 minutes.',
+    options: [
+      'Beta-1 stimulation is elevating the heart rate',
+      'Pure alpha vasoconstriction can be associated with reflex bradycardia',
+      'The lower heart rate suggests the patient is now well-compensated',
+      'Heart rate slowing with BP improvement always means vagal tone',
+    ],
+    correctOption: 1,
+    explanation: 'Phenylephrine acts on alpha-1 receptors only — no direct cardiac stimulation. Pure vasoconstriction can trigger reflex bradycardia as blood pressure rises. This pattern is a useful bedside signal when reading a vasopressor trend.',
+    relatedDripId: 'phenylephrine',
+    learningPearl: 'With pure alpha vasoconstrictors, the heart rate can drop as MAP rises — reflex bradycardia is the mechanism.',
+  },
+  {
+    id: 'q-dobut-milrinone-co-bp',
+    prompt: 'Cardiac output improves but blood pressure softens. What does this pattern suggest?',
+    context: 'A patient on an inotrope shows better CO numbers, but MAP has drifted lower than expected.',
+    options: [
+      'The inotropy is working and the blood pressure drop is irrelevant',
+      'Inotropy and vasodilation can move in opposite directions at the same time',
+      'Soft blood pressure after an inotrope always signals clinical deterioration',
+      'This pattern only occurs with catecholamine inotropes',
+    ],
+    correctOption: 1,
+    explanation: 'Both dobutamine and milrinone support cardiac output, but both have vasodilatory effects that can lower blood pressure even as output improves. Recognizing this pattern helps anticipate that CO and MAP can trend in opposite directions simultaneously.',
+    relatedDripId: 'dobutamine',
+    learningPearl: 'Improved CO does not guarantee a higher MAP — vasodilation from inotropes can lower pressure even as the cardiac output number rises.',
+  },
+  {
+    id: 'q-milrinone-halftime',
+    prompt: 'Hemodynamics remain soft several hours after a rate change was reversed. What fits this pattern best?',
+    context: 'A patient on milrinone had a rate reduction ordered by the provider. Blood pressure is still lower than expected hours later.',
+    options: [
+      'The rate change must not have been entered correctly',
+      'Milrinone has a shorter half-life than most vasopressors',
+      'Milrinone\'s longer half-life means hemodynamic effects linger well after a rate change',
+      'Soft hemodynamics always indicate volume depletion in this setting',
+    ],
+    correctOption: 2,
+    explanation: 'Milrinone\'s longer half-life means the hemodynamic picture reflects what was running hours earlier, not just the current rate. Expecting immediate resolution after a rate change does not account for the drug\'s pharmacokinetic behavior.',
+    relatedDripId: 'milrinone',
+    learningPearl: 'With milrinone, what the numbers show now may reflect what was running hours ago — not just the current rate.',
+  },
+  {
+    id: 'q-vaso-no-hr-change',
+    prompt: 'MAP improves with little change in heart rate or rhythm. Which mechanism fits this pattern?',
+    context: 'A patient\'s blood pressure improves on a running vasopressor, but the heart rate has remained relatively stable throughout.',
+    options: [
+      'Beta-1 stimulation is improving vascular tone without cardiac effect',
+      'Non-catecholamine vascular tone support via V1 receptors',
+      'The MAP rise confirms improved cardiac output',
+      'Heart rate stability means the vasopressor is not yet working',
+    ],
+    correctOption: 1,
+    explanation: 'Vasopressin works through V1 receptors rather than adrenergic pathways. Unlike catecholamine vasopressors, it does not directly stimulate the heart. MAP improvement without a significant heart rate shift is a pattern consistent with non-catecholamine vascular tone support.',
+    relatedDripId: 'vasopressin',
+    learningPearl: 'Vasopressin raises MAP through a different receptor system — heart rate often stays stable because there is no direct beta stimulation.',
+  },
+  {
+    id: 'q-sedation-hemo-pattern',
+    prompt: 'Two calm patients are on different sedation infusions. One has softer blood pressure, the other has a slower heart rate. What does this pattern highlight?',
+    context: 'Both patients appear similarly sedated on assessment. One is on propofol, the other on dexmedetomidine.',
+    options: [
+      'Sedation depth is the only hemodynamic variable that matters',
+      'Hemodynamic pattern differs between sedation infusions — vasodilation vs bradycardia',
+      'The patient with the slower heart rate is more deeply sedated',
+      'Blood pressure softening on sedation always means the level is too high',
+    ],
+    correctOption: 1,
+    explanation: 'Propofol commonly causes hypotension through vasodilation. Dexmedetomidine\'s primary hemodynamic concern is bradycardia. Two patients can look equally calm while having distinctly different hemodynamic patterns depending on which agent is running.',
+    relatedDripId: 'propofol',
+    learningPearl: 'Sedation depth is not the only story — the hemodynamic pattern on the monitor helps identify which agent\'s dominant effect is showing.',
+  },
+  {
+    id: 'q-nicardipine-ntg-context',
+    prompt: 'Both infusions lower blood pressure. What is the most meaningful distinction in the pattern they produce?',
+    context: 'A nurse is reviewing the hemodynamic and clinical context for two patients on different antihypertensive infusions.',
+    options: [
+      'One lowers MAP faster than the other in all situations',
+      'Nicardipine reduces afterload (arterial); nitroglycerin reduces preload (venous) — the clinical context differs',
+      'Nitroglycerin is always more potent than nicardipine at the same MAP target',
+      'Reflex bradycardia is more prominent with nitroglycerin',
+    ],
+    correctOption: 1,
+    explanation: 'Nicardipine primarily lowers blood pressure through arterial vasodilation (afterload reduction). Nitroglycerin acts predominantly through venodilation (preload reduction). The same MAP number can reflect very different hemodynamic mechanisms — and different monitoring priorities follow.',
+    relatedDripId: 'nicardipine',
+    learningPearl: 'Both lower MAP, but the hemodynamic mechanism differs — afterload vs preload — and the clinical context shapes which pattern to monitor for.',
+  },
+  {
+    id: 'q-heparin-no-hemo',
+    prompt: 'The infusion has no direct effect on MAP, SVR, CO, CI, or HR. What is the primary monitoring focus?',
+    context: 'A patient is on an IV heparin infusion. Vitals have been stable overnight.',
+    options: [
+      'Blood pressure — heparin lowers SVR over time',
+      'Heart rate — heparin can cause reflex tachycardia',
+      'Lab-guided anticoagulation monitoring, not hemodynamics',
+      'Cardiac output — heparin has mild positive inotropic effects',
+    ],
+    correctOption: 2,
+    explanation: 'Heparin has no direct hemodynamic action. Its effect is anticoagulation, tracked through lab values. Recognizing that not all infusions have a hemodynamic footprint helps redirect monitoring attention appropriately — toward lab trends and bleeding signs.',
+    relatedDripId: 'heparin',
+    learningPearl: 'Heparin is a lab-guided infusion, not a hemodynamic one. Monitoring focus shifts to anticoagulation levels and bleeding risk.',
+  },
+  {
+    id: 'q-insulin-potassium',
+    prompt: 'An insulin infusion is running for glucose management. Which other lab trend requires close attention?',
+    context: 'A patient is on an insulin infusion per provider order. Glucose checks are in progress per protocol.',
+    options: [
+      'Sodium — insulin commonly causes hypernatremia',
+      'Potassium — insulin shifts potassium into cells and can lower serum levels',
+      'Creatinine — insulin directly affects renal clearance',
+      'Hemoglobin — insulin suppresses red cell production',
+    ],
+    correctOption: 1,
+    explanation: 'Insulin drives glucose into cells and simultaneously shifts potassium intracellularly, which can lower serum potassium levels. Close monitoring of potassium alongside glucose is an essential nursing awareness point during insulin infusions.',
+    relatedDripId: 'insulin-infusion',
+    learningPearl: 'Glucose is not the only number that matters on an insulin infusion — potassium moves with it and can drop silently.',
+  },
+  {
+    id: 'q-amiodarone-tail',
+    prompt: 'The amiodarone infusion has stopped. When do its effects and interactions end?',
+    context: 'A patient\'s amiodarone infusion was discontinued. The team is planning next steps.',
+    options: [
+      'Effects resolve within a few hours of stopping the infusion',
+      'Effects and drug interactions can persist for weeks after the infusion ends',
+      'Amiodarone has a short half-life — monitoring can stop when the infusion does',
+      'Thyroid and liver monitoring is only relevant while the infusion is running',
+    ],
+    correctOption: 1,
+    explanation: 'Amiodarone has an exceptionally long half-life measured in weeks. Its effects on heart rhythm, QTc, thyroid function, and drug interactions can persist long after the infusion is stopped. This is especially important when other medications are being added or adjusted.',
+    relatedDripId: 'amiodarone',
+    learningPearl: 'Amiodarone\'s effects outlast the infusion — monitoring for QTc, thyroid, liver, and drug interactions continues well beyond discontinuation.',
+  },
+];
+
 // ─── Recently viewed helpers (localStorage, max 5) ────────────────────────────
 function getRecentDripIds() {
   try { return JSON.parse(localStorage.getItem('ce_id_recent') || '[]'); }
@@ -716,7 +870,7 @@ function QuickCompare({ onBackToHome, onNavigateToDrip, initialPairId }) {
 }
 
 // ─── Landing page ─────────────────────────────────────────────────────────────
-function DripsHome({ onSelect, onShowCompare }) {
+function DripsHome({ onSelect, onShowCompare, onShowPractice }) {
   const [query,    setQuery]    = useState('');
   const [category, setCategory] = useState('all');
 
@@ -800,6 +954,14 @@ function DripsHome({ onSelect, onShowCompare }) {
           </div>
         </div>
       )}
+
+      {/* Practice entry */}
+      <button className="id-practice-entry" onClick={onShowPractice}>
+        <span className="id-practice-entry__icon">◎</span>
+        <span className="id-practice-entry__label">Practice hemodynamics</span>
+        <span className="id-practice-entry__sub">Pattern recognition · {PRACTICE_DECK.length} questions</span>
+        <span className="id-practice-entry__arrow">→</span>
+      </button>
 
       {/* Search + filter */}
       <div className="id-search-bar">
@@ -926,6 +1088,154 @@ function DripsHome({ onSelect, onShowCompare }) {
   );
 }
 
+// ─── Practice mode ────────────────────────────────────────────────────────────
+function PracticeMode({ onBack, onNavigateToDrip }) {
+  const [index,    setIndex]    = useState(0);
+  const [selected, setSelected] = useState(null); // index of chosen option
+  const [score,    setScore]    = useState(0);
+  const [done,     setDone]     = useState(false);
+
+  const total = PRACTICE_DECK.length;
+
+  useEffect(() => {
+    trackEvent('icu_drips_practice_opened');
+  }, []);
+
+  function handleAnswer(optionIndex) {
+    if (selected !== null) return; // locked after first answer
+    const q = PRACTICE_DECK[index];
+    const correct = optionIndex === q.correctOption;
+    setSelected(optionIndex);
+    if (correct) setScore(s => s + 1);
+    trackEvent('icu_drips_practice_answered', {
+      question_id: q.id,
+      correct,
+    });
+  }
+
+  function handleNext() {
+    if (index + 1 >= total) {
+      trackEvent('icu_drips_practice_completed', { score: score + (selected === PRACTICE_DECK[index].correctOption ? 1 : 0), total });
+      setDone(true);
+    } else {
+      setIndex(i => i + 1);
+      setSelected(null);
+    }
+  }
+
+  function handleRestart() {
+    setIndex(0);
+    setSelected(null);
+    setScore(0);
+    setDone(false);
+    trackEvent('icu_drips_practice_opened');
+  }
+
+  if (done) {
+    const finalScore = score;
+    const pct = Math.round((finalScore / total) * 100);
+    const msg = pct === 100
+      ? 'Perfect — strong pattern recognition.'
+      : pct >= 70
+        ? 'Solid work. A few patterns worth a second look.'
+        : 'Keep going — each pass sharpens the pattern.';
+    return (
+      <div className="id-practice">
+        <button className="id-practice__back" onClick={onBack}>← Back to ICU Drips</button>
+        <div className="id-practice-end">
+          <div className="id-practice-end__eyebrow">Practice complete</div>
+          <div className="id-practice-end__score">{finalScore} / {total}</div>
+          <p className="id-practice-end__msg">{msg}</p>
+          <button className="id-practice-btn id-practice-btn--primary" onClick={handleRestart}>
+            Practice again
+          </button>
+          <button className="id-practice-btn id-practice-btn--ghost" onClick={onBack}>
+            Back to ICU Drips
+          </button>
+        </div>
+        <div className="id-detail__disclaimer" style={{ marginTop: 24 }}>{SAFETY_DISCLAIMER}</div>
+      </div>
+    );
+  }
+
+  const q = PRACTICE_DECK[index];
+  const answered = selected !== null;
+  const correct = answered && selected === q.correctOption;
+  const relatedDrip = q.relatedDripId ? DRIPS.find(d => d.id === q.relatedDripId) : null;
+
+  return (
+    <div className="id-practice">
+      <button className="id-practice__back" onClick={onBack}>← Back to ICU Drips</button>
+
+      {/* Header */}
+      <div className="id-practice-header">
+        <div className="id-practice-header__top">
+          <span className="id-practice-header__title">ICU Drips Practice</span>
+          <span className="id-practice-header__progress">{index + 1} / {total}</span>
+        </div>
+        <p className="id-practice-header__sub">Pattern recognition, not medication selection.</p>
+        <div className="id-practice-progress-bar">
+          <div className="id-practice-progress-bar__fill" style={{ width: `${((index) / total) * 100}%` }} />
+        </div>
+      </div>
+
+      {/* Question card */}
+      <div className="id-practice-card">
+        {q.context && <p className="id-practice-card__context">{q.context}</p>}
+        <p className="id-practice-card__prompt">{q.prompt}</p>
+      </div>
+
+      {/* Options */}
+      <div className="id-practice-options">
+        {q.options.map((opt, i) => {
+          let cls = 'id-practice-option';
+          if (answered) {
+            if (i === q.correctOption) cls += ' id-practice-option--correct';
+            else if (i === selected)   cls += ' id-practice-option--incorrect';
+            else                       cls += ' id-practice-option--dim';
+          } else if (i === selected) {
+            cls += ' id-practice-option--selected';
+          }
+          return (
+            <button key={i} className={cls} onClick={() => handleAnswer(i)} disabled={answered}>
+              <span className="id-practice-option__letter">{String.fromCharCode(65 + i)}</span>
+              <span className="id-practice-option__text">{opt}</span>
+            </button>
+          );
+        })}
+      </div>
+
+      {/* Feedback */}
+      {answered && (
+        <div className="id-practice-feedback">
+          <div className={`id-practice-feedback__verdict ${correct ? 'id-practice-feedback__verdict--correct' : 'id-practice-feedback__verdict--incorrect'}`}>
+            {correct ? 'Correct' : 'Not quite'}
+          </div>
+          <p className="id-practice-feedback__explanation">{q.explanation}</p>
+          <div className="id-practice-feedback__pearl">
+            <span className="id-practice-feedback__pearl-label">Pearl</span>
+            <p className="id-practice-feedback__pearl-text">{q.learningPearl}</p>
+          </div>
+          {relatedDrip && (
+            <button
+              className="id-practice-feedback__drip-link"
+              onClick={() => {
+                trackEvent('icu_drips_practice_review_drip_clicked', { drip_id: relatedDrip.id });
+                onNavigateToDrip(relatedDrip);
+              }}
+            >
+              Review {relatedDrip.name} →
+            </button>
+          )}
+          <button className="id-practice-btn id-practice-btn--primary" onClick={handleNext}>
+            {index + 1 >= total ? 'See results' : 'Next question'}
+          </button>
+        </div>
+      )}
+    </div>
+  );
+}
+
 // ─── Module shell ─────────────────────────────────────────────────────────────
 export default function IcuDripsModule({ onGoHome }) {
   const [view,          setView]          = useState('home');
@@ -959,6 +1269,10 @@ export default function IcuDripsModule({ onGoHome }) {
     trackEvent('hemodynamic_compare_opened');
     setComparePairId(pairId);
     setView('compare');
+  }
+
+  function handleShowPractice() {
+    setView('practice');
   }
 
   function handleNavigateToDrip(drip) {
@@ -996,10 +1310,16 @@ export default function IcuDripsModule({ onGoHome }) {
             onNavigateToDrip={handleNavigateToDrip}
             initialPairId={comparePairId}
           />
+        ) : view === 'practice' ? (
+          <PracticeMode
+            onBack={() => setView('home')}
+            onNavigateToDrip={handleNavigateToDrip}
+          />
         ) : (
           <DripsHome
             onSelect={handleSelect}
             onShowCompare={handleShowCompare}
+            onShowPractice={handleShowPractice}
           />
         )}
       </div>

@@ -537,11 +537,40 @@ function KeyDifferenceCard({ pair }) {
   );
 }
 
+// ─── Clinical Scenario card ───────────────────────────────────────────────────
+function ClinicalScenarioCard({ scenario }) {
+  if (!scenario) return null;
+  return (
+    <div className="id-scenario-card">
+      <div className="id-scenario-card__eyebrow">Clinical Scenario</div>
+      <p className="id-scenario-card__title">{scenario.title}</p>
+      <div className="id-scenario-card__row">
+        <span className="id-scenario-card__row-label">Situation</span>
+        <p className="id-scenario-card__row-text">{scenario.setup}</p>
+      </div>
+      <div className="id-scenario-card__row">
+        <span className="id-scenario-card__row-label">Bedside read</span>
+        <p className="id-scenario-card__row-text">{scenario.bedsideRead}</p>
+      </div>
+      <div className="id-scenario-card__row">
+        <span className="id-scenario-card__row-label">Why it matters</span>
+        <p className="id-scenario-card__row-text">{scenario.whyItMatters}</p>
+      </div>
+    </div>
+  );
+}
+
 // ─── Compare detail ───────────────────────────────────────────────────────────
 function CompareDetail({ pair, onBack, onNavigateToDrip }) {
   const aDrip = pair.aId ? DRIPS.find(d => d.id === pair.aId) : null;
   const bDrip = pair.bId ? DRIPS.find(d => d.id === pair.bId) : null;
   const [tableOpen, setTableOpen] = useState(false);
+
+  useEffect(() => {
+    if (pair.clinicalScenario) {
+      trackEvent('clinical_scenario_viewed', { pair_id: pair.id });
+    }
+  }, [pair.id]);
 
   function handleToggleTable() {
     if (!tableOpen) {
@@ -569,6 +598,9 @@ function CompareDetail({ pair, onBack, onNavigateToDrip }) {
 
       {/* Key Difference — scannable in under 10 seconds */}
       <KeyDifferenceCard pair={pair} />
+
+      {/* Clinical Scenario — supporting context after Key Difference */}
+      <ClinicalScenarioCard scenario={pair.clinicalScenario} />
 
       {/* Collapsible detailed comparison table */}
       <div className="id-compare-detail-toggle">

@@ -2207,6 +2207,12 @@ export const COMPARE_PAIRS = [
         b: "Peripheral acceptable short-term",
       },
     ],
+    clinicalScenario: {
+      title: "When pressure rises but the heart slows",
+      setup: "A hypotensive patient is already on the slower side, and the blood pressure improves while the heart rate drifts down.",
+      bedsideRead: "That pattern fits pure alpha vasoconstriction more than a mixed pressor effect.",
+      whyItMatters: "The hemodynamic difference between these two becomes visible in the heart rate trend, not just the MAP.",
+    },
     keyDistinction:
       "Norepinephrine has a mild cardiac component; phenylephrine is pure vasoconstriction. When cardiac support matters alongside pressure, they are not interchangeable.",
     commonConfusion:
@@ -2250,6 +2256,12 @@ export const COMPARE_PAIRS = [
         b: "Peripheral perfusion, sodium, urine output",
       },
     ],
+    clinicalScenario: {
+      title: "When MAP rises without more heart stimulation",
+      setup: "The MAP improves, but the heart rate and rhythm stay mostly unchanged.",
+      bedsideRead: "That pattern fits non-catecholamine vascular tone support rather than direct beta stimulation.",
+      whyItMatters: "It helps separate vessel tone from cardiac stimulation when reading the trend — the monitor tells a different story depending on which pressor is running.",
+    },
     keyDistinction:
       "Vasopressin works through a completely different receptor system. It is not a stronger norepinephrine — it is a different class of pressor with a different physiologic role.",
     commonConfusion:
@@ -2295,6 +2307,12 @@ export const COMPARE_PAIRS = [
         b: "Hypotension, arrhythmia, renal function",
       },
     ],
+    clinicalScenario: {
+      title: "When output improves but pressure softens",
+      setup: "The cardiac output picture improves, but the blood pressure does not rise the way the team expected.",
+      bedsideRead: "That pattern can appear when inotropy and vasodilation are moving in opposite directions at the same time.",
+      whyItMatters: "Milrinone's longer tail means the current hemodynamic picture may reflect what was running hours earlier — not just what is happening right now.",
+    },
     keyDistinction:
       "Milrinone's longer half-life means hemodynamic changes linger well after any rate adjustment. What you are seeing now reflects what was running hours ago.",
     commonConfusion:
@@ -2340,6 +2358,12 @@ export const COMPARE_PAIRS = [
         b: "Bradycardia; rebound with abrupt discontinuation",
       },
     ],
+    clinicalScenario: {
+      title: "When calm looks different on the monitor",
+      setup: "Two patients look equally calm, but one has softer blood pressure while the other has a slower heart rate.",
+      bedsideRead: "The monitor pattern can help explain whether vasodilation or bradycardia is the dominant bedside signal.",
+      whyItMatters: "Sedation depth is not the only story — the hemodynamic pattern helps a nurse anticipate which direction the vital signs are likely to drift.",
+    },
     keyDistinction:
       "Propofol can achieve deep sedation and suppresses respiratory drive significantly. Dexmedetomidine keeps patients arousable with relatively preserved breathing — it is not a substitute when deep sedation is the clinical goal.",
     commonConfusion:
@@ -2536,6 +2560,12 @@ export const COMPARE_PAIRS = [
         b: "Non-PVC tubing recommended (absorption)",
       },
     ],
+    clinicalScenario: {
+      title: "When the number falls, but for different reasons",
+      setup: "The blood pressure comes down on both, but one pattern points more toward arterial afterload reduction while the other reflects preload and venous offloading.",
+      bedsideRead: "The bedside clue is whether the clinical context is systemic BP control or an ischemic-chest-pain physiology with elevated filling pressures.",
+      whyItMatters: "Both can lower the MAP number, but the hemodynamic story each tells — and the monitoring priorities that follow — are not identical.",
+    },
     keyDistinction:
       "Nicardipine reduces afterload through arterial vasodilation. Nitroglycerin reduces preload through venodilation. The same MAP number can mask very different mechanisms and clinical pathways.",
     commonConfusion:

@@ -1618,6 +1618,54 @@
   border-top: none;
 }
 
+/* ─── Clinical Scenario card ─────────────────────────────────────────────────── */
+.id-scenario-card {
+  background: var(--id-bg-card);
+  border: 1px solid var(--id-border-card);
+  border-left: 3px solid var(--id-teal);
+  border-radius: 8px;
+  padding: 13px 16px 11px;
+  margin-bottom: 16px;
+  opacity: 0.95;
+}
+.id-scenario-card__eyebrow {
+  font-size: 9px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 1.4px;
+  color: var(--id-teal);
+  font-family: var(--id-font-mono);
+  margin-bottom: 6px;
+}
+.id-scenario-card__title {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--id-text-dark);
+  line-height: 1.45;
+  margin: 0 0 8px;
+}
+.id-scenario-card__row {
+  border-top: 1px solid var(--id-border-warm);
+  padding-top: 7px;
+  margin-top: 7px;
+}
+.id-scenario-card__row-label {
+  display: block;
+  font-size: 9px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 1.2px;
+  color: var(--id-text-dim);
+  font-family: var(--id-font-mono);
+  margin-bottom: 2px;
+}
+.id-scenario-card__row-text {
+  font-size: 12px;
+  color: var(--id-text-mid);
+  line-height: 1.5;
+  margin: 0;
+}
+
 /* ─── Reduced motion ─────────────────────────────────────────────────────────── */
 @media (prefers-reduced-motion: reduce) {
   .id-drip-row,

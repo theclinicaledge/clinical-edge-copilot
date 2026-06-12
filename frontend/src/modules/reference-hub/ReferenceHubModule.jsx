@@ -42,6 +42,10 @@ const BEDSIDE_PATHWAYS = [
       'Base Excess',
       'Skin and mentation',
     ],
+    conceptMap: {
+      nodes: ['Perfusion', 'Oxygen Debt', 'Lactate Trend', 'Base Deficit'],
+      note: 'A rising lactate is a trend story, not a single-number story.',
+    },
     commonPattern:
       'Rising lactate is rarely a single-number problem. The trend connects perfusion, clearance, oxygen delivery, and the patient\'s bedside picture.',
     relatedRefs: ['lactate', 'map', 'urine-output', 'shock-index', 'base-excess'],
@@ -64,6 +68,10 @@ const BEDSIDE_PATHWAYS = [
       'Cardiac output / index',
       'SVR',
     ],
+    conceptMap: {
+      nodes: ['MAP', 'Cardiac Output', 'Urine Output', 'Lactate'],
+      note: 'Pressure can look acceptable while flow and tissue perfusion remain poor.',
+    },
     commonPattern:
       'MAP is a pressure number. Perfusion is the patient picture built from multiple trends.',
     relatedRefs: ['map', 'urine-output', 'lactate', 'cardiac-output', 'svr'],
@@ -86,6 +94,10 @@ const BEDSIDE_PATHWAYS = [
       'Ventilator compliance',
       'SpO₂',
     ],
+    conceptMap: {
+      nodes: ['PEEP', 'Venous Return', 'Cardiac Output', 'MAP'],
+      note: 'Oxygenation support can change preload and pressure.',
+    },
     commonPattern:
       'PEEP can improve oxygenation while changing venous return and right-heart loading. The oxygen number and pressure number may move in opposite directions.',
     relatedRefs: ['peep', 'map', 'cvp', 'plateau-pressure', 'ventilator-compliance'],
@@ -108,6 +120,10 @@ const BEDSIDE_PATHWAYS = [
       'Fluid balance',
       'Capillary refill',
     ],
+    conceptMap: {
+      nodes: ['MAP', 'Renal Perfusion', 'Urine Output', 'Creatinine'],
+      note: 'Urine output often moves before creatinine does.',
+    },
     commonPattern:
       'Falling urine output is often an early perfusion signal. It should be read with pressure, labs, and the full bedside picture.',
     relatedRefs: ['urine-output', 'map', 'lactate', 'creatinine', 'capillary-refill'],
@@ -115,7 +131,7 @@ const BEDSIDE_PATHWAYS = [
   {
     id: 'oxygenation-vs-ventilation',
     icon: '⇌',
-    title: 'Oxygenation vs Ventilation',
+    title: 'Oxygen Looks Fine, CO₂ Doesn\'t',
     subtitle: 'SpO₂/PaO₂ vs CO₂ clearance',
     summaryRefs: 'Includes SpO₂, PaCO₂, FiO₂',
     notice: [
@@ -130,6 +146,10 @@ const BEDSIDE_PATHWAYS = [
       'FiO₂',
       'Minute ventilation',
     ],
+    conceptMap: {
+      nodes: ['FiO₂ / PEEP', 'PaO₂ / SpO₂', 'Minute Ventilation', 'PaCO₂'],
+      note: 'Oxygenation and ventilation answer different questions.',
+    },
     commonPattern:
       'More oxygen does not always mean better ventilation. Oxygenation asks whether oxygen gets in; ventilation asks whether CO₂ gets out.',
     relatedRefs: ['oxygenation-vs-ventilation', 'spo2', 'pao2', 'paco2', 'minute-ventilation'],
@@ -137,8 +157,8 @@ const BEDSIDE_PATHWAYS = [
   {
     id: 'high-peak-pressure',
     icon: '▲',
-    title: 'High Peak Pressure',
-    subtitle: 'Airway resistance vs lung stiffness',
+    title: 'Why Is the Vent Alarming?',
+    subtitle: 'Peak vs plateau pressure',
     summaryRefs: 'Includes Peak, Pplat, Compliance',
     notice: [
       'Peak pressure rises on the ventilator.',
@@ -152,6 +172,10 @@ const BEDSIDE_PATHWAYS = [
       'Patient-vent synchrony',
       'Breath sounds',
     ],
+    conceptMap: {
+      nodes: ['Peak Pressure', 'Plateau Pressure', 'Resistance vs Compliance'],
+      note: 'The peak-to-plateau relationship helps separate airway resistance from lung stiffness.',
+    },
     commonPattern:
       'Peak pressure alone does not tell the whole story. The peak-to-plateau relationship helps separate airway resistance from lung stiffness.',
     relatedRefs: ['plateau-pressure', 'ventilator-compliance', 'tidal-volume', 'respiratory-rate'],
@@ -244,6 +268,27 @@ function PathwayCard({ pathway, onSelect }) {
   );
 }
 
+// ── Concept map card ──────────────────────────────────────────────────────────
+
+function ConceptMapCard({ map }) {
+  return (
+    <div className="rh-concept-map">
+      <div className="rh-concept-map__title">Concept Map</div>
+      <div className="rh-concept-map__flow">
+        {map.nodes.map((node, i) => (
+          <span key={i} className="rh-concept-map__step">
+            <span className="rh-concept-map__node">{node}</span>
+            {i < map.nodes.length - 1 && (
+              <span className="rh-concept-map__arrow" aria-hidden="true">→</span>
+            )}
+          </span>
+        ))}
+      </div>
+      <div className="rh-concept-map__note">{map.note}</div>
+    </div>
+  );
+}
+
 // ── Pathway detail view ───────────────────────────────────────────────────────
 
 function PathwayDetailView({ pathway, onBack, onSelectRef }) {
@@ -319,6 +364,9 @@ function PathwayDetailView({ pathway, onBack, onSelectRef }) {
             ))}
           </div>
         </div>
+
+        {/* Concept map */}
+        {pathway.conceptMap && <ConceptMapCard map={pathway.conceptMap} />}
 
         {/* Common pattern */}
         <div style={{
@@ -465,7 +513,7 @@ function HubView({ onSelect, onGoHome, onSelectPathway }) {
         </div>
 
         {/* Bedside Pathways */}
-        <div className="rh-pathways" style={{ marginBottom: 28 }}>
+        <div className="rh-pathways" style={{ marginBottom: 24 }}>
           <div className="rh-eyebrow" style={{ marginBottom: 4 }}>Bedside Pathways</div>
           <p style={{ fontSize: 12, color: '#556B7A', margin: '0 0 14px', lineHeight: 1.4 }}>
             Common patterns nurses connect quickly.

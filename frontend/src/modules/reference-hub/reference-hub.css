@@ -302,9 +302,136 @@
   line-height: 1;
 }
 
+/* ── Bedside Pathways — landing section ── */
+.rh-pathways {
+  border-top: 1px solid rgba(255,255,255,0.06);
+  border-bottom: 1px solid rgba(255,255,255,0.06);
+  padding: 20px 0 24px;
+}
+.rh-pathways-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 8px;
+}
+.rh-pathway-card {
+  background: var(--ce-navy-700);
+  border: 1px solid var(--ce-line-navy);
+  border-radius: var(--ce-r-md);
+  padding: 14px 16px;
+  cursor: pointer;
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  transition:
+    border-color var(--ce-dur-fast),
+    box-shadow   var(--ce-dur-fast),
+    transform    var(--ce-dur-fast);
+  -webkit-tap-highlight-color: transparent;
+}
+.rh-pathway-card:hover {
+  border-color: rgba(10,191,188,0.30);
+  box-shadow: var(--ce-shadow-float);
+  transform: translateY(-1px);
+}
+.rh-pathway-card:active {
+  transform: scale(0.98);
+  transition-duration: 60ms;
+}
+.rh-pathway-card-title {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--ce-text-light);
+  line-height: 1.3;
+  letter-spacing: -0.01em;
+  margin-bottom: 3px;
+}
+.rh-pathway-card-subtitle {
+  font-size: 11px;
+  color: var(--ce-text-dim);
+  line-height: 1.4;
+  margin-bottom: 8px;
+}
+.rh-pathway-card-count {
+  font-family: var(--ce-font-mono);
+  font-size: 9.5px;
+  font-weight: 600;
+  letter-spacing: 0.5px;
+  color: var(--ce-teal);
+  opacity: 0.75;
+  text-transform: uppercase;
+}
+.rh-pathway-card-arrow {
+  color: var(--ce-text-dim);
+  font-size: 16px;
+  flex-shrink: 0;
+  margin-top: 1px;
+  transition: color var(--ce-dur-fast), transform var(--ce-dur-fast);
+}
+.rh-pathway-card:hover .rh-pathway-card-arrow {
+  color: var(--ce-teal);
+  transform: translateX(2px);
+}
+
+/* ── Bedside Pathways — detail page ── */
+.rh-pathway-detail {
+  background: var(--ce-warm-bg);
+  min-height: 100vh;
+  font-family: var(--ce-font-sans);
+  animation: ce-slide-up var(--ce-dur-slow) var(--ce-ease-out) both;
+}
+.rh-pathway-section {
+  background: var(--ce-warm-card);
+  border: 1px solid var(--ce-warm-line);
+  border-radius: var(--ce-r-md);
+  padding: 18px 20px;
+  margin-bottom: 10px;
+}
+
+/* ── Look at chips ── */
+.rh-look-chip {
+  background: rgba(10,191,188,0.08);
+  border: 1px solid rgba(10,191,188,0.22);
+  border-radius: var(--ce-r-pill);
+  padding: 5px 12px;
+  font-size: 12px;
+  font-weight: 500;
+  color: var(--ce-teal-deep);
+  font-family: var(--ce-font-sans);
+  white-space: nowrap;
+  letter-spacing: 0.01em;
+}
+
+/* ── Connected ref cards (inside pathway detail) ── */
+.rh-connected-ref {
+  background: var(--ce-warm-card);
+  border: 1px solid var(--ce-warm-line);
+  border-radius: var(--ce-r-md);
+  padding: 14px 16px;
+  cursor: pointer;
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  transition:
+    border-color var(--ce-dur-fast),
+    box-shadow   var(--ce-dur-fast),
+    transform    var(--ce-dur-fast);
+  -webkit-tap-highlight-color: transparent;
+}
+.rh-connected-ref:hover {
+  border-color: rgba(10,191,188,0.28);
+  box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+  transform: translateY(-1px);
+}
+.rh-connected-ref:active {
+  transform: scale(0.998);
+  transition-duration: 60ms;
+}
+
 /* ── Mobile ── */
 @media (max-width: 768px) {
   .rh-search { font-size: 16px; }
   .rh-filters { gap: 6px; }
   .rh-filter-btn { padding: 6px 12px; font-size: 11.5px; }
+  .rh-pathways-grid { grid-template-columns: 1fr; }
+  .rh-look-chip { white-space: normal; }
 }

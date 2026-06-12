@@ -266,11 +266,20 @@ function RefCard({ ref_, onSelect }) {
 
 // ── Detail view ───────────────────────────────────────────────────────────────
 
-function DetailView({ ref_, onBack }) {
+function DetailView({ ref_, onBack, onSelect }) {
   useEffect(() => {
     trackEvent('reference_viewed', { reference_id: ref_.id, category: ref_.category });
     window.scrollTo({ top: 0, behavior: 'instant' });
   }, [ref_.id, ref_.category]);
+
+  const related = useMemo(() =>
+    (ref_.relatedRefs || []).map(id => REFERENCES.find(r => r.id === id)).filter(Boolean),
+  [ref_.relatedRefs]);
+
+  const handleRelatedClick = useCallback((target) => {
+    trackEvent('reference_related_clicked', { from_ref_id: ref_.id, to_ref_id: target.id });
+    onSelect(target);
+  }, [ref_.id, onSelect]);
 
   return (
     <div className="rh-detail-page">
@@ -329,6 +338,20 @@ function DetailView({ ref_, onBack }) {
           <div className="rh-detail-field-body">{ref_.nursesCare}</div>
         </div>
 
+        {/* What nurses notice */}
+        {ref_.nursesNotice && ref_.nursesNotice.length > 0 && (
+          <div className="rh-nurses-notice">
+            <div className="rh-detail-field-label" style={{ color: 'var(--ce-teal-deep)', marginBottom: 10 }}>
+              What nurses notice
+            </div>
+            <ul className="rh-nurses-notice-list">
+              {ref_.nursesNotice.map((item, i) => (
+                <li key={i} className="rh-nurses-notice-item">{item}</li>
+              ))}
+            </ul>
+          </div>
+        )}
+
         {/* When attention increases */}
         <div className="rh-detail-field" style={{ borderLeft: '3px solid #C06B6B' }}>
           <div className="rh-detail-field-label" style={{ color: '#8E2F2F' }}>
@@ -336,6 +359,16 @@ function DetailView({ ref_, onBack }) {
           </div>
           <div className="rh-detail-field-body">{ref_.whenAttentionIncreases}</div>
         </div>
+
+        {/* Common mistake */}
+        {ref_.commonMistake && (
+          <div className="rh-common-mistake">
+            <div className="rh-detail-field-label" style={{ color: '#8A6010', marginBottom: 7 }}>
+              Common mistake
+            </div>
+            <div className="rh-common-mistake-body">{ref_.commonMistake}</div>
+          </div>
+        )}
 
         {/* Pearl */}
         <div style={{
@@ -370,6 +403,27 @@ function DetailView({ ref_, onBack }) {
           </div>
         </div>
 
+        {/* Related refs */}
+        {related.length > 0 && (
+          <div style={{ marginBottom: 10 }}>
+            <div className="rh-detail-field-label" style={{ color: '#526174', marginBottom: 10 }}>
+              Commonly connected with
+            </div>
+            <div className="rh-related-refs">
+              {related.map(r => (
+                <button
+                  key={r.id}
+                  className="rh-related-chip"
+                  onClick={() => handleRelatedClick(r)}
+                >
+                  <span className="rh-related-chip-cat">{CAT_LABEL[r.category]}</span>
+                  {r.title}
+                </button>
+              ))}
+            </div>
+          </div>
+        )}
+
         {/* Safety note */}
         <div style={{
           marginTop: 24,
@@ -393,9 +447,19 @@ function DetailView({ ref_, onBack }) {
 export default function ReferenceHubModule({ onGoHome }) {
   const [selected, setSelected] = useState(null);
 
+  const handleSelect = useCallback((ref) => {
+    // add to recently viewed via HubView's localStorage mechanism
+    try {
+      const prev = JSON.parse(localStorage.getItem('ce_ref_hub_recent') || '[]');
+      const updated = [ref.id, ...prev.filter(id => id !== ref.id)].slice(0, 5);
+      localStorage.setItem('ce_ref_hub_recent', JSON.stringify(updated));
+    } catch {}
+    setSelected(ref);
+  }, []);
+
   return selected ? (
-    <DetailView ref_={selected} onBack={() => setSelected(null)} />
+    <DetailView ref_={selected} onBack={() => setSelected(null)} onSelect={handleSelect} />
   ) : (
-    <HubView onSelect={setSelected} onGoHome={onGoHome} />
+    <HubView onSelect={handleSelect} onGoHome={onGoHome} />
   );
 }

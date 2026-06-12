@@ -207,6 +207,101 @@
   margin-bottom: 8px;
 }
 
+/* ── What nurses notice ── */
+.rh-nurses-notice {
+  background: var(--ce-warm-card);
+  border: 1px solid var(--ce-warm-line);
+  border-left: 3px solid var(--ce-teal);
+  border-radius: var(--ce-r-md);
+  padding: 18px 20px;
+  margin-bottom: 10px;
+}
+.rh-nurses-notice-list {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: 9px;
+}
+.rh-nurses-notice-item {
+  font-size: 13.5px;
+  line-height: 1.65;
+  color: #2E3B4A;
+  padding-left: 18px;
+  position: relative;
+}
+.rh-nurses-notice-item::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 8px;
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--ce-teal);
+  opacity: 0.7;
+}
+
+/* ── Common mistake ── */
+.rh-common-mistake {
+  background: rgba(212,168,75,0.06);
+  border: 1px solid rgba(212,168,75,0.22);
+  border-left: 3px solid rgba(212,168,75,0.55);
+  border-radius: var(--ce-r-md);
+  padding: 18px 20px;
+  margin-bottom: 10px;
+}
+.rh-common-mistake-body {
+  font-size: 13.5px;
+  line-height: 1.7;
+  color: #5A3D08;
+}
+
+/* ── Related refs ── */
+.rh-related-refs {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 7px;
+}
+.rh-related-chip {
+  background: var(--ce-navy-700);
+  border: 1px solid var(--ce-line-navy);
+  border-radius: var(--ce-r-pill);
+  padding: 6px 13px;
+  cursor: pointer;
+  font-family: var(--ce-font-sans);
+  font-size: 12px;
+  font-weight: 500;
+  color: var(--ce-text-light-sec);
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 1px;
+  text-align: left;
+  transition: all var(--ce-dur-fast);
+  -webkit-tap-highlight-color: transparent;
+}
+.rh-related-chip:hover {
+  border-color: rgba(10,191,188,0.35);
+  color: var(--ce-text-light);
+  background: rgba(10,191,188,0.07);
+}
+.rh-related-chip:active {
+  transform: scale(0.97);
+  transition-duration: 60ms;
+}
+.rh-related-chip-cat {
+  font-family: var(--ce-font-mono);
+  font-size: 8.5px;
+  font-weight: 700;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  color: var(--ce-teal);
+  opacity: 0.75;
+  line-height: 1;
+}
+
 /* ── Mobile ── */
 @media (max-width: 768px) {
   .rh-search { font-size: 16px; }

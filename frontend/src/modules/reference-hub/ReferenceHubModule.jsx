@@ -26,8 +26,10 @@ const CAT_LABEL = Object.fromEntries(CATEGORIES.map(c => [c.id, c.label]));
 const BEDSIDE_PATHWAYS = [
   {
     id: 'rising-lactate',
+    icon: '↗',
     title: 'Rising Lactate',
     subtitle: 'Perfusion, clearance, and trend direction',
+    summaryRefs: 'Includes Lactate, MAP, UO',
     notice: [
       'Lactate is rising across serial draws.',
       'Vital signs may lag behind the cellular oxygen debt.',
@@ -46,8 +48,10 @@ const BEDSIDE_PATHWAYS = [
   },
   {
     id: 'map-fine-patient-bad',
+    icon: '◉',
     title: 'MAP Looks Fine, Patient Looks Bad',
     subtitle: 'Pressure vs perfusion',
+    summaryRefs: 'Includes MAP, Lactate, CO/CI',
     notice: [
       'MAP is in range, but the patient still looks poorly perfused.',
       'Cool extremities, altered mentation, or falling urine output do not match the number.',
@@ -66,8 +70,10 @@ const BEDSIDE_PATHWAYS = [
   },
   {
     id: 'peep-hypotension',
+    icon: '⇅',
     title: 'PEEP Causing Hypotension?',
     subtitle: 'Oxygenation support with hemodynamic cost',
+    summaryRefs: 'Includes PEEP, MAP, Pplat',
     notice: [
       'Oxygenation improves after PEEP changes, but blood pressure softens.',
       'Higher intrathoracic pressure can reduce venous return.',
@@ -86,8 +92,10 @@ const BEDSIDE_PATHWAYS = [
   },
   {
     id: 'urine-output-falling',
+    icon: '↓',
     title: 'Urine Output Falling',
     subtitle: 'End-organ perfusion signal',
+    summaryRefs: 'Includes UO, MAP, Creatinine',
     notice: [
       'Urine output drops before other numbers look dramatic.',
       'The patient may still have a borderline acceptable MAP.',
@@ -106,8 +114,10 @@ const BEDSIDE_PATHWAYS = [
   },
   {
     id: 'oxygenation-vs-ventilation',
+    icon: '⇌',
     title: 'Oxygenation vs Ventilation',
     subtitle: 'SpO₂/PaO₂ vs CO₂ clearance',
+    summaryRefs: 'Includes SpO₂, PaCO₂, FiO₂',
     notice: [
       'SpO₂ may look acceptable while PaCO₂ worsens.',
       'Oxygenation and ventilation are separate problems.',
@@ -126,8 +136,10 @@ const BEDSIDE_PATHWAYS = [
   },
   {
     id: 'high-peak-pressure',
+    icon: '▲',
     title: 'High Peak Pressure',
     subtitle: 'Airway resistance vs lung stiffness',
+    summaryRefs: 'Includes Peak, Pplat, Compliance',
     notice: [
       'Peak pressure rises on the ventilator.',
       'Plateau pressure helps separate airway resistance from lung compliance.',
@@ -221,12 +233,11 @@ function PathwayCard({ pathway, onSelect }) {
       onKeyDown={e => (e.key === 'Enter' || e.key === ' ') && onSelect(pathway)}
       aria-label={pathway.title}
     >
+      <span className="rh-pathway-card-icon" aria-hidden="true">{pathway.icon}</span>
       <div style={{ flex: 1, minWidth: 0 }}>
         <div className="rh-pathway-card-title">{pathway.title}</div>
         <div className="rh-pathway-card-subtitle">{pathway.subtitle}</div>
-        <div className="rh-pathway-card-count">
-          {pathway.relatedRefs.length} connected refs
-        </div>
+        <div className="rh-pathway-card-summary">{pathway.summaryRefs}</div>
       </div>
       <span className="rh-pathway-card-arrow">›</span>
     </div>
@@ -334,28 +345,19 @@ function PathwayDetailView({ pathway, onBack, onSelectRef }) {
         {/* Connected references */}
         {connectedRefs.length > 0 && (
           <div style={{ marginTop: 24, marginBottom: 10 }}>
-            <div className="rh-eyebrow" style={{ marginBottom: 10 }}>
+            <div className="rh-eyebrow" style={{ marginBottom: 10, color: '#526174' }}>
               Connected references
             </div>
-            <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
+            <div className="rh-connected-chips">
               {connectedRefs.map(ref => (
-                <div
+                <button
                   key={ref.id}
-                  className="rh-connected-ref"
+                  className="rh-connected-chip"
                   onClick={() => handleRefClick(ref)}
-                  role="button"
-                  tabIndex={0}
-                  onKeyDown={e => (e.key === 'Enter' || e.key === ' ') && handleRefClick(ref)}
                 >
-                  <div style={{ flex: 1, minWidth: 0 }}>
-                    <div className="rh-ref-cat">{CAT_LABEL[ref.category]}</div>
-                    <div className="rh-ref-title">{ref.title}</div>
-                    {ref.normalRange && (
-                      <div className="rh-ref-range">{ref.normalRange}</div>
-                    )}
-                  </div>
-                  <span className="rh-ref-arrow">›</span>
-                </div>
+                  <span className="rh-connected-chip__category">{CAT_LABEL[ref.category]}</span>
+                  <span className="rh-connected-chip__title">{ref.title}</span>
+                </button>
               ))}
             </div>
           </div>
@@ -438,25 +440,32 @@ function HubView({ onSelect, onGoHome, onSelectPathway }) {
       <div style={{ maxWidth: 800, margin: '0 auto', padding: '32px 20px 60px' }}>
 
         {/* Hero */}
-        <div style={{ marginBottom: 28 }}>
-          <h2 style={{
-            fontFamily: 'var(--ce-font-sans)',
-            fontWeight: 700,
-            fontSize: 'clamp(20px, 4.5vw, 26px)',
-            color: '#F8FBFC',
-            margin: '0 0 6px',
-            lineHeight: 1.15,
-            letterSpacing: '-0.03em',
-          }}>
-            Clinical Reference Hub
-          </h2>
-          <p style={{ fontSize: 13, color: '#7F99A5', margin: 0, lineHeight: 1.5 }}>
-            Fast bedside answers. No dosing. No diagnosis. Just the reference.
+        <div className="rh-hero">
+          <div className="rh-hero__eyebrow">Clinical Reference Hub</div>
+          <h2 className="rh-hero__title">Find what matters faster.</h2>
+          <p className="rh-hero__text">
+            Fast bedside answers. No dosing. No diagnosis.
           </p>
+          <div className="rh-hero__stats">
+            <div className="rh-hero__stat">
+              <span className="rh-hero__stat-num">{REFERENCES.length}</span>
+              <span className="rh-hero__stat-label">References</span>
+            </div>
+            <div className="rh-hero__stat-divider" aria-hidden="true" />
+            <div className="rh-hero__stat">
+              <span className="rh-hero__stat-num">{BEDSIDE_PATHWAYS.length}</span>
+              <span className="rh-hero__stat-label">Pathways</span>
+            </div>
+            <div className="rh-hero__stat-divider" aria-hidden="true" />
+            <div className="rh-hero__stat">
+              <span className="rh-hero__stat-num">5</span>
+              <span className="rh-hero__stat-label">Categories</span>
+            </div>
+          </div>
         </div>
 
         {/* Bedside Pathways */}
-        <div className="rh-pathways" style={{ marginBottom: 32 }}>
+        <div className="rh-pathways" style={{ marginBottom: 28 }}>
           <div className="rh-eyebrow" style={{ marginBottom: 4 }}>Bedside Pathways</div>
           <p style={{ fontSize: 12, color: '#556B7A', margin: '0 0 14px', lineHeight: 1.4 }}>
             Common patterns nurses connect quickly.

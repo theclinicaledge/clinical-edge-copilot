@@ -182,6 +182,96 @@ const BEDSIDE_PATHWAYS = [
   },
 ];
 
+// ── Clinical Concepts data ────────────────────────────────────────────────────
+
+const CLINICAL_CONCEPTS = [
+  {
+    id: 'shock',
+    title: 'Shock',
+    subtitle: 'Perfusion failure patterns',
+    summary: 'Shock is not one number. It is a pattern of pressure, flow, oxygen debt, and end-organ response.',
+    notice: [
+      'MAP may fall late or look temporarily acceptable.',
+      'Urine output, mentation, skin temperature, lactate, and base deficit help complete the picture.',
+      'Different shock patterns can share similar blood pressure numbers.',
+    ],
+    conceptMap: {
+      nodes: ['Pressure', 'Flow', 'Oxygen Debt', 'Organ Response'],
+      note: 'Shock is the failure of perfusion, not just the presence of hypotension.',
+    },
+    connectedPathwayIds: ['rising-lactate', 'map-fine-patient-bad', 'urine-output-falling'],
+    connectedRefIds: ['map', 'lactate', 'urine-output', 'shock-index', 'base-excess', 'cardiac-output'],
+  },
+  {
+    id: 'ards',
+    title: 'ARDS',
+    subtitle: 'Oxygenation failure with stiff lungs',
+    summary: 'ARDS is a pattern of poor oxygen transfer, reduced compliance, and escalating oxygenation support.',
+    notice: [
+      'SpO₂ may remain fragile despite high oxygen support.',
+      'P/F ratio, PEEP, plateau pressure, and compliance become connected bedside clues.',
+      'Hemodynamics may change as airway pressures rise.',
+    ],
+    conceptMap: {
+      nodes: ['FiO₂ / PEEP', 'P/F Ratio', 'Compliance', 'Hemodynamics'],
+      note: 'ARDS links oxygenation numbers with lung mechanics and circulation.',
+    },
+    connectedPathwayIds: ['peep-hypotension', 'oxygenation-vs-ventilation', 'high-peak-pressure'],
+    connectedRefIds: ['pf-ratio', 'peep', 'plateau-pressure', 'ventilator-compliance', 'spo2'],
+  },
+  {
+    id: 'aki',
+    title: 'AKI',
+    subtitle: 'Kidney signal, perfusion signal, timing signal',
+    summary: 'AKI is often first noticed through urine output trends before creatinine fully reflects the change.',
+    notice: [
+      'Urine output may fall before creatinine changes.',
+      'Perfusion, obstruction, fluid balance, and lab trends all matter together.',
+      'A single low-output hour is less useful than the pattern across time.',
+    ],
+    conceptMap: {
+      nodes: ['Perfusion', 'Urine Output', 'Creatinine', 'Trend'],
+      note: 'Kidney function is read through both immediate output and delayed lab movement.',
+    },
+    connectedPathwayIds: ['urine-output-falling', 'map-fine-patient-bad', 'rising-lactate'],
+    connectedRefIds: ['urine-output', 'creatinine', 'bun', 'map', 'lactate'],
+  },
+  {
+    id: 'ventilator-trouble',
+    title: 'Ventilator Trouble',
+    subtitle: 'Oxygenation, ventilation, resistance, compliance',
+    summary: 'Ventilator changes are easier to understand when oxygenation, CO₂ clearance, airway resistance, and lung stiffness are separated.',
+    notice: [
+      'SpO₂ and PaCO₂ can move in different directions.',
+      'Peak pressure and plateau pressure answer different questions.',
+      'Patient synchrony, secretions, compliance, and minute ventilation help frame the pattern.',
+    ],
+    conceptMap: {
+      nodes: ['Oxygenation', 'Ventilation', 'Resistance', 'Compliance'],
+      note: 'Ventilator problems become clearer when oxygen, CO₂, airway resistance, and lung stiffness are separated.',
+    },
+    connectedPathwayIds: ['oxygenation-vs-ventilation', 'high-peak-pressure', 'peep-hypotension'],
+    connectedRefIds: ['spo2', 'paco2', 'minute-ventilation', 'plateau-pressure', 'ventilator-compliance'],
+  },
+  {
+    id: 'sepsis-pattern',
+    title: 'Sepsis Pattern',
+    subtitle: 'Inflammation, perfusion, lactate, organ response',
+    summary: 'Sepsis becomes clinically concerning when infection concern, perfusion changes, lactate trend, and organ response begin lining up.',
+    notice: [
+      'Vital signs may change before labs return.',
+      'Lactate, urine output, mentation, MAP, and temperature patterns matter together.',
+      'A patient can look worse before one single number looks dramatic.',
+    ],
+    conceptMap: {
+      nodes: ['Infection Concern', 'Perfusion', 'Lactate', 'Organ Response'],
+      note: 'The bedside pattern matters more than any isolated value.',
+    },
+    connectedPathwayIds: ['rising-lactate', 'map-fine-patient-bad', 'urine-output-falling'],
+    connectedRefIds: ['lactate', 'map', 'urine-output', 'wbc', 'shock-index'],
+  },
+];
+
 // ── CE Logo (shared mark) ─────────────────────────────────────────────────────
 
 function CELogo() {
@@ -291,7 +381,7 @@ function ConceptMapCard({ map }) {
 
 // ── Pathway detail view ───────────────────────────────────────────────────────
 
-function PathwayDetailView({ pathway, onBack, onSelectRef }) {
+function PathwayDetailView({ pathway, onBack, onSelectRef, backLabel }) {
   useEffect(() => {
     trackEvent('reference_pathway_opened', { pathway_id: pathway.id });
     window.scrollTo({ top: 0, behavior: 'instant' });
@@ -308,7 +398,7 @@ function PathwayDetailView({ pathway, onBack, onSelectRef }) {
 
   return (
     <div className="rh-pathway-detail">
-      <Header showBack onBack={onBack} backLabel="All pathways" />
+      <Header showBack onBack={onBack} backLabel={backLabel || 'All pathways'} />
 
       <div style={{ maxWidth: 800, margin: '0 auto', padding: '32px 20px 60px' }}>
 
@@ -429,9 +519,187 @@ function PathwayDetailView({ pathway, onBack, onSelectRef }) {
   );
 }
 
+// ── Concept card (landing page) ───────────────────────────────────────────────
+
+function ConceptCard({ concept, onSelect }) {
+  const pathwayCount = concept.connectedPathwayIds.length;
+  const refCount     = concept.connectedRefIds.length;
+  return (
+    <div
+      className="rh-concept-card"
+      onClick={() => onSelect(concept)}
+      role="button"
+      tabIndex={0}
+      onKeyDown={e => (e.key === 'Enter' || e.key === ' ') && onSelect(concept)}
+      aria-label={concept.title}
+    >
+      <div className="rh-concept-card__accent" aria-hidden="true">◆</div>
+      <div style={{ flex: 1, minWidth: 0 }}>
+        <div className="rh-concept-card__title">{concept.title}</div>
+        <div className="rh-concept-card__subtitle">{concept.subtitle}</div>
+        <div className="rh-concept-card__summary">{concept.summary}</div>
+        <div className="rh-concept-card__meta">
+          {pathwayCount} pathway{pathwayCount !== 1 ? 's' : ''} · {refCount} references
+        </div>
+      </div>
+      <span className="rh-concept-card__arrow">›</span>
+    </div>
+  );
+}
+
+// ── Concept detail view ───────────────────────────────────────────────────────
+
+function ConceptDetailView({ concept, onBack, onSelectPathway, onSelectRef }) {
+  useEffect(() => {
+    trackEvent('reference_concept_opened', { concept_id: concept.id });
+    window.scrollTo({ top: 0, behavior: 'instant' });
+  }, [concept.id]);
+
+  const connectedPathways = useMemo(() =>
+    concept.connectedPathwayIds.map(id => BEDSIDE_PATHWAYS.find(p => p.id === id)).filter(Boolean),
+  [concept.connectedPathwayIds]);
+
+  const connectedRefs = useMemo(() =>
+    concept.connectedRefIds.map(id => REFERENCES.find(r => r.id === id)).filter(Boolean),
+  [concept.connectedRefIds]);
+
+  const handlePathwayClick = useCallback((pathway) => {
+    trackEvent('reference_concept_pathway_clicked', { concept_id: concept.id, pathway_id: pathway.id });
+    onSelectPathway(pathway);
+  }, [concept.id, onSelectPathway]);
+
+  const handleRefClick = useCallback((ref) => {
+    trackEvent('reference_concept_reference_clicked', { concept_id: concept.id, reference_id: ref.id });
+    onSelectRef(ref);
+  }, [concept.id, onSelectRef]);
+
+  return (
+    <div className="rh-concept-detail">
+      <Header showBack onBack={onBack} backLabel="All concepts" />
+
+      <div style={{ maxWidth: 800, margin: '0 auto', padding: '32px 20px 60px' }}>
+
+        {/* Title block */}
+        <div style={{ marginBottom: 28 }}>
+          <div style={{
+            fontFamily: 'var(--ce-font-mono)',
+            fontSize: 9.5,
+            fontWeight: 700,
+            textTransform: 'uppercase',
+            letterSpacing: '1.4px',
+            color: 'var(--ce-gold)',
+            marginBottom: 8,
+            opacity: 0.85,
+          }}>
+            Clinical Concept
+          </div>
+          <h1 style={{
+            fontSize: 'clamp(22px, 5vw, 28px)',
+            fontWeight: 700,
+            color: '#111827',
+            margin: '0 0 6px',
+            lineHeight: 1.15,
+            letterSpacing: '-0.03em',
+          }}>
+            {concept.title}
+          </h1>
+          <p style={{ fontSize: 14, color: '#526174', margin: 0, lineHeight: 1.5 }}>
+            {concept.subtitle}
+          </p>
+        </div>
+
+        {/* Big idea */}
+        <div className="rh-concept-section" style={{ borderLeft: '3px solid var(--ce-gold)' }}>
+          <div className="rh-detail-field-label" style={{ color: '#9A7020', marginBottom: 9 }}>
+            Big idea
+          </div>
+          <div style={{ fontSize: 14.5, lineHeight: 1.75, color: '#2E3B4A', fontWeight: 500 }}>
+            {concept.summary}
+          </div>
+        </div>
+
+        {/* What nurses notice */}
+        <div className="rh-concept-section" style={{ borderLeft: '3px solid var(--ce-teal)' }}>
+          <div className="rh-detail-field-label" style={{ color: 'var(--ce-teal-deep)', marginBottom: 10 }}>
+            What nurses notice
+          </div>
+          <ul className="rh-nurses-notice-list">
+            {concept.notice.map((item, i) => (
+              <li key={i} className="rh-nurses-notice-item">{item}</li>
+            ))}
+          </ul>
+        </div>
+
+        {/* Concept map */}
+        {concept.conceptMap && <ConceptMapCard map={concept.conceptMap} />}
+
+        {/* Connected pathways */}
+        {connectedPathways.length > 0 && (
+          <div style={{ marginBottom: 10 }}>
+            <div className="rh-eyebrow" style={{ marginBottom: 10, color: '#526174' }}>
+              Connected pathways
+            </div>
+            <div className="rh-concept-connected">
+              {connectedPathways.map(pathway => (
+                <button
+                  key={pathway.id}
+                  className="rh-concept-pathway-chip"
+                  onClick={() => handlePathwayClick(pathway)}
+                >
+                  <span className="rh-concept-pathway-chip__icon" aria-hidden="true">{pathway.icon}</span>
+                  <div style={{ flex: 1, minWidth: 0 }}>
+                    <div className="rh-concept-pathway-chip__title">{pathway.title}</div>
+                    <div className="rh-concept-pathway-chip__sub">{pathway.subtitle}</div>
+                  </div>
+                  <span style={{ color: 'var(--ce-text-dim)', fontSize: 14, flexShrink: 0 }}>›</span>
+                </button>
+              ))}
+            </div>
+          </div>
+        )}
+
+        {/* Connected references */}
+        {connectedRefs.length > 0 && (
+          <div style={{ marginBottom: 10 }}>
+            <div className="rh-eyebrow" style={{ marginBottom: 10, color: '#526174' }}>
+              Connected references
+            </div>
+            <div className="rh-connected-chips">
+              {connectedRefs.map(ref => (
+                <button
+                  key={ref.id}
+                  className="rh-concept-ref-chip"
+                  onClick={() => handleRefClick(ref)}
+                >
+                  <span className="rh-concept-ref-chip__category">{CAT_LABEL[ref.category]}</span>
+                  <span className="rh-concept-ref-chip__title">{ref.title}</span>
+                </button>
+              ))}
+            </div>
+          </div>
+        )}
+
+        {/* Safety note */}
+        <div style={{
+          marginTop: 24,
+          paddingTop: 16,
+          borderTop: '1px solid var(--ce-warm-line)',
+          fontSize: 11,
+          color: '#8A9BA8',
+          lineHeight: 1.6,
+          fontFamily: 'var(--ce-font-mono)',
+          textAlign: 'center',
+        }}>
+          Reference aid only. Verify with your facility's protocols and clinical judgment.
+        </div>
+      </div>
+    </div>
+  );
+}
+
 // ── Hub view (search + browse) ────────────────────────────────────────────────
 
-function HubView({ onSelect, onGoHome, onSelectPathway }) {
+function HubView({ onSelect, onGoHome, onSelectPathway, onSelectConcept }) {
   const [query, setQuery]   = useState('');
   const [cat, setCat]       = useState('all');
   const [recent, setRecent] = useState(() => lsGet(LS_RECENT, []));
@@ -521,6 +789,19 @@ function HubView({ onSelect, onGoHome, onSelectPathway }) {
           <div className="rh-pathways-grid">
             {BEDSIDE_PATHWAYS.map(pathway => (
               <PathwayCard key={pathway.id} pathway={pathway} onSelect={onSelectPathway} />
+            ))}
+          </div>
+        </div>
+
+        {/* Clinical Concepts */}
+        <div className="rh-concepts" style={{ marginBottom: 24 }}>
+          <div className="rh-eyebrow" style={{ marginBottom: 4 }}>Clinical Concepts</div>
+          <p style={{ fontSize: 12, color: '#556B7A', margin: '0 0 14px', lineHeight: 1.4 }}>
+            Bigger frameworks built from bedside clues.
+          </p>
+          <div className="rh-concepts-grid">
+            {CLINICAL_CONCEPTS.map(concept => (
+              <ConceptCard key={concept.id} concept={concept} onSelect={onSelectConcept} />
             ))}
           </div>
         </div>
@@ -812,6 +1093,7 @@ function DetailView({ ref_, onBack, onSelect, backLabel }) {
 export default function ReferenceHubModule({ onGoHome }) {
   const [selected, setSelected]               = useState(null);
   const [selectedPathway, setSelectedPathway] = useState(null);
+  const [selectedConcept, setSelectedConcept] = useState(null);
 
   const handleSelectRef = useCallback((ref) => {
     try {
@@ -822,10 +1104,26 @@ export default function ReferenceHubModule({ onGoHome }) {
     setSelected(ref);
   }, []);
 
-  const handleBackFromDetail = useCallback(() => {
-    setSelected(null);
-    // stays on pathway view if one is active, otherwise hub shows
+  const handleBackFromDetail = useCallback(() => { setSelected(null); }, []);
+
+  const handleSelectPathwayFromConcept = useCallback((pathway) => {
+    setSelectedPathway(pathway);
   }, []);
+
+  const handleBackFromPathway = useCallback(() => {
+    setSelectedPathway(null);
+    // if opened from concept, selectedConcept is still set → returns to concept
+  }, []);
+
+  // Detail back label: prefer pathway context, then concept, then hub
+  const detailBackLabel = selectedPathway
+    ? 'Back to pathway'
+    : selectedConcept
+    ? 'Back to concept'
+    : 'All references';
+
+  // Pathway back label: if opened from concept, go back to concept
+  const pathwayBackLabel = selectedConcept ? 'Back to concept' : 'All pathways';
 
   if (selected) {
     return (
@@ -833,7 +1131,7 @@ export default function ReferenceHubModule({ onGoHome }) {
         ref_={selected}
         onBack={handleBackFromDetail}
         onSelect={handleSelectRef}
-        backLabel={selectedPathway ? 'Back to pathway' : 'All references'}
+        backLabel={detailBackLabel}
       />
     );
   }
@@ -842,7 +1140,19 @@ export default function ReferenceHubModule({ onGoHome }) {
     return (
       <PathwayDetailView
         pathway={selectedPathway}
-        onBack={() => setSelectedPathway(null)}
+        onBack={handleBackFromPathway}
+        onSelectRef={handleSelectRef}
+        backLabel={pathwayBackLabel}
+      />
+    );
+  }
+
+  if (selectedConcept) {
+    return (
+      <ConceptDetailView
+        concept={selectedConcept}
+        onBack={() => setSelectedConcept(null)}
+        onSelectPathway={handleSelectPathwayFromConcept}
         onSelectRef={handleSelectRef}
       />
     );
@@ -853,6 +1163,7 @@ export default function ReferenceHubModule({ onGoHome }) {
       onSelect={handleSelectRef}
       onGoHome={onGoHome}
       onSelectPathway={setSelectedPathway}
+      onSelectConcept={setSelectedConcept}
     />
   );
 }

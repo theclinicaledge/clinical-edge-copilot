@@ -583,6 +583,209 @@
   margin-top: 2px;
 }
 
+/* ── Clinical Concepts — landing section ── */
+.rh-concepts {
+  border-top: 1px solid rgba(255,255,255,0.06);
+  border-bottom: 1px solid rgba(255,255,255,0.06);
+  padding: 20px 0 24px;
+}
+.rh-concepts-grid {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+.rh-concept-card {
+  background: var(--ce-navy-800);
+  border: 1px solid var(--ce-line-navy);
+  border-left: 3px solid var(--ce-gold);
+  border-radius: var(--ce-r-md);
+  padding: 14px 16px;
+  cursor: pointer;
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  transition:
+    border-color var(--ce-dur-fast),
+    box-shadow   var(--ce-dur-fast),
+    transform    var(--ce-dur-fast);
+  -webkit-tap-highlight-color: transparent;
+}
+.rh-concept-card:hover {
+  border-color: var(--ce-gold);
+  box-shadow: var(--ce-shadow-float);
+  transform: translateY(-1px);
+}
+.rh-concept-card:active {
+  transform: scale(0.99);
+  transition-duration: 60ms;
+}
+.rh-concept-card__accent {
+  font-size: 13px;
+  color: var(--ce-gold);
+  flex-shrink: 0;
+  margin-top: 2px;
+  opacity: 0.8;
+  line-height: 1;
+  width: 16px;
+  text-align: center;
+}
+.rh-concept-card__title {
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--ce-text-light);
+  line-height: 1.25;
+  letter-spacing: -0.02em;
+  margin-bottom: 2px;
+}
+.rh-concept-card__subtitle {
+  font-size: 11px;
+  color: var(--ce-text-dim);
+  line-height: 1.4;
+  margin-bottom: 6px;
+}
+.rh-concept-card__summary {
+  font-size: 12px;
+  color: var(--ce-text-light-sec);
+  line-height: 1.5;
+  margin-bottom: 7px;
+  opacity: 0.85;
+}
+.rh-concept-card__meta {
+  font-family: var(--ce-font-mono);
+  font-size: 9px;
+  font-weight: 600;
+  letter-spacing: 0.3px;
+  color: var(--ce-gold);
+  opacity: 0.65;
+}
+.rh-concept-card__arrow {
+  color: var(--ce-text-dim);
+  font-size: 16px;
+  flex-shrink: 0;
+  margin-top: 1px;
+  transition: color var(--ce-dur-fast), transform var(--ce-dur-fast);
+}
+.rh-concept-card:hover .rh-concept-card__arrow {
+  color: var(--ce-gold);
+  transform: translateX(2px);
+}
+
+/* ── Concept detail page ── */
+.rh-concept-detail {
+  background: var(--ce-warm-bg);
+  min-height: 100vh;
+  font-family: var(--ce-font-sans);
+  animation: ce-slide-up var(--ce-dur-slow) var(--ce-ease-out) both;
+}
+.rh-concept-section {
+  background: var(--ce-warm-card);
+  border: 1px solid var(--ce-warm-line);
+  border-radius: var(--ce-r-md);
+  padding: 18px 20px;
+  margin-bottom: 10px;
+}
+
+/* ── Concept connected pathways ── */
+.rh-concept-connected {
+  display: flex;
+  flex-direction: column;
+  gap: 7px;
+  margin-bottom: 16px;
+}
+.rh-concept-pathway-chip {
+  background: var(--ce-warm-card);
+  border: 1px solid var(--ce-warm-line);
+  border-left: 3px solid rgba(10,191,188,0.45);
+  border-radius: var(--ce-r-md);
+  padding: 11px 14px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-family: var(--ce-font-sans);
+  text-align: left;
+  transition:
+    border-color var(--ce-dur-fast),
+    box-shadow   var(--ce-dur-fast),
+    transform    var(--ce-dur-fast);
+  -webkit-tap-highlight-color: transparent;
+}
+.rh-concept-pathway-chip:hover {
+  border-color: var(--ce-teal);
+  box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+  transform: translateY(-1px);
+}
+.rh-concept-pathway-chip:active {
+  transform: scale(0.99);
+  transition-duration: 60ms;
+}
+.rh-concept-pathway-chip__icon {
+  font-size: 14px;
+  color: var(--ce-teal);
+  flex-shrink: 0;
+  opacity: 0.8;
+  width: 18px;
+  text-align: center;
+}
+.rh-concept-pathway-chip__title {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--ce-text-dark);
+  line-height: 1.25;
+  letter-spacing: -0.01em;
+  margin-bottom: 2px;
+}
+.rh-concept-pathway-chip__sub {
+  font-size: 11px;
+  color: var(--ce-text-muted);
+  line-height: 1.3;
+}
+
+/* ── Concept connected ref chips ── */
+.rh-concept-ref-chip {
+  background: var(--ce-warm-card);
+  border: 1px solid var(--ce-warm-line);
+  border-radius: var(--ce-r-md);
+  padding: 8px 13px;
+  cursor: pointer;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 2px;
+  font-family: var(--ce-font-sans);
+  text-align: left;
+  transition:
+    border-color var(--ce-dur-fast),
+    box-shadow   var(--ce-dur-fast),
+    transform    var(--ce-dur-fast);
+  -webkit-tap-highlight-color: transparent;
+}
+.rh-concept-ref-chip:hover {
+  border-color: rgba(10,191,188,0.35);
+  box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+  transform: translateY(-1px);
+}
+.rh-concept-ref-chip:active {
+  transform: scale(0.98);
+  transition-duration: 60ms;
+}
+.rh-concept-ref-chip__category {
+  font-family: var(--ce-font-mono);
+  font-size: 8px;
+  font-weight: 700;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  color: var(--ce-teal-deep);
+  line-height: 1;
+}
+.rh-concept-ref-chip__title {
+  font-size: 12.5px;
+  font-weight: 600;
+  color: var(--ce-text-dark);
+  line-height: 1.25;
+  letter-spacing: -0.01em;
+}
+
 /* ── Mobile ── */
 @media (max-width: 768px) {
   .rh-search { font-size: 16px; }

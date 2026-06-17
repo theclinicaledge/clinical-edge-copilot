@@ -8,6 +8,7 @@ const MODULE_OPEN_EVENTS = {
   rhythmlab:    'rhythm_lab_module_opened',
   icudrips:     'icu_drips_module_opened',
   referencehub: 'reference_hub_opened',
+  abglab:       'abg_lab_opened',
 };
 
 // ─── CE Logo ──────────────────────────────────────────────────────────────────
@@ -68,6 +69,15 @@ const MODULES = [
       "Fast bedside answers for hemodynamics, labs, ABGs, ventilation, and devices. No dosing. No diagnosis.",
     status: "active",
     path: "/reference-hub",
+  },
+  {
+    key: "abglab",
+    tag: "Acid-Base · Oxygenation",
+    title: "ABG & Oxygenation Lab",
+    description:
+      "Interpret acid-base patterns and oxygenation clues. Deterministic, offline-capable, educational.",
+    status: "active",
+    path: "/abg-lab",
   },
 ];
 
@@ -249,6 +259,82 @@ export default function ClinicalEdgeHome({ onNavigate }) {
             }}>
               Think through clinical situations, practice rhythm recognition, and build bedside confidence.
             </p>
+          </div>
+
+          {/* Reference Hub banner */}
+          <div style={{
+            background: "#FFFDF8",
+            border: "1px solid #D6D0C4",
+            borderLeft: "3px solid #0ABFBC",
+            borderRadius: 8,
+            padding: "14px 18px",
+            marginBottom: 24,
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "space-between",
+            gap: 16,
+          }}>
+            <div style={{ minWidth: 0 }}>
+              <div style={{
+                fontFamily: "'IBM Plex Mono', 'Courier New', monospace",
+                fontSize: 9,
+                fontWeight: 700,
+                textTransform: "uppercase",
+                letterSpacing: "1.4px",
+                color: "#0A8F8D",
+                marginBottom: 5,
+              }}>
+                New in Clinical Edge
+              </div>
+              <div style={{
+                fontSize: 14,
+                fontWeight: 700,
+                color: "#111827",
+                letterSpacing: "-0.02em",
+                lineHeight: 1.2,
+                marginBottom: 4,
+              }}>
+                Reference Hub is live
+              </div>
+              <div style={{
+                fontSize: 12,
+                color: "#526174",
+                lineHeight: 1.5,
+              }}>
+                Quick bedside answers, pathways, and clinical concepts — built for 15-second review.
+              </div>
+            </div>
+            <button
+              onClick={() => {
+                trackEvent('home_reference_hub_banner_clicked');
+                onNavigate('/reference-hub');
+              }}
+              style={{
+                flexShrink: 0,
+                background: "transparent",
+                border: "1px solid rgba(10,191,188,0.40)",
+                borderRadius: 6,
+                padding: "7px 13px",
+                fontSize: 12,
+                fontWeight: 600,
+                color: "#0A8F8D",
+                cursor: "pointer",
+                fontFamily: "'Inter', sans-serif",
+                letterSpacing: "-0.01em",
+                whiteSpace: "nowrap",
+                transition: "background 0.15s, border-color 0.15s",
+              }}
+              onMouseEnter={e => {
+                e.currentTarget.style.background = "rgba(10,191,188,0.07)";
+                e.currentTarget.style.borderColor = "#0ABFBC";
+              }}
+              onMouseLeave={e => {
+                e.currentTarget.style.background = "transparent";
+                e.currentTarget.style.borderColor = "rgba(10,191,188,0.40)";
+              }}
+            >
+              Open Reference Hub →
+            </button>
           </div>
 
           {/* Module list */}

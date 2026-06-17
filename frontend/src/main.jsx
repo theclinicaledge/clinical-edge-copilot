@@ -14,6 +14,7 @@ import ClinicalEdgeHome from './ClinicalEdgeHome.jsx'
 import RhythmLabModule from './modules/rhythm-lab/RhythmLabModule.tsx'
 import IcuDripsModule from './modules/icu-drips/IcuDripsModule.jsx'
 import ReferenceHubModule from './modules/reference-hub/ReferenceHubModule.jsx'
+import AbgLabModule from './modules/abg-lab/AbgLabModule.jsx'
 
 // ── Service Worker Registration ─────────────────────────────────────────────
 if ('serviceWorker' in navigator) {
@@ -38,6 +39,7 @@ function getPage() {
   if (path === '/download')   return 'download';
   if (path === '/icu-drips')      return 'icudrips';
   if (path === '/reference-hub')  return 'referencehub';
+  if (path === '/abg-lab')        return 'abglab';
   return 'home'; // fallback to home hub
 }
 
@@ -88,6 +90,7 @@ function Root() {
       {page === 'download'   && <Download />}
       {page === 'icudrips'      && <IcuDripsModule onGoHome={() => navigate('/')} />}
       {page === 'referencehub'  && <ReferenceHubModule onGoHome={() => navigate('/')} />}
+      {page === 'abglab'        && <AbgLabModule onGoHome={() => navigate('/')} />}
       <Analytics />
     </>
   );

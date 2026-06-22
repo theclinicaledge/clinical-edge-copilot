@@ -10,6 +10,9 @@ import { CopilotAppStoreDemoComposition } from "./compositions/AppStoreDemo";
 import { ClinicalScenarioVideo }    from "./clinical-edge-video/ClinicalScenarioVideo";
 import { septicShockScenario }      from "./clinical-edge-video/data/scenarios";
 import { RhythmLabPatternVideo }    from "./rhythm-lab-video/compositions/RhythmLabPatternVideo";
+import { CompleteHeartBlockVideo }  from "./complete-heart-block/CompleteHeartBlockVideo";
+import { VideoTemplate }           from "./video-template/VideoTemplate";
+import { DEFAULT_VIDEO_SCRIPT }    from "./video-template/types";
 
 // App Store screenshot dimensions — 6.7" iPhone display (iPhone 15 Pro Max)
 const AS_W = 1284;
@@ -78,6 +81,31 @@ export const Root: React.FC = () => {
         width={1080}
         height={1920}
         defaultProps={{ scenario: septicShockScenario }}
+      />
+
+      {/* ── Generic video template — driven by JSON props ── */}
+      {/* Usage: remotion render VideoTemplate --props=path/to/script.json */}
+      <Composition
+        id="VideoTemplate"
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        component={VideoTemplate as any}
+        durationInFrames={600}
+        fps={30}
+        width={1080}
+        height={1920}
+        defaultProps={DEFAULT_VIDEO_SCRIPT}
+      />
+
+      {/* ── Complete Heart Block — TikTok/Reels 1080×1920 ── */}
+      <Composition
+        id="CompleteHeartBlockVideo"
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        component={CompleteHeartBlockVideo as any}
+        durationInFrames={750}
+        fps={30}
+        width={1080}
+        height={1920}
+        defaultProps={{}}
       />
 
       <Composition

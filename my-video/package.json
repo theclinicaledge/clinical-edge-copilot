@@ -8,7 +8,9 @@
     "build": "remotion render",
     "render": "remotion render ChestPainVideo out/chest-pain-priority.mp4 --codec=h264",
     "render:clinical-scenario": "remotion render ClinicalScenarioVideo out/clinical-scenario-septic-shock.mp4 --codec=h264",
-    "render:rhythm-lab": "remotion render RhythmLabPatternVideo out/rhythm-lab-atrial-flutter.mp4 --codec=h264"
+    "render:rhythm-lab": "remotion render RhythmLabPatternVideo out/rhythm-lab-atrial-flutter.mp4 --codec=h264",
+    "render:complete-heart-block": "remotion render CompleteHeartBlockVideo out/complete-heart-block.mp4 --codec=h264",
+    "create-video": "node scripts/create-video.mjs"
   },
   "dependencies": {
     "@remotion/cli": "4.0.438",

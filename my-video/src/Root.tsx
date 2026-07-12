@@ -13,6 +13,8 @@ import { RhythmLabPatternVideo }    from "./rhythm-lab-video/compositions/Rhythm
 import { CompleteHeartBlockVideo }  from "./complete-heart-block/CompleteHeartBlockVideo";
 import { VideoTemplate }           from "./video-template/VideoTemplate";
 import { DEFAULT_VIDEO_SCRIPT }    from "./video-template/types";
+import { ProductDemoTemplate }     from "./product-demo/ProductDemoTemplate";
+import { DEFAULT_PRODUCT_DEMO_SCRIPT } from "./product-demo/types";
 
 // App Store screenshot dimensions — 6.7" iPhone display (iPhone 15 Pro Max)
 const AS_W = 1284;
@@ -81,6 +83,19 @@ export const Root: React.FC = () => {
         width={1080}
         height={1920}
         defaultProps={{ scenario: septicShockScenario }}
+      />
+
+      {/* ── Product demo template — driven by JSON props ── */}
+      {/* Usage: remotion render ProductDemoTemplate --props=path/to/script.json */}
+      <Composition
+        id="ProductDemoTemplate"
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        component={ProductDemoTemplate as any}
+        durationInFrames={600}
+        fps={30}
+        width={1080}
+        height={1920}
+        defaultProps={DEFAULT_PRODUCT_DEMO_SCRIPT}
       />
 
       {/* ── Generic video template — driven by JSON props ── */}

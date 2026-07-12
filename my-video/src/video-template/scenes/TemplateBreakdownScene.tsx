@@ -108,7 +108,7 @@ export const TemplateBreakdownScene: React.FC<Props> = ({
         <FootageBackground
           file={footageFile}
           startFrom={footageStartFrom}
-          overlayOpacity={0.52}
+          overlayOpacity={0.42}
           zoomEnd={1.06}
           panX={18}
           panY={-12}

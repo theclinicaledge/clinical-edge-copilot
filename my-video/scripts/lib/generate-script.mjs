@@ -1,7 +1,8 @@
 // ─── Generate VideoScript via Claude API ──────────────────────────────────────
 // Uses native fetch (Node 18+). No SDK dependency.
 
-import { log, C } from "./utils.mjs";
+import { log, info, C }                    from "./utils.mjs";
+import { selectFootageQueries, detectCategory } from "./footage-strategy.mjs";
 
 const ANTHROPIC_API = "https://api.anthropic.com/v1/messages";
 const MODEL         = "claude-sonnet-4-6";
@@ -205,6 +206,14 @@ export async function generateScript(topic) {
   if (!script.hashtags.includes("#clinicaledgeco")) {
     script.hashtags.unshift("#clinicaledgeco");
   }
+
+  // Override Claude's generic footage queries with strategy-layer queries.
+  // The strategy layer knows the clinical category of the topic and returns
+  // Pexels search terms proven to return relevant bedside/clinical footage.
+  const category = detectCategory(topic);
+  const strategyQueries = selectFootageQueries(topic);
+  info(`Footage category: ${C.white}${category}${C.reset} → ${strategyQueries.join(", ")}`);
+  script.footageQueries = strategyQueries;
 
   return script;
 }

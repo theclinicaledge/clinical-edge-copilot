@@ -61,7 +61,7 @@ export const TemplateHookScene: React.FC<Props> = ({
         <FootageBackground
           file={footageFile}
           startFrom={0}
-          overlayOpacity={0.38}
+          overlayOpacity={0.28}
           zoomEnd={1.10}
           panY={-30}
           bottomGradient

@@ -19,7 +19,7 @@ function CELogo() {
       height="30"
       viewBox="0 0 225 200"
       xmlns="http://www.w3.org/2000/svg"
-      fill="#0ABFBC"
+      fill="var(--ce-teal)"
       aria-label="Clinical Edge"
       style={{ flexShrink: 0, display: "block" }}
     >
@@ -89,8 +89,8 @@ const ACTIVE_STYLE = {
   paddingTop:   28,
   paddingBottom: 22,
   descSize:     13.5,
-  descColor:    "#526174",
-  tagColor:     "#0ABFBC",
+  descColor:    "var(--ce-text-muted)",
+  tagColor:     "var(--ce-teal)",
   tagOpacity:   1,
 };
 
@@ -155,7 +155,7 @@ function ModuleEntry({ module, isLast, onNavigate }) {
       <div style={{
         fontSize: s.titleSize,
         fontWeight: s.titleWeight,
-        color: isActive ? (hovered ? "#07111C" : "#111827") : "#9AABBA",
+        color: isActive ? (hovered ? "#07111C" : "var(--ce-text-dark)") : "#9AABBA",
         letterSpacing: s.titleTracking,
         lineHeight: 1.12,
         marginBottom: 8,
@@ -183,7 +183,7 @@ export default function ClinicalEdgeHome({ onNavigate }) {
   return (
     <div style={{
       minHeight: "100vh",
-      background: "#111827",
+      background: "var(--ce-navy-900)",
       fontFamily: "'Inter', -apple-system, BlinkMacSystemFont, sans-serif",
       display: "flex",
       flexDirection: "column",
@@ -230,7 +230,7 @@ export default function ClinicalEdgeHome({ onNavigate }) {
       </div>
 
       {/* ── Warm surface ─────────────────────────────────────────────────── */}
-      <div className="ce-page-enter" style={{ background: "#E7E1D6", flex: 1 }}>
+      <div className="ce-page-enter" style={{ background: "var(--ce-warm-bg)", flex: 1 }}>
         <div
           className="ce-home-content"
           style={{ maxWidth: 750, margin: "0 auto", width: "100%" }}
@@ -242,7 +242,7 @@ export default function ClinicalEdgeHome({ onNavigate }) {
               fontFamily: "'Inter', sans-serif",
               fontWeight: 800,
               fontSize: "clamp(23px, 5vw, 34px)",
-              color: "#111827",
+              color: "var(--ce-text-dark)",
               margin: "0 0 10px",
               lineHeight: 1.1,
               letterSpacing: "-0.04em",
@@ -251,7 +251,7 @@ export default function ClinicalEdgeHome({ onNavigate }) {
             </h1>
             <p style={{
               fontSize: "clamp(14px, 2.8vw, 15.5px)",
-              color: "#526174",
+              color: "var(--ce-text-muted)",
               margin: 0,
               lineHeight: 1.55,
               fontWeight: 400,
@@ -277,7 +277,7 @@ export default function ClinicalEdgeHome({ onNavigate }) {
           <div style={{ marginTop: 32, fontFamily: "'IBM Plex Mono', monospace" }}>
             <p style={{
               fontSize: 11,
-              color: "#7F99A5",
+              color: "var(--ce-text-dim)",
               lineHeight: 1.65,
               margin: "0 0 10px",
             }}>
@@ -294,7 +294,7 @@ export default function ClinicalEdgeHome({ onNavigate }) {
                   onClick={(e) => { e.preventDefault(); onNavigate(path); }}
                   style={{
                     fontSize: 11,
-                    color: "#7F99A5",
+                    color: "var(--ce-text-dim)",
                     textDecoration: "none",
                     letterSpacing: "0.02em",
                   }}

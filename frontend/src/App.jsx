@@ -29,12 +29,12 @@ const EXAMPLES = [
 ];
 
 const SECTIONS = [
-  { name: "What this could be",       aliases: ["What this could be"],                                        accent: "#4da3ff", bg: "rgba(77,163,255,0.06)"  },
+  { name: "What this could be",       aliases: ["What this could be"],                                        accent: "var(--ce-blue)", bg: "rgba(77,163,255,0.06)"  },
   { name: "Possible concerns",        aliases: ["Possible concerns",      "What concerns me most"],           accent: "#e05572", bg: "rgba(224,85,114,0.06)"  },
   { name: "What to assess next",      aliases: ["What to assess next",    "What I'd assess next"],            accent: "#1FBF75", bg: "rgba(31,191,117,0.06)"  },
   { name: "What to consider next",    aliases: ["What to consider next",  "What I'd do right now"],           accent: "#F2B94B", bg: "rgba(242,185,75,0.06)"  },
   { name: "Where this may be heading",aliases: ["Where this may be heading"],                                 accent: "#F2B94B", bg: "rgba(242,185,75,0.06)"  },
-  { name: "Closing",                  aliases: ["Closing"],                                                   accent: "#0ABFBC", bg: "rgba(10,191,188,0.04)"  },
+  { name: "Closing",                  aliases: ["Closing"],                                                   accent: "var(--ce-teal)", bg: "rgba(10,191,188,0.04)"  },
 ];
 
 const SECTION_CONFIG = {};
@@ -191,13 +191,13 @@ function renderInline(text) {
 // ─── Sub-components ───────────────────────────────────────────────────────────
 
 function SectionCard({ title, content }) {
-  const cfg = SECTION_CONFIG[title] || { accent: "#4da3ff", bg: "rgba(77,163,255,0.06)" };
+  const cfg = SECTION_CONFIG[title] || { accent: "var(--ce-blue)", bg: "rgba(77,163,255,0.06)" };
 
   // Closing — italic pull-quote treatment, no label
   if (title === "Closing") {
     return (
       <div style={{
-        borderLeft: "2px solid #0ABFBC",
+        borderLeft: "2px solid var(--ce-teal)",
         padding: "14px 20px",
         marginTop: 10,
         marginBottom: 6,
@@ -208,7 +208,7 @@ function SectionCard({ title, content }) {
           margin: 0,
           fontSize: 14,
           fontStyle: "italic",
-          color: "#526174",
+          color: "var(--ce-text-muted)",
           lineHeight: 1.82,
           letterSpacing: "0.008em",
         }}>
@@ -240,16 +240,16 @@ function SectionCard({ title, content }) {
       }}>
         {title}
       </div>
-      <div style={{ fontSize: 14, lineHeight: 1.72, color: "#1E2A3A" }}>
+      <div style={{ fontSize: 14, lineHeight: 1.72, color: "var(--ce-navy-700)" }}>
         {lines.map((line, i) => {
           const isBullet = /^[-\u2022*]\s/.test(line);
           if (isBullet) return (
             <div key={i} style={{ display: "flex", gap: 11, marginBottom: 8, alignItems: "flex-start" }}>
               <span style={{ color: cfg.accent, fontWeight: 700, marginTop: 2, flexShrink: 0, fontSize: 14, lineHeight: 1.72 }}>&rsaquo;</span>
-              <span style={{ color: "#1E2A3A" }}>{renderInline(line.replace(/^[-\u2022*]\s+/, ""))}</span>
+              <span style={{ color: "var(--ce-navy-700)" }}>{renderInline(line.replace(/^[-\u2022*]\s+/, ""))}</span>
             </div>
           );
-          return <p key={i} style={{ margin: "0 0 7px", color: "#1E2A3A" }}>{renderInline(line)}</p>;
+          return <p key={i} style={{ margin: "0 0 7px", color: "var(--ce-navy-700)" }}>{renderInline(line)}</p>;
         })}
       </div>
     </div>
@@ -300,7 +300,7 @@ function LoadingIndicator({ phase }) {
           <div key={i} style={{
             width: 3,
             borderRadius: 3,
-            background: "#0ABFBC",
+            background: "var(--ce-teal)",
             opacity: 0.75,
             animation: "barPulse 1.1s ease-in-out " + (i * 0.11) + "s infinite",
           }} />
@@ -339,7 +339,7 @@ function StreamPreview({ text }) {
         display: "inline-block",
         width: 6,
         height: 14,
-        background: "#0ABFBC",
+        background: "var(--ce-teal)",
         marginLeft: 3,
         verticalAlign: "middle",
         animation: "cursorBlink 1s step-end infinite",
@@ -369,7 +369,7 @@ function SavedCaseRow({ sc, onReopen, onDelete, onCopy, onSaveNote }) {
   };
 
   return (
-    <div style={{ background: "#1E2A3A", border: "1px solid #2D3B4E", borderRadius: 8, marginBottom: 8, overflow: "hidden" }}>
+    <div style={{ background: "var(--ce-navy-700)", border: "1px solid var(--ce-line-navy)", borderRadius: 8, marginBottom: 8, overflow: "hidden" }}>
       <div style={{ padding: "12px 14px", display: "flex", gap: 10, alignItems: "flex-start" }}>
         <div style={{ flex: 1, minWidth: 0 }}>
           <div style={{ display: "flex", alignItems: "center", gap: 7, marginBottom: 4, flexWrap: "wrap" }}>
@@ -387,7 +387,7 @@ function SavedCaseRow({ sc, onReopen, onDelete, onCopy, onSaveNote }) {
               fontSize: 9,
               fontWeight: 700,
               fontFamily: "'IBM Plex Mono', monospace",
-              color: urgStyle ? (urgStyle.darkText || urgStyle.color) : "#7F99A5",
+              color: urgStyle ? (urgStyle.darkText || urgStyle.color) : "var(--ce-text-dim)",
               textTransform: "uppercase",
               letterSpacing: "0.8px",
             }}>
@@ -404,15 +404,15 @@ function SavedCaseRow({ sc, onReopen, onDelete, onCopy, onSaveNote }) {
             {sc.question}
           </div>
           {sc.note && !editNote && (
-            <div style={{ marginTop: 5, fontSize: 12, color: "#7F99A5", lineHeight: 1.4 }}>
+            <div style={{ marginTop: 5, fontSize: 12, color: "var(--ce-text-dim)", lineHeight: 1.4 }}>
               Note: {sc.note}
             </div>
           )}
         </div>
         <div style={{ display: "flex", gap: 5, flexShrink: 0, alignItems: "center" }}>
           <button onClick={() => setExpanded(!expanded)} title={expanded ? "Collapse" : "Expand"} style={iconBtnStyle("#4A6978")}>{expanded ? "\u25b2" : "\u25bc"}</button>
-          <button onClick={() => onReopen(sc.question)} title="Reopen in input" style={iconBtnStyle("#0ABFBC")}>&crarr;</button>
-          <button onClick={handleCopy} title="Copy response" style={iconBtnStyle(copied ? "#1FBF75" : "#0ABFBC")}>{copied ? "\u2713" : "\u2398"}</button>
+          <button onClick={() => onReopen(sc.question)} title="Reopen in input" style={iconBtnStyle("var(--ce-teal)")}>&crarr;</button>
+          <button onClick={handleCopy} title="Copy response" style={iconBtnStyle(copied ? "#1FBF75" : "var(--ce-teal)")}>{copied ? "\u2713" : "\u2398"}</button>
           <button onClick={() => { setEditNote(true); setExpanded(true); }} title="Add/edit note" aria-label="Add or edit note" style={iconBtnStyle("#F2B94B")}>{"✎"}</button>
           <button onClick={() => onDelete(sc.id)} title="Delete case" style={iconBtnStyle("#E96B6B")}>&times;</button>
         </div>
@@ -422,7 +422,7 @@ function SavedCaseRow({ sc, onReopen, onDelete, onCopy, onSaveNote }) {
         <div style={{ padding: "0 14px 12px", borderTop: "1px solid rgba(255,255,255,0.07)" }}>
           <div style={{
             fontSize: 9,
-            color: "#7F99A5",
+            color: "var(--ce-text-dim)",
             fontWeight: 700,
             textTransform: "uppercase",
             letterSpacing: "1.3px",
@@ -450,8 +450,8 @@ function SavedCaseRow({ sc, onReopen, onDelete, onCopy, onSaveNote }) {
             }}
           />
           <div style={{ display: "flex", gap: 8, marginTop: 8 }}>
-            <button onClick={handleNoteSave} style={{ ...smallBtnStyle("#0ABFBC", "#0B1F2A"), fontWeight: 700 }}>Save Note</button>
-            <button onClick={() => { setEditNote(false); setNoteText(sc.note || ""); }} style={smallBtnStyle("transparent", "#7F99A5", "1px solid rgba(255,255,255,0.1)")}>Cancel</button>
+            <button onClick={handleNoteSave} style={{ ...smallBtnStyle("var(--ce-teal)", "#0B1F2A"), fontWeight: 700 }}>Save Note</button>
+            <button onClick={() => { setEditNote(false); setNoteText(sc.note || ""); }} style={smallBtnStyle("transparent", "var(--ce-text-dim)", "1px solid rgba(255,255,255,0.1)")}>Cancel</button>
           </div>
         </div>
       )}
@@ -460,7 +460,7 @@ function SavedCaseRow({ sc, onReopen, onDelete, onCopy, onSaveNote }) {
         <div style={{ padding: "0 14px 14px", borderTop: "1px solid rgba(255,255,255,0.07)" }}>
           <div style={{
             fontSize: 9,
-            color: "#7F99A5",
+            color: "var(--ce-text-dim)",
             fontWeight: 700,
             textTransform: "uppercase",
             letterSpacing: "1.3px",
@@ -470,7 +470,7 @@ function SavedCaseRow({ sc, onReopen, onDelete, onCopy, onSaveNote }) {
           }}>Saved Response</div>
           <div style={{
             fontSize: 12,
-            color: "#7F99A5",
+            color: "var(--ce-text-dim)",
             lineHeight: 1.7,
             whiteSpace: "pre-wrap",
             maxHeight: 260,
@@ -872,20 +872,20 @@ export default function App({ onGoHome, isOnline = true }) {
   return (
     <div style={{
       minHeight: "100vh",
-      background: "#111827",
+      background: "var(--ce-navy-900)",
       color: "#A8C1CC",
       fontFamily: "'Inter', -apple-system, BlinkMacSystemFont, sans-serif",
       padding: "0 0 calc(80px + env(safe-area-inset-bottom))",
     }}>
       <style>{`
         *, *::before, *::after { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
-        body { margin: 0; background: #111827; -webkit-font-smoothing: antialiased; overscroll-behavior: none; -webkit-text-size-adjust: 100%; }
+        body { margin: 0; background: var(--ce-navy-900); -webkit-font-smoothing: antialiased; overscroll-behavior: none; -webkit-text-size-adjust: 100%; }
         textarea { outline: none; touch-action: pan-y; }
-        textarea::placeholder { color: #94A3B8; }
+        textarea::placeholder { color: var(--ce-text-light-sec); }
         button { transition: all 0.15s ease; font-family: inherit; cursor: pointer; }
         ::-webkit-scrollbar { width: 4px; }
         ::-webkit-scrollbar-track { background: transparent; }
-        ::-webkit-scrollbar-thumb { background: #2D3B4E; border-radius: 2px; }
+        ::-webkit-scrollbar-thumb { background: var(--ce-line-navy); border-radius: 2px; }
         .preview-scroll::-webkit-scrollbar { display: none; }
 
         .chip:hover {
@@ -899,10 +899,10 @@ export default function App({ onGoHome, isOnline = true }) {
         }
         .mode-btn:hover:not(.mode-active) {
           border-color: rgba(10,191,188,0.22) !important;
-          color: #94A3B8 !important;
+          color: var(--ce-text-light-sec) !important;
         }
         .submit-btn:hover:not(:disabled) {
-          background: #0ABFBC !important;
+          background: var(--ce-teal) !important;
           transform: translateY(-1px);
         }
         .submit-btn:active:not(:disabled) { transform: translateY(0); }
@@ -913,7 +913,7 @@ export default function App({ onGoHome, isOnline = true }) {
         }
         .copy-btn:hover {
           border-color: rgba(0,0,0,0.15) !important;
-          color: #526174 !important;
+          color: var(--ce-text-muted) !important;
         }
 
         @keyframes fadeUp { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
@@ -922,7 +922,7 @@ export default function App({ onGoHome, isOnline = true }) {
         .spinner {
           width: 15px; height: 15px;
           border: 2px solid rgba(10,191,188,0.20);
-          border-top-color: #0ABFBC;
+          border-top-color: var(--ce-teal);
           border-radius: 50%;
           animation: spin 0.7s linear infinite;
           display: inline-block;
@@ -983,7 +983,7 @@ export default function App({ onGoHome, isOnline = true }) {
             xmlns="http://www.w3.org/2000/svg"
             style={{ flexShrink: 0, display: "block" }}
             aria-label="Clinical Edge"
-            fill="#0ABFBC"
+            fill="var(--ce-teal)"
           >
             <path d="M 159.1,24.3 A 96,96 0 1,0 159.1,175.7 L 135.7,145.7 A 58,58 0 1,1 135.7,54.3 Z" />
             <path d="M 144.0,57 L 208,45 L 218,58 L 208,70 L 150.0,71 Z" />
@@ -1005,7 +1005,7 @@ export default function App({ onGoHome, isOnline = true }) {
             <span style={{
               fontSize: 10,
               fontWeight: 500,
-              color: "#7F99A5",
+              color: "var(--ce-text-dim)",
               letterSpacing: "0.7px",
               textTransform: "uppercase",
               fontFamily: "'IBM Plex Mono', 'Courier New', monospace",
@@ -1026,7 +1026,7 @@ export default function App({ onGoHome, isOnline = true }) {
       </div>
 
       {/* ── Warm clinical workspace ──────────────────────────────────────── */}
-      <div className="ce-page-enter" style={{ background: "#E7E1D6", minHeight: "100vh" }}>
+      <div className="ce-page-enter" style={{ background: "var(--ce-warm-bg)", minHeight: "100vh" }}>
 
       {/* ── Main ─────────────────────────────────────────────────────────── */}
       <div className="main-container" style={{ maxWidth: 800, margin: "0 auto", width: "100%", padding: "40px 20px 0", display: "flex", flexDirection: "column", alignItems: "stretch" }}>
@@ -1037,7 +1037,7 @@ export default function App({ onGoHome, isOnline = true }) {
             fontFamily: "'Inter', sans-serif",
             fontWeight: 700,
             fontSize: "clamp(20px, 4.5vw, 26px)",
-            color: "#111827",
+            color: "var(--ce-text-dark)",
             margin: "0 0 6px",
             lineHeight: 1.15,
             letterSpacing: "-0.03em",
@@ -1054,7 +1054,7 @@ export default function App({ onGoHome, isOnline = true }) {
           <div style={{
             background: "rgba(77,163,255,0.06)",
             border: "1px solid rgba(77,163,255,0.22)",
-            borderLeft: "3px solid #4da3ff",
+            borderLeft: "3px solid var(--ce-blue)",
             borderRadius: 8,
             padding: "14px 16px",
             marginBottom: 14,
@@ -1065,21 +1065,21 @@ export default function App({ onGoHome, isOnline = true }) {
             <span style={{
               fontFamily: "'IBM Plex Mono', monospace",
               fontSize: 11,
-              color: "#4da3ff",
+              color: "var(--ce-blue)",
               flexShrink: 0,
               marginTop: 1,
             }}>OFFLINE</span>
-            <span style={{ fontSize: 13, color: "#526174", lineHeight: 1.55 }}>
-              Copilot requires internet. <strong style={{ color: "#4da3ff", fontWeight: 600 }}>Rhythm Lab</strong> and <strong style={{ color: "#4da3ff", fontWeight: 600 }}>ICU Drips</strong> are available offline once loaded.
+            <span style={{ fontSize: 13, color: "var(--ce-text-muted)", lineHeight: 1.55 }}>
+              Copilot requires internet. <strong style={{ color: "var(--ce-blue)", fontWeight: 600 }}>Rhythm Lab</strong> and <strong style={{ color: "var(--ce-blue)", fontWeight: 600 }}>ICU Drips</strong> are available offline once loaded.
             </span>
           </div>
         )}
 
         {/* Input card */}
         <div className="input-card" style={{
-          background: "#1E2A3A",
+          background: "var(--ce-navy-700)",
           border: inputFocused
-            ? "1px solid #0ABFBC"
+            ? "1px solid var(--ce-teal)"
             : "1px solid rgba(240,237,230,0.10)",
           borderRadius: 8,
           padding: "14px 16px 12px",
@@ -1102,7 +1102,7 @@ export default function App({ onGoHome, isOnline = true }) {
               width: "100%",
               background: "transparent",
               border: "none",
-              color: "#F0EDE6",
+              color: "var(--ce-text-light)",
               fontSize: 15,
               lineHeight: 1.6,
               resize: "none",
@@ -1124,8 +1124,8 @@ export default function App({ onGoHome, isOnline = true }) {
               onClick={handleSubmit}
               disabled={!question.trim() || isActive || !isOnline}
               style={{
-                background: (!question.trim() || isActive || !isOnline) ? "rgba(10,191,188,0.08)" : "#0ABFBC",
-                color: (!question.trim() || isActive || !isOnline) ? "#94A3B8" : "#0B1F2A",
+                background: (!question.trim() || isActive || !isOnline) ? "rgba(10,191,188,0.08)" : "var(--ce-teal)",
+                color: (!question.trim() || isActive || !isOnline) ? "var(--ce-text-light-sec)" : "#0B1F2A",
                 border: "none",
                 borderRadius: 8,
                 padding: "10px 22px",
@@ -1261,7 +1261,7 @@ export default function App({ onGoHome, isOnline = true }) {
                 fontWeight: 500,
                 letterSpacing: "0.10em",
                 textTransform: "uppercase",
-                color: "#526174",
+                color: "var(--ce-text-muted)",
                 fontFamily: "'IBM Plex Mono', monospace",
               }}>
                 Saved Cases <span style={{ color: "rgba(82,97,116,0.55)", fontWeight: 400 }}>({savedCases.length})</span>
@@ -1293,7 +1293,7 @@ export default function App({ onGoHome, isOnline = true }) {
                 style={{
                   background: "rgba(0,0,0,0.05)",
                   border: "1px solid rgba(0,0,0,0.09)",
-                  color: "#526174",
+                  color: "var(--ce-text-muted)",
                   padding: "7px 11px",
                   borderRadius: 6,
                   fontSize: 12,
@@ -1460,7 +1460,7 @@ export default function App({ onGoHome, isOnline = true }) {
                 style={{
                   background: "transparent",
                   border: "1px solid rgba(0,0,0,0.10)",
-                  color: sourcesOpen ? "#526174" : "#3D5E6E",
+                  color: sourcesOpen ? "var(--ce-text-muted)" : "#3D5E6E",
                   borderRadius: 6,
                   padding: "9px 16px",
                   fontSize: 12.5,
@@ -1481,7 +1481,7 @@ export default function App({ onGoHome, isOnline = true }) {
                   marginLeft: "auto",
                   background: sbar && !sbar.error ? "rgba(10,191,188,0.07)" : "transparent",
                   border: "1px solid " + (sbar && !sbar.error ? "rgba(10,191,188,0.25)" : "rgba(10,191,188,0.14)"),
-                  color: sbarLoading ? "rgba(10,191,188,0.35)" : "#0ABFBC",
+                  color: sbarLoading ? "rgba(10,191,188,0.35)" : "var(--ce-teal)",
                   borderRadius: 6,
                   padding: "9px 16px",
                   fontSize: 12.5,
@@ -1497,7 +1497,7 @@ export default function App({ onGoHome, isOnline = true }) {
               >
                 {sbarLoading ? (
                   <>
-                    <span style={{ display: "inline-block", width: 10, height: 10, border: "1.5px solid rgba(10,191,188,0.28)", borderTopColor: "#0ABFBC", borderRadius: "50%", animation: "spin 0.75s linear infinite" }} />
+                    <span style={{ display: "inline-block", width: 10, height: 10, border: "1.5px solid rgba(10,191,188,0.28)", borderTopColor: "var(--ce-teal)", borderRadius: "50%", animation: "spin 0.75s linear infinite" }} />
                     Building SBAR…
                   </>
                 ) : (
@@ -1510,8 +1510,8 @@ export default function App({ onGoHome, isOnline = true }) {
             {sourcesOpen && (
               <div style={{
                 marginTop: 10,
-                background: "#1E2A3A",
-                border: "1px solid #2D3B4E",
+                background: "var(--ce-navy-700)",
+                border: "1px solid var(--ce-line-navy)",
                 borderRadius: 8,
                 padding: "14px 16px",
               }}>
@@ -1557,9 +1557,9 @@ export default function App({ onGoHome, isOnline = true }) {
                         gap: 12,
                         padding: "10px 12px",
                         borderRadius: 6,
-                        background: "#243040",
-                        border: "1px solid #2D3B4E",
-                        color: "#0ABFBC",
+                        background: "var(--ce-navy-600)",
+                        border: "1px solid var(--ce-line-navy)",
+                        color: "var(--ce-teal)",
                         textDecoration: "none",
                         fontSize: 14,
                         lineHeight: 1.35,
@@ -1573,9 +1573,9 @@ export default function App({ onGoHome, isOnline = true }) {
                 <div style={{
                   marginTop: 10,
                   paddingTop: 10,
-                  borderTop: "1px solid #2D3B4E",
+                  borderTop: "1px solid var(--ce-line-navy)",
                   fontSize: 11,
-                  color: "#526174",
+                  color: "var(--ce-text-muted)",
                   lineHeight: 1.5,
                 }}>
                   Always follow your local policy, approved references, and clinician judgment.
@@ -1586,8 +1586,8 @@ export default function App({ onGoHome, isOnline = true }) {
             {/* ── Continue Thinking ─────────────────────────────────────── */}
             <div style={{
               marginTop: 22,
-              background: "#1E2A3A",
-              border: "1px solid #2D3B4E",
+              background: "var(--ce-navy-700)",
+              border: "1px solid var(--ce-line-navy)",
               borderRadius: 8,
               padding: "16px 18px",
             }}>
@@ -1596,7 +1596,7 @@ export default function App({ onGoHome, isOnline = true }) {
                 fontWeight: 700,
                 textTransform: "uppercase",
                 letterSpacing: "1.3px",
-                color: "#7F99A5",
+                color: "var(--ce-text-dim)",
                 marginBottom: 10,
                 fontFamily: "'IBM Plex Mono', monospace",
               }}>
@@ -1631,7 +1631,7 @@ export default function App({ onGoHome, isOnline = true }) {
                   style={{
                     background: followUp.trim() ? "rgba(10,191,188,0.10)" : "transparent",
                     border: "1px solid " + (followUp.trim() ? "rgba(10,191,188,0.30)" : "rgba(255,255,255,0.10)"),
-                    color: followUp.trim() ? "#0ABFBC" : "#3A5566",
+                    color: followUp.trim() ? "var(--ce-teal)" : "#3A5566",
                     borderRadius: 6,
                     padding: "7px 16px",
                     fontSize: 12,
@@ -1650,8 +1650,8 @@ export default function App({ onGoHome, isOnline = true }) {
           {(sbar || sbarLoading) && (
             <div style={{
               marginTop: 16,
-              background: "#1E2A3A",
-              border: "1px solid #2D3B4E",
+              background: "var(--ce-navy-700)",
+              border: "1px solid var(--ce-line-navy)",
               borderRadius: 8,
               padding: "20px 20px 16px",
             }}>
@@ -1662,7 +1662,7 @@ export default function App({ onGoHome, isOnline = true }) {
                   fontWeight: 700,
                   textTransform: "uppercase",
                   letterSpacing: "1.4px",
-                  color: "#7F99A5",
+                  color: "var(--ce-text-dim)",
                   fontFamily: "'IBM Plex Mono', monospace",
                 }}>
                   SBAR Handoff Draft
@@ -1700,7 +1700,7 @@ export default function App({ onGoHome, isOnline = true }) {
               {sbar && !sbar.error && (
                 <div style={{ display: "flex", flexDirection: "column", gap: 14 }}>
                   {[
-                    { label: "Situation",      value: sbar.situation,      accent: "#4da3ff" },
+                    { label: "Situation",      value: sbar.situation,      accent: "var(--ce-blue)" },
                     { label: "Background",     value: sbar.background,     accent: "#A8C1CC" },
                     { label: "Assessment",     value: sbar.assessment,     accent: "#F2B94B" },
                     { label: "Recommendation", value: sbar.recommendation, accent: "#1FBF75" },
@@ -1770,7 +1770,7 @@ export default function App({ onGoHome, isOnline = true }) {
               fontFamily: "'IBM Plex Mono', monospace",
               letterSpacing: "0.01em",
             }}
-            onMouseEnter={e => e.currentTarget.style.color = "#0A9E9B"}
+            onMouseEnter={e => e.currentTarget.style.color = "var(--ce-teal-deep)"}
             onMouseLeave={e => e.currentTarget.style.color = "#8A9BA8"}
             >{label}</a>
           ))}

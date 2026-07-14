@@ -208,7 +208,7 @@
   transition: border-color 0.15s, box-shadow 0.15s;
   -webkit-appearance: none;
 }
-.id-search-input::placeholder { color: #94A3B8; }
+.id-search-input::placeholder { color: var(--ce-text-light-sec); }
 .id-search-input:focus {
   border-color: var(--id-teal);
   box-shadow: 0 0 0 2px rgba(10,191,188,0.1);
@@ -1281,7 +1281,7 @@
 }
 .id-hcm__col-tag--a {
   background: rgba(10,191,188,0.14);
-  color: #0A8F8D;
+  color: var(--ce-teal-deep);
 }
 .id-hcm__col-tag--b {
   background: rgba(212,168,75,0.18);
@@ -1386,7 +1386,7 @@
   letter-spacing: -0.01em;
 }
 /* Direction color classes */
-.id-hemo-val--up       { color: #0ABFBC; }
+.id-hemo-val--up       { color: var(--ce-teal); }
 .id-hemo-val--down     { color: #C09030; }
 .id-hemo-val--neutral  { color: #8096A0; }
 .id-hemo-val--variable {
@@ -1438,7 +1438,7 @@
   font-weight: 700;
   text-transform: uppercase;
   letter-spacing: 1.5px;
-  color: #0A8F8D;
+  color: var(--ce-teal-deep);
   font-family: var(--id-font-mono);
   margin-bottom: 5px;
 }
@@ -1819,7 +1819,7 @@
   text-decoration: underline;
   text-underline-offset: 2px;
 }
-.id-pearl-view__drip-link:hover { color: #089e9b; }
+.id-pearl-view__drip-link:hover { color: var(--ce-teal-deep); }
 .id-pearl-view__more {
   background: var(--id-bg-card);
   border: 1px solid var(--id-border-card);
@@ -2045,7 +2045,7 @@
 }
 .id-practice-option--correct .id-practice-option__letter,
 .id-practice-option--correct .id-practice-option__text {
-  color: #0a8c8a;
+  color: var(--ce-teal-deep);
   font-weight: 600;
 }
 .id-practice-option--incorrect {
@@ -2078,7 +2078,7 @@
   font-family: var(--id-font-sans);
   margin-bottom: 8px;
 }
-.id-practice-feedback__verdict--correct { color: #0a8c8a; }
+.id-practice-feedback__verdict--correct { color: var(--ce-teal-deep); }
 .id-practice-feedback__verdict--incorrect { color: #b05050; }
 .id-practice-feedback__explanation {
   font-size: 13px;
@@ -2124,7 +2124,7 @@
   text-decoration: underline;
   text-underline-offset: 2px;
 }
-.id-practice-feedback__drip-link:hover { color: #089e9b; }
+.id-practice-feedback__drip-link:hover { color: var(--ce-teal-deep); }
 
 /* ─── Practice buttons ───────────────────────────────────────────────────────── */
 .id-practice-btn {
@@ -2145,7 +2145,7 @@
   border: 1.5px solid var(--id-teal);
   color: #fff;
 }
-.id-practice-btn--primary:hover { background: #089e9b; border-color: #089e9b; }
+.id-practice-btn--primary:hover { background: var(--ce-teal-deep); border-color: var(--ce-teal-deep); }
 .id-practice-btn--ghost {
   background: var(--id-bg-card);
   border: 1.5px solid var(--id-border-card);
@@ -2376,7 +2376,7 @@
 }
 .id-challenge-option--correct .id-challenge-option__letter,
 .id-challenge-option--correct .id-challenge-option__text {
-  color: #0a8c8a;
+  color: var(--ce-teal-deep);
   font-weight: 600;
 }
 .id-challenge-option--incorrect {
@@ -2401,7 +2401,7 @@
   font-family: var(--id-font-sans);
   margin-bottom: 8px;
 }
-.id-challenge-feedback__verdict--correct  { color: #0a8c8a; }
+.id-challenge-feedback__verdict--correct  { color: var(--ce-teal-deep); }
 .id-challenge-feedback__verdict--incorrect { color: #b05050; }
 .id-challenge-feedback__explanation {
   font-size: 13px;
@@ -2448,7 +2448,7 @@
   text-decoration: underline;
   text-underline-offset: 2px;
 }
-.id-challenge-feedback__drip-link:hover { color: #089e9b; }
+.id-challenge-feedback__drip-link:hover { color: var(--ce-teal-deep); }
 
 /* Buttons */
 .id-challenge-btn {

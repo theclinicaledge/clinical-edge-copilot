@@ -277,7 +277,7 @@ const CLINICAL_CONCEPTS = [
 function CELogo() {
   return (
     <svg width="30" height="30" viewBox="0 0 225 200" xmlns="http://www.w3.org/2000/svg"
-      fill="#0ABFBC" aria-label="Clinical Edge" style={{ flexShrink: 0, display: 'block' }}>
+      fill="var(--ce-teal)" aria-label="Clinical Edge" style={{ flexShrink: 0, display: 'block' }}>
       <path d="M 159.1,24.3 A 96,96 0 1,0 159.1,175.7 L 135.7,145.7 A 58,58 0 1,1 135.7,54.3 Z" />
       <path d="M 144.0,57 L 208,45 L 218,58 L 208,70 L 150.0,71 Z" />
       <path d="M 158.0,92 L 215,82 L 225,95 L 215,107 L 158.0,108 Z" />
@@ -313,7 +313,7 @@ function Header({ onGoHome, showBack, onBack, backLabel }) {
             Clinical Edge
           </span>
           <span style={{
-            fontSize: 10, fontWeight: 500, color: '#7F99A5',
+            fontSize: 10, fontWeight: 500, color: 'var(--ce-text-dim)',
             letterSpacing: '0.7px', textTransform: 'uppercase',
             fontFamily: 'var(--ce-font-mono)', lineHeight: 1,
           }}>
@@ -419,14 +419,14 @@ function PathwayDetailView({ pathway, onBack, onSelectRef, backLabel }) {
           <h1 style={{
             fontSize: 'clamp(22px, 5vw, 28px)',
             fontWeight: 700,
-            color: '#111827',
+            color: 'var(--ce-text-dark)',
             margin: '0 0 6px',
             lineHeight: 1.15,
             letterSpacing: '-0.03em',
           }}>
             {pathway.title}
           </h1>
-          <p style={{ fontSize: 14, color: '#526174', margin: 0, lineHeight: 1.5 }}>
+          <p style={{ fontSize: 14, color: 'var(--ce-text-muted)', margin: 0, lineHeight: 1.5 }}>
             {pathway.subtitle}
           </p>
         </div>
@@ -483,7 +483,7 @@ function PathwayDetailView({ pathway, onBack, onSelectRef, backLabel }) {
         {/* Connected references */}
         {connectedRefs.length > 0 && (
           <div style={{ marginTop: 24, marginBottom: 10 }}>
-            <div className="rh-eyebrow" style={{ marginBottom: 10, color: '#526174' }}>
+            <div className="rh-eyebrow" style={{ marginBottom: 10, color: 'var(--ce-text-muted)' }}>
               Connected references
             </div>
             <div className="rh-connected-chips">
@@ -596,14 +596,14 @@ function ConceptDetailView({ concept, onBack, onSelectPathway, onSelectRef }) {
           <h1 style={{
             fontSize: 'clamp(22px, 5vw, 28px)',
             fontWeight: 700,
-            color: '#111827',
+            color: 'var(--ce-text-dark)',
             margin: '0 0 6px',
             lineHeight: 1.15,
             letterSpacing: '-0.03em',
           }}>
             {concept.title}
           </h1>
-          <p style={{ fontSize: 14, color: '#526174', margin: 0, lineHeight: 1.5 }}>
+          <p style={{ fontSize: 14, color: 'var(--ce-text-muted)', margin: 0, lineHeight: 1.5 }}>
             {concept.subtitle}
           </p>
         </div>
@@ -636,7 +636,7 @@ function ConceptDetailView({ concept, onBack, onSelectPathway, onSelectRef }) {
         {/* Connected pathways */}
         {connectedPathways.length > 0 && (
           <div style={{ marginBottom: 10 }}>
-            <div className="rh-eyebrow" style={{ marginBottom: 10, color: '#526174' }}>
+            <div className="rh-eyebrow" style={{ marginBottom: 10, color: 'var(--ce-text-muted)' }}>
               Connected pathways
             </div>
             <div className="rh-concept-connected">
@@ -661,7 +661,7 @@ function ConceptDetailView({ concept, onBack, onSelectPathway, onSelectRef }) {
         {/* Connected references */}
         {connectedRefs.length > 0 && (
           <div style={{ marginBottom: 10 }}>
-            <div className="rh-eyebrow" style={{ marginBottom: 10, color: '#526174' }}>
+            <div className="rh-eyebrow" style={{ marginBottom: 10, color: 'var(--ce-text-muted)' }}>
               Connected references
             </div>
             <div className="rh-connected-chips">
@@ -950,7 +950,7 @@ function DetailView({ ref_, onBack, onSelect, backLabel }) {
           <h1 style={{
             fontSize: 'clamp(22px, 5vw, 28px)',
             fontWeight: 700,
-            color: '#111827',
+            color: 'var(--ce-text-dark)',
             margin: 0,
             lineHeight: 1.15,
             letterSpacing: '-0.03em',
@@ -1052,7 +1052,7 @@ function DetailView({ ref_, onBack, onSelect, backLabel }) {
         {/* Related refs */}
         {related.length > 0 && (
           <div style={{ marginBottom: 10 }}>
-            <div className="rh-detail-field-label" style={{ color: '#526174', marginBottom: 10 }}>
+            <div className="rh-detail-field-label" style={{ color: 'var(--ce-text-muted)', marginBottom: 10 }}>
               Commonly connected with
             </div>
             <div className="rh-related-refs">

@@ -97,7 +97,7 @@ function CELogo({ size = 26 }) {
       height={size}
       viewBox="0 0 225 200"
       xmlns="http://www.w3.org/2000/svg"
-      fill="#0ABFBC"
+      fill="var(--ce-teal)"
       aria-label="Clinical Edge"
       style={{ flexShrink: 0 }}
     >
@@ -136,7 +136,7 @@ export default function Download() {
   return (
     <div style={{
       minHeight: "100vh",
-      background: "#111827",
+      background: "var(--ce-navy-900)",
       fontFamily: "'Inter', -apple-system, BlinkMacSystemFont, sans-serif",
     }}>
       <style>{`

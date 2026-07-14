@@ -23,15 +23,15 @@ export function RhythmStrip({ rhythmId, preview = false }: RhythmStripProps) {
     >
       <defs>
         <pattern id={`${uid}-minor`} width="20" height="10" patternUnits="userSpaceOnUse">
-          <path d="M 20 0 L 0 0 0 10" fill="none" stroke="#243040" strokeWidth="0.4" />
+          <path d="M 20 0 L 0 0 0 10" fill="none" stroke="var(--ce-navy-600)" strokeWidth="0.4" />
         </pattern>
         <pattern id={`${uid}-major`} width="100" height="50" patternUnits="userSpaceOnUse">
           <rect width="100" height="50" fill={`url(#${uid}-minor)`} />
-          <path d="M 100 0 L 0 0 0 50" fill="none" stroke="#2D3B4E" strokeWidth="0.8" />
+          <path d="M 100 0 L 0 0 0 50" fill="none" stroke="var(--ce-line-navy)" strokeWidth="0.8" />
         </pattern>
         <linearGradient id={`${uid}-fade`} x1="0%" y1="0%" x2="100%" y2="0%">
-          <stop offset="70%" stopColor="#111827" stopOpacity="0" />
-          <stop offset="100%" stopColor="#111827" stopOpacity="1" />
+          <stop offset="70%" stopColor="var(--ce-navy-900)" stopOpacity="0" />
+          <stop offset="100%" stopColor="var(--ce-navy-900)" stopOpacity="1" />
         </linearGradient>
         {/* Phosphor glow: blurred copy merged under the sharp stroke */}
         <filter id={`${uid}-glow`} x="-10%" y="-80%" width="120%" height="260%">
@@ -45,12 +45,12 @@ export function RhythmStrip({ rhythmId, preview = false }: RhythmStripProps) {
 
       <rect width="800" height="100" fill={`url(#${uid}-major)`} />
 
-      <line x1="0" y1="65" x2="800" y2="65" stroke="#2D3B4E" strokeWidth="0.6" strokeDasharray="4 4" />
+      <line x1="0" y1="65" x2="800" y2="65" stroke="var(--ce-line-navy)" strokeWidth="0.6" strokeDasharray="4 4" />
 
       <path
         d={path}
         fill="none"
-        stroke="#0ABFBC"
+        stroke="var(--ce-teal)"
         strokeWidth={preview ? 1.6 : 2}
         strokeLinecap="round"
         strokeLinejoin="round"

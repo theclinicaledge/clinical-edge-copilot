@@ -11,9 +11,9 @@ import {
 // ─── Urgency config ───────────────────────────────────────────────────────────
 // Brand palette (tags sit on the dark navy hero card): gold, soft red, info blue.
 const URGENCY_CONFIG = {
-  watch:     { label: 'Watch',     color: '#D4A84B', bg: 'rgba(212,168,75,0.12)', border: 'rgba(212,168,75,0.30)' },
+  watch:     { label: 'Watch',     color: 'var(--ce-gold)', bg: 'rgba(212,168,75,0.12)', border: 'rgba(212,168,75,0.30)' },
   caution:   { label: 'Caution',   color: '#E96B6B', bg: 'rgba(233,107,107,0.10)', border: 'rgba(233,107,107,0.28)' },
-  reference: { label: 'Reference', color: '#4da3ff', bg: 'rgba(77,163,255,0.09)', border: 'rgba(77,163,255,0.22)' },
+  reference: { label: 'Reference', color: 'var(--ce-blue)', bg: 'rgba(77,163,255,0.09)', border: 'rgba(77,163,255,0.22)' },
 };
 
 // ─── Practice deck ────────────────────────────────────────────────────────────
@@ -380,7 +380,7 @@ function CELogo() {
   return (
     <svg
       width="26" height="26" viewBox="0 0 225 200"
-      xmlns="http://www.w3.org/2000/svg" fill="#0ABFBC"
+      xmlns="http://www.w3.org/2000/svg" fill="var(--ce-teal)"
       aria-label="Clinical Edge"
       style={{ flexShrink: 0, display: 'block' }}
     >

@@ -12,7 +12,7 @@ interface CompareModeProps {
 
 const URGENCY_COLOR: Record<string, string> = {
   stable:   '#4E7C70',
-  monitor:  '#D4A84B',
+  monitor:  'var(--ce-gold)',
   urgent:   '#D97706',
   critical: '#DC2626',
 };
@@ -184,7 +184,7 @@ export function CompareMode({ onBack }: CompareModeProps) {
 }
 
 function StripCard({ rhythm }: { rhythm: Rhythm }) {
-  const color = URGENCY_COLOR[rhythm.urgency] ?? '#94A3B8';
+  const color = URGENCY_COLOR[rhythm.urgency] ?? 'var(--ce-text-light-sec)';
   return (
     <div className="compare-strip-card">
       <div className="compare-strip-card__header">

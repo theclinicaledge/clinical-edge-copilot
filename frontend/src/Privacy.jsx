@@ -2,7 +2,7 @@ export default function Privacy() {
   return (
     <div style={{
       minHeight: "100vh",
-      background: "#111827",
+      background: "var(--ce-navy-900)",
       fontFamily: "'Inter', -apple-system, BlinkMacSystemFont, sans-serif",
     }}>
       <style>{`
@@ -30,7 +30,7 @@ export default function Privacy() {
           gap: 11,
         }}>
           <svg width="26" height="26" viewBox="0 0 225 200" xmlns="http://www.w3.org/2000/svg"
-            fill="#0ABFBC" aria-label="Clinical Edge" style={{ flexShrink: 0 }}>
+            fill="var(--ce-teal)" aria-label="Clinical Edge" style={{ flexShrink: 0 }}>
             <path d="M 159.1,24.3 A 96,96 0 1,0 159.1,175.7 L 135.7,145.7 A 58,58 0 1,1 135.7,54.3 Z" />
             <path d="M 144.0,57 L 208,45 L 218,58 L 208,70 L 150.0,71 Z" />
             <path d="M 158.0,92 L 215,82 L 225,95 L 215,107 L 158.0,108 Z" />
@@ -40,7 +40,7 @@ export default function Privacy() {
             <span style={{ fontSize: 14, fontWeight: 700, color: "#F8FBFC", letterSpacing: "-0.3px", lineHeight: 1.15 }}>
               Clinical Edge
             </span>
-            <span style={{ fontSize: 10, fontWeight: 500, color: "#7F99A5", letterSpacing: "0.7px", textTransform: "uppercase", fontFamily: "'IBM Plex Mono', monospace", lineHeight: 1 }}>
+            <span style={{ fontSize: 10, fontWeight: 500, color: "var(--ce-text-dim)", letterSpacing: "0.7px", textTransform: "uppercase", fontFamily: "'IBM Plex Mono', monospace", lineHeight: 1 }}>
               Copilot
             </span>
           </div>
@@ -49,7 +49,7 @@ export default function Privacy() {
             style={{
             marginLeft: "auto",
             fontSize: 11,
-            color: "#7F99A5",
+            color: "var(--ce-text-dim)",
             textDecoration: "none",
             fontWeight: 500,
             border: "1px solid rgba(255,255,255,0.10)",
@@ -73,7 +73,7 @@ export default function Privacy() {
           <h1 style={{
             fontWeight: 700,
             fontSize: "clamp(22px, 5vw, 30px)",
-            color: "#111827",
+            color: "var(--ce-text-dark)",
             margin: "0 0 6px",
             letterSpacing: "-0.03em",
             lineHeight: 1.15,
@@ -82,7 +82,7 @@ export default function Privacy() {
           </h1>
           <p style={{
             fontSize: 13,
-            color: "#526174",
+            color: "var(--ce-text-muted)",
             fontFamily: "'IBM Plex Mono', monospace",
             margin: "0 0 36px",
             letterSpacing: "0.01em",
@@ -135,8 +135,8 @@ export default function Privacy() {
           ].map(({ title, body }) => (
             <div key={title} style={{
               background: "#FFFFFF",
-              border: "1px solid #D6D0C4",
-              borderLeft: "3px solid #D4A84B",
+              border: "1px solid var(--ce-warm-line)",
+              borderLeft: "3px solid var(--ce-gold)",
               borderRadius: 8,
               padding: "16px 18px",
               marginBottom: 10,
@@ -155,7 +155,7 @@ export default function Privacy() {
               <p style={{
                 fontSize: 14,
                 lineHeight: 1.78,
-                color: "#1E2A3A",
+                color: "var(--ce-navy-700)",
                 margin: 0,
                 whiteSpace: "pre-line",
               }}>
@@ -170,7 +170,7 @@ export default function Privacy() {
             paddingTop: 20,
             borderTop: "1px solid rgba(0,0,0,0.08)",
             fontSize: 11,
-            color: "#526174",
+            color: "var(--ce-text-muted)",
             fontFamily: "'IBM Plex Mono', monospace",
             lineHeight: 1.75,
             textAlign: "center",

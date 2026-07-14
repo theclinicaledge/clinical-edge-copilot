@@ -10,7 +10,7 @@ html {
 
 body {
   margin: 0;
-  background: #111827;
+  background: var(--ce-navy-900);
   color: #E8E4DC;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
@@ -20,16 +20,16 @@ body {
   width: 5px;
 }
 ::-webkit-scrollbar-track {
-  background: #111827;
+  background: var(--ce-navy-900);
 }
 ::-webkit-scrollbar-thumb {
-  background: #2D3B4E;
+  background: var(--ce-line-navy);
   border-radius: 3px;
 }
 
 /* Textarea placeholder — muted warm-white on dark input card */
 textarea::placeholder {
-  color: #94A3B8;
+  color: var(--ce-text-light-sec);
 }
 
 /* ── Home Hub — responsive layout ─────────────────────────────────────────── */

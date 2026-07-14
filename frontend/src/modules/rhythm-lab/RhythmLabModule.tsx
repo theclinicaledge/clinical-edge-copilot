@@ -24,7 +24,7 @@ function CELogo() {
       height="26"
       viewBox="0 0 225 200"
       xmlns="http://www.w3.org/2000/svg"
-      fill="#0ABFBC"
+      fill="var(--ce-teal)"
       aria-label="Clinical Edge"
       style={{ flexShrink: 0, display: 'block' }}
     >

@@ -2,7 +2,7 @@ export default function Support() {
   return (
     <div style={{
       minHeight: "100vh",
-      background: "#111827",
+      background: "var(--ce-navy-900)",
       fontFamily: "'Inter', -apple-system, BlinkMacSystemFont, sans-serif",
     }}>
       <style>{`
@@ -30,7 +30,7 @@ export default function Support() {
           gap: 11,
         }}>
           <svg width="26" height="26" viewBox="0 0 225 200" xmlns="http://www.w3.org/2000/svg"
-            fill="#0ABFBC" aria-label="Clinical Edge" style={{ flexShrink: 0 }}>
+            fill="var(--ce-teal)" aria-label="Clinical Edge" style={{ flexShrink: 0 }}>
             <path d="M 159.1,24.3 A 96,96 0 1,0 159.1,175.7 L 135.7,145.7 A 58,58 0 1,1 135.7,54.3 Z" />
             <path d="M 144.0,57 L 208,45 L 218,58 L 208,70 L 150.0,71 Z" />
             <path d="M 158.0,92 L 215,82 L 225,95 L 215,107 L 158.0,108 Z" />
@@ -40,7 +40,7 @@ export default function Support() {
             <span style={{ fontSize: 14, fontWeight: 700, color: "#F8FBFC", letterSpacing: "-0.3px", lineHeight: 1.15 }}>
               Clinical Edge
             </span>
-            <span style={{ fontSize: 10, fontWeight: 500, color: "#7F99A5", letterSpacing: "0.7px", textTransform: "uppercase", fontFamily: "'IBM Plex Mono', monospace", lineHeight: 1 }}>
+            <span style={{ fontSize: 10, fontWeight: 500, color: "var(--ce-text-dim)", letterSpacing: "0.7px", textTransform: "uppercase", fontFamily: "'IBM Plex Mono', monospace", lineHeight: 1 }}>
               Copilot
             </span>
           </div>
@@ -49,7 +49,7 @@ export default function Support() {
             style={{
             marginLeft: "auto",
             fontSize: 11,
-            color: "#7F99A5",
+            color: "var(--ce-text-dim)",
             textDecoration: "none",
             fontWeight: 500,
             border: "1px solid rgba(255,255,255,0.10)",
@@ -73,22 +73,22 @@ export default function Support() {
           <h1 style={{
             fontWeight: 700,
             fontSize: "clamp(22px, 5vw, 30px)",
-            color: "#111827",
+            color: "var(--ce-text-dark)",
             letterSpacing: "-0.03em",
             lineHeight: 1.15,
             margin: "0 0 6px",
           }}>
             Support
           </h1>
-          <p style={{ fontSize: 14, color: "#526174", margin: "0 0 36px", lineHeight: 1.5 }}>
+          <p style={{ fontSize: 14, color: "var(--ce-text-muted)", margin: "0 0 36px", lineHeight: 1.5 }}>
             Questions, feedback, or issues with Clinical Edge Copilot
           </p>
 
           {/* ── Contact card — warm surface, gold accent ── */}
           <div style={{
-            background: "#FFFDF8",
+            background: "var(--ce-warm-card)",
             border: "1px solid rgba(212,168,75,0.30)",
-            borderLeft: "3px solid #D4A84B",
+            borderLeft: "3px solid var(--ce-gold)",
             borderRadius: 8,
             padding: "18px 20px",
             marginBottom: 32,
@@ -106,11 +106,11 @@ export default function Support() {
             </div>
             <a
               href="mailto:clinicaledgehq@gmail.com"
-              style={{ fontSize: 15, fontWeight: 500, color: "#0A9E9B", textDecoration: "none" }}
+              style={{ fontSize: 15, fontWeight: 500, color: "var(--ce-teal-deep)", textDecoration: "none" }}
             >
               clinicaledgehq@gmail.com
             </a>
-            <p style={{ margin: "10px 0 0", fontSize: 13, color: "#526174", lineHeight: 1.65 }}>
+            <p style={{ margin: "10px 0 0", fontSize: 13, color: "var(--ce-text-muted)", lineHeight: 1.65 }}>
               For questions about the product, feedback, bug reports, or anything else — reach out directly. We read every message.
             </p>
           </div>
@@ -121,7 +121,7 @@ export default function Support() {
             fontWeight: 700,
             textTransform: "uppercase",
             letterSpacing: "1.3px",
-            color: "#526174",
+            color: "var(--ce-text-muted)",
             marginBottom: 12,
             fontFamily: "'IBM Plex Mono', monospace",
           }}>
@@ -150,12 +150,12 @@ export default function Support() {
             ].map(({ q, a }) => (
               <div key={q} style={{
                 background: "#FFFFFF",
-                border: "1px solid #D6D0C4",
+                border: "1px solid var(--ce-warm-line)",
                 borderRadius: 8,
                 padding: "16px 18px",
               }}>
-                <p style={{ margin: "0 0 6px", fontSize: 13, fontWeight: 600, color: "#111827", lineHeight: 1.4 }}>{q}</p>
-                <p style={{ margin: 0, fontSize: 13, color: "#526174", lineHeight: 1.65 }}>{a}</p>
+                <p style={{ margin: "0 0 6px", fontSize: 13, fontWeight: 600, color: "var(--ce-text-dark)", lineHeight: 1.4 }}>{q}</p>
+                <p style={{ margin: 0, fontSize: 13, color: "var(--ce-text-muted)", lineHeight: 1.65 }}>{a}</p>
               </div>
             ))}
           </div>
@@ -168,11 +168,11 @@ export default function Support() {
             display: "flex",
             gap: 20,
             fontSize: 11,
-            color: "#526174",
+            color: "var(--ce-text-muted)",
             fontFamily: "'IBM Plex Mono', monospace",
           }}>
-            <a href="/privacy" style={{ color: "#526174", textDecoration: "none" }}>Privacy Policy</a>
-            <a href="/" style={{ color: "#526174", textDecoration: "none" }}>← Home</a>
+            <a href="/privacy" style={{ color: "var(--ce-text-muted)", textDecoration: "none" }}>Privacy Policy</a>
+            <a href="/" style={{ color: "var(--ce-text-muted)", textDecoration: "none" }}>← Home</a>
           </div>
 
         </div>

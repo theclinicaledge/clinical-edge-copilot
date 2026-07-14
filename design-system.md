@@ -109,7 +109,7 @@ This IS a (subtle) visual change; it is intended and approved:
 | App section accents `#e05572 #1FBF75 #F2B94B` and marketing chip colors `#fca5a5 #fbbf24 #86efac #c084fc #fb923c #fcd34d #e07a3a #22c55e #f59e0b #f97316 #ef4444 #DC2626 #D97706` | Removed entirely by §6.2 and §8.6 — no mapping, the pattern is deleted |
 | `#8B5CF6`, `#7c4de6` | `var(--ce-gold)`; hover `var(--ce-gold-deep)` |
 | Download.jsx locals `#0E2436 #103246 #0B1E2D #0E2E40 #162033 #F3F4F6 #E7E2D8 #a6a6a6` | Gradients → flat `var(--ce-navy-900)`; light grays → nearest warm/text token per the rows above |
-| ICU pale surfaces `#F0F7F7 #E8F0F4 #BFCFDA #FFF8EE #0B2E2E` | `rgba(10,191,188,0.06)` tint on warm-card (all four pales); `#0B2E2E` → `var(--ce-navy-700)` |
+| ICU pale surfaces `#F0F7F7 #E8F0F4 #BFCFDA #FFF8EE #0B2E2E` | **Backgrounds/surfaces only:** `rgba(10,191,188,0.06)` tint on warm-card (all four pales); `#0B2E2E` → `var(--ce-navy-700)`. **Usage decides, not the hex** (ratified 2026-07-14): when `#E8F0F4` or `#BFCFDA` appear as *text on dark* (e.g. ICU Drips hero-card / compare-pair drip names), map by text role instead — `#E8F0F4` → `var(--ce-text-light)` (heading), `#BFCFDA` → `var(--ce-text-light-body)` (secondary, consistent with the `#BCCDD6`-lookalike row). Same principle applies to any future hex-collision between a surface row and a text usage. |
 | Rhythm Lab `#4E9E78`/`#4E7C70` "sinus green" | Keep — ratify as `--ce-cat-sinus: #4E7C70` (Rhythm Lab rhythm-family accent, same rules as §1.1 category accents; replace `#4E9E78` occurrences with it) |
 | Rhythm Lab dark golds `#8B6914 #1a1208`, `#8B7EC0`, `#C09030` | `var(--ce-gold-deep)` / `var(--ce-navy-900)` / `var(--ce-cat-antiarrhythmic)` / `var(--ce-gold)` |
 

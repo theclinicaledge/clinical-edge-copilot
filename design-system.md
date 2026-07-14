@@ -208,7 +208,7 @@ of the back link.
 ### 4.2 Buttons
 | Variant | Spec |
 |---|---|
-| Primary | Fill `--ce-teal`, text `#111827` (via `--ce-text-dark`), radius `--ce-r-md`, padding 10px 22px, 13px/700 Inter, `box-shadow: none`. Hover: fill `--ce-teal-deep`. Active: none (no transform). Disabled: fill `rgba(10,191,188,0.08)`, text `--ce-text-light-sec`. |
+| Primary | Fill `--ce-teal`, text `#111827` (via `--ce-text-dark`), radius `--ce-r-md`, padding 10px 22px, 13px/700 Inter, `box-shadow: none`. Hover: fill `--ce-teal-deep`. Active: `scale(0.98)` @60ms — amended 2026-07-14 by motion-system.md §3 (previously "none"). Disabled: fill `rgba(10,191,188,0.08)`, text `--ce-text-light-sec`. |
 | Primary-gold (Shift Challenge only) | Same geometry; fill `--ce-gold`, text `--ce-text-dark`. Hover: `--ce-gold-deep` fill with text `--ce-warm-card`. |
 | Secondary | Transparent; border 1px `--ce-line-navy` (dark) / `--ce-warm-line` (warm); text `--ce-text-light-body` / `--ce-text-muted`. Hover: border-color `rgba(10,191,188,0.30)`, text one tier brighter. |
 | Text/link | No border; `--ce-teal` on dark, `--ce-teal-deep` on warm; underline on hover only. |

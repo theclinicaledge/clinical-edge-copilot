@@ -126,7 +126,7 @@ Supported actions: expand, edit note, reopen, copy, delete.
 ## UI Design — Do Not Change
 
 - **Color scheme:** Dark navy background, electric blue accents
-- **Fonts:** Syne (headings), DM Sans (body), DM Mono (labels)
+- **Fonts:** Inter (headings and body), IBM Plex Mono (labels/eyebrows)
 - **Cards:** Color-coded by section
 - **Aesthetic:** Premium, clinical, professional
 

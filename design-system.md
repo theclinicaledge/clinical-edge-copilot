@@ -63,6 +63,22 @@ never buttons.
 most ONE accent color plus neutrals. Hierarchy comes from type scale and spacing, not
 from adding a second hue.
 
+**Confirmation states (ratified 2026-07-14 — save/copy/apply "it worked" feedback):**
+There is no success color. Success is not a clinical semantic in this product, and a
+green success token would re-import the deleted `#1FBF75` family and collide with
+urgency-LOW's meaning. Confirmation renders in the **teal family, one §1.6 step up**
+from the control's resting state, **plus a mandatory non-color signal** (glyph swap
+`⎘ → ✓`, or label change `Save → Saved`) — the non-color signal carries the meaning
+(WCAG 1.4.1); the teal step is reinforcement only. Specifics:
+- Text/glyph color: `--ce-teal` on dark navy, `--ce-teal-deep` on warm surfaces.
+- Tinted controls: resting `0.04` bg / `0.22` border → confirmed `0.10` bg / `0.30`
+  border (§1.6 steps; already implemented in Copilot's Save Case — that is the
+  reference pattern for every module).
+- Transient confirmations (copy) revert after ~1.5–2s; persistent ones (saved) hold
+  until state changes.
+- Never urgency tokens, never gold, never any green. Applies to every module with
+  save/copy/apply actions — not decided per module.
+
 ### 1.3 Text tokens (complete set after additions)
 
 | Token | Value | Use |

@@ -11,7 +11,7 @@ html {
 body {
   margin: 0;
   background: var(--ce-navy-900);
-  color: #E8E4DC;
+  color: var(--ce-text-light);
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }

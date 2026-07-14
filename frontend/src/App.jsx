@@ -29,11 +29,11 @@ const EXAMPLES = [
 ];
 
 const SECTIONS = [
-  { name: "What this could be",       aliases: ["What this could be"],                                        accent: "var(--ce-blue)", bg: "rgba(77,163,255,0.06)"  },
-  { name: "Possible concerns",        aliases: ["Possible concerns",      "What concerns me most"],           accent: "#e05572", bg: "rgba(224,85,114,0.06)"  },
-  { name: "What to assess next",      aliases: ["What to assess next",    "What I'd assess next"],            accent: "#1FBF75", bg: "rgba(31,191,117,0.06)"  },
-  { name: "What to consider next",    aliases: ["What to consider next",  "What I'd do right now"],           accent: "#F2B94B", bg: "rgba(242,185,75,0.06)"  },
-  { name: "Where this may be heading",aliases: ["Where this may be heading"],                                 accent: "#F2B94B", bg: "rgba(242,185,75,0.06)"  },
+  { name: "What this could be",       aliases: ["What this could be"],                                        accent: "var(--ce-teal-deep)", bg: "transparent"  },
+  { name: "Possible concerns",        aliases: ["Possible concerns",      "What concerns me most"],           accent: "var(--ce-gold-deep)", bg: "rgba(212,168,75,0.06)"  },
+  { name: "What to assess next",      aliases: ["What to assess next",    "What I'd assess next"],            accent: "var(--ce-teal-deep)", bg: "transparent"  },
+  { name: "What to consider next",    aliases: ["What to consider next",  "What I'd do right now"],           accent: "var(--ce-teal-deep)", bg: "transparent"  },
+  { name: "Where this may be heading",aliases: ["Where this may be heading"],                                 accent: "var(--ce-gold-deep)", bg: "rgba(212,168,75,0.06)"  },
   { name: "Closing",                  aliases: ["Closing"],                                                   accent: "var(--ce-teal)", bg: "rgba(10,191,188,0.04)"  },
 ];
 
@@ -46,22 +46,17 @@ SECTIONS.forEach((s) => { s.aliases.forEach((a) => { ALIAS_MAP[a] = s.name; }); 
 const URGENCY_STYLES = {
   // color     = text/dot on warm light surface (UrgencyBadge, callouts)
   // darkText  = text/dot on dark card surface (SavedCaseRow)
-  HIGH:     { color: "#8E2F2F", bg: "rgba(190,70,70,0.10)",    border: "#B45454",               darkText: "#f4a4a4" },
-  MODERATE: { color: "#9A6F1F", bg: "rgba(212,168,75,0.10)",   border: "#C79A3B",               darkText: "#e8c060" },
-  LOW:      { color: "#0F766E", bg: "rgba(10,191,188,0.08)",   border: "rgba(10,191,188,0.30)", darkText: "#5eead4" },
+  HIGH:     { color: "var(--ce-urgency-high)", bg: "var(--ce-urgency-high-bg)", border: "var(--ce-urgency-high-line)", darkText: "var(--ce-urgency-high-dark)" },
+  MODERATE: { color: "var(--ce-urgency-mod)",  bg: "var(--ce-urgency-mod-bg)",  border: "var(--ce-urgency-mod-line)",  darkText: "var(--ce-urgency-mod-dark)" },
+  LOW:      { color: "var(--ce-urgency-low)",  bg: "var(--ce-urgency-low-bg)",  border: "var(--ce-urgency-low-line)",  darkText: "var(--ce-urgency-low-dark)" },
 };
 
 const LS_HISTORY = "clinical_edge_history";
 const LS_SAVED   = "clinical_edge_saved_cases";
 const LS_MODE    = "clinical_edge_mode";
 
-// Loading phase messages
-const LOADING_PHASES = [
-  "Interpreting bedside concern...",
-  "Prioritizing assessments...",
-  "Building clinical guidance...",
-  "Finalizing recommendations...",
-];
+// Loading state — single static caption (no rotating narration, §4.7)
+const LOADING_MESSAGE = "Thinking it through…";
 
 // ─── Helpers ──────────────────────────────────────────────────────────────────
 
@@ -135,12 +130,12 @@ function generateId() {
 
 // ─── Style helpers ────────────────────────────────────────────────────────────
 
-function iconBtnStyle(color) {
+function iconBtnStyle() {
   return {
     background: "transparent",
-    border: "1px solid " + color + "40",
-    color,
-    borderRadius: 6,
+    border: "1px solid var(--ce-line-navy)",
+    color: "var(--ce-text-dim)",
+    borderRadius: 4,
     padding: "4px 7px",
     fontSize: 13,
     cursor: "pointer",
@@ -155,7 +150,7 @@ function smallBtnStyle(bg, color, border) {
     background: bg,
     color,
     border: border || "none",
-    borderRadius: 6,
+    borderRadius: 8,
     padding: "6px 14px",
     fontSize: 12,
     fontWeight: 500,
@@ -267,7 +262,7 @@ function UrgencyBadge({ level }) {
       gap: 10,
       background: s.bg,
       border: "1px solid " + s.border,
-      borderRadius: 6,
+      borderRadius: 4,
       padding: "10px 16px",
       marginBottom: 16,
     }}>
@@ -292,7 +287,7 @@ function UrgencyBadge({ level }) {
   );
 }
 
-function LoadingIndicator({ phase }) {
+function LoadingIndicator() {
   return (
     <div style={{ padding: "32px 0 16px", display: "flex", flexDirection: "column", alignItems: "flex-start", gap: 16 }}>
       <div style={{ display: "flex", gap: 4, alignItems: "center" }}>
@@ -308,11 +303,11 @@ function LoadingIndicator({ phase }) {
       </div>
       <div style={{
         fontSize: 12,
-        color: "#5A7A8A",
+        color: "var(--ce-text-muted)",
         fontFamily: "'IBM Plex Mono', 'Courier New', monospace",
         letterSpacing: "0.3px",
       }}>
-        {phase}
+        {LOADING_MESSAGE}
       </div>
     </div>
   );
@@ -328,7 +323,7 @@ function StreamPreview({ text }) {
       padding: "18px 20px",
       marginBottom: 10,
       fontSize: 14,
-      color: "#6A8A9A",
+      color: "var(--ce-text-dim)",
       lineHeight: 1.82,
       whiteSpace: "pre-wrap",
       maxHeight: 340,
@@ -393,14 +388,14 @@ function SavedCaseRow({ sc, onReopen, onDelete, onCopy, onSaveNote }) {
             }}>
               {sc.urgencyLevel || "\u2014"}
             </span>
-            <span style={{ fontSize: 9, color: "#3A5566", fontFamily: "'IBM Plex Mono', monospace" }}>&middot;</span>
-            <span style={{ fontSize: 9, color: "#4A6978", fontFamily: "'IBM Plex Mono', monospace", textTransform: "uppercase", letterSpacing: "0.5px" }}>
+            <span style={{ fontSize: 9, color: "var(--ce-text-dim)", fontFamily: "'IBM Plex Mono', monospace" }}>&middot;</span>
+            <span style={{ fontSize: 9, color: "var(--ce-text-dim)", fontFamily: "'IBM Plex Mono', monospace", textTransform: "uppercase", letterSpacing: "0.5px" }}>
               {sc.mode === "quick" ? "Quick" : "Clinical"}
             </span>
-            <span style={{ fontSize: 9, color: "#3A5566", fontFamily: "'IBM Plex Mono', monospace" }}>&middot;</span>
-            <span style={{ fontSize: 9, color: "#4A6978" }}>{formatTimestamp(sc.timestamp)}</span>
+            <span style={{ fontSize: 9, color: "var(--ce-text-dim)", fontFamily: "'IBM Plex Mono', monospace" }}>&middot;</span>
+            <span style={{ fontSize: 9, color: "var(--ce-text-dim)" }}>{formatTimestamp(sc.timestamp)}</span>
           </div>
-          <div style={{ fontSize: 13, color: "#A8C1CC", lineHeight: 1.4, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: expanded ? "normal" : "nowrap" }}>
+          <div style={{ fontSize: 13, color: "var(--ce-text-light-body)", lineHeight: 1.4, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: expanded ? "normal" : "nowrap" }}>
             {sc.question}
           </div>
           {sc.note && !editNote && (
@@ -410,11 +405,11 @@ function SavedCaseRow({ sc, onReopen, onDelete, onCopy, onSaveNote }) {
           )}
         </div>
         <div style={{ display: "flex", gap: 5, flexShrink: 0, alignItems: "center" }}>
-          <button onClick={() => setExpanded(!expanded)} title={expanded ? "Collapse" : "Expand"} style={iconBtnStyle("#4A6978")}>{expanded ? "\u25b2" : "\u25bc"}</button>
-          <button onClick={() => onReopen(sc.question)} title="Reopen in input" style={iconBtnStyle("var(--ce-teal)")}>&crarr;</button>
-          <button onClick={handleCopy} title="Copy response" style={iconBtnStyle(copied ? "#1FBF75" : "var(--ce-teal)")}>{copied ? "\u2713" : "\u2398"}</button>
-          <button onClick={() => { setEditNote(true); setExpanded(true); }} title="Add/edit note" aria-label="Add or edit note" style={iconBtnStyle("#F2B94B")}>{"✎"}</button>
-          <button onClick={() => onDelete(sc.id)} title="Delete case" style={iconBtnStyle("#E96B6B")}>&times;</button>
+          <button onClick={() => setExpanded(!expanded)} title={expanded ? "Collapse" : "Expand"} className="saved-icon-btn" style={iconBtnStyle()}>{expanded ? "\u25b2" : "\u25bc"}</button>
+          <button onClick={() => onReopen(sc.question)} title="Reopen in input" className="saved-icon-btn" style={iconBtnStyle()}>&crarr;</button>
+          <button onClick={handleCopy} title="Copy response" className="saved-icon-btn" style={iconBtnStyle()}>{copied ? "\u2713" : "\u2398"}</button>
+          <button onClick={() => { setEditNote(true); setExpanded(true); }} title="Add/edit note" aria-label="Add or edit note" className="saved-icon-btn" style={iconBtnStyle()}>Note</button>
+          <button onClick={() => onDelete(sc.id)} title="Delete case" className="saved-icon-btn saved-icon-btn-delete" style={iconBtnStyle()}>&times;</button>
         </div>
       </div>
 
@@ -439,9 +434,9 @@ function SavedCaseRow({ sc, onReopen, onDelete, onCopy, onSaveNote }) {
               width: "100%",
               background: "rgba(0,0,0,0.04)",
               border: "1px solid rgba(0,0,0,0.12)",
-              borderRadius: 7,
+              borderRadius: 8,
               padding: "8px 10px",
-              color: "#A8C1CC",
+              color: "var(--ce-text-light-body)",
               fontSize: 13,
               fontFamily: "inherit",
               resize: "vertical",
@@ -450,7 +445,7 @@ function SavedCaseRow({ sc, onReopen, onDelete, onCopy, onSaveNote }) {
             }}
           />
           <div style={{ display: "flex", gap: 8, marginTop: 8 }}>
-            <button onClick={handleNoteSave} style={{ ...smallBtnStyle("var(--ce-teal)", "#0B1F2A"), fontWeight: 700 }}>Save Note</button>
+            <button onClick={handleNoteSave} style={{ ...smallBtnStyle("var(--ce-teal)", "var(--ce-text-dark)"), fontWeight: 700 }}>Save Note</button>
             <button onClick={() => { setEditNote(false); setNoteText(sc.note || ""); }} style={smallBtnStyle("transparent", "var(--ce-text-dim)", "1px solid rgba(255,255,255,0.1)")}>Cancel</button>
           </div>
         </div>
@@ -477,7 +472,7 @@ function SavedCaseRow({ sc, onReopen, onDelete, onCopy, onSaveNote }) {
             overflowY: "auto",
             padding: "10px 12px",
             background: "rgba(0,0,0,0.2)",
-            borderRadius: 7,
+            borderRadius: 8,
             border: "1px solid rgba(255,255,255,0.07)",
           }}>
             {sc.rawText}
@@ -538,7 +533,6 @@ export default function App({ onGoHome, isOnline = true }) {
   const [streamBuffer, setStreamBuffer] = useState("");
   const [streaming, setStreaming]       = useState(false);
   const [loading, setLoading]           = useState(false);
-  const [loadingPhase, setLoadingPhase] = useState(0);
   const [error, setError]               = useState(null);
   const [mode]                          = useState("deep");
   const [history, setHistory]           = useState(() => lsGet(LS_HISTORY, []));
@@ -553,7 +547,6 @@ export default function App({ onGoHome, isOnline = true }) {
 
   const textareaRef           = useRef(null);
   const outputRef             = useRef(null);
-  const phaseTimerRef         = useRef(null);
   const lastSubmittedRef      = useRef("");
   const wasRecentlyHiddenRef  = useRef(false);
   const hiddenAtRef           = useRef(null);
@@ -638,19 +631,6 @@ export default function App({ onGoHome, isOnline = true }) {
     document.addEventListener("visibilitychange", onVisChange);
     return () => document.removeEventListener("visibilitychange", onVisChange);
   }, []);
-
-  // Rotate loading phase messages while loading
-  useEffect(() => {
-    if (loading || streaming) {
-      phaseTimerRef.current = setInterval(() => {
-        setLoadingPhase((p) => (p + 1) % LOADING_PHASES.length);
-      }, 1800);
-    } else {
-      clearInterval(phaseTimerRef.current);
-      setLoadingPhase(0);
-    }
-    return () => clearInterval(phaseTimerRef.current);
-  }, [loading, streaming]);
 
   // Core query runner — accepts an explicit query string so chips and
   // follow-ups can call it directly without going through question state.
@@ -873,7 +853,7 @@ export default function App({ onGoHome, isOnline = true }) {
     <div style={{
       minHeight: "100vh",
       background: "var(--ce-navy-900)",
-      color: "#A8C1CC",
+      color: "var(--ce-text-light-body)",
       fontFamily: "'Inter', -apple-system, BlinkMacSystemFont, sans-serif",
       padding: "0 0 calc(80px + env(safe-area-inset-bottom))",
     }}>
@@ -907,13 +887,21 @@ export default function App({ onGoHome, isOnline = true }) {
         }
         .submit-btn:active:not(:disabled) { transform: translateY(0); }
         .save-case-btn:hover:not(:disabled) {
-          background: rgba(31,191,117,0.14) !important;
-          border-color: rgba(31,191,117,0.45) !important;
-          color: #1FBF75 !important;
+          background: rgba(10,191,188,0.16) !important;
+          border-color: rgba(10,191,188,0.30) !important;
+          color: var(--ce-teal-deep) !important;
         }
         .copy-btn:hover {
           border-color: rgba(0,0,0,0.15) !important;
           color: var(--ce-text-muted) !important;
+        }
+        .saved-icon-btn:hover {
+          color: var(--ce-teal) !important;
+          border-color: rgba(10,191,188,0.22) !important;
+        }
+        .saved-icon-btn-delete:hover {
+          color: var(--ce-urgency-high-dark) !important;
+          border-color: rgba(244,164,164,0.22) !important;
         }
 
         @keyframes fadeUp { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
@@ -996,7 +984,7 @@ export default function App({ onGoHome, isOnline = true }) {
             <span style={{
               fontSize: 15,
               fontWeight: 700,
-              color: "#F8FBFC",
+              color: "var(--ce-text-light)",
               letterSpacing: "-0.3px",
               lineHeight: 1.15,
             }}>
@@ -1044,7 +1032,7 @@ export default function App({ onGoHome, isOnline = true }) {
           }}>
             What are you thinking through?
           </h2>
-          <p style={{ fontSize: 13, color: "#7A8D9A", margin: 0, lineHeight: 1.5, fontWeight: 400 }}>
+          <p style={{ fontSize: 13, color: "var(--ce-text-dim)", margin: 0, lineHeight: 1.5, fontWeight: 400 }}>
             Ask a clinical reasoning question. No patient identifiers.
           </p>
         </div>
@@ -1125,7 +1113,7 @@ export default function App({ onGoHome, isOnline = true }) {
               disabled={!question.trim() || isActive || !isOnline}
               style={{
                 background: (!question.trim() || isActive || !isOnline) ? "rgba(10,191,188,0.08)" : "var(--ce-teal)",
-                color: (!question.trim() || isActive || !isOnline) ? "var(--ce-text-light-sec)" : "#0B1F2A",
+                color: (!question.trim() || isActive || !isOnline) ? "var(--ce-text-light-sec)" : "var(--ce-text-dark)",
                 border: "none",
                 borderRadius: 8,
                 padding: "10px 22px",
@@ -1148,7 +1136,7 @@ export default function App({ onGoHome, isOnline = true }) {
         {/* PHI note — muted inline */}
         <div style={{
           fontSize: 11,
-          color: "#8A9BA8",
+          color: "var(--ce-text-dim)",
           marginTop: 6,
           marginBottom: 14,
           paddingLeft: 2,
@@ -1161,7 +1149,7 @@ export default function App({ onGoHome, isOnline = true }) {
         <div style={{ marginBottom: 14 }}>
           <div style={{
             fontSize: 10,
-            color: "#8A9BA8",
+            color: "var(--ce-text-dim)",
             fontFamily: "'IBM Plex Mono', monospace",
             letterSpacing: "0.06em",
             textTransform: "uppercase",
@@ -1177,9 +1165,9 @@ export default function App({ onGoHome, isOnline = true }) {
                 onClick={() => { if (textareaRef.current) { textareaRef.current.placeholder = placeholder; textareaRef.current.focus(); } }}
                 style={{
                   background: "transparent",
-                  border: "1px solid #C4BDB5",
-                  color: "#6A7D8A",
-                  borderRadius: 5,
+                  border: "1px solid var(--ce-warm-line)",
+                  color: "var(--ce-text-muted)",
+                  borderRadius: 4,
                   padding: "3px 9px",
                   fontSize: 11,
                   fontWeight: 400,
@@ -1203,7 +1191,7 @@ export default function App({ onGoHome, isOnline = true }) {
               fontWeight: 500,
               letterSpacing: "0.10em",
               textTransform: "uppercase",
-              color: "#8A9BA8",
+              color: "var(--ce-text-dim)",
               marginBottom: 6,
               fontFamily: "'IBM Plex Mono', monospace",
             }}>Recent</div>
@@ -1216,9 +1204,9 @@ export default function App({ onGoHome, isOnline = true }) {
                   style={{
                     background: "rgba(0,0,0,0.04)",
                     border: "1px solid rgba(0,0,0,0.08)",
-                    color: "#3D5166",
+                    color: "var(--ce-text-muted)",
                     padding: "7px 11px",
-                    borderRadius: 6,
+                    borderRadius: 4,
                     fontSize: 12,
                     fontWeight: 400,
                     letterSpacing: "-0.01em",
@@ -1233,7 +1221,7 @@ export default function App({ onGoHome, isOnline = true }) {
                     overflow: "hidden",
                   }}
                 >
-                  <span style={{ color: "#9AA8B2", fontSize: 8, flexShrink: 0, marginTop: 3 }}>↩</span>
+                  <span style={{ color: "var(--ce-text-dim)", fontSize: 8, flexShrink: 0, marginTop: 3 }}>↩</span>
                   <span style={{
                     display: "-webkit-box",
                     WebkitLineClamp: 2,
@@ -1281,7 +1269,7 @@ export default function App({ onGoHome, isOnline = true }) {
             fontWeight: 500,
             letterSpacing: "0.09em",
             textTransform: "uppercase",
-            color: "#8A9BA8",
+            color: "var(--ce-text-dim)",
             marginBottom: 8,
           }}>Examples</div>
           <div className="chips-try" style={{ display: "flex", flexDirection: "column", gap: 5 }}>
@@ -1295,7 +1283,7 @@ export default function App({ onGoHome, isOnline = true }) {
                   border: "1px solid rgba(0,0,0,0.09)",
                   color: "var(--ce-text-muted)",
                   padding: "7px 11px",
-                  borderRadius: 6,
+                  borderRadius: 4,
                   fontSize: 12,
                   fontWeight: 400,
                   letterSpacing: "-0.01em",
@@ -1309,7 +1297,7 @@ export default function App({ onGoHome, isOnline = true }) {
                   width: "100%",
                 }}
               >
-                <span style={{ color: "#9AA8B2", fontSize: 8, flexShrink: 0 }}>▶</span>
+                <span style={{ color: "var(--ce-text-dim)", fontSize: 8, flexShrink: 0 }}>▶</span>
                 {ex}
               </button>
             ))}
@@ -1322,12 +1310,12 @@ export default function App({ onGoHome, isOnline = true }) {
             display: "flex",
             gap: 10,
             alignItems: "center",
-            background: "rgba(233,107,107,0.07)",
-            border: "1px solid rgba(233,107,107,0.22)",
-            borderLeft: "3px solid #E96B6B",
-            borderRadius: 6,
+            background: "rgba(190,70,70,0.06)",
+            border: "1px solid rgba(190,70,70,0.22)",
+            borderLeft: "3px solid var(--ce-urgency-high)",
+            borderRadius: 8,
             padding: "12px 15px",
-            color: "#E96B6B",
+            color: "var(--ce-urgency-high)",
             fontSize: 13,
             marginBottom: 24,
           }}>
@@ -1344,14 +1332,14 @@ export default function App({ onGoHome, isOnline = true }) {
         {/* Loading */}
         {loading && (
           <div ref={outputRef}>
-            <LoadingIndicator phase={LOADING_PHASES[loadingPhase]} />
+            <LoadingIndicator />
           </div>
         )}
 
         {/* Streaming preview */}
         {streaming && streamBuffer && (
           <div ref={outputRef}>
-            <LoadingIndicator phase={LOADING_PHASES[loadingPhase]} />
+            <LoadingIndicator />
             <StreamPreview text={streamBuffer} />
           </div>
         )}
@@ -1367,13 +1355,13 @@ export default function App({ onGoHome, isOnline = true }) {
               gap: 7,
               padding: "0 2px 14px",
               fontSize: 11,
-              color: "#4A6675",
+              color: "var(--ce-text-muted)",
               fontFamily: "'IBM Plex Mono', monospace",
               lineHeight: 1.5,
               borderBottom: "1px solid rgba(0,0,0,0.07)",
               marginBottom: 16,
             }}>
-              <span style={{ color: "#3A5A6A", flexShrink: 0, fontSize: 9 }}>◆</span>
+              <span style={{ color: "var(--ce-text-muted)", flexShrink: 0, fontSize: 9 }}>◆</span>
               <span>Structured clinical reasoning support — confirm with your assessment and provider guidance</span>
             </div>
 
@@ -1382,11 +1370,11 @@ export default function App({ onGoHome, isOnline = true }) {
             {result.urgent && (
               <div style={{
                 background: "rgba(190,70,70,0.08)",
-                border: "1px solid rgba(180,84,84,0.20)",
-                borderLeft: "3px solid #B45454",
-                borderRadius: 6,
+                border: "1px solid rgba(190,70,70,0.22)",
+                borderLeft: "3px solid var(--ce-urgency-high-line)",
+                borderRadius: 8,
                 padding: "14px 18px",
-                color: "#8E2F2F",
+                color: "var(--ce-urgency-high)",
                 fontWeight: 600,
                 fontSize: 14,
                 lineHeight: 1.65,
@@ -1416,10 +1404,10 @@ export default function App({ onGoHome, isOnline = true }) {
                 onClick={handleSaveCase}
                 disabled={justSaved}
                 style={{
-                  background: justSaved ? "rgba(31,191,117,0.10)" : "rgba(31,191,117,0.04)",
-                  border: "1px solid " + (justSaved ? "rgba(31,191,117,0.45)" : "rgba(31,191,117,0.22)"),
-                  color: justSaved ? "#1FBF75" : "#4E9E78",
-                  borderRadius: 6,
+                  background: justSaved ? "rgba(10,191,188,0.10)" : "rgba(10,191,188,0.04)",
+                  border: "1px solid " + (justSaved ? "rgba(10,191,188,0.30)" : "rgba(10,191,188,0.22)"),
+                  color: "var(--ce-teal-deep)",
+                  borderRadius: 8,
                   padding: "9px 20px",
                   fontSize: 13,
                   fontWeight: 600,
@@ -1441,8 +1429,8 @@ export default function App({ onGoHome, isOnline = true }) {
                 style={{
                   background: "transparent",
                   border: "1px solid rgba(0,0,0,0.12)",
-                  color: "#3D5E6E",
-                  borderRadius: 6,
+                  color: "var(--ce-text-muted)",
+                  borderRadius: 8,
                   padding: "9px 18px",
                   fontSize: 13,
                   fontWeight: 400,
@@ -1460,8 +1448,8 @@ export default function App({ onGoHome, isOnline = true }) {
                 style={{
                   background: "transparent",
                   border: "1px solid rgba(0,0,0,0.10)",
-                  color: sourcesOpen ? "var(--ce-text-muted)" : "#3D5E6E",
-                  borderRadius: 6,
+                  color: "var(--ce-text-muted)",
+                  borderRadius: 8,
                   padding: "9px 16px",
                   fontSize: 12.5,
                   fontWeight: 400,
@@ -1482,7 +1470,7 @@ export default function App({ onGoHome, isOnline = true }) {
                   background: sbar && !sbar.error ? "rgba(10,191,188,0.07)" : "transparent",
                   border: "1px solid " + (sbar && !sbar.error ? "rgba(10,191,188,0.25)" : "rgba(10,191,188,0.14)"),
                   color: sbarLoading ? "rgba(10,191,188,0.35)" : "var(--ce-teal)",
-                  borderRadius: 6,
+                  borderRadius: 8,
                   padding: "9px 16px",
                   fontSize: 12.5,
                   fontWeight: 500,
@@ -1520,7 +1508,7 @@ export default function App({ onGoHome, isOnline = true }) {
                   fontWeight: 700,
                   textTransform: "uppercase",
                   letterSpacing: "1.2px",
-                  color: "#5A7A8A",
+                  color: "var(--ce-text-dim)",
                   fontFamily: "'IBM Plex Mono', monospace",
                   marginBottom: 10,
                 }}>
@@ -1556,7 +1544,7 @@ export default function App({ onGoHome, isOnline = true }) {
                         justifyContent: "space-between",
                         gap: 12,
                         padding: "10px 12px",
-                        borderRadius: 6,
+                        borderRadius: 8,
                         background: "var(--ce-navy-600)",
                         border: "1px solid var(--ce-line-navy)",
                         color: "var(--ce-teal)",
@@ -1613,7 +1601,7 @@ export default function App({ onGoHome, isOnline = true }) {
                   background: "transparent",
                   border: "none",
                   borderBottom: "1px solid rgba(10,191,188,0.15)",
-                  color: "#F8FBFC",
+                  color: "var(--ce-text-light)",
                   fontSize: 14,
                   lineHeight: 1.6,
                   resize: "none",
@@ -1631,8 +1619,8 @@ export default function App({ onGoHome, isOnline = true }) {
                   style={{
                     background: followUp.trim() ? "rgba(10,191,188,0.10)" : "transparent",
                     border: "1px solid " + (followUp.trim() ? "rgba(10,191,188,0.30)" : "rgba(255,255,255,0.10)"),
-                    color: followUp.trim() ? "var(--ce-teal)" : "#3A5566",
-                    borderRadius: 6,
+                    color: followUp.trim() ? "var(--ce-teal)" : "var(--ce-text-dim)",
+                    borderRadius: 8,
                     padding: "7px 16px",
                     fontSize: 12,
                     fontWeight: 600,
@@ -1673,8 +1661,8 @@ export default function App({ onGoHome, isOnline = true }) {
                     style={{
                       background: "transparent",
                       border: "1px solid rgba(10,191,188,0.18)",
-                      color: sbarCopied ? "#1FBF75" : "rgba(10,191,188,0.55)",
-                      borderRadius: 6,
+                      color: sbarCopied ? "var(--ce-teal)" : "rgba(10,191,188,0.55)",
+                      borderRadius: 8,
                       padding: "4px 11px",
                       fontSize: 11,
                       fontWeight: 500,
@@ -1694,16 +1682,16 @@ export default function App({ onGoHome, isOnline = true }) {
               )}
 
               {sbar && sbar.error && (
-                <div style={{ color: "#e05572", fontSize: 13 }}>{sbar.error}</div>
+                <div style={{ color: "var(--ce-urgency-high-dark)", fontSize: 13 }}>{sbar.error}</div>
               )}
 
               {sbar && !sbar.error && (
                 <div style={{ display: "flex", flexDirection: "column", gap: 14 }}>
                   {[
                     { label: "Situation",      value: sbar.situation,      accent: "var(--ce-blue)" },
-                    { label: "Background",     value: sbar.background,     accent: "#A8C1CC" },
-                    { label: "Assessment",     value: sbar.assessment,     accent: "#F2B94B" },
-                    { label: "Recommendation", value: sbar.recommendation, accent: "#1FBF75" },
+                    { label: "Background",     value: sbar.background,     accent: "var(--ce-text-light-body)" },
+                    { label: "Assessment",     value: sbar.assessment,     accent: "var(--ce-text-dim)" },
+                    { label: "Recommendation", value: sbar.recommendation, accent: "var(--ce-text-dim)" },
                   ].map(({ label, value, accent }) => (
                     <div key={label}>
                       <div style={{
@@ -1721,7 +1709,7 @@ export default function App({ onGoHome, isOnline = true }) {
                       <div style={{
                         fontSize: 13.5,
                         lineHeight: 1.65,
-                        color: "#BCCDD6",
+                        color: "var(--ce-text-light-body)",
                       }}>
                         {value ? renderInline(value) : "—"}
                       </div>
@@ -1745,7 +1733,7 @@ export default function App({ onGoHome, isOnline = true }) {
           padding: "12px 0 0",
           borderTop: "1px solid rgba(0,0,0,0.08)",
           fontSize: 10,
-          color: "#8A9BA8",
+          color: "var(--ce-text-dim)",
           textAlign: "center",
           lineHeight: 1.6,
           fontFamily: "'IBM Plex Mono', monospace",
@@ -1765,13 +1753,13 @@ export default function App({ onGoHome, isOnline = true }) {
           {[["Privacy", "/privacy"], ["Support", "/support"]].map(([label, href]) => (
             <a key={label} href={href} style={{
               fontSize: 10,
-              color: "#8A9BA8",
+              color: "var(--ce-text-dim)",
               textDecoration: "none",
               fontFamily: "'IBM Plex Mono', monospace",
               letterSpacing: "0.01em",
             }}
             onMouseEnter={e => e.currentTarget.style.color = "var(--ce-teal-deep)"}
-            onMouseLeave={e => e.currentTarget.style.color = "#8A9BA8"}
+            onMouseLeave={e => e.currentTarget.style.color = "var(--ce-text-dim)"}
             >{label}</a>
           ))}
         </div>

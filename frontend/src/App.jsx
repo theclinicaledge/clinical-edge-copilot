@@ -141,7 +141,11 @@ function iconBtnStyle() {
     cursor: "pointer",
     fontFamily: "inherit",
     lineHeight: 1,
-    transition: "all 0.15s",
+    transition:
+      "color var(--ce-dur-fast) var(--ce-ease-out), " +
+      "border-color var(--ce-dur-fast) var(--ce-ease-out), " +
+      "transform var(--ce-dur-fast) var(--ce-ease-out), " +
+      "opacity var(--ce-dur-fast) var(--ce-ease-out)",
   };
 }
 
@@ -156,6 +160,11 @@ function smallBtnStyle(bg, color, border) {
     fontWeight: 500,
     cursor: "pointer",
     fontFamily: "inherit",
+    transition:
+      "background-color var(--ce-dur-fast) var(--ce-ease-out), " +
+      "border-color var(--ce-dur-fast) var(--ce-ease-out), " +
+      "color var(--ce-dur-fast) var(--ce-ease-out), " +
+      "transform var(--ce-dur-fast) var(--ce-ease-out)",
   };
 }
 
@@ -191,7 +200,7 @@ function SectionCard({ title, content }) {
   // Closing — italic pull-quote treatment, no label
   if (title === "Closing") {
     return (
-      <div style={{
+      <div className="ce-card-enter" style={{
         borderLeft: "2px solid var(--ce-teal)",
         padding: "14px 20px",
         marginTop: 10,
@@ -215,7 +224,7 @@ function SectionCard({ title, content }) {
 
   const lines = content.split("\n").filter((l) => l.trim());
   return (
-    <div style={{
+    <div className="ce-card-enter" style={{
       background: "var(--ce-warm-card)",
       border: "1px solid var(--ce-warm-line)",
       borderLeft: "3px solid " + cfg.accent,
@@ -288,16 +297,18 @@ function UrgencyBadge({ level }) {
 }
 
 function LoadingIndicator() {
+  // Sole sanctioned loop (motion-system.md §6/§7): one quiet opacity breathe
+  // on the whole indicator. No per-bar pulsing, no progress theater.
   return (
-    <div style={{ padding: "32px 0 16px", display: "flex", flexDirection: "column", alignItems: "flex-start", gap: 16 }}>
+    <div className="ce-breathe" style={{ padding: "32px 0 16px", display: "flex", flexDirection: "column", alignItems: "flex-start", gap: 16 }}>
       <div style={{ display: "flex", gap: 4, alignItems: "center" }}>
         {[0, 1, 2, 3, 4].map((i) => (
           <div key={i} style={{
             width: 3,
+            height: 16,
             borderRadius: 3,
             background: "var(--ce-teal)",
             opacity: 0.75,
-            animation: "barPulse 1.1s ease-in-out " + (i * 0.11) + "s infinite",
           }} />
         ))}
       </div>
@@ -405,15 +416,16 @@ function SavedCaseRow({ sc, onReopen, onDelete, onCopy, onSaveNote }) {
           )}
         </div>
         <div style={{ display: "flex", gap: 5, flexShrink: 0, alignItems: "center" }}>
-          <button onClick={() => setExpanded(!expanded)} title={expanded ? "Collapse" : "Expand"} className="saved-icon-btn" style={iconBtnStyle()}>{expanded ? "\u25b2" : "\u25bc"}</button>
+          <button onClick={() => setExpanded(!expanded)} title={expanded ? "Collapse" : "Expand"} className="saved-icon-btn ce-accordion-chevron" data-open={expanded ? "true" : "false"} style={iconBtnStyle()}>{"\u25bc"}</button>
           <button onClick={() => onReopen(sc.question)} title="Reopen in input" className="saved-icon-btn" style={iconBtnStyle()}>&crarr;</button>
-          <button onClick={handleCopy} title="Copy response" className="saved-icon-btn" style={iconBtnStyle()}>{copied ? "\u2713" : "\u2398"}</button>
+          <button onClick={handleCopy} title="Copy response" className="saved-icon-btn" style={iconBtnStyle()}><span key={copied ? "copied" : "copy"} className="ce-swap-fast">{copied ? "\u2713" : "\u2398"}</span></button>
           <button onClick={() => { setEditNote(true); setExpanded(true); }} title="Add/edit note" aria-label="Add or edit note" className="saved-icon-btn" style={iconBtnStyle()}>Note</button>
           <button onClick={() => onDelete(sc.id)} title="Delete case" className="saved-icon-btn saved-icon-btn-delete" style={iconBtnStyle()}>&times;</button>
         </div>
       </div>
 
-      {expanded && editNote && (
+      <div className="ce-accordion-panel" data-open={expanded ? "true" : "false"}>
+      {editNote ? (
         <div style={{ padding: "0 14px 12px", borderTop: "1px solid rgba(255,255,255,0.07)" }}>
           <div style={{
             fontSize: 9,
@@ -442,16 +454,16 @@ function SavedCaseRow({ sc, onReopen, onDelete, onCopy, onSaveNote }) {
               resize: "vertical",
               outline: "none",
               boxSizing: "border-box",
+              transition: "border-color var(--ce-dur-fast) var(--ce-ease-out)",
             }}
+            className="note-textarea"
           />
           <div style={{ display: "flex", gap: 8, marginTop: 8 }}>
-            <button onClick={handleNoteSave} style={{ ...smallBtnStyle("var(--ce-teal)", "var(--ce-text-dark)"), fontWeight: 700 }}>Save Note</button>
-            <button onClick={() => { setEditNote(false); setNoteText(sc.note || ""); }} style={smallBtnStyle("transparent", "var(--ce-text-dim)", "1px solid rgba(255,255,255,0.1)")}>Cancel</button>
+            <button onClick={handleNoteSave} className="note-save-btn" style={{ ...smallBtnStyle("var(--ce-teal)", "var(--ce-text-dark)"), fontWeight: 700 }}>Save Note</button>
+            <button onClick={() => { setEditNote(false); setNoteText(sc.note || ""); }} className="note-cancel-btn" style={smallBtnStyle("transparent", "var(--ce-text-dim)", "1px solid rgba(255,255,255,0.1)")}>Cancel</button>
           </div>
         </div>
-      )}
-
-      {expanded && !editNote && (
+      ) : (
         <div style={{ padding: "0 14px 14px", borderTop: "1px solid rgba(255,255,255,0.07)" }}>
           <div style={{
             fontSize: 9,
@@ -479,6 +491,7 @@ function SavedCaseRow({ sc, onReopen, onDelete, onCopy, onSaveNote }) {
           </div>
         </div>
       )}
+      </div>
     </div>
   );
 }
@@ -862,11 +875,24 @@ export default function App({ onGoHome, isOnline = true }) {
         body { margin: 0; background: var(--ce-navy-900); -webkit-font-smoothing: antialiased; overscroll-behavior: none; -webkit-text-size-adjust: 100%; }
         textarea { outline: none; touch-action: pan-y; }
         textarea::placeholder { color: var(--ce-text-light-sec); }
-        button { transition: all 0.15s ease; font-family: inherit; cursor: pointer; }
+        button {
+          transition:
+            background-color var(--ce-dur-fast) var(--ce-ease-out),
+            border-color      var(--ce-dur-fast) var(--ce-ease-out),
+            color             var(--ce-dur-fast) var(--ce-ease-out),
+            box-shadow        var(--ce-dur-fast) var(--ce-ease-out),
+            transform         var(--ce-dur-fast) var(--ce-ease-out),
+            opacity           var(--ce-dur-fast) var(--ce-ease-out);
+          font-family: inherit;
+          cursor: pointer;
+        }
         ::-webkit-scrollbar { width: 4px; }
         ::-webkit-scrollbar-track { background: transparent; }
         ::-webkit-scrollbar-thumb { background: var(--ce-line-navy); border-radius: 2px; }
         .preview-scroll::-webkit-scrollbar { display: none; }
+
+        /* Save/copy confirmation glyph swaps — single fast fade-in (motion-system.md §6) */
+        .ce-swap-fast { animation: ce-fade-in var(--ce-dur-fast) var(--ce-ease-out) both; }
 
         .chip:hover {
           background: rgba(10,191,188,0.07) !important;
@@ -877,49 +903,96 @@ export default function App({ onGoHome, isOnline = true }) {
           opacity: 0.85;
           transition-duration: 60ms !important;
         }
-        .mode-btn:hover:not(.mode-active) {
-          border-color: rgba(10,191,188,0.22) !important;
-          color: var(--ce-text-light-sec) !important;
-        }
         .submit-btn:hover:not(:disabled) {
           background: var(--ce-teal) !important;
           transform: translateY(-1px);
         }
-        .submit-btn:active:not(:disabled) { transform: translateY(0); }
+        .submit-btn:active:not(:disabled) {
+          transform: translateY(0) scale(0.98);
+          transition-duration: 60ms !important;
+        }
         .save-case-btn:hover:not(:disabled) {
           background: rgba(10,191,188,0.16) !important;
           border-color: rgba(10,191,188,0.30) !important;
           color: var(--ce-teal-deep) !important;
         }
+        .save-case-btn:active:not(:disabled) {
+          transform: scale(0.98);
+          transition-duration: 60ms !important;
+        }
         .copy-btn:hover {
           border-color: rgba(0,0,0,0.15) !important;
           color: var(--ce-text-muted) !important;
         }
+        .copy-btn:active {
+          transform: scale(0.98);
+          transition-duration: 60ms !important;
+        }
+        .sources-btn:hover {
+          border-color: rgba(10,191,188,0.28) !important;
+          background: rgba(10,191,188,0.05) !important;
+        }
+        .sources-btn:active {
+          transform: scale(0.98);
+          transition-duration: 60ms !important;
+        }
+        .sbar-trigger-btn:hover:not(:disabled) {
+          border-color: rgba(10,191,188,0.32) !important;
+          background: rgba(10,191,188,0.11) !important;
+        }
+        .sbar-trigger-btn:active:not(:disabled) {
+          transform: scale(0.98);
+          transition-duration: 60ms !important;
+        }
+        .sbar-copy-btn:hover {
+          border-color: rgba(10,191,188,0.34) !important;
+          color: var(--ce-teal) !important;
+        }
+        .sbar-copy-btn:active {
+          transform: scale(0.98);
+          transition-duration: 60ms !important;
+        }
+        .send-update-btn:hover:not(:disabled) {
+          border-color: rgba(10,191,188,0.42) !important;
+          background: rgba(10,191,188,0.14) !important;
+        }
+        .send-update-btn:active:not(:disabled) {
+          transform: scale(0.98);
+          transition-duration: 60ms !important;
+        }
+        .note-save-btn:hover {
+          background: var(--ce-teal-deep) !important;
+          transform: translateY(-1px);
+        }
+        .note-save-btn:active {
+          transform: translateY(0) scale(0.98);
+          transition-duration: 60ms !important;
+        }
+        .note-cancel-btn:hover {
+          border-color: rgba(10,191,188,0.30) !important;
+          color: var(--ce-teal) !important;
+        }
+        .note-cancel-btn:active {
+          transform: scale(0.98);
+          transition-duration: 60ms !important;
+        }
+        .note-textarea:focus { border-color: var(--ce-teal) !important; }
+        .followup-textarea { transition: border-bottom-color var(--ce-dur-fast) var(--ce-ease-out); }
+        .followup-textarea:focus { border-bottom-color: var(--ce-teal) !important; }
         .saved-icon-btn:hover {
           color: var(--ce-teal) !important;
           border-color: rgba(10,191,188,0.22) !important;
+        }
+        .saved-icon-btn:active {
+          transform: scale(0.97);
+          opacity: 0.85;
+          transition-duration: 60ms !important;
         }
         .saved-icon-btn-delete:hover {
           color: var(--ce-urgency-high-dark) !important;
           border-color: rgba(244,164,164,0.22) !important;
         }
 
-        @keyframes fadeUp { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
-        @keyframes spin { to { transform: rotate(360deg); } }
-        .fade-up { animation: fadeUp 0.35s ease forwards; }
-        .spinner {
-          width: 15px; height: 15px;
-          border: 2px solid rgba(10,191,188,0.20);
-          border-top-color: var(--ce-teal);
-          border-radius: 50%;
-          animation: spin 0.7s linear infinite;
-          display: inline-block;
-          flex-shrink: 0;
-        }
-        @keyframes barPulse {
-          0%, 100% { height: 9px; opacity: 0.35; }
-          50% { height: 26px; opacity: 1; }
-        }
         @keyframes cursorBlink {
           0%, 100% { opacity: 0.8; }
           50% { opacity: 0; }
@@ -1075,7 +1148,7 @@ export default function App({ onGoHome, isOnline = true }) {
             ? "0 0 0 3px rgba(10,191,188,0.12), 0 6px 18px rgba(0,0,0,0.18)"
             : "0 6px 18px rgba(0,0,0,0.18)",
           marginBottom: 10,
-          transition: "border-color 0.2s ease, box-shadow 0.2s ease",
+          transition: "border-color var(--ce-dur-fast) var(--ce-ease-out), box-shadow var(--ce-dur-fast) var(--ce-ease-out)",
         }}>
           <textarea
             ref={textareaRef}
@@ -1125,10 +1198,13 @@ export default function App({ onGoHome, isOnline = true }) {
                 gap: 8,
                 letterSpacing: "-0.1px",
                 boxShadow: "none",
-                transition: "all 0.18s",
+                transition:
+                  "background-color var(--ce-dur-fast) var(--ce-ease-out), " +
+                  "color var(--ce-dur-fast) var(--ce-ease-out), " +
+                  "transform var(--ce-dur-fast) var(--ce-ease-out)",
               }}
             >
-              {isActive ? <><span className="spinner" />Analyzing...</> : "Ask Copilot"}
+              {isActive ? <span className="ce-breathe">Analyzing...</span> : "Ask Copilot"}
             </button>
           </div>
         </div>
@@ -1216,7 +1292,11 @@ export default function App({ onGoHome, isOnline = true }) {
                     gap: 8,
                     textAlign: "left",
                     lineHeight: 1.4,
-                    transition: "all 0.15s",
+                    transition:
+                      "background-color var(--ce-dur-fast) var(--ce-ease-out), " +
+                      "border-color var(--ce-dur-fast) var(--ce-ease-out), " +
+                      "transform var(--ce-dur-fast) var(--ce-ease-out), " +
+                      "opacity var(--ce-dur-fast) var(--ce-ease-out)",
                     width: "100%",
                     overflow: "hidden",
                   }}
@@ -1293,7 +1373,11 @@ export default function App({ onGoHome, isOnline = true }) {
                   gap: 8,
                   textAlign: "left",
                   lineHeight: 1.4,
-                  transition: "all 0.15s",
+                  transition:
+                    "background-color var(--ce-dur-fast) var(--ce-ease-out), " +
+                    "border-color var(--ce-dur-fast) var(--ce-ease-out), " +
+                    "transform var(--ce-dur-fast) var(--ce-ease-out), " +
+                    "opacity var(--ce-dur-fast) var(--ce-ease-out)",
                   width: "100%",
                 }}
               >
@@ -1306,7 +1390,7 @@ export default function App({ onGoHome, isOnline = true }) {
 
         {/* Error */}
         {error && (
-          <div className="fade-up" style={{
+          <div className="ce-section-enter" style={{
             display: "flex",
             gap: 10,
             alignItems: "center",
@@ -1346,7 +1430,7 @@ export default function App({ onGoHome, isOnline = true }) {
 
         {/* Final structured result */}
         {result && !streaming && (
-          <div ref={outputRef} className="fade-up">
+          <div ref={outputRef}>
 
             {/* Response trust cue */}
             <div style={{
@@ -1384,9 +1468,11 @@ export default function App({ onGoHome, isOnline = true }) {
               </div>
             )}
 
-            {result.sections.map((s) => (
-              <SectionCard key={s.title} title={s.title} content={s.content} />
-            ))}
+            <div className="ce-stagger-children">
+              {result.sections.map((s) => (
+                <SectionCard key={s.title} title={s.title} content={s.content} />
+              ))}
+            </div>
 
             {/* Action bar */}
             <div style={{
@@ -1415,11 +1501,15 @@ export default function App({ onGoHome, isOnline = true }) {
                   display: "flex",
                   alignItems: "center",
                   gap: 7,
-                  transition: "all 0.15s",
+                  transition:
+                    "background-color var(--ce-dur-fast) var(--ce-ease-out), " +
+                    "border-color var(--ce-dur-fast) var(--ce-ease-out), " +
+                    "color var(--ce-dur-fast) var(--ce-ease-out), " +
+                    "transform var(--ce-dur-fast) var(--ce-ease-out)",
                   letterSpacing: "-0.1px",
                 }}
               >
-                {justSaved ? "\u2713 Case Saved" : "+ Save Case"}
+                <span key={justSaved ? "saved" : "save"} className="ce-swap-fast">{justSaved ? "\u2713 Case Saved" : "+ Save Case"}</span>
               </button>
 
               {/* Copy — secondary, quieter */}
@@ -1435,7 +1525,10 @@ export default function App({ onGoHome, isOnline = true }) {
                   fontSize: 13,
                   fontWeight: 400,
                   cursor: "pointer",
-                  transition: "all 0.15s",
+                  transition:
+                    "border-color var(--ce-dur-fast) var(--ce-ease-out), " +
+                    "color var(--ce-dur-fast) var(--ce-ease-out), " +
+                    "transform var(--ce-dur-fast) var(--ce-ease-out)",
                   letterSpacing: "-0.1px",
                 }}
               >
@@ -1444,6 +1537,7 @@ export default function App({ onGoHome, isOnline = true }) {
 
               {/* Sources — regulatory affordance */}
               <button
+                className="sources-btn"
                 onClick={() => setSourcesOpen(o => !o)}
                 style={{
                   background: "transparent",
@@ -1454,7 +1548,10 @@ export default function App({ onGoHome, isOnline = true }) {
                   fontSize: 12.5,
                   fontWeight: 400,
                   cursor: "pointer",
-                  transition: "all 0.15s",
+                  transition:
+                    "background-color var(--ce-dur-fast) var(--ce-ease-out), " +
+                    "border-color var(--ce-dur-fast) var(--ce-ease-out), " +
+                    "transform var(--ce-dur-fast) var(--ce-ease-out)",
                   letterSpacing: "-0.1px",
                 }}
               >
@@ -1463,6 +1560,7 @@ export default function App({ onGoHome, isOnline = true }) {
 
               {/* SBAR — tertiary, accent */}
               <button
+                className="sbar-trigger-btn"
                 onClick={handleSbar}
                 disabled={sbarLoading}
                 style={{
@@ -1475,7 +1573,11 @@ export default function App({ onGoHome, isOnline = true }) {
                   fontSize: 12.5,
                   fontWeight: 500,
                   cursor: sbarLoading ? "default" : "pointer",
-                  transition: "all 0.15s",
+                  transition:
+                    "background-color var(--ce-dur-fast) var(--ce-ease-out), " +
+                    "border-color var(--ce-dur-fast) var(--ce-ease-out), " +
+                    "color var(--ce-dur-fast) var(--ce-ease-out), " +
+                    "transform var(--ce-dur-fast) var(--ce-ease-out)",
                   letterSpacing: "-0.1px",
                   display: "flex",
                   alignItems: "center",
@@ -1484,10 +1586,7 @@ export default function App({ onGoHome, isOnline = true }) {
                 }}
               >
                 {sbarLoading ? (
-                  <>
-                    <span style={{ display: "inline-block", width: 10, height: 10, border: "1.5px solid rgba(10,191,188,0.28)", borderTopColor: "var(--ce-teal)", borderRadius: "50%", animation: "spin 0.75s linear infinite" }} />
-                    Building SBAR…
-                  </>
+                  <span className="ce-breathe">Building SBAR…</span>
                 ) : (
                   "Turn into SBAR"
                 )}
@@ -1591,6 +1690,7 @@ export default function App({ onGoHome, isOnline = true }) {
                 Anything change?
               </div>
               <textarea
+                className="followup-textarea"
                 value={followUp}
                 onChange={(e) => setFollowUp(e.target.value)}
                 onKeyDown={(e) => { if (e.key === "Enter" && (e.metaKey || e.ctrlKey)) handleFollowUp(); }}
@@ -1614,6 +1714,7 @@ export default function App({ onGoHome, isOnline = true }) {
               />
               <div style={{ display: "flex", justifyContent: "flex-end" }}>
                 <button
+                  className="send-update-btn"
                   onClick={handleFollowUp}
                   disabled={!followUp.trim()}
                   style={{
@@ -1626,7 +1727,11 @@ export default function App({ onGoHome, isOnline = true }) {
                     fontWeight: 600,
                     cursor: followUp.trim() ? "pointer" : "not-allowed",
                     fontFamily: "inherit",
-                    transition: "all 0.15s",
+                    transition:
+                      "background-color var(--ce-dur-fast) var(--ce-ease-out), " +
+                      "border-color var(--ce-dur-fast) var(--ce-ease-out), " +
+                      "color var(--ce-dur-fast) var(--ce-ease-out), " +
+                      "transform var(--ce-dur-fast) var(--ce-ease-out)",
                   }}
                 >
                   Send update
@@ -1657,6 +1762,7 @@ export default function App({ onGoHome, isOnline = true }) {
                 </div>
                 {sbar && !sbar.error && (
                   <button
+                    className="sbar-copy-btn"
                     onClick={() => handleCopySbar(sbar)}
                     style={{
                       background: "transparent",
@@ -1667,10 +1773,13 @@ export default function App({ onGoHome, isOnline = true }) {
                       fontSize: 11,
                       fontWeight: 500,
                       cursor: "pointer",
-                      transition: "all 0.15s",
+                      transition:
+                        "border-color var(--ce-dur-fast) var(--ce-ease-out), " +
+                        "color var(--ce-dur-fast) var(--ce-ease-out), " +
+                        "transform var(--ce-dur-fast) var(--ce-ease-out)",
                     }}
                   >
-                    {sbarCopied ? "✓ Copied" : "Copy"}
+                    <span key={sbarCopied ? "copied" : "copy"} className="ce-swap-fast">{sbarCopied ? "✓ Copied" : "Copy"}</span>
                   </button>
                 )}
               </div>

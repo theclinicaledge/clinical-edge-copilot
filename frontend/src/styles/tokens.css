@@ -185,6 +185,7 @@
 .ce-stagger-children > *:nth-child(3) { animation-delay: 100ms; }
 .ce-stagger-children > *:nth-child(4) { animation-delay: 150ms; }
 .ce-stagger-children > *:nth-child(5) { animation-delay: 200ms; }
+.ce-stagger-children > *:nth-child(n+6) { animation-delay: 200ms; } /* children 6+ enter with child 5 — motion-system.md §1 */
 
 /* Pressable — subtle scale-down press state for chips and icon buttons */
 .ce-pressable {

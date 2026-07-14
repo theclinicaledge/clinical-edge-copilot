@@ -1,4 +1,5 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import { trackEvent } from "./analytics";
 
 // ─── Design Tokens (mirrors Landing.jsx) ──────────────────────────────────────
 const C = {
@@ -30,14 +31,19 @@ function CELogo({ size = 24 }) {
 }
 
 const EXAMPLES = [
-  "BP dropping post-op",
-  "Patient more confused than earlier",
-  "New chest pain but vitals okay",
+  { id: "bp_drop",    text: "BP dropping post-op" },
+  { id: "confusion",  text: "Patient more confused than earlier" },
+  { id: "chest_pain", text: "New chest pain but vitals okay" },
 ];
 
 // ─── QuickStart Component ─────────────────────────────────────────────────────
 export default function QuickStart({ onBack, onEnterApp }) {
   const [value, setValue] = useState("");
+
+  // Track module open — fires once on mount
+  useEffect(() => {
+    trackEvent('quickstart_opened', { source: 'direct' });
+  }, []);
 
   const handleSubmit = () => {
     const trimmed = value.trim();
@@ -45,8 +51,9 @@ export default function QuickStart({ onBack, onEnterApp }) {
     // Store prefill in localStorage so App can pick it up on mount
     try {
       localStorage.setItem("copilot_prefill", trimmed);
+      trackEvent('quickstart_completed', { destination: 'copilot' });
     } catch (e) {
-      console.log("QuickStart prefill:", trimmed);
+      console.warn("QuickStart prefill: localStorage unavailable");
     }
     onEnterApp();
   };
@@ -181,8 +188,8 @@ export default function QuickStart({ onBack, onEnterApp }) {
           </span>
           {EXAMPLES.map(ex => (
             <button
-              key={ex}
-              onClick={() => setValue(ex)}
+              key={ex.id}
+              onClick={() => { setValue(ex.text); trackEvent('quickstart_option_selected', { option_id: ex.id }); }}
               style={{
                 background: "transparent",
                 border: `1px solid ${C.subtle}`,
@@ -197,7 +204,7 @@ export default function QuickStart({ onBack, onEnterApp }) {
               onMouseEnter={e => { e.currentTarget.style.borderColor = C.accent; e.currentTarget.style.color = C.textPrimary; }}
               onMouseLeave={e => { e.currentTarget.style.borderColor = C.subtle; e.currentTarget.style.color = C.muted; }}
             >
-              {ex}
+              {ex.text}
             </button>
           ))}
         </div>

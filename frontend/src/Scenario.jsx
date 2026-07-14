@@ -1,4 +1,5 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import { trackEvent } from "./analytics";
 
 // ─── Design Tokens (mirrors Landing.jsx) ──────────────────────────────────────
 const C = {
@@ -143,6 +144,18 @@ export default function Scenario({ onBack, onEnterApp, onQuickStart }) {
   const [step, setStep] = useState(1);
 
   const sc = SCENARIOS[scenarioIndex];
+
+  // Fires once on mount and again whenever the active scenario changes.
+  useEffect(() => {
+    trackEvent('scenario_opened', { scenario_id: sc.id });
+  }, [scenarioIndex]); // eslint-disable-line react-hooks/exhaustive-deps
+
+  // Fires once per step transition (scenario switches reset step to 1 in the
+  // same batch, so this fires once — not twice — when switching scenarios).
+  useEffect(() => {
+    const stepId = step === 1 ? 'scenario' : step === 2 ? 'thinking' : 'analysis';
+    trackEvent('scenario_step_viewed', { scenario_id: sc.id, step_id: stepId });
+  }, [scenarioIndex, step]); // eslint-disable-line react-hooks/exhaustive-deps
 
   const switchScenario = (idx) => {
     setScenarioIndex(idx);
@@ -655,7 +668,7 @@ export default function Scenario({ onBack, onEnterApp, onQuickStart }) {
               )}
               {scenarioIndex === 2 && (
                 <button
-                  onClick={onQuickStart} style={btnPrimary}
+                  onClick={() => { trackEvent('scenario_completed', { scenario_id: sc.id, destination: 'quickstart' }); onQuickStart(); }} style={btnPrimary}
                   onMouseEnter={e => e.currentTarget.style.opacity = "0.88"}
                   onMouseLeave={e => e.currentTarget.style.opacity = "1"}
                 >

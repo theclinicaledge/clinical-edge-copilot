@@ -1,4 +1,5 @@
 import { useState, useEffect, useRef } from "react";
+import { trackEvent } from "./analytics";
 
 // ─── Design Tokens ────────────────────────────────────────────────────────────
 const C = {
@@ -346,7 +347,7 @@ export default function Landing({ onEnterApp, onEnterScenario }) {
             See Demo
           </button>
           <button
-            onClick={onEnterApp}
+            onClick={() => { trackEvent('landing_secondary_cta_clicked', { destination: 'copilot', placement: 'nav' }); onEnterApp(); }}
             className="l-btn-primary"
             style={{ ...btnPrimary, fontSize: 13, padding: "9px 20px", borderRadius: 8 }}
           >
@@ -463,7 +464,7 @@ export default function Landing({ onEnterApp, onEnterScenario }) {
               flexWrap: "wrap",
             }}
           >
-            <button onClick={onEnterScenario} className="l-btn-primary" style={{ ...btnPrimary, fontSize: 15, padding: "14px 34px", borderRadius: 11 }}>
+            <button onClick={() => { trackEvent('landing_primary_cta_clicked', { destination: 'scenario', placement: 'hero' }); onEnterScenario(); }} className="l-btn-primary" style={{ ...btnPrimary, fontSize: 15, padding: "14px 34px", borderRadius: 11 }}>
               Try a real scenario →
             </button>
             <button onClick={scrollToDemo} className="l-btn-ghost" style={{ ...btnGhost, fontSize: 15, padding: "14px 34px", borderRadius: 11 }}>
@@ -1799,14 +1800,14 @@ export default function Landing({ onEnterApp, onEnterScenario }) {
             flexWrap: "wrap",
           }}>
             <button
-              onClick={onEnterScenario}
+              onClick={() => { trackEvent('landing_primary_cta_clicked', { destination: 'scenario', placement: 'closing' }); onEnterScenario(); }}
               className="l-btn-primary"
               style={{ ...btnPrimary, fontSize: 15, padding: "14px 34px", borderRadius: 11, boxShadow: "0 6px 30px rgba(0,194,209,0.22)" }}
             >
               Try Clinical Edge Copilot
             </button>
             <button
-              onClick={onEnterApp}
+              onClick={() => { trackEvent('landing_secondary_cta_clicked', { destination: 'copilot', placement: 'closing' }); onEnterApp(); }}
               className="l-btn-ghost"
               style={{ ...btnGhost, fontSize: 15, padding: "14px 34px", borderRadius: 11 }}
             >

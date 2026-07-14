@@ -799,6 +799,7 @@ export default function App({ onGoHome, isOnline = true }) {
     const updated = [newCase, ...savedCases];
     setSavedCases(updated);
     lsSet(LS_SAVED, updated);
+    trackEvent('saved_case_created', { source: 'copilot', has_note: false });
     setJustSaved(true);
   }, [result, rawText, question, mode, savedCases]);
 
@@ -806,16 +807,19 @@ export default function App({ onGoHome, isOnline = true }) {
     const updated = savedCases.filter((sc) => sc.id !== id);
     setSavedCases(updated);
     lsSet(LS_SAVED, updated);
+    trackEvent('saved_case_deleted', { source: 'saved_cases' });
   }, [savedCases]);
 
   const handleSaveNote = useCallback((id, note) => {
     const updated = savedCases.map((sc) => sc.id === id ? { ...sc, note } : sc);
     setSavedCases(updated);
     lsSet(LS_SAVED, updated);
+    trackEvent('saved_case_note_edited', { has_note: Boolean(note) });
   }, [savedCases]);
 
-  const handleCopyResponse = useCallback((text) => {
+  const handleCopyResponse = useCallback((text, source = 'copilot') => {
     try { navigator.clipboard.writeText(text); } catch {}
+    trackEvent('copilot_response_copied', { copy_scope: 'full_response', source });
   }, []);
 
   const handleSbar = useCallback(async () => {
@@ -831,11 +835,14 @@ export default function App({ onGoHome, isOnline = true }) {
       const data = await res.json();
       if (!res.ok || data.error) {
         setSbar({ error: data.error || "Failed to generate SBAR." });
+        trackEvent('sbar_generation_failed', { error_type: 'request_failed' });
       } else {
         setSbar(data.sbar);
+        trackEvent('sbar_generated', { source: 'copilot' });
       }
     } catch {
       setSbar({ error: "Network error. Please try again." });
+      trackEvent('sbar_generation_failed', { error_type: 'request_failed' });
     } finally {
       setSbarLoading(false);
     }
@@ -849,11 +856,13 @@ export default function App({ onGoHome, isOnline = true }) {
       `RECOMMENDATION:\n${sbarData.recommendation}`,
     ].join("\n\n");
     try { navigator.clipboard.writeText(text); } catch {}
+    trackEvent('sbar_copied', { source: 'copilot', copy_scope: 'full_sbar' });
     setSbarCopied(true);
     setTimeout(() => setSbarCopied(false), 2000);
   }, []);
 
   const handleReopenCase = useCallback((q) => {
+    trackEvent('saved_case_reopened', { source: 'saved_cases' });
     setQuestion(q);
     window.scrollTo({ top: 0, behavior: "smooth" });
   }, []);
@@ -1259,7 +1268,7 @@ export default function App({ onGoHome, isOnline = true }) {
               </div>
             </div>
             {savedCases.map((sc) => (
-              <SavedCaseRow key={sc.id} sc={sc} onReopen={handleReopenCase} onDelete={handleDeleteCase} onCopy={handleCopyResponse} onSaveNote={handleSaveNote} />
+              <SavedCaseRow key={sc.id} sc={sc} onReopen={handleReopenCase} onDelete={handleDeleteCase} onCopy={(text) => handleCopyResponse(text, 'saved_cases')} onSaveNote={handleSaveNote} />
             ))}
           </div>
         )}

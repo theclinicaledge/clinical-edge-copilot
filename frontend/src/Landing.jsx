@@ -1,21 +1,6 @@
 import { useState, useEffect, useRef } from "react";
 import { trackEvent } from "./analytics";
 
-// ─── Design Tokens ────────────────────────────────────────────────────────────
-const C = {
-  bg:           "#0B1F2A",
-  card:         "#112936",
-  accent:       "#00C2D1",
-  accentDim:    "rgba(0,194,209,0.1)",
-  accentGlow:   "rgba(0,194,209,0.06)",
-  textPrimary:  "#F8FBFC",
-  textSecondary:"#A8C1CC",
-  muted:        "#7F99A5",
-  subtle:       "#3A5566",
-  border:       "rgba(255,255,255,0.07)",
-  borderAccent: "rgba(0,194,209,0.2)",
-};
-
 // ─── CE Logo ──────────────────────────────────────────────────────────────────
 function CELogo({ size = 26 }) {
   return (
@@ -24,7 +9,7 @@ function CELogo({ size = 26 }) {
       height={size}
       viewBox="0 0 225 200"
       xmlns="http://www.w3.org/2000/svg"
-      fill={C.accent}
+      fill="var(--ce-teal)"
       aria-label="Clinical Edge"
       style={{ flexShrink: 0, display: "block" }}
     >
@@ -70,15 +55,15 @@ function Fade({ children, style, delay = 0, up = 22 }) {
   );
 }
 
-// ─── Mono label ───────────────────────────────────────────────────────────────
+// ─── Mono label (eyebrow) ─────────────────────────────────────────────────────
 function Label({ children }) {
   return (
     <div style={{
-      fontFamily: "'IBM Plex Mono', monospace",
-      fontSize: 10,
-      fontWeight: 500,
-      color: C.accent,
-      letterSpacing: "1.8px",
+      fontFamily: "var(--ce-font-mono, 'IBM Plex Mono', monospace)",
+      fontSize: "var(--ce-fs-eyebrow)",
+      fontWeight: 700,
+      color: "var(--ce-teal)",
+      letterSpacing: "var(--ce-track-eyebrow)",
       textTransform: "uppercase",
       marginBottom: 22,
     }}>
@@ -93,7 +78,7 @@ function SectionHeading({ children, maxWidth = 540 }) {
     <h2 style={{
       fontSize: "clamp(28px, 4vw, 46px)",
       fontWeight: 800,
-      color: C.textPrimary,
+      color: "var(--ce-text-light)",
       letterSpacing: "-1.5px",
       lineHeight: 1.08,
       margin: 0,
@@ -104,27 +89,30 @@ function SectionHeading({ children, maxWidth = 540 }) {
   );
 }
 
-// ─── Mock section card (for demo panel) ──────────────────────────────────────
-function MockCard({ label, accent, bg, border, children }) {
+// ─── Mock section card (mirrors App.jsx's SectionCard/SECTION_CONFIG so the
+//     marketing preview shows the product's actual colors) ────────────────────
+function MockCard({ label, accent, children }) {
   return (
     <div style={{
-      background: bg,
-      border: `1px solid ${border}`,
-      borderRadius: 10,
+      background: "var(--ce-warm-card)",
+      border: "1px solid var(--ce-warm-line)",
+      borderLeft: `3px solid ${accent}`,
+      borderRadius: "var(--ce-r-md)",
       padding: "14px 18px",
     }}>
       <div style={{
-        fontFamily: "'IBM Plex Mono', monospace",
+        fontFamily: "var(--ce-font-mono, 'IBM Plex Mono', monospace)",
         fontSize: 9,
         fontWeight: 700,
         color: accent,
         textTransform: "uppercase",
         letterSpacing: "0.9px",
         marginBottom: 8,
+        opacity: 0.88,
       }}>
         {label}
       </div>
-      <div style={{ fontSize: 13, color: C.textSecondary, lineHeight: 1.65 }}>
+      <div style={{ fontSize: 13, color: "var(--ce-navy-700)", lineHeight: 1.65 }}>
         {children}
       </div>
     </div>
@@ -138,8 +126,8 @@ function Check() {
       width: 22,
       height: 22,
       borderRadius: "50%",
-      background: "rgba(0,194,209,0.1)",
-      border: "1px solid rgba(0,194,209,0.28)",
+      background: "rgba(10,191,188,0.1)",
+      border: "1px solid rgba(10,191,188,0.22)",
       display: "flex",
       alignItems: "center",
       justifyContent: "center",
@@ -147,7 +135,7 @@ function Check() {
       marginTop: 2,
     }}>
       <svg width="9" height="7" viewBox="0 0 9 7" fill="none">
-        <path d="M1 3.5L3.5 6L8 1" stroke="#00C2D1" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round"/>
+        <path d="M1 3.5L3.5 6L8 1" stroke="var(--ce-teal)" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round"/>
       </svg>
     </div>
   );
@@ -168,47 +156,49 @@ export default function Landing({ onEnterApp, onEnterScenario }) {
     demoRef.current?.scrollIntoView({ behavior: "smooth", block: "start" });
   };
 
+  // §4.2 Primary button: fill --ce-teal, text --ce-text-dark, radius --ce-r-md, no shadow.
   const btnPrimary = {
     display: "inline-flex",
     alignItems: "center",
     justifyContent: "center",
-    background: C.accent,
-    color: "#0B1F2A",
+    background: "var(--ce-teal)",
+    color: "var(--ce-text-dark)",
     fontWeight: 700,
     fontSize: 15,
     padding: "13px 30px",
-    borderRadius: 10,
+    borderRadius: "var(--ce-r-md)",
     border: "none",
     letterSpacing: "-0.2px",
     cursor: "pointer",
-    transition: "all 0.2s ease",
-    boxShadow: "0 4px 20px rgba(0,194,209,0.18)",
-    fontFamily: "'Inter', sans-serif",
+    transition: "background var(--ce-dur-fast) var(--ce-ease-out)",
+    boxShadow: "none",
+    fontFamily: "var(--ce-font-sans)",
   };
 
+  // §4.2 Secondary button: transparent, 1px border, text-light-body.
   const btnGhost = {
     display: "inline-flex",
     alignItems: "center",
     justifyContent: "center",
     background: "transparent",
-    color: C.muted,
+    color: "var(--ce-text-light-body)",
     fontWeight: 600,
     fontSize: 15,
     padding: "13px 30px",
-    borderRadius: 10,
-    border: `1px solid ${C.border}`,
+    borderRadius: "var(--ce-r-md)",
+    border: "1px solid var(--ce-line-navy)",
     letterSpacing: "-0.2px",
     cursor: "pointer",
-    transition: "all 0.2s ease",
-    fontFamily: "'Inter', sans-serif",
+    transition: "border-color var(--ce-dur-fast) var(--ce-ease-out), color var(--ce-dur-fast) var(--ce-ease-out)",
+    fontFamily: "var(--ce-font-sans)",
   };
 
   return (
     <div style={{
       minHeight: "100vh",
-      background: C.bg,
-      color: C.textSecondary,
-      fontFamily: "'Inter', -apple-system, BlinkMacSystemFont, sans-serif",
+      background: "var(--ce-navy-900)",
+      color: "var(--ce-text-light-body)",
+      fontFamily: "var(--ce-font-sans)",
       overflowX: "hidden",
     }}>
       {/* ── Global styles ────────────────────────────────────────────────────── */}
@@ -220,14 +210,6 @@ export default function Landing({ onEnterApp, onEnterScenario }) {
           from { opacity: 0; transform: translateY(20px); }
           to   { opacity: 1; transform: translateY(0); }
         }
-        @keyframes lFloat {
-          0%, 100% { transform: translateY(0px); }
-          50%       { transform: translateY(-7px); }
-        }
-        @keyframes lGlow {
-          0%, 100% { opacity: 0.5; }
-          50%       { opacity: 0.9; }
-        }
 
         .l-h1-anim { animation: lFadeUp 0.9s ease 0.05s both; }
         .l-h2-anim { animation: lFadeUp 0.9s ease 0.2s  both; }
@@ -236,33 +218,19 @@ export default function Landing({ onEnterApp, onEnterScenario }) {
         .l-h5-anim { animation: lFadeUp 0.9s ease 0.65s both; }
         .l-card-anim { animation: lFadeUp 0.9s ease 0.75s both; }
 
-        .l-card-float { animation: lFloat 5s ease-in-out infinite; }
-
         .l-btn-primary:hover {
-          background: #19D3E0 !important;
-          transform: translateY(-1px) !important;
-          box-shadow: 0 8px 30px rgba(0,194,209,0.3) !important;
+          background: var(--ce-teal-deep) !important;
         }
-        .l-btn-primary:active { transform: translateY(0) !important; }
 
         .l-btn-ghost:hover {
-          border-color: rgba(0,194,209,0.35) !important;
-          color: #A8C1CC !important;
-          background: rgba(0,194,209,0.04) !important;
+          border-color: rgba(10,191,188,0.30) !important;
+          color: var(--ce-text-light) !important;
         }
 
-        .l-step:hover {
-          border-color: rgba(0,194,209,0.22) !important;
-          background: rgba(17,41,54,0.95) !important;
-        }
-        .l-diff:hover {
-          border-color: rgba(0,194,209,0.18) !important;
-          background: rgba(17,41,54,0.7) !important;
-        }
-        .l-nav-link:hover { color: #F8FBFC !important; }
+        .l-nav-link:hover { color: var(--ce-text-light) !important; }
 
         .l-flow { display: flex; align-items: flex-start; gap: 0; width: 100%; }
-        .l-flow-arrow { flex-shrink: 0; align-self: center; color: #3A5566; font-size: 20px; padding: 0 6px; margin-bottom: 8px; line-height: 1; }
+        .l-flow-arrow { flex-shrink: 0; align-self: center; color: var(--ce-text-dim); font-size: 20px; padding: 0 6px; margin-bottom: 8px; line-height: 1; }
         .l-flow-step { flex: 1; min-width: 0; }
 
         @media (max-width: 640px) {
@@ -288,10 +256,10 @@ export default function Landing({ onEnterApp, onEnterScenario }) {
         top: 0, left: 0, right: 0,
         zIndex: 100,
         paddingTop: "env(safe-area-inset-top)",
-        background: scrolled ? "rgba(11,31,42,0.97)" : "rgba(11,31,42,0)",
+        background: scrolled ? "var(--ce-navy-header)" : "rgba(11,24,32,0)",
         backdropFilter: scrolled ? "blur(20px)" : "none",
-        borderBottom: scrolled ? `1px solid ${C.border}` : "1px solid transparent",
-        transition: "all 0.3s ease",
+        borderBottom: scrolled ? "1px solid var(--ce-line-dark)" : "1px solid transparent",
+        transition: "background var(--ce-dur-base) var(--ce-ease-out), border-color var(--ce-dur-base) var(--ce-ease-out)",
       }}>
         {/* Inner row — 62px visual height, safe area handled by outer nav */}
         <div style={{
@@ -307,7 +275,7 @@ export default function Landing({ onEnterApp, onEnterScenario }) {
             <span style={{
               fontSize: 14,
               fontWeight: 700,
-              color: C.textPrimary,
+              color: "var(--ce-text-light)",
               letterSpacing: "-0.2px",
               lineHeight: 1.15,
             }}>
@@ -316,10 +284,10 @@ export default function Landing({ onEnterApp, onEnterScenario }) {
             <span style={{
               fontSize: 9,
               fontWeight: 500,
-              color: C.muted,
+              color: "var(--ce-text-dim)",
               letterSpacing: "0.8px",
               textTransform: "uppercase",
-              fontFamily: "'IBM Plex Mono', monospace",
+              fontFamily: "var(--ce-font-mono)",
               lineHeight: 1,
             }}>
               Copilot
@@ -336,10 +304,10 @@ export default function Landing({ onEnterApp, onEnterScenario }) {
               background: "none",
               border: "none",
               fontSize: 13,
-              color: C.muted,
+              color: "var(--ce-text-dim)",
               fontWeight: 500,
               cursor: "pointer",
-              transition: "color 0.2s ease",
+              transition: "color var(--ce-dur-fast) var(--ce-ease-out)",
               padding: 0,
               display: "none",
             }}
@@ -357,101 +325,69 @@ export default function Landing({ onEnterApp, onEnterScenario }) {
         </div>{/* end inner nav row */}
       </nav>
 
-      {/* ══ HERO ═════════════════════════════════════════════════════════════════ */}
+      {/* ══ HERO — left-aligned editorial (§8.6 / banned pattern §15) ══════════════ */}
       <section style={{
-        minHeight: "100vh",
         display: "flex",
         flexDirection: "column",
-        alignItems: "center",
-        justifyContent: "center",
+        alignItems: "flex-start",
         padding: "calc(120px + env(safe-area-inset-top)) clamp(20px, 6vw, 80px) 80px",
         position: "relative",
-        textAlign: "center",
-        overflow: "hidden",
       }}>
-        {/* Ambient glow */}
-        <div style={{
-          position: "absolute",
-          top: "35%",
-          left: "50%",
-          transform: "translate(-50%, -50%)",
-          width: 700,
-          height: 500,
-          background: "radial-gradient(ellipse, rgba(0,194,209,0.07) 0%, transparent 65%)",
-          pointerEvents: "none",
-        }} />
-
-        <div className="l-hero-wrap" style={{ maxWidth: 800, width: "100%", position: "relative" }}>
-          {/* Eyebrow */}
-          <div className="l-h1-anim" style={{ display: "flex", justifyContent: "center", marginBottom: 36 }}>
+        <div className="l-hero-wrap" style={{ maxWidth: 720, width: "100%" }}>
+          {/* Eyebrow — static dot, no pulse */}
+          <div className="l-h1-anim" style={{ display: "flex", marginBottom: 28 }}>
             <div style={{
               display: "inline-flex",
               alignItems: "center",
               gap: 9,
-              background: C.accentDim,
-              border: `1px solid ${C.borderAccent}`,
-              borderRadius: 100,
+              background: "rgba(10,191,188,0.10)",
+              border: "1px solid rgba(10,191,188,0.22)",
+              borderRadius: "var(--ce-r-pill)",
               padding: "7px 16px",
             }}>
               <span style={{
                 width: 6,
                 height: 6,
                 borderRadius: "50%",
-                background: C.accent,
+                background: "var(--ce-teal)",
                 display: "inline-block",
-                animation: "lGlow 2.5s ease-in-out infinite",
               }} />
               <span style={{
-                fontFamily: "'IBM Plex Mono', monospace",
-                fontSize: 11,
-                fontWeight: 500,
-                color: C.accent,
-                letterSpacing: "0.5px",
+                fontFamily: "var(--ce-font-mono)",
+                fontSize: "var(--ce-fs-eyebrow)",
+                fontWeight: 700,
+                color: "var(--ce-teal)",
+                letterSpacing: "var(--ce-track-eyebrow)",
+                textTransform: "uppercase",
               }}>
                 Clinical Reasoning Support for Nurses
               </span>
             </div>
           </div>
 
-          {/* Headline */}
+          {/* Headline — Display scale, accent on one phrase */}
           <h1 className="l-h2-anim l-hero-h1" style={{
-            fontSize: "clamp(38px, 6.5vw, 70px)",
+            fontSize: "clamp(38px, 6vw, 64px)",
             fontWeight: 800,
-            color: C.textPrimary,
-            lineHeight: 1.06,
-            letterSpacing: "-2.5px",
-            margin: "0 0 28px",
+            color: "var(--ce-text-light)",
+            lineHeight: 1.08,
+            letterSpacing: "-0.03em",
+            margin: "0 0 24px",
           }}>
-            Less second-guessing.
-            <br />
-            <span className="l-hero-accent" style={{ color: C.accent, whiteSpace: "nowrap" }}>More clinical confidence.</span>
-            <br />
-            When it matters most.
+            Less second-guessing.{" "}
+            <span className="l-hero-accent" style={{ color: "var(--ce-teal)" }}>More clinical confidence.</span>
           </h1>
 
-          {/* Subhead */}
+          {/* Lead paragraph */}
           <p className="l-h3-anim" style={{
-            fontSize: "clamp(16px, 2vw, 19px)",
+            fontSize: "var(--ce-fs-lead)",
             fontWeight: 400,
-            color: C.textSecondary,
+            color: "var(--ce-text-light-body)",
             lineHeight: 1.72,
-            margin: "0 auto 50px",
-            maxWidth: 580,
+            margin: "0 0 40px",
+            maxWidth: 560,
           }}>
-            Clinical Edge Copilot helps you think through patient situations, medication questions, and clinical reasoning — whether you're new to nursing, building your skills, or practicing at the bedside.
-          </p>
-
-          {/* Bridge line */}
-          <p className="l-h3-anim" style={{
-            fontSize: "clamp(13px, 1.5vw, 14px)",
-            fontWeight: 500,
-            color: C.muted,
-            fontFamily: "'IBM Plex Mono', monospace",
-            letterSpacing: "0.3px",
-            margin: "-32px auto 50px",
-            maxWidth: 480,
-          }}>
-            Built for how nurses actually think — not just what textbooks say.
+            Clinical Edge Copilot helps you think through patient situations, medication questions, and clinical reasoning — whether you're new to nursing, building your skills, or practicing at the bedside. Structured clinical reasoning, in the same order a preceptor would walk you through it.
           </p>
 
           {/* CTAs */}
@@ -460,61 +396,39 @@ export default function Landing({ onEnterApp, onEnterScenario }) {
             style={{
               display: "flex",
               gap: 14,
-              justifyContent: "center",
               flexWrap: "wrap",
             }}
           >
-            <button onClick={() => { trackEvent('landing_primary_cta_clicked', { destination: 'scenario', placement: 'hero' }); onEnterScenario(); }} className="l-btn-primary" style={{ ...btnPrimary, fontSize: 15, padding: "14px 34px", borderRadius: 11 }}>
+            <button onClick={() => { trackEvent('landing_primary_cta_clicked', { destination: 'scenario', placement: 'hero' }); onEnterScenario(); }} className="l-btn-primary" style={{ ...btnPrimary, fontSize: 15, padding: "14px 34px" }}>
               Try a real scenario →
             </button>
-            <button onClick={scrollToDemo} className="l-btn-ghost" style={{ ...btnGhost, fontSize: 15, padding: "14px 34px", borderRadius: 11 }}>
+            <button onClick={scrollToDemo} className="l-btn-ghost" style={{ ...btnGhost, fontSize: 15, padding: "14px 34px" }}>
               See How It Thinks
             </button>
           </div>
         </div>
 
-        {/* Hero mock card */}
-        <div className="l-card-anim" style={{ marginTop: 80, maxWidth: 620, width: "100%", position: "relative" }}>
-          {/* Under-card glow */}
+        {/* Hero mock card — §4.3 dark hero card, static */}
+        <div className="l-card-anim" style={{ marginTop: 64, maxWidth: 620, width: "100%" }}>
           <div style={{
-            position: "absolute",
-            bottom: -24,
-            left: "50%",
-            transform: "translateX(-50%)",
-            width: "75%",
-            height: 60,
-            background: "radial-gradient(ellipse, rgba(0,194,209,0.18) 0%, transparent 70%)",
-            filter: "blur(18px)",
-            pointerEvents: "none",
-          }} />
-
-          <div
-            className="l-card-float"
-            style={{
-              background: C.card,
-              border: `1px solid rgba(255,255,255,0.09)`,
-              borderRadius: 18,
-              overflow: "hidden",
-              boxShadow: "0 32px 80px rgba(0,0,0,0.5), 0 0 0 1px rgba(255,255,255,0.04)",
-            }}
-          >
-            {/* Card chrome */}
+            background: "var(--ce-navy-700)",
+            border: "1px solid var(--ce-line-navy)",
+            borderRadius: "var(--ce-r-lg)",
+            overflow: "hidden",
+            boxShadow: "var(--ce-shadow-hero)",
+          }}>
+            {/* Card chrome — eyebrow + hairline, no traffic lights */}
             <div style={{
               padding: "13px 20px",
-              borderBottom: `1px solid ${C.border}`,
-              display: "flex",
-              alignItems: "center",
-              gap: 7,
-              background: "rgba(255,255,255,0.02)",
+              borderBottom: "1px solid var(--ce-line-dark)",
             }}>
-              {["rgba(255,95,87,0.8)", "rgba(255,189,46,0.8)", "rgba(39,201,63,0.8)"].map((c, i) => (
-                <div key={i} style={{ width: 11, height: 11, borderRadius: "50%", background: c }} />
-              ))}
               <span style={{
-                marginLeft: 10,
-                fontFamily: "'IBM Plex Mono', monospace",
-                fontSize: 10,
-                color: C.subtle,
+                fontFamily: "var(--ce-font-mono)",
+                fontSize: "var(--ce-fs-eyebrow)",
+                fontWeight: 700,
+                color: "var(--ce-text-dim)",
+                letterSpacing: "var(--ce-track-eyebrow)",
+                textTransform: "uppercase",
               }}>
                 Clinical Edge Copilot
               </span>
@@ -524,47 +438,47 @@ export default function Landing({ onEnterApp, onEnterScenario }) {
               {/* Scenario input preview */}
               <div style={{
                 fontSize: 12,
-                color: "#2E4A5C",
+                color: "var(--ce-text-light-sec)",
                 fontStyle: "italic",
                 marginBottom: 20,
                 padding: "11px 14px",
                 background: "rgba(255,255,255,0.02)",
-                border: `1px solid ${C.border}`,
-                borderRadius: 8,
+                border: "1px solid var(--ce-line-dark)",
+                borderRadius: "var(--ce-r-md)",
                 lineHeight: 1.6,
               }}>
                 "BP dropped to 88/50, HR 122, was stable 20 min ago..."
               </div>
 
-              {/* Urgency badge row */}
+              {/* Urgency badge row — real urgency tokens */}
               <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 18 }}>
                 <span style={{
-                  fontFamily: "'IBM Plex Mono', monospace",
+                  fontFamily: "var(--ce-font-mono)",
                   fontSize: 10,
                   fontWeight: 700,
-                  color: "#fca5a5",
-                  background: "rgba(239,68,68,0.12)",
-                  border: "1px solid rgba(239,68,68,0.3)",
+                  color: "var(--ce-urgency-high-dark)",
+                  background: "var(--ce-urgency-high-bg)",
+                  border: "1px solid var(--ce-urgency-high-line)",
                   padding: "4px 11px",
-                  borderRadius: 6,
+                  borderRadius: "var(--ce-r-sm)",
                   textTransform: "uppercase",
                   letterSpacing: "0.5px",
                 }}>
                   Urgency: HIGH
                 </span>
-                <span style={{ fontSize: 10, color: C.subtle, fontFamily: "'IBM Plex Mono', monospace" }}>·</span>
-                <span style={{ fontSize: 10, color: C.subtle, fontFamily: "'IBM Plex Mono', monospace" }}>Clinical Reasoning</span>
+                <span style={{ fontSize: 10, color: "var(--ce-text-dim)", fontFamily: "var(--ce-font-mono)" }}>·</span>
+                <span style={{ fontSize: 10, color: "var(--ce-text-dim)", fontFamily: "var(--ce-font-mono)" }}>Clinical Reasoning</span>
               </div>
 
-              {/* Section cards */}
+              {/* Section cards — real SECTION_CONFIG colors (teal + gold only) */}
               <div style={{ display: "flex", flexDirection: "column", gap: 9 }}>
-                <MockCard label="What this could be" accent="#e05572" bg="rgba(224,85,114,0.06)" border="rgba(224,85,114,0.18)">
+                <MockCard label="What this could be" accent="var(--ce-teal-deep)" bg="transparent">
                   Acute hemodynamic compromise — the combination of hypotension and tachycardia points toward shock physiology.
                 </MockCard>
-                <MockCard label="Possible concerns" accent="#4da3ff" bg="rgba(77,163,255,0.06)" border="rgba(77,163,255,0.18)">
+                <MockCard label="Possible concerns" accent="var(--ce-gold-deep)" bg="rgba(212,168,75,0.06)">
                   Hypotension + tachycardia + acute onset suggests circulatory instability. JVD, lung sounds, skin perfusion, and cap refill help clarify the picture.
                 </MockCard>
-                <MockCard label="What to assess next" accent="#1FBF75" bg="rgba(31,191,117,0.06)" border="rgba(31,191,117,0.18)">
+                <MockCard label="What to assess next" accent="var(--ce-teal-deep)" bg="transparent">
                   Full reassessment, IV access, 12-lead ECG, fluid responsiveness assessment, and provider awareness.
                 </MockCard>
               </div>
@@ -585,7 +499,7 @@ export default function Landing({ onEnterApp, onEnterScenario }) {
             <h2 style={{
               fontSize: "clamp(26px, 3.8vw, 44px)",
               fontWeight: 800,
-              color: C.textPrimary,
+              color: "var(--ce-text-light)",
               letterSpacing: "-1.5px",
               lineHeight: 1.1,
               margin: "0 auto 18px",
@@ -595,7 +509,7 @@ export default function Landing({ onEnterApp, onEnterScenario }) {
             </h2>
             <p style={{
               fontSize: "clamp(14px, 1.6vw, 17px)",
-              color: C.textSecondary,
+              color: "var(--ce-text-light-body)",
               lineHeight: 1.65,
               maxWidth: 560,
               margin: "0 auto",
@@ -632,29 +546,29 @@ export default function Landing({ onEnterApp, onEnterScenario }) {
           {/* ── Card 1: Clinical Reasoning ── */}
           <Fade delay={60}>
             <div style={{
-              background: C.card,
+              background: "var(--ce-navy-700)",
               border: `1px solid rgba(255,255,255,0.07)`,
-              borderRadius: 16,
+              borderRadius: "var(--ce-r-lg)",
               overflow: "hidden",
             }}>
               {/* Card header */}
               <div style={{
                 padding: "14px 20px",
-                borderBottom: `1px solid ${C.border}`,
+                borderBottom: `1px solid var(--ce-line-dark)`,
                 display: "flex",
                 alignItems: "center",
                 gap: 8,
                 background: "rgba(255,255,255,0.02)",
               }}>
                 <span style={{
-                  fontFamily: "'IBM Plex Mono', monospace",
+                  fontFamily: "var(--ce-font-mono)",
                   fontSize: 9,
                   fontWeight: 700,
-                  color: "#e05572",
-                  background: "rgba(224,85,114,0.1)",
-                  border: "1px solid rgba(224,85,114,0.22)",
+                  color: "var(--ce-teal)",
+                  background: "rgba(10,191,188,0.10)",
+                  border: "1px solid rgba(10,191,188,0.22)",
                   padding: "3px 9px",
-                  borderRadius: 5,
+                  borderRadius: "var(--ce-r-sm)",
                   textTransform: "uppercase",
                   letterSpacing: "0.8px",
                 }}>
@@ -666,12 +580,12 @@ export default function Landing({ onEnterApp, onEnterScenario }) {
                 {/* Scenario input */}
                 <div style={{
                   fontSize: 12,
-                  color: "#2E4A5C",
+                  color: "var(--ce-text-light-sec)",
                   fontStyle: "italic",
                   marginBottom: 16,
                   padding: "10px 13px",
                   background: "rgba(255,255,255,0.02)",
-                  border: `1px solid ${C.border}`,
+                  border: `1px solid var(--ce-line-dark)`,
                   borderRadius: 8,
                   lineHeight: 1.6,
                 }}>
@@ -681,14 +595,14 @@ export default function Landing({ onEnterApp, onEnterScenario }) {
                 {/* Urgency badge */}
                 <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 14 }}>
                   <span style={{
-                    fontFamily: "'IBM Plex Mono', monospace",
+                    fontFamily: "var(--ce-font-mono)",
                     fontSize: 9,
                     fontWeight: 700,
-                    color: "#fbbf24",
-                    background: "rgba(251,191,36,0.1)",
-                    border: "1px solid rgba(251,191,36,0.25)",
+                    color: "var(--ce-urgency-mod-dark)",
+                    background: "var(--ce-urgency-mod-bg)",
+                    border: "1px solid var(--ce-urgency-mod-line)",
                     padding: "3px 9px",
-                    borderRadius: 5,
+                    borderRadius: "var(--ce-r-sm)",
                     textTransform: "uppercase",
                     letterSpacing: "0.5px",
                   }}>Urgency: MODERATE</span>
@@ -696,10 +610,10 @@ export default function Landing({ onEnterApp, onEnterScenario }) {
 
                 {/* Output preview */}
                 <div style={{ display: "flex", flexDirection: "column", gap: 7 }}>
-                  <MockCard label="What this could be" accent="#e05572" bg="rgba(224,85,114,0.05)" border="rgba(224,85,114,0.15)">
+                  <MockCard label="What this could be" accent="var(--ce-teal-deep)" bg="transparent">
                     Trending tachycardia in a post-op patient can point toward occult bleeding or early sepsis — the trajectory over time is the key signal.
                   </MockCard>
-                  <MockCard label="Possible concerns" accent="#4da3ff" bg="rgba(77,163,255,0.05)" border="rgba(77,163,255,0.15)">
+                  <MockCard label="Possible concerns" accent="var(--ce-gold-deep)" bg="rgba(212,168,75,0.06)">
                     Trending values carry more weight than any single reading. Perfusion, urine output, and pain together build the fuller picture.
                   </MockCard>
                 </div>
@@ -707,9 +621,9 @@ export default function Landing({ onEnterApp, onEnterScenario }) {
 
               <div style={{
                 padding: "12px 22px",
-                borderTop: `1px solid ${C.border}`,
+                borderTop: `1px solid var(--ce-line-dark)`,
                 fontSize: 11,
-                color: C.muted,
+                color: "var(--ce-text-dim)",
               }}>
                 Helps you catch subtle deterioration before it escalates
               </div>
@@ -719,14 +633,14 @@ export default function Landing({ onEnterApp, onEnterScenario }) {
           {/* ── Card 2: Quick Question ── */}
           <Fade delay={120}>
             <div style={{
-              background: C.card,
+              background: "var(--ce-navy-700)",
               border: `1px solid rgba(255,255,255,0.07)`,
-              borderRadius: 16,
+              borderRadius: "var(--ce-r-lg)",
               overflow: "hidden",
             }}>
               <div style={{
                 padding: "14px 20px",
-                borderBottom: `1px solid ${C.border}`,
+                borderBottom: `1px solid var(--ce-line-dark)`,
                 display: "flex",
                 alignItems: "center",
                 gap: 8,
@@ -736,11 +650,11 @@ export default function Landing({ onEnterApp, onEnterScenario }) {
                   fontFamily: "'IBM Plex Mono', monospace",
                   fontSize: 9,
                   fontWeight: 700,
-                  color: C.accent,
+                  color: "var(--ce-teal)",
                   background: "rgba(0,194,209,0.08)",
                   border: `1px solid rgba(0,194,209,0.2)`,
                   padding: "3px 9px",
-                  borderRadius: 5,
+                  borderRadius: "var(--ce-r-sm)",
                   textTransform: "uppercase",
                   letterSpacing: "0.8px",
                 }}>
@@ -751,12 +665,12 @@ export default function Landing({ onEnterApp, onEnterScenario }) {
               <div style={{ padding: "20px 22px" }}>
                 <div style={{
                   fontSize: 12,
-                  color: "#2E4A5C",
+                  color: "var(--ce-text-light-sec)",
                   fontStyle: "italic",
                   marginBottom: 16,
                   padding: "10px 13px",
                   background: "rgba(255,255,255,0.02)",
-                  border: `1px solid ${C.border}`,
+                  border: `1px solid var(--ce-line-dark)`,
                   borderRadius: 8,
                   lineHeight: 1.6,
                 }}>
@@ -765,24 +679,24 @@ export default function Landing({ onEnterApp, onEnterScenario }) {
 
                 <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 14 }}>
                   <span style={{
-                    fontFamily: "'IBM Plex Mono', monospace",
+                    fontFamily: "var(--ce-font-mono)",
                     fontSize: 9,
                     fontWeight: 700,
-                    color: "#86efac",
-                    background: "rgba(134,239,172,0.08)",
-                    border: "1px solid rgba(134,239,172,0.2)",
+                    color: "var(--ce-urgency-low-dark)",
+                    background: "var(--ce-urgency-low-bg)",
+                    border: "1px solid var(--ce-urgency-low-line)",
                     padding: "3px 9px",
-                    borderRadius: 5,
+                    borderRadius: "var(--ce-r-sm)",
                     textTransform: "uppercase",
                     letterSpacing: "0.5px",
                   }}>Urgency: LOW</span>
                 </div>
 
                 <div style={{ display: "flex", flexDirection: "column", gap: 7 }}>
-                  <MockCard label="Direct Answer" accent={C.accent} bg="rgba(0,194,209,0.05)" border="rgba(0,194,209,0.15)">
+                  <MockCard label="Direct Answer" accent="var(--ce-teal-deep)" bg="transparent">
                     Yes — furosemide lowers potassium. It's a loop diuretic that increases urinary K⁺ loss.
                   </MockCard>
-                  <MockCard label="What to watch" accent="#1FBF75" bg="rgba(31,191,117,0.05)" border="rgba(31,191,117,0.15)">
+                  <MockCard label="What to watch" accent="var(--ce-gold-deep)" bg="rgba(212,168,75,0.06)">
                     Signs of hypokalemia — weakness, cramps, arrhythmias. Lab trends and cardiac status are worth following, with management guided by provider assessment.
                   </MockCard>
                 </div>
@@ -790,9 +704,9 @@ export default function Landing({ onEnterApp, onEnterScenario }) {
 
               <div style={{
                 padding: "12px 22px",
-                borderTop: `1px solid ${C.border}`,
+                borderTop: `1px solid var(--ce-line-dark)`,
                 fontSize: 11,
-                color: C.muted,
+                color: "var(--ce-text-dim)",
               }}>
                 Fast, accurate answers for bedside knowledge gaps
               </div>
@@ -802,28 +716,28 @@ export default function Landing({ onEnterApp, onEnterScenario }) {
           {/* ── Card 3: NCLEX ── */}
           <Fade delay={180}>
             <div style={{
-              background: C.card,
+              background: "var(--ce-navy-700)",
               border: `1px solid rgba(255,255,255,0.07)`,
-              borderRadius: 16,
+              borderRadius: "var(--ce-r-lg)",
               overflow: "hidden",
             }}>
               <div style={{
                 padding: "14px 20px",
-                borderBottom: `1px solid ${C.border}`,
+                borderBottom: `1px solid var(--ce-line-dark)`,
                 display: "flex",
                 alignItems: "center",
                 gap: 8,
                 background: "rgba(255,255,255,0.02)",
               }}>
                 <span style={{
-                  fontFamily: "'IBM Plex Mono', monospace",
+                  fontFamily: "var(--ce-font-mono)",
                   fontSize: 9,
                   fontWeight: 700,
-                  color: "#c084fc",
-                  background: "rgba(192,132,252,0.08)",
-                  border: "1px solid rgba(192,132,252,0.2)",
+                  color: "var(--ce-teal)",
+                  background: "rgba(10,191,188,0.10)",
+                  border: "1px solid rgba(10,191,188,0.22)",
                   padding: "3px 9px",
-                  borderRadius: 5,
+                  borderRadius: "var(--ce-r-sm)",
                   textTransform: "uppercase",
                   letterSpacing: "0.8px",
                 }}>
@@ -834,12 +748,12 @@ export default function Landing({ onEnterApp, onEnterScenario }) {
               <div style={{ padding: "20px 22px" }}>
                 <div style={{
                   fontSize: 12,
-                  color: "#2E4A5C",
+                  color: "var(--ce-text-light-sec)",
                   fontStyle: "italic",
                   marginBottom: 16,
                   padding: "10px 13px",
                   background: "rgba(255,255,255,0.02)",
-                  border: `1px solid ${C.border}`,
+                  border: `1px solid var(--ce-line-dark)`,
                   borderRadius: 8,
                   lineHeight: 1.6,
                 }}>
@@ -848,24 +762,24 @@ export default function Landing({ onEnterApp, onEnterScenario }) {
 
                 <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 14 }}>
                   <span style={{
-                    fontFamily: "'IBM Plex Mono', monospace",
+                    fontFamily: "var(--ce-font-mono)",
                     fontSize: 9,
                     fontWeight: 700,
-                    color: "#86efac",
-                    background: "rgba(134,239,172,0.08)",
-                    border: "1px solid rgba(134,239,172,0.2)",
+                    color: "var(--ce-urgency-low-dark)",
+                    background: "var(--ce-urgency-low-bg)",
+                    border: "1px solid var(--ce-urgency-low-line)",
                     padding: "3px 9px",
-                    borderRadius: 5,
+                    borderRadius: "var(--ce-r-sm)",
                     textTransform: "uppercase",
                     letterSpacing: "0.5px",
                   }}>Urgency: LOW</span>
                 </div>
 
                 <div style={{ display: "flex", flexDirection: "column", gap: 7 }}>
-                  <MockCard label="What this suggests" accent="#c084fc" bg="rgba(192,132,252,0.05)" border="rgba(192,132,252,0.15)">
+                  <MockCard label="What this suggests" accent="var(--ce-teal-deep)" bg="transparent">
                     B — Calcium gluconate stabilizes the myocardium first. Peaked T waves point toward cardiac instability risk — membrane protection typically comes before K⁺ lowering.
                   </MockCard>
-                  <MockCard label="Clinical context" accent="#4da3ff" bg="rgba(77,163,255,0.05)" border="rgba(77,163,255,0.15)">
+                  <MockCard label="Clinical context" accent="var(--ce-teal-deep)" bg="transparent">
                     A/C/D address the potassium level but act more slowly — when EKG changes are present, cardiac membrane stabilization tends to be the earlier priority.
                   </MockCard>
                 </div>
@@ -873,9 +787,9 @@ export default function Landing({ onEnterApp, onEnterScenario }) {
 
               <div style={{
                 padding: "12px 22px",
-                borderTop: `1px solid ${C.border}`,
+                borderTop: `1px solid var(--ce-line-dark)`,
                 fontSize: 11,
-                color: C.muted,
+                color: "var(--ce-text-dim)",
               }}>
                 Builds clinical reasoning and pattern recognition
               </div>
@@ -885,28 +799,28 @@ export default function Landing({ onEnterApp, onEnterScenario }) {
           {/* ── Card 4: Escalation / What I'd Do Right Now ── */}
           <Fade delay={240}>
             <div style={{
-              background: C.card,
+              background: "var(--ce-navy-700)",
               border: `1px solid rgba(255,255,255,0.07)`,
-              borderRadius: 16,
+              borderRadius: "var(--ce-r-lg)",
               overflow: "hidden",
             }}>
               <div style={{
                 padding: "14px 20px",
-                borderBottom: `1px solid ${C.border}`,
+                borderBottom: `1px solid var(--ce-line-dark)`,
                 display: "flex",
                 alignItems: "center",
                 gap: 8,
                 background: "rgba(255,255,255,0.02)",
               }}>
                 <span style={{
-                  fontFamily: "'IBM Plex Mono', monospace",
+                  fontFamily: "var(--ce-font-mono)",
                   fontSize: 9,
                   fontWeight: 700,
-                  color: "#fb923c",
-                  background: "rgba(251,146,60,0.08)",
-                  border: "1px solid rgba(251,146,60,0.2)",
+                  color: "var(--ce-teal)",
+                  background: "rgba(10,191,188,0.10)",
+                  border: "1px solid rgba(10,191,188,0.22)",
                   padding: "3px 9px",
-                  borderRadius: 5,
+                  borderRadius: "var(--ce-r-sm)",
                   textTransform: "uppercase",
                   letterSpacing: "0.8px",
                 }}>
@@ -917,12 +831,12 @@ export default function Landing({ onEnterApp, onEnterScenario }) {
               <div style={{ padding: "20px 22px" }}>
                 <div style={{
                   fontSize: 12,
-                  color: "#2E4A5C",
+                  color: "var(--ce-text-light-sec)",
                   fontStyle: "italic",
                   marginBottom: 16,
                   padding: "10px 13px",
                   background: "rgba(255,255,255,0.02)",
-                  border: `1px solid ${C.border}`,
+                  border: `1px solid var(--ce-line-dark)`,
                   borderRadius: 8,
                   lineHeight: 1.6,
                 }}>
@@ -931,24 +845,24 @@ export default function Landing({ onEnterApp, onEnterScenario }) {
 
                 <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 14 }}>
                   <span style={{
-                    fontFamily: "'IBM Plex Mono', monospace",
+                    fontFamily: "var(--ce-font-mono)",
                     fontSize: 9,
                     fontWeight: 700,
-                    color: "#fca5a5",
-                    background: "rgba(239,68,68,0.1)",
-                    border: "1px solid rgba(239,68,68,0.25)",
+                    color: "var(--ce-urgency-high-dark)",
+                    background: "var(--ce-urgency-high-bg)",
+                    border: "1px solid var(--ce-urgency-high-line)",
                     padding: "3px 9px",
-                    borderRadius: 5,
+                    borderRadius: "var(--ce-r-sm)",
                     textTransform: "uppercase",
                     letterSpacing: "0.5px",
                   }}>Urgency: HIGH</span>
                 </div>
 
                 <div style={{ display: "flex", flexDirection: "column", gap: 7 }}>
-                  <MockCard label="Possible concerns" accent="#fb923c" bg="rgba(251,146,60,0.05)" border="rgba(251,146,60,0.15)">
+                  <MockCard label="Possible concerns" accent="var(--ce-gold-deep)" bg="rgba(212,168,75,0.06)">
                     Anxious presentation with tachypnea and dropping O₂ sats together point toward a respiratory picture that tends to move quickly.
                   </MockCard>
-                  <MockCard label="What to consider next" accent="#e05572" bg="rgba(224,85,114,0.05)" border="rgba(224,85,114,0.15)">
+                  <MockCard label="What to consider next" accent="var(--ce-teal-deep)" bg="transparent">
                     Oxygen support, lung sound assessment, and keeping the provider aware tend to be early priorities in this kind of picture.
                   </MockCard>
                 </div>
@@ -956,9 +870,9 @@ export default function Landing({ onEnterApp, onEnterScenario }) {
 
               <div style={{
                 padding: "12px 22px",
-                borderTop: `1px solid ${C.border}`,
+                borderTop: `1px solid var(--ce-line-dark)`,
                 fontSize: 11,
-                color: C.muted,
+                color: "var(--ce-text-dim)",
               }}>
                 Helps organize thinking when uncertainty is highest
               </div>
@@ -976,37 +890,24 @@ export default function Landing({ onEnterApp, onEnterScenario }) {
       }}>
         <Fade>
           <div style={{
-            background: "rgba(0,194,209,0.04)",
-            border: `1px solid rgba(0,194,209,0.22)`,
-            borderLeft: `4px solid ${C.accent}`,
-            borderRadius: 16,
+            background: "rgba(10,191,188,0.04)",
+            border: "1px solid rgba(10,191,188,0.22)",
+            borderLeft: "4px solid var(--ce-teal)",
+            borderRadius: "var(--ce-r-lg)",
             padding: "52px clamp(28px, 5vw, 64px)",
-            position: "relative",
-            overflow: "hidden",
           }}>
-            {/* Corner glow */}
-            <div style={{
-              position: "absolute",
-              top: -50,
-              right: -50,
-              width: 240,
-              height: 240,
-              background: "radial-gradient(circle, rgba(0,194,209,0.06) 0%, transparent 65%)",
-              pointerEvents: "none",
-            }} />
-
-            <div style={{ position: "relative" }}>
+            <div>
               <Label>Designed with Clinical Guardrails</Label>
               <h2 style={{
                 fontSize: "clamp(22px, 3vw, 36px)",
                 fontWeight: 800,
-                color: C.textPrimary,
+                color: "var(--ce-text-light)",
                 letterSpacing: "-1px",
                 lineHeight: 1.15,
                 margin: "0 0 32px",
                 maxWidth: 520,
               }}>
-                Designed with clinical guardrails — not generic AI.
+                Built around clinical guardrails.
               </h2>
 
               <div style={{ display: "flex", flexDirection: "column", gap: 18 }}>
@@ -1018,7 +919,7 @@ export default function Landing({ onEnterApp, onEnterScenario }) {
                 ].map((point) => (
                   <div key={point} style={{ display: "flex", alignItems: "flex-start", gap: 14 }}>
                     <Check />
-                    <span style={{ fontSize: 15, color: C.textSecondary, lineHeight: 1.65 }}>
+                    <span style={{ fontSize: 15, color: "var(--ce-text-light-body)", lineHeight: 1.65 }}>
                       {point}
                     </span>
                   </div>
@@ -1029,26 +930,26 @@ export default function Landing({ onEnterApp, onEnterScenario }) {
         </Fade>
       </section>
 
-      {/* ══ WHY DIFFERENT (CONSOLIDATED) ════════════════════════════════════════ */}
+      {/* ══ HOW IT'S BUILT (the one surviving 3-card grid — §5.8) ═════════════════ */}
       <section style={{
         padding: "84px clamp(20px, 6vw, 80px)",
         maxWidth: 960,
         margin: "0 auto",
       }}>
         <Fade style={{ textAlign: "center", marginBottom: 52 }}>
-          <Label>This isn't another AI chatbot.</Label>
+          <Label>How It's Built</Label>
           <SectionHeading maxWidth={560} style={{ margin: "0 auto 20px" }}>
-            Not another AI tool telling you what to do.
+            Built around how nurses actually reason.
           </SectionHeading>
           <p style={{
             fontSize: "clamp(15px, 1.8vw, 17px)",
             fontWeight: 400,
-            color: C.textSecondary,
+            color: "var(--ce-text-light-body)",
             lineHeight: 1.72,
             margin: "20px auto 0",
             maxWidth: 520,
           }}>
-            Most tools give generic answers. Clinical Edge Copilot helps you break down what's actually happening — step by step, like an experienced nurse would.
+            Clinical Edge Copilot breaks down what's actually happening, step by step, the way an experienced nurse would.
           </p>
         </Fade>
 
@@ -1060,7 +961,7 @@ export default function Landing({ onEnterApp, onEnterScenario }) {
           {[
             {
               title: "Thinks like a nurse",
-              body: "Every response follows real clinical reasoning — not textbook explanations or AI-generated fluff.",
+              body: "Every response follows real clinical reasoning — the same pattern-recognition an experienced nurse uses at the bedside.",
             },
             {
               title: "Shows what matters",
@@ -1073,26 +974,26 @@ export default function Landing({ onEnterApp, onEnterScenario }) {
           ].map((card, i) => (
             <Fade key={card.title} delay={i * 80}>
               <div style={{
-                background: C.card,
-                border: `1px solid ${C.border}`,
-                borderTop: `2px solid ${C.accent}`,
-                borderRadius: 14,
+                background: "var(--ce-navy-700)",
+                border: "1px solid var(--ce-line-navy)",
+                borderLeft: "3px solid var(--ce-teal)",
+                borderRadius: "var(--ce-r-md)",
                 padding: "32px 28px",
-                boxShadow: "0 8px 32px rgba(0,0,0,0.22)",
+                boxShadow: "var(--ce-shadow-card)",
                 height: "100%",
                 boxSizing: "border-box",
               }}>
                 <div style={{
                   fontSize: 16,
                   fontWeight: 700,
-                  color: C.textPrimary,
+                  color: "var(--ce-text-light)",
                   letterSpacing: "-0.3px",
                   lineHeight: 1.35,
                   marginBottom: 12,
                 }}>
                   {card.title}
                 </div>
-                <div style={{ fontSize: 14, color: C.textSecondary, lineHeight: 1.72 }}>
+                <div style={{ fontSize: 14, color: "var(--ce-text-light-body)", lineHeight: 1.72 }}>
                   {card.body}
                 </div>
               </div>
@@ -1115,7 +1016,7 @@ export default function Landing({ onEnterApp, onEnterScenario }) {
           <p style={{
             fontSize: "clamp(15px, 1.8vw, 17px)",
             fontWeight: 400,
-            color: C.textSecondary,
+            color: "var(--ce-text-light-body)",
             lineHeight: 1.72,
             margin: "16px 0 0",
             maxWidth: 460,
@@ -1127,29 +1028,27 @@ export default function Landing({ onEnterApp, onEnterScenario }) {
         <Fade delay={80}>
           <div className="l-flow">
             {[
-              { step: "01", label: "Recognizes the pattern",  body: "Identifies what's clinically concerning",    accent: C.accent,   accentRgb: "0,194,209"   },
-              { step: "02", label: "Prioritizes risk",       body: "Surfaces urgency and red flags first",        accent: "#4da3ff",  accentRgb: "77,163,255"  },
-              { step: "03", label: "Guides assessment",      body: "Shows what to check and why",                 accent: "#F2B94B",  accentRgb: "242,185,75"  },
-              { step: "04", label: "Clarifies what matters next", body: "What to consider, what to watch, and when provider awareness may be helpful", accent: "#1FBF75",  accentRgb: "31,191,117"  },
+              { step: "01", label: "Recognizes the pattern",  body: "Identifies what's clinically concerning" },
+              { step: "02", label: "Prioritizes risk",       body: "Surfaces urgency and red flags first" },
+              { step: "03", label: "Guides assessment",      body: "Shows what to check and why" },
+              { step: "04", label: "Clarifies what matters next", body: "What to consider, what to watch, and when provider awareness may be helpful" },
             ].map((item, i) => (
               <>
                 {i > 0 && (
                   <div key={`arrow-${i}`} className="l-flow-arrow">›</div>
                 )}
                 <div key={item.step} className="l-flow-step" style={{
-                  borderTop: `3px solid ${item.accent}`,
-                  background: C.card,
-                  borderRadius: 12,
+                  background: "var(--ce-navy-700)",
+                  borderRadius: "var(--ce-r-md)",
                   padding: "24px 22px",
-                  border: `1px solid ${C.border}`,
-                  borderTopColor: item.accent,
-                  borderTopWidth: 3,
+                  border: "1px solid var(--ce-line-navy)",
+                  borderLeft: "3px solid var(--ce-teal)",
                 }}>
                   <div style={{
-                    fontFamily: "'IBM Plex Mono', monospace",
+                    fontFamily: "var(--ce-font-mono)",
                     fontSize: 9,
                     fontWeight: 700,
-                    color: item.accent,
+                    color: "var(--ce-teal)",
                     letterSpacing: "0.8px",
                     textTransform: "uppercase",
                     marginBottom: 12,
@@ -1160,7 +1059,7 @@ export default function Landing({ onEnterApp, onEnterScenario }) {
                   <div style={{
                     fontSize: 15,
                     fontWeight: 700,
-                    color: C.textPrimary,
+                    color: "var(--ce-text-light)",
                     letterSpacing: "-0.3px",
                     lineHeight: 1.3,
                     marginBottom: 8,
@@ -1169,7 +1068,7 @@ export default function Landing({ onEnterApp, onEnterScenario }) {
                   </div>
                   <div style={{
                     fontSize: 13,
-                    color: C.textSecondary,
+                    color: "var(--ce-text-light-body)",
                     lineHeight: 1.65,
                   }}>
                     {item.body}
@@ -1181,34 +1080,30 @@ export default function Landing({ onEnterApp, onEnterScenario }) {
         </Fade>
       </section>
 
-      {/* ══ REAL SHIFT MOMENTS ═══════════════════════════════════════════════════ */}
+      {/* ══ REAL SHIFT MOMENTS — editorial list, not a card grid (§5.8) ═══════════ */}
       <section style={{
         padding: "84px clamp(20px, 6vw, 80px)",
-        maxWidth: 960,
+        maxWidth: 760,
         margin: "0 auto",
       }}>
-        <Fade style={{ textAlign: "center", marginBottom: 52 }}>
+        <Fade style={{ marginBottom: 44 }}>
           <Label>Real Shift Moments</Label>
-          <SectionHeading maxWidth={480} style={{ margin: "0 auto 20px" }}>
+          <SectionHeading maxWidth={480}>
             The moment something feels off.
           </SectionHeading>
           <p style={{
             fontSize: "clamp(15px, 1.8vw, 17px)",
             fontWeight: 400,
-            color: C.textSecondary,
+            color: "var(--ce-text-light-body)",
             lineHeight: 1.72,
-            margin: "20px auto 0",
+            margin: "20px 0 0",
             maxWidth: 480,
           }}>
-            Vitals are changing. The patient looks different. You know you need to think clearly — fast.
+            Vitals are changing. The patient looks different. You need to think clearly — fast.
           </p>
         </Fade>
 
-        <div style={{
-          display: "grid",
-          gridTemplateColumns: "repeat(auto-fit, minmax(268px, 1fr))",
-          gap: 16,
-        }}>
+        <div style={{ display: "flex", flexDirection: "column" }}>
           {[
             {
               n: "01",
@@ -1225,45 +1120,39 @@ export default function Landing({ onEnterApp, onEnterScenario }) {
               title: "You're not looking for more noise.",
               body: "You need help sorting what's urgent, what to assess, and when to escalate.",
             },
-          ].map((card, i) => (
-            <Fade key={card.n} delay={i * 80}>
+          ].map((item, i) => (
+            <Fade key={item.n} delay={i * 60}>
               <div style={{
-                background: C.card,
-                border: `1px solid ${C.border}`,
-                borderTop: `2px solid ${C.accent}`,
-                borderRadius: 14,
-                padding: "32px 30px",
-                boxShadow: "0 8px 32px rgba(0,0,0,0.22)",
-                height: "100%",
-                boxSizing: "border-box",
+                display: "flex",
+                gap: 20,
+                padding: "24px 0",
+                borderTop: i === 0 ? "none" : "1px solid var(--ce-line-dark)",
               }}>
                 <div style={{
-                  fontFamily: "'IBM Plex Mono', monospace",
-                  fontSize: 10,
-                  fontWeight: 600,
-                  color: C.accent,
-                  opacity: 0.55,
-                  letterSpacing: "0.5px",
-                  marginBottom: 20,
-                }}>
-                  {card.n}
-                </div>
-                <div style={{
-                  fontSize: 16,
+                  fontFamily: "var(--ce-font-mono)",
+                  fontSize: 11,
                   fontWeight: 700,
-                  color: C.textPrimary,
-                  letterSpacing: "-0.3px",
-                  lineHeight: 1.35,
-                  marginBottom: 14,
+                  color: "var(--ce-teal)",
+                  letterSpacing: "0.3px",
+                  flexShrink: 0,
+                  paddingTop: 2,
                 }}>
-                  {card.title}
+                  {item.n}
                 </div>
-                <div style={{
-                  fontSize: 14,
-                  color: C.textSecondary,
-                  lineHeight: 1.72,
-                }}>
-                  {card.body}
+                <div>
+                  <div style={{
+                    fontSize: 16,
+                    fontWeight: 700,
+                    color: "var(--ce-text-light)",
+                    letterSpacing: "-0.3px",
+                    lineHeight: 1.35,
+                    marginBottom: 8,
+                  }}>
+                    {item.title}
+                  </div>
+                  <div style={{ fontSize: 14, color: "var(--ce-text-light-body)", lineHeight: 1.72 }}>
+                    {item.body}
+                  </div>
                 </div>
               </div>
             </Fade>
@@ -1271,97 +1160,7 @@ export default function Landing({ onEnterApp, onEnterScenario }) {
         </div>
       </section>
 
-      {/* ══ HOW IT HELPS YOU THINK ═══════════════════════════════════════════════ */}
-      <section style={{
-        padding: "84px clamp(20px, 6vw, 80px)",
-        maxWidth: 960,
-        margin: "0 auto",
-      }}>
-        <Fade style={{ textAlign: "center", marginBottom: 52 }}>
-          <Label>It doesn't just answer — it organizes your thinking</Label>
-          <SectionHeading maxWidth={520}>
-            It doesn't just answer — it organizes your thinking.
-          </SectionHeading>
-          <p style={{
-            fontSize: "clamp(15px, 1.8vw, 17px)",
-            fontWeight: 400,
-            color: C.textSecondary,
-            lineHeight: 1.72,
-            margin: "20px auto 0",
-            maxWidth: 460,
-          }}>
-            You don't need more information in a critical moment. You need clarity.
-          </p>
-        </Fade>
-
-        <div style={{
-          display: "grid",
-          gridTemplateColumns: "repeat(auto-fit, minmax(268px, 1fr))",
-          gap: 16,
-        }}>
-          {[
-            {
-              n: "01",
-              title: "You describe what's happening.",
-              body: "Vitals, symptoms, changes — just like you'd explain it to another nurse.",
-            },
-            {
-              n: "02",
-              title: "It organizes the clinical picture.",
-              body: "Surfaces patterns, flags concerns, and highlights what actually matters.",
-            },
-            {
-              n: "03",
-              title: "You move with clarity.",
-              body: "What to assess next. What to watch. When to escalate.",
-            },
-          ].map((card, i) => (
-            <Fade key={card.n} delay={i * 80}>
-              <div style={{
-                background: C.card,
-                border: `1px solid ${C.border}`,
-                borderTop: `2px solid ${C.accent}`,
-                borderRadius: 14,
-                padding: "32px 30px",
-                boxShadow: "0 8px 32px rgba(0,0,0,0.22)",
-                height: "100%",
-                boxSizing: "border-box",
-              }}>
-                <div style={{
-                  fontFamily: "'IBM Plex Mono', monospace",
-                  fontSize: 10,
-                  fontWeight: 600,
-                  color: C.accent,
-                  opacity: 0.55,
-                  letterSpacing: "0.5px",
-                  marginBottom: 20,
-                }}>
-                  {card.n}
-                </div>
-                <div style={{
-                  fontSize: 16,
-                  fontWeight: 700,
-                  color: C.textPrimary,
-                  letterSpacing: "-0.3px",
-                  lineHeight: 1.35,
-                  marginBottom: 14,
-                }}>
-                  {card.title}
-                </div>
-                <div style={{
-                  fontSize: 14,
-                  color: C.textSecondary,
-                  lineHeight: 1.72,
-                }}>
-                  {card.body}
-                </div>
-              </div>
-            </Fade>
-          ))}
-        </div>
-      </section>
-
-      {/* ══ BUILT FOR BEDSIDE NURSING ════════════════════════════════════════════ */}
+      {/* ══ BUILT FOR BEDSIDE NURSING — numbered hairline grid (Problem-section recipe) ══ */}
       <section style={{
         padding: "84px clamp(20px, 6vw, 80px)",
         maxWidth: 960,
@@ -1369,13 +1168,13 @@ export default function Landing({ onEnterApp, onEnterScenario }) {
       }}>
         <Fade style={{ textAlign: "center", marginBottom: 52 }}>
           <Label>Built for real clinical thinking</Label>
-          <SectionHeading maxWidth={540}>
+          <SectionHeading maxWidth={540} style={{ margin: "0 auto" }}>
             Built for wherever you are in your clinical journey.
           </SectionHeading>
           <p style={{
             fontSize: "clamp(15px, 1.8vw, 17px)",
             fontWeight: 400,
-            color: C.textSecondary,
+            color: "var(--ce-text-light-body)",
             lineHeight: 1.72,
             margin: "20px auto 0",
             maxWidth: 520,
@@ -1385,9 +1184,14 @@ export default function Landing({ onEnterApp, onEnterScenario }) {
         </Fade>
 
         <div style={{
+          marginTop: 16,
           display: "grid",
           gridTemplateColumns: "repeat(auto-fit, minmax(268px, 1fr))",
-          gap: 16,
+          gap: 0,
+          background: "var(--ce-line-dark)",
+          borderRadius: "var(--ce-r-lg)",
+          overflow: "hidden",
+          border: "1px solid var(--ce-line-dark)",
         }}>
           {[
             {
@@ -1405,62 +1209,34 @@ export default function Landing({ onEnterApp, onEnterScenario }) {
               title: "For nurses thinking through situations in real time",
               body: "When things are moving fast and you need clarity — not more noise.",
             },
-          ].map((card, i) => (
-            <Fade key={card.n} delay={i * 80}>
+          ].map((item, i) => (
+            <Fade key={item.n} delay={i * 60} style={{ background: "var(--ce-navy-900)", padding: "40px 34px" }}>
               <div style={{
-                background: C.card,
-                border: `1px solid ${C.border}`,
-                borderTop: `2px solid ${C.accent}`,
-                borderRadius: 14,
-                padding: "32px 30px",
-                boxShadow: "0 8px 32px rgba(0,0,0,0.22)",
-                height: "100%",
-                boxSizing: "border-box",
+                fontFamily: "var(--ce-font-mono)",
+                fontSize: 11,
+                color: "var(--ce-teal)",
+                opacity: 0.55,
+                letterSpacing: "0.3px",
+                marginBottom: 16,
               }}>
-                <div style={{
-                  fontFamily: "'IBM Plex Mono', monospace",
-                  fontSize: 10,
-                  fontWeight: 600,
-                  color: C.accent,
-                  opacity: 0.55,
-                  letterSpacing: "0.5px",
-                  marginBottom: 20,
-                }}>
-                  {card.n}
-                </div>
-                <div style={{
-                  fontSize: 16,
-                  fontWeight: 700,
-                  color: C.textPrimary,
-                  letterSpacing: "-0.3px",
-                  lineHeight: 1.35,
-                  marginBottom: 14,
-                }}>
-                  {card.title}
-                </div>
-                <div style={{
-                  fontSize: 14,
-                  color: C.textSecondary,
-                  lineHeight: 1.72,
-                }}>
-                  {card.body}
-                </div>
+                {item.n}
+              </div>
+              <div style={{
+                fontSize: 16,
+                fontWeight: 700,
+                color: "var(--ce-text-light)",
+                letterSpacing: "-0.3px",
+                lineHeight: 1.35,
+                marginBottom: 12,
+              }}>
+                {item.title}
+              </div>
+              <div style={{ fontSize: 14, color: "var(--ce-text-light-body)", lineHeight: 1.72 }}>
+                {item.body}
               </div>
             </Fade>
           ))}
         </div>
-
-        <Fade style={{ textAlign: "center", marginTop: 48 }}>
-          <p style={{
-            fontFamily: "'IBM Plex Mono', monospace",
-            fontSize: 13,
-            fontWeight: 500,
-            color: C.muted,
-            letterSpacing: "0.2px",
-          }}>
-            No noise. No fluff. Just better thinking — at every stage.
-          </p>
-        </Fade>
       </section>
 
       {/* ══ PROBLEM ══════════════════════════════════════════════════════════════ */}
@@ -1482,10 +1258,10 @@ export default function Landing({ onEnterApp, onEnterScenario }) {
           display: "grid",
           gridTemplateColumns: "repeat(auto-fit, minmax(300px, 1fr))",
           gap: 0,
-          background: C.border,
-          borderRadius: 18,
+          background: "var(--ce-line-dark)",
+          borderRadius: "var(--ce-r-lg)",
           overflow: "hidden",
-          border: `1px solid ${C.border}`,
+          border: "1px solid var(--ce-line-dark)",
         }}>
           {[
             {
@@ -1509,11 +1285,11 @@ export default function Landing({ onEnterApp, onEnterScenario }) {
               body: "When you're tired, at the end of a shift, or dealing with an unfamiliar presentation — a structured second opinion helps anyone think more clearly.",
             },
           ].map((item, i) => (
-            <Fade key={item.n} delay={i * 60} style={{ background: C.bg, padding: "44px 40px" }}>
+            <Fade key={item.n} delay={i * 60} style={{ background: "var(--ce-navy-900)", padding: "44px 40px" }}>
               <div style={{
                 fontFamily: "'IBM Plex Mono', monospace",
                 fontSize: 11,
-                color: C.accent,
+                color: "var(--ce-teal)",
                 opacity: 0.45,
                 letterSpacing: "0.3px",
                 marginBottom: 18,
@@ -1523,14 +1299,14 @@ export default function Landing({ onEnterApp, onEnterScenario }) {
               <div style={{
                 fontSize: 16,
                 fontWeight: 700,
-                color: C.textPrimary,
+                color: "var(--ce-text-light)",
                 letterSpacing: "-0.3px",
                 lineHeight: 1.35,
                 marginBottom: 12,
               }}>
                 {item.title}
               </div>
-              <div style={{ fontSize: 14, color: C.textSecondary, lineHeight: 1.72 }}>
+              <div style={{ fontSize: 14, color: "var(--ce-text-light-body)", lineHeight: 1.72 }}>
                 {item.body}
               </div>
             </Fade>
@@ -1553,7 +1329,7 @@ export default function Landing({ onEnterApp, onEnterScenario }) {
           <p style={{
             fontSize: "clamp(14px, 1.6vw, 16px)",
             fontWeight: 500,
-            color: C.accent,
+            color: "var(--ce-teal)",
             fontFamily: "'IBM Plex Mono', monospace",
             letterSpacing: "0.2px",
             margin: "16px auto 0",
@@ -1565,25 +1341,25 @@ export default function Landing({ onEnterApp, onEnterScenario }) {
 
         <Fade delay={80}>
           <div style={{
-            background: C.card,
-            border: `1px solid rgba(255,255,255,0.09)`,
-            borderRadius: 20,
+            background: "var(--ce-navy-700)",
+            border: "1px solid var(--ce-line-navy)",
+            borderRadius: "var(--ce-r-lg)",
             overflow: "hidden",
-            boxShadow: "0 40px 100px rgba(0,0,0,0.45)",
+            boxShadow: "var(--ce-shadow-hero)",
           }}>
-            {/* Window chrome */}
+            {/* Card chrome — eyebrow + hairline, no traffic lights */}
             <div style={{
               padding: "14px 22px",
-              borderBottom: `1px solid ${C.border}`,
-              display: "flex",
-              alignItems: "center",
-              gap: 7,
-              background: "rgba(255,255,255,0.02)",
+              borderBottom: "1px solid var(--ce-line-dark)",
             }}>
-              {["rgba(255,95,87,0.8)", "rgba(255,189,46,0.8)", "rgba(39,201,63,0.8)"].map((c, i) => (
-                <div key={i} style={{ width: 11, height: 11, borderRadius: "50%", background: c }} />
-              ))}
-              <span style={{ marginLeft: 12, fontFamily: "'IBM Plex Mono', monospace", fontSize: 11, color: C.subtle }}>
+              <span style={{
+                fontFamily: "var(--ce-font-mono)",
+                fontSize: "var(--ce-fs-eyebrow)",
+                fontWeight: 700,
+                color: "var(--ce-text-dim)",
+                letterSpacing: "var(--ce-track-eyebrow)",
+                textTransform: "uppercase",
+              }}>
                 Clinical Edge Copilot — Clinical Reasoning Mode
               </span>
             </div>
@@ -1591,10 +1367,10 @@ export default function Landing({ onEnterApp, onEnterScenario }) {
             <div style={{ padding: "32px 36px" }}>
               {/* Input label */}
               <div style={{
-                fontFamily: "'IBM Plex Mono', monospace",
+                fontFamily: "var(--ce-font-mono)",
                 fontSize: 10,
                 fontWeight: 500,
-                color: C.subtle,
+                color: "var(--ce-text-dim)",
                 textTransform: "uppercase",
                 letterSpacing: "1.2px",
                 marginBottom: 12,
@@ -1605,11 +1381,11 @@ export default function Landing({ onEnterApp, onEnterScenario }) {
               {/* Scenario text */}
               <div style={{
                 background: "rgba(255,255,255,0.025)",
-                border: `1px solid rgba(0,194,209,0.18)`,
-                borderRadius: 10,
+                border: "1px solid rgba(10,191,188,0.18)",
+                borderRadius: "var(--ce-r-md)",
                 padding: "16px 18px",
                 fontSize: 14,
-                color: C.textSecondary,
+                color: "var(--ce-text-light-body)",
                 lineHeight: 1.68,
                 marginBottom: 28,
                 fontStyle: "italic",
@@ -1620,35 +1396,35 @@ export default function Landing({ onEnterApp, onEnterScenario }) {
               {/* Urgency badge row */}
               <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 22 }}>
                 <span style={{
-                  fontFamily: "'IBM Plex Mono', monospace",
+                  fontFamily: "var(--ce-font-mono)",
                   fontSize: 10,
                   fontWeight: 700,
-                  color: "#fcd34d",
-                  background: "rgba(245,158,11,0.12)",
-                  border: "1px solid rgba(245,158,11,0.32)",
+                  color: "var(--ce-urgency-mod-dark)",
+                  background: "var(--ce-urgency-mod-bg)",
+                  border: "1px solid var(--ce-urgency-mod-line)",
                   padding: "5px 12px",
-                  borderRadius: 6,
+                  borderRadius: "var(--ce-r-sm)",
                   textTransform: "uppercase",
                   letterSpacing: "0.5px",
                 }}>
                   Urgency: MODERATE
                 </span>
-                <span style={{ fontSize: 11, color: C.subtle, fontFamily: "'IBM Plex Mono', monospace" }}>·</span>
-                <span style={{ fontSize: 11, color: C.subtle, fontFamily: "'IBM Plex Mono', monospace" }}>Clinical Reasoning</span>
+                <span style={{ fontSize: 11, color: "var(--ce-text-dim)", fontFamily: "var(--ce-font-mono)" }}>·</span>
+                <span style={{ fontSize: 11, color: "var(--ce-text-dim)", fontFamily: "var(--ce-font-mono)" }}>Clinical Reasoning</span>
               </div>
 
-              {/* Sections */}
+              {/* Sections — real SECTION_CONFIG colors (teal + gold only) */}
               <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
-                <MockCard label="What this could be" accent="#e05572" bg="rgba(224,85,114,0.06)" border="rgba(224,85,114,0.16)">
+                <MockCard label="What this could be" accent="var(--ce-teal-deep)" bg="transparent">
                   Acute decompensated heart failure with progressive fluid overload — the escalating oxygen need is the signal here.
                 </MockCard>
-                <MockCard label="Possible concerns" accent="#4da3ff" bg="rgba(77,163,255,0.06)" border="rgba(77,163,255,0.16)">
+                <MockCard label="Possible concerns" accent="var(--ce-gold-deep)" bg="rgba(212,168,75,0.06)">
                   Escalating O₂ requirement + bilateral crackles + tachycardia in a CHF patient is a pattern consistent with ADHF. The 3-hour trend matters more than any single value.
                 </MockCard>
-                <MockCard label="What to assess next" accent="#1FBF75" bg="rgba(31,191,117,0.06)" border="rgba(31,191,117,0.16)">
+                <MockCard label="What to assess next" accent="var(--ce-teal-deep)" bg="transparent">
                   Work of breathing, O₂ sat trend, lung sounds, lower extremity edema, urine output, daily weight delta, and JVP. Upright positioning is typically prioritized in this picture.
                 </MockCard>
-                <MockCard label="Where this may be heading" accent="#e07a3a" bg="rgba(224,122,58,0.06)" border="rgba(224,122,58,0.16)">
+                <MockCard label="Where this may be heading" accent="var(--ce-gold-deep)" bg="rgba(212,168,75,0.06)">
                   If O₂ requirement continues rising, SpO₂ falls below 92%, respiratory rate exceeds 28, or mental status changes — these are patterns that tend to warrant provider awareness.
                 </MockCard>
               </div>
@@ -1665,40 +1441,18 @@ export default function Landing({ onEnterApp, onEnterScenario }) {
       }}>
         <Fade>
           <div style={{
-            background: C.card,
-            border: `1px solid ${C.borderAccent}`,
-            borderRadius: 20,
+            background: "var(--ce-navy-700)",
+            border: "1px solid rgba(10,191,188,0.22)",
+            borderRadius: "var(--ce-r-lg)",
             padding: "64px clamp(28px, 5vw, 72px)",
-            position: "relative",
-            overflow: "hidden",
           }}>
-            {/* Corner glow */}
-            <div style={{
-              position: "absolute",
-              top: -60,
-              right: -60,
-              width: 260,
-              height: 260,
-              background: "radial-gradient(circle, rgba(0,194,209,0.07) 0%, transparent 65%)",
-              pointerEvents: "none",
-            }} />
-            <div style={{
-              position: "absolute",
-              bottom: -40,
-              left: -40,
-              width: 200,
-              height: 200,
-              background: "radial-gradient(circle, rgba(0,194,209,0.04) 0%, transparent 70%)",
-              pointerEvents: "none",
-            }} />
-
-            <div style={{ position: "relative" }}>
+            <div>
               <Label>Grounded in real clinical frameworks</Label>
 
               <h2 style={{
                 fontSize: "clamp(24px, 3.5vw, 40px)",
                 fontWeight: 800,
-                color: C.textPrimary,
+                color: "var(--ce-text-light)",
                 letterSpacing: "-1.2px",
                 lineHeight: 1.12,
                 margin: "0 0 28px",
@@ -1706,17 +1460,17 @@ export default function Landing({ onEnterApp, onEnterScenario }) {
               }}>
                 Supporting how you think.
                 <br />
-                <span style={{ color: C.accent }}>Not replacing your judgment.</span>
+                <span style={{ color: "var(--ce-teal)" }}>Not replacing your judgment.</span>
               </h2>
 
               <p style={{
                 fontSize: 16,
-                color: C.textSecondary,
+                color: "var(--ce-text-light-body)",
                 lineHeight: 1.75,
                 margin: "0 0 40px",
                 maxWidth: 540,
               }}>
-                Responses are structured around real nursing assessment patterns and clinical reasoning — not generic AI outputs.
+                Responses are structured around real nursing assessment patterns and clinical reasoning.
               </p>
 
               <div style={{ display: "flex", flexDirection: "column", gap: 18, marginBottom: 44 }}>
@@ -1727,7 +1481,7 @@ export default function Landing({ onEnterApp, onEnterScenario }) {
                 ].map((point) => (
                   <div key={point} style={{ display: "flex", alignItems: "flex-start", gap: 14 }}>
                     <Check />
-                    <span style={{ fontSize: 15, color: C.textSecondary, lineHeight: 1.65 }}>
+                    <span style={{ fontSize: 15, color: "var(--ce-text-light-body)", lineHeight: 1.65 }}>
                       {point}
                     </span>
                   </div>
@@ -1736,10 +1490,10 @@ export default function Landing({ onEnterApp, onEnterScenario }) {
 
               <div style={{
                 paddingTop: 28,
-                borderTop: `1px solid ${C.border}`,
+                borderTop: "1px solid var(--ce-line-dark)",
                 fontSize: 15,
                 fontWeight: 600,
-                color: C.textSecondary,
+                color: "var(--ce-text-light-body)",
                 lineHeight: 1.65,
                 maxWidth: 560,
               }}>
@@ -1756,37 +1510,23 @@ export default function Landing({ onEnterApp, onEnterScenario }) {
         maxWidth: 720,
         margin: "0 auto",
         textAlign: "center",
-        position: "relative",
-        overflow: "hidden",
       }}>
-        {/* Ambient glow */}
-        <div style={{
-          position: "absolute",
-          top: "50%",
-          left: "50%",
-          transform: "translate(-50%, -50%)",
-          width: 600,
-          height: 380,
-          background: "radial-gradient(ellipse, rgba(0,194,209,0.06) 0%, transparent 65%)",
-          pointerEvents: "none",
-        }} />
-
-        <Fade style={{ position: "relative" }}>
+        <Fade>
           <Label>Start Thinking Clearly on Shift</Label>
           <h2 style={{
-            fontSize: "clamp(30px, 5vw, 54px)",
+            fontSize: "clamp(28px, 4vw, 46px)",
             fontWeight: 800,
-            color: C.textPrimary,
-            letterSpacing: "-2px",
-            lineHeight: 1.07,
+            color: "var(--ce-text-light)",
+            letterSpacing: "-1.5px",
+            lineHeight: 1.1,
             margin: "0 auto 22px",
             maxWidth: 560,
           }}>
-            Think clearer. Move faster. Feel more confident.
+            Bring clarity to the moment that matters.
           </h2>
           <p style={{
             fontSize: "clamp(15px, 1.8vw, 17px)",
-            color: C.textSecondary,
+            color: "var(--ce-text-light-body)",
             lineHeight: 1.72,
             margin: "0 auto 48px",
             maxWidth: 440,
@@ -1802,14 +1542,14 @@ export default function Landing({ onEnterApp, onEnterScenario }) {
             <button
               onClick={() => { trackEvent('landing_primary_cta_clicked', { destination: 'scenario', placement: 'closing' }); onEnterScenario(); }}
               className="l-btn-primary"
-              style={{ ...btnPrimary, fontSize: 15, padding: "14px 34px", borderRadius: 11, boxShadow: "0 6px 30px rgba(0,194,209,0.22)" }}
+              style={{ ...btnPrimary, fontSize: 15, padding: "14px 34px" }}
             >
               Try Clinical Edge Copilot
             </button>
             <button
               onClick={() => { trackEvent('landing_secondary_cta_clicked', { destination: 'copilot', placement: 'closing' }); onEnterApp(); }}
               className="l-btn-ghost"
-              style={{ ...btnGhost, fontSize: 15, padding: "14px 34px", borderRadius: 11 }}
+              style={{ ...btnGhost, fontSize: 15, padding: "14px 34px" }}
             >
               Open Copilot
             </button>
@@ -1819,7 +1559,7 @@ export default function Landing({ onEnterApp, onEnterScenario }) {
 
       {/* ══ FOOTER ═══════════════════════════════════════════════════════════════ */}
       <footer style={{
-        borderTop: `1px solid ${C.border}`,
+        borderTop: `1px solid var(--ce-line-dark)`,
         padding: "38px clamp(20px, 6vw, 80px)",
         display: "flex",
         flexDirection: "column",
@@ -1832,7 +1572,7 @@ export default function Landing({ onEnterApp, onEnterScenario }) {
           <span style={{
             fontSize: 13,
             fontWeight: 600,
-            color: C.muted,
+            color: "var(--ce-text-dim)",
             letterSpacing: "-0.1px",
           }}>
             The Clinical Edge
@@ -1841,7 +1581,7 @@ export default function Landing({ onEnterApp, onEnterScenario }) {
 
         <p style={{
           fontSize: 11,
-          color: C.subtle,
+          color: "var(--ce-text-dim)",
           lineHeight: 1.65,
           maxWidth: 520,
           margin: 0,
@@ -1852,7 +1592,7 @@ export default function Landing({ onEnterApp, onEnterScenario }) {
 
         <p style={{
           fontSize: 11,
-          color: C.subtle,
+          color: "var(--ce-text-dim)",
           margin: 0,
           fontFamily: "'IBM Plex Mono', monospace",
         }}>

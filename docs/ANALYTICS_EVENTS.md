@@ -87,6 +87,58 @@ URL changes. All custom events go through `trackEvent()` in `src/analytics.ts`.
 
 ---
 
+## Clinical Trust Layer
+
+Shared "Sources & review" disclosure used on content-module detail pages. One
+event name is reused across modules (rather than a module-prefixed variant)
+so the trust interaction stays comparable as it's extended beyond ICU Drips.
+
+| Event | When it fires | Payload |
+|-------|---------------|---------|
+| `clinical_sources_opened` | User expands the "View sources and review details" disclosure | `{ module, source_context }` |
+
+**`module` values:** `icu_drips` (currently the only module wired up; `rhythm_lab`,
+`reference_hub`, `abg_lab` planned for later phases)
+
+**`source_context` values currently in use:** `medication_detail` (ICU Drips
+medication detail page)
+
+---
+
+## Reference Hub
+
+| Event | When it fires | Payload |
+|-------|---------------|---------|
+| `reference_hub_opened` | Reference Hub module mounts | _(no payload)_ |
+| `reference_category_selected` | User selects a category filter | `{ category }` |
+| `reference_search_used` | User types into the reference search field | `{ query_length }` |
+| `reference_viewed` | A reference entry is displayed | `{ reference_id, category }` |
+| `reference_related_clicked` | User taps a related reference from a reference entry | `{ from_ref_id, to_ref_id }` |
+| `reference_pathway_opened` | User opens a clinical pathway | `{ pathway_id }` |
+| `reference_pathway_related_clicked` | User taps a reference linked from a pathway | `{ pathway_id, reference_id }` |
+| `reference_concept_opened` | User opens a concept entry | `{ concept_id }` |
+| `reference_concept_pathway_clicked` | User taps a pathway linked from a concept | `{ concept_id, pathway_id }` |
+| `reference_concept_reference_clicked` | User taps a reference linked from a concept | `{ concept_id, reference_id }` |
+
+**`query_length`:** integer character count of the search query (the query text itself is never sent)
+
+---
+
+## ABG Lab
+
+| Event | When it fires | Payload |
+|-------|---------------|---------|
+| `abg_lab_opened` | ABG Lab module mounts | _(no payload)_ |
+| `abg_interpreted` | An ABG interpretation is generated (manual entry or example) | `{ pattern, has_pao2, has_fio2 }` |
+| `abg_example_used` | User loads a preset example case | `{ example_id }` |
+| `abg_cleared` | User clears the current ABG entry | _(no payload)_ |
+
+**`pattern`:** the interpreted acid-base disorder label (e.g. `"Respiratory acidosis"`, `"Within normal limits"`) — a fixed classification result, not user-entered text
+
+**`has_pao2` / `has_fio2`:** booleans indicating whether those optional fields were filled in (values themselves are never sent)
+
+---
+
 ## Backend Persistence
 
 **Vercel Analytics only.** No custom backend analytics endpoint is used.

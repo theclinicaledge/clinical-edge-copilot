@@ -1,0 +1,169 @@
+/* ─── Clinical Trust Panel ─────────────────────────────────────────────────── */
+/* Uses shared Clinical Edge tokens (src/styles/tokens.css) directly so this
+   component renders consistently across any module surface. */
+
+.ctp-panel {
+  margin-top: 20px;
+  padding-top: 18px;
+  border-top: 1px solid var(--ce-warm-line-soft);
+}
+
+.ctp-summary {
+  margin-bottom: 10px;
+}
+.ctp-summary__label {
+  display: block;
+  font-size: var(--ce-fs-eyebrow);
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: var(--ce-track-eyebrow);
+  color: var(--ce-text-dim);
+  font-family: var(--ce-font-mono);
+  margin-bottom: 6px;
+}
+.ctp-summary__line {
+  font-size: 12.5px;
+  font-weight: 600;
+  color: var(--ce-text-dark);
+  margin: 0 0 2px;
+  line-height: 1.4;
+}
+.ctp-summary__status {
+  font-size: 11px;
+  color: var(--ce-text-muted);
+  font-family: var(--ce-font-mono);
+  margin: 0;
+  line-height: 1.5;
+}
+
+.ctp-toggle {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  width: 100%;
+  padding: 9px 12px;
+  margin-top: 4px;
+  background: none;
+  border: 1px solid var(--ce-warm-line);
+  border-radius: var(--ce-r-md);
+  color: var(--ce-teal-deep);
+  font-size: 12px;
+  font-weight: 600;
+  font-family: var(--ce-font-sans);
+  cursor: pointer;
+  text-align: left;
+  transition: background var(--ce-dur-fast) var(--ce-ease-out), border-color var(--ce-dur-fast) var(--ce-ease-out);
+}
+.ctp-toggle:hover { background: rgba(10, 191, 188, 0.06); }
+.ctp-toggle[aria-expanded="true"] { border-color: rgba(10, 191, 188, 0.35); }
+.ctp-toggle:focus-visible {
+  outline: 2px solid var(--ce-teal);
+  outline-offset: 2px;
+}
+.ctp-toggle:focus:not(:focus-visible) { outline: none; }
+
+.ctp-toggle__chevron {
+  flex-shrink: 0;
+  font-size: 13px;
+  transition: transform var(--ce-dur-base) var(--ce-ease-out);
+}
+.ctp-toggle__chevron--open { transform: rotate(90deg); }
+
+.ctp-body {
+  overflow: hidden;
+  max-height: 1400px;
+  opacity: 1;
+  padding-top: 12px;
+  transition:
+    max-height 240ms var(--ce-ease-out),
+    opacity 180ms var(--ce-ease-out),
+    padding-top 200ms var(--ce-ease-out);
+}
+.ctp-body--hidden {
+  max-height: 0;
+  opacity: 0;
+  padding-top: 0;
+}
+
+.ctp-body__explainer {
+  font-size: 12px;
+  color: var(--ce-text-muted);
+  line-height: 1.6;
+  margin: 0 0 12px;
+}
+
+.ctp-source-list {
+  list-style: none;
+  margin: 0 0 12px;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+.ctp-source {
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+  padding: 8px 10px;
+  background: var(--ce-warm-card);
+  border: 1px solid var(--ce-warm-line);
+  border-radius: var(--ce-r-sm);
+}
+.ctp-source__link {
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--ce-teal-deep);
+  text-decoration: none;
+  overflow-wrap: anywhere;
+}
+.ctp-source__link:hover,
+.ctp-source__link:focus-visible { text-decoration: underline; }
+.ctp-source__link:focus-visible {
+  outline: 2px solid var(--ce-teal);
+  outline-offset: 2px;
+  border-radius: 2px;
+}
+.ctp-source__org {
+  font-size: 10.5px;
+  color: var(--ce-text-dim);
+  font-family: var(--ce-font-mono);
+  overflow-wrap: anywhere;
+}
+.ctp-source__desc {
+  font-size: 11px;
+  color: var(--ce-text-muted);
+  line-height: 1.5;
+  margin-top: 3px;
+  overflow-wrap: anywhere;
+}
+
+.ctp-body__policy {
+  font-size: 11.5px;
+  color: var(--ce-text-muted);
+  line-height: 1.6;
+  margin: 0 0 10px;
+}
+
+.ctp-body__disclaimer {
+  font-size: 10.5px;
+  color: var(--ce-text-muted);
+  font-family: var(--ce-font-mono);
+  line-height: 1.68;
+  margin: 0;
+  padding-top: 10px;
+  border-top: 1px solid var(--ce-warm-line-soft);
+}
+
+@media (max-width: 400px) {
+  .ctp-toggle { font-size: 11.5px; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .ctp-body,
+  .ctp-body--hidden,
+  .ctp-toggle,
+  .ctp-toggle__chevron {
+    transition: none;
+  }
+}

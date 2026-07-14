@@ -1,5 +1,7 @@
 import { useState, useEffect } from 'react';
 import { trackEvent } from '../../analytics';
+import ClinicalTrustPanel from '../../components/clinical-trust/ClinicalTrustPanel.jsx';
+import { ICU_DRIPS_TRUST, getSourcesForDrip } from '../../data/clinicalSources.js';
 import './icu-drips.css';
 import {
   DRIPS, CATEGORIES, FAMILIES, FOUNDATIONS,
@@ -853,6 +855,14 @@ function DripsDetail({ drip, onBack, onNavigate }) {
           ))}
         </div>
       )}
+
+      {/* Sources & review — clinical trust layer */}
+      <ClinicalTrustPanel
+        module={ICU_DRIPS_TRUST.module}
+        context="medication_detail"
+        sources={getSourcesForDrip(drip)}
+        reviewMeta={ICU_DRIPS_TRUST}
+      />
 
       <div className="id-detail__disclaimer">{SAFETY_DISCLAIMER}</div>
     </div>

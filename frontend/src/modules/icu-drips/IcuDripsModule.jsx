@@ -12,7 +12,7 @@ import {
 // Brand palette (tags sit on the dark navy hero card): gold, soft red, info blue.
 const URGENCY_CONFIG = {
   watch:     { label: 'Watch',     color: 'var(--ce-gold)', bg: 'rgba(212,168,75,0.12)', border: 'rgba(212,168,75,0.30)' },
-  caution:   { label: 'Caution',   color: '#E96B6B', bg: 'rgba(233,107,107,0.10)', border: 'rgba(233,107,107,0.28)' },
+  caution:   { label: 'Caution',   color: 'var(--ce-urgency-high-dark)', bg: 'rgba(190,70,70,0.10)', border: 'rgba(190,70,70,0.30)' },
   reference: { label: 'Reference', color: 'var(--ce-blue)', bg: 'rgba(77,163,255,0.09)', border: 'rgba(77,163,255,0.22)' },
 };
 

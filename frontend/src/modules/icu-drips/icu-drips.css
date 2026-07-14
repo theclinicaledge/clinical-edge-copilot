@@ -23,35 +23,35 @@
 /* Applied to hero cards, drip rows, and family blocks */
 .id-hero-card--vasopressor,
 .id-drip-row--vasopressor,
-.id-family-block--vasopressor     { --id-cat-accent: #0ABFBC; }
+.id-family-block--vasopressor     { --id-cat-accent: var(--ce-cat-vasopressor); }
 
 .id-hero-card--sedation,
 .id-drip-row--sedation,
-.id-family-block--sedation        { --id-cat-accent: #4EAD8A; }
+.id-family-block--sedation        { --id-cat-accent: var(--ce-cat-sedation); }
 
 .id-hero-card--antiarrhythmic,
 .id-drip-row--antiarrhythmic,
-.id-family-block--antiarrhythmic  { --id-cat-accent: #7B7FC4; }
+.id-family-block--antiarrhythmic  { --id-cat-accent: var(--ce-cat-antiarrhythmic); }
 
 .id-hero-card--anticoagulation,
 .id-drip-row--anticoagulation,
-.id-family-block--anticoagulation { --id-cat-accent: #B07040; }
+.id-family-block--anticoagulation { --id-cat-accent: var(--ce-cat-anticoag); }
 
 .id-hero-card--inotrope,
 .id-drip-row--inotrope,
-.id-family-block--inotropes       { --id-cat-accent: #D4785A; }
+.id-family-block--inotropes       { --id-cat-accent: var(--ce-cat-inotrope); }
 
 .id-hero-card--vasodilator,
 .id-drip-row--vasodilator,
-.id-family-block--vasodilators    { --id-cat-accent: #3B9EC9; }
+.id-family-block--vasodilators    { --id-cat-accent: var(--ce-cat-vasodilator); }
 
 .id-hero-card--diuretic,
 .id-drip-row--diuretic,
-.id-family-block--diuretics       { --id-cat-accent: #5B8AB0; }
+.id-family-block--diuretics       { --id-cat-accent: var(--ce-cat-diuretic); }
 
 .id-hero-card--glycemic,
 .id-drip-row--glycemic,
-.id-family-block--glycemic        { --id-cat-accent: #C4A035; }
+.id-family-block--glycemic        { --id-cat-accent: var(--ce-cat-glycemic); }
 
 /* ── Root shell ──────────────────────────────────────────────────────────────── */
 .icu-drips-root {
@@ -484,7 +484,7 @@
 .id-compare-pair-card__name {
   font-size: 12px;
   font-weight: 600;
-  color: #BFCFDA;
+  color: var(--ce-text-light-body);
   letter-spacing: -0.015em;
   line-height: 1.2;
 }
@@ -650,7 +650,7 @@
 .id-hero-card__name {
   font-size: clamp(22px, 4.5vw, 30px);
   font-weight: 800;
-  color: #E8F0F4;
+  color: var(--ce-text-light);
   letter-spacing: -0.04em;
   line-height: 1.08;
   margin: 0 0 3px;
@@ -689,7 +689,7 @@
 
 /* ── Clinical pearl / mental model ──────────────────────────────────────────── */
 .id-pearl {
-  background: #FFF8EE;
+  background: rgba(10,191,188,0.06);
   border: 1px solid rgba(212,168,75,0.2);
   border-left: 3px solid var(--id-gold);
   border-radius: 8px;
@@ -702,7 +702,7 @@
   font-weight: 700;
   text-transform: uppercase;
   letter-spacing: 1.4px;
-  color: #9A7520;
+  color: var(--ce-gold-deep);
   font-family: var(--id-font-mono);
   margin-bottom: 6px;
 }
@@ -760,9 +760,9 @@
   transition: opacity 0.12s;
 }
 .id-ref-row__header[aria-expanded="true"] .id-ref-row__icon { opacity: 0.75; }
-.id-ref-row--watch    .id-ref-row__icon { color: #C08030; opacity: 0.75; }
-.id-ref-row--escalate .id-ref-row__icon { color: #B84040; opacity: 0.65; }
-.id-ref-row--safety   .id-ref-row__icon { color: #B07020; opacity: 0.85; }
+.id-ref-row--watch    .id-ref-row__icon { color: var(--ce-gold-deep); opacity: 0.75; }
+.id-ref-row--escalate .id-ref-row__icon { color: var(--ce-urgency-high); opacity: 0.65; }
+.id-ref-row--safety   .id-ref-row__icon { color: var(--ce-gold-deep); opacity: 0.85; }
 
 /* Label */
 .id-ref-row__label {
@@ -774,9 +774,9 @@
   font-family: var(--id-font-sans);
   line-height: 1;
 }
-.id-ref-row--watch    .id-ref-row__label { color: #7A5D1A; }
-.id-ref-row--escalate .id-ref-row__label { color: #8A3030; }
-.id-ref-row--safety   .id-ref-row__label { color: #8A6A22; }
+.id-ref-row--watch    .id-ref-row__label { color: var(--ce-gold-deep); }
+.id-ref-row--escalate .id-ref-row__label { color: var(--ce-urgency-high); }
+.id-ref-row--safety   .id-ref-row__label { color: var(--ce-gold-deep); }
 
 /* Count badge */
 .id-ref-row__count {
@@ -831,13 +831,13 @@
   margin-left: 33px;
   padding-left: 14px;
   padding-right: 14px;
-  border-left: 2px solid rgba(184,64,64,0.28);
+  border-left: 2px solid rgba(190,70,70,0.30);
 }
 .id-ref-row--safety .id-ref-row__body {
   margin-left: 33px;
   padding-left: 14px;
   padding-right: 14px;
-  border-left: 2px solid rgba(176,112,32,0.38);
+  border-left: 2px solid rgba(212,168,75,0.30);
 }
 
 /* Bullet list inside ref rows — shared across all variants */
@@ -868,7 +868,7 @@
   opacity: 0.5;
 }
 .id-ref-row--watch    .id-ref-list li::before { background: var(--id-gold); opacity: 0.55; }
-.id-ref-row--escalate .id-ref-list li::before { background: #C84444; opacity: 0.45; }
+.id-ref-row--escalate .id-ref-list li::before { background: var(--ce-urgency-high); opacity: 0.45; }
 .id-ref-row--safety   .id-ref-list li::before { background: var(--id-gold); opacity: 0.65; }
 
 /* ── Explore next ────────────────────────────────────────────────────────────── */
@@ -1285,7 +1285,7 @@
 }
 .id-hcm__col-tag--b {
   background: rgba(212,168,75,0.18);
-  color: #8A6A22;
+  color: var(--ce-gold-deep);
 }
 
 /* Drug name in column header */
@@ -1444,7 +1444,7 @@
 }
 .id-lead-finding__text {
   font-size: 13.5px;
-  color: #0B2E2E;
+  color: var(--ce-navy-700);
   line-height: 1.68;
   margin: 0;
   font-weight: 500;
@@ -1453,7 +1453,7 @@
 /* ── Per-drip Clinical Pearl (detail page, below Lead Finding) ───────────────── */
 /* Matches the gold pearl styling (.id-pearl) — the brand's pearl language. */
 .id-drip-pearl {
-  background: #FFF8EE;
+  background: rgba(10,191,188,0.06);
   border: 1px solid rgba(212,168,75,0.2);
   border-left: 3px solid var(--id-gold);
   border-radius: 8px;
@@ -1466,7 +1466,7 @@
   font-weight: 700;
   text-transform: uppercase;
   letter-spacing: 1.5px;
-  color: #9A7520;
+  color: var(--ce-gold-deep);
   font-family: var(--id-font-mono);
   margin-bottom: 5px;
 }
@@ -1569,7 +1569,7 @@
   margin-bottom: 3px;
 }
 .id-key-diff__row--pearl .id-key-diff__row-label {
-  color: #8B5CF6;
+  color: var(--ce-gold);
 }
 .id-key-diff__row-text {
   font-size: 12.5px;
@@ -1600,7 +1600,7 @@
   transition: background 0.12s, border-color 0.12s;
 }
 .id-compare-detail-toggle__btn:hover {
-  background: #F0F7F7;
+  background: rgba(10,191,188,0.06);
   border-color: var(--id-teal);
   color: var(--id-text-dark);
 }
@@ -1680,7 +1680,7 @@
   text-align: left;
   transition: background 0.12s, border-color 0.12s;
 }
-.id-pearl-home-card:hover { background: #F0F7F7; border-color: var(--id-teal); }
+.id-pearl-home-card:hover { background: rgba(10,191,188,0.06); border-color: var(--id-teal); }
 .id-pearl-home-card__eyebrow {
   display: block;
   font-size: 9px;
@@ -1876,7 +1876,7 @@
   min-height: 52px;
 }
 .id-home-action:hover {
-  background: #F0F7F7;
+  background: rgba(10,191,188,0.06);
 }
 .id-home-action--practice:hover { border-color: var(--id-teal); }
 .id-home-action--compare:hover  { border-color: var(--id-gold); }
@@ -2022,7 +2022,7 @@
 }
 .id-practice-option:hover:not(:disabled) {
   border-color: var(--id-teal);
-  background: #F0F7F7;
+  background: rgba(10,191,188,0.06);
 }
 .id-practice-option:disabled { cursor: default; }
 .id-practice-option__letter {
@@ -2040,21 +2040,21 @@
   line-height: 1.5;
 }
 .id-practice-option--correct {
-  border-color: var(--id-teal);
-  background: rgba(10,191,188,0.07);
+  border-color: var(--ce-urgency-low-line);
+  background: var(--ce-urgency-low-bg);
 }
 .id-practice-option--correct .id-practice-option__letter,
 .id-practice-option--correct .id-practice-option__text {
-  color: var(--ce-teal-deep);
+  color: var(--ce-urgency-low);
   font-weight: 600;
 }
 .id-practice-option--incorrect {
-  border-color: #D97C7C;
-  background: rgba(217,124,124,0.07);
+  border-color: var(--ce-urgency-high-line);
+  background: var(--ce-urgency-high-bg);
 }
 .id-practice-option--incorrect .id-practice-option__letter,
 .id-practice-option--incorrect .id-practice-option__text {
-  color: #b05050;
+  color: var(--ce-urgency-high);
 }
 .id-practice-option--dim {
   opacity: 0.45;
@@ -2078,8 +2078,8 @@
   font-family: var(--id-font-sans);
   margin-bottom: 8px;
 }
-.id-practice-feedback__verdict--correct { color: var(--ce-teal-deep); }
-.id-practice-feedback__verdict--incorrect { color: #b05050; }
+.id-practice-feedback__verdict--correct { color: var(--ce-urgency-low); }
+.id-practice-feedback__verdict--incorrect { color: var(--ce-urgency-high); }
 .id-practice-feedback__explanation {
   font-size: 13px;
   color: var(--id-text-mid);
@@ -2230,8 +2230,8 @@
 }
 
 /* ─── Home action — challenge accent ────────────────────────────────────────── */
-.id-home-action--challenge:hover { border-color: #8B5CF6; }
-.id-home-action--challenge .id-home-action__arrow { color: #8B5CF6; }
+.id-home-action--challenge:hover { border-color: var(--ce-gold); }
+.id-home-action--challenge .id-home-action__arrow { color: var(--ce-gold); }
 
 /* ─── Shift Challenge view ───────────────────────────────────────────────────── */
 .id-challenge {
@@ -2290,7 +2290,7 @@
 }
 .id-challenge-progress-bar__fill {
   height: 100%;
-  background: #8B5CF6;
+  background: var(--ce-gold);
   border-radius: 2px;
   transition: width 0.3s ease;
 }
@@ -2308,7 +2308,7 @@
   font-weight: 700;
   text-transform: uppercase;
   letter-spacing: 1.3px;
-  color: #8B5CF6;
+  color: var(--ce-gold);
   font-family: var(--id-font-mono);
   margin-bottom: 8px;
 }
@@ -2352,8 +2352,8 @@
   min-height: 48px;
 }
 .id-challenge-option:hover:not(:disabled) {
-  border-color: #8B5CF6;
-  background: rgba(139,92,246,0.04);
+  border-color: var(--ce-gold);
+  background: rgba(212,168,75,0.04);
 }
 .id-challenge-option:disabled { cursor: default; }
 .id-challenge-option__letter {
@@ -2371,20 +2371,20 @@
   line-height: 1.5;
 }
 .id-challenge-option--correct {
-  border-color: var(--id-teal);
-  background: rgba(10,191,188,0.07);
+  border-color: var(--ce-urgency-low-line);
+  background: var(--ce-urgency-low-bg);
 }
 .id-challenge-option--correct .id-challenge-option__letter,
 .id-challenge-option--correct .id-challenge-option__text {
-  color: var(--ce-teal-deep);
+  color: var(--ce-urgency-low);
   font-weight: 600;
 }
 .id-challenge-option--incorrect {
-  border-color: #D97C7C;
-  background: rgba(217,124,124,0.07);
+  border-color: var(--ce-urgency-high-line);
+  background: var(--ce-urgency-high-bg);
 }
 .id-challenge-option--incorrect .id-challenge-option__letter,
-.id-challenge-option--incorrect .id-challenge-option__text { color: #b05050; }
+.id-challenge-option--incorrect .id-challenge-option__text { color: var(--ce-urgency-high); }
 .id-challenge-option--dim { opacity: 0.45; }
 
 /* Feedback */
@@ -2401,8 +2401,8 @@
   font-family: var(--id-font-sans);
   margin-bottom: 8px;
 }
-.id-challenge-feedback__verdict--correct  { color: var(--ce-teal-deep); }
-.id-challenge-feedback__verdict--incorrect { color: #b05050; }
+.id-challenge-feedback__verdict--correct  { color: var(--ce-urgency-low); }
+.id-challenge-feedback__verdict--incorrect { color: var(--ce-urgency-high); }
 .id-challenge-feedback__explanation {
   font-size: 13px;
   color: var(--id-text-mid);
@@ -2465,17 +2465,17 @@
   margin-top: 8px;
 }
 .id-challenge-btn--primary {
-  background: #8B5CF6;
-  border: 1.5px solid #8B5CF6;
-  color: #fff;
+  background: var(--ce-gold);
+  border: 1.5px solid var(--ce-gold);
+  color: var(--ce-text-dark);
 }
-.id-challenge-btn--primary:hover { background: #7c4de6; border-color: #7c4de6; }
+.id-challenge-btn--primary:hover { background: var(--ce-gold-deep); border-color: var(--ce-gold-deep); color: var(--ce-warm-card); }
 .id-challenge-btn--ghost {
   background: var(--id-bg-card);
   border: 1.5px solid var(--id-border-card);
   color: var(--id-text-mid);
 }
-.id-challenge-btn--ghost:hover { border-color: #8B5CF6; color: #8B5CF6; }
+.id-challenge-btn--ghost:hover { border-color: var(--ce-gold); color: var(--ce-gold); }
 
 /* End screen */
 .id-challenge-end {
@@ -2491,7 +2491,7 @@
   font-weight: 700;
   text-transform: uppercase;
   letter-spacing: 1.4px;
-  color: #8B5CF6;
+  color: var(--ce-gold);
   font-family: var(--id-font-mono);
   margin-bottom: 10px;
 }

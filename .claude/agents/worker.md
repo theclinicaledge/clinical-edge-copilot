@@ -16,5 +16,6 @@ Hard rules, every task:
 - If a task is ambiguous or design-system.md is silent on something, stop and ask rather than guessing.
 - Do not commit. Do not push. Never force-push. Never use `git add .`, `git add -A`, or `git add --all` — stage only the files you intentionally changed.
 - Do not delete branches.
+- When you make ANY judgment call not explicitly directed by design-system.md — even a conservative or well-reasoned one — you must flag it explicitly as "JUDGMENT CALL, not spec-directed" in your report, separate from changes that follow an explicit rule. Do not characterize a judgment call as "no mapping" or "removed" without also stating that you chose the replacement.
 
 When you finish a task, report: files changed, what changed, build status, and anything you flagged instead of deciding yourself.

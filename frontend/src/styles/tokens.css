@@ -216,6 +216,59 @@
 }
 .ce-interactive-card:focus:not(:focus-visible) { outline: none; }
 
+/* ─── Accordion expand/collapse (motion-system.md §6) ──────────────────────── */
+/* Grid-rows technique: the collapsible region animates 0fr → 1fr so height
+   never has to be measured in JS. Its direct child needs overflow:hidden so
+   content doesn't peek out mid-transition. Toggle by setting data-open="true"
+   on the shared accordion root (or directly on the panel/chevron if there's
+   no shared root) — both selectors below are supported. */
+.ce-accordion-panel {
+  display: grid;
+  grid-template-rows: 0fr;
+  transition: grid-template-rows var(--ce-dur-base) var(--ce-ease-out);
+}
+.ce-accordion[data-open="true"] .ce-accordion-panel,
+.ce-accordion-panel[data-open="true"] {
+  grid-template-rows: 1fr;
+}
+.ce-accordion-panel > * {
+  overflow: hidden;
+  min-height: 0;
+}
+/* Chevron rotation hook — pair with the accordion trigger's icon */
+.ce-accordion-chevron {
+  transition: transform var(--ce-dur-base) var(--ce-ease-out);
+}
+.ce-accordion[data-open="true"] .ce-accordion-chevron,
+.ce-accordion-chevron[data-open="true"] {
+  transform: rotate(180deg);
+}
+
+/* ─── Overlay / scrim (motion-system.md §8) ─────────────────────────────────── */
+/* Scrim: flat black, no backdrop-filter. Fades in with the panel; panel itself
+   uses the existing .ce-section-enter. Exit (both scrim and panel) is the one
+   sanctioned CSS-only overlay exit: pair .ce-overlay-exit with the element's
+   entrance class and toggle data-closing="true" to fade it out in place. */
+.ce-scrim {
+  background: rgba(0, 0, 0, 0.5);
+  animation: ce-fade-in var(--ce-dur-fast) var(--ce-ease-out) both;
+}
+.ce-overlay-exit[data-closing="true"] {
+  animation: none;
+  opacity: 0;
+  transition: opacity var(--ce-dur-fast) var(--ce-ease-out);
+}
+
+/* ─── Copilot pending "breathe" (motion-system.md §6/§7 — sanctioned exemption
+   from the no-infinite-ambient-animation rule; active-request states only) ── */
+@keyframes ce-breathe {
+  0%, 100% { opacity: 0.5; }
+  50%      { opacity: 1; }
+}
+.ce-breathe {
+  animation: ce-breathe 1.6s var(--ce-ease-in-out) infinite;
+}
+
 /* ─── Reduced motion ────────────────────────────────────────────────────────── */
 @media (prefers-reduced-motion: reduce) {
   .ce-fade-in,
@@ -240,6 +293,22 @@
     transition: none;
   }
   .ce-back-link { transition: none; }
+  .ce-accordion-panel,
+  .ce-accordion-chevron {
+    transition: none;
+  }
+  .ce-scrim {
+    animation: none;
+    opacity: 1;
+  }
+  .ce-overlay-exit[data-closing="true"] {
+    animation: none;
+    transition: none;
+  }
+  .ce-breathe {
+    animation: none;
+    opacity: 1;
+  }
 }
 
 /* ─── Global reduced-motion override ───────────────────────────────────────── */

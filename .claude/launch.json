@@ -5,8 +5,15 @@
       "name": "frontend",
       "runtimeExecutable": "npm",
       "runtimeArgs": ["run", "dev"],
-      "cwd": "/Users/PieDaddy/Code/Clinical-Edge/clinical-edge-copilot/frontend",
+      "cwd": "/Users/mohamed/Code/clinical-edge-copilot-fixed/frontend",
       "port": 5173
+    },
+    {
+      "name": "backend",
+      "runtimeExecutable": "node",
+      "runtimeArgs": ["server.js"],
+      "cwd": "/Users/mohamed/Code/clinical-edge-copilot-fixed/backend",
+      "port": 3001
     }
   ]
 }

@@ -6,7 +6,7 @@
 :root {
   /* ── Surfaces — navy shell ── */
   --ce-navy-900:   #111827;                 /* page base */
-  --ce-navy-800:   #0C1E2C;                 /* hero cards */
+  --ce-navy-800:   #0C1E2C;                 /* @deprecated — do not use; hero cards */
   --ce-navy-700:   #1E2A3A;                 /* raised cards */
   --ce-navy-600:   #243040;                 /* elevated / hover */
   --ce-navy-header: rgba(11, 31, 42, 0.97); /* sticky header backdrop */
@@ -18,11 +18,14 @@
   --ce-warm-card:      #FFFDF8;
   --ce-warm-line:      #D6D0C4;
   --ce-warm-line-soft: rgba(17, 24, 39, 0.09);
+  --ce-warm-mid:       #F0EDE6;  /* mid warm surface (Rhythm Lab sidebar); same value as --ce-text-light, distinct role */
+  --ce-warm-deep:      #E8E3D8;  /* deep warm surface (Rhythm Lab wells) */
 
   /* ── Brand accents ── */
   --ce-teal:      #0ABFBC;
   --ce-teal-deep: #0A8F8D;   /* teal text on warm surfaces */
   --ce-gold:      #D4A84B;
+  --ce-gold-deep: #8A6A22;   /* single gold-on-warm; also hover for #8B5CF6/#7c4de6 migrations */
   --ce-blue:      #4da3ff;   /* informational accent */
 
   /* ── Urgency — desaturated clinical palette ── */
@@ -47,7 +50,20 @@
   --ce-text-muted:     #526174;  /* secondary on warm */
   --ce-text-dim:       #7F99A5;  /* tertiary / labels */
   --ce-text-light:     #F0EDE6;  /* headings on navy */
+  --ce-text-light-body: #A8C1CC; /* body copy on dark navy — canonical per IG template */
   --ce-text-light-sec: #94A3B8;  /* secondary on navy */
+
+  /* ── ICU Drips category accents (formalized from icu-drips.css:22–54) ── */
+  /* Eyebrow text + edge-bars only — never backgrounds, never floods, never buttons. */
+  --ce-cat-vasopressor:    #0ABFBC;
+  --ce-cat-inotrope:       #D4785A;
+  --ce-cat-sedation:       #4EAD8A;
+  --ce-cat-antiarrhythmic: #7B7FC4;
+  --ce-cat-anticoag:       #B07040;
+  --ce-cat-vasodilator:    #3B9EC9;
+  --ce-cat-diuretic:       #5B8AB0;
+  --ce-cat-glycemic:       #C4A035;
+  --ce-cat-sinus:          #4E7C70;  /* Rhythm Lab rhythm-family accent; same rules as above */
 
   /* ── Typography ── */
   --ce-font-sans: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;

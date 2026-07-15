@@ -119,7 +119,7 @@
   font-weight: 500;
   font-family: var(--ce-font-sans);
   cursor: pointer;
-  transition: all var(--ce-dur-fast);
+  transition: background-color var(--ce-dur-fast), border-color var(--ce-dur-fast), color var(--ce-dur-fast);
   white-space: nowrap;
   letter-spacing: 0.01em;
   -webkit-tap-highlight-color: transparent;
@@ -130,9 +130,13 @@
 }
 .rh-filter-btn.active {
   background: rgba(10,191,188,0.12);
-  border-color: rgba(10,191,188,0.40);
+  border-color: rgba(10,191,188,0.30);
   color: var(--ce-teal);
   font-weight: 600;
+}
+.rh-filter-btn:focus-visible {
+  outline: 2px solid var(--ce-teal);
+  outline-offset: 2px;
 }
 .rh-filter-btn:active { transform: scale(0.97); transition-duration: 60ms; }
 
@@ -150,13 +154,17 @@
   -webkit-tap-highlight-color: transparent;
 }
 .rh-ref-card:hover {
-  border-color: rgba(10,191,188,0.28);
+  border-color: rgba(10,191,188,0.30);
   box-shadow: var(--ce-shadow-float);
   transform: translateY(-1px);
 }
 .rh-ref-card:active {
   transform: translateY(0) scale(0.998);
   transition-duration: 60ms;
+}
+.rh-ref-card:focus-visible {
+  outline: 2px solid var(--ce-teal);
+  outline-offset: 2px;
 }
 
 .rh-ref-cat {
@@ -211,21 +219,24 @@
   cursor: pointer;
   white-space: nowrap;
   font-family: var(--ce-font-sans);
-  transition: all var(--ce-dur-fast);
+  transition: border-color var(--ce-dur-fast), color var(--ce-dur-fast);
   -webkit-tap-highlight-color: transparent;
 }
 .rh-recent-chip:hover {
-  border-color: rgba(10,191,188,0.25);
+  border-color: rgba(10,191,188,0.22);
   color: var(--ce-text-light-sec);
 }
 .rh-recent-chip:active { transform: scale(0.97); transition-duration: 60ms; }
+.rh-recent-chip:focus-visible {
+  outline: 2px solid var(--ce-teal);
+  outline-offset: 2px;
+}
 
 /* ── Detail view ── */
 .rh-detail-page {
   background: var(--ce-warm-bg);
   min-height: 100vh;
   font-family: var(--ce-font-sans);
-  animation: ce-slide-up var(--ce-dur-slow) var(--ce-ease-out) both;
 }
 
 .rh-detail-field {
@@ -248,7 +259,7 @@
 .rh-detail-field-body {
   font-size: 14px;
   line-height: 1.75;
-  color: #2E3B4A;
+  color: var(--ce-text-mid);
 }
 
 /* ── Empty state ── */
@@ -290,7 +301,7 @@
 .rh-nurses-notice-item {
   font-size: 13.5px;
   line-height: 1.65;
-  color: #2E3B4A;
+  color: var(--ce-text-mid);
   padding-left: 18px;
   position: relative;
 }
@@ -310,7 +321,7 @@
 .rh-common-mistake {
   background: rgba(212,168,75,0.06);
   border: 1px solid rgba(212,168,75,0.22);
-  border-left: 3px solid rgba(212,168,75,0.55);
+  border-left: 3px solid rgba(212,168,75,0.30);
   border-radius: var(--ce-r-md);
   padding: 18px 20px;
   margin-bottom: 10px;
@@ -318,7 +329,7 @@
 .rh-common-mistake-body {
   font-size: 13.5px;
   line-height: 1.7;
-  color: #5A3D08;
+  color: var(--ce-gold-deep);
 }
 
 /* ── Related refs ── */
@@ -342,17 +353,21 @@
   align-items: flex-start;
   gap: 1px;
   text-align: left;
-  transition: all var(--ce-dur-fast);
+  transition: border-color var(--ce-dur-fast), color var(--ce-dur-fast), background-color var(--ce-dur-fast);
   -webkit-tap-highlight-color: transparent;
 }
 .rh-related-chip:hover {
-  border-color: rgba(10,191,188,0.35);
+  border-color: rgba(10,191,188,0.30);
   color: var(--ce-text-light);
-  background: rgba(10,191,188,0.07);
+  background: rgba(10,191,188,0.06);
 }
 .rh-related-chip:active {
   transform: scale(0.97);
   transition-duration: 60ms;
+}
+.rh-related-chip:focus-visible {
+  outline: 2px solid var(--ce-teal);
+  outline-offset: 2px;
 }
 .rh-related-chip-cat {
   font-family: var(--ce-font-mono);
@@ -399,6 +414,10 @@
 .rh-pathway-card:active {
   transform: scale(0.98);
   transition-duration: 60ms;
+}
+.rh-pathway-card:focus-visible {
+  outline: 2px solid var(--ce-teal);
+  outline-offset: 2px;
 }
 .rh-pathway-card-icon {
   font-size: 15px;
@@ -449,7 +468,6 @@
   background: var(--ce-warm-bg);
   min-height: 100vh;
   font-family: var(--ce-font-sans);
-  animation: ce-slide-up var(--ce-dur-slow) var(--ce-ease-out) both;
 }
 .rh-pathway-section {
   background: var(--ce-warm-card);
@@ -498,13 +516,17 @@
   -webkit-tap-highlight-color: transparent;
 }
 .rh-connected-chip:hover {
-  border-color: rgba(10,191,188,0.35);
+  border-color: rgba(10,191,188,0.30);
   box-shadow: 0 2px 8px rgba(0,0,0,0.06);
   transform: translateY(-1px);
 }
 .rh-connected-chip:active {
   transform: scale(0.98);
   transition-duration: 60ms;
+}
+.rh-connected-chip:focus-visible {
+  outline: 2px solid var(--ce-teal);
+  outline-offset: 2px;
 }
 .rh-connected-chip__category {
   font-family: var(--ce-font-mono);
@@ -556,7 +578,7 @@
 .rh-concept-map__node {
   display: inline-block;
   background: rgba(10,191,188,0.08);
-  border: 1px solid rgba(10,191,188,0.25);
+  border: 1px solid rgba(10,191,188,0.22);
   border-radius: var(--ce-r-sm);
   padding: 5px 10px;
   font-size: 11.5px;
@@ -619,6 +641,10 @@
   transform: scale(0.99);
   transition-duration: 60ms;
 }
+.rh-concept-card:focus-visible {
+  outline: 2px solid var(--ce-teal);
+  outline-offset: 2px;
+}
 .rh-concept-card__accent {
   font-size: 13px;
   color: var(--ce-gold);
@@ -675,7 +701,6 @@
   background: var(--ce-warm-bg);
   min-height: 100vh;
   font-family: var(--ce-font-sans);
-  animation: ce-slide-up var(--ce-dur-slow) var(--ce-ease-out) both;
 }
 .rh-concept-section {
   background: var(--ce-warm-card);
@@ -695,7 +720,7 @@
 .rh-concept-pathway-chip {
   background: var(--ce-warm-card);
   border: 1px solid var(--ce-warm-line);
-  border-left: 3px solid rgba(10,191,188,0.45);
+  border-left: 3px solid rgba(10,191,188,0.30);
   border-radius: var(--ce-r-md);
   padding: 11px 14px;
   cursor: pointer;
@@ -718,6 +743,10 @@
 .rh-concept-pathway-chip:active {
   transform: scale(0.99);
   transition-duration: 60ms;
+}
+.rh-concept-pathway-chip:focus-visible {
+  outline: 2px solid var(--ce-teal);
+  outline-offset: 2px;
 }
 .rh-concept-pathway-chip__icon {
   font-size: 14px;
@@ -761,13 +790,17 @@
   -webkit-tap-highlight-color: transparent;
 }
 .rh-concept-ref-chip:hover {
-  border-color: rgba(10,191,188,0.35);
+  border-color: rgba(10,191,188,0.30);
   box-shadow: 0 2px 8px rgba(0,0,0,0.06);
   transform: translateY(-1px);
 }
 .rh-concept-ref-chip:active {
   transform: scale(0.98);
   transition-duration: 60ms;
+}
+.rh-concept-ref-chip:focus-visible {
+  outline: 2px solid var(--ce-teal);
+  outline-offset: 2px;
 }
 .rh-concept-ref-chip__category {
   font-family: var(--ce-font-mono);

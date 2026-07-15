@@ -292,15 +292,14 @@ function Header({ onGoHome, showBack, onBack, backLabel }) {
   return (
     <div style={{
       borderBottom: '1px solid var(--ce-line-dark)',
-      boxShadow: '0 4px 20px rgba(0,0,0,0.18)',
       paddingTop: 'env(safe-area-inset-top)',
       paddingLeft: 'max(14px, env(safe-area-inset-left))',
       paddingRight: 'max(14px, env(safe-area-inset-right))',
-      background: 'linear-gradient(to bottom, rgba(255,255,255,0.025) 0%, rgba(255,255,255,0) 100%), rgba(11,31,42,0.97)',
+      background: 'var(--ce-navy-header)',
       backdropFilter: 'blur(20px)',
       position: 'sticky',
       top: 0,
-      zIndex: 50,
+      zIndex: 10,
     }}>
       <div style={{
         maxWidth: 800, margin: '0 auto', width: '100%',
@@ -309,7 +308,7 @@ function Header({ onGoHome, showBack, onBack, backLabel }) {
       }}>
         <CELogo />
         <div style={{ display: 'flex', flexDirection: 'column', gap: 1 }}>
-          <span style={{ fontSize: 15, fontWeight: 700, color: '#F8FBFC', letterSpacing: '-0.3px', lineHeight: 1.15 }}>
+          <span style={{ fontSize: 15, fontWeight: 700, color: 'var(--ce-text-light)', letterSpacing: '-0.3px', lineHeight: 1.15 }}>
             Clinical Edge
           </span>
           <span style={{
@@ -397,7 +396,7 @@ function PathwayDetailView({ pathway, onBack, onSelectRef, backLabel }) {
   }, [pathway.id, onSelectRef]);
 
   return (
-    <div className="rh-pathway-detail">
+    <div className="rh-pathway-detail ce-page-enter">
       <Header showBack onBack={onBack} backLabel={backLabel || 'All pathways'} />
 
       <div style={{ maxWidth: 800, margin: '0 auto', padding: '32px 20px 60px' }}>
@@ -445,7 +444,7 @@ function PathwayDetailView({ pathway, onBack, onSelectRef, backLabel }) {
 
         {/* Look at */}
         <div className="rh-pathway-section" style={{ borderLeft: '3px solid var(--ce-gold)' }}>
-          <div className="rh-detail-field-label" style={{ color: '#9A7020', marginBottom: 10 }}>
+          <div className="rh-detail-field-label" style={{ color: 'var(--ce-gold-deep)', marginBottom: 10 }}>
             Look at
           </div>
           <div style={{ display: 'flex', flexWrap: 'wrap', gap: 7 }}>
@@ -460,8 +459,8 @@ function PathwayDetailView({ pathway, onBack, onSelectRef, backLabel }) {
 
         {/* Common pattern */}
         <div style={{
-          background: 'rgba(212,168,75,0.07)',
-          border: '1px solid rgba(212,168,75,0.25)',
+          background: 'rgba(212,168,75,0.06)',
+          border: '1px solid rgba(212,168,75,0.22)',
           borderRadius: 'var(--ce-r-md)',
           padding: '18px 20px',
           marginBottom: 10,
@@ -471,10 +470,10 @@ function PathwayDetailView({ pathway, onBack, onSelectRef, backLabel }) {
         }}>
           <span style={{ fontSize: 18, flexShrink: 0, marginTop: 1, lineHeight: 1, color: 'var(--ce-gold)' }}>◆</span>
           <div>
-            <div className="rh-detail-field-label" style={{ color: '#9A7020', marginBottom: 7 }}>
+            <div className="rh-detail-field-label" style={{ color: 'var(--ce-gold-deep)', marginBottom: 7 }}>
               Common pattern
             </div>
-            <div style={{ fontSize: 14, lineHeight: 1.75, color: '#4A3800', fontStyle: 'italic' }}>
+            <div style={{ fontSize: 14, lineHeight: 1.75, color: 'var(--ce-gold-deep)', fontStyle: 'italic' }}>
               {pathway.commonPattern}
             </div>
           </div>
@@ -507,7 +506,7 @@ function PathwayDetailView({ pathway, onBack, onSelectRef, backLabel }) {
           paddingTop: 16,
           borderTop: '1px solid var(--ce-warm-line)',
           fontSize: 11,
-          color: '#8A9BA8',
+          color: 'var(--ce-text-dim)',
           lineHeight: 1.6,
           fontFamily: 'var(--ce-font-mono)',
           textAlign: 'center',
@@ -574,7 +573,7 @@ function ConceptDetailView({ concept, onBack, onSelectPathway, onSelectRef }) {
   }, [concept.id, onSelectRef]);
 
   return (
-    <div className="rh-concept-detail">
+    <div className="rh-concept-detail ce-page-enter">
       <Header showBack onBack={onBack} backLabel="All concepts" />
 
       <div style={{ maxWidth: 800, margin: '0 auto', padding: '32px 20px 60px' }}>
@@ -610,10 +609,10 @@ function ConceptDetailView({ concept, onBack, onSelectPathway, onSelectRef }) {
 
         {/* Big idea */}
         <div className="rh-concept-section" style={{ borderLeft: '3px solid var(--ce-gold)' }}>
-          <div className="rh-detail-field-label" style={{ color: '#9A7020', marginBottom: 9 }}>
+          <div className="rh-detail-field-label" style={{ color: 'var(--ce-gold-deep)', marginBottom: 9 }}>
             Big idea
           </div>
-          <div style={{ fontSize: 14.5, lineHeight: 1.75, color: '#2E3B4A', fontWeight: 500 }}>
+          <div style={{ fontSize: 14.5, lineHeight: 1.75, color: 'var(--ce-text-mid)', fontWeight: 500 }}>
             {concept.summary}
           </div>
         </div>
@@ -685,7 +684,7 @@ function ConceptDetailView({ concept, onBack, onSelectPathway, onSelectRef }) {
           paddingTop: 16,
           borderTop: '1px solid var(--ce-warm-line)',
           fontSize: 11,
-          color: '#8A9BA8',
+          color: 'var(--ce-text-dim)',
           lineHeight: 1.6,
           fontFamily: 'var(--ce-font-mono)',
           textAlign: 'center',
@@ -783,7 +782,7 @@ function HubView({ onSelect, onGoHome, onSelectPathway, onSelectConcept }) {
         {/* Bedside Pathways */}
         <div className="rh-pathways" style={{ marginBottom: 24 }}>
           <div className="rh-eyebrow" style={{ marginBottom: 4 }}>Bedside Pathways</div>
-          <p style={{ fontSize: 12, color: '#556B7A', margin: '0 0 14px', lineHeight: 1.4 }}>
+          <p style={{ fontSize: 12, color: 'var(--ce-text-muted)', margin: '0 0 14px', lineHeight: 1.4 }}>
             Common patterns nurses connect quickly.
           </p>
           <div className="rh-pathways-grid">
@@ -796,7 +795,7 @@ function HubView({ onSelect, onGoHome, onSelectPathway, onSelectConcept }) {
         {/* Clinical Concepts */}
         <div className="rh-concepts" style={{ marginBottom: 24 }}>
           <div className="rh-eyebrow" style={{ marginBottom: 4 }}>Clinical Concepts</div>
-          <p style={{ fontSize: 12, color: '#556B7A', margin: '0 0 14px', lineHeight: 1.4 }}>
+          <p style={{ fontSize: 12, color: 'var(--ce-text-muted)', margin: '0 0 14px', lineHeight: 1.4 }}>
             Bigger frameworks built from bedside clues.
           </p>
           <div className="rh-concepts-grid">
@@ -928,7 +927,7 @@ function DetailView({ ref_, onBack, onSelect, backLabel }) {
   }, [ref_.id, onSelect]);
 
   return (
-    <div className="rh-detail-page">
+    <div className="rh-detail-page ce-page-enter">
       <Header showBack onBack={onBack} backLabel={backLabel || 'All references'} />
 
       <div style={{ maxWidth: 800, margin: '0 auto', padding: '32px 20px 60px' }}>
@@ -962,12 +961,12 @@ function DetailView({ ref_, onBack, onSelect, backLabel }) {
         {/* Normal range */}
         {ref_.normalRange && (
           <div className="rh-detail-field" style={{ borderLeft: '3px solid var(--ce-gold)' }}>
-            <div className="rh-detail-field-label" style={{ color: '#9A7020' }}>Normal Range</div>
+            <div className="rh-detail-field-label" style={{ color: 'var(--ce-gold-deep)' }}>Normal Range</div>
             <div style={{
               fontFamily: 'var(--ce-font-mono)',
               fontSize: 15,
               fontWeight: 600,
-              color: '#7A5A10',
+              color: 'var(--ce-gold-deep)',
               letterSpacing: '0.02em',
               lineHeight: 1.5,
             }}>
@@ -999,8 +998,8 @@ function DetailView({ ref_, onBack, onSelect, backLabel }) {
         )}
 
         {/* When attention increases */}
-        <div className="rh-detail-field" style={{ borderLeft: '3px solid #C06B6B' }}>
-          <div className="rh-detail-field-label" style={{ color: '#8E2F2F' }}>
+        <div className="rh-detail-field" style={{ borderLeft: '3px solid var(--ce-urgency-high-line)' }}>
+          <div className="rh-detail-field-label" style={{ color: 'var(--ce-urgency-high)' }}>
             When attention increases
           </div>
           <div className="rh-detail-field-body">{ref_.whenAttentionIncreases}</div>
@@ -1009,7 +1008,7 @@ function DetailView({ ref_, onBack, onSelect, backLabel }) {
         {/* Common mistake */}
         {ref_.commonMistake && (
           <div className="rh-common-mistake">
-            <div className="rh-detail-field-label" style={{ color: '#8A6010', marginBottom: 7 }}>
+            <div className="rh-detail-field-label" style={{ color: 'var(--ce-gold-deep)', marginBottom: 7 }}>
               Common mistake
             </div>
             <div className="rh-common-mistake-body">{ref_.commonMistake}</div>
@@ -1018,8 +1017,8 @@ function DetailView({ ref_, onBack, onSelect, backLabel }) {
 
         {/* Pearl */}
         <div style={{
-          background: 'rgba(212,168,75,0.07)',
-          border: '1px solid rgba(212,168,75,0.25)',
+          background: 'rgba(212,168,75,0.06)',
+          border: '1px solid rgba(212,168,75,0.22)',
           borderRadius: 'var(--ce-r-md)',
           padding: '18px 20px',
           marginBottom: 10,
@@ -1035,13 +1034,13 @@ function DetailView({ ref_, onBack, onSelect, backLabel }) {
             color: 'var(--ce-gold)',
           }}>◆</span>
           <div>
-            <div className="rh-detail-field-label" style={{ color: '#9A7020', marginBottom: 7 }}>
+            <div className="rh-detail-field-label" style={{ color: 'var(--ce-gold-deep)', marginBottom: 7 }}>
               Quick pearl
             </div>
             <div style={{
               fontSize: 14,
               lineHeight: 1.75,
-              color: '#4A3800',
+              color: 'var(--ce-gold-deep)',
               fontStyle: 'italic',
             }}>
               {ref_.pearl}
@@ -1076,7 +1075,7 @@ function DetailView({ ref_, onBack, onSelect, backLabel }) {
           paddingTop: 16,
           borderTop: '1px solid var(--ce-warm-line)',
           fontSize: 11,
-          color: '#8A9BA8',
+          color: 'var(--ce-text-dim)',
           lineHeight: 1.6,
           fontFamily: 'var(--ce-font-mono)',
           textAlign: 'center',

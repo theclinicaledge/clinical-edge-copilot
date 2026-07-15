@@ -731,7 +731,8 @@ function HubView({ onSelect, onGoHome, onSelectPathway, onSelectConcept }) {
         r.title.toLowerCase().includes(q) ||
         r.nursesCare.toLowerCase().includes(q) ||
         r.pearl.toLowerCase().includes(q) ||
-        (r.normalRange && r.normalRange.toLowerCase().includes(q))
+        (r.normalRange && r.normalRange.toLowerCase().includes(q)) ||
+        (r.aliases || []).some(alias => alias.toLowerCase().includes(q))
       );
     });
   }, [query, cat]);

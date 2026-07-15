@@ -4,6 +4,7 @@ export const CATEGORIES = [
   { id: 'abgs',         label: 'ABGs' },
   { id: 'ventilation',  label: 'Ventilation' },
   { id: 'devices',      label: 'Devices' },
+  { id: 'neuro',        label: 'Neuro Assessment' },
 ];
 
 export const REFERENCES = [
@@ -1015,5 +1016,119 @@ export const REFERENCES = [
     pearl:
       'Auscultation alone is not a reliable confirmation method. pH testing of gastric aspirate or X-ray confirmation before first use is the safer standard.',
     relatedRefs: ['albumin', 'glucose', 'phosphorus', 'sodium'],
+  },
+
+  // ── Labs (expansion) ─────────────────────────────────────────────────────────
+  {
+    id: 'calcium',
+    category: 'labs',
+    title: 'Serum Calcium',
+    aliases: ['Ca', 'total calcium', 'ionized calcium', 'iCa', 'corrected calcium', 'hypocalcemia', 'hypercalcemia'],
+    normalRange: 'Total: ~8.8–10.4 mg/dL · Ionized: ~4.5–5.6 mg/dL (≈1.1–1.3 mmol/L) — exact ranges vary by lab',
+    nursesCare:
+      'About 40% of total serum calcium is bound to albumin and is not physiologically active. Ionized calcium is the free, biologically active fraction — total and ionized calcium can tell different stories when albumin is abnormal.',
+    nursesNotice: [
+      'A low total calcium in a patient with low albumin may not reflect true hypocalcemia — an ionized calcium is the more reliable value when available.',
+      'Albumin-correction formulas are a rough estimate, not a substitute for a directly measured ionized level — especially in critical illness, acid-base shifts, or very abnormal albumin.',
+      'Neuromuscular irritability (perioral tingling, cramps, Chvostek\'s/Trousseau\'s signs) and cardiac conduction changes matter more than the isolated number.',
+    ],
+    whenAttentionIncreases:
+      'New neuromuscular irritability (tetany, seizure, laryngospasm), cardiac rhythm or QT changes, or altered mental status alongside an abnormal calcium — trend and clinical context matter more than one isolated result. Escalate per clinical context and local policy.',
+    commonMistake:
+      'Treating a low total calcium as confirmed hypocalcemia without considering albumin or checking an ionized level.',
+    pearl:
+      'When albumin or acid-base status is abnormal, total and ionized calcium may tell different stories.',
+    relatedRefs: ['phosphorus', 'albumin', 'potassium', 'magnesium'],
+  },
+  {
+    id: 'magnesium',
+    category: 'labs',
+    title: 'Serum Magnesium',
+    aliases: ['Mg', 'Mg2+', 'hypomagnesemia', 'hypermagnesemia'],
+    normalRange: '~1.5–2.5 mg/dL (≈0.7–1.0 mmol/L) — reference ranges vary by lab; no single international consensus range',
+    nursesCare:
+      'Magnesium supports neuromuscular and cardiac stability. The kidneys are the primary regulator of magnesium balance, so renal function is important context for interpreting any level.',
+    nursesNotice: [
+      'Neuromuscular hyperexcitability (tremor, hyperreflexia, tetany, seizure) is often an early sign of low magnesium.',
+      'Low magnesium may accompany QT prolongation and ventricular arrhythmias, including torsades de pointes.',
+      'Markedly elevated magnesium may be associated with bradycardia, conduction slowing, and progressive neuromuscular depression (diminished reflexes progressing to weakness).',
+      'Renal impairment changes both the risk of an abnormal level and how that level should be interpreted.',
+    ],
+    whenAttentionIncreases:
+      'New neuromuscular changes (tetany, seizure, diminished or absent deep tendon reflexes), a new arrhythmia, or a level markedly outside the lab\'s reference range — escalate per clinical context and local policy.',
+    commonMistake:
+      'Interpreting magnesium in isolation without considering renal function or a concurrent potassium/calcium abnormality — these often move together.',
+    pearl:
+      'When potassium or calcium remains abnormal despite correction efforts, magnesium is an important value to review.',
+    relatedRefs: ['calcium', 'potassium', 'creatinine'],
+  },
+
+  // ── Neuro Assessment ────────────────────────────────────────────────────────
+  {
+    id: 'gcs',
+    category: 'neuro',
+    title: 'Glasgow Coma Scale (GCS)',
+    aliases: ['Glasgow', 'GCS score', 'level of consciousness', 'LOC', 'neuro check', 'EVM score'],
+    normalRange: 'Highest score: 15 · Eye 1–4, Verbal 1–5, Motor 1–6 — interpret against baseline and assessment limitations',
+    nursesCare:
+      'GCS standardizes communication of a patient\'s level of consciousness across three components — Eye, Verbal, Motor — so a change can be recognized and communicated consistently over time.',
+    nursesNotice: [
+      'Document each component individually (E, V, M) — not just the total. The same total score can come from very different combinations.',
+      'Intubation, sedation, paralytics, language barriers, or facial/orbital trauma can make a component untestable — document what could not be assessed rather than estimating a score.',
+      'Trend against the patient\'s own baseline matters more than any single score.',
+    ],
+    whenAttentionIncreases:
+      'Any acute decline from the patient\'s established neurologic baseline, a worsening Eye, Verbal, or Motor component, or a new asymmetric motor response — escalate promptly according to clinical context and local policy. GCS does not replace a complete neurologic assessment.',
+    commonMistake:
+      'Reporting only the total score without the E/V/M breakdown, or guessing a score for a component that is genuinely untestable.',
+    pearl:
+      'The total number tells you how low. The E-V-M breakdown tells you why — and that\'s usually what changes first.',
+    relatedRefs: ['cpp', 'pupil-assessment'],
+  },
+  {
+    id: 'pupil-assessment',
+    category: 'neuro',
+    title: 'Pupil Assessment (PERRLA)',
+    aliases: ['PERRLA', 'pupils', 'pupil check', 'pupillary response', 'anisocoria', 'neuro check'],
+    normalRange: 'Assess size, equality, shape, and reactivity in context — compare with the patient\'s baseline and prior assessments',
+    nursesCare:
+      'PERRLA (pupils equal, round, reactive to light and accommodation) is a useful shorthand, but the details that matter most are size, equality, shape, and reactivity compared with the patient\'s own baseline — not a single ideal measurement.',
+    nursesNotice: [
+      'PERRLA alone doesn\'t capture exact size or reaction speed — document actual size and reaction quality (brisk, sluggish, fixed) when possible.',
+      'A pupil size difference is not automatically abnormal — some people have a mild, lifelong baseline size difference (physiologic anisocoria) unrelated to any acute process.',
+      'Some units use quantitative pupillometry for a more objective, reproducible measurement than visual estimation alone.',
+    ],
+    whenAttentionIncreases:
+      'A new or worsening size difference between pupils, a newly sluggish or nonreactive pupil, or any pupil finding that is new compared with the patient\'s own baseline — escalate per clinical context and local policy. A single asymmetric finding does not confirm one diagnosis.',
+    commonMistake:
+      'Treating any pupil size difference as automatically abnormal without checking whether it is new or a known baseline finding for that patient.',
+    pearl:
+      'The change matters more than the millimeters. A pupil that was reactive an hour ago and is now sluggish is the finding — not the number itself.',
+    relatedRefs: ['gcs', 'cpp'],
+  },
+
+  // ── Devices (expansion) ──────────────────────────────────────────────────────
+  {
+    id: 'chest-tube',
+    category: 'devices',
+    title: 'Chest Tube / Pleural Drainage System',
+    aliases: ['CT', 'pleurovac', 'pleur-evac', 'water seal', 'air leak', 'thoracostomy tube', 'tidaling'],
+    normalRange: null,
+    nursesCare:
+      'A pleural drainage system removes air, fluid, or blood from the pleural space and uses a water seal (often with suction) to keep air from re-entering. What counts as an expected finding depends on the indication, how recently the tube was placed, the specific system in use, and local policy — this is an observation and escalation guide, not a procedure reference.',
+    nursesNotice: [
+      'Gentle rise and fall of fluid in the water-seal chamber with breathing ("tidaling") is an expected sign the system is patent; its absence can mean the lung has re-expanded or the system is obstructed — both are worth investigating rather than assuming.',
+      'Continuous bubbling in the water-seal chamber may indicate an air leak and is generally a finding to investigate and report, distinct from brief bubbling that resolves.',
+      'This should not be confused with the expected continuous bubbling in the suction-control chamber of some wet-suction systems, which reflects the suction source rather than a leak.',
+      'Drainage should generally trend down over time; an unexpected change in drainage amount or character compared with the patient\'s recent trend is worth reporting rather than managing independently.',
+      'New puffiness or crackling around the insertion site (subcutaneous emphysema) can signal air tracking into tissue and is worth reporting.',
+    ],
+    whenAttentionIncreases:
+      'Sudden loss of tidaling with respiratory distress, a new or worsening continuous air leak, an unexpected change in drainage amount or character compared with the patient\'s recent trend, new or worsening subcutaneous emphysema, or an accidentally dislodged tube — escalate per clinical context and local policy immediately.',
+    commonMistake:
+      'Routinely clamping a chest tube or independently clamping it to troubleshoot. Clamping can create serious risk in some situations; follow the specific drainage system instructions, local policy, and direction from the responsible clinical team.',
+    pearl:
+      'Tidaling means the system is "talking" to the lung. A suddenly quiet water-seal chamber in a patient who looks worse is a reason to look closer, not a reason to assume things improved.',
+    relatedRefs: ['spo2', 'respiratory-rate'],
   },
 ];

@@ -38,6 +38,41 @@ test('reference hub search accepts input and displays matching content', async (
   await expect(page.getByText('Serum Lactate')).toBeVisible();
 });
 
+test('reference hub aliases match new entries', async ({ page }) => {
+  await page.goto('/reference-hub');
+  const search = page.getByPlaceholder('Search references…');
+
+  await search.fill('iCa');
+  await expect(page.getByText('Serum Calcium', { exact: true })).toBeVisible();
+
+  await search.fill('Mg');
+  await expect(page.getByText('Serum Magnesium', { exact: true })).toBeVisible();
+
+  await search.fill('PERRLA');
+  await expect(page.getByText('Pupil Assessment (PERRLA)', { exact: true })).toBeVisible();
+
+  await search.fill('Glasgow');
+  await expect(page.getByText('Glasgow Coma Scale (GCS)', { exact: true })).toBeVisible();
+
+  await search.fill('pleur-evac');
+  await expect(page.getByText('Chest Tube / Pleural Drainage System', { exact: true })).toBeVisible();
+});
+
+test('neuro assessment category appears and filters to the new entries', async ({ page }) => {
+  await page.goto('/reference-hub');
+  await page.getByRole('button', { name: 'Neuro Assessment' }).click();
+  await expect(page.getByText('Glasgow Coma Scale (GCS)', { exact: true })).toBeVisible();
+  await expect(page.getByText('Pupil Assessment (PERRLA)', { exact: true })).toBeVisible();
+});
+
+test('opening a new reference detail view works', async ({ page }) => {
+  await page.goto('/reference-hub');
+  await page.getByPlaceholder('Search references…').fill('Serum Calcium');
+  await page.getByRole('button', { name: 'Serum Calcium' }).click();
+  await expect(page.getByRole('heading', { name: 'Serum Calcium' })).toBeVisible();
+  await expect(page.getByText('When albumin or acid-base status is abnormal, total and ionized calcium may tell different stories.')).toBeVisible();
+});
+
 test('abg lab example can be selected and interpreted', async ({ page }) => {
   await page.goto('/abg-lab');
   await page.getByRole('button', { name: 'Respiratory acidosis' }).click();

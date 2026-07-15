@@ -409,7 +409,7 @@ export const REFERENCES = [
       'Using a normal WBC to exclude significant infection — particularly in elderly or immunocompromised patients.',
     pearl:
       'A normal WBC does not rule out serious infection. Trend the whole picture, not the number alone.',
-    relatedRefs: ['lactate', 'glucose', 'albumin', 'procalcitonin-placeholder'],
+    relatedRefs: ['lactate', 'glucose', 'albumin'],
   },
   {
     id: 'inr',

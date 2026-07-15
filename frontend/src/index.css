@@ -51,28 +51,6 @@ textarea::placeholder {
   }
 }
 
-/* ── Home Hub — hero ECG trace ────────────────────────────────────────────
-   Reuses RhythmStrip's clip-path sweep-reveal technique (rhythm-lab.css
-   "strip-reveal") but loops it continuously instead of a one-shot reveal —
-   this is the content-rendering / clinical-sweep exemption in motion-system.md,
-   not general UI chrome motion. Reduced-motion: no animation is applied, so
-   the trace renders fully visible and static (see global reduced-motion rule
-   in tokens.css for the last-resort ms-clamp on any animation this misses). */
-.ce-hero-ecg-trace {
-  line-height: 0;
-}
-
-@media (prefers-reduced-motion: no-preference) {
-  @keyframes ce-hero-ecg-sweep {
-    from { clip-path: inset(0 100% 0 0); }
-    to   { clip-path: inset(0 0% 0 0); }
-  }
-
-  .ce-hero-ecg-trace {
-    animation: ce-hero-ecg-sweep 4s linear infinite;
-  }
-}
-
 /* Mobile: tighten workspace padding and chip text */
 @media (max-width: 600px) {
   .main-container {

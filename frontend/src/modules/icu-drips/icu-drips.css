@@ -67,13 +67,10 @@
   position: sticky;
   top: 0;
   z-index: 50;
-  background: linear-gradient(
-    to bottom,
-    rgba(255,255,255,0.025) 0%,
-    rgba(255,255,255,0) 100%
-  ), var(--id-bg-header);
-  border-bottom: 1px solid rgba(255,255,255,0.07);
-  box-shadow: 0 4px 20px rgba(0,0,0,0.18);
+  background: var(--id-bg-header);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border-bottom: 1px solid var(--ce-line-dark);
   padding-top: env(safe-area-inset-top);
   padding-left: max(0px, env(safe-area-inset-left));
   padding-right: max(0px, env(safe-area-inset-right));
@@ -94,12 +91,12 @@
 .id-header__brand {
   font-size: 15px;
   font-weight: 700;
-  color: #F8FBFC;
+  color: var(--ce-text-light);
   letter-spacing: -0.3px;
   line-height: 1.15;
 }
 .id-header__sep {
-  color: rgba(255,255,255,0.18);
+  color: rgba(255,255,255,0.16);
   font-size: 14px;
   font-weight: 300;
   margin: 0 1px;
@@ -107,7 +104,7 @@
 .id-header__module {
   font-size: 11px;
   font-weight: 500;
-  color: #4A6978;
+  color: var(--ce-text-dim);
   font-family: var(--id-font-mono);
   letter-spacing: 0.04em;
 }
@@ -357,7 +354,7 @@
   line-height: 1.2;
   transition: color var(--ce-dur-fast) var(--ce-ease-out);
 }
-.id-drip-row:hover .id-drip-row__name { color: #07111C; }
+.id-drip-row:hover .id-drip-row__name { color: var(--ce-navy-900); }
 .id-drip-row__brand {
   font-size: 10px;
   color: var(--id-text-dim);
@@ -907,7 +904,7 @@
   line-height: 1.2;
   transition: color var(--ce-dur-fast) var(--ce-ease-out);
 }
-.id-explore-next__row:hover .id-explore-next__name { color: #07111C; }
+.id-explore-next__row:hover .id-explore-next__name { color: var(--ce-navy-900); }
 .id-explore-next__meta {
   font-size: 10px;
   color: var(--id-text-dim);
@@ -1377,8 +1374,8 @@
 }
 /* Direction color classes */
 .id-hemo-val--up       { color: var(--ce-teal); }
-.id-hemo-val--down     { color: #C09030; }
-.id-hemo-val--neutral  { color: #8096A0; }
+.id-hemo-val--down     { color: var(--ce-gold); }
+.id-hemo-val--neutral  { color: var(--ce-text-dim); }
 .id-hemo-val--variable {
   font-size: 8.5px;
   font-family: var(--id-font-mono);

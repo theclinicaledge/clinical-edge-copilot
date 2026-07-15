@@ -426,7 +426,7 @@ function SavedCaseRow({ sc, onReopen, onDelete, onCopy, onSaveNote }) {
 
       <div className="ce-accordion-panel" data-open={expanded ? "true" : "false"}>
       {editNote ? (
-        <div style={{ padding: "0 14px 12px", borderTop: "1px solid rgba(255,255,255,0.07)" }}>
+        <div style={{ padding: "0 14px 12px", borderTop: "1px solid var(--ce-line-dark)" }}>
           <div style={{
             fontSize: 9,
             color: "var(--ce-text-dim)",
@@ -464,7 +464,7 @@ function SavedCaseRow({ sc, onReopen, onDelete, onCopy, onSaveNote }) {
           </div>
         </div>
       ) : (
-        <div style={{ padding: "0 14px 14px", borderTop: "1px solid rgba(255,255,255,0.07)" }}>
+        <div style={{ padding: "0 14px 14px", borderTop: "1px solid var(--ce-line-dark)" }}>
           <div style={{
             fontSize: 9,
             color: "var(--ce-text-dim)",
@@ -485,7 +485,7 @@ function SavedCaseRow({ sc, onReopen, onDelete, onCopy, onSaveNote }) {
             padding: "10px 12px",
             background: "rgba(0,0,0,0.2)",
             borderRadius: 8,
-            border: "1px solid rgba(255,255,255,0.07)",
+            border: "1px solid var(--ce-line-dark)",
           }}>
             {sc.rawText}
           </div>
@@ -1013,13 +1013,12 @@ export default function App({ onGoHome, isOnline = true }) {
 
       {/* ── Header ───────────────────────────────────────────────────────── */}
       <div style={{
-        borderBottom: "1px solid rgba(255,255,255,0.07)",
-        boxShadow: "0 4px 20px rgba(0,0,0,0.18)",
+        borderBottom: "1px solid var(--ce-line-dark)",
         paddingTop: "env(safe-area-inset-top)",
         paddingLeft: "max(14px, env(safe-area-inset-left))",
         paddingRight: "max(14px, env(safe-area-inset-right))",
         paddingBottom: 0,
-        background: "linear-gradient(to bottom, rgba(255,255,255,0.025) 0%, rgba(255,255,255,0) 100%), rgba(11,31,42,0.97)",
+        background: "var(--ce-navy-header)",
         backdropFilter: "blur(20px)",
         position: "sticky",
         top: 0,

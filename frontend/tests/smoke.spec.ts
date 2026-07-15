@@ -56,6 +56,29 @@ test('reference hub aliases match new entries', async ({ page }) => {
 
   await search.fill('pleur-evac');
   await expect(page.getByText('Chest Tube / Pleural Drainage System', { exact: true })).toBeVisible();
+
+  await search.fill('PICC');
+  await expect(page.getByText('PICC Line / Midline Catheter', { exact: true })).toBeVisible();
+
+  await search.fill('JP drain');
+  await expect(page.getByText('Wound Drains (JP / Hemovac)', { exact: true })).toBeVisible();
+
+  await search.fill('trach');
+  await expect(page.getByText('Tracheostomy Care Basics', { exact: true })).toBeVisible();
+
+  await search.fill('CAM-ICU');
+  await expect(page.getByText('CAM-ICU (Delirium Screening)', { exact: true })).toBeVisible();
+
+  await search.fill('NH3');
+  await expect(page.getByText('Serum Ammonia', { exact: true })).toBeVisible();
+});
+
+test('opening a second-batch reference detail view works', async ({ page }) => {
+  await page.goto('/reference-hub');
+  await page.getByPlaceholder('Search references…').fill('trach');
+  await page.getByRole('button', { name: 'Tracheostomy Care Basics' }).click();
+  await expect(page.getByRole('heading', { name: 'Tracheostomy Care Basics' })).toBeVisible();
+  await expect(page.getByText('A patient-specific airway plan is most useful when the team knows where it is and what equipment is available before an emergency occurs.')).toBeVisible();
 });
 
 test('neuro assessment category appears and filters to the new entries', async ({ page }) => {

@@ -1131,4 +1131,113 @@ export const REFERENCES = [
       'Tidaling means the system is "talking" to the lung. A suddenly quiet water-seal chamber in a patient who looks worse is a reason to look closer, not a reason to assume things improved.',
     relatedRefs: ['spo2', 'respiratory-rate'],
   },
+  {
+    id: 'picc-line',
+    category: 'devices',
+    title: 'PICC Line / Midline Catheter',
+    aliases: ['PICC', 'peripherally inserted central catheter', 'midline catheter', 'midline'],
+    normalRange: null,
+    nursesCare:
+      'A PICC is inserted peripherally but terminates in the central circulation. A midline remains a peripheral catheter and does not terminate centrally. Because the devices can look similar externally, confirm the documented device type and tip location before making assumptions about use.',
+    nursesNotice: [
+      'A PICC and a midline can look similar at the insertion site — confirm the documented device type and tip location rather than assuming from appearance alone.',
+      'Do not assume a PICC and a midline have the same infusion suitability — confirm the documented device type before assuming what it can be used for.',
+      'Resistance with flushing, new pain, swelling, leakage at the site, inability to use the device as expected, or a changed external length are findings worth reporting.',
+    ],
+    whenAttentionIncreases:
+      'New arm swelling, pain, redness, or warmth along the catheter path; new resistance or inability to use the device as expected; a dislodged or visibly altered external length; or signs of a line-associated infection — escalate per clinical context and local policy.',
+    commonMistake:
+      'Assuming a peripherally-placed upper-arm catheter is a PICC (and therefore central) without confirming the documented device type and tip location.',
+    pearl:
+      'Same arm, same-looking dressing — very different device. The tip location is what defines what the line can safely be used for.',
+    relatedRefs: ['central-line'],
+  },
+  {
+    id: 'wound-drain',
+    category: 'devices',
+    title: 'Wound Drains (JP / Hemovac)',
+    aliases: ['JP drain', 'Jackson-Pratt', 'Hemovac', 'surgical drain', 'closed suction drain'],
+    normalRange: null,
+    nursesCare:
+      'Closed suction wound drains (Jackson-Pratt, Hemovac) remove fluid or blood from a surgical site using negative pressure. What counts as an expected finding depends on the type of surgery, how recently the drain was placed, and local policy — this is an observation and escalation guide, not a procedure reference.',
+    nursesNotice: [
+      'The reservoir should remain in its configured compressed state and maintain the expected suction — different systems use different reservoir shapes and configurations, so loss of compression or seal may reduce drainage effectiveness and is worth checking rather than assuming it\'s fine.',
+      'Drainage is expected to gradually lighten in color and decrease in volume over time; a sudden change in amount, a darker or thicker character, or a new strong odor is worth reporting rather than something to interpret alone.',
+      'The insertion site should be assessed for redness, leakage around the tube, or the drain pulling at the skin.',
+    ],
+    whenAttentionIncreases:
+      'A sudden increase in drainage volume, a marked change in character (for example, suddenly bright red or purulent), loss of suction or seal that doesn\'t resolve, or new site redness or leakage — escalate per clinical context and local policy.',
+    commonMistake:
+      'Reporting a drain\'s output volume without also checking whether suction and seal are intact — a lost seal can itself change how much and how the drain appears to be collecting.',
+    pearl:
+      'A drain that stops "pulling" isn\'t necessarily a drain that\'s finished working — check the seal before assuming the job is done.',
+    relatedRefs: [],
+  },
+  {
+    id: 'tracheostomy',
+    category: 'devices',
+    title: 'Tracheostomy Care Basics',
+    aliases: ['trach', 'trach care', 'tracheostomy tube', 'stoma'],
+    normalRange: null,
+    nursesCare:
+      'A tracheostomy is a surgical airway through the neck into the trachea. Airway anatomy, tube type, and the individualized emergency or rescue pathway can differ significantly between patients — this is an observation and escalation guide, not a substitute for the patient-specific airway plan and emergency equipment that should be at the bedside.',
+    nursesNotice: [
+      'Increased secretions, visible mucus, reduced airflow, or new respiratory difficulty may indicate an airway problem and warrant prompt assessment and escalation according to the patient-specific airway plan.',
+      'Bleeding from or around the stoma, new or worsening swelling or crepitus in the neck, or a tube that appears to be moving in or out of position all warrant prompt reporting.',
+      'Emergency airway equipment and the patient\'s specific rescue plan should be confirmed at the bedside every shift — not assumed to be present or unchanged.',
+    ],
+    whenAttentionIncreases:
+      'Increasing respiratory distress, an audible or suspected obstruction, bleeding at the stoma, new neck swelling or crepitus, or any sign the tube has become displaced or dislodged — treat as an urgent airway event and escalate immediately per clinical context and local policy.',
+    commonMistake:
+      'Assuming every tracheostomy patient shares the same airway anatomy, tube type, or emergency rescue pathway — the individualized plan should be confirmed, not assumed.',
+    pearl:
+      'A patient-specific airway plan is most useful when the team knows where it is and what equipment is available before an emergency occurs.',
+    relatedRefs: ['spo2', 'respiratory-rate'],
+  },
+
+  // ── Neuro Assessment (expansion) ────────────────────────────────────────────
+  {
+    id: 'cam-icu',
+    category: 'neuro',
+    title: 'CAM-ICU (Delirium Screening)',
+    aliases: ['CAM-ICU', 'delirium screen', 'confusion assessment method', 'ICU delirium'],
+    normalRange: 'CAM-ICU negative = delirium not detected on this screen — a feature-based result, not a numeric range',
+    nursesCare:
+      'CAM-ICU is a validated bedside screening tool for delirium, not a diagnosis. It is distinct from a level-of-consciousness or sedation assessment (e.g., RASS). If the patient is not sufficiently arousable for the tool to be completed, document the screen as unable to assess according to the validated tool instructions and local workflow.',
+    nursesNotice: [
+      'A positive screen identifies features consistent with delirium — it flags the need for clinical correlation and provider communication, not a stand-alone diagnosis.',
+      'A negative screen does not exclude every cause of altered mental status — new or worsening confusion outside the screen\'s specific features still warrants a full clinical assessment.',
+      'Level of consciousness should be assessed first — CAM-ICU is intended to be applied once a patient is arousable enough to participate in the assessment.',
+    ],
+    whenAttentionIncreases:
+      'A new positive screen, a new acute change in mental status regardless of screen result, or a fluctuating course compared with the patient\'s recent baseline — escalate per clinical context and local policy.',
+    commonMistake:
+      'Treating a positive CAM-ICU as a confirmed diagnosis of delirium, or treating a negative screen as ruling out all causes of altered mental status.',
+    pearl:
+      'CAM-ICU tells you delirium features are present right now — it doesn\'t tell you why. The screen opens the clinical conversation; it doesn\'t close it.',
+    relatedRefs: ['gcs'],
+  },
+
+  // ── Labs (expansion 2) ───────────────────────────────────────────────────────
+  {
+    id: 'ammonia',
+    category: 'labs',
+    title: 'Serum Ammonia',
+    aliases: ['NH3', 'ammonia level', 'hyperammonemia', 'hepatic encephalopathy'],
+    normalRange: 'Use the reporting laboratory\'s reference interval — assay, specimen type, collection, transport, and processing can affect the result',
+    nursesCare:
+      'Serum ammonia can rise with hepatic dysfunction, but hepatic encephalopathy remains a clinical diagnosis based on mental status and exam findings — ammonia is supportive lab data, not a stand-alone diagnostic value. Ammonia levels do not reliably correlate with the severity of encephalopathy symptoms.',
+    nursesNotice: [
+      'A normal ammonia level does not rule out hepatic encephalopathy, and an elevated level does not confirm it — clinical exam and trend matter more than the isolated number.',
+      'Interpret an unexpected ammonia result alongside the clinical picture and specimen quality; confirmation may be appropriate according to laboratory and clinical policy.',
+      'Ammonia can also rise in some non-hepatic conditions, so an elevated level should be interpreted in the full clinical context, not hepatic causes alone.',
+    ],
+    whenAttentionIncreases:
+      'New or worsening altered mental status alongside an elevated ammonia level or relevant hepatic, metabolic, medication, or nutritional context warrants prompt clinical assessment and escalation according to local policy.',
+    commonMistake:
+      'Using an isolated ammonia level to confirm or exclude hepatic encephalopathy without considering the clinical exam and mental status trend.',
+    pearl:
+      'Clinical assessment leads. Ammonia provides supporting context, not a stand-alone diagnosis or severity score.',
+    relatedRefs: [],
+  },
 ];

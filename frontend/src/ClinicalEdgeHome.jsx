@@ -107,47 +107,16 @@ const SOON_STYLE = {
   tagOpacity:   0.65,
 };
 
-// ─── Hero ECG trace ────────────────────────────────────────────────────────────
-// Decorative monitor-sweep trace. Reuses RhythmStrip's clip-path sweep-reveal
-// technique (see RhythmStrip.tsx / rhythm-lab.css "strip-reveal") but loops it
-// continuously via animation-iteration-count instead of a one-shot reveal.
-// Solid teal stroke only — no glow filter, no gradient, per design-system.md.
-function HeroEcgTrace() {
-  return (
-    <div className="ce-hero-ecg-trace" aria-hidden="true">
-      <svg
-        viewBox="0 0 600 64"
-        width="100%"
-        height="40"
-        preserveAspectRatio="none"
-        style={{ display: "block" }}
-      >
-        <path
-          d="M0,32 L44,32 C50,32 58,20 64,20 C70,20 76,32 82,32 L96,32 L100,38 L106,4 L112,42 C118,42 124,32 132,32 L146,32 C152,32 164,16 176,16 C184,16 194,32 202,32 L220,32 L264,32 C270,32 278,20 284,20 C290,20 296,32 302,32 L316,32 L320,38 L326,4 L332,42 C338,42 344,32 352,32 L366,32 C372,32 384,16 396,16 C404,16 414,32 422,32 L440,32 L600,32"
-          fill="none"
-          stroke="var(--ce-teal)"
-          strokeWidth="1.5"
-          strokeLinecap="round"
-          strokeLinejoin="round"
-        />
-      </svg>
-    </div>
-  );
-}
-
 // ─── Module Entry ─────────────────────────────────────────────────────────────
 // Active entries: identical size, weight, spacing, luminance-card treatment.
 // Soon entry: reduced contrast, no hover, no cursor, no card surface.
 function ModuleEntry({ module, onNavigate }) {
-  const [hovered, setHovered] = useState(false);
   const isActive = module.status === "active";
   const s = isActive ? ACTIVE_STYLE : SOON_STYLE;
 
   return (
     <div
       className={isActive ? "ce-pressable ce-card-lift" : undefined}
-      onMouseEnter={() => isActive && setHovered(true)}
-      onMouseLeave={() => setHovered(false)}
       onClick={isActive ? () => { trackEvent(MODULE_OPEN_EVENTS[module.key] ?? 'module_opened', { route: '/' }); onNavigate(module.path); } : undefined}
       style={{
         paddingTop: s.paddingTop,
@@ -157,9 +126,6 @@ function ModuleEntry({ module, onNavigate }) {
         cursor: isActive ? "pointer" : "default",
         background: isActive ? "var(--ce-warm-mid)" : "transparent",
         borderRadius: isActive ? "var(--ce-r-md)" : 0,
-        borderLeft: isActive
-          ? `3px solid ${hovered ? "rgba(10,191,188,0.55)" : "var(--ce-teal)"}`
-          : "3px solid transparent",
         borderTop: isActive ? "1px solid var(--ce-warm-card)" : "none",
       }}
     >
@@ -269,7 +235,7 @@ export default function ClinicalEdgeHome({ onNavigate }) {
         >
 
           {/* Hero */}
-          <div style={{ marginBottom: "var(--ce-sp-6)" }}>
+          <div style={{ marginBottom: "var(--ce-sp-8)" }}>
             <h1 style={{
               fontFamily: "'Inter', sans-serif",
               fontWeight: 800,
@@ -291,9 +257,6 @@ export default function ClinicalEdgeHome({ onNavigate }) {
             }}>
               Think through clinical situations, practice rhythm recognition, and build bedside confidence.
             </p>
-            <div style={{ marginTop: "var(--ce-sp-4)", maxWidth: 480 }}>
-              <HeroEcgTrace />
-            </div>
           </div>
 
           {/* Module list */}

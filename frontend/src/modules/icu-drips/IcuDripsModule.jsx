@@ -552,12 +552,14 @@ function RefRow({ iconType, label, variant, count, isOpen, onToggle, children })
         {count != null && (
           <span className="id-ref-row__count">{count}</span>
         )}
-        <span className={`id-ref-row__chevron${isOpen ? ' id-ref-row__chevron--open' : ''}`}>
+        <span className="id-ref-row__chevron ce-accordion-chevron" data-open={isOpen}>
           ›
         </span>
       </button>
-      <div className={`id-ref-row__body${isOpen ? '' : ' id-ref-row__body--hidden'}`}>
-        {children}
+      <div className="id-ref-row__body ce-accordion-panel" data-open={isOpen}>
+        <div className="id-ref-row__body-inner">
+          {children}
+        </div>
       </div>
     </div>
   );
@@ -697,13 +699,16 @@ function DripsDetail({ drip, onBack, onNavigate }) {
     .filter(Boolean);
 
   return (
-    <div className="id-detail">
+    <div className="id-detail ce-page-enter">
       <button className="id-detail__back" onClick={onBack}>
         ← Back to ICU Drips
       </button>
 
-      {/* Dark navy hero card */}
-      <div className={`id-hero-card id-hero-card--${drip.category}`}>
+      {/* Dark navy hero card — list→detail is the one sanctioned double-layer
+          entrance (motion-system.md §5): page root above gets .ce-page-enter,
+          the hero card + first ≤5 content sections below additionally get
+          .ce-card-enter on a .ce-stagger-children ladder. */}
+      <div className={`id-hero-card id-hero-card--${drip.category} ce-card-enter`}>
         <div className="id-hero-card__top">
           <span className="id-hero-card__category">{drip.categoryLabel}</span>
           {drip.urgency && (() => {
@@ -731,107 +736,115 @@ function DripsDetail({ drip, onBack, onNavigate }) {
         </div>
       </div>
 
-      {/* Lead Finding — single most important bedside observation */}
-      {drip.leadFinding && (
-        <div className="id-lead-finding">
-          <span className="id-lead-finding__label">Lead Finding</span>
-          <p className="id-lead-finding__text">{drip.leadFinding}</p>
+      {/* First ≤5 content sections — staggered fade-in, capped per §1/§5 */}
+      <div className="ce-stagger-children">
+
+        {/* Lead Finding — single most important bedside observation */}
+        {drip.leadFinding && (
+          <div className="id-lead-finding ce-card-enter">
+            <span className="id-lead-finding__label">Lead Finding</span>
+            <p className="id-lead-finding__text">{drip.leadFinding}</p>
+          </div>
+        )}
+
+        {/* Per-drip Clinical Pearl */}
+        {drip.pearl && (
+          <div className="id-drip-pearl ce-card-enter">
+            <span className="id-drip-pearl__label">Clinical Pearl</span>
+            <p className="id-drip-pearl__text">{drip.pearl}</p>
+          </div>
+        )}
+
+        {/* Hemodynamic Effect card */}
+        {drip.hemodynamics && (
+          <div className="ce-card-enter">
+            <HemodynamicCard hemodynamics={drip.hemodynamics} />
+          </div>
+        )}
+
+        {/* Clinical pearl / nurse mental model */}
+        <div className="id-pearl ce-card-enter">
+          <span className="id-pearl__label">Nurse mental model</span>
+          <p className="id-pearl__text">{drip.mentalModel}</p>
         </div>
-      )}
 
-      {/* Per-drip Clinical Pearl */}
-      {drip.pearl && (
-        <div className="id-drip-pearl">
-          <span className="id-drip-pearl__label">Clinical Pearl</span>
-          <p className="id-drip-pearl__text">{drip.pearl}</p>
+        {/* Reference rows — single containing card */}
+        <div className="id-ref-card ce-card-enter">
+
+          <RefRow
+            iconType="target"
+            label="Commonly used for"
+            count={drip.commonlyUsedFor.length}
+            isOpen={open.commonlyUsedFor}
+            onToggle={() => toggle('commonlyUsedFor')}
+          >
+            <RefBulletList items={drip.commonlyUsedFor} />
+          </RefRow>
+
+          <RefRow
+            iconType="mechanism"
+            label="What it is doing"
+            count={drip.whatItIsDoing.length}
+            isOpen={open.whatItIsDoing}
+            onToggle={() => toggle('whatItIsDoing')}
+          >
+            <RefBulletList items={drip.whatItIsDoing} />
+          </RefRow>
+
+          <RefRow
+            iconType="monitor"
+            label="What nurses monitor"
+            count={drip.whatNursesMonitor.length}
+            isOpen={open.whatNursesMonitor}
+            onToggle={() => toggle('whatNursesMonitor')}
+          >
+            <RefBulletList items={drip.whatNursesMonitor} />
+          </RefRow>
+
+          <RefRow
+            iconType="watch"
+            label="Watch out"
+            variant="watch"
+            count={drip.watchOut.length}
+            isOpen={open.watchOut}
+            onToggle={() => toggle('watchOut')}
+          >
+            <RefBulletList items={drip.watchOut} />
+          </RefRow>
+
+          <RefRow
+            iconType="escalate"
+            label="Signals to escalate"
+            variant="escalate"
+            count={drip.signalsToEscalate.length}
+            isOpen={open.signalsToEscalate}
+            onToggle={() => toggle('signalsToEscalate')}
+          >
+            <RefBulletList items={drip.signalsToEscalate} />
+          </RefRow>
+
+          <RefRow
+            iconType="lines"
+            label="Lines, access and policy"
+            count={drip.linesAccessPolicy.length}
+            isOpen={open.linesAccessPolicy}
+            onToggle={() => toggle('linesAccessPolicy')}
+          >
+            <RefBulletList items={drip.linesAccessPolicy} />
+          </RefRow>
+
+          <RefRow
+            iconType="safety"
+            label="Key safety notes"
+            variant="safety"
+            count={drip.keySafetyNotes.length}
+            isOpen={open.keySafetyNotes}
+            onToggle={() => toggle('keySafetyNotes')}
+          >
+            <RefBulletList items={drip.keySafetyNotes} />
+          </RefRow>
+
         </div>
-      )}
-
-      {/* Hemodynamic Effect card */}
-      <HemodynamicCard hemodynamics={drip.hemodynamics} />
-
-      {/* Clinical pearl / nurse mental model */}
-      <div className="id-pearl">
-        <span className="id-pearl__label">Nurse mental model</span>
-        <p className="id-pearl__text">{drip.mentalModel}</p>
-      </div>
-
-      {/* Reference rows — single containing card */}
-      <div className="id-ref-card">
-
-        <RefRow
-          iconType="target"
-          label="Commonly used for"
-          count={drip.commonlyUsedFor.length}
-          isOpen={open.commonlyUsedFor}
-          onToggle={() => toggle('commonlyUsedFor')}
-        >
-          <RefBulletList items={drip.commonlyUsedFor} />
-        </RefRow>
-
-        <RefRow
-          iconType="mechanism"
-          label="What it is doing"
-          count={drip.whatItIsDoing.length}
-          isOpen={open.whatItIsDoing}
-          onToggle={() => toggle('whatItIsDoing')}
-        >
-          <RefBulletList items={drip.whatItIsDoing} />
-        </RefRow>
-
-        <RefRow
-          iconType="monitor"
-          label="What nurses monitor"
-          count={drip.whatNursesMonitor.length}
-          isOpen={open.whatNursesMonitor}
-          onToggle={() => toggle('whatNursesMonitor')}
-        >
-          <RefBulletList items={drip.whatNursesMonitor} />
-        </RefRow>
-
-        <RefRow
-          iconType="watch"
-          label="Watch out"
-          variant="watch"
-          count={drip.watchOut.length}
-          isOpen={open.watchOut}
-          onToggle={() => toggle('watchOut')}
-        >
-          <RefBulletList items={drip.watchOut} />
-        </RefRow>
-
-        <RefRow
-          iconType="escalate"
-          label="Signals to escalate"
-          variant="escalate"
-          count={drip.signalsToEscalate.length}
-          isOpen={open.signalsToEscalate}
-          onToggle={() => toggle('signalsToEscalate')}
-        >
-          <RefBulletList items={drip.signalsToEscalate} />
-        </RefRow>
-
-        <RefRow
-          iconType="lines"
-          label="Lines, access and policy"
-          count={drip.linesAccessPolicy.length}
-          isOpen={open.linesAccessPolicy}
-          onToggle={() => toggle('linesAccessPolicy')}
-        >
-          <RefBulletList items={drip.linesAccessPolicy} />
-        </RefRow>
-
-        <RefRow
-          iconType="safety"
-          label="Key safety notes"
-          variant="safety"
-          count={drip.keySafetyNotes.length}
-          isOpen={open.keySafetyNotes}
-          onToggle={() => toggle('keySafetyNotes')}
-        >
-          <RefBulletList items={drip.keySafetyNotes} />
-        </RefRow>
-
       </div>
 
       {/* Explore next */}
@@ -969,26 +982,28 @@ function CompareDetail({ pair, onBack, onNavigateToDrip }) {
           <span>Detailed comparison</span>
           <span className="id-compare-detail-toggle__arrow">{tableOpen ? '▲' : '▼'}</span>
         </button>
-        {tableOpen && (
-          <table className="id-compare-table">
-            <thead>
-              <tr>
-                <th> </th>
-                <th>{pair.aLabel}</th>
-                <th>{pair.bLabel}</th>
-              </tr>
-            </thead>
-            <tbody>
-              {pair.rows.map((row, i) => (
-                <tr key={i}>
-                  <td>{row.aspect}</td>
-                  <td>{row.a}</td>
-                  <td>{row.b}</td>
+        <div className="id-compare-detail-toggle__panel ce-accordion-panel" data-open={tableOpen}>
+          <div className="id-compare-detail-toggle__panel-inner">
+            <table className="id-compare-table">
+              <thead>
+                <tr>
+                  <th> </th>
+                  <th>{pair.aLabel}</th>
+                  <th>{pair.bLabel}</th>
                 </tr>
-              ))}
-            </tbody>
-          </table>
-        )}
+              </thead>
+              <tbody>
+                {pair.rows.map((row, i) => (
+                  <tr key={i}>
+                    <td>{row.aspect}</td>
+                    <td>{row.a}</td>
+                    <td>{row.b}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        </div>
       </div>
 
       <div className="id-compare-bottom-line">
@@ -1408,40 +1423,43 @@ function PracticeMode({ onBack, onNavigateToDrip }) {
         </div>
         <p className="id-practice-header__sub">Pattern recognition, not medication selection.</p>
         <div className="id-practice-progress-bar">
-          <div className="id-practice-progress-bar__fill" style={{ width: `${((index) / total) * 100}%` }} />
+          <div className="id-practice-progress-bar__fill" style={{ transform: `scaleX(${index / total})` }} />
         </div>
       </div>
 
-      {/* Question card */}
-      <div className="id-practice-card">
-        {q.context && <p className="id-practice-card__context">{q.context}</p>}
-        <p className="id-practice-card__prompt">{q.prompt}</p>
-      </div>
+      {/* Question card + options — keyed so each new question replays the
+          section-swap entrance (motion-system.md §5); the feedback block
+          below is a separate mount and is not part of this swapped region. */}
+      <div key={q.id} className="ce-section-enter">
+        <div className="id-practice-card">
+          {q.context && <p className="id-practice-card__context">{q.context}</p>}
+          <p className="id-practice-card__prompt">{q.prompt}</p>
+        </div>
 
-      {/* Options */}
-      <div className="id-practice-options">
-        {q.options.map((opt, i) => {
-          let cls = 'id-practice-option';
-          if (answered) {
-            if (i === q.correctOption) cls += ' id-practice-option--correct';
-            else if (i === selected)   cls += ' id-practice-option--incorrect';
-            else                       cls += ' id-practice-option--dim';
-          } else if (i === selected) {
-            cls += ' id-practice-option--selected';
-          }
-          return (
-            <button key={i} className={cls} onClick={() => handleAnswer(i)} disabled={answered}>
-              <span className="id-practice-option__letter">{String.fromCharCode(65 + i)}</span>
-              <span className="id-practice-option__text">{opt}</span>
-            </button>
-          );
-        })}
+        <div className="id-practice-options">
+          {q.options.map((opt, i) => {
+            let cls = 'id-practice-option';
+            if (answered) {
+              if (i === q.correctOption) cls += ' id-practice-option--correct';
+              else if (i === selected)   cls += ' id-practice-option--incorrect';
+              else                       cls += ' id-practice-option--dim';
+            } else if (i === selected) {
+              cls += ' id-practice-option--selected';
+            }
+            return (
+              <button key={i} className={cls} onClick={() => handleAnswer(i)} disabled={answered}>
+                <span className="id-practice-option__letter">{String.fromCharCode(65 + i)}</span>
+                <span className="id-practice-option__text">{opt}</span>
+              </button>
+            );
+          })}
+        </div>
       </div>
 
       {/* Feedback */}
       {answered && (
         <div className="id-practice-feedback">
-          <div className={`id-practice-feedback__verdict ${correct ? 'id-practice-feedback__verdict--correct' : 'id-practice-feedback__verdict--incorrect'}`}>
+          <div className={`id-practice-feedback__verdict ce-fade-in ${correct ? 'id-practice-feedback__verdict--correct' : 'id-practice-feedback__verdict--incorrect'}`}>
             {correct ? 'Correct' : 'Not quite'}
           </div>
           <p className="id-practice-feedback__explanation">{q.explanation}</p>
@@ -1541,39 +1559,42 @@ function ShiftChallenge({ onBack, onNavigateToDrip }) {
         </div>
         <p className="id-challenge-header__sub">One quick bedside pattern.</p>
         <div className="id-challenge-progress-bar">
-          <div className="id-challenge-progress-bar__fill" style={{ width: `${(index / total) * 100}%` }} />
+          <div className="id-challenge-progress-bar__fill" style={{ transform: `scaleX(${index / total})` }} />
         </div>
       </div>
 
-      {/* Scenario card */}
-      <div className="id-challenge-card">
-        <div className="id-challenge-card__title">{ch.title}</div>
-        <p className="id-challenge-card__snapshot">{ch.patientSnapshot}</p>
-        <p className="id-challenge-card__prompt">{ch.prompt}</p>
-      </div>
+      {/* Scenario card + options — keyed so each new challenge replays the
+          section-swap entrance (motion-system.md §5); the feedback block
+          below is a separate mount and is not part of this swapped region. */}
+      <div key={ch.id} className="ce-section-enter">
+        <div className="id-challenge-card">
+          <div className="id-challenge-card__title">{ch.title}</div>
+          <p className="id-challenge-card__snapshot">{ch.patientSnapshot}</p>
+          <p className="id-challenge-card__prompt">{ch.prompt}</p>
+        </div>
 
-      {/* Options */}
-      <div className="id-challenge-options">
-        {ch.options.map((opt, i) => {
-          let cls = 'id-challenge-option';
-          if (answered) {
-            if (i === ch.correctOption)  cls += ' id-challenge-option--correct';
-            else if (i === selected)     cls += ' id-challenge-option--incorrect';
-            else                         cls += ' id-challenge-option--dim';
-          }
-          return (
-            <button key={i} className={cls} onClick={() => handleAnswer(i)} disabled={answered}>
-              <span className="id-challenge-option__letter">{String.fromCharCode(65 + i)}</span>
-              <span className="id-challenge-option__text">{opt}</span>
-            </button>
-          );
-        })}
+        <div className="id-challenge-options">
+          {ch.options.map((opt, i) => {
+            let cls = 'id-challenge-option';
+            if (answered) {
+              if (i === ch.correctOption)  cls += ' id-challenge-option--correct';
+              else if (i === selected)     cls += ' id-challenge-option--incorrect';
+              else                         cls += ' id-challenge-option--dim';
+            }
+            return (
+              <button key={i} className={cls} onClick={() => handleAnswer(i)} disabled={answered}>
+                <span className="id-challenge-option__letter">{String.fromCharCode(65 + i)}</span>
+                <span className="id-challenge-option__text">{opt}</span>
+              </button>
+            );
+          })}
+        </div>
       </div>
 
       {/* Feedback */}
       {answered && (
         <div className="id-challenge-feedback">
-          <div className={`id-challenge-feedback__verdict ${correct ? 'id-challenge-feedback__verdict--correct' : 'id-challenge-feedback__verdict--incorrect'}`}>
+          <div className={`id-challenge-feedback__verdict ce-fade-in ${correct ? 'id-challenge-feedback__verdict--correct' : 'id-challenge-feedback__verdict--incorrect'}`}>
             {correct ? 'Correct' : 'Not quite'}
           </div>
           <p className="id-challenge-feedback__explanation">{ch.explanation}</p>

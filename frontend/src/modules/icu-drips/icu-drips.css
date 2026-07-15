@@ -72,20 +72,23 @@
   -webkit-backdrop-filter: blur(20px);
   border-bottom: 1px solid var(--ce-line-dark);
   padding-top: env(safe-area-inset-top);
-  padding-left: max(0px, env(safe-area-inset-left));
-  padding-right: max(0px, env(safe-area-inset-right));
+  padding-left: max(16px, env(safe-area-inset-left));
+  padding-right: max(16px, env(safe-area-inset-right));
 }
 
 .id-header__inner {
   max-width: 860px;
   margin: 0 auto;
-  padding: 17px 16px 13px;
+  padding: 14px 0;
   display: flex;
   align-items: center;
-  gap: 10px;
+  gap: 11px;
 }
-@media (min-width: 768px) {
-  .id-header__inner { padding: 18px 32px 14px; }
+
+.id-header__brand-block {
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
 }
 
 .id-header__brand {
@@ -95,47 +98,15 @@
   letter-spacing: -0.3px;
   line-height: 1.15;
 }
-.id-header__sep {
-  color: rgba(255,255,255,0.16);
-  font-size: 14px;
-  font-weight: 300;
-  margin: 0 1px;
-}
 .id-header__module {
-  font-size: 11px;
-  font-weight: 500;
+  font-size: var(--ce-fs-eyebrow);
+  font-weight: 700;
   color: var(--ce-text-dim);
   font-family: var(--id-font-mono);
-  letter-spacing: 0.04em;
-}
-.id-header__back {
-  margin-left: auto;
-  background: none;
-  border: none;
-  color: var(--ce-text-dim);
-  font-size: 13px;
-  font-weight: 500;
-  cursor: pointer;
-  font-family: var(--id-font-sans);
-  letter-spacing: 0;
-  padding: 0;
-  min-height: 40px;
-  display: inline-flex;
-  align-items: center;
-  gap: 5px;
+  letter-spacing: var(--ce-track-eyebrow);
+  text-transform: uppercase;
   line-height: 1;
-  transition: color var(--ce-dur-fast);
-  white-space: nowrap;
-  flex-shrink: 0;
 }
-.id-header__back:hover { color: var(--id-teal); }
-.id-header__back:focus-visible {
-  color: var(--id-teal);
-  outline: 2px solid var(--id-teal);
-  outline-offset: 3px;
-  border-radius: 3px;
-}
-.id-header__back:focus:not(:focus-visible) { outline: none; }
 
 /* ── Body ────────────────────────────────────────────────────────────────────── */
 .id-body {
@@ -2537,7 +2508,6 @@
     transform: none;
     transition: none;
   }
-  .id-header__back,
   .id-detail__back,
   .id-compare__back { transition: none; }
   .id-landing,

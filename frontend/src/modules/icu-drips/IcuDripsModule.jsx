@@ -379,7 +379,7 @@ function addRecentDripId(id) {
 function CELogo() {
   return (
     <svg
-      width="26" height="26" viewBox="0 0 225 200"
+      width="30" height="30" viewBox="0 0 225 200"
       xmlns="http://www.w3.org/2000/svg" fill="var(--ce-teal)"
       aria-label="Clinical Edge"
       style={{ flexShrink: 0, display: 'block' }}
@@ -1765,10 +1765,11 @@ export default function IcuDripsModule({ onGoHome }) {
       <header className="id-header">
         <div className="id-header__inner">
           <CELogo />
-          <span className="id-header__brand">Clinical Edge</span>
-          <span className="id-header__sep" aria-hidden="true">/</span>
-          <span className="id-header__module">ICU Drips</span>
-          <button className="id-header__back" onClick={onGoHome}>
+          <div className="id-header__brand-block">
+            <span className="id-header__brand">Clinical Edge</span>
+            <span className="id-header__module">ICU Drips</span>
+          </div>
+          <button className="ce-back-link" onClick={onGoHome}>
             ← All tools
           </button>
         </div>

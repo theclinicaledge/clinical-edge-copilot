@@ -293,18 +293,19 @@ function Header({ onGoHome, showBack, onBack, backLabel }) {
     <div style={{
       borderBottom: '1px solid var(--ce-line-dark)',
       paddingTop: 'env(safe-area-inset-top)',
-      paddingLeft: 'max(14px, env(safe-area-inset-left))',
-      paddingRight: 'max(14px, env(safe-area-inset-right))',
+      paddingLeft: 'max(16px, env(safe-area-inset-left))',
+      paddingRight: 'max(16px, env(safe-area-inset-right))',
       background: 'var(--ce-navy-header)',
       backdropFilter: 'blur(20px)',
+      WebkitBackdropFilter: 'blur(20px)',
       position: 'sticky',
       top: 0,
-      zIndex: 10,
+      zIndex: 50,
     }}>
       <div style={{
         maxWidth: 800, margin: '0 auto', width: '100%',
         display: 'flex', alignItems: 'center',
-        paddingTop: 22, paddingBottom: 16, gap: 11,
+        paddingTop: 14, paddingBottom: 14, gap: 11,
       }}>
         <CELogo />
         <div style={{ display: 'flex', flexDirection: 'column', gap: 1 }}>
@@ -312,8 +313,8 @@ function Header({ onGoHome, showBack, onBack, backLabel }) {
             Clinical Edge
           </span>
           <span style={{
-            fontSize: 10, fontWeight: 500, color: 'var(--ce-text-dim)',
-            letterSpacing: '0.7px', textTransform: 'uppercase',
+            fontSize: 'var(--ce-fs-eyebrow)', fontWeight: 700, color: 'var(--ce-text-dim)',
+            letterSpacing: 'var(--ce-track-eyebrow)', textTransform: 'uppercase',
             fontFamily: 'var(--ce-font-mono)', lineHeight: 1,
           }}>
             Reference Hub

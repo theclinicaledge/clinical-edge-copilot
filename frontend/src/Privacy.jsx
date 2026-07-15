@@ -45,14 +45,9 @@ export default function Privacy() {
             <path d="M 158.0,92 L 215,82 L 225,95 L 215,107 L 158.0,108 Z" />
             <path d="M 150.0,129 L 208,130 L 218,142 L 208,155 L 144.0,143 Z" />
           </svg>
-          <div style={{ display: "flex", flexDirection: "column", gap: 1 }}>
-            <span style={{ fontSize: 15, fontWeight: 700, color: "var(--ce-text-light)", letterSpacing: "-0.3px", lineHeight: 1.15 }}>
-              Clinical Edge
-            </span>
-            <span style={{ fontSize: "var(--ce-fs-eyebrow)", fontWeight: 500, color: "var(--ce-text-dim)", letterSpacing: "var(--ce-track-eyebrow)", textTransform: "uppercase", fontFamily: "'IBM Plex Mono', monospace", lineHeight: 1 }}>
-              Copilot
-            </span>
-          </div>
+          <span style={{ fontSize: 15, fontWeight: 700, color: "var(--ce-text-light)", letterSpacing: "-0.3px", lineHeight: 1.15 }}>
+            Clinical Edge
+          </span>
           <a
             href="/"
             className="privacy-back-link"

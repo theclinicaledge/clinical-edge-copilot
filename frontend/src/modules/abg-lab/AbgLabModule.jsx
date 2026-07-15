@@ -30,6 +30,19 @@ const EXAMPLES = [
 
 const EMPTY = { pH: '', paco2: '', hco3: '', pao2: '', fio2: '' };
 
+// ── CE Logo (shared mark) ─────────────────────────────────────────────────────
+function CELogo() {
+  return (
+    <svg width="30" height="30" viewBox="0 0 225 200" xmlns="http://www.w3.org/2000/svg"
+      fill="var(--ce-teal)" aria-label="Clinical Edge" style={{ flexShrink: 0, display: 'block' }}>
+      <path d="M 159.1,24.3 A 96,96 0 1,0 159.1,175.7 L 135.7,145.7 A 58,58 0 1,1 135.7,54.3 Z" />
+      <path d="M 144.0,57 L 208,45 L 218,58 L 208,70 L 150.0,71 Z" />
+      <path d="M 158.0,92 L 215,82 L 225,95 L 215,107 L 158.0,108 Z" />
+      <path d="M 150.0,129 L 208,130 L 218,142 L 208,155 L 144.0,143 Z" />
+    </svg>
+  );
+}
+
 function validateFields(f) {
   const pH    = parseFloat(f.pH);
   const paco2 = parseFloat(f.paco2);
@@ -109,7 +122,7 @@ function ResultCard({ result }) {
       <div className="abg-card">
         <div className="abg-card-label" style={{ marginBottom: 10 }}>Nurse-Facing Pearl</div>
         <div className="abg-pearl">
-          <span className="abg-pearl-icon">✦</span>
+          <span className="abg-pearl-eyebrow">Pearl</span>
           <span className="abg-pearl-text">"{pearl}"</span>
         </div>
         <hr className="abg-divider" />
@@ -201,10 +214,14 @@ export default function AbgLabModule({ onGoHome }) {
       {/* Header */}
       <div className="abg-header">
         <div className="abg-header-inner">
-          <button className="abg-back-btn" onClick={onGoHome} aria-label="Back to all tools">
+          <CELogo />
+          <div className="abg-header-titles">
+            <span className="abg-header-name">Clinical Edge</span>
+            <span className="abg-header-eyebrow">ABG Lab</span>
+          </div>
+          <button className="ce-back-link" onClick={onGoHome}>
             ← All tools
           </button>
-          <span className="abg-header-label">ABG Lab</span>
         </div>
       </div>
 
@@ -329,7 +346,7 @@ export default function AbgLabModule({ onGoHome }) {
 
           {/* Result */}
           {result && (
-            <div id="abg-result-anchor">
+            <div id="abg-result-anchor" className="ce-section-enter">
               <ResultCard result={result} />
             </div>
           )}

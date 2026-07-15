@@ -132,7 +132,7 @@ export function TwoQuestionSprint({ onBack }: TwoQuestionSprintProps) {
       {/* Panel */}
       <div className="sprint-panel">
         {!revealed ? (
-          <div className="sprint-questions">
+          <div key={`q-${cardIdx}`} className="sprint-questions ce-section-enter">
 
             <div className="sprint-q-block">
               <p className="sprint-q-label">Rate?</p>
@@ -171,17 +171,17 @@ export function TwoQuestionSprint({ onBack }: TwoQuestionSprintProps) {
             )}
           </div>
         ) : (
-          <div className="sprint-reveal sprint-reveal--animate">
+          <div key={`r-${cardIdx}`} className="sprint-reveal ce-section-enter">
             <div className="sprint-reveal__header">
               <div className="sprint-reveal__identity">
                 <span className="practice-answer__abbrev">{rhythm.shortName}</span>
                 <span className="practice-answer__name">{rhythm.name}</span>
               </div>
               <div className="sprint-reveal__checks">
-                <span className={`sprint-check${rateAns === correctRate ? ' sprint-check--correct' : ' sprint-check--wrong'}`}>
+                <span className={`sprint-check ce-fade-in${rateAns === correctRate ? ' sprint-check--correct' : ' sprint-check--wrong'}`}>
                   {rateAns === correctRate ? '✓' : '✗'} Rate: {correctRate}
                 </span>
-                <span className={`sprint-check${regAns === correctReg ? ' sprint-check--correct' : ' sprint-check--wrong'}`}>
+                <span className={`sprint-check ce-fade-in${regAns === correctReg ? ' sprint-check--correct' : ' sprint-check--wrong'}`}>
                   {regAns === correctReg ? '✓' : '✗'} {correctReg.charAt(0).toUpperCase() + correctReg.slice(1)}
                 </span>
               </div>

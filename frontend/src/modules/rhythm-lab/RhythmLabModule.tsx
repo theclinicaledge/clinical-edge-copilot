@@ -20,8 +20,8 @@ interface RhythmLabModuleProps {
 function CELogo() {
   return (
     <svg
-      width="26"
-      height="26"
+      width="30"
+      height="30"
       viewBox="0 0 225 200"
       xmlns="http://www.w3.org/2000/svg"
       fill="var(--ce-teal)"
@@ -78,9 +78,10 @@ export default function RhythmLabModule({ onGoHome }: RhythmLabModuleProps) {
         <header className="site-header">
           <div className="site-header__inner">
             <CELogo />
-            <span className="site-header__brand">Clinical Edge</span>
-            <span className="site-header__sep" aria-hidden="true">/</span>
-            <span className="site-header__module">Rhythm Lab</span>
+            <div className="site-header__brand-block">
+              <span className="site-header__brand">Clinical Edge</span>
+              <span className="site-header__module">Rhythm Lab</span>
+            </div>
             <button className="ce-back-link" onClick={onGoHome}>
               ← All tools
             </button>

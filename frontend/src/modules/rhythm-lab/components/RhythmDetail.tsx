@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { trackEvent } from '../../../analytics';
-import { URGENCY_COLORS, URGENCY_CONTEXT } from '../data/rhythms';
+import { URGENCY_BADGE, URGENCY_COLORS_WARM, URGENCY_CONTEXT } from '../data/rhythms';
 import type { Rhythm } from '../data/rhythms';
 import { RhythmStrip } from './RhythmStrip';
 import { RecognitionSidebar } from './RecognitionSidebar';
@@ -15,7 +15,8 @@ interface RhythmDetailProps {
 }
 
 export function RhythmDetail({ rhythm, onBack }: RhythmDetailProps) {
-  const urgencyColor   = URGENCY_COLORS[rhythm.urgency];
+  const urgencyBadge   = URGENCY_BADGE[rhythm.urgency];
+  const urgencyColor   = URGENCY_COLORS_WARM[rhythm.urgency];
   const urgencyContext = URGENCY_CONTEXT[rhythm.urgency];
   const [caliperOn, setCaliperOn] = useState(false);
   const [bookmarked, setBookmarked] = useState(() => isFavorite(rhythm.id));
@@ -29,7 +30,7 @@ export function RhythmDetail({ rhythm, onBack }: RhythmDetailProps) {
   }, [rhythm.id]);
 
   return (
-    <div className="detail-page">
+    <div className="detail-page ce-stagger-children">
 
       <div className="detail-nav">
         <button className="detail-back" onClick={onBack} aria-label="Back to rhythm list">
@@ -42,9 +43,9 @@ export function RhythmDetail({ rhythm, onBack }: RhythmDetailProps) {
         <span
           className="detail-urgency-tag"
           style={{
-            color: urgencyColor,
-            borderColor: urgencyColor + '60',
-            backgroundColor: urgencyColor + '16',
+            color: urgencyBadge.color,
+            borderColor: urgencyBadge.border,
+            backgroundColor: urgencyBadge.bg,
           }}
         >
           {rhythm.urgencyLabel}
@@ -67,7 +68,7 @@ export function RhythmDetail({ rhythm, onBack }: RhythmDetailProps) {
         </button>
       </div>
 
-      <div className="detail-strip-area">
+      <div className="detail-strip-area ce-card-enter">
         <div className="detail-strip-wrap">
           <RhythmStrip rhythmId={rhythm.id} />
           {caliperOn && <CaliperOverlay />}
@@ -97,11 +98,11 @@ export function RhythmDetail({ rhythm, onBack }: RhythmDetailProps) {
         )}
       </div>
 
-      <div className="detail-tagline-bar">
+      <div className="detail-tagline-bar ce-card-enter">
         <p className="detail-tagline">{rhythm.tagline}</p>
       </div>
 
-      <div className="detail-content">
+      <div className="detail-content ce-card-enter">
         <div className="detail-main">
 
           {/* First Clue callout — most important recognition cue, surfaced above the snapshot */}
@@ -209,7 +210,7 @@ export function RhythmDetail({ rhythm, onBack }: RhythmDetailProps) {
         </aside>
       </div>
 
-      <div className="disclaimer">
+      <div className="disclaimer ce-card-enter">
         <p>
           Educational reference only. Not a diagnostic tool. Always interpret rhythm findings
           in full clinical context with provider guidance and local protocol.

@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef } from 'react';
-import { RHYTHMS } from '../data/rhythms';
+import { RHYTHMS, URGENCY_COLORS } from '../data/rhythms';
 import type { Rhythm } from '../data/rhythms';
 import { COMPARISONS } from '../data/comparisons';
 import { RhythmStrip } from './RhythmStrip';
@@ -9,13 +9,6 @@ import type { ComparePair } from '../utils/localProgress';
 interface CompareModeProps {
   onBack: () => void;
 }
-
-const URGENCY_COLOR: Record<string, string> = {
-  stable:   '#4E7C70',
-  monitor:  'var(--ce-gold)',
-  urgent:   '#D97706',
-  critical: '#DC2626',
-};
 
 export function CompareMode({ onBack }: CompareModeProps) {
   const [idA, setIdA] = useState('mobitz_i');
@@ -184,7 +177,7 @@ export function CompareMode({ onBack }: CompareModeProps) {
 }
 
 function StripCard({ rhythm }: { rhythm: Rhythm }) {
-  const color = URGENCY_COLOR[rhythm.urgency] ?? 'var(--ce-text-light-sec)';
+  const color = URGENCY_COLORS[rhythm.urgency] ?? 'var(--ce-text-light-sec)';
   return (
     <div className="compare-strip-card">
       <div className="compare-strip-card__header">

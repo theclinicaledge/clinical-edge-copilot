@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef } from 'react';
 import { trackEvent } from '../../../analytics';
-import { RHYTHMS, PRACTICE_CATEGORIES, URGENCY_COLORS } from '../data/rhythms';
+import { RHYTHMS, PRACTICE_CATEGORIES, URGENCY_COLORS_WARM } from '../data/rhythms';
 import { RhythmStrip } from './RhythmStrip';
 import {
   recordPracticeDay,
@@ -36,7 +36,7 @@ export function PracticeMode({ onBack }: PracticeModeProps) {
 
   const safeIdx    = catIdx % catRhythms.length;
   const rhythm     = catRhythms[safeIdx];
-  const urgencyColor = URGENCY_COLORS[rhythm.urgency];
+  const urgencyColor = URGENCY_COLORS_WARM[rhythm.urgency];
 
   // Record today as a practice day on first mount
   const didRecordDay = useRef(false);
@@ -110,7 +110,7 @@ export function PracticeMode({ onBack }: PracticeModeProps) {
         {!revealed ? (
 
           /* ── Pre-reveal ────────────────────────────────────── */
-          <div className="practice-identify">
+          <div key={`identify-${catKey}-${safeIdx}`} className="practice-identify ce-section-enter">
             <div className="practice-identify__top">
               <p className="practice-eyebrow">Practice Strip</p>
               <p className="practice-identify__prompt">Identify the rhythm</p>
@@ -122,12 +122,12 @@ export function PracticeMode({ onBack }: PracticeModeProps) {
             {/* Progressive clues */}
             {cluesShown > 0 && (
               <div className="practice-clues">
-                <div className="practice-clue-block">
+                <div className="practice-clue-block ce-section-enter">
                   <span className="practice-clue-tag">Clue 1</span>
                   <p className="practice-clue-text">{rhythm.recognitionCues[0]}</p>
                 </div>
                 {cluesShown >= 2 && (
-                  <div className="practice-clue-block">
+                  <div className="practice-clue-block ce-section-enter">
                     <span className="practice-clue-tag">Clue 2</span>
                     <p className="practice-clue-text">{rhythm.recognitionCues[1]}</p>
                   </div>
@@ -168,7 +168,7 @@ export function PracticeMode({ onBack }: PracticeModeProps) {
         ) : (
 
           /* ── Post-reveal ────────────────────────────────────── */
-          <div className="practice-answer">
+          <div key={`answer-${catKey}-${safeIdx}`} className="practice-answer ce-section-enter">
             <div className="practice-answer__header">
               <span className="practice-answer__abbrev">{rhythm.shortName}</span>
               <span className="practice-answer__name">{rhythm.name}</span>

@@ -1194,11 +1194,33 @@ export const RHYTHM_ALIASES: Record<string, string[]> = {
   mat:                        ['multifocal', 'multifocal atrial', 'wandering', 'copd rhythm', 'chaotic atrial'],
 };
 
+// Text-only urgency colors for plain labels on the DARK surface (rhythm index rows,
+// compare-mode strip cards, detail nav badge text). §1.5: dark surfaces use the
+// -dark text variants; "monitor" maps to gold per design-system.md §1.2's
+// "monitor/watch badges" role for --ce-gold.
 export const URGENCY_COLORS: Record<UrgencyLevel, string> = {
-  stable:   "#22c55e",
-  monitor:  "#f59e0b",
-  urgent:   "#f97316",
-  critical: "#ef4444",
+  stable:   "var(--ce-urgency-low-dark)",
+  monitor:  "var(--ce-gold)",
+  urgent:   "var(--ce-urgency-mod-dark)",
+  critical: "var(--ce-urgency-high-dark)",
+};
+
+// Same 4-tier semantics, WARM-surface variant (practice-mode answer panel,
+// bedside urgency callout) — base tokens read correctly on light backgrounds.
+export const URGENCY_COLORS_WARM: Record<UrgencyLevel, string> = {
+  stable:   "var(--ce-urgency-low)",
+  monitor:  "var(--ce-gold-deep)",
+  urgent:   "var(--ce-urgency-mod)",
+  critical: "var(--ce-urgency-high)",
+};
+
+// Full badge treatment (text + tint bg + line border, design-system.md §4.4) for the
+// dark-surface urgency tag in the rhythm-detail nav bar.
+export const URGENCY_BADGE: Record<UrgencyLevel, { color: string; border: string; bg: string }> = {
+  stable:   { color: "var(--ce-urgency-low-dark)",  border: "var(--ce-urgency-low-line)",  bg: "var(--ce-urgency-low-bg)" },
+  monitor:  { color: "var(--ce-gold)",               border: "rgba(212, 168, 75, 0.30)",    bg: "rgba(212, 168, 75, 0.10)" },
+  urgent:   { color: "var(--ce-urgency-mod-dark)",  border: "var(--ce-urgency-mod-line)",  bg: "var(--ce-urgency-mod-bg)" },
+  critical: { color: "var(--ce-urgency-high-dark)", border: "var(--ce-urgency-high-line)", bg: "var(--ce-urgency-high-bg)" },
 };
 
 export const URGENCY_CONTEXT: Record<UrgencyLevel, string> = {

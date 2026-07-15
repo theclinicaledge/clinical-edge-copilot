@@ -18,8 +18,8 @@
   --bg-base:          var(--ce-navy-900);
   --bg-surface:       var(--ce-navy-700);
   --bg-elevated:      var(--ce-navy-600);
-  --surface-warm:     #F0EDE6;
-  --surface-warm-deep: #E8E3D8;
+  --surface-warm:     var(--ce-warm-mid);
+  --surface-warm-deep: var(--ce-warm-deep);
   --text-primary:     var(--ce-text-light);
   --text-secondary:   var(--ce-text-light-sec);
   --text-dark:        var(--ce-text-dark);
@@ -84,9 +84,8 @@
 
 .site-header {
   flex-shrink: 0;
-  background: var(--bg-base);
-  border-bottom: 1px solid var(--border);
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.18);
+  background: var(--ce-navy-header);
+  border-bottom: 1px solid var(--ce-line-dark);
   padding-top: env(safe-area-inset-top);
   padding-left: max(0px, env(safe-area-inset-left));
   padding-right: max(0px, env(safe-area-inset-right));
@@ -99,7 +98,7 @@
   height: 50px;
   display: flex;
   align-items: center;
-  gap: 12px;
+  gap: 11px;
 }
 
 .site-header__logo {
@@ -108,27 +107,30 @@
   align-items: center;
 }
 
-.site-header__brand {
-  font-family: var(--font-mono);
-  font-size: 11px;
-  font-weight: 600;
-  letter-spacing: 0.12em;
-  text-transform: uppercase;
-  color: var(--text-primary);
+/* Wordmark + module eyebrow stack — the one page-header recipe (design-system.md §4.1) */
+.site-header__brand-block {
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
 }
 
-.site-header__sep {
-  color: var(--border);
-  font-size: 16px;
-  user-select: none;
+.site-header__brand {
+  font-family: var(--font-sans);
+  font-size: 15px;
+  font-weight: 700;
+  letter-spacing: -0.3px;
+  line-height: 1.15;
+  color: var(--text-primary);
 }
 
 .site-header__module {
   font-family: var(--font-mono);
-  font-size: 11px;
-  letter-spacing: 0.08em;
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.12em;
   text-transform: uppercase;
-  color: var(--accent-teal);
+  line-height: 1;
+  color: var(--ce-text-dim);
 }
 
 /* ─── Back / navigation link ─────────────────────────────────────────── */
@@ -381,7 +383,7 @@
   color: var(--text-primary);
   cursor: pointer;
   background: none;
-  transition: background 0.16s ease, transform 0.16s ease;
+  transition: background var(--ce-dur-fast) var(--ce-ease-out);
   position: relative;
 }
 
@@ -391,7 +393,12 @@
 
 .rhythm-item:hover {
   background: var(--bg-elevated);
-  transform: translateX(2px);
+}
+
+/* Row press: tint step only, no transform — rows are furniture (§2, precedent: icu-drips.css) */
+.rhythm-item:active {
+  background: var(--bg-elevated);
+  transition-duration: 60ms;
 }
 
 .rhythm-item:focus-visible {
@@ -522,7 +529,7 @@
   border: none;
   background: none;
   cursor: pointer;
-  transition: color 0.14s;
+  transition: color var(--ce-dur-fast) var(--ce-ease-out);
   flex-shrink: 0;
   opacity: 0.6;
 }
@@ -646,12 +653,18 @@
   letter-spacing: 0.06em;
   text-transform: uppercase;
   cursor: pointer;
-  transition: border-color 0.15s, color 0.15s, background 0.15s;
+  transition: border-color var(--ce-dur-fast) var(--ce-ease-out), color var(--ce-dur-fast) var(--ce-ease-out),
+    background var(--ce-dur-fast) var(--ce-ease-out), transform 60ms var(--ce-ease-out), opacity 60ms var(--ce-ease-out);
   white-space: nowrap;
 }
 .caliper-btn:hover {
   border-color: rgba(10, 191, 188, 0.45);
   color: var(--text-primary);
+}
+.caliper-btn:active {
+  transform: scale(0.97);
+  opacity: 0.85;
+  transition-duration: 60ms;
 }
 .caliper-btn--on {
   border-color: rgba(10, 191, 188, 0.55);
@@ -789,7 +802,7 @@
   font-family: var(--font-mono);
   font-size: 10px;
   font-weight: 600;
-  color: #4E7C70;
+  color: var(--ce-cat-sinus);
   flex-shrink: 0;
   width: 18px;
   padding-top: 2px;
@@ -1136,7 +1149,11 @@
 @media (prefers-reduced-motion: no-preference) {
 
   /* Waveform sweep: clip-path reveals the strip left → right,
-     matching the left-to-right reading direction of a cardiac strip. */
+     matching the left-to-right reading direction of a cardiac strip.
+     NOTE (flagged, not changed): this keeps its pre-existing 2.3s/linear
+     timing rather than the §1 token set — it is a clinical-strip signature
+     effect, not a UI entrance, and collapsing it to ≤220ms would erase the
+     sweep entirely. See final report — dispatcher call needed. */
   @keyframes strip-reveal {
     from { clip-path: inset(0 100% 0 0); }
     to   { clip-path: inset(0 0% 0 0); }
@@ -1145,22 +1162,13 @@
   .strip-canvas {
     animation: strip-reveal 2.3s linear both;
   }
-
-  /* Staggered entrance for detail page sections below the nav bar.
-     Nav stays fixed; everything beneath cascades in. */
-  @keyframes fade-up {
-    from { opacity: 0; transform: translateY(7px); }
-    to   { opacity: 1; transform: translateY(0); }
-  }
-
-  .detail-strip-area  { animation: fade-up 0.28s ease-out both; }
-  .detail-tagline-bar { animation: fade-up 0.28s 0.10s ease-out both; }
-  .detail-content     { animation: fade-up 0.32s 0.17s ease-out both; }
-  .disclaimer         { animation: fade-up 0.26s 0.23s ease-out both; }
-
-  .compare-strip-card { animation: fade-up 0.3s ease-out both; }
-  .compare-analysis   { animation: fade-up 0.3s 0.12s ease-out both; }
 }
+
+/* Detail-page section entrance: the ONE sanctioned double-layer (motion-system.md §5) —
+   .detail-page gets .ce-stagger-children (see RhythmDetail.tsx); each section below the
+   nav bar carries .ce-card-enter. Compare-mode's own sections do not re-animate —
+   compare-page already receives .ce-page-enter from the app-body wrapper, and a second
+   per-section animation there would be the banned cascading double-entrance. */
 
 /* ─── Home: right header & action row ───────────────────────────────── */
 
@@ -1310,7 +1318,7 @@
   background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6' viewBox='0 0 10 6'%3E%3Cpath d='M1 1l4 4 4-4' stroke='%2394A3B8' stroke-width='1.5' fill='none' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
   background-repeat: no-repeat;
   background-position: right 10px center;
-  transition: border-color 0.14s;
+  transition: border-color var(--ce-dur-fast) var(--ce-ease-out);
 }
 
 .compare-select:hover { border-color: var(--text-secondary); }
@@ -1364,7 +1372,7 @@
   cursor: pointer;
   padding: 2px 8px;
   white-space: nowrap;
-  transition: color 0.13s;
+  transition: color var(--ce-dur-fast) var(--ce-ease-out);
 }
 
 .compare-preset-row:first-child { border-left: none; padding-left: 0; }
@@ -1516,7 +1524,7 @@
   font-family: var(--font-mono);
   font-size: 10px;
   font-weight: 600;
-  color: #4E7C70;
+  color: var(--ce-cat-sinus);
   flex-shrink: 0;
   width: 16px;
   padding-top: 3px;
@@ -1564,7 +1572,7 @@
 }
 
 .compare-note--teaching .compare-note__label {
-  color: #8B6914;
+  color: var(--ce-gold-deep);
 }
 
 .compare-note__text {
@@ -1623,7 +1631,13 @@
   cursor: pointer;
   white-space: nowrap;
   width: 100%;
-  transition: background 0.13s, border-color 0.13s;
+  transition: background var(--ce-dur-fast) var(--ce-ease-out), border-color var(--ce-dur-fast) var(--ce-ease-out),
+    transform 60ms var(--ce-ease-out);
+}
+
+.action-btn:active {
+  transform: scale(0.98);
+  transition-duration: 60ms;
 }
 
 @media (min-width: 640px) {
@@ -1736,7 +1750,7 @@
   background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6' viewBox='0 0 10 6'%3E%3Cpath d='M1 1l4 4 4-4' stroke='%2394A3B8' stroke-width='1.5' fill='none' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
   background-repeat: no-repeat;
   background-position: right 8px center;
-  transition: border-color 0.14s;
+  transition: border-color var(--ce-dur-fast) var(--ce-ease-out);
   min-width: 0;
   max-width: 100%;
 }
@@ -1806,23 +1820,25 @@
   font-weight: 600;
   letter-spacing: 0.1em;
   text-transform: uppercase;
-  color: #1a1208;
+  color: var(--ce-navy-900);
   background: var(--accent-gold);
   border: none;
   border-radius: 4px;
   padding: 10px 28px;
   cursor: pointer;
-  transition: opacity 0.14s;
+  transition: opacity var(--ce-dur-fast) var(--ce-ease-out), transform 60ms var(--ce-ease-out);
 }
 
 .practice-reveal-btn:hover { opacity: 0.85; }
 
-/* ─── Progressive reveal clues ───────────────────────────────────────── */
-
-@keyframes clue-fade-in {
-  from { opacity: 0; transform: translateY(4px); }
-  to   { opacity: 1; transform: none; }
+.practice-reveal-btn:active {
+  transform: scale(0.98);
+  transition-duration: 60ms;
 }
+
+/* ─── Progressive reveal clues ───────────────────────────────────────── */
+/* Clue reveal uses the sanctioned .ce-section-enter utility (tokens.css),
+   applied in PracticeMode.tsx — motion-system.md §5. */
 
 .practice-identify__action {
   padding: 14px 32px 0;
@@ -1836,7 +1852,6 @@
 .practice-clue-block {
   padding: 13px 32px;
   border-bottom: 1px solid var(--border-warm);
-  animation: clue-fade-in 0.22s ease-out;
 }
 
 .practice-clue-tag {
@@ -1870,12 +1885,18 @@
   border-radius: 3px;
   padding: 9px 24px;
   cursor: pointer;
-  transition: border-color 0.14s, color 0.14s;
+  transition: border-color var(--ce-dur-fast) var(--ce-ease-out), color var(--ce-dur-fast) var(--ce-ease-out),
+    transform 60ms var(--ce-ease-out);
 }
 
 .practice-clue-btn:hover {
   border-color: rgba(10, 191, 188, 0.45);
   color: var(--text-dark);
+}
+
+.practice-clue-btn:active {
+  transform: scale(0.98);
+  transition-duration: 60ms;
 }
 
 /* Systematic approach framework */
@@ -2042,7 +2063,7 @@
   font-family: var(--font-mono);
   font-size: 10px;
   font-weight: 600;
-  color: #4E7C70;
+  color: var(--ce-cat-sinus);
   flex-shrink: 0;
   width: 18px;
   padding-top: 2px;
@@ -2090,12 +2111,18 @@
   cursor: pointer;
   white-space: nowrap;
   flex-shrink: 0;
-  transition: color 0.13s, border-color 0.13s;
+  transition: color var(--ce-dur-fast) var(--ce-ease-out), border-color var(--ce-dur-fast) var(--ce-ease-out),
+    transform 60ms var(--ce-ease-out);
 }
 
 .practice-next-btn:hover {
   color: var(--text-dark);
   border-color: var(--text-dark-muted);
+}
+
+.practice-next-btn:active {
+  transform: scale(0.98);
+  transition-duration: 60ms;
 }
 
 /* ── Mobile adjustments ───────────────────────────────────────────────── */
@@ -2364,13 +2391,20 @@
   color: var(--text-secondary);
   border: 1px solid var(--border);
   cursor: pointer;
-  transition: border-color 0.15s, color 0.15s;
+  transition: border-color var(--ce-dur-fast) var(--ce-ease-out), color var(--ce-dur-fast) var(--ce-ease-out),
+    transform 60ms var(--ce-ease-out), opacity 60ms var(--ce-ease-out);
   line-height: 1.6;
 }
 
 .progress-recent-chip:hover {
   border-color: var(--accent-teal);
   color: var(--accent-teal);
+}
+
+.progress-recent-chip:active {
+  transform: scale(0.97);
+  opacity: 0.85;
+  transition-duration: 60ms;
 }
 
 /* Saved rhythms panel (home-left, below teaching panel) */
@@ -2401,9 +2435,15 @@
   border-bottom: 1px solid var(--border);
   background: none;
   cursor: pointer;
-  transition: color 0.15s;
+  transition: color var(--ce-dur-fast) var(--ce-ease-out), background var(--ce-dur-fast) var(--ce-ease-out);
   color: var(--text-primary);
   font-size: 13px;
+}
+
+/* Row press: tint step only, no transform (§2 — rows are furniture) */
+.progress-rhythm-row:active {
+  background: var(--bg-elevated);
+  transition-duration: 60ms;
 }
 
 .progress-rhythm-row:last-child {
@@ -2451,7 +2491,8 @@
   background: none;
   color: var(--text-dark-muted);
   cursor: pointer;
-  transition: border-color 0.15s, color 0.15s;
+  transition: border-color var(--ce-dur-fast) var(--ce-ease-out), color var(--ce-dur-fast) var(--ce-ease-out),
+    transform 60ms var(--ce-ease-out);
   margin-left: 8px;
   white-space: nowrap;
   flex-shrink: 0;
@@ -2461,6 +2502,11 @@
 .bookmark-btn--active {
   border-color: var(--accent-teal);
   color: var(--accent-teal);
+}
+
+.bookmark-btn:active {
+  transform: scale(0.98);
+  transition-duration: 60ms;
 }
 
 /* Recently compared chips in compare-presets */
@@ -2492,8 +2538,15 @@
   color: var(--text-secondary);
   border: 1px solid var(--border);
   cursor: pointer;
-  transition: border-color 0.15s, color 0.15s;
+  transition: border-color var(--ce-dur-fast) var(--ce-ease-out), color var(--ce-dur-fast) var(--ce-ease-out),
+    transform 60ms var(--ce-ease-out), opacity 60ms var(--ce-ease-out);
   line-height: 1.6;
+}
+
+.compare-recent-chip:active {
+  transform: scale(0.97);
+  opacity: 0.85;
+  transition-duration: 60ms;
 }
 
 .compare-recent-chip__sep {
@@ -2501,9 +2554,15 @@
   color: var(--text-dark-muted);
 }
 
-.compare-recent-chip:hover,
-.compare-recent-chip--active {
+.compare-recent-chip:hover {
   border-color: var(--accent-teal);
+  color: var(--accent-teal);
+}
+
+/* Focused/selected treatment (motion-system.md §8) */
+.compare-recent-chip--active {
+  border-color: rgba(10, 191, 188, 0.30);
+  box-shadow: var(--ce-shadow-float);
   color: var(--accent-teal);
 }
 
@@ -2543,11 +2602,16 @@
   cursor: pointer;
   border: none;
   text-align: left;
-  transition: background 0.12s;
+  transition: background var(--ce-dur-fast) var(--ce-ease-out), transform 60ms var(--ce-ease-out);
 }
 
 .foundations-toggle:hover {
   background: rgba(10, 191, 188, 0.04);
+}
+
+.foundations-toggle:active {
+  transform: scale(0.98);
+  transition-duration: 60ms;
 }
 
 .foundations-toggle__eyebrow {
@@ -2575,7 +2639,7 @@
   color: var(--text-secondary);
   flex-shrink: 0;
   opacity: 0.5;
-  transition: transform 0.18s var(--ce-ease-out);
+  transition: transform var(--ce-dur-base) var(--ce-ease-out);
 }
 .foundations-toggle[aria-expanded="true"] .foundations-toggle__chevron {
   transform: rotate(90deg);
@@ -2704,7 +2768,7 @@
   color: var(--accent-gold);
   cursor: pointer;
   opacity: 0.6;
-  transition: opacity 0.13s;
+  transition: opacity var(--ce-dur-fast) var(--ce-ease-out);
 }
 
 .pearls-expand-btn:hover { opacity: 1; }
@@ -2734,7 +2798,7 @@
   flex: 1;
   border-radius: 2px;
   background: var(--border);
-  transition: background 0.2s;
+  transition: background var(--ce-dur-fast) var(--ce-ease-out);
 }
 
 .sprint-progress-pip--done {
@@ -2798,7 +2862,8 @@
   font-size: 12px;
   font-weight: 500;
   cursor: pointer;
-  transition: background 0.1s, border-color 0.1s, color 0.1s;
+  transition: background var(--ce-dur-fast) var(--ce-ease-out), border-color var(--ce-dur-fast) var(--ce-ease-out),
+    color var(--ce-dur-fast) var(--ce-ease-out), transform 60ms var(--ce-ease-out);
   letter-spacing: 0.02em;
 }
 
@@ -2808,15 +2873,20 @@
   background: rgba(10, 191, 188, 0.06);
 }
 
+.sprint-option:active {
+  transform: scale(0.98);
+  transition-duration: 60ms;
+}
+
 .sprint-option--selected {
   background: var(--accent-teal);
   border-color: var(--accent-teal);
-  color: #fff;
+  color: var(--ce-text-dark);
 }
 
 .sprint-option--selected:hover {
   background: var(--accent-teal);
-  color: #fff;
+  color: var(--ce-text-dark);
 }
 
 .sprint-reveal-btn {
@@ -2832,10 +2902,15 @@
   font-weight: 600;
   cursor: pointer;
   letter-spacing: 0.04em;
-  transition: opacity 0.15s;
+  transition: opacity var(--ce-dur-fast) var(--ce-ease-out), transform 60ms var(--ce-ease-out);
 }
 
 .sprint-reveal-btn:hover { opacity: 0.8; }
+
+.sprint-reveal-btn:active {
+  transform: scale(0.98);
+  transition-duration: 60ms;
+}
 
 /* Reveal panel */
 .sprint-reveal {
@@ -2845,14 +2920,8 @@
   gap: 12px;
 }
 
-@keyframes sprintReveal {
-  from { opacity: 0; transform: translateY(4px); }
-  to   { opacity: 1; transform: translateY(0); }
-}
-
-.sprint-reveal--animate {
-  animation: sprintReveal 0.2s ease-out both;
-}
+/* Reveal/next-question swap uses the sanctioned .ce-section-enter utility
+   (tokens.css), keyed by cardIdx in TwoQuestionSprint.tsx — see motion-system.md §5. */
 
 .sprint-reveal__header {
   display: flex;
@@ -2881,16 +2950,17 @@
   font-weight: 600;
   padding: 2px 8px;
   border-radius: 3px;
+  transition: color var(--ce-dur-fast) var(--ce-ease-out), background var(--ce-dur-fast) var(--ce-ease-out);
 }
 
 .sprint-check--correct {
-  color: #2D7A56;
-  background: rgba(45, 122, 86, 0.1);
+  color: var(--ce-urgency-low);
+  background: var(--ce-urgency-low-bg);
 }
 
 .sprint-check--wrong {
-  color: #B94040;
-  background: rgba(185, 64, 64, 0.1);
+  color: var(--ce-urgency-high);
+  background: var(--ce-urgency-high-bg);
 }
 
 .sprint-reveal__data {
@@ -2935,10 +3005,15 @@
   font-size: 12px;
   font-weight: 600;
   cursor: pointer;
-  transition: opacity 0.15s;
+  transition: opacity var(--ce-dur-fast) var(--ce-ease-out), transform 60ms var(--ce-ease-out);
 }
 
 .sprint-next-btn:hover { opacity: 0.8; }
+
+.sprint-next-btn:active {
+  transform: scale(0.98);
+  transition-duration: 60ms;
+}
 
 /* Done screen */
 .sprint-done {
@@ -3135,7 +3210,9 @@
   font-family: var(--font-mono);
   font-size: 10px;
   cursor: pointer;
-  transition: background 0.12s, border-color 0.12s, color 0.12s;
+  transition: background var(--ce-dur-fast) var(--ce-ease-out), border-color var(--ce-dur-fast) var(--ce-ease-out),
+    color var(--ce-dur-fast) var(--ce-ease-out), box-shadow var(--ce-dur-fast) var(--ce-ease-out),
+    transform 60ms var(--ce-ease-out);
   white-space: nowrap;
   width: fit-content;
   max-width: 100%;
@@ -3146,9 +3223,17 @@
   color: var(--accent-teal);
 }
 
+.crv-selector-btn:active {
+  transform: scale(0.98);
+  transition-duration: 60ms;
+}
+
+/* Focused/selected treatment (motion-system.md §8) — border steps to the
+   permitted 0.30 alpha step + shadow-float; never scale-up, never dim siblings. */
 .crv-selector-btn--active {
   background: rgba(10, 191, 188, 0.12);
-  border-color: rgba(10, 191, 188, 0.55);
+  border-color: rgba(10, 191, 188, 0.30);
+  box-shadow: var(--ce-shadow-float);
   color: var(--accent-teal);
 }
 
@@ -3287,8 +3372,8 @@
 }
 
 .crv-mistake {
-  background: rgba(185, 64, 64, 0.05);
-  border: 1px solid rgba(185, 64, 64, 0.18);
+  background: var(--ce-urgency-high-bg);
+  border: 1px solid var(--ce-urgency-high-line);
 }
 
 .crv-pearl__label,
@@ -3303,7 +3388,7 @@
 }
 
 .crv-pearl__label { color: var(--accent-gold); }
-.crv-mistake__label { color: #B94040; }
+.crv-mistake__label { color: var(--ce-urgency-high); }
 
 .crv-pearl__text,
 .crv-mistake__text {
@@ -3398,6 +3483,16 @@
   cursor: pointer;
   text-align: left;
   gap: 12px;
+  transition: background var(--ce-dur-fast) var(--ce-ease-out), transform 60ms var(--ce-ease-out);
+}
+
+.breakdown-toggle:hover {
+  background: rgba(10, 191, 188, 0.05);
+}
+
+.breakdown-toggle:active {
+  transform: scale(0.98);
+  transition-duration: 60ms;
 }
 
 .breakdown-toggle__title {
@@ -3414,7 +3509,7 @@
   color: var(--text-dark-muted);
   opacity: 0.6;
   flex-shrink: 0;
-  transition: transform 0.18s var(--ce-ease-out);
+  transition: transform var(--ce-dur-base) var(--ce-ease-out);
 }
 .breakdown-toggle[aria-expanded="true"] .breakdown-toggle__chevron {
   transform: rotate(90deg);
@@ -3639,6 +3734,16 @@
   cursor: pointer;
   box-sizing: border-box;
   gap: 10px;
+  transition: background var(--ce-dur-fast) var(--ce-ease-out), transform 60ms var(--ce-ease-out);
+}
+
+.crv-breakdown-toggle:hover {
+  background: rgba(10, 191, 188, 0.05);
+}
+
+.crv-breakdown-toggle:active {
+  transform: scale(0.98);
+  transition-duration: 60ms;
 }
 
 .crv-breakdown-toggle[aria-expanded="true"] {
@@ -3661,7 +3766,7 @@
   color: var(--text-dark-muted);
   opacity: 0.6;
   flex-shrink: 0;
-  transition: transform 0.18s var(--ce-ease-out);
+  transition: transform var(--ce-dur-base) var(--ce-ease-out);
 }
 .crv-breakdown-toggle[aria-expanded="true"] .crv-breakdown-toggle__chevron {
   transform: rotate(90deg);
@@ -3755,10 +3860,10 @@
   .detail-main { gap: 14px; }
 }
 
-/* ─── Reduced motion — disable hover transforms ──────────────────────── */
+/* ─── Reduced motion — disable hover/press transforms on hand-rolled
+   states (module utility classes — .ce-*, .ce-card-enter, .ce-stagger-children —
+   are already covered by the global block in tokens.css) ──────────────────── */
 @media (prefers-reduced-motion: reduce) {
-  .rhythm-item { transition: background 0.16s ease; }
-  .rhythm-item:hover { transform: none; }
   .foundations-toggle__chevron,
   .breakdown-toggle__chevron,
   .crv-breakdown-toggle__chevron { transition: none; }
@@ -3766,5 +3871,24 @@
   .breakdown-toggle[aria-expanded="true"] .breakdown-toggle__chevron,
   .crv-breakdown-toggle[aria-expanded="true"] .crv-breakdown-toggle__chevron { transform: none; }
   .foundations-grid { animation: none; opacity: 1; }
+
+  /* Press-scale states: drop the transform, keep the (now-instant) color/tint step */
+  .caliper-btn:active,
+  .action-btn:active,
+  .practice-reveal-btn:active,
+  .practice-clue-btn:active,
+  .practice-next-btn:active,
+  .progress-recent-chip:active,
+  .bookmark-btn:active,
+  .compare-recent-chip:active,
+  .foundations-toggle:active,
+  .sprint-option:active,
+  .sprint-reveal-btn:active,
+  .sprint-next-btn:active,
+  .crv-selector-btn:active,
+  .breakdown-toggle:active,
+  .crv-breakdown-toggle:active {
+    transform: none;
+  }
 }
 

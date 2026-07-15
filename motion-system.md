@@ -231,6 +231,10 @@ non-negotiable:
 7. Parallax, scroll-jacking, scroll-linked animation, animated scroll progress.
 8. Staggered slide-up cascades on long lists (>5) or on filter re-renders.
 9. Typewriter effects on headings/copy. (Real streaming API text is not an effect.)
+   Same content-rendering exemption (ratified 2026-07-14): Rhythm Lab's ECG
+   waveform sweep (`strip-reveal` 2.3s linear) — it represents clinical data
+   drawing at monitor sweep speed, not UI chrome, and is exempt from §1's
+   duration/easing set. Content rendering is never choreography.
 10. `transition: all`, durations outside §1, `ease-in` starts.
 11. Layout-shifting motion: nothing may animate `width`/`height`/`top`/`left` of
     in-flow content except accordions (§6). Transforms and opacity only.

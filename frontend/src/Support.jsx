@@ -8,12 +8,36 @@ export default function Support() {
       <style>{`
         *, *::before, *::after { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
         a { outline: none; -webkit-tap-highlight-color: transparent; }
+        .support-back-link {
+          transition: color var(--ce-dur-fast) var(--ce-ease-out);
+          text-decoration-color: transparent;
+          text-underline-offset: 3px;
+          transition-property: color, text-decoration-color;
+        }
+        .support-back-link:hover { color: var(--ce-teal); text-decoration: underline; text-decoration-color: var(--ce-teal); }
+        .support-back-link:focus-visible { outline: 2px solid var(--ce-teal); outline-offset: 2px; }
+        .support-text-link {
+          transition: color var(--ce-dur-fast) var(--ce-ease-out);
+          text-decoration-color: transparent;
+          text-underline-offset: 3px;
+        }
+        .support-text-link:hover { color: var(--ce-teal-deep); text-decoration: underline; text-decoration-color: var(--ce-teal-deep); }
+        .support-text-link:focus-visible { outline: 2px solid var(--ce-teal); outline-offset: 2px; }
+        .support-footer-link {
+          transition: color var(--ce-dur-fast) var(--ce-ease-out);
+          text-decoration-color: transparent;
+          text-underline-offset: 3px;
+        }
+        .support-footer-link:hover { color: var(--ce-teal-deep); text-decoration: underline; text-decoration-color: var(--ce-teal-deep); }
+        .support-footer-link:focus-visible { outline: 2px solid var(--ce-teal); outline-offset: 2px; }
       `}</style>
 
-      {/* ── Header — dark navy shell, matches App.jsx ─────────────────── */}
+      {/* ── Header — unified Clinical Edge header recipe (design-system.md §4.1) ── */}
       <div style={{
-        borderBottom: "1px solid rgba(255,255,255,0.05)",
-        background: "rgba(11,31,42,0.97)",
+        borderBottom: "1px solid var(--ce-line-dark)",
+        background: "var(--ce-navy-header)",
+        backdropFilter: "blur(20px)",
+        WebkitBackdropFilter: "blur(20px)",
         position: "sticky",
         top: 0,
         zIndex: 50,
@@ -29,7 +53,7 @@ export default function Support() {
           alignItems: "center",
           gap: 11,
         }}>
-          <svg width="26" height="26" viewBox="0 0 225 200" xmlns="http://www.w3.org/2000/svg"
+          <svg width="30" height="30" viewBox="0 0 225 200" xmlns="http://www.w3.org/2000/svg"
             fill="var(--ce-teal)" aria-label="Clinical Edge" style={{ flexShrink: 0 }}>
             <path d="M 159.1,24.3 A 96,96 0 1,0 159.1,175.7 L 135.7,145.7 A 58,58 0 1,1 135.7,54.3 Z" />
             <path d="M 144.0,57 L 208,45 L 218,58 L 208,70 L 150.0,71 Z" />
@@ -37,15 +61,16 @@ export default function Support() {
             <path d="M 150.0,129 L 208,130 L 218,142 L 208,155 L 144.0,143 Z" />
           </svg>
           <div style={{ display: "flex", flexDirection: "column", gap: 1 }}>
-            <span style={{ fontSize: 14, fontWeight: 700, color: "#F8FBFC", letterSpacing: "-0.3px", lineHeight: 1.15 }}>
+            <span style={{ fontSize: 15, fontWeight: 700, color: "var(--ce-text-light)", letterSpacing: "-0.3px", lineHeight: 1.15 }}>
               Clinical Edge
             </span>
-            <span style={{ fontSize: 10, fontWeight: 500, color: "var(--ce-text-dim)", letterSpacing: "0.7px", textTransform: "uppercase", fontFamily: "'IBM Plex Mono', monospace", lineHeight: 1 }}>
+            <span style={{ fontSize: "var(--ce-fs-eyebrow)", fontWeight: 500, color: "var(--ce-text-dim)", letterSpacing: "var(--ce-track-eyebrow)", textTransform: "uppercase", fontFamily: "'IBM Plex Mono', monospace", lineHeight: 1 }}>
               Copilot
             </span>
           </div>
           <a
             href="/"
+            className="support-back-link"
             style={{
             marginLeft: "auto",
             fontSize: 11,
@@ -53,7 +78,7 @@ export default function Support() {
             textDecoration: "none",
             fontWeight: 500,
             border: "1px solid rgba(255,255,255,0.10)",
-            borderRadius: 6,
+            borderRadius: "var(--ce-r-sm)",
             padding: "4px 10px",
             letterSpacing: "0.01em",
             fontFamily: "'IBM Plex Mono', monospace",
@@ -67,7 +92,7 @@ export default function Support() {
       </div>
 
       {/* ── Warm content surface ──────────────────────────────────────── */}
-      <div style={{ background: "#E9E3D8", minHeight: "calc(100vh - 58px)", padding: "0 0 80px" }}>
+      <div style={{ background: "var(--ce-warm-bg)", minHeight: "calc(100vh - 58px)", padding: "0 0 80px" }}>
         <div style={{ maxWidth: 720, margin: "0 auto", padding: "48px 20px 0" }}>
 
           <h1 style={{
@@ -89,16 +114,16 @@ export default function Support() {
             background: "var(--ce-warm-card)",
             border: "1px solid rgba(212,168,75,0.30)",
             borderLeft: "3px solid var(--ce-gold)",
-            borderRadius: 8,
+            borderRadius: "var(--ce-r-md)",
             padding: "18px 20px",
             marginBottom: 32,
           }}>
             <div style={{
-              fontSize: 9,
+              fontSize: "var(--ce-fs-eyebrow)",
               fontWeight: 700,
               textTransform: "uppercase",
-              letterSpacing: "1.3px",
-              color: "#8A6A22",
+              letterSpacing: "var(--ce-track-eyebrow)",
+              color: "var(--ce-gold-deep)",
               marginBottom: 8,
               fontFamily: "'IBM Plex Mono', monospace",
             }}>
@@ -106,6 +131,7 @@ export default function Support() {
             </div>
             <a
               href="mailto:clinicaledgehq@gmail.com"
+              className="support-text-link"
               style={{ fontSize: 15, fontWeight: 500, color: "var(--ce-teal-deep)", textDecoration: "none" }}
             >
               clinicaledgehq@gmail.com
@@ -117,10 +143,10 @@ export default function Support() {
 
           {/* ── FAQ section label ── */}
           <div style={{
-            fontSize: 9,
+            fontSize: "var(--ce-fs-eyebrow)",
             fontWeight: 700,
             textTransform: "uppercase",
-            letterSpacing: "1.3px",
+            letterSpacing: "var(--ce-track-eyebrow)",
             color: "var(--ce-text-muted)",
             marginBottom: 12,
             fontFamily: "'IBM Plex Mono', monospace",
@@ -133,7 +159,7 @@ export default function Support() {
             {[
               {
                 q: "What is Clinical Edge Copilot?",
-                a: "Clinical Edge Copilot is an AI-powered clinical reasoning support tool for bedside nurses. It helps you think through patient scenarios, interpret findings, and identify escalation needs — not replace clinical judgment.",
+                a: "Clinical Edge Copilot is a clinical reasoning support tool for bedside nurses, built on a large language model. It helps you think through patient scenarios, interpret findings, and identify escalation needs — not replace clinical judgment.",
               },
               {
                 q: "Is this a diagnostic tool?",
@@ -149,9 +175,9 @@ export default function Support() {
               },
             ].map(({ q, a }) => (
               <div key={q} style={{
-                background: "#FFFFFF",
+                background: "var(--ce-warm-card)",
                 border: "1px solid var(--ce-warm-line)",
-                borderRadius: 8,
+                borderRadius: "var(--ce-r-md)",
                 padding: "16px 18px",
               }}>
                 <p style={{ margin: "0 0 6px", fontSize: 13, fontWeight: 600, color: "var(--ce-text-dark)", lineHeight: 1.4 }}>{q}</p>
@@ -171,8 +197,8 @@ export default function Support() {
             color: "var(--ce-text-muted)",
             fontFamily: "'IBM Plex Mono', monospace",
           }}>
-            <a href="/privacy" style={{ color: "var(--ce-text-muted)", textDecoration: "none" }}>Privacy Policy</a>
-            <a href="/" style={{ color: "var(--ce-text-muted)", textDecoration: "none" }}>← Home</a>
+            <a href="/privacy" className="support-footer-link" style={{ color: "var(--ce-text-muted)", textDecoration: "none" }}>Privacy Policy</a>
+            <a href="/" className="support-footer-link" style={{ color: "var(--ce-text-muted)", textDecoration: "none" }}>← Home</a>
           </div>
 
         </div>

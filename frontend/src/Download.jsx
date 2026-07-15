@@ -115,9 +115,9 @@ function AppIcon() {
     <div style={{
       width: 80,
       height: 80,
-      borderRadius: 18,
-      background: "linear-gradient(145deg, #0B1E2D 0%, #0E2E40 100%)",
-      border: "1px solid rgba(10,191,188,0.18)",
+      borderRadius: "var(--ce-r-lg)",
+      background: "var(--ce-navy-900)",
+      border: "1px solid rgba(10,191,188,0.16)",
       display: "flex",
       alignItems: "center",
       justifyContent: "center",
@@ -142,15 +142,23 @@ export default function Download() {
       <style>{`
         *, *::before, *::after { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
         a { outline: none; -webkit-tap-highlight-color: transparent; }
-        .dl-badge-link { display: inline-block; border-radius: 8px; transition: opacity 0.15s; }
+        .dl-badge-link { display: inline-block; border-radius: var(--ce-r-md); transition: opacity var(--ce-dur-fast) var(--ce-ease-out); }
         .dl-badge-link:hover { opacity: 0.88; }
         .dl-badge-link:active { opacity: 0.72; }
+        .dl-badge-link:focus-visible { outline: 2px solid var(--ce-teal); outline-offset: 2px; }
+        .dl-footer-link {
+          transition: color var(--ce-dur-fast) var(--ce-ease-out);
+          text-decoration-color: transparent;
+          text-underline-offset: 3px;
+        }
+        .dl-footer-link:hover { color: var(--ce-teal-deep); text-decoration: underline; text-decoration-color: var(--ce-teal-deep); }
+        .dl-footer-link:focus-visible { outline: 2px solid var(--ce-teal); outline-offset: 2px; }
       `}</style>
 
-      {/* ── Header — dark navy gradient, tightened height ─────────────── */}
+      {/* ── Header — flat navy, tightened height (design-system.md §6.7: gradients → flat --ce-navy-900) ── */}
       <div style={{
-        background: "linear-gradient(90deg, #0E2436 0%, #103246 50%, #0E2436 100%)",
-        borderBottom: "1px solid rgba(255,255,255,0.06)",
+        background: "var(--ce-navy-900)",
+        borderBottom: "1px solid var(--ce-line-dark)",
         paddingTop: "env(safe-area-inset-top)",
         paddingLeft: "max(0px, env(safe-area-inset-left))",
         paddingRight: "max(0px, env(safe-area-inset-right))",
@@ -168,17 +176,17 @@ export default function Download() {
             <span style={{
               fontSize: 13,
               fontWeight: 700,
-              color: "#F3F4F6",
+              color: "var(--ce-text-light)",
               letterSpacing: "-0.3px",
               lineHeight: 1.15,
             }}>
               Clinical Edge
             </span>
             <span style={{
-              fontSize: 9.5,
+              fontSize: "var(--ce-fs-eyebrow)",
               fontWeight: 500,
-              color: "#A8B3C3",
-              letterSpacing: "0.7px",
+              color: "var(--ce-text-dim)",
+              letterSpacing: "var(--ce-track-eyebrow)",
               textTransform: "uppercase",
               fontFamily: "'IBM Plex Mono', monospace",
               lineHeight: 1,
@@ -191,7 +199,7 @@ export default function Download() {
 
       {/* ── Warm content area ────────────────────────────────────────────── */}
       <div style={{
-        background: "#E7E2D8",
+        background: "var(--ce-warm-bg)",
         minHeight: "calc(100vh - 49px)",
         padding: "0 0 80px",
       }}>
@@ -211,11 +219,11 @@ export default function Download() {
           {/* Copy block */}
           <div style={{ marginTop: 20, marginBottom: 36 }}>
             <div style={{
-              fontSize: 10.5,
+              fontSize: "var(--ce-fs-eyebrow)",
               fontWeight: 600,
-              letterSpacing: "1.4px",
+              letterSpacing: "var(--ce-track-eyebrow)",
               textTransform: "uppercase",
-              color: "#7B8494",
+              color: "var(--ce-text-muted)",
               fontFamily: "'IBM Plex Mono', monospace",
               marginBottom: 12,
             }}>
@@ -225,7 +233,7 @@ export default function Download() {
             <h1 style={{
               fontSize: "clamp(23px, 5.5vw, 30px)",
               fontWeight: 700,
-              color: "#162033",
+              color: "var(--ce-text-dark)",
               letterSpacing: "-0.04em",
               lineHeight: 1.2,
               margin: "0 0 14px",
@@ -235,7 +243,7 @@ export default function Download() {
 
             <p style={{
               fontSize: "clamp(14px, 3.5vw, 15.5px)",
-              color: "#5D687C",
+              color: "var(--ce-text-muted)",
               lineHeight: 1.68,
               margin: 0,
               fontWeight: 400,
@@ -247,8 +255,8 @@ export default function Download() {
 
           {/* ── CTA area — calm, card-reduced ───────────────────────────── */}
           <div style={{
-            border: "1px solid rgba(0,0,0,0.09)",
-            borderRadius: 10,
+            border: "1px solid rgba(0,0,0,0.08)",
+            borderRadius: "var(--ce-r-md)",
             padding: "24px 20px",
             width: "100%",
             display: "flex",
@@ -272,7 +280,7 @@ export default function Download() {
             {isAndroid && (
               <p style={{
                 fontSize: 11.5,
-                color: "#7B8494",
+                color: "var(--ce-text-muted)",
                 margin: 0,
                 fontFamily: "'IBM Plex Mono', monospace",
                 letterSpacing: "0.01em",
@@ -291,7 +299,7 @@ export default function Download() {
             {/* Safety disclaimer */}
             <p style={{
               fontSize: 11.5,
-              color: "#7B8494",
+              color: "var(--ce-text-muted)",
               lineHeight: 1.65,
               margin: 0,
               letterSpacing: "0.005em",
@@ -320,7 +328,7 @@ export default function Download() {
                 alignItems: "center",
                 gap: 5,
                 fontSize: 11,
-                color: "#7B8494",
+                color: "var(--ce-text-muted)",
                 fontWeight: 500,
                 letterSpacing: "0.01em",
               }}>
@@ -328,7 +336,7 @@ export default function Download() {
                   width: 5,
                   height: 5,
                   borderRadius: "50%",
-                  background: "#19C2D1",
+                  background: "var(--ce-teal-deep)",
                   display: "inline-block",
                   flexShrink: 0,
                 }} />
@@ -342,7 +350,7 @@ export default function Download() {
 
       {/* ── Footer ──────────────────────────────────────────────────────── */}
       <div style={{
-        background: "#E7E2D8",
+        background: "var(--ce-warm-bg)",
         borderTop: "1px solid rgba(0,0,0,0.08)",
         padding: "20px",
         display: "flex",
@@ -354,7 +362,7 @@ export default function Download() {
           <CELogo size={13} />
           <span style={{
             fontSize: 11,
-            color: "#7B8494",
+            color: "var(--ce-text-muted)",
             fontFamily: "'IBM Plex Mono', monospace",
             letterSpacing: "0.02em",
           }}>
@@ -364,9 +372,10 @@ export default function Download() {
         <div style={{ display: "flex", gap: 16 }}>
           <a
             href="/privacy"
+            className="dl-footer-link"
             style={{
               fontSize: 11,
-              color: "#7B8494",
+              color: "var(--ce-text-muted)",
               textDecoration: "none",
               fontFamily: "'IBM Plex Mono', monospace",
             }}
@@ -375,9 +384,10 @@ export default function Download() {
           </a>
           <a
             href="/support"
+            className="dl-footer-link"
             style={{
               fontSize: 11,
-              color: "#7B8494",
+              color: "var(--ce-text-muted)",
               textDecoration: "none",
               fontFamily: "'IBM Plex Mono', monospace",
             }}

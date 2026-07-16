@@ -1,4 +1,8 @@
+import { useSeo } from "./seo/useSeo.js";
+import { STATIC_ROUTE_SEO } from "./seo/routeSeo.js";
+
 export default function Support() {
+  useSeo(STATIC_ROUTE_SEO["/support"]);
   return (
     <div style={{
       minHeight: "100vh",
@@ -87,7 +91,7 @@ export default function Support() {
       </div>
 
       {/* ── Warm content surface ──────────────────────────────────────── */}
-      <div style={{ background: "var(--ce-warm-bg)", minHeight: "calc(100vh - 58px)", padding: "0 0 80px" }}>
+      <main style={{ background: "var(--ce-warm-bg)", minHeight: "calc(100vh - 58px)", padding: "0 0 80px" }}>
         <div style={{ maxWidth: 720, margin: "0 auto", padding: "48px 20px 0" }}>
 
           <h1 style={{
@@ -182,7 +186,7 @@ export default function Support() {
           </div>
 
           {/* ── Footer ── */}
-          <div style={{
+          <footer style={{
             marginTop: 40,
             paddingTop: 20,
             borderTop: "1px solid rgba(0,0,0,0.08)",
@@ -194,10 +198,10 @@ export default function Support() {
           }}>
             <a href="/privacy" className="support-footer-link" style={{ color: "var(--ce-text-muted)", textDecoration: "none" }}>Privacy Policy</a>
             <a href="/" className="support-footer-link" style={{ color: "var(--ce-text-muted)", textDecoration: "none" }}>← Home</a>
-          </div>
+          </footer>
 
         </div>
-      </div>
+      </main>
     </div>
   );
 }

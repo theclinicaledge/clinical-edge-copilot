@@ -1,4 +1,6 @@
 import { trackEvent } from "./analytics";
+import { useSeo } from "./seo/useSeo.js";
+import { STATIC_ROUTE_SEO } from "./seo/routeSeo.js";
 
 // Maps module.key → explicit analytics event name.
 // Explicit names are easier to filter in Vercel Analytics than payload fields.
@@ -177,6 +179,7 @@ function ModuleEntry({ module, onNavigate }) {
 
 // ─── Clinical Edge Home Hub ───────────────────────────────────────────────────
 export default function ClinicalEdgeHome({ onNavigate }) {
+  useSeo(STATIC_ROUTE_SEO["/"]);
   return (
     <div style={{
       minHeight: "100vh",
@@ -226,7 +229,7 @@ export default function ClinicalEdgeHome({ onNavigate }) {
       </div>
 
       {/* ── Warm surface ─────────────────────────────────────────────────── */}
-      <div className="ce-page-enter" style={{ background: "var(--ce-warm-bg)", flex: 1 }}>
+      <main className="ce-page-enter" style={{ background: "var(--ce-warm-bg)", flex: 1 }}>
         <div
           className="ce-home-content"
           style={{ maxWidth: 750, margin: "0 auto", width: "100%" }}
@@ -269,7 +272,7 @@ export default function ClinicalEdgeHome({ onNavigate }) {
           </div>
 
           {/* Footer */}
-          <div style={{ marginTop: 32, fontFamily: "'IBM Plex Mono', monospace" }}>
+          <footer style={{ marginTop: 32, fontFamily: "'IBM Plex Mono', monospace" }}>
             <p style={{
               fontSize: 11,
               color: "var(--ce-text-dim)",
@@ -298,10 +301,10 @@ export default function ClinicalEdgeHome({ onNavigate }) {
                 </a>
               ))}
             </div>
-          </div>
+          </footer>
 
         </div>
-      </div>
+      </main>
     </div>
   );
 }

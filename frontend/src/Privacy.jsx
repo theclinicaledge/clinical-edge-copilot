@@ -1,4 +1,8 @@
+import { useSeo } from "./seo/useSeo.js";
+import { STATIC_ROUTE_SEO } from "./seo/routeSeo.js";
+
 export default function Privacy() {
+  useSeo(STATIC_ROUTE_SEO["/privacy"]);
   return (
     <div style={{
       minHeight: "100vh",
@@ -72,7 +76,7 @@ export default function Privacy() {
       </div>
 
       {/* ── Warm content surface ──────────────────────────────────────── */}
-      <div style={{ background: "var(--ce-warm-bg)", minHeight: "calc(100vh - 58px)", padding: "0 0 80px" }}>
+      <main style={{ background: "var(--ce-warm-bg)", minHeight: "calc(100vh - 58px)", padding: "0 0 80px" }}>
         <div style={{ maxWidth: 720, margin: "0 auto", padding: "48px 20px 0" }}>
 
           <h1 style={{
@@ -170,7 +174,7 @@ export default function Privacy() {
           ))}
 
           {/* ── Footer ── */}
-          <div style={{
+          <footer style={{
             marginTop: 40,
             paddingTop: 20,
             borderTop: "1px solid rgba(0,0,0,0.08)",
@@ -182,10 +186,10 @@ export default function Privacy() {
           }}>
             Clinical Edge Copilot · theclinicaledge.org<br />
             Your clinical judgment comes first.
-          </div>
+          </footer>
 
         </div>
-      </div>
+      </main>
     </div>
   );
 }

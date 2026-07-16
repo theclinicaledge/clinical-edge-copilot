@@ -1,5 +1,5 @@
 import { StrictMode, useState, useEffect } from 'react'
-import { createRoot } from 'react-dom/client'
+import { createRoot, hydrateRoot } from 'react-dom/client'
 import { Analytics } from '@vercel/analytics/react'
 import './styles/tokens.css'
 import './index.css'
@@ -15,6 +15,8 @@ import RhythmLabModule from './modules/rhythm-lab/RhythmLabModule.tsx'
 import IcuDripsModule from './modules/icu-drips/IcuDripsModule.jsx'
 import ReferenceHubModule from './modules/reference-hub/ReferenceHubModule.jsx'
 import AbgLabModule from './modules/abg-lab/AbgLabModule.jsx'
+import BlogIndex from './blog/BlogIndex.jsx'
+import BlogPostPage from './blog/BlogPostPage.jsx'
 
 // ── Service Worker Registration ─────────────────────────────────────────────
 if ('serviceWorker' in navigator) {
@@ -40,6 +42,8 @@ function getPage() {
   if (path === '/icu-drips')      return 'icudrips';
   if (path === '/reference-hub')  return 'referencehub';
   if (path === '/abg-lab')        return 'abglab';
+  if (path === '/blog')           return 'blog';
+  if (path.startsWith('/blog/'))  return 'blogpost';
   return 'home'; // fallback to home hub
 }
 
@@ -91,13 +95,36 @@ function Root() {
       {page === 'icudrips'      && <IcuDripsModule onGoHome={() => navigate('/')} />}
       {page === 'referencehub'  && <ReferenceHubModule onGoHome={() => navigate('/')} />}
       {page === 'abglab'        && <AbgLabModule onGoHome={() => navigate('/')} />}
+      {page === 'blog'          && <BlogIndex />}
+      {page === 'blogpost'      && <BlogPostPage slug={window.location.pathname.replace(/^\/blog\//, '').replace(/\/$/, '')} />}
       <Analytics />
     </>
   );
 }
 
-createRoot(document.getElementById('root')).render(
+// Prerendered routes ship server-rendered markup inside #root, tagged with
+// the exact path it was built for (data-ssr-route). Hydrate only when that
+// matches the current URL — e.g. /copilot has no static file on Vercel, so
+// the SPA rewrite hands it dist/index.html (prerendered for "/"); that markup
+// belongs to Home, not Copilot, and must be replaced rather than hydrated.
+const rootEl = document.getElementById('root')
+const app = (
   <StrictMode>
     <Root />
-  </StrictMode>,
+  </StrictMode>
 )
+
+const normalize = (p) => (p.length > 1 && p.endsWith('/') ? p.slice(0, -1) : p)
+const ssrRoute = rootEl.getAttribute('data-ssr-route')
+const matchesCurrentRoute = ssrRoute !== null && normalize(ssrRoute) === normalize(window.location.pathname)
+
+if (matchesCurrentRoute) {
+  hydrateRoot(rootEl, app)
+} else {
+  // Falling through the SPA rewrite means this HTML was prerendered for a
+  // different route (e.g. /copilot receiving Home's dist/index.html) — its
+  // title/meta belong to that other page, so reset to the generic default
+  // before the real page renders instead of leaving the wrong title visible.
+  document.title = 'Clinical Edge Copilot'
+  createRoot(rootEl).render(app)
+}

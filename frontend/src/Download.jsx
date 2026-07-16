@@ -1,5 +1,7 @@
 import { useState, useEffect } from "react";
 import { trackEvent } from "./analytics";
+import { useSeo } from "./seo/useSeo.js";
+import { STATIC_ROUTE_SEO } from "./seo/routeSeo.js";
 
 // ── App Store destination ────────────────────────────────────────────────────
 const APP_STORE_URL =
@@ -131,6 +133,7 @@ function AppIcon() {
 
 // ── Download page ────────────────────────────────────────────────────────────
 export default function Download() {
+  useSeo(STATIC_ROUTE_SEO["/download"]);
   const isAndroid = useIsAndroid();
 
   return (
@@ -198,7 +201,7 @@ export default function Download() {
       </div>
 
       {/* ── Warm content area ────────────────────────────────────────────── */}
-      <div style={{
+      <main style={{
         background: "var(--ce-warm-bg)",
         minHeight: "calc(100vh - 49px)",
         padding: "0 0 80px",
@@ -346,10 +349,10 @@ export default function Download() {
           </div>
 
         </div>
-      </div>
+      </main>
 
       {/* ── Footer ──────────────────────────────────────────────────────── */}
-      <div style={{
+      <footer style={{
         background: "var(--ce-warm-bg)",
         borderTop: "1px solid rgba(0,0,0,0.08)",
         padding: "20px",
@@ -395,7 +398,7 @@ export default function Download() {
             Support
           </a>
         </div>
-      </div>
+      </footer>
 
     </div>
   );

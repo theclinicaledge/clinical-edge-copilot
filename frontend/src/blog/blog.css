@@ -1,0 +1,399 @@
+/* ─── Clinical Edge Blog — shared styles ─────────────────────────────────────
+   Reuses design tokens from styles/tokens.css. No new visual language —
+   same warm surface, navy CTA, teal/gold accents as the rest of the app. */
+
+/* ── Breadcrumb ── */
+.ce-breadcrumb {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  align-items: center;
+  font-family: var(--ce-font-mono);
+  font-size: 11px;
+  color: var(--ce-text-muted);
+  margin: 0 0 22px;
+}
+.ce-breadcrumb a {
+  color: var(--ce-text-muted);
+  text-decoration: none;
+}
+.ce-breadcrumb a:hover { color: var(--ce-teal-deep); text-decoration: underline; }
+.ce-breadcrumb a:focus-visible {
+  outline: 2px solid var(--ce-teal);
+  outline-offset: 2px;
+  border-radius: 2px;
+}
+.ce-breadcrumb [aria-current="page"] {
+  color: var(--ce-text-dark);
+  font-weight: 600;
+}
+.ce-breadcrumb-sep { color: var(--ce-text-dim); }
+
+/* ── Article header ── */
+.ce-article-meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  align-items: center;
+  font-family: var(--ce-font-mono);
+  font-size: 11.5px;
+  color: var(--ce-text-muted);
+  margin: 0 0 32px;
+}
+.ce-article-meta-dot { color: var(--ce-text-dim); }
+.ce-byline {
+  font-size: 12.5px;
+  color: var(--ce-text-muted);
+  line-height: 1.6;
+  margin: 0 0 32px;
+  max-width: 640px;
+}
+.ce-byline a { color: var(--ce-teal-deep); text-decoration: underline; text-underline-offset: 2px; }
+
+/* ── Related resources ── */
+.ce-related {
+  margin: 8px 0 32px;
+  padding: 20px 20px;
+  background: var(--ce-warm-card);
+  border: 1px solid var(--ce-warm-line);
+  border-radius: var(--ce-r-md);
+}
+.ce-related h2 {
+  font-size: 13px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--ce-text-muted);
+  font-family: var(--ce-font-mono);
+  margin: 0 0 12px;
+}
+.ce-related ul { list-style: none; margin: 0; padding: 0; }
+.ce-related li {
+  font-size: 13.5px;
+  color: var(--ce-text-muted);
+  line-height: 1.6;
+  margin-bottom: 8px;
+}
+.ce-related li:last-child { margin-bottom: 0; }
+.ce-related a { color: var(--ce-teal-deep); font-weight: 600; text-decoration: underline; text-underline-offset: 2px; }
+
+/* ── Article body typography ── */
+.ce-blog-body {
+  font-family: var(--ce-font-sans);
+  color: var(--ce-text-mid);
+  font-size: 15.5px;
+  line-height: 1.75;
+}
+.ce-blog-body h2 {
+  font-size: clamp(19px, 4vw, 23px);
+  font-weight: 700;
+  color: var(--ce-text-dark);
+  letter-spacing: -0.02em;
+  margin: 40px 0 14px;
+  line-height: 1.28;
+}
+.ce-blog-body h2:first-child { margin-top: 0; }
+.ce-blog-body h3 {
+  font-size: clamp(16px, 3vw, 18px);
+  font-weight: 700;
+  color: var(--ce-text-dark);
+  margin: 26px 0 10px;
+  line-height: 1.32;
+}
+.ce-blog-body p { margin: 0 0 16px; }
+.ce-blog-body ul,
+.ce-blog-body ol {
+  margin: 0 0 16px;
+  padding-left: 22px;
+}
+.ce-blog-body li { margin-bottom: 8px; }
+.ce-blog-body strong { color: var(--ce-text-dark); font-weight: 700; }
+.ce-blog-body a {
+  color: var(--ce-teal-deep);
+  text-decoration: underline;
+  text-underline-offset: 3px;
+  text-decoration-color: rgba(10, 143, 141, 0.35);
+}
+.ce-blog-body a:hover { text-decoration-color: var(--ce-teal-deep); }
+.ce-blog-body a:focus-visible {
+  outline: 2px solid var(--ce-teal);
+  outline-offset: 2px;
+  border-radius: 2px;
+}
+
+/* ── Responsive tables ── */
+.ce-table-wrap {
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+  margin: 0 0 20px;
+  border: 1px solid var(--ce-warm-line);
+  border-radius: var(--ce-r-md);
+  background: var(--ce-warm-card);
+}
+.ce-table {
+  width: 100%;
+  min-width: 460px;
+  border-collapse: collapse;
+}
+.ce-table th,
+.ce-table td {
+  padding: 10px 14px;
+  text-align: left;
+  font-size: 13.5px;
+  border-bottom: 1px solid var(--ce-warm-line);
+  line-height: 1.5;
+}
+.ce-table thead th {
+  font-family: var(--ce-font-mono);
+  font-size: 10.5px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--ce-text-muted);
+  background: var(--ce-warm-mid);
+  white-space: nowrap;
+}
+.ce-table tbody tr:last-child td { border-bottom: none; }
+.ce-table caption { text-align: left; caption-side: top; padding: 10px 14px 0; font-size: 11px; color: var(--ce-text-dim); }
+
+/* ── Callouts ── */
+.ce-callout {
+  background: var(--ce-warm-card);
+  border: 1px solid var(--ce-warm-line);
+  border-left: 3px solid var(--ce-teal);
+  border-radius: var(--ce-r-md);
+  padding: 18px 20px;
+  margin: 0 0 24px;
+}
+.ce-callout-eyebrow {
+  font-family: var(--ce-font-mono);
+  font-size: 10px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+  color: var(--ce-teal-deep);
+  margin-bottom: 10px;
+}
+.ce-callout p:last-child { margin-bottom: 0; }
+.ce-callout--safety { border-left-color: var(--ce-gold); }
+.ce-callout--safety .ce-callout-eyebrow { color: var(--ce-gold-deep); }
+
+/* ── Worked example cards ── */
+.ce-example-card {
+  background: var(--ce-warm-card);
+  border: 1px solid var(--ce-warm-line);
+  border-left: 3px solid var(--ce-teal-deep);
+  border-radius: var(--ce-r-md);
+  padding: 20px 20px 6px;
+  margin: 0 0 24px;
+}
+.ce-blog-body h3.ce-example-eyebrow {
+  font-family: var(--ce-font-mono);
+  font-size: 10.5px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  color: var(--ce-teal-deep);
+  margin-bottom: 14px;
+}
+
+/* ── Checklist ── */
+.ce-checklist {
+  list-style: none;
+  margin: 0 0 24px;
+  padding: 0;
+  background: var(--ce-warm-card);
+  border: 1px solid var(--ce-warm-line);
+  border-radius: var(--ce-r-md);
+  overflow: hidden;
+}
+.ce-checklist li {
+  display: flex;
+  gap: 12px;
+  align-items: flex-start;
+  padding: 13px 18px;
+  border-bottom: 1px solid var(--ce-warm-line);
+  font-size: 14px;
+  line-height: 1.6;
+  color: var(--ce-text-mid);
+}
+.ce-checklist li:last-child { border-bottom: none; }
+.ce-checklist-num {
+  flex-shrink: 0;
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  background: rgba(10, 191, 188, 0.12);
+  color: var(--ce-teal-deep);
+  font-family: var(--ce-font-mono);
+  font-size: 11px;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-top: 1px;
+}
+
+/* ── FAQ ── */
+.ce-faq dt {
+  font-weight: 700;
+  color: var(--ce-text-dark);
+  font-size: 15.5px;
+  margin: 22px 0 6px;
+}
+.ce-faq dt:first-child { margin-top: 0; }
+.ce-faq dd {
+  margin: 0 0 4px;
+  color: var(--ce-text-mid);
+  font-size: 14.5px;
+  line-height: 1.7;
+}
+
+/* ── CTA banner ── */
+.ce-blog-cta {
+  background: var(--ce-navy-900);
+  border-radius: var(--ce-r-lg);
+  padding: 30px 26px;
+  margin: 8px 0 40px;
+}
+.ce-blog-cta-eyebrow {
+  font-family: var(--ce-font-mono);
+  font-size: 10.5px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+  color: var(--ce-teal);
+  margin-bottom: 10px;
+}
+.ce-blog-cta h2 {
+  font-size: clamp(19px, 4vw, 23px);
+  font-weight: 700;
+  color: var(--ce-text-light);
+  margin: 0 0 10px;
+  letter-spacing: -0.02em;
+  line-height: 1.25;
+}
+.ce-blog-cta p {
+  font-size: 14px;
+  color: var(--ce-text-light-body);
+  line-height: 1.68;
+  margin: 0;
+  max-width: 560px;
+}
+.ce-blog-cta-buttons {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  margin-top: 20px;
+}
+.ce-blog-cta-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 11px 20px;
+  border-radius: var(--ce-r-md);
+  font-size: 13.5px;
+  font-weight: 700;
+  text-decoration: none;
+  transition: background-color var(--ce-dur-fast) var(--ce-ease-out),
+    border-color var(--ce-dur-fast) var(--ce-ease-out),
+    transform var(--ce-dur-fast) var(--ce-ease-out);
+}
+.ce-blog-cta-btn--primary { background: var(--ce-teal); color: var(--ce-text-dark); }
+.ce-blog-cta-btn--primary:hover { background: #0dd4d1; transform: translateY(-1px); }
+.ce-blog-cta-btn--secondary {
+  background: transparent;
+  color: var(--ce-text-light);
+  border: 1px solid rgba(255, 255, 255, 0.18);
+}
+.ce-blog-cta-btn--secondary:hover { border-color: rgba(10, 191, 188, 0.5); color: var(--ce-teal); }
+.ce-blog-cta-btn:focus-visible { outline: 2px solid var(--ce-teal); outline-offset: 2px; }
+
+/* ── Prev / next article nav ── */
+.ce-blog-adjacent {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 14px;
+  justify-content: space-between;
+  margin: 0 0 40px;
+  padding-top: 20px;
+  border-top: 1px solid var(--ce-warm-line-soft);
+}
+.ce-blog-adjacent a {
+  flex: 1 1 220px;
+  display: block;
+  padding: 14px 16px;
+  border: 1px solid var(--ce-warm-line);
+  border-radius: var(--ce-r-md);
+  text-decoration: none;
+  background: var(--ce-warm-mid);
+}
+.ce-blog-adjacent-label {
+  display: block;
+  font-family: var(--ce-font-mono);
+  font-size: 10px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  color: var(--ce-text-dim);
+  margin-bottom: 6px;
+}
+.ce-blog-adjacent-title {
+  display: block;
+  font-size: 13.5px;
+  font-weight: 600;
+  color: var(--ce-text-dark);
+  line-height: 1.4;
+}
+
+/* ── Blog index cards ── */
+.ce-blog-grid {
+  display: flex;
+  flex-direction: column;
+  gap: var(--ce-sp-3);
+}
+.ce-blog-card {
+  display: block;
+  text-decoration: none;
+  background: var(--ce-warm-mid);
+  border-radius: var(--ce-r-md);
+  padding: 22px 20px;
+}
+.ce-blog-card-eyebrow {
+  font-family: var(--ce-font-mono);
+  font-size: 10.5px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  color: var(--ce-teal-deep);
+  margin-bottom: 10px;
+}
+.ce-blog-card-title {
+  font-size: clamp(18px, 3.6vw, 21px);
+  font-weight: 700;
+  color: var(--ce-text-dark);
+  letter-spacing: -0.02em;
+  line-height: 1.25;
+  margin-bottom: 8px;
+}
+.ce-blog-card-desc {
+  font-size: 13.5px;
+  color: var(--ce-text-muted);
+  line-height: 1.62;
+  margin-bottom: 14px;
+  max-width: 560px;
+}
+.ce-blog-card-meta {
+  font-family: var(--ce-font-mono);
+  font-size: 11px;
+  color: var(--ce-text-dim);
+  display: flex;
+  gap: 8px;
+  align-items: center;
+}
+
+/* ── Mobile refinements ── */
+@media (max-width: 600px) {
+  .ce-blog-adjacent { flex-direction: column; }
+  .ce-blog-cta { padding: 24px 18px; }
+}

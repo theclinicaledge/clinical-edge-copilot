@@ -1,0 +1,471 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Clinical Edge — Post 75 — ABGs Finally Make Sense (Editorial)</title>
+  <link
+    href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=IBM+Plex+Mono:wght@400;500;600;700&display=swap"
+    rel="stylesheet"
+  />
+  <style>
+    :root {
+      --paper:  #F7F4ED;
+      --ink:    #182126;
+      --ink-60: rgba(24,33,38,0.62);
+      --ink-35: rgba(24,33,38,0.35);
+      --ink-15: rgba(24,33,38,0.14);
+      --blue:   #4DA3FF;
+      --green:  #1FBF75;
+      --gold:   #F2B94B;
+      --coral:  #E05572;
+    }
+
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      background: #0D1117;
+      font-family: 'Inter', -apple-system, sans-serif;
+      padding: 48px 32px;
+      display: flex; flex-direction: column; align-items: center; gap: 56px;
+    }
+
+    .slide {
+      width: 1080px; height: 1350px;
+      background-color: var(--paper);
+      position: relative; overflow: hidden; flex-shrink: 0;
+      color: var(--ink);
+    }
+    /* paper grain — the only texture on the slide */
+    .slide::before {
+      content: ''; position: absolute; inset: 0; z-index: 0; pointer-events: none;
+      background-image: url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' width='200' height='200'><filter id='g'><feTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/></filter><rect width='200' height='200' filter='url(%23g)' opacity='0.05'/></svg>");
+      background-size: 200px 200px; background-repeat: repeat;
+      mix-blend-mode: multiply;
+    }
+
+    .slide-label { width: 1080px; display: flex; align-items: center; gap: 14px; margin-bottom: -40px; }
+    .slide-label span { font-family: 'IBM Plex Mono', monospace; font-size: 11px; font-weight: 500; color: #9B8E7E; letter-spacing: 2px; text-transform: uppercase; }
+    .slide-label::after { content: ''; flex: 1; height: 1px; background: #9B8E7E; opacity: 0.35; }
+
+    .slide-footer {
+      position: absolute; bottom: 0; left: 0; right: 0; height: 92px;
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 0 72px; z-index: 2;
+      border-top: 1px solid var(--ink-15);
+    }
+    .footer-brand  { display: flex; align-items: center; gap: 14px; }
+    .footer-dot    { width: 9px; height: 9px; border-radius: 50%; background: var(--blue); }
+    .footer-name   { font-size: 26px; font-weight: 600; color: var(--ink-60); letter-spacing: -0.2px; }
+    .footer-handle { font-family: 'IBM Plex Mono', monospace; font-size: 23px; font-weight: 500; color: var(--ink-35); letter-spacing: 1.4px; text-transform: uppercase; }
+
+    .slide-number { position: absolute; bottom: 34px; left: 50%; transform: translateX(-50%); display: flex; gap: 8px; z-index: 3; }
+    .slide-number .dot        { width: 6px; height: 6px; border-radius: 50%; background: var(--ink-15); }
+    .slide-number .dot.active { background: var(--blue); }
+
+    .eyebrow { font-family: 'IBM Plex Mono', monospace; font-size: 22px; font-weight: 600; letter-spacing: 2px; text-transform: uppercase; color: var(--ink-35); }
+    .pagenum { font-family: 'IBM Plex Mono', monospace; font-size: 22px; font-weight: 500; letter-spacing: 1px; color: var(--ink-35); }
+
+    .slide-content { position: relative; z-index: 1; padding: 58px 72px 128px; height: 100%; display: flex; flex-direction: column; }
+    .top-row { display: flex; align-items: center; justify-content: space-between; flex-shrink: 0; }
+
+    .rule    { height: 1px; background: var(--ink-15); width: 100%; }
+    .rule-2  { height: 2px; background: var(--ink); width: 100%; }
+
+    /* marker-highlight — colored stroke sitting behind a word, like real highlighter ink */
+    .mark { position: relative; display: inline-block; z-index: 0; padding: 0 0.04em; }
+    .mark::before {
+      content: ''; position: absolute; z-index: -1;
+      left: -0.07em; right: -0.07em; top: 0.34em; bottom: 0.00em;
+      opacity: 0.55; transform: rotate(-1deg);
+      border-radius: 2px 7px 3px 8px;
+    }
+    .mark-blue::before  { background: var(--blue); }
+    .mark-green::before { background: var(--green); }
+    .mark-gold::before  { background: var(--gold); }
+    .mark-coral::before { background: var(--coral); }
+
+    .mono { font-family: 'IBM Plex Mono', monospace; }
+  </style>
+</head>
+<body>
+
+<!-- POST 75 — ABGs finally make sense. (editorial rebuild) -->
+
+
+<!-- ═══ SLIDE 1 — COVER ══════════════════════════════════════════════════════ -->
+<div class="slide-label"><span>Slide 01 — Cover</span></div>
+<div class="slide" id="slide-1">
+  <div class="slide-content">
+
+    <div class="top-row">
+      <span class="eyebrow">Clinical Edge</span>
+      <span class="pagenum">01 / 05</span>
+    </div>
+
+    <div style="margin-top:56px;">
+      <div style="font-size:98px; font-weight:900; line-height:1.0; letter-spacing:-4px;">
+        <span style="position:relative; display:inline-block;">
+          ABGs
+          <svg width="100%" height="26" viewBox="0 0 300 26" preserveAspectRatio="none"
+               style="position:absolute; left:0; bottom:-14px; width:100%; height:26px;">
+            <path d="M4,16 Q80,4 150,12 T296,10" stroke="#4DA3FF" stroke-width="9" fill="none" stroke-linecap="round"/>
+          </svg>
+        </span>
+        finally
+      </div>
+      <div style="font-size:98px; font-weight:900; line-height:1.08; letter-spacing:-4px; margin-top:10px;">make sense.</div>
+    </div>
+
+    <div style="margin-top:36px; font-size:38px; font-weight:400; line-height:1.5; color:var(--ink-60); max-width:600px;">
+      The 60-second cheat sheet you&rsquo;ll actually remember.
+    </div>
+
+    <div style="margin-top:150px;">
+      <div style="display:flex; align-items:flex-end; gap:36px;">
+
+        <!-- typed lab readout -->
+        <div class="mono" style="border-left:2px solid var(--ink); padding-left:26px; display:flex; flex-direction:column; gap:14px;">
+          <div style="display:flex; align-items:baseline; gap:28px; font-size:32px; font-weight:600;">
+            <span style="color:var(--ink-60); width:110px; display:inline-block;">pH</span>
+            <span style="color:var(--coral); font-size:44px; font-weight:700;">7.28</span>
+          </div>
+          <div style="display:flex; align-items:baseline; gap:28px; font-size:32px; font-weight:600;">
+            <span style="color:var(--ink-60); width:110px; display:inline-block;">PaCO&#8322;</span>
+            <span style="color:var(--blue); font-size:44px; font-weight:700;">55</span>
+          </div>
+          <div style="display:flex; align-items:baseline; gap:28px; font-size:32px; font-weight:600;">
+            <span style="color:var(--ink-60); width:110px; display:inline-block;">HCO&#8323;</span>
+            <span style="color:var(--gold); font-size:44px; font-weight:700;">25</span>
+          </div>
+        </div>
+
+        <!-- hand-drawn arrow + annotation -->
+        <div style="position:relative; padding-bottom:6px; max-width:280px;">
+          <svg width="90" height="70" viewBox="0 0 90 70" style="margin-bottom:6px;">
+            <path d="M6,8 C 20,42 46,54 78,50" stroke="#182126" stroke-width="2.5" fill="none" stroke-linecap="round"/>
+            <path d="M78,50 L66,42 M78,50 L70,60" stroke="#182126" stroke-width="2.5" fill="none" stroke-linecap="round"/>
+          </svg>
+          <div style="font-size:26px; font-style:italic; font-weight:500; color:var(--ink-60); line-height:1.35; transform:rotate(-1.2deg);">
+            What is the body trying to tell you?
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+    <div class="mono" style="margin-top:56px; font-size:26px; font-weight:600; color:var(--ink);">Swipe to decode &rarr;</div>
+
+  </div>
+  <div class="slide-footer">
+    <div class="footer-brand"><div class="footer-dot"></div><span class="footer-name">Clinical Edge: Nursing Tools</span></div>
+    <span class="footer-handle">@clinicaledgeco</span>
+  </div>
+  <div class="slide-number">
+    <div class="dot active"></div><div class="dot"></div><div class="dot"></div><div class="dot"></div><div class="dot"></div>
+  </div>
+</div>
+
+
+<!-- ═══ SLIDE 2 — NORMAL VALUES ═════════════════════════════════════════════ -->
+<div class="slide-label"><span>Slide 02 — Normal Values</span></div>
+<div class="slide" id="slide-2">
+  <div class="slide-content">
+
+    <div class="top-row">
+      <span class="eyebrow">The Fundamentals</span>
+      <span class="pagenum">02 / 05</span>
+    </div>
+
+    <div style="margin-top:50px; font-size:70px; font-weight:900; line-height:1.05; letter-spacing:-3px;">
+      Start with<br>the numbers.
+    </div>
+
+    <div style="margin-top:56px;">
+      <div class="rule-2"></div>
+
+      <!-- row: pH -->
+      <div style="display:flex; align-items:baseline; padding:30px 0; gap:24px;">
+        <div class="mono" style="width:200px; font-size:32px; font-weight:600; color:var(--ink);">pH</div>
+        <div class="mono" style="flex:0 0 340px; font-size:52px; font-weight:800; letter-spacing:-1px;">7.35&ndash;7.45</div>
+        <div style="font-size:28px; color:var(--ink-60);">Acid&ndash;base balance</div>
+      </div>
+      <div class="rule"></div>
+
+      <!-- row: PaCO2 -->
+      <div style="display:flex; align-items:baseline; padding:30px 0; gap:24px;">
+        <div class="mono" style="width:200px; font-size:32px; font-weight:600; color:var(--blue);">PaCO&#8322;</div>
+        <div class="mono" style="flex:0 0 340px; font-size:52px; font-weight:800; letter-spacing:-1px; color:var(--blue);">35&ndash;45</div>
+        <div style="font-size:28px; color:var(--ink-60);">The lungs</div>
+      </div>
+      <div class="rule"></div>
+
+      <!-- row: HCO3 -->
+      <div style="display:flex; align-items:baseline; padding:30px 0; gap:24px;">
+        <div class="mono" style="width:200px; font-size:32px; font-weight:600; color:var(--gold);">HCO&#8323;&#8315;</div>
+        <div class="mono" style="flex:0 0 340px; font-size:52px; font-weight:800; letter-spacing:-1px; color:var(--gold);">22&ndash;26</div>
+        <div style="font-size:28px; color:var(--ink-60);">The kidneys</div>
+      </div>
+      <div class="rule"></div>
+
+      <!-- row: PaO2 -->
+      <div style="display:flex; align-items:baseline; padding:30px 0; gap:24px;">
+        <div class="mono" style="width:200px; font-size:32px; font-weight:600; color:var(--ink);">PaO&#8322;</div>
+        <div class="mono" style="flex:0 0 340px; font-size:52px; font-weight:800; letter-spacing:-1px;">80&ndash;100</div>
+        <div style="font-size:28px; color:var(--ink-60);">Oxygenation</div>
+      </div>
+      <div class="rule-2"></div>
+    </div>
+
+    <div style="margin-top:64px;">
+      <div style="max-width:640px; font-size:27px; font-style:italic; line-height:1.5; color:var(--ink-60); transform:rotate(-0.6deg);">
+        <span class="mark mark-blue">PaCO&#8322;</span> is 35&ndash;45. pH also lives near 7.35&ndash;7.45.
+        Easy numbers to anchor first.
+      </div>
+    </div>
+
+  </div>
+  <div class="slide-footer">
+    <div class="footer-brand"><div class="footer-dot"></div><span class="footer-name">Clinical Edge: Nursing Tools</span></div>
+    <span class="footer-handle">@clinicaledgeco</span>
+  </div>
+  <div class="slide-number">
+    <div class="dot"></div><div class="dot active"></div><div class="dot"></div><div class="dot"></div><div class="dot"></div>
+  </div>
+</div>
+
+
+<!-- ═══ SLIDE 3 — THE TRICK ═════════════════════════════════════════════════ -->
+<div class="slide-label"><span>Slide 03 — The Trick</span></div>
+<div class="slide" id="slide-3">
+  <div class="slide-content">
+
+    <div class="top-row">
+      <span class="eyebrow">The ABG Trick</span>
+      <span class="pagenum">03 / 05</span>
+    </div>
+
+    <div style="margin-top:48px; font-size:58px; font-weight:900; line-height:1.12; letter-spacing:-2.5px; max-width:900px;">
+      One moves <span class="mark mark-blue">opposite.</span><br>One moves <span class="mark mark-gold">the same.</span>
+    </div>
+
+    <div style="display:flex; margin-top:64px; gap:0;">
+
+      <!-- CO2 / respiratory -->
+      <div style="flex:1; padding-right:40px;">
+        <div style="font-size:64px; font-weight:900; letter-spacing:-2px; color:var(--blue);">CO&#8322;</div>
+        <div class="mono" style="font-size:24px; font-weight:600; letter-spacing:2px; color:var(--ink-35); margin-top:2px;">RESPIRATORY</div>
+
+        <div class="mono" style="margin-top:44px; display:flex; flex-direction:column; gap:30px; font-size:42px; font-weight:700;">
+          <div style="display:flex; align-items:center; gap:16px;">
+            <span style="color:var(--blue);">&uarr; CO&#8322;</span>
+          </div>
+          <div style="display:flex; align-items:center; gap:16px; padding-left:12px;">
+            <span style="color:var(--ink-35); font-size:30px;">&darr;</span>
+            <span style="color:var(--coral);">&darr; pH</span>
+          </div>
+          <div style="height:2px; background:var(--ink-15); margin:6px 0;"></div>
+          <div style="display:flex; align-items:center; gap:16px;">
+            <span style="color:var(--blue);">&darr; CO&#8322;</span>
+          </div>
+          <div style="display:flex; align-items:center; gap:16px; padding-left:12px;">
+            <span style="color:var(--ink-35); font-size:30px;">&darr;</span>
+            <span style="color:var(--green);">&uarr; pH</span>
+          </div>
+        </div>
+      </div>
+
+      <div style="width:1px; background:var(--ink-15);"></div>
+
+      <!-- HCO3 / metabolic -->
+      <div style="flex:1; padding-left:40px;">
+        <div style="font-size:64px; font-weight:900; letter-spacing:-2px; color:var(--gold);">HCO&#8323;&#8315;</div>
+        <div class="mono" style="font-size:24px; font-weight:600; letter-spacing:2px; color:var(--ink-35); margin-top:2px;">METABOLIC</div>
+
+        <div class="mono" style="margin-top:44px; display:flex; flex-direction:column; gap:30px; font-size:42px; font-weight:700;">
+          <div style="display:flex; align-items:center; gap:16px;">
+            <span style="color:var(--gold);">&uarr; HCO&#8323;</span>
+          </div>
+          <div style="display:flex; align-items:center; gap:16px; padding-left:12px;">
+            <span style="color:var(--ink-35); font-size:30px;">&darr;</span>
+            <span style="color:var(--green);">&uarr; pH</span>
+          </div>
+          <div style="height:2px; background:var(--ink-15); margin:6px 0;"></div>
+          <div style="display:flex; align-items:center; gap:16px;">
+            <span style="color:var(--gold);">&darr; HCO&#8323;</span>
+          </div>
+          <div style="display:flex; align-items:center; gap:16px; padding-left:12px;">
+            <span style="color:var(--ink-35); font-size:30px;">&darr;</span>
+            <span style="color:var(--coral);">&darr; pH</span>
+          </div>
+        </div>
+      </div>
+
+    </div>
+
+    <div class="rule-2" style="margin-top:56px;"></div>
+    <div style="padding:26px 0 6px; text-align:center; font-size:36px; font-weight:800; letter-spacing:-0.5px;">
+      <span style="color:var(--blue);">CO&#8322; = opposite</span>
+      <span style="color:var(--ink-35); font-weight:500;">&nbsp;&nbsp;&middot;&nbsp;&nbsp;</span>
+      <span style="color:var(--gold);">HCO&#8323; = same</span>
+    </div>
+
+  </div>
+  <div class="slide-footer">
+    <div class="footer-brand"><div class="footer-dot"></div><span class="footer-name">Clinical Edge: Nursing Tools</span></div>
+    <span class="footer-handle">@clinicaledgeco</span>
+  </div>
+  <div class="slide-number">
+    <div class="dot"></div><div class="dot"></div><div class="dot active"></div><div class="dot"></div><div class="dot"></div>
+  </div>
+</div>
+
+
+<!-- ═══ SLIDE 4 — THE FOUR DISORDERS ════════════════════════════════════════ -->
+<div class="slide-label"><span>Slide 04 — Four Disorders</span></div>
+<div class="slide" id="slide-4">
+  <div class="slide-content">
+
+    <div class="top-row">
+      <span class="eyebrow">The Four Patterns</span>
+      <span class="pagenum">04 / 05</span>
+    </div>
+
+    <div style="margin-top:40px; font-size:52px; font-weight:900; line-height:1.1; letter-spacing:-2px;">
+      Match the pH to<br>the value causing it.
+    </div>
+
+    <div style="flex:1; display:flex; flex-direction:column; justify-content:space-between; margin-top:36px;">
+
+      <!-- Respiratory acidosis -->
+      <div style="display:flex; gap:22px; padding:20px 0;">
+        <div style="width:7px; background:var(--blue); flex-shrink:0; border-radius:1px;"></div>
+        <div style="flex:1;">
+          <div style="font-size:26px; font-weight:800; letter-spacing:0.5px;">RESPIRATORY <span style="color:var(--coral);">ACIDOSIS</span></div>
+          <div class="mono" style="margin-top:8px; font-size:44px; font-weight:700; display:flex; gap:36px;">
+            <span style="color:var(--coral);">&darr; pH</span><span style="color:var(--blue);">&uarr; CO&#8322;</span>
+          </div>
+          <div style="margin-top:10px; font-size:23px; color:var(--ink-60);">COPD &middot; opioids &middot; hypoventilation</div>
+        </div>
+      </div>
+      <div class="rule"></div>
+
+      <!-- Respiratory alkalosis -->
+      <div style="display:flex; gap:22px; padding:20px 0;">
+        <div style="width:7px; background:var(--blue); flex-shrink:0; border-radius:1px;"></div>
+        <div style="flex:1;">
+          <div style="font-size:26px; font-weight:800; letter-spacing:0.5px;">RESPIRATORY <span style="color:var(--green);">ALKALOSIS</span></div>
+          <div class="mono" style="margin-top:8px; font-size:44px; font-weight:700; display:flex; gap:36px;">
+            <span style="color:var(--green);">&uarr; pH</span><span style="color:var(--blue);">&darr; CO&#8322;</span>
+          </div>
+          <div style="margin-top:10px; font-size:23px; color:var(--ink-60);">Anxiety &middot; pain &middot; hyperventilation</div>
+        </div>
+      </div>
+      <div class="rule"></div>
+
+      <!-- Metabolic acidosis -->
+      <div style="display:flex; gap:22px; padding:20px 0;">
+        <div style="width:7px; background:var(--gold); flex-shrink:0; border-radius:1px;"></div>
+        <div style="flex:1;">
+          <div style="font-size:26px; font-weight:800; letter-spacing:0.5px;">METABOLIC <span style="color:var(--coral);">ACIDOSIS</span></div>
+          <div class="mono" style="margin-top:8px; font-size:44px; font-weight:700; display:flex; gap:36px;">
+            <span style="color:var(--coral);">&darr; pH</span><span style="color:var(--gold);">&darr; HCO&#8323;</span>
+          </div>
+          <div style="margin-top:10px; font-size:23px; color:var(--ink-60);">DKA &middot; lactate &middot; renal failure</div>
+        </div>
+      </div>
+      <div class="rule"></div>
+
+      <!-- Metabolic alkalosis -->
+      <div style="display:flex; gap:22px; padding:20px 0;">
+        <div style="width:7px; background:var(--gold); flex-shrink:0; border-radius:1px;"></div>
+        <div style="flex:1;">
+          <div style="font-size:26px; font-weight:800; letter-spacing:0.5px;">METABOLIC <span style="color:var(--green);">ALKALOSIS</span></div>
+          <div class="mono" style="margin-top:8px; font-size:44px; font-weight:700; display:flex; gap:36px;">
+            <span style="color:var(--green);">&uarr; pH</span><span style="color:var(--gold);">&uarr; HCO&#8323;</span>
+          </div>
+          <div style="margin-top:10px; font-size:23px; color:var(--ink-60);">Vomiting &middot; NG suction &middot; diuretics</div>
+        </div>
+      </div>
+      <div class="rule-2"></div>
+
+    </div>
+
+  </div>
+  <div class="slide-footer">
+    <div class="footer-brand"><div class="footer-dot"></div><span class="footer-name">Clinical Edge: Nursing Tools</span></div>
+    <span class="footer-handle">@clinicaledgeco</span>
+  </div>
+  <div class="slide-number">
+    <div class="dot"></div><div class="dot"></div><div class="dot"></div><div class="dot active"></div><div class="dot"></div>
+  </div>
+</div>
+
+
+<!-- ═══ SLIDE 5 — TEST YOURSELF ═════════════════════════════════════════════ -->
+<div class="slide-label"><span>Slide 05 — Test Yourself</span></div>
+<div class="slide" id="slide-5">
+  <div class="slide-content">
+
+    <div class="top-row">
+      <span class="eyebrow">Test Yourself</span>
+      <span class="pagenum">05 / 05</span>
+    </div>
+
+    <div style="margin-top:42px; font-size:52px; font-weight:900; line-height:1.12; letter-spacing:-2px; max-width:880px;">
+      Read this ABG before revealing the answer.
+    </div>
+
+    <div style="margin-top:44px; display:flex; flex-direction:column; gap:22px;">
+
+      <div class="rule-2"></div>
+      <div style="display:flex; align-items:baseline; gap:26px; padding:6px 0;">
+        <span class="mono" style="width:150px; font-size:34px; font-weight:600; color:var(--ink-60);">pH</span>
+        <span class="mono" style="width:150px; font-size:52px; font-weight:800; color:var(--coral);">7.28</span>
+        <span style="font-size:27px; color:var(--ink-60);">&rarr; below 7.35 &rarr; <span class="mark mark-coral" style="font-weight:700;">ACIDOSIS</span></span>
+      </div>
+      <div class="rule"></div>
+      <div style="display:flex; align-items:baseline; gap:26px; padding:6px 0;">
+        <span class="mono" style="width:150px; font-size:34px; font-weight:600; color:var(--ink-60);">PaCO&#8322;</span>
+        <span class="mono" style="width:150px; font-size:52px; font-weight:800; color:var(--blue);">55</span>
+        <span style="font-size:27px; color:var(--ink-60);">&rarr; CO&#8322; is high &rarr; <span class="mark mark-blue" style="font-weight:700;">RESPIRATORY</span></span>
+      </div>
+      <div class="rule"></div>
+      <div style="display:flex; align-items:baseline; gap:26px; padding:6px 0;">
+        <span class="mono" style="width:150px; font-size:34px; font-weight:600; color:var(--ink-60);">HCO&#8323;</span>
+        <span class="mono" style="width:150px; font-size:52px; font-weight:800; color:var(--gold);">25</span>
+        <span style="font-size:27px; color:var(--ink-60);">&rarr; normal &rarr; <span class="mark mark-green" style="font-weight:700;">NOT COMPENSATED</span></span>
+      </div>
+      <div class="rule-2"></div>
+
+    </div>
+
+    <div style="margin-top:38px; background:var(--ink); padding:32px 40px;">
+      <div class="mono" style="font-size:20px; font-weight:600; letter-spacing:2px; color:rgba(247,244,237,0.5); text-transform:uppercase;">The Diagnosis</div>
+      <div style="margin-top:8px; font-size:42px; font-weight:900; letter-spacing:-1px; color:var(--paper); text-transform:uppercase; line-height:1.15;">
+        Uncompensated respiratory acidosis
+      </div>
+    </div>
+
+    <div style="margin-top:24px; font-size:25px; font-style:italic; color:var(--ink-60); line-height:1.5;">
+      Think hypoventilation, opioids, sedation, COPD, or respiratory failure.
+    </div>
+
+    <div style="margin-top:52px;">
+      <div style="font-size:30px; font-weight:800;">Save this for your next ABG.</div>
+      <div class="mono" style="margin-top:6px; font-size:20px; font-weight:500; letter-spacing:1px; color:var(--ink-35); text-transform:uppercase;">Clinical Edge &middot; theclinicaledge.org</div>
+    </div>
+
+  </div>
+  <div class="slide-footer">
+    <div class="footer-brand"><div class="footer-dot"></div><span class="footer-name">Clinical Edge: Nursing Tools</span></div>
+    <span class="footer-handle">@clinicaledgeco</span>
+  </div>
+  <div class="slide-number">
+    <div class="dot"></div><div class="dot"></div><div class="dot"></div><div class="dot"></div><div class="dot active"></div>
+  </div>
+</div>
+
+
+</body>
+</html>

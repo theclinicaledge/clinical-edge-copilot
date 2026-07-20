@@ -1,25 +1,9 @@
-import { useState } from 'react';
-import type { Rhythm } from '../data/rhythms';
-import { RHYTHMS, RHYTHM_ALIASES } from '../data/rhythms';
-import { RhythmCard } from './RhythmCard';
 import { RhythmStrip } from './RhythmStrip';
 import { FoundationsSection } from './FoundationsSection';
-import { PearlsSection } from './PearlsSection';
-import { getRecentRhythms, getFavorites, getStreakText } from '../utils/localProgress';
+import { getStreakText } from '../utils/localProgress';
 
 interface RhythmLabHomeProps {
-  rhythms: Rhythm[];
-  onSelect: (rhythm: Rhythm) => void;
-  onCompare: () => void;
-  onPractice: () => void;
-  onSprint: () => void;
-  onConfusables: () => void;
-}
-
-// Normalise a search string: lowercase, hyphens → spaces, collapse whitespace.
-// Lets queries like "v-tach", "a-fib", "mobitz-2" hit the right rhythm.
-function norm(s: string): string {
-  return s.toLowerCase().replace(/-/g, ' ').replace(/\s+/g, ' ').trim();
+  navigate: (path: string) => void;
 }
 
 const TEACHING_POINTS = [
@@ -37,28 +21,93 @@ const TEACHING_POINTS = [
   },
 ];
 
-export function RhythmLabHome({ rhythms, onSelect, onCompare, onPractice, onSprint, onConfusables }: RhythmLabHomeProps) {
-  const [query, setQuery] = useState('');
+interface ExploreCard {
+  key: string;
+  path: string;
+  title: string;
+  desc: string;
+  accent: 'teal' | 'gold';
+  icon: React.ReactNode;
+}
 
-  // Progress data — read once on mount (home remounts on every return from detail/practice/compare)
-  const recentIds   = getRecentRhythms();
-  const favoriteIds = getFavorites();
-  const streakText  = getStreakText();
+const EXPLORE_CARDS: ExploreCard[] = [
+  {
+    key: 'pearls',
+    path: '/rhythm-lab/pearls',
+    title: 'Recognition Pearls',
+    desc: 'Explore all high-yield rhythm recognition tips.',
+    accent: 'gold',
+    icon: (
+      <svg width="15" height="15" viewBox="0 0 13 13" fill="none" aria-hidden="true">
+        <path d="M6.5 1 L8 5 L12 6.5 L8 8 L6.5 12 L5 8 L1 6.5 L5 5 Z" stroke="currentColor" strokeWidth="1.1" strokeLinejoin="round"/>
+      </svg>
+    ),
+  },
+  {
+    key: 'library',
+    path: '/rhythm-lab/library',
+    title: 'Rhythm Library',
+    desc: 'Browse all 36 rhythms, ECG strips, and recognition details.',
+    accent: 'teal',
+    icon: (
+      <svg width="15" height="15" viewBox="0 0 13 13" fill="none" aria-hidden="true">
+        <rect x="0.5" y="1" width="12" height="3.2" rx="0.8" stroke="currentColor" strokeWidth="1.1"/>
+        <rect x="0.5" y="5.4" width="12" height="3.2" rx="0.8" stroke="currentColor" strokeWidth="1.1"/>
+        <rect x="0.5" y="9.8" width="12" height="3.2" rx="0.8" stroke="currentColor" strokeWidth="1.1"/>
+      </svg>
+    ),
+  },
+  {
+    key: 'compare',
+    path: '/rhythm-lab/compare',
+    title: 'Compare Rhythms & Confusables',
+    desc: 'Review commonly confused rhythms side by side.',
+    accent: 'teal',
+    icon: (
+      <svg width="15" height="15" viewBox="0 0 13 13" fill="none" aria-hidden="true">
+        <rect x="0.5" y="0.5" width="5" height="12" rx="1" stroke="currentColor" strokeWidth="1.2"/>
+        <rect x="7.5" y="0.5" width="5" height="12" rx="1" stroke="currentColor" strokeWidth="1.2"/>
+      </svg>
+    ),
+  },
+  {
+    key: 'practice',
+    path: '/rhythm-lab/practice',
+    title: 'Practice',
+    desc: 'Test rhythm recognition with guided practice.',
+    accent: 'gold',
+    icon: (
+      <svg width="15" height="15" viewBox="0 0 13 13" fill="none" aria-hidden="true">
+        <rect x="0.5" y="1.5" width="12" height="10" rx="1.5" stroke="currentColor" strokeWidth="1.2"/>
+        <line x1="0.5" y1="5" x2="12.5" y2="5" stroke="currentColor" strokeWidth="1"/>
+      </svg>
+    ),
+  },
+  {
+    key: 'sprint',
+    path: '/rhythm-lab/sprint',
+    title: 'Sprint',
+    desc: 'Build speed with rapid rhythm identification.',
+    accent: 'gold',
+    icon: (
+      <svg width="15" height="15" viewBox="0 0 13 13" fill="none" aria-hidden="true">
+        <circle cx="6.5" cy="6.5" r="5.5" stroke="currentColor" strokeWidth="1.2"/>
+        <line x1="6.5" y1="3.5" x2="6.5" y2="6.5" stroke="currentColor" strokeWidth="1.2" strokeLinecap="round"/>
+        <line x1="6.5" y1="6.5" x2="8.5" y2="8.5" stroke="currentColor" strokeWidth="1" strokeLinecap="round"/>
+      </svg>
+    ),
+  },
+];
 
-  const recentRhythms   = recentIds.map(id => RHYTHMS.find(r => r.id === id)).filter((r): r is Rhythm => r != null);
-  const favoriteRhythms = favoriteIds.map(id => RHYTHMS.find(r => r.id === id)).filter((r): r is Rhythm => r != null);
+export function RhythmLabHome({ navigate }: RhythmLabHomeProps) {
+  const streakText = getStreakText();
 
-  const q = norm(query);
-  const filtered = q
-    ? rhythms.filter(r => {
-        const aliases = RHYTHM_ALIASES[r.id] ?? [];
-        return (
-          norm(r.name).includes(q) ||
-          norm(r.shortName).includes(q) ||
-          aliases.some(a => norm(a).includes(q))
-        );
-      })
-    : rhythms;
+  function goTo(path: string) {
+    return (e: React.MouseEvent) => {
+      e.preventDefault();
+      navigate(path);
+    };
+  }
 
   return (
     <div className="home-layout">
@@ -92,113 +141,40 @@ export function RhythmLabHome({ rhythms, onSelect, onCompare, onPractice, onSpri
         </div>
 
         <FoundationsSection />
-        <PearlsSection />
 
-        {favoriteRhythms.length > 0 && (
-          <div className="progress-panel">
-            <p className="progress-panel__heading">Saved rhythms</p>
-            {favoriteRhythms.map(r => (
-              <button
-                key={r.id}
-                className="progress-rhythm-row"
-                onClick={() => onSelect(r)}
+        <div className="explore-hub">
+          <p className="explore-hub__eyebrow">Get started</p>
+          <p className="explore-hub__title">Explore Rhythm Lab</p>
+          <div className="explore-list">
+            {EXPLORE_CARDS.map(card => (
+              <a
+                key={card.key}
+                className="explore-row"
+                href={card.path}
+                onClick={goTo(card.path)}
+                style={{ borderLeftColor: card.accent === 'teal' ? 'var(--ce-teal-deep)' : 'var(--accent-gold)' }}
               >
-                <span className="progress-rhythm-row__abbrev">{r.shortName}</span>
-                <span className="progress-rhythm-row__name">{r.name}</span>
-              </button>
+                <span
+                  className="explore-row__icon"
+                  style={{ color: card.accent === 'teal' ? 'var(--ce-teal-deep)' : 'var(--accent-gold)' }}
+                >
+                  {card.icon}
+                </span>
+                <span className="explore-row__body">
+                  <span className="explore-row__title">{card.title}</span>
+                  <span className="explore-row__desc">{card.desc}</span>
+                </span>
+                <svg className="explore-row__chevron" width="14" height="14" viewBox="0 0 14 14" fill="none" aria-hidden="true">
+                  <path d="M5 3l4 4-4 4" stroke="currentColor" strokeWidth="1.4" strokeLinecap="round" strokeLinejoin="round"/>
+                </svg>
+              </a>
             ))}
           </div>
-        )}
+        </div>
 
         {streakText && (
           <p className="progress-streak">{streakText}</p>
         )}
-      </div>
-
-      <div className="home-right">
-        <div className="home-right__header">
-          <p className="home-right__label">
-            {q
-              ? `${filtered.length} of ${rhythms.length} rhythms`
-              : `${rhythms.length} core rhythms — select to explore`}
-          </p>
-          <div className="home-right__actions">
-            <button className="action-btn action-btn--teal" onClick={onConfusables}>
-              <svg width="12" height="12" viewBox="0 0 13 13" fill="none" aria-hidden="true">
-                <path d="M2 4h4M7 4h4M2 6.5h4M7 6.5h4M2 9h4M7 9h4" stroke="currentColor" strokeWidth="1.1" strokeLinecap="round"/>
-                <line x1="5.5" y1="1" x2="5.5" y2="12" stroke="currentColor" strokeWidth="1" strokeDasharray="1.5 1.5"/>
-              </svg>
-              Confusables
-            </button>
-            <button className="action-btn action-btn--gold" onClick={onSprint}>
-              <svg width="12" height="12" viewBox="0 0 13 13" fill="none" aria-hidden="true">
-                <circle cx="6.5" cy="6.5" r="5.5" stroke="currentColor" strokeWidth="1.2" fill="none"/>
-                <line x1="6.5" y1="3.5" x2="6.5" y2="6.5" stroke="currentColor" strokeWidth="1.2" strokeLinecap="round"/>
-                <line x1="6.5" y1="6.5" x2="8.5" y2="8.5" stroke="currentColor" strokeWidth="1" strokeLinecap="round"/>
-              </svg>
-              Sprint
-            </button>
-            <button className="action-btn action-btn--gold" onClick={onPractice}>
-              <svg width="12" height="12" viewBox="0 0 13 13" fill="none" aria-hidden="true">
-                <rect x="0.5" y="1.5" width="12" height="10" rx="1.5" stroke="currentColor" strokeWidth="1.2" fill="none"/>
-                <line x1="0.5" y1="5" x2="12.5" y2="5" stroke="currentColor" strokeWidth="1"/>
-              </svg>
-              Practice
-            </button>
-            <button className="action-btn action-btn--teal" onClick={onCompare}>
-              <svg width="12" height="12" viewBox="0 0 13 13" fill="none" aria-hidden="true">
-                <rect x="0.5" y="0.5" width="5" height="12" rx="1" stroke="currentColor" strokeWidth="1.2" fill="none"/>
-                <rect x="7.5" y="0.5" width="5" height="12" rx="1" stroke="currentColor" strokeWidth="1.2" fill="none"/>
-              </svg>
-              Compare
-            </button>
-          </div>
-        </div>
-        {recentRhythms.length > 0 && (
-          <div className="progress-recent">
-            <p className="progress-recent__label">Recently viewed</p>
-            <div className="progress-recent__list">
-              {recentRhythms.map(r => (
-                <button
-                  key={r.id}
-                  className="progress-recent-chip"
-                  onClick={() => onSelect(r)}
-                  title={r.name}
-                >
-                  {r.shortName}
-                </button>
-              ))}
-            </div>
-          </div>
-        )}
-
-        <div className="rhythm-index-bar">
-          <span className="rhythm-index-bar__label">Rhythm Index</span>
-          <input
-            className="rhythm-index-bar__input"
-            type="search"
-            placeholder="Search rhythms or abbreviations"
-            value={query}
-            onChange={e => setQuery(e.target.value)}
-            aria-label="Filter rhythms"
-            autoComplete="off"
-            spellCheck={false}
-          />
-        </div>
-        <div className="rhythm-list">
-          {filtered.length > 0
-            ? filtered.map((rhythm) => (
-                <RhythmCard
-                  key={rhythm.id}
-                  rhythm={rhythm}
-                  onClick={() => onSelect(rhythm)}
-                />
-              ))
-            : (
-                <p className="rhythm-index-no-results">No matching rhythms.</p>
-              )
-          }
-        </div>
       </div>
     </div>
   );

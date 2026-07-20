@@ -65,7 +65,7 @@ const SHOTS = [
     subheadline: 'Structured clinical reasoning support built around how nurses actually work.',
   },
   {
-    url:         '/rhythm-lab',
+    url:         '/rhythm-lab/library',
     out:         '03.png',
     label:       'Rhythm Lab — library',
     waitFn:      () => !!document.querySelector('.rhythm-lab-root'),
@@ -74,7 +74,7 @@ const SHOTS = [
     subheadline: '30+ cardiac rhythms with real waveform patterns and bedside clinical context.',
   },
   {
-    url:         '/rhythm-lab?screenshot=compare',
+    url:         '/rhythm-lab/compare',
     out:         '04.png',
     label:       'Rhythm Lab — Compare',
     waitFn:      () => !!document.querySelector('[class*="compare"]'),
@@ -83,7 +83,7 @@ const SHOTS = [
     // No prepFn — capture the real app exactly as it renders on a mobile viewport.
   },
   {
-    url:         '/rhythm-lab?screenshot=practice',
+    url:         '/rhythm-lab/practice',
     out:         '05.png',
     label:       'Rhythm Lab — Practice',
     waitFn:      () => !!document.querySelector('[class*="practice"]'),

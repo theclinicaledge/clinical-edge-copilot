@@ -111,6 +111,32 @@
   align-items: center;
 }
 
+/* Logo + wordmark — clickable, leads back to the all-tools home hub */
+.site-header__brand-link {
+  display: flex;
+  align-items: center;
+  gap: 11px;
+  text-decoration: none;
+  color: inherit;
+  border-radius: 4px;
+  transition: opacity var(--ce-dur-fast);
+}
+
+.site-header__brand-link:hover {
+  opacity: 0.82;
+}
+
+.site-header__brand-link:hover .site-header__brand {
+  color: var(--accent-teal);
+}
+
+.site-header__brand-link:focus-visible {
+  outline: 2px solid var(--accent-teal);
+  outline-offset: 3px;
+}
+
+.site-header__brand-link:focus:not(:focus-visible) { outline: none; }
+
 /* Wordmark + module eyebrow stack — the one page-header recipe (design-system.md §4.1) */
 .site-header__brand-block {
   display: flex;
@@ -138,34 +164,210 @@
 }
 
 /* ─── Back / navigation link ─────────────────────────────────────────── */
-/* Shared .ce-back-link styles live in src/styles/tokens.css */
+/* Base .ce-back-link styles live in src/styles/tokens.css and are shared
+   with the Copilot and ICU Drips headers. The rules below only raise its
+   visual weight inside Rhythm Lab (scoped via .rhythm-lab-root so the
+   other modules' headers are untouched) — same element, same position,
+   same destination, just easier to notice. */
+
+.rhythm-lab-root .site-header .ce-back-link {
+  padding: 7px 14px;
+  border-radius: var(--ce-r-pill);
+  background: var(--bg-elevated);
+  border: 1px solid var(--border);
+  color: var(--text-primary);
+  font-weight: 600;
+}
+
+.rhythm-lab-root .site-header .ce-back-link:hover {
+  background: rgba(10, 191, 188, 0.14);
+  border-color: var(--accent-teal);
+  color: var(--accent-teal);
+}
+
+.rhythm-lab-root .site-header .ce-back-link:focus-visible {
+  outline: 2px solid var(--accent-teal);
+  outline-offset: 2px;
+}
+
+@media (max-width: 480px) {
+  .rhythm-lab-root .site-header .ce-back-link { padding: 6px 11px; font-size: 12px; }
+}
+
+/* ─── Phase 2: dedicated feature-page back control ───────────────────── */
+/* Shared by RhythmLabPageShell across /rhythm-lab/library, /practice,
+   /compare, /pearls, /sprint. Returns to the /rhythm-lab landing page —
+   distinct from the landing page's own "All tools" header link above.
+   Sticky (not fixed) with reserved flow space, so it never overlaps the
+   header/title on first paint and locks to the viewport top once the
+   header scrolls past it. */
+
+.rhythm-back-float {
+  position: sticky;
+  top: 0;
+  z-index: 60;
+  display: flex;
+  justify-content: flex-end;
+  padding: max(10px, env(safe-area-inset-top)) max(16px, env(safe-area-inset-right)) 10px 16px;
+  pointer-events: none;
+}
+
+.rhythm-back-float__btn {
+  pointer-events: auto;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  min-height: 44px;
+  min-width: 44px;
+  padding: 0 16px;
+  border-radius: var(--ce-r-pill);
+  border: 1px solid var(--border);
+  background: rgba(17, 24, 39, 0.82);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  color: var(--text-primary);
+  font-family: var(--font-sans);
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  text-decoration: none;
+  box-shadow: var(--ce-shadow-float);
+  transition: border-color var(--ce-dur-fast), color var(--ce-dur-fast);
+  white-space: nowrap;
+}
+
+.rhythm-back-float__btn:hover {
+  border-color: var(--accent-teal);
+  color: var(--accent-teal);
+}
+
+.rhythm-back-float__btn:focus-visible {
+  outline: 2px solid var(--accent-teal);
+  outline-offset: 3px;
+}
+
+.rhythm-back-float__btn:focus:not(:focus-visible) { outline: none; }
+
+@media (max-width: 480px) {
+  .rhythm-back-float {
+    padding-left: 12px;
+    padding-right: max(12px, env(safe-area-inset-right));
+  }
+  .rhythm-back-float__btn { padding: 0 13px; font-size: 12px; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .rhythm-back-float__btn { transition: none; }
+}
+
+/* ─── Phase 2: compact page identity (dedicated pages only) ─────────── */
+/* "Rhythm Lab" eyebrow + page title + optional subtitle — replaces the
+   full hero + three principles that only the landing page shows. */
+
+.page-identity {
+  padding: 20px max(20px, calc((100% - var(--ce-content)) / 2)) 4px;
+}
+
+@media (max-width: 640px) {
+  .page-identity { padding: 16px 16px 2px; }
+}
+
+.page-identity__eyebrow {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--accent-teal);
+  margin-bottom: 6px;
+}
+
+.page-identity__title {
+  font-size: clamp(22px, 4vw, 28px);
+  font-weight: 700;
+  letter-spacing: -0.4px;
+  color: var(--text-primary);
+  line-height: 1.15;
+  overflow-wrap: break-word;
+}
+
+.page-identity__subtitle {
+  font-size: 13.5px;
+  color: var(--text-secondary);
+  line-height: 1.6;
+  margin-top: 6px;
+  max-width: 56ch;
+}
+
+/* ─── Phase 2: Compare / Confusables tab switcher ────────────────────── */
+
+.compare-tabs {
+  display: flex;
+  gap: 6px;
+  padding: 14px max(20px, calc((100% - var(--ce-content)) / 2)) 0;
+  flex-wrap: wrap;
+}
+
+@media (max-width: 640px) {
+  .compare-tabs { padding: 12px 16px 0; }
+}
+
+.compare-tab {
+  display: inline-flex;
+  align-items: center;
+  min-height: 36px;
+  padding: 0 16px;
+  border: 1px solid var(--border);
+  border-radius: var(--ce-r-pill);
+  background: none;
+  color: var(--text-secondary);
+  font-family: var(--font-sans);
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: border-color 0.15s, color 0.15s, background 0.15s;
+}
+
+.compare-tab:hover {
+  color: var(--text-primary);
+  border-color: var(--text-secondary);
+}
+
+.compare-tab--active {
+  background: rgba(10, 191, 188, 0.14);
+  border-color: var(--accent-teal);
+  color: var(--accent-teal);
+}
+
+.compare-tab:focus-visible {
+  outline: 2px solid var(--accent-teal);
+  outline-offset: 2px;
+}
+
+.compare-tab:focus:not(:focus-visible) { outline: none; }
 
 /* ─── Home: outer wrapper ────────────────────────────────────────────── */
+/* Phase 1 reorg: single top-to-bottom stack (was a 2-column grid). Each
+   retained panel keeps its original warm/navy surface so colors stay
+   identical to the prior 2-column layout — only the outer arrangement
+   changed from side-by-side to stacked. */
 
 .home-layout {
   flex: 1;
-  display: grid;
-  grid-template-columns: 1fr;
+  display: flex;
+  flex-direction: column;
   min-height: calc(100svh - 50px);
+  width: 100%;
+  max-width: 100%;
 }
 
-@media (min-width: 900px) {
-  .home-layout {
-    grid-template-columns: 370px 1fr;
-  }
-}
-
-@media (min-width: 1200px) {
-  .home-layout {
-    grid-template-columns: 420px 1fr;
-  }
-}
-
-/* ─── Home: left education panel ─────────────────────────────────────── */
+/* ─── Home: warm education panel (hero, principles, hub, pearls, foundations) ── */
 
 .home-left {
-  border-right: 1px solid var(--border);
-  padding: 44px 36px;
+  border-bottom: 1px solid var(--border);
+  /* Full-bleed background; content centers to a comfortable reading width
+     once the row is wider than a 2-column desktop layout would have been. */
+  padding: 44px max(36px, calc((100% - var(--ce-content)) / 2));
   display: flex;
   flex-direction: column;
   gap: 28px;
@@ -174,8 +376,6 @@
 
 @media (max-width: 899px) {
   .home-left {
-    border-right: none;
-    border-bottom: 1px solid var(--border);
     padding: 24px 16px 20px;
     gap: 16px;
   }
@@ -270,6 +470,135 @@
   line-height: 1.55;
 }
 
+/* ─── Phase 1: Explore Rhythm Lab navigation hub ─────────────────────── */
+/* Warm surface — continues straight through from the intro panel. Uses the
+   same bordered-row idiom as .rhythm-item / .progress-rhythm-row below,
+   just adapted for the warm palette (teal-deep / gold accents on light bg). */
+
+.explore-hub {
+  border-top: 1px solid rgba(214, 208, 196, 0.8);
+  padding: 20px 0 0;
+}
+
+.explore-hub__eyebrow {
+  font-family: var(--font-mono);
+  font-size: 9px;
+  font-weight: 600;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--text-dark-muted);
+  margin-bottom: 6px;
+}
+
+.explore-hub__title {
+  font-size: 18px;
+  font-weight: 700;
+  letter-spacing: -0.2px;
+  color: var(--text-dark);
+  margin-bottom: 14px;
+}
+
+.explore-list {
+  border-top: 1px solid var(--border-warm);
+  border-radius: 6px;
+  overflow: hidden;
+}
+
+.explore-row {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  width: 100%;
+  text-align: left;
+  text-decoration: none;
+  padding: 14px 12px 14px 13px;
+  border: none;
+  border-bottom: 1px solid var(--border-warm);
+  border-left: 3px solid transparent;
+  background: none;
+  color: var(--text-dark);
+  cursor: pointer;
+  transition: background 0.15s ease, transform 0.15s ease;
+}
+
+.explore-row:hover {
+  background: rgba(10, 143, 141, 0.05);
+  transform: translateX(2px);
+}
+
+.explore-row:focus-visible {
+  outline: 2px solid var(--ce-teal-deep);
+  outline-offset: -2px;
+  z-index: 1;
+  position: relative;
+}
+
+.explore-row:focus:not(:focus-visible) { outline: none; }
+
+.explore-row__icon {
+  flex-shrink: 0;
+  width: 30px;
+  height: 30px;
+  border-radius: 7px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--surface-warm-deep);
+  border: 1px solid var(--border-warm);
+  margin-top: 1px;
+}
+
+.explore-row__body {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.explore-row__title {
+  display: block;
+  font-size: 14.5px;
+  font-weight: 600;
+  color: var(--text-dark);
+}
+
+.explore-row__desc {
+  display: block;
+  font-size: 12px;
+  color: var(--text-dark-muted);
+  line-height: 1.5;
+}
+
+.explore-row__chevron {
+  flex-shrink: 0;
+  align-self: center;
+  opacity: 0.35;
+  transition: transform 0.15s, opacity 0.15s;
+}
+
+.explore-row:hover .explore-row__chevron {
+  opacity: 0.75;
+  transform: translateX(2px);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .explore-row,
+  .explore-row:hover,
+  .explore-row__chevron {
+    transition: none;
+    transform: none;
+  }
+}
+
+@media (max-width: 480px) {
+  .explore-row {
+    padding-left: 10px;
+    padding-right: 8px;
+    gap: 10px;
+  }
+}
+
 /* ─── Home: right rhythm selection panel ─────────────────────────────── */
 
 .home-right {
@@ -285,6 +614,14 @@
 
 @media (max-width: 640px) {
   .home-right__header { padding: 14px 16px 12px; }
+}
+
+.home-right__section-title {
+  font-size: 16px;
+  font-weight: 700;
+  letter-spacing: -0.1px;
+  color: var(--text-primary);
+  margin-bottom: 6px;
 }
 
 .home-right__label {

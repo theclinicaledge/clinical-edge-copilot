@@ -12,6 +12,11 @@ import Support from './Support.jsx'
 import Download from './Download.jsx'
 import ClinicalEdgeHome from './ClinicalEdgeHome.jsx'
 import RhythmLabModule from './modules/rhythm-lab/RhythmLabModule.tsx'
+import RhythmLibraryPage from './modules/rhythm-lab/RhythmLibraryPage.tsx'
+import RhythmPracticePage from './modules/rhythm-lab/RhythmPracticePage.tsx'
+import RhythmComparePage from './modules/rhythm-lab/RhythmComparePage.tsx'
+import RhythmPearlsPage from './modules/rhythm-lab/RhythmPearlsPage.tsx'
+import RhythmSprintPage from './modules/rhythm-lab/RhythmSprintPage.tsx'
 import IcuDripsModule from './modules/icu-drips/IcuDripsModule.jsx'
 import ReferenceHubModule from './modules/reference-hub/ReferenceHubModule.jsx'
 import AbgLabModule from './modules/abg-lab/AbgLabModule.jsx'
@@ -33,6 +38,11 @@ function getPage() {
   if (path === '/' || path === '/home') return 'home';
   if (path === '/copilot')    return 'app';
   if (path === '/rhythm-lab') return 'rhythmlab';
+  if (path === '/rhythm-lab/library')  return 'rhythmlab-library';
+  if (path === '/rhythm-lab/practice') return 'rhythmlab-practice';
+  if (path === '/rhythm-lab/compare')  return 'rhythmlab-compare';
+  if (path === '/rhythm-lab/pearls')   return 'rhythmlab-pearls';
+  if (path === '/rhythm-lab/sprint')   return 'rhythmlab-sprint';
   if (path === '/landing')    return 'landing';
   if (path === '/scenario')   return 'scenario';
   if (path === '/quickstart') return 'quickstart';
@@ -85,7 +95,12 @@ function Root() {
     <>
       {page === 'home'       && <ClinicalEdgeHome onNavigate={navigate} />}
       {page === 'app'        && <App onGoHome={() => navigate('/')} isOnline={isOnline} />}
-      {page === 'rhythmlab'  && <RhythmLabModule onGoHome={() => navigate('/')} />}
+      {page === 'rhythmlab'          && <RhythmLabModule onGoHome={() => navigate('/')} navigate={navigate} />}
+      {page === 'rhythmlab-library'  && <RhythmLibraryPage navigate={navigate} />}
+      {page === 'rhythmlab-practice' && <RhythmPracticePage navigate={navigate} />}
+      {page === 'rhythmlab-compare'  && <RhythmComparePage navigate={navigate} />}
+      {page === 'rhythmlab-pearls'   && <RhythmPearlsPage navigate={navigate} />}
+      {page === 'rhythmlab-sprint'   && <RhythmSprintPage navigate={navigate} />}
       {page === 'scenario'   && <Scenario onBack={goBack} onEnterApp={enterApp} onQuickStart={enterQuickStart} />}
       {page === 'quickstart' && <QuickStart onBack={goBackToScenario} onEnterApp={enterApp} />}
       {page === 'landing'    && <Landing onEnterApp={enterApp} onEnterScenario={enterScenario} />}

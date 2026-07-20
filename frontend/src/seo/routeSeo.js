@@ -11,9 +11,9 @@ export const STATIC_ROUTE_SEO = {
     ogType: "website",
   },
   "/download": {
-    title: `Download Clinical Edge Copilot | ${SITE_NAME}`,
+    title: `${SITE_NAME} — Clinical Tools for Nurses`,
     description:
-      "Get Clinical Edge Copilot, a clinical reasoning support tool for bedside nurses, on the App Store.",
+      "Explore Clinical Edge's tools for nurses: Copilot for bedside clinical reasoning, Rhythm Lab, ICU Drip Lab, ABG Lab, and Reference Hub — plus the Clinical Edge Copilot app on the App Store.",
     path: "/download",
     ogType: "website",
   },

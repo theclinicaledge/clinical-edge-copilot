@@ -106,7 +106,7 @@ function Root() {
       {page === 'landing'    && <Landing onEnterApp={enterApp} onEnterScenario={enterScenario} />}
       {page === 'privacy'    && <Privacy />}
       {page === 'support'    && <Support />}
-      {page === 'download'   && <Download />}
+      {page === 'download'   && <Download onNavigate={navigate} />}
       {page === 'icudrips'      && <IcuDripsModule onGoHome={() => navigate('/')} />}
       {page === 'referencehub'  && <ReferenceHubModule onGoHome={() => navigate('/')} />}
       {page === 'abglab'        && <AbgLabModule onGoHome={() => navigate('/')} />}

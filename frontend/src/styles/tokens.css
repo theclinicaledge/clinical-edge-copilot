@@ -26,6 +26,8 @@
   --ce-teal-deep: #0A8F8D;   /* teal text on warm surfaces */
   --ce-gold:      #D4A84B;
   --ce-gold-deep: #8A6A22;   /* single gold-on-warm; also hover for #8B5CF6/#7c4de6 migrations */
+  --ce-green:      #10B981;  /* matches --ce-teal lightness/saturation */
+  --ce-green-deep: #0C8D62;  /* green text on warm surfaces */
   --ce-blue:      #4da3ff;   /* informational accent */
 
   /* ── Urgency — desaturated clinical palette ── */

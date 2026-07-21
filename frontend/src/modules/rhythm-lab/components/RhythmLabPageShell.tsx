@@ -82,6 +82,9 @@ export function RhythmLabPageShell({
             </a>
             <span className="site-header__sep" aria-hidden="true">/</span>
             <span className="site-header__module">Rhythm Lab</span>
+            <button className="ce-back-link" onClick={goHome}>
+              ← All tools
+            </button>
           </div>
         </header>
 

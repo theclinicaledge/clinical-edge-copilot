@@ -26,11 +26,17 @@
   --text-dark-muted:  var(--ce-text-muted);
   --accent-teal:      var(--ce-teal);
   --accent-gold:      var(--ce-gold);
+  --accent-green:     var(--ce-green);
   --border:           var(--ce-line-navy);
   --border-warm:      var(--ce-warm-line);
 
   --font-sans: var(--ce-font-sans);
   --font-mono: var(--ce-font-mono);
+
+  /* .site-header__inner padding (14px top/bottom) + .ce-back-link min-height (40px) —
+     the sticky top offset .rhythm-back-float needs so it docks below the header
+     instead of stacking on top of it. */
+  --site-header-h: 68px;
 }
 
 .rhythm-lab-root {
@@ -165,50 +171,37 @@
 
 /* ─── Back / navigation link ─────────────────────────────────────────── */
 /* Base .ce-back-link styles live in src/styles/tokens.css and are shared
-   with the Copilot and ICU Drips headers. The rules below only raise its
-   visual weight inside Rhythm Lab (scoped via .rhythm-lab-root so the
-   other modules' headers are untouched) — same element, same position,
-   same destination, just easier to notice. */
-
-.rhythm-lab-root .site-header .ce-back-link {
-  padding: 7px 14px;
-  border-radius: var(--ce-r-pill);
-  background: var(--bg-elevated);
-  border: 1px solid var(--border);
-  color: var(--text-primary);
-  font-weight: 600;
-}
-
-.rhythm-lab-root .site-header .ce-back-link:hover {
-  background: rgba(10, 191, 188, 0.14);
-  border-color: var(--accent-teal);
-  color: var(--accent-teal);
-}
-
-.rhythm-lab-root .site-header .ce-back-link:focus-visible {
-  outline: 2px solid var(--accent-teal);
-  outline-offset: 2px;
-}
-
-@media (max-width: 480px) {
-  .rhythm-lab-root .site-header .ce-back-link { padding: 6px 11px; font-size: 12px; }
-}
+   with the Copilot, ABG Lab, ICU Drips, and Reference Hub headers. The
+   landing page header uses the shared style as-is, unmodified here, so
+   it matches the "All tools" control on every other tool. */
 
 /* ─── Phase 2: dedicated feature-page back control ───────────────────── */
 /* Shared by RhythmLabPageShell across /rhythm-lab/library, /practice,
    /compare, /pearls, /sprint. Returns to the /rhythm-lab landing page —
    distinct from the landing page's own "All tools" header link above.
    Sticky (not fixed) with reserved flow space, so it never overlaps the
-   header/title on first paint and locks to the viewport top once the
-   header scrolls past it. */
+   header/title on first paint. Its sticky top offset is pinned to
+   --site-header-h (the sticky .site-header's own height) so it docks
+   directly below the header once scrolled, instead of stacking on top
+   of it.
 
+   The header's "All tools" link sits inside .site-header's own edge padding
+   (16px/safe-area) PLUS .site-header__inner's max-width: 1280px centering —
+   so on screens wider than 1312px (1280 + 16px*2) its right edge sits inboard
+   of the true viewport edge, not flush against it. The right-hand padding
+   below reproduces that same inset with a matching calc() so this pill's
+   right edge lines up with the header link's right edge at every width,
+   instead of guessing at a fixed max-width. */
 .rhythm-back-float {
   position: sticky;
-  top: 0;
+  top: calc(env(safe-area-inset-top) + var(--site-header-h));
   z-index: 60;
   display: flex;
   justify-content: flex-end;
-  padding: max(10px, env(safe-area-inset-top)) max(16px, env(safe-area-inset-right)) 10px 16px;
+  padding: max(10px, env(safe-area-inset-top))
+           max(16px, env(safe-area-inset-right), calc((100vw - 1312px) / 2 + 16px))
+           10px
+           16px;
   pointer-events: none;
 }
 

@@ -20,4 +20,13 @@ export const meta = {
     height: 630,
     alt: "Clinical Edge — ABG Interpretation for Nurses, a step-by-step guide to acid-base interpretation",
   },
+  cta: {
+    eyebrow: "Try it yourself",
+    headline: "Practice ABG interpretation with Clinical Edge",
+    body: "Work through ABGs, EKGs, ICU concepts, and real clinical scenarios with step-by-step reasoning designed for nurses.",
+    primaryLabel: "Explore ABG Lab",
+    primaryHref: "/abg-lab",
+    secondaryLabel: "Ask Copilot a question",
+    secondaryHref: "/copilot",
+  },
 };

@@ -80,8 +80,8 @@ export default function BlogLayout({ meta, children, prev, next }) {
         </ul>
       </nav>
 
-      {/* CTA */}
-      <CTASection />
+      {/* CTA — per-post copy from meta.cta, falls back to CTASection's own defaults */}
+      <CTASection {...(meta.cta || {})} />
 
       {/* Prev / next article nav — architecture ready for future posts */}
       {(prev || next) && (

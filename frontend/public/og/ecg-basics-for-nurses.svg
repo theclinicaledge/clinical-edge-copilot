@@ -1,0 +1,33 @@
+<svg width="1200" height="630" viewBox="0 0 1200 630" xmlns="http://www.w3.org/2000/svg" role="img" aria-labelledby="og-title og-desc">
+  <title id="og-title">Clinical Edge — ECG Basics for Nurses</title>
+  <desc id="og-desc">Clinical Edge branded social preview card for the ECG Basics for Nurses article</desc>
+
+  <!-- Background -->
+  <rect width="1200" height="630" fill="#111827" />
+  <rect x="0" y="0" width="1200" height="6" fill="#0ABFBC" />
+
+  <!-- CE mark + wordmark -->
+  <g transform="translate(80, 76)">
+    <g transform="scale(0.42)" fill="#0ABFBC">
+      <path d="M 159.1,24.3 A 96,96 0 1,0 159.1,175.7 L 135.7,145.7 A 58,58 0 1,1 135.7,54.3 Z" />
+      <path d="M 144.0,57 L 208,45 L 218,58 L 208,70 L 150.0,71 Z" />
+      <path d="M 158.0,92 L 215,82 L 225,95 L 215,107 L 158.0,108 Z" />
+      <path d="M 150.0,129 L 208,130 L 218,142 L 208,155 L 144.0,143 Z" />
+    </g>
+    <text x="105" y="60" font-family="Arial, Helvetica, sans-serif" font-size="34" font-weight="700" fill="#F0EDE6">Clinical Edge</text>
+  </g>
+
+  <!-- Eyebrow -->
+  <text x="80" y="250" font-family="'Courier New', monospace" font-size="22" font-weight="700" letter-spacing="4" fill="#0ABFBC">CLINICAL GUIDE</text>
+
+  <!-- Title -->
+  <text x="78" y="335" font-family="Arial, Helvetica, sans-serif" font-size="72" font-weight="800" letter-spacing="-1.5" fill="#F0EDE6">ECG Basics</text>
+  <text x="78" y="415" font-family="Arial, Helvetica, sans-serif" font-size="72" font-weight="800" letter-spacing="-1.5" fill="#F0EDE6">for Nurses</text>
+
+  <!-- Subtitle -->
+  <text x="80" y="472" font-family="Arial, Helvetica, sans-serif" font-size="26" font-weight="400" fill="#A8C1CC">How to read a heart rhythm in 5 steps</text>
+
+  <!-- Footer -->
+  <line x1="80" y1="540" x2="1120" y2="540" stroke="#2D3B4E" stroke-width="1" />
+  <text x="80" y="580" font-family="'Courier New', monospace" font-size="20" fill="#7F99A5">theclinicaledge.org</text>
+</svg>

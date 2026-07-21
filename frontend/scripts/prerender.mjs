@@ -14,7 +14,15 @@ const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const root = path.resolve(__dirname, "..");
 const distDir = path.join(root, "dist");
 
-const ROUTES = ["/", "/blog", "/blog/abg-interpretation-for-nurses", "/download", "/privacy", "/support"];
+const ROUTES = [
+  "/",
+  "/blog",
+  "/blog/abg-interpretation-for-nurses",
+  "/blog/ecg-basics-for-nurses",
+  "/download",
+  "/privacy",
+  "/support",
+];
 
 function replaceMarkerBlock(html, markerName, innerHtml) {
   const re = new RegExp(`<!-- ${markerName}:START -->[\\s\\S]*?<!-- ${markerName}:END -->`);

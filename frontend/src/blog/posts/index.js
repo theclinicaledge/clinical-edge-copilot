@@ -3,10 +3,12 @@
 // (metadata) pair, registering the meta in registry.meta.js, and mapping the
 // slug to its content component below.
 import AbgInterpretationForNurses from "./abg-interpretation-for-nurses.jsx";
+import EcgBasicsForNurses from "./ecg-basics-for-nurses.jsx";
 import { postsMeta, getPostMetaBySlug } from "./registry.meta.js";
 
 const COMPONENTS = {
   "abg-interpretation-for-nurses": AbgInterpretationForNurses,
+  "ecg-basics-for-nurses": EcgBasicsForNurses,
 };
 
 export const posts = postsMeta.map((meta) => ({ ...meta, Component: COMPONENTS[meta.slug] }));

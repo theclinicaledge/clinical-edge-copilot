@@ -73,6 +73,33 @@ export function ExampleCard({ number, label, values, interpretation, situations,
   );
 }
 
+export function TableOfContents({ items }) {
+  return (
+    <nav aria-label="Table of contents" className="ce-toc">
+      <div className="ce-toc-title">On this page</div>
+      <ol>
+        {items.map(({ id, label }) => (
+          <li key={id}><a href={`#${id}`}>{label}</a></li>
+        ))}
+      </ol>
+    </nav>
+  );
+}
+
+export function RhythmCard({ name, rate, regularity, pWaves, prInterval, qrs, whyItMatters, clinicalNote }) {
+  return (
+    <div className="ce-example-card">
+      <h3 className="ce-example-eyebrow">{name}</h3>
+      <ResponsiveTable
+        headers={["Rate", "Regularity", "P waves", "PR interval", "QRS"]}
+        rows={[[rate, regularity, pWaves, prInterval, qrs]]}
+      />
+      <p><strong>Why it matters:</strong> {whyItMatters}</p>
+      <p><strong>Clinical note:</strong> {clinicalNote}</p>
+    </div>
+  );
+}
+
 export function FaqList({ items }) {
   return (
     <dl className="ce-faq">

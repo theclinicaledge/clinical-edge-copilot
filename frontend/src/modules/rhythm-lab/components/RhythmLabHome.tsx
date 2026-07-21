@@ -26,23 +26,11 @@ interface ExploreCard {
   path: string;
   title: string;
   desc: string;
-  accent: 'teal' | 'gold';
+  accent: 'teal' | 'gold' | 'green';
   icon: React.ReactNode;
 }
 
 const EXPLORE_CARDS: ExploreCard[] = [
-  {
-    key: 'pearls',
-    path: '/rhythm-lab/pearls',
-    title: 'Recognition Pearls',
-    desc: 'Explore all high-yield rhythm recognition tips.',
-    accent: 'gold',
-    icon: (
-      <svg width="15" height="15" viewBox="0 0 13 13" fill="none" aria-hidden="true">
-        <path d="M6.5 1 L8 5 L12 6.5 L8 8 L6.5 12 L5 8 L1 6.5 L5 5 Z" stroke="currentColor" strokeWidth="1.1" strokeLinejoin="round"/>
-      </svg>
-    ),
-  },
   {
     key: 'library',
     path: '/rhythm-lab/library',
@@ -75,7 +63,7 @@ const EXPLORE_CARDS: ExploreCard[] = [
     path: '/rhythm-lab/practice',
     title: 'Practice',
     desc: 'Test rhythm recognition with guided practice.',
-    accent: 'gold',
+    accent: 'green',
     icon: (
       <svg width="15" height="15" viewBox="0 0 13 13" fill="none" aria-hidden="true">
         <rect x="0.5" y="1.5" width="12" height="10" rx="1.5" stroke="currentColor" strokeWidth="1.2"/>
@@ -88,7 +76,7 @@ const EXPLORE_CARDS: ExploreCard[] = [
     path: '/rhythm-lab/sprint',
     title: 'Sprint',
     desc: 'Build speed with rapid rhythm identification.',
-    accent: 'gold',
+    accent: 'green',
     icon: (
       <svg width="15" height="15" viewBox="0 0 13 13" fill="none" aria-hidden="true">
         <circle cx="6.5" cy="6.5" r="5.5" stroke="currentColor" strokeWidth="1.2"/>
@@ -97,7 +85,25 @@ const EXPLORE_CARDS: ExploreCard[] = [
       </svg>
     ),
   },
+  {
+    key: 'pearls',
+    path: '/rhythm-lab/pearls',
+    title: 'Recognition Pearls',
+    desc: 'Explore all high-yield rhythm recognition tips.',
+    accent: 'gold',
+    icon: (
+      <svg width="15" height="15" viewBox="0 0 13 13" fill="none" aria-hidden="true">
+        <path d="M6.5 1 L8 5 L12 6.5 L8 8 L6.5 12 L5 8 L1 6.5 L5 5 Z" stroke="currentColor" strokeWidth="1.1" strokeLinejoin="round"/>
+      </svg>
+    ),
+  },
 ];
+
+const ACCENT_COLOR: Record<ExploreCard['accent'], string> = {
+  teal: 'var(--ce-teal-deep)',
+  gold: 'var(--accent-gold)',
+  green: 'var(--accent-green)',
+};
 
 export function RhythmLabHome({ navigate }: RhythmLabHomeProps) {
   const streakText = getStreakText();
@@ -152,11 +158,11 @@ export function RhythmLabHome({ navigate }: RhythmLabHomeProps) {
                 className="explore-row"
                 href={card.path}
                 onClick={goTo(card.path)}
-                style={{ borderLeftColor: card.accent === 'teal' ? 'var(--ce-teal-deep)' : 'var(--accent-gold)' }}
+                style={{ borderLeftColor: ACCENT_COLOR[card.accent] }}
               >
                 <span
                   className="explore-row__icon"
-                  style={{ color: card.accent === 'teal' ? 'var(--ce-teal-deep)' : 'var(--accent-gold)' }}
+                  style={{ color: ACCENT_COLOR[card.accent] }}
                 >
                   {card.icon}
                 </span>

@@ -498,6 +498,189 @@
   width: auto;
 }
 
+/* Six-column variant of the glance grid above — same cell internals
+   (`.bs-handoff-summary-col`/`-num`/`-field`/`-field-stacked`), just more of
+   them per row for a six-patient assignment. Kept as a sibling class rather
+   than parameterizing `.bs-handoff-summary` itself, since that class is a
+   fixed 4-column grid Med-Surg 4 already depends on. */
+.bs-glance-grid-6 {
+  display: grid;
+  grid-template-columns: repeat(6, 1fr);
+  gap: 5pt;
+}
+
+/* ── Six horizontal patient bands (Med-Surg 6 Patient — high-ratio) ───────
+   Deliberately a NEW, band-specific class set rather than a reuse/rename of
+   the four-quadrant classes above: a "quadrant" framing does not fit a
+   stacked-band layout, and Med-Surg 4 is finalized — nothing here may
+   require touching its classes. Visual language (type scale, teal
+   hierarchy, hairlines, checkbox styling) matches the quadrant set exactly;
+   only the structural/container classes are new. */
+
+.bs-band-list {
+  display: flex;
+  flex-direction: column;
+  flex: 1 1 auto;
+  gap: 2pt;
+}
+
+/* Natural content-driven height, not a forced equal division — `.bs-sheet`
+   is `height: auto` at print (see below), so a flex-basis: 0 child here has
+   no real space to grow into and collapses to near-zero (proven while
+   building this sheet). Six bands whose own compact content is similar in
+   density render at similar heights without needing to force it. */
+.bs-band {
+  min-width: 0;
+  border: 0.75pt solid var(--ce-warm-line);
+  border-radius: var(--ce-r-sm);
+  padding: 1.5pt 8pt;
+  display: flex;
+  flex-direction: column;
+  gap: 1pt;
+}
+
+.bs-band-identity {
+  display: flex;
+  align-items: baseline;
+  flex-wrap: wrap;
+  gap: 3pt 9pt;
+}
+
+.bs-band-num {
+  flex-shrink: 0;
+  align-self: center;
+  min-width: 12pt;
+  border: 1pt solid var(--ce-teal-deep);
+  border-radius: var(--ce-r-sm);
+  color: var(--ce-teal-deep);
+  font-family: var(--ce-font-mono);
+  font-size: 8pt;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0 2pt;
+}
+
+.bs-band-identity .bs-field {
+  flex: 1 1 auto;
+  min-width: 44pt;
+}
+
+.bs-band-identity .bs-field-label {
+  width: auto;
+}
+
+.bs-band-priority-field {
+  flex: 0 0 auto;
+}
+
+.bs-band-priority-field .bs-blank-line {
+  width: 34pt;
+  flex: 0 0 auto;
+}
+
+.bs-band-paired {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1pt 10pt;
+}
+
+.bs-band-callout {
+  display: flex;
+  align-items: baseline;
+  gap: 5pt;
+  min-width: 0;
+}
+
+.bs-band-callout-label {
+  font-family: var(--ce-font-mono);
+  font-size: 7pt;
+  font-weight: 700;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  color: var(--ce-teal-deep);
+  flex-shrink: 0;
+}
+
+.bs-band-mid-row {
+  display: flex;
+  align-items: flex-start;
+  gap: 10pt;
+}
+
+.bs-band-label {
+  font-family: var(--ce-font-mono);
+  font-size: 7pt;
+  font-weight: 700;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  color: var(--ce-text-dim);
+  flex-shrink: 0;
+  white-space: nowrap;
+}
+
+.bs-band-priorities {
+  flex: 0 0 auto;
+  display: flex;
+  flex-direction: column;
+  gap: 1pt;
+  min-width: 90pt;
+}
+
+.bs-band-priority-row {
+  display: flex;
+  align-items: center;
+  gap: 5pt;
+}
+
+.bs-band-priority-row .bs-blank-line {
+  height: 7pt;
+}
+
+.bs-band-concerns-row {
+  flex: 1 1 auto;
+  display: flex;
+  align-items: baseline;
+  flex-wrap: wrap;
+  gap: 2pt 8pt;
+  min-width: 0;
+}
+
+.bs-band-concerns-row .bs-field {
+  flex: 1 1 0;
+  min-width: 52pt;
+}
+
+.bs-band-rail-row {
+  display: flex;
+  align-items: center;
+  gap: 8pt;
+}
+
+.bs-band-rail-row .bs-hour-rail {
+  flex: 1 1 auto;
+}
+
+.bs-band-rail-row .bs-hour-tick {
+  padding: 1pt 1pt 0;
+  gap: 1pt;
+}
+
+.bs-band-rail-row .bs-hour-tick-label {
+  font-size: 6.5pt;
+}
+
+.bs-band-rail-row .bs-checkbox {
+  width: 9pt;
+  height: 9pt;
+}
+
+.bs-band-task-line {
+  flex: 0 0 auto;
+  min-width: 130pt;
+}
+
 /* ── Table ─────────────────────────────────────────────────────────────── */
 
 .bs-table {

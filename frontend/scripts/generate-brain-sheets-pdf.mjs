@@ -57,6 +57,16 @@ const SHEETS = [
       creator: 'Clinical Edge',
     },
   },
+  {
+    id: 'medsurg-6pt',
+    filename: 'clinical-edge-medsurg-6-patient-brain-sheet.pdf',
+    metadata: {
+      title: 'Med-Surg 6 Patient Brain Sheet',
+      author: 'Clinical Edge',
+      subject: 'Printable nurse shift-organization brain sheet',
+      creator: 'Clinical Edge',
+    },
+  },
 ];
 
 async function setPdfMetadata(filePath, metadata) {

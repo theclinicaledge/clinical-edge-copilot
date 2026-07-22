@@ -12,6 +12,7 @@
 // before rendering a Download PDF action.
 
 import MedSurg4 from '../sheets/MedSurg4.jsx';
+import MedSurg6 from '../sheets/MedSurg6.jsx';
 
 export const TEMPLATES = [
   {
@@ -23,6 +24,7 @@ export const TEMPLATES = [
     Sheet: MedSurg4,
     pdfPath: '/brain-sheets/pdfs/clinical-edge-medsurg-4-patient-brain-sheet.pdf',
     pdfFilename: 'clinical-edge-medsurg-4-patient-brain-sheet.pdf',
+    pdfTitle: 'Med-Surg 4 Patient Brain Sheet',
   },
   {
     id: 'medsurg-6pt',
@@ -30,6 +32,10 @@ export const TEMPLATES = [
     audience: 'For high-ratio assignments of five to six patients.',
     meta: '1 PAGE · 6 PATIENTS',
     pearls: [],
+    Sheet: MedSurg6,
+    pdfPath: '/brain-sheets/pdfs/clinical-edge-medsurg-6-patient-brain-sheet.pdf',
+    pdfFilename: 'clinical-edge-medsurg-6-patient-brain-sheet.pdf',
+    pdfTitle: 'Med-Surg 6 Patient Brain Sheet',
   },
   {
     id: 'icu-systems',

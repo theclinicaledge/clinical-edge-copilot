@@ -193,7 +193,7 @@ function TemplateActions({ template }) {
         setShareFailed(true);
         return;
       }
-      await navigator.share({ files: [file], title: 'Med-Surg 4 Patient Brain Sheet' });
+      await navigator.share({ files: [file], title: template.pdfTitle });
       setShareFailed(false);
     } catch (err) {
       // The share sheet reports a user-dismissed share as AbortError — that

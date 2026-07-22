@@ -158,7 +158,7 @@ writing space:
 | Template | Handoff region |
 |---|---|
 | `medsurg-4pt` | One shared handoff band divided into **four numbered mini-SBAR columns** (one per patient) |
-| `medsurg-6pt` | One compact **`NEXT SHIFT`** line per patient band + a small shared **SBAR reminder key** (the four letters + one-word glosses) in the band margin |
+| `medsurg-6pt` | Per-band **`NEXT SHIFT`** line (paired with `PENDING`) — no SBAR reminder key. Whole-assignment handoff instead surfaces in a six-column **`SHIFT AT A GLANCE`** band (`PRIORITY` / `WATCH FOR` / `FIRST THING NEXT SHIFT` per patient), the same revised convention as `medsurg-4pt` |
 | `icu-systems` | One **full-width four-part SBAR strip** |
 | `telemetry` | One **compact SBAR block per patient half** |
 | `ed-rapid` | Per-encounter **`DISPOSITION / PENDING / HANDOFF`** area (no four-part block) |
@@ -196,18 +196,42 @@ Per quadrant:
 - **Timed tasks**: 5 checkbox rows with time blank + task blank.
 - **Handoff**: shared four-column mini-SBAR band per §3.0.2.
 
-### 3.2 `medsurg-6pt` — Med-Surg · 6 Patient (high-ratio)
+### 3.2 `medsurg-6pt` — Med-Surg · 6 Patient (high-ratio) (revised — matches implementation)
 
-Six horizontal bands, one patient each. At a 5–6 patient ratio the sheet is a task
-list, not an assessment record — so the band is dominated by a **task-organization
-rail**: hour ticks **0700–1900** across, checkbox row beneath. The rail is generic
-hourly organization for tasks and follow-ups; **it is a task-organization rail, not
-a medication schedule**, and prints no medication-related content. Plus, per band:
-- Identity: `ROOM / BED` blank + `PT LABEL` blank area (ruled — a sticker box does
-  not fit a sixth-page band) + `DX` blank + `CODE STATUS` blank.
-- One single `ASSESSMENT NOTES` ruled line and a `WATCH FOR` blank.
-- **Handoff**: compact `NEXT SHIFT` line per band + shared SBAR reminder key
-  per §3.0.2.
+Six horizontal bands, one patient each, stacked vertically — not a compressed
+four-quadrant grid. At a 5–6 patient ratio the sheet is a task list first, not an
+assessment record: each band leads with a compact identity/context row, then the
+fields a nurse re-checks through the shift, then the shift's centerpiece — an
+hourly task-organization rail — then pending/next-shift for handoff. Per band:
+- **Identity**: `ROOM / BED` blank + `PT LABEL` blank area (ruled — a sticker box
+  does not fit a sixth-page band) + `CODE STATUS` blank + `DX` blank +
+  `ALLERGIES` blank (matches the Med-Surg 4 safety convention: every identity
+  strip with a `DX` blank also carries `ALLERGIES`) + `ISOLATION` checkbox +
+  blank `SHIFT PRIORITY`.
+- **Why Here / Watch For**: paired one-line row, same convention as Med-Surg 4.
+- **Today's Priorities**: exactly two checkbox-and-line rows.
+- **Clinical Concerns**: the same five compact labels as Med-Surg 4 (`AIRWAY /
+  O₂` · `HEMODYNAMICS` · `NEURO` · `SAFETY` · `OTHER`), packed into one compact
+  row rather than a two-column grid — the six-patient ratio calls for
+  shorthand, not a full systems grid.
+- **Task-organization rail**: hour ticks **0700–1900** across, a checkbox
+  beneath each tick, plus one general `TASK` line. Generic hourly organization
+  for tasks and follow-ups; **it is a task-organization rail, not a medication
+  schedule**, and prints no medication-related content.
+- **Pending / Next Shift**: paired one-line row.
+- **Handoff**: no per-band SBAR reminder key — see the revised §3.0.2 row and
+  the whole-assignment `SHIFT AT A GLANCE` band below.
+
+**Shift At A Glance** (whole-assignment summary, six columns): legend
+**`HIGH-RATIO ASSIGNMENT SUMMARY`**; one cell per patient with `PRIORITY` /
+`WATCH FOR` / `FIRST THING NEXT SHIFT` (label stacked above its own blank line
+at six-column width) — the same revised convention as Med-Surg 4's glance
+band, no isolated SBAR letters.
+
+**Static PDF**: `medsurg-6pt` has a generated static PDF
+(`clinical-edge-medsurg-6-patient-brain-sheet.pdf`), produced the same way as
+Med-Surg 4 — see §5.
+
 No night-hour variant of this sheet in v1 (§9).
 
 ### 3.3 `icu-systems` — ICU · Systems-Based Single Patient
@@ -422,9 +446,11 @@ margins stay clean for the nurse's own pen).
 
 Wherever a four-part handoff block appears (§3.0.2), it uses the exact four labels
 and ordering of the Copilot SBAR feature (Situation / Background / Assessment /
-Recommendation). Compact variants (`medsurg-6pt`, `ed-rapid`, `night-shift`) keep
+Recommendation). Compact variants (`ed-rapid`, `night-shift`) keep
 the alignment through the shared reminder key or region naming without consuming
-per-patient writing space. The template page's left rail includes one cross-link
+per-patient writing space. `medsurg-6pt` no longer participates in this pattern —
+like `medsurg-4pt`, it dropped SBAR letters entirely in favor of the
+`SHIFT AT A GLANCE` convention (§3.2). The template page's left rail includes one cross-link
 under the pearls: "Practice building the handoff itself → Copilot's SBAR generator"
 linking to `/copilot`. That's the full extent of the integration in v1 — no data
 flows anywhere (there is no data).

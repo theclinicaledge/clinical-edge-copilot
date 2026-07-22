@@ -31,4 +31,11 @@ export const STATIC_ROUTE_SEO = {
     path: "/support",
     ogType: "website",
   },
+  "/brain-sheets": {
+    title: `Brain Sheet Library | ${SITE_NAME}`,
+    description:
+      "Blank, printable nurse brain sheets for med-surg, ICU, telemetry, ED, and night shift. Print and fill in on paper — nothing is entered or stored in the app.",
+    path: "/brain-sheets",
+    ogType: "website",
+  },
 };

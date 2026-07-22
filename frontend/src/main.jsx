@@ -20,6 +20,7 @@ import RhythmSprintPage from './modules/rhythm-lab/RhythmSprintPage.tsx'
 import IcuDripsModule from './modules/icu-drips/IcuDripsModule.jsx'
 import ReferenceHubModule from './modules/reference-hub/ReferenceHubModule.jsx'
 import AbgLabModule from './modules/abg-lab/AbgLabModule.jsx'
+import BrainSheetsModule from './modules/brain-sheets/BrainSheetsModule.jsx'
 import BlogIndex from './blog/BlogIndex.jsx'
 import BlogPostPage from './blog/BlogPostPage.jsx'
 
@@ -52,6 +53,8 @@ function getPage() {
   if (path === '/icu-drips')      return 'icudrips';
   if (path === '/reference-hub')  return 'referencehub';
   if (path === '/abg-lab')        return 'abglab';
+  if (path === '/brain-sheets')       return 'brainsheets';
+  if (path.startsWith('/brain-sheets/')) return 'brainsheets-detail';
   if (path === '/blog')           return 'blog';
   if (path.startsWith('/blog/'))  return 'blogpost';
   return 'home'; // fallback to home hub
@@ -110,6 +113,8 @@ function Root() {
       {page === 'icudrips'      && <IcuDripsModule onGoHome={() => navigate('/')} />}
       {page === 'referencehub'  && <ReferenceHubModule onGoHome={() => navigate('/')} />}
       {page === 'abglab'        && <AbgLabModule onGoHome={() => navigate('/')} />}
+      {page === 'brainsheets'        && <BrainSheetsModule navigate={navigate} onGoHome={() => navigate('/')} />}
+      {page === 'brainsheets-detail' && <BrainSheetsModule navigate={navigate} onGoHome={() => navigate('/')} templateId={window.location.pathname.replace(/^\/brain-sheets\//, '').replace(/\/$/, '')} />}
       {page === 'blog'          && <BlogIndex />}
       {page === 'blogpost'      && <BlogPostPage slug={window.location.pathname.replace(/^\/blog\//, '').replace(/\/$/, '')} />}
       <Analytics />

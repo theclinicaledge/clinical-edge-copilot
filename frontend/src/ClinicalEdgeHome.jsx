@@ -10,6 +10,7 @@ const MODULE_OPEN_EVENTS = {
   icudrips:     'icu_drips_module_opened',
   referencehub: 'reference_hub_opened',
   abglab:       'abg_lab_opened',
+  brainsheets:  'brain_sheets_module_opened',
 };
 
 // ─── CE Logo ──────────────────────────────────────────────────────────────────
@@ -79,6 +80,15 @@ const MODULES = [
       "Interpret acid-base patterns and oxygenation clues. Deterministic, offline-capable, educational.",
     status: "active",
     path: "/abg-lab",
+  },
+  {
+    key: "brainsheets",
+    tag: "Shift Organization",
+    title: "Brain Sheets",
+    description:
+      "Blank, printable nurse organization sheets for med-surg, ICU, telemetry, ED, and night shift. Nothing entered or stored here — print it and fill it in on paper.",
+    status: "active",
+    path: "/brain-sheets",
   },
 ];
 

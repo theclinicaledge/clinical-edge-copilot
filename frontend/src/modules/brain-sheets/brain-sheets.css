@@ -1,0 +1,202 @@
+/* Brain Sheet Library — screen-only scaffold styles.
+   Print layer (brain-sheets-print.css) ships in a later block; this file
+   never contains @media print or @page. */
+
+.bs-page {
+  min-height: 100vh;
+  background: var(--ce-navy-900);
+  font-family: var(--ce-font-sans);
+}
+
+.bs-content {
+  max-width: var(--ce-content);
+  margin: 0 auto;
+  width: 100%;
+  padding: var(--ce-sp-10) var(--ce-sp-5) var(--ce-sp-10);
+}
+
+.bs-eyebrow {
+  font-family: var(--ce-font-mono);
+  font-size: var(--ce-fs-eyebrow);
+  font-weight: 700;
+  letter-spacing: var(--ce-track-eyebrow);
+  text-transform: uppercase;
+  color: var(--ce-teal);
+  margin-bottom: var(--ce-sp-2);
+}
+
+.bs-h1 {
+  font-size: var(--ce-fs-h1);
+  font-weight: 800;
+  letter-spacing: -0.04em;
+  color: var(--ce-text-light);
+  margin: 0 0 var(--ce-sp-4);
+}
+
+.bs-lead {
+  font-size: var(--ce-fs-lead);
+  line-height: 1.65;
+  color: var(--ce-text-light-body);
+  max-width: 640px;
+  margin: 0 0 var(--ce-sp-6);
+}
+
+.bs-info-banner {
+  border-left: 3px solid var(--ce-blue);
+  background: rgba(77, 163, 255, 0.06);
+  border-radius: var(--ce-r-md);
+  padding: var(--ce-sp-4);
+  font-size: var(--ce-fs-body-sm);
+  line-height: 1.6;
+  color: var(--ce-text-light-body);
+  margin-bottom: var(--ce-sp-8);
+}
+
+.bs-list {
+  display: flex;
+  flex-direction: column;
+  gap: var(--ce-sp-1);
+}
+
+.bs-list-item {
+  padding: var(--ce-sp-5);
+  background: var(--ce-navy-700);
+  border: 1px solid var(--ce-line-navy);
+  border-radius: var(--ce-r-md);
+  cursor: pointer;
+}
+
+.bs-list-item-title {
+  font-size: var(--ce-fs-h3);
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  color: var(--ce-text-light);
+  margin-bottom: 4px;
+}
+
+.bs-list-item-audience {
+  font-size: var(--ce-fs-body-sm);
+  color: var(--ce-text-light-body);
+  line-height: 1.5;
+  margin-bottom: 8px;
+}
+
+.bs-list-item-meta {
+  font-family: var(--ce-font-mono);
+  font-size: var(--ce-fs-caption);
+  font-weight: 500;
+  letter-spacing: var(--ce-track-eyebrow);
+  text-transform: uppercase;
+  color: var(--ce-text-dim);
+}
+
+.bs-meta-line {
+  font-family: var(--ce-font-mono);
+  font-size: var(--ce-fs-caption);
+  font-weight: 500;
+  letter-spacing: var(--ce-track-eyebrow);
+  text-transform: uppercase;
+  color: var(--ce-text-dim);
+  margin-bottom: var(--ce-sp-6);
+}
+
+.bs-actions {
+  display: flex;
+  flex-direction: column;
+  gap: var(--ce-sp-2);
+  margin-bottom: var(--ce-sp-6);
+}
+
+.bs-actions-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--ce-sp-3);
+}
+
+.bs-btn {
+  font-family: var(--ce-font-sans);
+  font-size: 13px;
+  font-weight: 700;
+  letter-spacing: -0.1px;
+  padding: 10px 22px;
+  border-radius: var(--ce-r-md);
+  cursor: pointer;
+  border: none;
+  /* .bs-btn is shared by <button> and the Download PDF <a> — neutralize
+     anchor defaults so both render identically. */
+  display: inline-block;
+  text-decoration: none;
+  line-height: 1.3;
+  transition:
+    background-color var(--ce-dur-fast) var(--ce-ease-out),
+    border-color var(--ce-dur-fast) var(--ce-ease-out),
+    color var(--ce-dur-fast) var(--ce-ease-out);
+}
+
+.bs-btn:focus-visible {
+  outline: 2px solid var(--ce-teal);
+  outline-offset: 2px;
+}
+
+.bs-btn-primary {
+  background: var(--ce-teal);
+  color: var(--ce-text-dark);
+}
+
+.bs-btn-primary:hover {
+  background: var(--ce-teal-deep);
+}
+
+.bs-btn-secondary {
+  background: transparent;
+  border: 1px solid var(--ce-line-navy);
+  color: var(--ce-text-light-body);
+}
+
+.bs-btn-secondary:hover {
+  border-color: rgba(10, 191, 188, 0.3);
+  color: var(--ce-text-light);
+}
+
+.bs-print-note {
+  font-family: var(--ce-font-mono);
+  font-size: 11px;
+  color: var(--ce-text-dim);
+  margin: 0;
+}
+
+.bs-copy-fallback {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  margin-top: 2px;
+}
+
+.bs-copy-fallback-url {
+  font-family: var(--ce-font-mono);
+  font-size: 12px;
+  color: var(--ce-text-light-body);
+  background: var(--ce-navy-700);
+  border: 1px solid var(--ce-line-navy);
+  border-radius: var(--ce-r-sm);
+  padding: 8px 10px;
+  user-select: all;
+  word-break: break-all;
+  cursor: text;
+}
+
+.bs-copy-fallback-hint {
+  font-family: var(--ce-font-mono);
+  font-size: 10px;
+  color: var(--ce-text-dim);
+}
+
+.bs-placeholder-note {
+  border: 1px solid var(--ce-line-navy);
+  border-radius: var(--ce-r-md);
+  padding: var(--ce-sp-4);
+  font-size: var(--ce-fs-body-sm);
+  line-height: 1.6;
+  color: var(--ce-text-dim);
+  max-width: 640px;
+}

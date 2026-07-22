@@ -1,0 +1,827 @@
+/* Brain Sheet Library — the printable sheet system.
+   brain-sheet-spec.md §5. This is the ONLY Brain Sheets file containing
+   @media print or @page. It owns two things:
+     1. The "paper" visual vocabulary (hairlines, blanks, checkboxes, tables,
+        systems bands, handoff variants) — identical rules apply on screen
+        (inside the scaled preview) and at print time, because it is the
+        same DOM in both contexts (spec §4.2: "the same DOM prints at full
+        size").
+     2. The print-time behavior: page setup, and scoping so ONLY the sheet
+        prints — never app chrome, headers, navigation, or review UI.
+
+   All sheet-internal typography and spacing uses absolute pt/in units per
+   §5.2's exact printed-size minimums (7pt / 8pt / 10–11pt) — this is a
+   print-specific type system, deliberately separate from the app's
+   --ce-fs-* UI scale. Colors, radii, and font-families still come from
+   design-system tokens. */
+
+@page {
+  size: letter portrait;
+  margin: 0.4in;
+}
+
+/* ── The sheet frame + scaled screen preview ─────────────────────────────── */
+
+.bs-print-root {
+  position: relative;
+  width: 100%;
+  max-width: 560px;
+  aspect-ratio: 8.5 / 11;
+  overflow: hidden;
+  container-type: inline-size;
+  background: var(--ce-warm-card);
+  border: 1px solid var(--ce-warm-line);
+  border-radius: var(--ce-r-lg);
+  box-shadow: var(--ce-shadow-float);
+}
+
+.bs-sheet {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 8.5in;
+  height: 11in;
+  padding: 0.4in;
+  box-sizing: border-box;
+  background: var(--ce-warm-card);
+  color: var(--ce-text-dark);
+  font-family: var(--ce-font-sans);
+  transform: scale(calc(100cqw / 816));
+  transform-origin: top left;
+  display: flex;
+  flex-direction: column;
+  gap: 1.5pt;
+}
+
+/* ── Sheet header: title + DATE/SHIFT (SheetFrame-owned) ─────────────────── */
+
+.bs-sheet-header {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 10pt;
+  border-bottom: 1.25pt solid var(--ce-text-dark);
+  padding-bottom: 3pt;
+}
+
+.bs-sheet-title {
+  font-size: 13pt;
+  font-weight: 700;
+  letter-spacing: -0.01em;
+}
+
+.bs-sheet-datefields {
+  display: flex;
+  gap: 10pt;
+  flex-shrink: 0;
+}
+
+.bs-df {
+  display: inline-flex;
+  align-items: baseline;
+  gap: 4pt;
+}
+
+.bs-df-label {
+  font-family: var(--ce-font-mono);
+  font-size: 7pt;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--ce-text-muted);
+}
+
+.bs-df .bs-blank-line {
+  width: 50pt;
+}
+
+/* ── Content + handoff regions (sheet-owned content lives here) ──────────── */
+
+.bs-sheet-content {
+  display: flex;
+  flex-direction: column;
+  gap: 6pt;
+  flex: 1 1 auto;
+}
+
+.bs-sheet-handoff {
+  border-top: 0.75pt solid var(--ce-warm-line);
+  padding-top: 3pt;
+}
+
+/* ── Shared footer (SheetFrame-owned, verbatim strings §5.3) ─────────────── */
+
+.bs-sheet-footer {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  align-items: baseline;
+  column-gap: 16pt;
+  border-top: 0.75pt solid var(--ce-warm-line);
+  padding-top: 3pt;
+  font-size: 7pt;
+  line-height: 1.3;
+}
+
+.bs-footer-brand {
+  color: var(--ce-teal-deep);
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+.bs-footer-phi {
+  color: var(--ce-text-muted);
+  text-align: right;
+}
+
+/* ── Shared field / mark primitives (used by every sheet, incl. B2 proto) ── */
+
+.bs-eyebrow {
+  font-family: var(--ce-font-mono);
+  font-size: 8pt;
+  font-weight: 700;
+  letter-spacing: 0.09em;
+  text-transform: uppercase;
+  color: var(--ce-text-muted);
+}
+
+.bs-field-label {
+  font-family: var(--ce-font-mono);
+  font-size: 7pt;
+  font-weight: 500;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--ce-text-muted);
+  white-space: nowrap;
+}
+
+.bs-blank-line {
+  display: inline-block;
+  flex: 1 1 auto;
+  min-width: 12pt;
+  border-bottom: 0.5pt solid var(--ce-text-dim);
+  height: 8pt;
+}
+
+/* Generous writing-line modifier — production sheets use this for fields a
+   nurse actually writes a phrase into (identity, next-shift, timed tasks).
+   Denser structural lines (systems rows, meds-strip cells) keep the 8pt
+   default. */
+.bs-line-lg {
+  height: 9pt;
+}
+
+.bs-blank-box {
+  border: 0.75pt solid var(--ce-text-dim);
+  border-radius: var(--ce-r-sm);
+  min-height: 10pt;
+}
+
+.bs-checkbox {
+  display: inline-block;
+  width: 10.5pt;
+  height: 10.5pt;
+  border: 0.75pt solid var(--ce-text-dark);
+  border-radius: var(--ce-r-sm);
+  flex-shrink: 0;
+}
+
+.bs-field {
+  display: flex;
+  align-items: baseline;
+  gap: 4pt;
+  min-width: 0;
+}
+
+/* Sticker-sized patient-identity box. Owned by each sheet, never by
+   SheetFrame (spec §3.0.1). */
+.bs-pt-label-box {
+  border: 1pt dashed var(--ce-text-dim);
+  border-radius: var(--ce-r-sm);
+  padding: 2.5pt 7pt;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+}
+
+.bs-pt-label-box-text {
+  font-family: var(--ce-font-mono);
+  font-size: 7pt;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--ce-text-dim);
+}
+
+/* Compact multi-patient identity strip: ROOM/BED + ruled PT LABEL area +
+   CODE STATUS. Owned by each sheet (spec §3.0.1). */
+.bs-identity-strip {
+  border: 0.75pt solid var(--ce-warm-line);
+  border-radius: var(--ce-r-sm);
+  padding: 5pt 7pt;
+  display: flex;
+  flex-direction: column;
+  gap: 3pt;
+}
+
+.bs-identity-strip .bs-field {
+  font-size: 8pt;
+}
+
+/* ── Four-quadrant patient layout (Med-Surg 4 Patient and any future sheet
+   that shares the same one-patient-per-quadrant convention) ─────────────── */
+
+.bs-quadrant-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  grid-template-rows: 1fr 1fr;
+  flex: 1 1 auto;
+  border-top: 0.75pt solid var(--ce-warm-line);
+  border-left: 0.75pt solid var(--ce-warm-line);
+}
+
+.bs-quadrant {
+  border-right: 0.75pt solid var(--ce-warm-line);
+  border-bottom: 0.75pt solid var(--ce-warm-line);
+  padding: 1.5pt 9pt;
+  display: flex;
+  flex-direction: column;
+  gap: 1pt;
+  min-width: 0;
+}
+
+/* Compact patient-number badge — replaces the old standalone "Patient N"
+   eyebrow row. Sits inline with the identity row instead of owning its
+   own row, saving a full row's height per quadrant while keeping patient
+   identification immediately scannable. */
+.bs-quadrant-num {
+  flex-shrink: 0;
+  align-self: stretch;
+  min-width: 13pt;
+  border: 1pt solid var(--ce-teal-deep);
+  border-radius: var(--ce-r-sm);
+  color: var(--ce-teal-deep);
+  font-family: var(--ce-font-mono);
+  font-size: 8pt;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.bs-quadrant-identity {
+  display: flex;
+  gap: 6pt;
+}
+
+/* Isolation + Shift Priority share one compact row — the priority marker
+   is blank (spec: nurse writes 1/2/3/4 or their own notation, never a
+   predefined High/Medium/Low choice). */
+.bs-quadrant-inline-fields {
+  display: flex;
+  align-items: center;
+  gap: 10pt;
+}
+
+.bs-shift-priority .bs-blank-line {
+  flex: 0 0 26pt;
+}
+
+.bs-quadrant-id-fields {
+  flex: 1;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1pt 8pt;
+  min-width: 0;
+}
+
+.bs-quadrant-section-label {
+  font-family: var(--ce-font-mono);
+  font-size: 8pt;
+  font-weight: 700;
+  letter-spacing: 0.07em;
+  text-transform: uppercase;
+  color: var(--ce-text-dim);
+}
+
+.bs-quadrant-systems {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1pt 8pt;
+}
+
+.bs-quadrant-system-row {
+  display: flex;
+  align-items: baseline;
+  gap: 5pt;
+  min-width: 0;
+}
+
+.bs-quadrant-system-row .bs-field-label {
+  width: 58pt;
+  flex-shrink: 0;
+}
+
+.bs-quadrant-system-row .bs-blank-line {
+  height: 7pt;
+}
+
+.bs-meds-strip {
+  display: grid;
+  grid-template-columns: repeat(6, 1fr);
+  gap: 5pt;
+}
+
+.bs-meds-cell {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1pt;
+}
+
+.bs-meds-cell .bs-blank-line {
+  width: 100%;
+  min-width: 0;
+  height: 6pt;
+}
+
+.bs-quadrant-tasks {
+  display: flex;
+  flex-direction: column;
+  gap: 1pt;
+}
+
+.bs-task-row {
+  display: flex;
+  align-items: center;
+  gap: 6pt;
+}
+
+.bs-task-row .bs-time-blank {
+  flex: 0 0 32pt;
+}
+
+.bs-task-row .bs-blank-line {
+  height: 7pt;
+}
+
+/* Shared "label above N stacked lines" pattern — used by Pending (2 lines)
+   and Next Shift (3 lines, the largest narrative area in the quadrant). */
+.bs-quadrant-stacked {
+  display: flex;
+  flex-direction: column;
+  gap: 1pt;
+}
+
+/* Clinical-reasoning callouts — Why Here / Watch For / Next Shift. Teal, the
+   module's one accent, deliberately outranks the gray structural labels
+   (Room/Bed, Meds/Tasks, systems rows) to carry the sheet's differentiator:
+   why the patient is here, not just what to chart. */
+/* Why Here + Watch For sit side-by-side as a visually paired row — this is
+   the sheet's structural win: one row instead of two, freeing real space
+   for breathing room elsewhere without cramping either field. */
+.bs-quadrant-paired-callouts {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1pt 10pt;
+}
+
+.bs-quadrant-callout {
+  display: flex;
+  align-items: baseline;
+  gap: 6pt;
+  min-width: 0;
+}
+
+.bs-quadrant-callout-label {
+  font-family: var(--ce-font-mono);
+  font-size: 7pt;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--ce-teal-deep);
+  flex-shrink: 0;
+}
+
+.bs-priorities {
+  display: flex;
+  flex-direction: column;
+  gap: 1pt;
+  margin-top: 1pt;
+}
+
+.bs-priority-row {
+  display: flex;
+  align-items: center;
+  gap: 6pt;
+}
+
+.bs-priority-row .bs-blank-line {
+  height: 7pt;
+}
+
+/* ── Bottom band: Shift At A Glance (Med-Surg 4 Patient) ───────────────────
+   A whole-assignment scan — one writable line per prompt, not a full SBAR
+   block. The legend acknowledges handoff support without claiming to be a
+   formal SBAR document. */
+
+.bs-glance-legend {
+  font-family: var(--ce-font-mono);
+  font-size: 7pt;
+  font-weight: 500;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  color: var(--ce-text-dim);
+  margin-bottom: 1.5pt;
+}
+
+.bs-handoff-summary {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 6pt;
+}
+
+.bs-handoff-summary-col {
+  border: 0.5pt solid var(--ce-warm-line);
+  border-radius: var(--ce-r-sm);
+  padding: 2pt 5pt;
+  display: flex;
+  flex-direction: column;
+  gap: 1pt;
+  min-width: 0;
+}
+
+.bs-handoff-summary-num {
+  font-family: var(--ce-font-mono);
+  font-size: 7pt;
+  font-weight: 700;
+  color: var(--ce-teal-deep);
+}
+
+.bs-handoff-summary-field {
+  display: flex;
+  align-items: baseline;
+  gap: 4pt;
+  min-width: 0;
+}
+
+.bs-handoff-summary-field .bs-field-label {
+  width: 44pt;
+  flex-shrink: 0;
+}
+
+/* Stacked variant — for a field whose label is too long to sit beside its
+   blank line at the 7pt print-minimum (spec §5.2) without crowding the
+   line into unwritable width. Label sits on its own full-width row above
+   the blank line instead. */
+.bs-handoff-summary-field-stacked {
+  flex-direction: column;
+  align-items: stretch;
+  gap: 1pt;
+}
+
+.bs-handoff-summary-col .bs-handoff-summary-field-stacked .bs-field-label {
+  width: auto;
+}
+
+/* ── Table ─────────────────────────────────────────────────────────────── */
+
+.bs-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 8pt;
+}
+
+.bs-table th,
+.bs-table td {
+  border: 0.5pt solid var(--ce-warm-line);
+  padding: 2.5pt 5pt;
+  text-align: left;
+  font-weight: 400;
+}
+
+.bs-table th {
+  font-family: var(--ce-font-mono);
+  font-size: 7pt;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--ce-text-muted);
+  background: transparent;
+}
+
+/* ── Systems bands ─────────────────────────────────────────────────────── */
+
+.bs-systems-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 4pt 10pt;
+}
+
+.bs-systems-band {
+  border-left: 1.5pt solid var(--ce-teal-deep);
+  padding-left: 5pt;
+  display: flex;
+  flex-direction: column;
+  gap: 2pt;
+}
+
+/* ── Hour rail / timeline ──────────────────────────────────────────────── */
+
+.bs-hour-rail {
+  display: flex;
+  border-top: 0.75pt solid var(--ce-text-dim);
+}
+
+.bs-hour-tick {
+  flex: 1 1 0;
+  border-left: 0.5pt solid var(--ce-warm-line);
+  padding: 2pt 2pt 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2pt;
+}
+
+.bs-hour-tick-label {
+  font-family: var(--ce-font-mono);
+  font-size: 7pt;
+  color: var(--ce-text-muted);
+}
+
+/* ── Maximum ruled-line density block ─────────────────────────────────── */
+
+.bs-dense-lines {
+  display: flex;
+  flex-direction: column;
+  gap: 3pt;
+}
+
+.bs-dense-lines .bs-blank-line {
+  height: 6pt;
+}
+
+/* ── Checkbox row ──────────────────────────────────────────────────────── */
+
+.bs-checkbox-row {
+  display: flex;
+  align-items: center;
+  gap: 10pt;
+  flex-wrap: wrap;
+}
+
+.bs-checkbox-row .bs-field {
+  font-size: 8pt;
+}
+
+/* ── Handoff: full-width four-part SBAR strip ─────────────────────────── */
+
+.bs-sbar-strip {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 8pt;
+}
+
+.bs-sbar-strip-col {
+  display: flex;
+  flex-direction: column;
+  gap: 3pt;
+}
+
+/* ── Handoff: numbered mini-SBAR columns ──────────────────────────────── */
+
+.bs-sbar-mini {
+  display: grid;
+  grid-template-columns: repeat(var(--bs-mini-count, 4), 1fr);
+  gap: 5pt;
+}
+
+.bs-sbar-mini-col {
+  border: 0.5pt solid var(--ce-warm-line);
+  border-radius: var(--ce-r-sm);
+  padding: 2pt 3pt;
+  display: flex;
+  flex-direction: column;
+  gap: 1.5pt;
+}
+
+.bs-sbar-mini-row .bs-blank-line {
+  height: 7pt;
+}
+
+.bs-sbar-mini-num {
+  font-family: var(--ce-font-mono);
+  font-size: 7pt;
+  font-weight: 700;
+  color: var(--ce-teal-deep);
+}
+
+.bs-sbar-mini-row {
+  display: flex;
+  align-items: baseline;
+  gap: 3pt;
+}
+
+.bs-sbar-mini-letter {
+  font-family: var(--ce-font-mono);
+  font-size: 7pt;
+  font-weight: 700;
+  color: var(--ce-text-muted);
+  width: 8pt;
+  flex-shrink: 0;
+}
+
+/* ── Handoff: expanded teaching SBAR half-band ────────────────────────── */
+
+.bs-sbar-halfband {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 8pt;
+}
+
+.bs-sbar-halfband-col {
+  display: flex;
+  flex-direction: column;
+  gap: 3pt;
+}
+
+.bs-sbar-halfband-prompt {
+  font-size: 7pt;
+  font-style: italic;
+  color: var(--ce-text-muted);
+  line-height: 1.35;
+}
+
+/* ── Handoff: compact per-patient NEXT SHIFT line + SBAR reminder key ───── */
+
+.bs-handoff-next-shift {
+  display: flex;
+  flex-direction: column;
+  gap: 3pt;
+}
+
+.bs-sbar-key {
+  display: flex;
+  gap: 8pt;
+  font-family: var(--ce-font-mono);
+  font-size: 7pt;
+  color: var(--ce-text-dim);
+}
+
+/* ── Handoff: per-encounter DISPOSITION / PENDING / HANDOFF ──────────────── */
+
+.bs-handoff-disposition {
+  display: flex;
+  flex-direction: column;
+  gap: 4pt;
+}
+
+.bs-dispo-options {
+  display: flex;
+  gap: 8pt;
+  flex-wrap: wrap;
+}
+
+/* ── Compact handoff-variant test matrix (B2 prototype only) ─────────────
+   A bounded, deliberately small section proving the remaining handoff
+   structural forms hold their intended grid/column shape at reduced
+   scale. Not a production pattern — real sheets use exactly one handoff
+   region at full size (spec §3.0.2). */
+
+.bs-handoff-matrix {
+  border: 0.75pt solid var(--ce-warm-line);
+  border-radius: var(--ce-r-sm);
+  padding: 5pt 6pt;
+  display: flex;
+  flex-direction: column;
+  gap: 4pt;
+}
+
+.bs-handoff-matrix-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 6pt;
+}
+
+.bs-handoff-matrix-cell {
+  border: 0.5pt solid var(--ce-warm-line);
+  border-radius: var(--ce-r-sm);
+  padding: 3pt 4pt;
+  display: flex;
+  flex-direction: column;
+  gap: 2pt;
+  min-width: 0;
+}
+
+.bs-handoff-matrix-cell-label {
+  font-family: var(--ce-font-mono);
+  font-size: 7pt;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--ce-teal-deep);
+  line-height: 1.25;
+}
+
+.bs-matrix-mini-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 3pt;
+}
+
+.bs-matrix-mini-col {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5pt;
+}
+
+.bs-matrix-tick {
+  display: block;
+  height: 4pt;
+  border-bottom: 0.5pt solid var(--ce-text-dim);
+}
+
+.bs-matrix-row {
+  display: flex;
+  align-items: baseline;
+  gap: 3pt;
+}
+
+/* ── Screen-only elements (review chrome, prototype marker) ─────────────── */
+
+.bs-screen-only {
+  /* visible on screen by default; hidden at print via the rule below */
+}
+
+/* ── PRINT: page setup + ink/grayscale rules + scoping ───────────────────
+
+   Scoping is driven by an explicit `body.bs-print-scope` class, toggled by
+   SheetFrame on mount/unmount (see SheetFrame.jsx) — NOT by a `:has()`
+   relational selector. `:has()`-based scoping (an earlier version of this
+   file) proved unreliable: it worked under programmatic PDF generation but
+   produced a collapsed, single-column layout in native browser print
+   preview — `:has()` support and behavior differ across a browser's
+   different print rendering paths. A class toggled by explicit component
+   lifecycle has no such ambiguity in any browser or rendering path.
+
+   Every selector below names a SPECIFIC known element — `.bs-screen-only`
+   for review-only chrome, `.bs-page` / `.bs-content` for the two known
+   app-shell wrappers this module ever nests the print root inside.
+   Nothing here uses `*`, `:has()`, or any other selector that could reach
+   inside `.bs-print-root` and touch a descendant it doesn't name
+   explicitly — every internal layout class (`.bs-systems-grid`,
+   `.bs-hour-rail`, `.bs-sbar-mini`, `.bs-sheet-footer`, etc.) keeps its
+   authored `display: grid` / `display: flex` completely untouched. */
+@media print {
+  html,
+  body {
+    background: #fff;
+  }
+
+  /* Hide review/screen-only chrome. The only display override in this
+     block, and it only ever targets elements explicitly opted in. */
+  body.bs-print-scope .bs-screen-only,
+  body.bs-print-scope .bs-screen-only * {
+    display: none !important;
+  }
+
+  /* Strip decoration from the two known app-shell wrappers the print root
+     is ever nested inside. Their own `display` is never touched — only
+     box decoration that would otherwise print as app chrome. */
+  body.bs-print-scope .bs-page {
+    background: transparent !important;
+    min-height: 0 !important;
+  }
+
+  body.bs-print-scope .bs-content {
+    padding: 0 !important;
+    margin: 0 !important;
+    max-width: none !important;
+  }
+
+  .bs-print-root {
+    position: static !important;
+    width: 100% !important;
+    max-width: none !important;
+    aspect-ratio: auto !important;
+    overflow: visible !important;
+    background: transparent !important;
+    border: none !important;
+    box-shadow: none !important;
+    border-radius: 0 !important;
+    /* No container-query containment at print — the scale transform this
+       drives on screen is already reset to none below; removing
+       containment too avoids any print-pagination interaction with it. */
+    container-type: normal !important;
+  }
+
+  .bs-sheet {
+    position: static !important;
+    width: 100% !important;
+    height: auto !important;
+    padding: 0 !important;
+    transform: none !important;
+    print-color-adjust: exact;
+    -webkit-print-color-adjust: exact;
+  }
+}

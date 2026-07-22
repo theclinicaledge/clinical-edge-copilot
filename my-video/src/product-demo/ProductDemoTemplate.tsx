@@ -42,6 +42,7 @@ export const ProductDemoTemplate: React.FC<ProductDemoScript> = (props) => {
       <Sequence from={90} durationInFrames={210}>
         <ProductTensionScene
           tensionTitle={s.tensionTitle}
+          tensionSubtext={s.tensionSubtext}
           tensionCards={s.tensionCards}
           footageFile={clip1 ?? clip0}
           footageStartFrom={45}

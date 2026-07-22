@@ -13,7 +13,7 @@ const COLORS: Record<string, string> = {
   teal:  "#0ABFBC",
 };
 
-type Props = Pick<ProductDemoScript, "tensionTitle" | "tensionCards"> & {
+type Props = Pick<ProductDemoScript, "tensionTitle" | "tensionSubtext" | "tensionCards"> & {
   footageFile?: string;
   footageStartFrom?: number;
 };
@@ -54,7 +54,7 @@ const TensionCard: React.FC<{
 };
 
 export const ProductTensionScene: React.FC<Props> = ({
-  tensionTitle, tensionCards, footageFile, footageStartFrom = 45,
+  tensionTitle, tensionSubtext, tensionCards, footageFile, footageStartFrom = 45,
 }) => {
   const frame = useCurrentFrame();
   const { fps, durationInFrames } = useVideoConfig();
@@ -70,6 +70,10 @@ export const ProductTensionScene: React.FC<Props> = ({
   const titleO  = interpolate(titleF, [0, 14], [0, 1], { extrapolateRight: "clamp" });
 
   const CARD_STARTS = [28, 52, 76];
+  const lastCardEnd = (CARD_STARTS[tensionCards.length - 1] ?? 76) + 20;
+  const subtextO = interpolate(
+    Math.max(0, frame - lastCardEnd), [0, 18], [0, 1], { extrapolateRight: "clamp" }
+  );
 
   return (
     <AbsoluteFill style={{ opacity: fadeIn * fadeOut, overflow: "hidden" }}>
@@ -145,6 +149,24 @@ export const ProductTensionScene: React.FC<Props> = ({
             />
           ))}
         </div>
+
+        {/* Optional subtext — fades in after last card */}
+        {tensionSubtext && (
+          <div style={{
+            opacity: subtextO,
+            marginTop: 48,
+            fontSize: 38,
+            fontWeight: 500,
+            fontStyle: "italic",
+            color: "rgba(255,255,255,0.55)",
+            fontFamily: T.sans,
+            letterSpacing: "-0.015em",
+            lineHeight: 1.3,
+            textShadow: "0 2px 12px rgba(0,0,0,0.6)",
+          }}>
+            {tensionSubtext}
+          </div>
+        )}
 
       </AbsoluteFill>
     </AbsoluteFill>

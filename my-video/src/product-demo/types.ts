@@ -14,6 +14,7 @@ export interface ProductDemoScript {
 
   // Scene 2 — Clinical tension
   tensionTitle: string;
+  tensionSubtext?: string;          // italic line shown below cards (e.g. "Small changes. Big story.")
   tensionCards: Array<{ label: string; color: string }>;
 
   // Scene 3 — App demo

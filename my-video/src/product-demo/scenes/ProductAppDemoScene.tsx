@@ -127,10 +127,8 @@ export const ProductAppDemoScene: React.FC<Props> = ({
   const phoneRiseY = interpolate(phoneSp, [0, 1], [60, 0]);
   const phoneO  = interpolate(phoneF, [0, 14], [0, 1], { extrapolateRight: "clamp" });
 
-  // Continuous float + perspective tilt after reveal settles
-  const settled = Math.max(0, frame - 35);
-  const floatY  = settled > 0 ? Math.sin(settled * 0.042) * 9 : 0;
-  const tiltDeg = settled > 0 ? Math.sin(settled * 0.027) * 1.6 : 0;
+  const floatY  = 0;
+  const tiltDeg = 0;
 
   // App header
   const headerO = interpolate(Math.max(0, frame - T_HEADER), [0, 14], [0, 1], { extrapolateRight: "clamp" });

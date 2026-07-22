@@ -124,6 +124,7 @@ export const ProductCTAScene: React.FC<Props> = ({
             fontFamily: T.sans,
             letterSpacing: "-0.015em",
             lineHeight: 1.4,
+            whiteSpace: "pre-line" as const,
           }}>
             {ctaLine}
           </span>

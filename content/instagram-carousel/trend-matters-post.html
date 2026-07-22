@@ -1,0 +1,227 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Clinical Edge — The Trend Matters More Than One Number</title>
+  <link
+    href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap"
+    rel="stylesheet"
+  />
+  <style>
+    :root {
+      --paper: #F7F3EA;
+      --navy:  #13233A;
+      --navy-60: rgba(19,35,58,0.62);
+      --navy-35: rgba(19,35,58,0.32);
+      --navy-15: rgba(19,35,58,0.14);
+      --navy-08: rgba(19,35,58,0.06);
+      --blue:  #4D7EA8;
+      --red:   #A6483F;
+    }
+
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      background: #0D1117;
+      font-family: 'Inter', -apple-system, sans-serif;
+      padding: 48px 32px;
+      display: flex; justify-content: center;
+    }
+
+    .slide {
+      width: 1080px; height: 1350px;
+      background-color: var(--paper);
+      color: var(--navy);
+      position: relative;
+      overflow: hidden;
+      flex-shrink: 0;
+    }
+
+    .slide-content {
+      position: relative; z-index: 1;
+      padding: 72px 80px 40px;
+      height: 100%;
+      display: flex; flex-direction: column;
+    }
+
+    .eyebrow {
+      font-size: 22px; font-weight: 700; letter-spacing: 2.5px;
+      text-transform: uppercase; color: var(--blue);
+    }
+
+    h1 {
+      margin-top: 18px;
+      font-size: 78px; font-weight: 800; line-height: 1.05; letter-spacing: -2.6px;
+      color: var(--navy);
+    }
+
+    .intro {
+      margin-top: 24px;
+      font-size: 24px; font-weight: 400; line-height: 1.55;
+      color: var(--navy-60);
+      max-width: 860px;
+    }
+
+    .rule    { height: 1px; background: var(--navy-15); width: 100%; }
+    .rule-2  { height: 2px; background: var(--navy); width: 100%; }
+
+    .grid {
+      margin-top: 40px;
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      column-gap: 64px;
+      row-gap: 0;
+    }
+    .cell { padding: 26px 0; }
+    .cell:nth-child(2)  { padding-left: 32px; border-left: 1px solid var(--navy-15); }
+    .cell:nth-child(4)  { padding-left: 32px; border-left: 1px solid var(--navy-15); }
+    .cell:nth-child(3), .cell:nth-child(4) { border-top: 1px solid var(--navy-15); }
+
+    .cell-head { display: flex; align-items: baseline; gap: 14px; }
+    .num   { font-size: 24px; font-weight: 700; color: var(--navy-35); }
+    .title { font-size: 27px; font-weight: 700; letter-spacing: -0.2px; }
+
+    .trend {
+      margin-top: 14px;
+      display: flex; flex-direction: column; gap: 4px;
+      font-size: 35px; font-weight: 700; letter-spacing: -0.5px;
+      line-height: 1.2;
+    }
+    .trend-row { display: flex; align-items: baseline; flex-wrap: wrap; gap: 10px; }
+    .trend .mid    { color: var(--navy-60); font-weight: 600; }
+    .trend .arrow  { color: var(--navy-35); font-weight: 500; }
+    .trend .final  { color: var(--red); font-weight: 800; font-size: 1.16em; }
+
+    .explain {
+      margin-top: 11px;
+      font-size: 22px; font-weight: 400; line-height: 1.5;
+      color: var(--navy-60);
+      max-width: 430px;
+    }
+
+    .takeaway {
+      margin-top: 44px;
+      background: var(--navy-08);
+      border-top: 3px solid var(--navy);
+      padding: 28px 40px;
+    }
+    .takeaway .ask-not {
+      font-size: 24px; font-weight: 500; color: var(--navy-60);
+    }
+    .takeaway .q1 {
+      margin-top: 4px; font-size: 30px; font-weight: 700; color: var(--navy);
+    }
+    .takeaway .ask-yes {
+      margin-top: 20px; font-size: 24px; font-weight: 500; color: var(--blue);
+    }
+    .takeaway .q2 {
+      margin-top: 4px; font-size: 33px; font-weight: 800; color: var(--navy);
+    }
+
+    .save-cta {
+      margin-top: 14px;
+      font-size: 25px; font-weight: 700; color: var(--navy);
+      letter-spacing: -0.2px;
+    }
+
+    .disclaimer {
+      margin-top: 12px;
+      font-size: 18px; font-weight: 400; font-style: italic;
+      line-height: 1.5; color: var(--navy-35);
+      max-width: 820px;
+    }
+
+    .spacer { flex: 1; }
+
+    .footer {
+      padding-top: 14px;
+      border-top: 1px solid var(--navy-15);
+      display: flex; align-items: baseline; justify-content: space-between;
+    }
+    .footer-brand { display: flex; align-items: baseline; gap: 14px; }
+    .footer-name { font-size: 22px; font-weight: 800; letter-spacing: -0.2px; color: var(--navy); }
+    .footer-tag  { font-size: 19px; font-weight: 400; color: var(--navy-60); }
+    .footer-url  { font-size: 21px; font-weight: 700; color: var(--blue); letter-spacing: 0.1px; }
+  </style>
+</head>
+<body>
+
+<div class="slide" id="slide-1">
+  <div class="slide-content">
+
+    <div class="eyebrow">Clinical Reasoning</div>
+    <h1>The trend tells<br>the real story.</h1>
+
+    <div class="intro">
+      A &ldquo;normal&rdquo; vital sign can still be concerning when it is moving in the wrong direction.
+    </div>
+
+    <div class="grid">
+
+      <div class="cell">
+        <div class="cell-head"><span class="num">01</span><span class="title">Respiratory rate</span></div>
+        <div class="trend">
+          <div class="trend-row"><span>18</span><span class="arrow">&rarr;</span><span class="mid">22</span></div>
+          <div class="trend-row"><span class="arrow">&rarr;</span><span class="final">26</span></div>
+        </div>
+        <div class="explain">Often changes before the monitor looks dramatic.</div>
+      </div>
+
+      <div class="cell">
+        <div class="cell-head"><span class="num">02</span><span class="title">Oxygen need</span></div>
+        <div class="trend" style="font-size:33px;">
+          <div class="trend-row"><span>Room air</span><span class="arrow">&rarr;</span><span class="mid">2 L</span><span class="arrow">&rarr;</span><span class="mid">4 L</span></div>
+          <div class="trend-row"><span class="arrow">&rarr;</span><span class="final">6 L</span></div>
+        </div>
+        <div class="explain">The SpO&#8322; may look acceptable because support keeps increasing.</div>
+      </div>
+
+      <div class="cell">
+        <div class="cell-head"><span class="num">03</span><span class="title">Blood pressure</span></div>
+        <div class="trend" style="font-size:33px;">
+          <div class="trend-row"><span>128/72</span><span class="arrow">&rarr;</span><span class="mid">106/64</span></div>
+          <div class="trend-row"><span class="arrow">&rarr;</span><span class="final">92/58</span></div>
+        </div>
+        <div class="explain">The direction matters, especially with symptoms or poor perfusion.</div>
+      </div>
+
+      <div class="cell">
+        <div class="cell-head"><span class="num">04</span><span class="title">Mental status</span></div>
+        <div class="trend" style="font-size:33px;">
+          <div class="trend-row"><span>Alert</span><span class="arrow">&rarr;</span><span class="mid">restless</span></div>
+          <div class="trend-row"><span class="arrow">&rarr;</span><span class="final">confused</span></div>
+        </div>
+        <div class="explain">A new change in mental status should never be dismissed as &ldquo;just tired.&rdquo;</div>
+      </div>
+
+    </div>
+
+    <div class="takeaway">
+      <div class="ask-not">Don&rsquo;t only ask:</div>
+      <div class="q1">&ldquo;Is this value abnormal?&rdquo;</div>
+      <div class="ask-yes">Ask:</div>
+      <div class="q2">&ldquo;What has changed, and where is this heading?&rdquo;</div>
+    </div>
+
+    <div class="save-cta">Save this for your next shift.</div>
+
+    <div class="disclaimer">
+      Assess the full clinical picture. Follow facility escalation protocols.
+    </div>
+
+    <div class="spacer"></div>
+
+    <div class="footer">
+      <div class="footer-brand">
+        <span class="footer-name">Clinical Edge</span>
+        <span class="footer-tag">Clinical reasoning for nurses.</span>
+      </div>
+      <span class="footer-url">theclinicaledge.org</span>
+    </div>
+
+  </div>
+</div>
+
+</body>
+</html>

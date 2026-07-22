@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Clinical Edge — Facebook Cover</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    /* Deep Clinical Edge navy — matches the current educational-content dark bg */
+    --navy:        #111827;
+    --teal:        #0ABFBC;
+    --warm-white:  #F0EDE6;   /* primary heading text — warm, not stark white */
+    --text-body:   #A8C1CC;   /* muted gray-blue secondary text */
+  }
+
+  html, body {
+    width: 1640px;
+    height: 624px;
+    overflow: hidden;
+    background: var(--navy);
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  .canvas {
+    position: relative;
+    width: 1640px;
+    height: 624px;
+    background: var(--navy);
+    overflow: hidden;
+  }
+
+  /* Matte grain only — no gradients, no glow. Flat, calm surface. */
+  .canvas::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    z-index: 0;
+    pointer-events: none;
+    background-image: url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' width='200' height='200'><filter id='g'><feTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/></filter><rect width='200' height='200' filter='url(%23g)' opacity='0.025'/></svg>");
+    background-size: 200px 200px;
+    background-repeat: repeat;
+  }
+
+  /* Safe zone: 1200px centered — all critical content lives inside */
+  .safe-zone {
+    position: absolute;
+    top: 0;
+    left: 220px;
+    width: 1200px;
+    height: 624px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 2;
+  }
+
+  /* ── Single logo+wordmark lockup, tagline, description, topics ── */
+  .left-col {
+    flex: 0 1 auto;
+    max-width: 750px;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .brand-row {
+    display: flex;
+    align-items: center;
+    gap: 20px;
+  }
+  .brand-row svg { display: block; flex-shrink: 0; }
+  .brand-name {
+    font-size: 60px;
+    font-weight: 800;
+    letter-spacing: -0.025em;
+    line-height: 1;
+    color: var(--warm-white);
+    white-space: nowrap;
+  }
+
+  .accent-bar {
+    width: 44px;
+    height: 3px;
+    border-radius: 2px;
+    background: var(--teal);
+    margin: 22px 0;
+  }
+
+  .tagline {
+    font-size: 26px;
+    font-weight: 500;
+    letter-spacing: -0.005em;
+    color: var(--teal);
+    line-height: 1.3;
+    margin-bottom: 16px;
+  }
+
+  .description {
+    font-size: 18px;
+    font-weight: 400;
+    line-height: 1.55;
+    color: var(--text-body);
+    max-width: 540px;
+    margin-bottom: 26px;
+  }
+
+  .topics {
+    font-size: 15px;
+    font-weight: 500;
+    letter-spacing: 0.01em;
+    color: rgba(10, 191, 188, 0.72);
+    white-space: nowrap;
+  }
+  .topics .sep {
+    color: rgba(168, 193, 204, 0.35);
+    margin: 0 12px;
+  }
+</style>
+</head>
+<body>
+<div class="canvas">
+
+  <div class="safe-zone">
+
+    <!-- LEFT: single logo lockup (doubles as the main headline) + supporting copy -->
+    <div class="left-col">
+      <div class="brand-row">
+        <svg width="58" height="51.5" viewBox="0 0 225 200" xmlns="http://www.w3.org/2000/svg">
+          <g fill="#0ABFBC">
+            <path d="M 159.1,24.3 A 96,96 0 1,0 159.1,175.7 L 135.7,145.7 A 58,58 0 1,1 135.7,54.3 Z"/>
+            <path d="M 144.0,57 L 208,45 L 218,58 L 208,70 L 150.0,71 Z"/>
+            <path d="M 158.0,92 L 215,82 L 225,95 L 215,107 L 158.0,108 Z"/>
+            <path d="M 150.0,129 L 208,130 L 218,142 L 208,155 L 144.0,143 Z"/>
+          </g>
+        </svg>
+        <div class="brand-name">Clinical Edge</div>
+      </div>
+
+      <div class="accent-bar"></div>
+
+      <div class="tagline">Clinical reasoning made clearer.</div>
+
+      <div class="description">Practical nursing education for students, new grads, and practicing nurses.</div>
+
+      <div class="topics">ABGs<span class="sep">&bull;</span>EKGs<span class="sep">&bull;</span>ICU<span class="sep">&bull;</span>Labs<span class="sep">&bull;</span>Clinical Reasoning</div>
+    </div>
+
+  </div>
+
+</div>
+</body>
+</html>

@@ -1,0 +1,401 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Clinical Edge — Post 76 — Which Patient Are You Seeing First?</title>
+  <link
+    href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=IBM+Plex+Mono:wght@400;500;600;700&display=swap"
+    rel="stylesheet"
+  />
+  <style>
+    :root {
+      --paper:  #F7F4ED;
+      --ink:    #182126;
+      --ink-60: rgba(24,33,38,0.62);
+      --ink-35: rgba(24,33,38,0.35);
+      --ink-15: rgba(24,33,38,0.14);
+      --blue:   #4DA3FF;
+      --green:  #1FBF75;
+      --gold:   #F2B94B;
+      --coral:  #E05572;
+    }
+
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      background: #0D1117;
+      font-family: 'Inter', -apple-system, sans-serif;
+      padding: 48px 32px;
+      display: flex; flex-direction: column; align-items: center; gap: 56px;
+    }
+
+    .slide {
+      width: 1080px; height: 1350px;
+      background-color: var(--paper);
+      position: relative; overflow: hidden; flex-shrink: 0;
+      color: var(--ink);
+    }
+    /* paper grain — the only texture on the slide */
+    .slide::before {
+      content: ''; position: absolute; inset: 0; z-index: 0; pointer-events: none;
+      background-image: url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' width='200' height='200'><filter id='g'><feTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/></filter><rect width='200' height='200' filter='url(%23g)' opacity='0.05'/></svg>");
+      background-size: 200px 200px; background-repeat: repeat;
+      mix-blend-mode: multiply;
+    }
+
+    .slide-label { width: 1080px; display: flex; align-items: center; gap: 14px; margin-bottom: -40px; }
+    .slide-label span { font-family: 'IBM Plex Mono', monospace; font-size: 11px; font-weight: 500; color: #9B8E7E; letter-spacing: 2px; text-transform: uppercase; }
+    .slide-label::after { content: ''; flex: 1; height: 1px; background: #9B8E7E; opacity: 0.35; }
+
+    .slide-footer {
+      position: absolute; bottom: 0; left: 0; right: 0; height: 92px;
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 0 72px; z-index: 2;
+      border-top: 1px solid var(--ink-15);
+    }
+    .footer-brand  { display: flex; align-items: center; gap: 14px; }
+    .footer-dot    { width: 9px; height: 9px; border-radius: 50%; background: var(--blue); }
+    .footer-name   { font-size: 26px; font-weight: 600; color: var(--ink-60); letter-spacing: -0.2px; }
+    .footer-handle { font-family: 'IBM Plex Mono', monospace; font-size: 23px; font-weight: 500; color: var(--ink-35); letter-spacing: 1.4px; text-transform: uppercase; }
+
+    .slide-number { position: absolute; bottom: 34px; left: 50%; transform: translateX(-50%); display: flex; gap: 8px; z-index: 3; }
+    .slide-number .dot        { width: 6px; height: 6px; border-radius: 50%; background: var(--ink-15); }
+    .slide-number .dot.active { background: var(--blue); }
+
+    .eyebrow { font-family: 'IBM Plex Mono', monospace; font-size: 22px; font-weight: 600; letter-spacing: 2px; text-transform: uppercase; color: var(--ink-35); }
+    .pagenum { font-family: 'IBM Plex Mono', monospace; font-size: 22px; font-weight: 500; letter-spacing: 1px; color: var(--ink-35); }
+
+    .slide-content { position: relative; z-index: 1; padding: 58px 72px 128px; height: 100%; display: flex; flex-direction: column; }
+    .top-row { display: flex; align-items: center; justify-content: space-between; flex-shrink: 0; }
+
+    .rule    { height: 1px; background: var(--ink-15); width: 100%; }
+    .rule-2  { height: 2px; background: var(--ink); width: 100%; }
+
+    /* marker-highlight — colored stroke sitting behind a word, like real highlighter ink */
+    .mark { position: relative; display: inline-block; z-index: 0; padding: 0 0.04em; }
+    .mark::before {
+      content: ''; position: absolute; z-index: -1;
+      left: -0.07em; right: -0.07em; top: 0.34em; bottom: 0.00em;
+      opacity: 0.55; transform: rotate(-1deg);
+      border-radius: 2px 7px 3px 8px;
+    }
+    .mark-blue::before  { background: var(--blue); }
+    .mark-green::before { background: var(--green); }
+    .mark-gold::before  { background: var(--gold); }
+    .mark-coral::before { background: var(--coral); }
+
+    .mono { font-family: 'IBM Plex Mono', monospace; }
+
+    /* patient sheet — vitals row */
+    .vrow { display: flex; align-items: baseline; padding: 26px 0; gap: 24px; }
+    .vlabel { width: 220px; font-size: 30px; font-weight: 600; color: var(--ink-60); }
+    .vvalue { font-size: 50px; font-weight: 800; letter-spacing: -1px; }
+</style>
+</head>
+<body>
+
+<!-- POST 76 — Which patient are you seeing first? -->
+
+
+<!-- ═══ SLIDE 1 — COVER ═════════════════════════════════════════════════════ -->
+<div class="slide-label"><span>Slide 01 — Cover</span></div>
+<div class="slide" id="slide-1">
+  <div class="slide-content">
+
+    <div class="top-row">
+      <span class="eyebrow">Clinical Edge</span>
+      <span class="pagenum">01 / 07</span>
+    </div>
+
+    <div style="margin-top:64px; font-size:90px; font-weight:900; line-height:1.05; letter-spacing:-3.5px;">
+      Which patient are<br>you seeing <span class="mark mark-coral">first?</span>
+    </div>
+
+    <div style="margin-top:36px; font-size:38px; font-weight:400; line-height:1.5; color:var(--ink-60); max-width:640px;">
+      Report just ended. Four patients. Who do you check on first?
+    </div>
+
+    <div class="mono" style="margin-top:56px; display:flex; gap:20px; font-size:32px; font-weight:700; color:var(--ink-35);">
+      <span>A</span><span>&middot;</span><span>B</span><span>&middot;</span><span>C</span><span>&middot;</span><span>D</span>
+    </div>
+
+    <div style="flex:1;"></div>
+
+    <div>
+      <div style="font-size:30px; font-weight:800;">Comment your answer before slide 7.</div>
+      <div class="mono" style="margin-top:14px; font-size:26px; font-weight:600; color:var(--ink);">Swipe to meet them &rarr;</div>
+    </div>
+
+  </div>
+  <div class="slide-footer">
+    <div class="footer-brand"><div class="footer-dot"></div><span class="footer-name">Clinical Edge: Nursing Tools</span></div>
+    <span class="footer-handle">@clinicaledgeco</span>
+  </div>
+  <div class="slide-number">
+    <div class="dot active"></div><div class="dot"></div><div class="dot"></div><div class="dot"></div><div class="dot"></div><div class="dot"></div><div class="dot"></div>
+  </div>
+</div>
+
+
+<!-- ═══ SLIDE 2 — PATIENT A ═════════════════════════════════════════════════ -->
+<div class="slide-label"><span>Slide 02 — Patient A</span></div>
+<div class="slide" id="slide-2">
+  <div class="slide-content">
+
+    <div class="top-row">
+      <span class="eyebrow">Patient A</span>
+      <span class="pagenum">02 / 07</span>
+    </div>
+
+    <div style="margin-top:26px; font-size:200px; font-weight:900; letter-spacing:-8px; line-height:1;">A.</div>
+
+    <div style="margin-top:8px; font-size:44px; font-weight:800; letter-spacing:-1px;">68-year-old &middot; CHF</div>
+
+    <div style="margin-top:44px;">
+      <div class="rule-2"></div>
+      <div class="vrow">
+        <div class="vlabel mono">BP</div>
+        <div class="vvalue mono">94/58</div>
+      </div>
+      <div class="rule"></div>
+      <div class="vrow">
+        <div class="vlabel mono">MAP</div>
+        <div class="vvalue mono">70</div>
+      </div>
+      <div class="rule-2"></div>
+    </div>
+
+    <div style="margin-top:40px; font-size:27px; font-style:italic; color:var(--ink-60);">
+      Baseline overnight for this patient.
+    </div>
+
+  </div>
+  <div class="slide-footer">
+    <div class="footer-brand"><div class="footer-dot"></div><span class="footer-name">Clinical Edge: Nursing Tools</span></div>
+    <span class="footer-handle">@clinicaledgeco</span>
+  </div>
+  <div class="slide-number">
+    <div class="dot"></div><div class="dot active"></div><div class="dot"></div><div class="dot"></div><div class="dot"></div><div class="dot"></div><div class="dot"></div>
+  </div>
+</div>
+
+
+<!-- ═══ SLIDE 3 — PATIENT B ═════════════════════════════════════════════════ -->
+<div class="slide-label"><span>Slide 03 — Patient B</span></div>
+<div class="slide" id="slide-3">
+  <div class="slide-content">
+
+    <div class="top-row">
+      <span class="eyebrow">Patient B</span>
+      <span class="pagenum">03 / 07</span>
+    </div>
+
+    <div style="margin-top:26px; font-size:200px; font-weight:900; letter-spacing:-8px; line-height:1;">B.</div>
+
+    <div style="margin-top:8px; font-size:44px; font-weight:800; letter-spacing:-1px;">Post-op day 1</div>
+
+    <div style="margin-top:44px;">
+      <div class="rule-2"></div>
+      <div class="vrow">
+        <div class="vlabel mono">HR</div>
+        <div class="vvalue mono">112</div>
+      </div>
+      <div class="rule"></div>
+      <div class="vrow">
+        <div class="vlabel mono">Pain</div>
+        <div class="vvalue mono">8/10</div>
+      </div>
+      <div class="rule-2"></div>
+    </div>
+
+    <div style="margin-top:40px; font-size:27px; font-style:italic; color:var(--ink-60);">
+      Documented as clinically stable.
+    </div>
+
+  </div>
+  <div class="slide-footer">
+    <div class="footer-brand"><div class="footer-dot"></div><span class="footer-name">Clinical Edge: Nursing Tools</span></div>
+    <span class="footer-handle">@clinicaledgeco</span>
+  </div>
+  <div class="slide-number">
+    <div class="dot"></div><div class="dot"></div><div class="dot active"></div><div class="dot"></div><div class="dot"></div><div class="dot"></div><div class="dot"></div>
+  </div>
+</div>
+
+
+<!-- ═══ SLIDE 4 — PATIENT C ═════════════════════════════════════════════════ -->
+<div class="slide-label"><span>Slide 04 — Patient C</span></div>
+<div class="slide" id="slide-4">
+  <div class="slide-content">
+
+    <div class="top-row">
+      <span class="eyebrow">Patient C</span>
+      <span class="pagenum">04 / 07</span>
+    </div>
+
+    <div style="margin-top:26px; font-size:200px; font-weight:900; letter-spacing:-8px; line-height:1;">C.</div>
+
+    <div style="margin-top:8px; font-size:44px; font-weight:800; letter-spacing:-1px;">Pneumonia</div>
+
+    <div style="margin-top:38px;">
+      <div class="rule-2"></div>
+      <div class="vrow">
+        <div class="vlabel mono">O&#8322; flow</div>
+        <div class="vvalue mono" style="font-size:42px;">2L &rarr; 6L NC <span style="font-size:26px; font-weight:600; color:var(--ink-60);">in 20 min</span></div>
+      </div>
+      <div class="rule"></div>
+      <div class="vrow">
+        <div class="vlabel mono">SpO&#8322;</div>
+        <div class="vvalue mono">88&ndash;90%</div>
+      </div>
+      <div class="rule"></div>
+      <div class="vrow">
+        <div class="vlabel mono">RR</div>
+        <div class="vvalue mono">32</div>
+      </div>
+      <div class="rule-2"></div>
+    </div>
+
+    <div style="margin-top:32px; display:flex; flex-direction:column; gap:14px; font-size:29px; color:var(--ink);">
+      <div>&ndash; Accessory muscle use</div>
+      <div>&ndash; Speaking in short phrases</div>
+    </div>
+
+  </div>
+  <div class="slide-footer">
+    <div class="footer-brand"><div class="footer-dot"></div><span class="footer-name">Clinical Edge: Nursing Tools</span></div>
+    <span class="footer-handle">@clinicaledgeco</span>
+  </div>
+  <div class="slide-number">
+    <div class="dot"></div><div class="dot"></div><div class="dot"></div><div class="dot active"></div><div class="dot"></div><div class="dot"></div><div class="dot"></div>
+  </div>
+</div>
+
+
+<!-- ═══ SLIDE 5 — PATIENT D ═════════════════════════════════════════════════ -->
+<div class="slide-label"><span>Slide 05 — Patient D</span></div>
+<div class="slide" id="slide-5">
+  <div class="slide-content">
+
+    <div class="top-row">
+      <span class="eyebrow">Patient D</span>
+      <span class="pagenum">05 / 07</span>
+    </div>
+
+    <div style="margin-top:26px; font-size:200px; font-weight:900; letter-spacing:-8px; line-height:1;">D.</div>
+
+    <div style="margin-top:24px;">
+      <div class="rule-2"></div>
+      <div class="vrow">
+        <div class="vlabel mono">Glucose</div>
+        <div class="vvalue mono">412</div>
+      </div>
+      <div class="rule-2"></div>
+    </div>
+
+    <div style="margin-top:40px; font-size:27px; font-style:italic; color:var(--ink-60);">
+      Documented as clinically stable.
+    </div>
+
+  </div>
+  <div class="slide-footer">
+    <div class="footer-brand"><div class="footer-dot"></div><span class="footer-name">Clinical Edge: Nursing Tools</span></div>
+    <span class="footer-handle">@clinicaledgeco</span>
+  </div>
+  <div class="slide-number">
+    <div class="dot"></div><div class="dot"></div><div class="dot"></div><div class="dot"></div><div class="dot active"></div><div class="dot"></div><div class="dot"></div>
+  </div>
+</div>
+
+
+<!-- ═══ SLIDE 6 — BEFORE YOU ANSWER ═════════════════════════════════════════ -->
+<div class="slide-label"><span>Slide 06 — Before You Answer</span></div>
+<div class="slide" id="slide-6">
+  <div class="slide-content">
+
+    <div class="top-row">
+      <span class="eyebrow">Before You Answer</span>
+      <span class="pagenum">06 / 07</span>
+    </div>
+
+    <div style="flex:1; display:flex; flex-direction:column; justify-content:center;">
+
+      <div style="font-size:78px; font-weight:900; line-height:1.1; letter-spacing:-3px;">
+        One of these patients<br>is quietly getting <span class="mark mark-coral">worse.</span>
+      </div>
+
+      <div class="rule-2" style="margin-top:48px; margin-bottom:36px; width:88px;"></div>
+
+      <div style="font-size:38px; font-weight:400; line-height:1.5; color:var(--ink-60); max-width:720px;">
+        The others just look worse on paper.
+      </div>
+
+    </div>
+
+  </div>
+  <div class="slide-footer">
+    <div class="footer-brand"><div class="footer-dot"></div><span class="footer-name">Clinical Edge: Nursing Tools</span></div>
+    <span class="footer-handle">@clinicaledgeco</span>
+  </div>
+  <div class="slide-number">
+    <div class="dot"></div><div class="dot"></div><div class="dot"></div><div class="dot"></div><div class="dot"></div><div class="dot active"></div><div class="dot"></div>
+  </div>
+</div>
+
+
+<!-- ═══ SLIDE 7 — THE ANSWER ════════════════════════════════════════════════ -->
+<div class="slide-label"><span>Slide 07 — The Answer</span></div>
+<div class="slide" id="slide-7">
+  <div class="slide-content">
+
+    <div class="top-row">
+      <span class="eyebrow">The Answer</span>
+      <span class="pagenum">07 / 07</span>
+    </div>
+
+    <div style="margin-top:40px; background:var(--ink); padding:36px 40px;">
+      <div class="mono" style="font-size:20px; font-weight:600; letter-spacing:2px; color:rgba(247,244,237,0.5); text-transform:uppercase;">You see</div>
+      <div style="margin-top:8px; font-size:64px; font-weight:900; letter-spacing:-2px; color:var(--paper);">Patient C.</div>
+    </div>
+
+    <div style="margin-top:40px; display:flex; flex-direction:column; gap:20px;">
+      <div class="rule-2"></div>
+      <div style="font-size:29px; line-height:1.5;">
+        <span class="mono" style="color:var(--coral); font-weight:700;">2L &rarr; 6L in 20 minutes</span> &mdash; escalating, not stable.
+      </div>
+      <div class="rule"></div>
+      <div style="font-size:29px; line-height:1.5;">
+        <span class="mono" style="color:var(--blue); font-weight:700;">RR 32, accessory muscles, short phrases</span> &mdash; the body compensating in real time.
+      </div>
+      <div class="rule"></div>
+      <div style="font-size:29px; line-height:1.5;">
+        <span class="mono" style="color:var(--blue); font-weight:700;">SpO&#8322; 88&ndash;90%</span> on rising oxygen &mdash; still not enough.
+      </div>
+      <div class="rule-2"></div>
+    </div>
+
+    <div style="margin-top:36px; font-size:27px; font-style:italic; color:var(--ink-60); line-height:1.5; max-width:820px;">
+      A, B, and D all had a number that explained itself. C didn&rsquo;t &mdash; it was still moving in the wrong direction.
+    </div>
+
+    <div style="flex:1;"></div>
+
+    <div>
+      <div style="font-size:30px; font-weight:800;">Save this to test your unit.</div>
+      <div class="mono" style="margin-top:6px; font-size:20px; font-weight:500; letter-spacing:1px; color:var(--ink-35); text-transform:uppercase;">Clinical Edge &middot; theclinicaledge.org</div>
+    </div>
+
+  </div>
+  <div class="slide-footer">
+    <div class="footer-brand"><div class="footer-dot"></div><span class="footer-name">Clinical Edge: Nursing Tools</span></div>
+    <span class="footer-handle">@clinicaledgeco</span>
+  </div>
+  <div class="slide-number">
+    <div class="dot"></div><div class="dot"></div><div class="dot"></div><div class="dot"></div><div class="dot"></div><div class="dot"></div><div class="dot active"></div>
+  </div>
+</div>
+
+
+</body>
+</html>

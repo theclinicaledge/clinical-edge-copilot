@@ -206,6 +206,29 @@
   color: var(--ce-text-dim);
 }
 
+/* Shown when mobile/PWA file sharing is unsupported or fails for a reason
+   other than user cancellation (BrainSheetsModule.jsx `showFallbackPanel`).
+   Already nested inside the metadata block's `.bs-screen-only` wrapper, so
+   it never prints — reuses the same informational-blue treatment as
+   `.bs-info-banner` rather than introducing a new accent color. */
+.bs-pdf-fallback {
+  border-left: 3px solid var(--ce-blue);
+  background: rgba(77, 163, 255, 0.06);
+  border-radius: var(--ce-r-md);
+  padding: var(--ce-sp-4);
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: var(--ce-sp-2);
+}
+
+.bs-pdf-fallback p {
+  font-size: var(--ce-fs-body-sm);
+  line-height: 1.6;
+  color: var(--ce-text-light-body);
+  margin: 0;
+}
+
 .bs-placeholder-note {
   border: 1px solid var(--ce-line-navy);
   border-radius: var(--ce-r-md);

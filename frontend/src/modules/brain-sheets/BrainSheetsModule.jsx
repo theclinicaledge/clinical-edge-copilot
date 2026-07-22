@@ -131,14 +131,30 @@ function isTouchDevice() {
   return 'ontouchstart' in window || navigator.maxTouchPoints > 0;
 }
 
+// A raw `<a href="…pdf" download>` navigation is unsafe in two overlapping
+// contexts, so both are checked and OR'd together (kept small and local to
+// this component — not a shared device-detection utility):
+//   - Installed home-screen PWA (`display-mode: standalone`, or iOS's older
+//     `navigator.standalone`): there is no browser chrome at all here, so a
+//     full-page PDF navigation has no back control whatsoever — confirmed
+//     trap on iPhone, the exact bug this fix addresses.
+//   - Any touch/mobile browsing context: even inside ordinary mobile Safari,
+//     `target="_blank"` and `download` are unreliable enough (iOS/WebKit)
+//     that a full-page PDF navigation can still replace the app's tab.
+function isStandaloneOrRiskyMobile() {
+  if (typeof window === 'undefined') return false;
+  const standaloneDisplayMode =
+    typeof window.matchMedia === 'function' && window.matchMedia('(display-mode: standalone)').matches;
+  const iosStandalone = window.navigator?.standalone === true;
+  return standaloneDisplayMode || iosStandalone || isTouchDevice();
+}
+
 // `window.print()` is unreliable on iOS: it is a documented no-op when this
 // page runs installed to the home screen (`display-mode: standalone` — this
 // app is configured as an installable PWA, see index.html), and is
-// inconsistent across mobile browser chrome generally. Rather than depend on
-// it, touch devices that can share the actual PDF file use the OS share
-// sheet instead (which itself offers Print and Save to Files). Feature
-// detection uses a throwaway File — this never touches the real PDF or any
-// patient data, it only asks the platform "can you share a PDF file at all."
+// inconsistent across mobile browser chrome generally. Feature detection
+// uses a throwaway File — this never touches the real PDF or any patient
+// data, it only asks the platform "can you share a PDF file at all."
 function supportsFileShare() {
   if (typeof navigator === 'undefined' || !navigator.canShare || !navigator.share) return false;
   try {
@@ -150,9 +166,11 @@ function supportsFileShare() {
 
 function TemplateActions({ template }) {
   const [copyState, setCopyState] = useState('idle'); // idle | copied | fallback
+  const [shareFailed, setShareFailed] = useState(false);
   const canonicalUrl = `${SITE_URL}/brain-sheets/${template.id}`;
-  const isMobile = isTouchDevice();
-  const shareCapable = isMobile && !!template.pdfPath && supportsFileShare();
+  const isMobileRisk = isStandaloneOrRiskyMobile();
+  const mobileShareSupported = isMobileRisk && !!template.pdfPath && supportsFileShare();
+  const showFallbackPanel = isMobileRisk && !!template.pdfPath && (!mobileShareSupported || shareFailed);
 
   const handlePrint = useCallback(() => {
     // No analytics here — template_downloaded wiring is a pending decision
@@ -160,17 +178,28 @@ function TemplateActions({ template }) {
     window.print();
   }, []);
 
-  const handleShare = useCallback(async () => {
+  // Mobile/PWA replacement for BOTH Download PDF and Print / Save PDF — the
+  // OS share sheet already exposes Save to Files, Print, and AirDrop, so
+  // there is no separate mobile print action (spec: "do not show a separate
+  // Print button on mobile if the share sheet already exposes Print"). Never
+  // navigates `window.location` to the PDF URL; the Clinical Edge page stays
+  // open regardless of outcome.
+  const handleSaveShare = useCallback(async () => {
     try {
       const response = await fetch(template.pdfPath);
       const blob = await response.blob();
       const file = new File([blob], template.pdfFilename, { type: 'application/pdf' });
-      if (navigator.canShare?.({ files: [file] })) {
-        await navigator.share({ files: [file], title: template.title });
+      if (!navigator.canShare?.({ files: [file] }) || !navigator.share) {
+        setShareFailed(true);
+        return;
       }
-    } catch {
-      // Either the user dismissed the share sheet or the share/fetch failed —
-      // both are silent no-ops here. Download PDF remains the primary path.
+      await navigator.share({ files: [file], title: 'Med-Surg 4 Patient Brain Sheet' });
+      setShareFailed(false);
+    } catch (err) {
+      // The share sheet reports a user-dismissed share as AbortError — that
+      // is a cancellation, not a failure, and shows no error.
+      if (err?.name === 'AbortError') return;
+      setShareFailed(true);
     }
   }, [template]);
 
@@ -188,7 +217,7 @@ function TemplateActions({ template }) {
   return (
     <div className="bs-actions">
       <div className="bs-actions-row">
-        {template.pdfPath && (
+        {!isMobileRisk && template.pdfPath && (
           <a
             href={template.pdfPath}
             download={template.pdfFilename}
@@ -199,14 +228,14 @@ function TemplateActions({ template }) {
             Download PDF
           </a>
         )}
-        {!isMobile && (
+        {!isMobileRisk && (
           <button type="button" className="bs-btn bs-btn-secondary" onClick={handlePrint}>
             Print / Save PDF
           </button>
         )}
-        {isMobile && shareCapable && (
-          <button type="button" className="bs-btn bs-btn-secondary" onClick={handleShare}>
-            Print / Save PDF
+        {isMobileRisk && mobileShareSupported && (
+          <button type="button" className="bs-btn bs-btn-primary" onClick={handleSaveShare}>
+            Save / Share PDF
           </button>
         )}
         <button type="button" className="bs-btn bs-btn-secondary" onClick={handleCopyLink}>
@@ -215,17 +244,31 @@ function TemplateActions({ template }) {
           </span>
         </button>
       </div>
-      {!isMobile && (
+      {!isMobileRisk && (
         <p className="bs-print-note">
           For best results: Letter, Portrait, 100% scale, browser headers and footers off.
           Browser print settings remain under your control — this path does not
           guarantee removal of browser-added headers or footers.
         </p>
       )}
-      {isMobile && !shareCapable && (
+      {isMobileRisk && mobileShareSupported && (
         <p className="bs-print-note">
-          Open the downloaded PDF, then use your device’s Share or Print option.
+          Use Save / Share PDF to print, save to Files, or send the blank sheet.
         </p>
+      )}
+      {showFallbackPanel && (
+        <div className="bs-pdf-fallback">
+          <p>Your device could not open the PDF safely inside the app.</p>
+          <p>Open Clinical Edge in Safari to download the file, or use Copy Link.</p>
+          <a
+            href={canonicalUrl}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="bs-btn bs-btn-secondary"
+          >
+            Open in Safari
+          </a>
+        </div>
       )}
       {copyState === 'fallback' && (
         <div className="bs-copy-fallback">

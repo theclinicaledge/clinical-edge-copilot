@@ -35,6 +35,15 @@
   box-shadow: var(--ce-shadow-float);
 }
 
+/* Enlarged tap-to-preview overlay (BrainSheetsModule.jsx `TemplatePreview`)
+   sizes its own outer wrapper — `.bs-print-root`'s default 560px cap only
+   needs lifting here so `width: 100%` above can resolve against that larger
+   wrapper instead. Nothing else about `.bs-print-root`/`.bs-sheet` changes,
+   so the aspect-ratio/scale math is identical to the default preview. */
+.bs-preview-overlay-frame .bs-print-root {
+  max-width: none;
+}
+
 .bs-sheet {
   position: absolute;
   top: 0;
@@ -46,7 +55,12 @@
   background: var(--ce-warm-card);
   color: var(--ce-text-dark);
   font-family: var(--ce-font-sans);
-  transform: scale(calc(100cqw / 816));
+  /* `816` must carry a unit (`816px`) — dividing a `cqw` length by a bare
+     number yields a length, which `scale()` rejects as invalid, silently
+     dropping the whole transform (computed `none`). That left the sheet
+     rendering at its unscaled 816px width, overflowing `.bs-print-root`'s
+     `overflow: hidden` box and showing only its cropped top-left corner. */
+  transform: scale(calc(100cqw / 816px));
   transform-origin: top left;
   display: flex;
   flex-direction: column;

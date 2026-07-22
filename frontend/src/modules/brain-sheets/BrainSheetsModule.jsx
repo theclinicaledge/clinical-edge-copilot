@@ -131,15 +131,48 @@ function isTouchDevice() {
   return 'ontouchstart' in window || navigator.maxTouchPoints > 0;
 }
 
+// `window.print()` is unreliable on iOS: it is a documented no-op when this
+// page runs installed to the home screen (`display-mode: standalone` — this
+// app is configured as an installable PWA, see index.html), and is
+// inconsistent across mobile browser chrome generally. Rather than depend on
+// it, touch devices that can share the actual PDF file use the OS share
+// sheet instead (which itself offers Print and Save to Files). Feature
+// detection uses a throwaway File — this never touches the real PDF or any
+// patient data, it only asks the platform "can you share a PDF file at all."
+function supportsFileShare() {
+  if (typeof navigator === 'undefined' || !navigator.canShare || !navigator.share) return false;
+  try {
+    return navigator.canShare({ files: [new File(['x'], 'test.pdf', { type: 'application/pdf' })] });
+  } catch {
+    return false;
+  }
+}
+
 function TemplateActions({ template }) {
   const [copyState, setCopyState] = useState('idle'); // idle | copied | fallback
   const canonicalUrl = `${SITE_URL}/brain-sheets/${template.id}`;
+  const isMobile = isTouchDevice();
+  const shareCapable = isMobile && !!template.pdfPath && supportsFileShare();
 
   const handlePrint = useCallback(() => {
     // No analytics here — template_downloaded wiring is a pending decision
     // (see comment above), not this block's to make silently.
     window.print();
   }, []);
+
+  const handleShare = useCallback(async () => {
+    try {
+      const response = await fetch(template.pdfPath);
+      const blob = await response.blob();
+      const file = new File([blob], template.pdfFilename, { type: 'application/pdf' });
+      if (navigator.canShare?.({ files: [file] })) {
+        await navigator.share({ files: [file], title: template.title });
+      }
+    } catch {
+      // Either the user dismissed the share sheet or the share/fetch failed —
+      // both are silent no-ops here. Download PDF remains the primary path.
+    }
+  }, [template]);
 
   const handleCopyLink = useCallback(async () => {
     try {
@@ -159,25 +192,41 @@ function TemplateActions({ template }) {
           <a
             href={template.pdfPath}
             download={template.pdfFilename}
+            target="_blank"
+            rel="noopener noreferrer"
             className="bs-btn bs-btn-primary"
           >
             Download PDF
           </a>
         )}
-        <button type="button" className="bs-btn bs-btn-secondary" onClick={handlePrint}>
-          Print / Save PDF
-        </button>
+        {!isMobile && (
+          <button type="button" className="bs-btn bs-btn-secondary" onClick={handlePrint}>
+            Print / Save PDF
+          </button>
+        )}
+        {isMobile && shareCapable && (
+          <button type="button" className="bs-btn bs-btn-secondary" onClick={handleShare}>
+            Print / Save PDF
+          </button>
+        )}
         <button type="button" className="bs-btn bs-btn-secondary" onClick={handleCopyLink}>
           <span key={copyState === 'copied' ? 'copied' : 'copy'} className="ce-swap-fast">
             {copyState === 'copied' ? '✓ Copied' : 'Copy Link'}
           </span>
         </button>
       </div>
-      <p className="bs-print-note">
-        For best results: Letter, Portrait, 100% scale, browser headers and footers off.
-        Browser print settings remain under your control — this path does not
-        guarantee removal of browser-added headers or footers.
-      </p>
+      {!isMobile && (
+        <p className="bs-print-note">
+          For best results: Letter, Portrait, 100% scale, browser headers and footers off.
+          Browser print settings remain under your control — this path does not
+          guarantee removal of browser-added headers or footers.
+        </p>
+      )}
+      {isMobile && !shareCapable && (
+        <p className="bs-print-note">
+          Open the downloaded PDF, then use your device’s Share or Print option.
+        </p>
+      )}
       {copyState === 'fallback' && (
         <div className="bs-copy-fallback">
           <div className="bs-copy-fallback-url">{canonicalUrl}</div>
@@ -186,6 +235,54 @@ function TemplateActions({ template }) {
           </span>
         </div>
       )}
+    </div>
+  );
+}
+
+// ── Sheet preview: fit-to-width default + tap-to-enlarge overlay ────────────────
+// Renders the exact same production `Sheet` component used for print/PDF
+// generation — never a second hand-built layout. Exactly one `<Sheet />`
+// instance is mounted at a time (default OR overlay, never both), so there is
+// never a risk of it printing twice. The whole overlay (backdrop, close
+// button, and the sheet copy inside it) carries `.bs-screen-only`, so the
+// existing print-scoping rule (brain-sheets-print.css) hides all of it
+// outright — the overlay itself must never print, full stop, per spec. The
+// default (non-overlay) preview has no such class and prints normally.
+function TemplatePreview(props) {
+  const { Sheet, title } = props;
+  const [open, setOpen] = useState(false);
+
+  if (open) {
+    return (
+      <div className="bs-preview-overlay bs-screen-only" role="dialog" aria-modal="true" aria-label={`${title} — full preview`}>
+        <button type="button" className="bs-preview-close" onClick={() => setOpen(false)}>
+          Close preview
+        </button>
+        <div className="bs-preview-overlay-frame">
+          <Sheet />
+        </div>
+      </div>
+    );
+  }
+
+  return (
+    <div className="bs-preview-slot">
+      <div
+        className="bs-preview-frame"
+        role="button"
+        tabIndex={0}
+        onClick={() => setOpen(true)}
+        onKeyDown={(e) => {
+          if (e.key === 'Enter' || e.key === ' ') {
+            e.preventDefault();
+            setOpen(true);
+          }
+        }}
+        aria-label={`View a larger preview of ${title}`}
+      >
+        <Sheet />
+      </div>
+      <p className="bs-preview-hint">Tap the preview to view it larger.</p>
     </div>
   );
 }
@@ -223,7 +320,7 @@ function DetailPlaceholder({ template, onBack, onGoHome }) {
       </div>
       {Sheet && (
         <div className="bs-content" style={{ paddingTop: 0 }}>
-          <Sheet />
+          <TemplatePreview Sheet={Sheet} title={template.title} />
         </div>
       )}
     </div>

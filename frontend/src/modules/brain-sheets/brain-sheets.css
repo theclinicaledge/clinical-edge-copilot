@@ -113,6 +113,21 @@
   gap: var(--ce-sp-3);
 }
 
+/* Narrow screens: stack actions in one clean column instead of letting the
+   row wrap awkwardly (e.g. one button stranded alone on its own line at an
+   in-between width). Download PDF stays visually primary via .bs-btn-primary
+   — this only changes width/direction, not which button is which. */
+@media (max-width: 480px) {
+  .bs-actions-row {
+    flex-direction: column;
+  }
+
+  .bs-actions-row .bs-btn {
+    width: 100%;
+    text-align: center;
+  }
+}
+
 .bs-btn {
   font-family: var(--ce-font-sans);
   font-size: 13px;
@@ -199,4 +214,94 @@
   line-height: 1.6;
   color: var(--ce-text-dim);
   max-width: 640px;
+}
+
+/* ── Sheet preview: clickable default + tap-to-enlarge overlay ───────────────
+   The scaling/aspect-ratio math itself lives on `.bs-print-root`/`.bs-sheet`
+   in brain-sheets-print.css (the single source of truth shared with print);
+   this file only owns the interactive chrome around it. */
+
+.bs-preview-slot {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--ce-sp-2);
+}
+
+.bs-preview-frame {
+  width: 100%;
+  cursor: pointer;
+  border-radius: var(--ce-r-lg);
+}
+
+.bs-preview-frame:focus-visible {
+  outline: 2px solid var(--ce-teal);
+  outline-offset: 3px;
+}
+
+.bs-preview-hint {
+  font-family: var(--ce-font-mono);
+  font-size: 11px;
+  color: var(--ce-text-dim);
+  margin: 0;
+  display: none;
+}
+
+/* Screen-only per spec — shown only at the narrower widths the "tap" wording
+   applies to; desktop's larger preview needs no such hint. */
+@media (max-width: 640px) {
+  .bs-preview-hint {
+    display: block;
+  }
+}
+
+.bs-preview-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 200;
+  background: rgba(6, 14, 20, 0.92);
+  backdrop-filter: blur(6px);
+  -webkit-backdrop-filter: blur(6px);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: var(--ce-sp-4);
+  padding:
+    max(16px, env(safe-area-inset-top))
+    max(16px, env(safe-area-inset-right))
+    max(16px, env(safe-area-inset-bottom))
+    max(16px, env(safe-area-inset-left));
+  /* Lets a very short viewport scroll rather than clip — the enlarged sheet
+     still preserves its own aspect ratio via .bs-print-root/.bs-sheet;
+     this only protects the rare case where that box is taller than the
+     viewport. Pinch/browser zoom works naturally on top of this. */
+  overflow: auto;
+}
+
+.bs-preview-close {
+  flex-shrink: 0;
+  font-family: var(--ce-font-sans);
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--ce-text-light);
+  background: var(--ce-navy-700);
+  border: 1px solid var(--ce-line-navy);
+  border-radius: var(--ce-r-md);
+  padding: 10px 22px;
+  cursor: pointer;
+}
+
+.bs-preview-close:hover {
+  border-color: rgba(10, 191, 188, 0.4);
+}
+
+.bs-preview-close:focus-visible {
+  outline: 2px solid var(--ce-teal);
+  outline-offset: 2px;
+}
+
+.bs-preview-overlay-frame {
+  width: min(94vw, 820px);
+  flex-shrink: 0;
 }

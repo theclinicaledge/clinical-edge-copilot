@@ -67,6 +67,16 @@ const SHEETS = [
       creator: 'Clinical Edge',
     },
   },
+  {
+    id: 'icu-systems',
+    filename: 'clinical-edge-icu-systems-brain-sheet.pdf',
+    metadata: {
+      title: 'ICU Systems Brain Sheet',
+      author: 'Clinical Edge',
+      subject: 'Printable nurse shift-organization brain sheet',
+      creator: 'Clinical Edge',
+    },
+  },
 ];
 
 async function setPdfMetadata(filePath, metadata) {

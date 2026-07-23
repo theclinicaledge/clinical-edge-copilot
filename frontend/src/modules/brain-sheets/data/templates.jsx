@@ -13,6 +13,7 @@
 
 import MedSurg4 from '../sheets/MedSurg4.jsx';
 import MedSurg6 from '../sheets/MedSurg6.jsx';
+import IcuSystems from '../sheets/IcuSystems.jsx';
 
 export const TEMPLATES = [
   {
@@ -43,6 +44,10 @@ export const TEMPLATES = [
     audience: 'For one ICU patient, organized by body system.',
     meta: '1 PAGE · 1 PATIENT',
     pearls: [],
+    Sheet: IcuSystems,
+    pdfPath: '/brain-sheets/pdfs/clinical-edge-icu-systems-brain-sheet.pdf',
+    pdfFilename: 'clinical-edge-icu-systems-brain-sheet.pdf',
+    pdfTitle: 'ICU Systems Brain Sheet',
   },
   {
     id: 'telemetry',

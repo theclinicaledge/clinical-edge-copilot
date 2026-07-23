@@ -288,7 +288,15 @@
   display: flex;
   flex-direction: column;
   align-items: center;
-  justify-content: center;
+  /* `safe center`, not plain `center`: centers normally when content fits
+     (identical to before for every existing sheet), but falls back to
+     start-alignment when content is taller than the viewport — plain
+     `center` lets the top of the overflow (including Close Preview) render
+     above y=0 with no way to scroll to it, `overflow: auto` notwithstanding.
+     Surfaced by ICU Systems' taller enlarged preview; verified this does
+     not change Med-Surg 4/6's overlay appearance, since their content
+     already fits without overflowing. */
+  justify-content: safe center;
   gap: var(--ce-sp-4);
   padding:
     max(16px, env(safe-area-inset-top))

@@ -681,6 +681,155 @@
   min-width: 130pt;
 }
 
+/* ── ICU · Systems-Based Single Patient ───────────────────────────────────
+   A NEW, icu-prefixed class set — same reasoning as the Med-Surg 6 band
+   classes above: Med-Surg 4 and Med-Surg 6 are both finalized, so nothing
+   here may require touching their classes, even where the underlying
+   structure (a labeled callout, a paired 2-up grid) is conceptually the
+   same. Truly generic primitives (`.bs-field`, `.bs-blank-line`,
+   `.bs-checkbox`, `.bs-eyebrow`, `.bs-table`, `.bs-systems-grid`/`-band`,
+   `.bs-hour-rail`/`-tick`, `.bs-pt-label-box`, `.bs-priorities`/`-row`,
+   `.bs-glance-legend`) are shared as-is — only the sheet-specific
+   containers below are new. */
+
+.bs-icu-identity {
+  display: flex;
+  align-items: center;
+  flex-wrap: nowrap;
+  gap: 3pt 7pt;
+}
+
+.bs-icu-identity .bs-field {
+  flex: 1 1 auto;
+  min-width: 30pt;
+}
+
+.bs-icu-top {
+  display: flex;
+  flex-direction: column;
+  gap: 3pt;
+}
+
+.bs-icu-top-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1pt 12pt;
+}
+
+.bs-icu-stacked-callout {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5pt;
+}
+
+.bs-icu-callout-label {
+  font-family: var(--ce-font-mono);
+  font-size: 7pt;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--ce-teal-deep);
+  flex-shrink: 0;
+}
+
+.bs-icu-secondary-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 4pt 14pt;
+}
+
+.bs-icu-secondary-col {
+  display: flex;
+  flex-direction: column;
+  gap: 2pt;
+  min-width: 0;
+}
+
+.bs-icu-vent-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 3pt 10pt;
+}
+
+.bs-icu-vent-row .bs-field {
+  flex: 1 1 auto;
+  min-width: 48pt;
+}
+
+.bs-icu-labs-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1.5pt 10pt;
+}
+
+.bs-icu-lab-row {
+  display: flex;
+  align-items: baseline;
+  gap: 4pt;
+  min-width: 0;
+}
+
+.bs-icu-lab-row .bs-field-label {
+  width: 44pt;
+  flex-shrink: 0;
+}
+
+.bs-icu-lab-row .bs-blank-line {
+  height: 7pt;
+}
+
+.bs-icu-trend {
+  flex-shrink: 0;
+  font-family: var(--ce-font-mono);
+  font-size: 7pt;
+  color: var(--ce-text-dim);
+  letter-spacing: 0.05em;
+}
+
+/* Shift-neutral hourly I/O rail — a blank hour line (the nurse writes in
+   whatever hour their shift actually starts) rather than fixed clock times,
+   since ICU coverage isn't tied to one shift pattern the way a day-shift
+   med-surg rail is. */
+.bs-icu-io-rail {
+  display: flex;
+  border-top: 0.75pt solid var(--ce-text-dim);
+}
+
+.bs-icu-io-tick {
+  flex: 1 1 0;
+  border-left: 0.5pt solid var(--ce-warm-line);
+  padding: 2pt 2pt 0;
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  gap: 1.5pt;
+}
+
+.bs-icu-io-tick .bs-field {
+  gap: 2pt;
+}
+
+.bs-icu-io-tick .bs-field-label {
+  font-size: 7pt;
+  width: auto;
+}
+
+.bs-icu-io-tick .bs-blank-line {
+  height: 6pt;
+  min-width: 0;
+}
+
+/* Two-column x two-row Shift Handoff — was a single compressed row of 4;
+   each prompt now reuses the same StackedCallout (label + N ruled lines)
+   pattern as the top clinical-focus area, just with fewer lines (2 vs.
+   2/2/2/3 up top) since this is still the quick-glance recap, not a
+   duplicate of the working notes. */
+.bs-icu-handoff-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 3pt 16pt;
+}
+
 /* ── Table ─────────────────────────────────────────────────────────────── */
 
 .bs-table {

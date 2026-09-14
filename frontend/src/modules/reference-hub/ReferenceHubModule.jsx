@@ -14,7 +14,9 @@ function lsGet(key, fallback) {
   catch { return fallback; }
 }
 function lsSet(key, value) {
-  try { localStorage.setItem(key, JSON.stringify(value)); } catch {}
+  try { localStorage.setItem(key, JSON.stringify(value)); } catch {
+    // Recents are best-effort only.
+  }
 }
 
 // ── Category label lookup ─────────────────────────────────────────────────────
@@ -1101,7 +1103,9 @@ export default function ReferenceHubModule({ onGoHome }) {
       const prev = JSON.parse(localStorage.getItem(LS_RECENT) || '[]');
       const updated = [ref.id, ...prev.filter(id => id !== ref.id)].slice(0, MAX_RECENT);
       localStorage.setItem(LS_RECENT, JSON.stringify(updated));
-    } catch {}
+    } catch {
+      // Recents are best-effort only.
+    }
     setSelected(ref);
   }, []);
 

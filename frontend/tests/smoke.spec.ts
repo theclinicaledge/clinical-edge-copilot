@@ -13,6 +13,7 @@ test('home hub loads and shows module navigation', async ({ page }) => {
   await expect(page.getByText('ICU Drips', { exact: true })).toBeVisible();
   await expect(page.getByText('Reference Hub', { exact: true })).toBeVisible();
   await expect(page.getByText('ABG & Oxygenation Lab', { exact: true })).toBeVisible();
+  await expect(page.getByText('Brain Sheets', { exact: true })).toBeVisible();
 });
 
 test('copilot route loads and shows its main input', async ({ page }) => {
@@ -103,6 +104,22 @@ test('abg lab example can be selected and interpreted', async ({ page }) => {
   await expect(page.getByText('How I Read It')).toBeVisible();
 });
 
+test('brain sheets library and production detail route load', async ({ page }) => {
+  await page.goto('/brain-sheets');
+  await expect(page.getByRole('heading', { name: 'Blank, printable shift-organization sheets.' })).toBeVisible();
+  await expect(page.getByText('Med-Surg · 4 Patient')).toBeVisible();
+
+  await page.goto('/brain-sheets/medsurg-4pt');
+  await expect(page.getByRole('heading', { name: 'Med-Surg · 4 Patient' })).toBeVisible();
+  await expect(page.getByRole('link', { name: 'Download PDF' })).toBeVisible();
+  await expect(page.getByLabel('View a larger preview of Med-Surg · 4 Patient')).toBeVisible();
+
+  await page.goto('/brain-sheets/telemetry');
+  await expect(page.getByRole('heading', { name: 'Telemetry / Stepdown' })).toBeVisible();
+  await expect(page.getByRole('link', { name: 'Download PDF' })).toBeVisible();
+  await expect(page.getByLabel('View a larger preview of Telemetry / Stepdown')).toBeVisible();
+});
+
 test('quickstart option can be selected and completed', async ({ page }) => {
   await page.goto('/quickstart');
   const textarea = page.getByPlaceholder('e.g. BP dropping post-op and patient looks pale, HR climbing...');
@@ -132,5 +149,6 @@ test('support page loads', async ({ page }) => {
 
 test('download page loads', async ({ page }) => {
   await page.goto('/download');
-  await expect(page.getByRole('heading', { name: 'Clinical reasoning support for nurses.' })).toBeVisible();
+  await expect(page.getByRole('heading', { name: 'Clinical tools built for real nursing workflows.' })).toBeVisible();
+  await expect(page.getByRole('link', { name: 'Download on the App Store' }).first()).toBeVisible();
 });

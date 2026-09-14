@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { trackEvent } from "./analytics";
 import { useSeo } from "./seo/useSeo.js";
 import { STATIC_ROUTE_SEO } from "./seo/routeSeo.js";
@@ -9,10 +9,7 @@ const APP_STORE_URL =
 
 // ── Android UA detection (display-only, no redirect) ────────────────────────
 function useIsAndroid() {
-  const [isAndroid, setIsAndroid] = useState(false);
-  useEffect(() => {
-    setIsAndroid(/android/i.test(navigator.userAgent));
-  }, []);
+  const [isAndroid] = useState(() => /android/i.test(navigator.userAgent));
   return isAndroid;
 }
 

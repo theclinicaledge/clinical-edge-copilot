@@ -1,6 +1,7 @@
-import { useCallback, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import { useSeo, SITE_URL } from '../../seo/useSeo.js';
 import { STATIC_ROUTE_SEO } from '../../seo/routeSeo.js';
+import { trackEvent } from '../../analytics';
 import { TEMPLATES, getTemplateById } from './data/templates.jsx';
 // TEMPORARY — B2 review-only import. Remove alongside the branch below and
 // components/SheetFramePrototypeB2.jsx once B2 is approved and production
@@ -121,10 +122,9 @@ function IndexView({ templates, onSelect, onGoHome }) {
 // without one simply don't render the button; Print / Save PDF and Copy
 // Link remain available regardless.
 //
-// ANALYTICS DECISION PENDING (flagged, not decided silently — see final
-// report): `template_downloaded` is not wired in this pass. Once it is,
-// Mohamed needs to confirm whether it fires from Download PDF only, or
-// from both Download PDF and Print / Save PDF.
+// Analytics follows brain-sheet-spec.md §8: `template_downloaded` is reserved
+// for the explicit Download PDF action only. Print / Save PDF, mobile share,
+// preview, and Copy Link intentionally do not fire it.
 
 function isTouchDevice() {
   if (typeof window === 'undefined') return false;
@@ -224,6 +224,7 @@ function TemplateActions({ template }) {
             target="_blank"
             rel="noopener noreferrer"
             className="bs-btn bs-btn-primary"
+            onClick={() => trackEvent('template_downloaded', { template_id: template.id })}
           >
             Download PDF
           </a>
@@ -343,6 +344,10 @@ function TemplatePreview(props) {
 // page's surrounding chrome can leak onto paper.
 function DetailPlaceholder({ template, onBack, onGoHome }) {
   const Sheet = template.Sheet;
+  useEffect(() => {
+    trackEvent('template_viewed', { template_id: template.id });
+  }, [template.id]);
+
   return (
     <div className="bs-page">
       <div className="bs-screen-only">
@@ -386,6 +391,9 @@ function isPdfGenerationMode() {
 
 // ── Module entry ─────────────────────────────────────────────────────────────
 export default function BrainSheetsModule({ templateId, navigate, onGoHome }) {
+  const goToIndex = useCallback(() => navigate('/brain-sheets'), [navigate]);
+  const openTemplate = useCallback((id) => navigate(`/brain-sheets/${id}`), [navigate]);
+
   // TEMPORARY — B2 review route only. The id is underscore-prefixed so it
   // can never collide with a real (kebab-case) template id. Remove this
   // branch when the B2 prototype is removed (spec §10, verified in B9).
@@ -399,9 +407,6 @@ export default function BrainSheetsModule({ templateId, navigate, onGoHome }) {
   }
 
   const template = templateId ? getTemplateById(templateId) : null;
-
-  const goToIndex = useCallback(() => navigate('/brain-sheets'), [navigate]);
-  const openTemplate = useCallback((id) => navigate(`/brain-sheets/${id}`), [navigate]);
 
   if (template?.Sheet && isPdfGenerationMode()) {
     const Sheet = template.Sheet;

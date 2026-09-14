@@ -14,6 +14,7 @@
 import MedSurg4 from '../sheets/MedSurg4.jsx';
 import MedSurg6 from '../sheets/MedSurg6.jsx';
 import IcuSystems from '../sheets/IcuSystems.jsx';
+import TelemetryStepdown from '../sheets/TelemetryStepdown.jsx';
 
 export const TEMPLATES = [
   {
@@ -55,6 +56,10 @@ export const TEMPLATES = [
     audience: 'For telemetry and stepdown, two patients per page.',
     meta: '1 PAGE · 2 PATIENTS',
     pearls: [],
+    Sheet: TelemetryStepdown,
+    pdfPath: '/brain-sheets/pdfs/clinical-edge-telemetry-stepdown-brain-sheet.pdf',
+    pdfFilename: 'clinical-edge-telemetry-stepdown-brain-sheet.pdf',
+    pdfTitle: 'Telemetry Stepdown Brain Sheet',
   },
   {
     id: 'ed-rapid',

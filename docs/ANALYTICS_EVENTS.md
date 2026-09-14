@@ -283,6 +283,27 @@ medication detail page)
 
 ---
 
+## Brain Sheets
+
+Brain Sheets renders blank printable sheets only. Analytics never includes
+anything written on paper after printing.
+
+| Event | When it fires | Payload |
+|-------|---------------|---------|
+| `brain_sheets_module_opened` | User taps **Brain Sheets** on the home hub | `{ route: "/" }` |
+| `template_viewed` | A valid template detail page mounts | `{ template_id }` |
+| `template_downloaded` | User taps the explicit **Download PDF** action | `{ template_id }` |
+
+**`template_id` values:** `medsurg-4pt` · `medsurg-6pt` · `icu-systems` ·
+`telemetry` · `ed-rapid` · `night-shift` · `new-grad`
+
+**Important semantics:** `template_downloaded` is a download-intent event only.
+It does not prove the browser completed a download. It does not fire for Print /
+Save PDF, mobile Save / Share PDF, Copy Link, preview open, or PDF generation
+mode.
+
+---
+
 ## ABG Lab
 
 | Event | When it fires | Payload |

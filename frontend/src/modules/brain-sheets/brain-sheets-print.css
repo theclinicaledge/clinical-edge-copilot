@@ -830,6 +830,223 @@
   gap: 3pt 16pt;
 }
 
+/* ── Telemetry / Stepdown ──────────────────────────────────────────────── */
+
+.bs-tele-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 5pt;
+  flex: 1 1 auto;
+}
+
+.bs-tele-panel {
+  border: 0.75pt solid var(--ce-warm-line);
+  border-radius: var(--ce-r-sm);
+  padding: 3pt 7pt;
+  display: flex;
+  flex-direction: column;
+  gap: 2pt;
+  min-width: 0;
+}
+
+.bs-tele-identity {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 2pt 7pt;
+}
+
+.bs-tele-num {
+  flex-shrink: 0;
+  min-width: 14pt;
+  min-height: 14pt;
+  border: 1pt solid var(--ce-teal-deep);
+  border-radius: var(--ce-r-sm);
+  color: var(--ce-teal-deep);
+  font-family: var(--ce-font-mono);
+  font-size: 8pt;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.bs-tele-identity .bs-field {
+  flex: 1 1 72pt;
+}
+
+.bs-tele-tight {
+  flex: 0 0 auto !important;
+}
+
+.bs-tele-callout-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 2pt 9pt;
+}
+
+.bs-tele-callout {
+  display: flex;
+  align-items: baseline;
+  gap: 5pt;
+  min-width: 0;
+}
+
+.bs-tele-callout-label {
+  font-family: var(--ce-font-mono);
+  font-size: 7pt;
+  font-weight: 700;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  color: var(--ce-teal-deep);
+  flex-shrink: 0;
+}
+
+.bs-tele-rhythm-block {
+  border-left: 1.5pt solid var(--ce-teal-deep);
+  padding-left: 5pt;
+  display: flex;
+  flex-direction: column;
+  gap: 2pt;
+}
+
+.bs-tele-rhythm-top {
+  display: flex;
+  gap: 7pt;
+}
+
+.bs-tele-rhythm-top .bs-field {
+  flex: 1 1 0;
+}
+
+.bs-tele-strip {
+  display: flex;
+  flex-direction: column;
+  gap: 1pt;
+}
+
+.bs-tele-strip-line {
+  display: block;
+  height: 8pt;
+  border-bottom: 0.5pt solid var(--ce-text-dim);
+}
+
+.bs-tele-checkbox-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  gap: 1.5pt 7pt;
+}
+
+.bs-tele-checkbox-grid .bs-field-label {
+  font-size: 6.5pt;
+  letter-spacing: 0.04em;
+}
+
+.bs-tele-checkbox-grid .bs-checkbox {
+  width: 9pt;
+  height: 9pt;
+}
+
+.bs-tele-trend-grid,
+.bs-tele-mid-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 4pt 10pt;
+}
+
+.bs-tele-trend-grid > div,
+.bs-tele-mid-grid > div {
+  min-width: 0;
+}
+
+.bs-tele-trend-grid .bs-field {
+  margin-top: 1pt;
+}
+
+.bs-tele-lab-grid,
+.bs-tele-concerns {
+  display: flex;
+  flex-direction: column;
+  gap: 1pt;
+  margin-top: 1pt;
+}
+
+.bs-tele-lab-row,
+.bs-tele-concern-row {
+  display: flex;
+  align-items: baseline;
+  gap: 4pt;
+  min-width: 0;
+}
+
+.bs-tele-lab-row .bs-field-label,
+.bs-tele-concern-row .bs-field-label {
+  width: 38pt;
+  flex-shrink: 0;
+}
+
+.bs-tele-lab-row .bs-blank-line,
+.bs-tele-concern-row .bs-blank-line {
+  height: 7pt;
+}
+
+.bs-tele-trend {
+  flex-shrink: 0;
+  font-family: var(--ce-font-mono);
+  font-size: 6.5pt;
+  color: var(--ce-text-dim);
+  letter-spacing: 0.03em;
+  text-transform: uppercase;
+}
+
+.bs-tele-hour-rail {
+  display: flex;
+  border-top: 0.75pt solid var(--ce-text-dim);
+  margin-top: 1pt;
+}
+
+.bs-tele-hour-tick {
+  flex: 1 1 0;
+  border-left: 0.5pt solid var(--ce-warm-line);
+  padding: 1pt 1pt 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1pt;
+}
+
+.bs-tele-hour-tick .bs-hour-tick-label {
+  font-size: 6pt;
+}
+
+.bs-tele-hour-tick .bs-checkbox {
+  width: 8pt;
+  height: 8pt;
+}
+
+.bs-tele-task-lines {
+  display: flex;
+  flex-direction: column;
+  gap: 1pt;
+  margin-top: 1pt;
+}
+
+.bs-tele-task-lines .bs-blank-line {
+  height: 7pt;
+}
+
+.bs-tele-stacked {
+  display: flex;
+  flex-direction: column;
+  gap: 1pt;
+}
+
+.bs-tele-handoff-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 6pt;
+}
+
 /* ── Table ─────────────────────────────────────────────────────────────── */
 
 .bs-table {

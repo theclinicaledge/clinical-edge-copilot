@@ -39,7 +39,7 @@ export default function QuickStart({ onBack, onEnterApp }) {
     try {
       localStorage.setItem("copilot_prefill", trimmed);
       trackEvent('quickstart_completed', { destination: 'copilot' });
-    } catch (e) {
+    } catch {
       console.warn("QuickStart prefill: localStorage unavailable");
     }
     onEnterApp();

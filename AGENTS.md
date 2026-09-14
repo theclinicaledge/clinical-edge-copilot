@@ -1,8 +1,8 @@
 # Clinical Edge Copilot — Codex Project Memory
 
 ## What This App Is
-Clinical Edge Copilot is an AI-powered clinical reasoning support tool for bedside nurses.
-It is a **reasoning and escalation awareness aid** — not a diagnostic tool.
+Clinical Edge is a multi-tool nursing platform centered on Clinical Edge Copilot.
+Copilot is an AI-powered clinical reasoning and escalation-awareness aid for bedside nurses — not a diagnostic tool.
 Built by Mohamed, a master's-prepared RN with critical care experience.
 
 ---
@@ -26,16 +26,31 @@ Built by Mohamed, a master's-prepared RN with critical care experience.
 |---|---|
 | Frontend | React + Vite (runs on localhost:5173) |
 | Backend | Node.js + Express (runs on localhost:3001) |
-| AI | Anthropic Codex API (model: Codex-sonnet-4-6) |
-| Persistence | Browser localStorage only (no database) |
+| AI | Anthropic Claude API (model: claude-sonnet-4-6) |
+| Web analytics | Vercel Analytics via `frontend/src/analytics.ts` |
+| Persistence | Browser localStorage/sessionStorage only (no database) |
+
+Primary shipped surfaces:
+- Home hub
+- Copilot
+- SBAR draft generation
+- Rhythm Lab
+- ICU Drips
+- Reference Hub
+- ABG & Oxygenation Lab
+- Brain Sheets
+- Scenario walkthrough
+- QuickStart
+- Blog / SEO pages
+- Download, Privacy, and Support pages
 
 ---
 
 ## Architecture — Non-Negotiable Rules
 
-- **Single backend endpoint:** `POST /api/copilot` — do not add or rename endpoints without explicit instruction
+- **Backend endpoints:** `POST /api/copilot`, `POST /api/sbar`, and `GET /health` — do not add or rename endpoints without explicit instruction
 - **API key lives in backend `.env` only** — NEVER expose it to the frontend, NEVER hardcode it anywhere
-- **Never use OpenAI** — Anthropic Codex API exclusively
+- **Never use OpenAI** — Anthropic Claude API exclusively
 - **Never redesign the UI** — dark navy premium aesthetic with electric blue accents is locked in
 - **Never simplify the product** — maintain full feature complexity
 - **Never remove previously built features** — every iteration must preserve all existing functionality
@@ -57,16 +72,18 @@ Built by Mohamed, a master's-prepared RN with critical care experience.
 
 ---
 
-## Deployment Setup
+## Deployment / Release Setup
 
-- Deployment is **not yet live**
-- Recommended build sequence: deploy app → launch landing page → collect waitlist signups
+- The web app targets `https://theclinicaledge.org`.
+- Production Copilot calls default to `https://clinical-edge-backend.onrender.com` unless `VITE_API_BASE_URL` is set.
+- Vercel config exists at repo root and in `frontend/`.
+- The separate Expo/App Store wrapper repo is `/Users/mohamed/Clinical-Edge-Mobile/clinical-edge-copilot-mobile`; it loads the web app in a native WebView and has App Store ID `id6761643064`.
 - Frontend build: `cd frontend && npm run build` (output goes to `frontend/dist/` — do not touch)
 - Do not modify deployment-related config (Render, Railway, Vercel, Netlify, etc.) without explicit instruction
 
 ---
 
-## Response Format — The Nine Sections (in order)
+## Copilot Response Format
 
 Every AI response opens with:
 ```
@@ -74,16 +91,13 @@ Urgency Level: HIGH / MODERATE / LOW
 ```
 HIGH urgency responses also include a `⚠️` urgent deterioration warning.
 
-Then the nine sections, always in this order:
-1. Most Likely Issue
-2. Urgency Summary
-3. Clinical Pattern Recognition
-4. Immediate Nursing Assessments
-5. Possible Clinical Causes
-6. Common Nursing Actions
-7. Notify Provider / Escalate If
-8. Clinical Insight
-9. Safety Note
+The current frontend parser expects these six section headers:
+1. What this could be
+2. Possible concerns
+3. What to assess next
+4. What to consider next
+5. Where this may be heading
+6. Closing
 
 `max_tokens` is set to 1400 — do not change this without explicit instruction.
 
@@ -145,14 +159,17 @@ Supported actions: expand, edit note, reopen, copy, delete.
 
 - Authentication / user accounts
 - Payment / subscription layer
-- Landing page
-- 30-scenario test library
+- Meta Pixel / Meta SDK / App Events integration
+- 30-scenario clinical regression test library
+- Full Brain Sheets library completion beyond the production sheets already built
 
 ---
 
 ## Developer Notes
 
 - Run frontend: `cd frontend && npm run dev`
-- Run backend: `cd backend && node server.js` (or `npm start`)
+- Run backend: `cd backend && node server.js`
 - Both must be running simultaneously for the app to work
+- Run frontend lint: `cd frontend && npm run lint`
+- Run Playwright smoke tests: `cd frontend && npm run test:e2e`
 - Test with realistic, context-rich nursing scenarios and avoid overfitting to minimal inputs

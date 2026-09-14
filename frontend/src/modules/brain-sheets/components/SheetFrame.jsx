@@ -83,7 +83,6 @@ export default function SheetFrame({ title, handoff, children, className }) {
   if (import.meta.env.DEV && !handoff) {
     // Not thrown — a missing handoff must never crash a sheet — but every
     // production sheet must pass one explicitly. SheetFrame has no default.
-    // eslint-disable-next-line no-console
     console.warn(`SheetFrame "${title}": no handoff region supplied.`);
   }
 

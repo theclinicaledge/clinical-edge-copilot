@@ -684,9 +684,8 @@ const DEFAULT_OPEN = {
 function DripsDetail({ drip, onBack, onNavigate }) {
   const [open, setOpen] = useState(DEFAULT_OPEN);
 
-  // Reset accordion + record view when drip changes
+  // Record view when drip changes. Accordion state resets via keyed remount.
   useEffect(() => {
-    setOpen(DEFAULT_OPEN);
     addRecentDripId(drip.id);
   }, [drip.id]);
 
@@ -940,7 +939,7 @@ function CompareDetail({ pair, onBack, onNavigateToDrip }) {
     if (pair.clinicalScenario) {
       trackEvent('clinical_scenario_viewed', { pair_id: pair.id });
     }
-  }, [pair.id]);
+  }, [pair.id, pair.clinicalScenario]);
 
   function handleToggleTable() {
     if (!tableOpen) {
@@ -1714,7 +1713,7 @@ export default function IcuDripsModule({ onGoHome }) {
   // Track module opened once on mount
   useEffect(() => {
     trackEvent('icu_drips_opened', { route: '/icu-drips' });
-  }, []); // eslint-disable-line react-hooks/exhaustive-deps
+  }, []);
 
   // Scroll to top on view change
   useEffect(() => {

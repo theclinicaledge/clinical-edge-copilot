@@ -1,3 +1,4 @@
+/* eslint-disable react-refresh/only-export-components */
 import { StrictMode, useState, useEffect } from 'react'
 import { createRoot, hydrateRoot } from 'react-dom/client'
 import { Analytics } from '@vercel/analytics/react'
@@ -23,6 +24,63 @@ import AbgLabModule from './modules/abg-lab/AbgLabModule.jsx'
 import BrainSheetsModule from './modules/brain-sheets/BrainSheetsModule.jsx'
 import BlogIndex from './blog/BlogIndex.jsx'
 import BlogPostPage from './blog/BlogPostPage.jsx'
+
+const TOOL_DOCK_ITEMS = [
+  { id: 'home', label: 'Home', path: '/' },
+  { id: 'app', label: 'Copilot', path: '/copilot' },
+  { id: 'rhythmlab', label: 'Rhythm', path: '/rhythm-lab' },
+  { id: 'icudrips', label: 'Drips', path: '/icu-drips' },
+  { id: 'referencehub', label: 'Ref', path: '/reference-hub' },
+  { id: 'abglab', label: 'ABG', path: '/abg-lab' },
+  { id: 'brainsheets', label: 'Sheets', path: '/brain-sheets' },
+]
+
+const TOOL_DOCK_PAGES = new Set([
+  'app',
+  'rhythmlab',
+  'rhythmlab-library',
+  'rhythmlab-practice',
+  'rhythmlab-compare',
+  'rhythmlab-pearls',
+  'rhythmlab-sprint',
+  'icudrips',
+  'referencehub',
+  'abglab',
+  'brainsheets',
+  'brainsheets-detail',
+])
+
+function getActiveDockId(page) {
+  if (page.startsWith('rhythmlab')) return 'rhythmlab'
+  if (page.startsWith('brainsheets')) return 'brainsheets'
+  return page
+}
+
+function ToolDock({ page, navigate }) {
+  if (!TOOL_DOCK_PAGES.has(page)) return null
+  const activeId = getActiveDockId(page)
+
+  return (
+    <nav className="ce-tool-dock" aria-label="Clinical Edge tools">
+      <div className="ce-tool-dock__inner">
+        {TOOL_DOCK_ITEMS.map((item) => (
+          <a
+            key={item.id}
+            href={item.path}
+            className={activeId === item.id ? 'ce-tool-dock__item is-active' : 'ce-tool-dock__item'}
+            aria-current={activeId === item.id ? 'page' : undefined}
+            onClick={(e) => {
+              e.preventDefault()
+              navigate(item.path)
+            }}
+          >
+            {item.label}
+          </a>
+        ))}
+      </div>
+    </nav>
+  )
+}
 
 // ── Service Worker Registration ─────────────────────────────────────────────
 if ('serviceWorker' in navigator) {
@@ -97,7 +155,7 @@ function Root() {
   return (
     <>
       {page === 'home'       && <ClinicalEdgeHome onNavigate={navigate} />}
-      {page === 'app'        && <App onGoHome={() => navigate('/')} isOnline={isOnline} />}
+      {page === 'app'        && <App onGoHome={() => navigate('/')} navigate={navigate} isOnline={isOnline} />}
       {page === 'rhythmlab'          && <RhythmLabModule onGoHome={() => navigate('/')} navigate={navigate} />}
       {page === 'rhythmlab-library'  && <RhythmLibraryPage navigate={navigate} />}
       {page === 'rhythmlab-practice' && <RhythmPracticePage navigate={navigate} />}
@@ -117,6 +175,7 @@ function Root() {
       {page === 'brainsheets-detail' && <BrainSheetsModule navigate={navigate} onGoHome={() => navigate('/')} templateId={window.location.pathname.replace(/^\/brain-sheets\//, '').replace(/\/$/, '')} />}
       {page === 'blog'          && <BlogIndex />}
       {page === 'blogpost'      && <BlogPostPage slug={window.location.pathname.replace(/^\/blog\//, '').replace(/\/$/, '')} />}
+      <ToolDock page={page} navigate={navigate} />
       <Analytics />
     </>
   );

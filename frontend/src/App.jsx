@@ -65,7 +65,9 @@ function lsGet(key, fallback) {
   catch { return fallback; }
 }
 function lsSet(key, value) {
-  try { localStorage.setItem(key, JSON.stringify(value)); } catch {}
+  try { localStorage.setItem(key, JSON.stringify(value)); } catch {
+    // Storage can be unavailable in private browsing or locked-down webviews.
+  }
 }
 
 function cleanContent(raw) {
@@ -200,22 +202,8 @@ function SectionCard({ title, content }) {
   // Closing — italic pull-quote treatment, no label
   if (title === "Closing") {
     return (
-      <div className="ce-card-enter" style={{
-        borderLeft: "2px solid var(--ce-teal)",
-        padding: "14px 20px",
-        marginTop: 10,
-        marginBottom: 6,
-        background: "var(--ce-warm-card)",
-        borderRadius: "0 8px 8px 0",
-      }}>
-        <p style={{
-          margin: 0,
-          fontSize: 14,
-          fontStyle: "italic",
-          color: "var(--ce-text-muted)",
-          lineHeight: 1.82,
-          letterSpacing: "0.008em",
-        }}>
+      <div className="copilot-closing-card ce-card-enter">
+        <p>
           {renderInline(content.trim())}
         </p>
       </div>
@@ -224,39 +212,26 @@ function SectionCard({ title, content }) {
 
   const lines = content.split("\n").filter((l) => l.trim());
   return (
-    <div className="ce-card-enter" style={{
-      background: "var(--ce-warm-card)",
-      border: "1px solid var(--ce-warm-line)",
-      borderLeft: "3px solid " + cfg.accent,
-      borderRadius: 8,
-      padding: "18px 20px",
-      marginBottom: 10,
-    }}>
-      <div style={{
-        fontSize: 10,
-        fontWeight: 700,
-        textTransform: "uppercase",
-        letterSpacing: "1.5px",
-        color: cfg.accent,
-        marginBottom: 12,
-        fontFamily: "'IBM Plex Mono', 'Courier New', monospace",
-        opacity: 0.88,
-      }}>
+    <section className="copilot-result-section ce-card-enter" style={{ "--section-accent": cfg.accent }}>
+      <div className="copilot-result-section__header">
+        <span className="copilot-result-section__marker" aria-hidden="true" />
+        <span>
         {title}
+        </span>
       </div>
-      <div style={{ fontSize: 14, lineHeight: 1.72, color: "var(--ce-navy-700)" }}>
+      <div className="copilot-result-section__body">
         {lines.map((line, i) => {
           const isBullet = /^[-\u2022*]\s/.test(line);
           if (isBullet) return (
-            <div key={i} style={{ display: "flex", gap: 11, marginBottom: 8, alignItems: "flex-start" }}>
-              <span style={{ color: cfg.accent, fontWeight: 700, marginTop: 2, flexShrink: 0, fontSize: 14, lineHeight: 1.72 }}>&rsaquo;</span>
-              <span style={{ color: "var(--ce-navy-700)" }}>{renderInline(line.replace(/^[-\u2022*]\s+/, ""))}</span>
+            <div className="copilot-result-bullet" key={i}>
+              <span aria-hidden="true" />
+              <span>{renderInline(line.replace(/^[-\u2022*]\s+/, ""))}</span>
             </div>
           );
-          return <p key={i} style={{ margin: "0 0 7px", color: "var(--ce-navy-700)" }}>{renderInline(line)}</p>;
+          return <p key={i}>{renderInline(line)}</p>;
         })}
       </div>
-    </div>
+    </section>
   );
 }
 
@@ -265,33 +240,9 @@ function UrgencyBadge({ level }) {
   const s = URGENCY_STYLES[level];
   if (!s) return null;
   return (
-    <div style={{
-      display: "flex",
-      alignItems: "center",
-      gap: 10,
-      background: s.bg,
-      border: "1px solid " + s.border,
-      borderRadius: 4,
-      padding: "10px 16px",
-      marginBottom: 16,
-    }}>
-      <span style={{
-        width: 7,
-        height: 7,
-        borderRadius: "50%",
-        background: s.color,
-        flexShrink: 0,
-      }} />
-      <span style={{
-        fontSize: 11,
-        fontWeight: 700,
-        color: s.color,
-        fontFamily: "'IBM Plex Mono', 'Courier New', monospace",
-        letterSpacing: "1.2px",
-        textTransform: "uppercase",
-      }}>
-        Urgency: {level}
-      </span>
+    <div className="copilot-urgency-badge" style={{ "--urgency-color": s.color, "--urgency-bg": s.bg, "--urgency-border": s.border }}>
+      <span aria-hidden="true" />
+      <strong>Urgency: {level}</strong>
     </div>
   );
 }
@@ -300,26 +251,14 @@ function LoadingIndicator() {
   // Sole sanctioned loop (motion-system.md §6/§7): one quiet opacity breathe
   // on the whole indicator. No per-bar pulsing, no progress theater.
   return (
-    <div className="ce-breathe" style={{ padding: "32px 0 16px", display: "flex", flexDirection: "column", alignItems: "flex-start", gap: 16 }}>
-      <div style={{ display: "flex", gap: 4, alignItems: "center" }}>
+    <div className="copilot-loading-card ce-breathe">
+      <div className="copilot-loading-meter">
         {[0, 1, 2, 3, 4].map((i) => (
-          <div key={i} style={{
-            width: 3,
-            height: 16,
-            borderRadius: 3,
-            background: "var(--ce-teal)",
-            opacity: 0.75,
-          }} />
+          <span key={i} />
         ))}
       </div>
-      <div style={{
-        fontSize: 12,
-        color: "var(--ce-text-muted)",
-        fontFamily: "'IBM Plex Mono', 'Courier New', monospace",
-        letterSpacing: "0.3px",
-      }}>
-        {LOADING_MESSAGE}
-      </div>
+      <strong>{LOADING_MESSAGE}</strong>
+      <small>Building a structured readout you can verify against your assessment.</small>
     </div>
   );
 }
@@ -327,19 +266,7 @@ function LoadingIndicator() {
 function StreamPreview({ text }) {
   if (!text) return null;
   return (
-    <div style={{
-      background: "rgba(15,36,50,0.75)",
-      border: "1px solid rgba(10,191,188,0.08)",
-      borderRadius: 8,
-      padding: "18px 20px",
-      marginBottom: 10,
-      fontSize: 14,
-      color: "var(--ce-text-dim)",
-      lineHeight: 1.82,
-      whiteSpace: "pre-wrap",
-      maxHeight: 340,
-      overflowY: "auto",
-    }}>
+    <div className="copilot-stream-card">
       {text}
       <span style={{
         display: "inline-block",
@@ -535,7 +462,7 @@ A slow HR climb with new fatigue usually has a clear reason. Thinking it through
 
 // ─── Main App ──────────────────────────────────────────────────────────────────
 
-export default function App({ onGoHome, isOnline = true }) {
+export default function App({ onGoHome, navigate, isOnline = true }) {
   const [question, setQuestion]         = useState(() => _ssParam === 'response' ? _SS_QUESTION : "");
   const [result, setResult]             = useState(() => {
     if (_ssParam !== 'response') return null;
@@ -571,7 +498,7 @@ export default function App({ onGoHome, isOnline = true }) {
   // Track module open — fires once on mount
   useEffect(() => {
     trackEvent('copilot_opened', { route: '/copilot' });
-  }, []); // eslint-disable-line react-hooks/exhaustive-deps
+  }, []);
 
   // Auto-resize textarea
   useEffect(() => {
@@ -586,7 +513,7 @@ export default function App({ onGoHome, isOnline = true }) {
     if (_ssParam === 'response' && outputRef.current) {
       outputRef.current.scrollIntoView({ behavior: 'instant', block: 'start' });
     }
-  }, []); // eslint-disable-line react-hooks/exhaustive-deps
+  }, []);
 
   // Load QuickStart prefill on mount; fall back to sessionStorage draft
   useEffect(() => {
@@ -600,12 +527,16 @@ export default function App({ onGoHome, isOnline = true }) {
         const draft = sessionStorage.getItem("cec_draft");
         if (draft) setQuestion(draft);
       }
-    } catch {}
+    } catch {
+      // Prefill is optional; the app still works without stored drafts.
+    }
   }, []);
 
   // Persist typed question as a draft so it survives background/restore cycles
   useEffect(() => {
-    try { sessionStorage.setItem("cec_draft", question); } catch {}
+    try { sessionStorage.setItem("cec_draft", question); } catch {
+      // Draft persistence is best-effort only.
+    }
   }, [question]);
 
   // Visibility resilience — track backgrounding and recover in-flight requests.
@@ -811,7 +742,7 @@ export default function App({ onGoHome, isOnline = true }) {
   }, [savedCases]);
 
   const handleCopyResponse = useCallback((text, source = 'copilot') => {
-    try { navigator.clipboard.writeText(text); } catch {}
+    navigator.clipboard?.writeText(text).catch(() => undefined);
     trackEvent('copilot_response_copied', { copy_scope: 'full_response', source });
   }, []);
 
@@ -848,7 +779,7 @@ export default function App({ onGoHome, isOnline = true }) {
       `ASSESSMENT:\n${sbarData.assessment}`,
       `RECOMMENDATION:\n${sbarData.recommendation}`,
     ].join("\n\n");
-    try { navigator.clipboard.writeText(text); } catch {}
+    navigator.clipboard?.writeText(text).catch(() => undefined);
     trackEvent('sbar_copied', { source: 'copilot', copy_scope: 'full_sbar' });
     setSbarCopied(true);
     setTimeout(() => setSbarCopied(false), 2000);
@@ -890,6 +821,401 @@ export default function App({ onGoHome, isOnline = true }) {
         ::-webkit-scrollbar-track { background: transparent; }
         ::-webkit-scrollbar-thumb { background: var(--ce-line-navy); border-radius: 2px; }
         .preview-scroll::-webkit-scrollbar { display: none; }
+
+        .copilot-command-layout {
+          display: grid;
+          grid-template-columns: minmax(0, 1fr) 300px;
+          gap: 18px;
+          align-items: start;
+        }
+        .copilot-command-main,
+        .copilot-command-rail {
+          min-width: 0;
+        }
+        .copilot-command-rail {
+          position: sticky;
+          top: calc(72px + env(safe-area-inset-top));
+          display: flex;
+          flex-direction: column;
+          gap: 10px;
+        }
+        .copilot-rail-card {
+          border: 1px solid var(--ce-warm-line);
+          border-radius: var(--ce-r-md);
+          background: rgba(255,253,248,0.72);
+          padding: 14px;
+          color: var(--ce-text-muted);
+        }
+        .copilot-rail-card--dark {
+          border-color: rgba(10,191,188,0.18);
+          background: var(--ce-navy-700);
+          color: var(--ce-text-light-body);
+        }
+        .copilot-rail-label {
+          display: block;
+          margin-bottom: 8px;
+          color: var(--ce-teal-deep);
+          font-family: var(--ce-font-mono);
+          font-size: 10px;
+          font-weight: 700;
+          letter-spacing: 0;
+          text-transform: uppercase;
+        }
+        .copilot-rail-card--dark .copilot-rail-label {
+          color: var(--ce-teal);
+        }
+        .copilot-rail-card p {
+          margin: 0;
+          font-size: 12.5px;
+          line-height: 1.58;
+        }
+        .copilot-rail-list {
+          display: flex;
+          flex-direction: column;
+          gap: 8px;
+          margin-top: 10px;
+        }
+        .copilot-rail-link {
+          min-height: 42px;
+          display: flex;
+          align-items: center;
+          justify-content: space-between;
+          gap: 10px;
+          border: 1px solid rgba(10,143,141,0.18);
+          border-radius: var(--ce-r-md);
+          background: rgba(10,191,188,0.04);
+          color: var(--ce-text-dark);
+          padding: 0 11px;
+          font-size: 12.5px;
+          font-weight: 700;
+          text-decoration: none;
+          transition:
+            border-color var(--ce-dur-fast) var(--ce-ease-out),
+            background-color var(--ce-dur-fast) var(--ce-ease-out),
+            transform var(--ce-dur-fast) var(--ce-ease-out);
+        }
+        .copilot-rail-link:hover,
+        .copilot-rail-link:focus-visible {
+          border-color: rgba(10,143,141,0.34);
+          background: rgba(10,191,188,0.08);
+          transform: translateY(-1px);
+        }
+        .copilot-context-strip {
+          display: grid;
+          grid-template-columns: repeat(3, minmax(0, 1fr));
+          gap: 8px;
+          margin-bottom: 14px;
+        }
+        .copilot-command-rail .copilot-context-strip {
+          grid-template-columns: 1fr;
+        }
+        .copilot-context-tile {
+          border: 1px solid var(--ce-warm-line);
+          border-radius: var(--ce-r-md);
+          background: rgba(255,253,248,0.58);
+          padding: 11px 12px;
+        }
+        .copilot-context-tile strong,
+        .copilot-context-tile span {
+          display: block;
+        }
+        .copilot-context-tile strong {
+          color: var(--ce-text-dark);
+          font-size: 13px;
+          line-height: 1.25;
+        }
+        .copilot-context-tile span {
+          margin-top: 4px;
+          color: var(--ce-text-muted);
+          font-size: 11.5px;
+          line-height: 1.35;
+        }
+        .copilot-input-header {
+          display: flex;
+          align-items: center;
+          justify-content: space-between;
+          gap: 12px;
+          margin-bottom: 10px;
+          color: var(--ce-text-light-sec);
+          font-family: var(--ce-font-mono);
+          font-size: 10px;
+          font-weight: 700;
+          text-transform: uppercase;
+        }
+        .copilot-input-header strong {
+          color: var(--ce-teal);
+          font-weight: 700;
+        }
+        .copilot-input-header span:last-child {
+          color: var(--ce-text-dim);
+        }
+        .copilot-example-row {
+          width: 100%;
+          min-height: 46px;
+          display: flex;
+          align-items: center;
+          gap: 10px;
+          border: 1px solid rgba(17,24,39,0.08);
+          border-radius: var(--ce-r-md);
+          background: rgba(255,253,248,0.44);
+          color: var(--ce-text-muted);
+          padding: 9px 12px;
+          font-family: inherit;
+          font-size: 12.5px;
+          line-height: 1.38;
+          text-align: left;
+          cursor: pointer;
+          transition:
+            border-color var(--ce-dur-fast) var(--ce-ease-out),
+            background-color var(--ce-dur-fast) var(--ce-ease-out),
+            transform var(--ce-dur-fast) var(--ce-ease-out);
+        }
+        .copilot-example-row:hover,
+        .copilot-example-row:focus-visible {
+          border-color: rgba(10,143,141,0.26);
+          background: rgba(255,253,248,0.72);
+          transform: translateY(-1px);
+        }
+        .copilot-example-row span:first-child {
+          width: 18px;
+          height: 18px;
+          display: inline-flex;
+          align-items: center;
+          justify-content: center;
+          flex-shrink: 0;
+          border-radius: 999px;
+          background: rgba(10,143,141,0.08);
+          color: var(--ce-teal-deep);
+          font-size: 9px;
+        }
+        .copilot-result-shell {
+          margin-top: 8px;
+          scroll-margin-top: calc(92px + env(safe-area-inset-top));
+        }
+        .copilot-result-topper {
+          display: grid;
+          grid-template-columns: minmax(0, 1fr) auto;
+          gap: 14px;
+          align-items: start;
+          border: 1px solid var(--ce-warm-line);
+          border-radius: var(--ce-r-md);
+          background: var(--ce-warm-card);
+          box-shadow: var(--ce-shadow-card);
+          padding: 16px 18px;
+          margin-bottom: 12px;
+        }
+        .copilot-result-topper__label {
+          display: block;
+          color: var(--ce-teal-deep);
+          font-family: var(--ce-font-mono);
+          font-size: 10px;
+          font-weight: 700;
+          letter-spacing: 0;
+          text-transform: uppercase;
+          margin-bottom: 6px;
+        }
+        .copilot-result-topper p {
+          margin: 0;
+          color: var(--ce-text-muted);
+          font-size: 13px;
+          line-height: 1.55;
+        }
+        .copilot-result-topper__meta {
+          display: flex;
+          flex-direction: column;
+          gap: 6px;
+          min-width: 150px;
+        }
+        .copilot-result-pill {
+          min-height: 30px;
+          display: inline-flex;
+          align-items: center;
+          justify-content: center;
+          border: 1px solid rgba(10,143,141,0.18);
+          border-radius: var(--ce-r-pill);
+          background: rgba(10,191,188,0.05);
+          color: var(--ce-teal-deep);
+          padding: 0 12px;
+          font-family: var(--ce-font-mono);
+          font-size: 10px;
+          font-weight: 700;
+          text-transform: uppercase;
+          white-space: nowrap;
+        }
+        .copilot-urgency-badge {
+          display: inline-flex;
+          align-items: center;
+          gap: 10px;
+          width: fit-content;
+          background: var(--urgency-bg);
+          border: 1px solid var(--urgency-border);
+          border-radius: var(--ce-r-pill);
+          padding: 8px 13px;
+          margin-bottom: 12px;
+        }
+        .copilot-urgency-badge span {
+          width: 7px;
+          height: 7px;
+          border-radius: 50%;
+          background: var(--urgency-color);
+          flex-shrink: 0;
+        }
+        .copilot-urgency-badge strong {
+          color: var(--urgency-color);
+          font-family: var(--ce-font-mono);
+          font-size: 10.5px;
+          font-weight: 700;
+          letter-spacing: 0;
+          text-transform: uppercase;
+        }
+        .copilot-urgent-callout {
+          background: rgba(190,70,70,0.08);
+          border: 1px solid rgba(190,70,70,0.22);
+          border-left: 3px solid var(--ce-urgency-high-line);
+          border-radius: var(--ce-r-md);
+          padding: 14px 18px;
+          color: var(--ce-urgency-high);
+          font-weight: 600;
+          font-size: 14px;
+          line-height: 1.65;
+          margin-bottom: 12px;
+        }
+        .copilot-result-section {
+          position: relative;
+          overflow: hidden;
+          background: var(--ce-warm-card);
+          border: 1px solid var(--ce-warm-line);
+          border-radius: var(--ce-r-md);
+          box-shadow: var(--ce-shadow-card);
+          padding: 18px 20px;
+          margin-bottom: 10px;
+        }
+        .copilot-result-section::before {
+          content: "";
+          position: absolute;
+          top: 0;
+          left: 0;
+          bottom: 0;
+          width: 3px;
+          background: var(--section-accent);
+        }
+        .copilot-result-section__header {
+          display: flex;
+          align-items: center;
+          gap: 9px;
+          color: var(--section-accent);
+          font-family: var(--ce-font-mono);
+          font-size: 10px;
+          font-weight: 700;
+          letter-spacing: 0;
+          text-transform: uppercase;
+          margin-bottom: 12px;
+        }
+        .copilot-result-section__marker {
+          width: 7px;
+          height: 7px;
+          border-radius: 50%;
+          background: var(--section-accent);
+          opacity: 0.82;
+          flex-shrink: 0;
+        }
+        .copilot-result-section__body {
+          color: var(--ce-navy-700);
+          font-size: 14px;
+          line-height: 1.72;
+        }
+        .copilot-result-section__body p {
+          margin: 0 0 7px;
+          color: var(--ce-navy-700);
+        }
+        .copilot-result-bullet {
+          display: grid;
+          grid-template-columns: 7px minmax(0, 1fr);
+          gap: 11px;
+          align-items: start;
+          margin-bottom: 9px;
+        }
+        .copilot-result-bullet > span:first-child {
+          width: 5px;
+          height: 5px;
+          border-radius: 50%;
+          background: var(--section-accent);
+          margin-top: 10px;
+          opacity: 0.9;
+        }
+        .copilot-closing-card {
+          border: 1px solid rgba(10,143,141,0.18);
+          border-left: 3px solid var(--ce-teal);
+          border-radius: var(--ce-r-md);
+          padding: 15px 19px;
+          margin-top: 10px;
+          margin-bottom: 6px;
+          background: rgba(255,253,248,0.74);
+        }
+        .copilot-closing-card p {
+          margin: 0;
+          color: var(--ce-text-muted);
+          font-size: 14px;
+          font-style: italic;
+          line-height: 1.78;
+        }
+        .copilot-action-bar {
+          display: flex;
+          align-items: center;
+          gap: 10px;
+          margin-top: 16px;
+          padding: 12px;
+          border: 1px solid var(--ce-warm-line);
+          border-radius: var(--ce-r-md);
+          background: rgba(255,253,248,0.62);
+          flex-wrap: wrap;
+        }
+        .copilot-loading-card,
+        .copilot-stream-card {
+          border: 1px solid var(--ce-warm-line);
+          border-radius: var(--ce-r-md);
+          background: var(--ce-warm-card);
+          box-shadow: var(--ce-shadow-card);
+        }
+        .copilot-loading-card {
+          padding: 20px;
+          margin: 12px 0 16px;
+        }
+        .copilot-loading-meter {
+          display: flex;
+          gap: 4px;
+          align-items: center;
+          margin-bottom: 14px;
+        }
+        .copilot-loading-meter span {
+          width: 4px;
+          height: 18px;
+          border-radius: 4px;
+          background: var(--ce-teal);
+          opacity: 0.72;
+        }
+        .copilot-loading-card strong {
+          display: block;
+          color: var(--ce-text-dark);
+          font-size: 14px;
+          margin-bottom: 4px;
+        }
+        .copilot-loading-card small {
+          display: block;
+          color: var(--ce-text-muted);
+          font-size: 12px;
+          line-height: 1.45;
+        }
+        .copilot-stream-card {
+          padding: 18px 20px;
+          margin-bottom: 10px;
+          color: var(--ce-text-muted);
+          font-size: 14px;
+          line-height: 1.78;
+          white-space: pre-wrap;
+          max-height: 340px;
+          overflow-y: auto;
+        }
 
         /* Save/copy confirmation glyph swaps — single fast fade-in (motion-system.md §6) */
         .ce-swap-fast { animation: ce-fade-in var(--ce-dur-fast) var(--ce-ease-out) both; }
@@ -1001,6 +1327,12 @@ export default function App({ onGoHome, isOnline = true }) {
         /* ─── Mobile refinements (≤ 768px only) ──────────────── */
         @media (max-width: 768px) {
           .main-container { max-width: 800px !important; margin: 0 auto !important; padding: 18px 16px 0 !important; overflow-x: hidden !important; }
+          .copilot-command-layout { grid-template-columns: 1fr; }
+          .copilot-command-rail { position: static; }
+          .copilot-context-strip { grid-template-columns: 1fr; }
+          .copilot-result-topper { grid-template-columns: 1fr; }
+          .copilot-result-topper__meta { min-width: 0; flex-direction: row; flex-wrap: wrap; }
+          .copilot-action-bar { padding: 10px; }
           .hero { margin-bottom: 12px !important; }
           /* Reduce try-asking chip density — show max 3 */
           .chips-try button:nth-child(n+4) { display: none !important; }
@@ -1089,7 +1421,10 @@ export default function App({ onGoHome, isOnline = true }) {
       <div className="ce-page-enter" style={{ background: "var(--ce-warm-bg)", minHeight: "100vh" }}>
 
       {/* ── Main ─────────────────────────────────────────────────────────── */}
-      <div className="main-container" style={{ maxWidth: 800, margin: "0 auto", width: "100%", padding: "40px 20px 0", display: "flex", flexDirection: "column", alignItems: "stretch" }}>
+      <div className="main-container" style={{ maxWidth: 1120, margin: "0 auto", width: "100%", padding: "40px 20px 0", display: "flex", flexDirection: "column", alignItems: "stretch" }}>
+
+        <div className="copilot-command-layout">
+          <div className="copilot-command-main">
 
         {/* Hero */}
         <div className="hero" style={{ marginBottom: 18 }}>
@@ -1142,13 +1477,17 @@ export default function App({ onGoHome, isOnline = true }) {
             ? "1px solid var(--ce-teal)"
             : "1px solid rgba(240,237,230,0.10)",
           borderRadius: 8,
-          padding: "14px 16px 12px",
+          padding: "15px 16px 12px",
           boxShadow: inputFocused
             ? "0 0 0 3px rgba(10,191,188,0.12), 0 6px 18px rgba(0,0,0,0.18)"
             : "0 6px 18px rgba(0,0,0,0.18)",
           marginBottom: 10,
           transition: "border-color var(--ce-dur-fast) var(--ce-ease-out), box-shadow var(--ce-dur-fast) var(--ce-ease-out)",
         }}>
+          <div className="copilot-input-header">
+            <strong>Clinical picture</strong>
+            <span>Reasoning support</span>
+          </div>
           <textarea
             ref={textareaRef}
             value={question}
@@ -1355,36 +1694,69 @@ export default function App({ onGoHome, isOnline = true }) {
             {EXAMPLES.map((ex) => (
               <button
                 key={ex}
-                className="chip"
+                className="copilot-example-row"
                 onClick={() => { setQuestion(ex); setTimeout(() => textareaRef.current?.focus(), 0); }}
-                style={{
-                  background: "rgba(0,0,0,0.05)",
-                  border: "1px solid rgba(0,0,0,0.09)",
-                  color: "var(--ce-text-muted)",
-                  padding: "7px 11px",
-                  borderRadius: 4,
-                  fontSize: 12,
-                  fontWeight: 400,
-                  letterSpacing: "-0.01em",
-                  cursor: "pointer",
-                  display: "flex",
-                  alignItems: "center",
-                  gap: 8,
-                  textAlign: "left",
-                  lineHeight: 1.4,
-                  transition:
-                    "background-color var(--ce-dur-fast) var(--ce-ease-out), " +
-                    "border-color var(--ce-dur-fast) var(--ce-ease-out), " +
-                    "transform var(--ce-dur-fast) var(--ce-ease-out), " +
-                    "opacity var(--ce-dur-fast) var(--ce-ease-out)",
-                  width: "100%",
-                }}
               >
-                <span style={{ color: "var(--ce-text-dim)", fontSize: 8, flexShrink: 0 }}>▶</span>
+                <span aria-hidden="true">{"▶"}</span>
                 {ex}
               </button>
             ))}
           </div>
+        </div>
+
+          </div>
+
+          <aside className="copilot-command-rail" aria-label="Copilot guidance">
+            <div className="copilot-rail-card copilot-rail-card--dark">
+              <span className="copilot-rail-label">First pass</span>
+              <p>Give Copilot the clinical picture, what changed, and what you are worried about. Keep identifiers out.</p>
+            </div>
+
+            <div className="copilot-context-strip" aria-label="Copilot workflow checkpoints">
+              <div className="copilot-context-tile">
+                <strong>Assess</strong>
+                <span>What do you see now?</span>
+              </div>
+              <div className="copilot-context-tile">
+                <strong>Trend</strong>
+                <span>What changed over time?</span>
+              </div>
+              <div className="copilot-context-tile">
+                <strong>Escalate</strong>
+                <span>What needs attention?</span>
+              </div>
+            </div>
+
+            <div className="copilot-rail-card">
+              <span className="copilot-rail-label">Jump somewhere focused</span>
+              <p>Use Copilot for reasoning, then switch to the focused tool when you need a narrower clinical check.</p>
+              <div className="copilot-rail-list">
+                {[
+                  ['Reference Hub', '/reference-hub'],
+                  ['ABG Lab', '/abg-lab'],
+                  ['Brain Sheets', '/brain-sheets'],
+                ].map(([label, path]) => (
+                  <a
+                    key={path}
+                    className="copilot-rail-link"
+                    href={path}
+                    onClick={(e) => {
+                      if (!navigate) return;
+                      e.preventDefault();
+                      navigate(path);
+                    }}
+                  >
+                    {label} <span aria-hidden="true">{"->"}</span>
+                  </a>
+                ))}
+              </div>
+            </div>
+
+            <div className="copilot-rail-card">
+              <span className="copilot-rail-label">Good prompt shape</span>
+              <p>Situation, vitals, relevant labs, recent change, bedside assessment, and what decision you are trying to make.</p>
+            </div>
+          </aside>
         </div>
 
         {/* Error */}
@@ -1429,40 +1801,22 @@ export default function App({ onGoHome, isOnline = true }) {
 
         {/* Final structured result */}
         {result && !streaming && (
-          <div ref={outputRef}>
-
-            {/* Response trust cue */}
-            <div style={{
-              display: "flex",
-              alignItems: "center",
-              gap: 7,
-              padding: "0 2px 14px",
-              fontSize: 11,
-              color: "var(--ce-text-muted)",
-              fontFamily: "'IBM Plex Mono', monospace",
-              lineHeight: 1.5,
-              borderBottom: "1px solid rgba(0,0,0,0.07)",
-              marginBottom: 16,
-            }}>
-              <span style={{ color: "var(--ce-text-muted)", flexShrink: 0, fontSize: 9 }}>◆</span>
-              <span>Structured clinical reasoning support — confirm with your assessment and provider guidance</span>
+          <div ref={outputRef} className="copilot-result-shell">
+            <div className="copilot-result-topper">
+              <div>
+                <span className="copilot-result-topper__label">Clinical reasoning readout</span>
+                <p>Structured support to compare against your bedside assessment, local policy, and provider guidance.</p>
+              </div>
+              <div className="copilot-result-topper__meta">
+                <span className="copilot-result-pill">Verify before use</span>
+                <span className="copilot-result-pill">No diagnosis</span>
+              </div>
             </div>
 
             <UrgencyBadge level={result.urgencyLevel} />
 
             {result.urgent && (
-              <div style={{
-                background: "rgba(190,70,70,0.08)",
-                border: "1px solid rgba(190,70,70,0.22)",
-                borderLeft: "3px solid var(--ce-urgency-high-line)",
-                borderRadius: 8,
-                padding: "14px 18px",
-                color: "var(--ce-urgency-high)",
-                fontWeight: 600,
-                fontSize: 14,
-                lineHeight: 1.65,
-                marginBottom: 14,
-              }}>
+              <div className="copilot-urgent-callout">
                 {renderInline(result.urgent)}
               </div>
             )}
@@ -1474,15 +1828,7 @@ export default function App({ onGoHome, isOnline = true }) {
             </div>
 
             {/* Action bar */}
-            <div style={{
-              display: "flex",
-              alignItems: "center",
-              gap: 10,
-              marginTop: 18,
-              paddingTop: 18,
-              borderTop: "1px solid rgba(0,0,0,0.08)",
-              flexWrap: "wrap",
-            }}>
+            <div className="copilot-action-bar">
               {/* Save — primary action */}
               <button
                 className="save-case-btn"

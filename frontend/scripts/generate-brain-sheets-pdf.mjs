@@ -77,6 +77,16 @@ const SHEETS = [
       creator: 'Clinical Edge',
     },
   },
+  {
+    id: 'telemetry',
+    filename: 'clinical-edge-telemetry-stepdown-brain-sheet.pdf',
+    metadata: {
+      title: 'Telemetry Stepdown Brain Sheet',
+      author: 'Clinical Edge',
+      subject: 'Printable nurse shift-organization brain sheet',
+      creator: 'Clinical Edge',
+    },
+  },
 ];
 
 async function setPdfMetadata(filePath, metadata) {

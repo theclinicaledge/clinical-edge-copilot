@@ -160,23 +160,26 @@ function QuickAction({ action, onNavigate }) {
         <strong>{action.label}</strong>
         <small>{action.detail}</small>
       </span>
-      <span aria-hidden="true" className="ce-shift-action__arrow">{"->"}</span>
+      <span aria-hidden="true" className="ce-shift-action__arrow" />
     </button>
   );
 }
 
-function RecentCase({ text, onNavigate }) {
+function RecentCase({ text, savedCount, onNavigate }) {
   return (
     <button
       type="button"
-      className="ce-recent-case"
+      className="ce-home-continue"
       onClick={() => {
         trackEvent("home_recent_case_opened");
         onNavigate("/copilot");
       }}
     >
-      <span className="ce-recent-case__label">Last Copilot prompt</span>
-      <span className="ce-recent-case__text">{text}</span>
+      <span>
+        <strong>Continue from last prompt</strong>
+        <small>{text}</small>
+      </span>
+      {savedCount > 0 && <em>{savedCount} saved</em>}
     </button>
   );
 }
@@ -195,19 +198,10 @@ export default function ClinicalEdgeHome({ onNavigate }) {
     return () => window.clearTimeout(timer);
   }, []);
 
-  const shiftSnapshot = useMemo(() => {
-    const recentCount = activity.recent.length;
-    const savedCount = activity.saved.length;
-    return [
-      { label: "Tools online", value: MODULES.length },
-      { label: "Recent prompts", value: recentCount },
-      { label: "Saved cases", value: savedCount },
-    ];
-  }, [activity]);
-
   const primaryModules = MODULES.slice(0, 3);
   const secondaryModules = MODULES.slice(3);
   const latestPrompt = activity.recent[0];
+  const savedCount = useMemo(() => activity.saved.length, [activity.saved.length]);
 
   return (
     <div className="ce-home-shell">
@@ -224,10 +218,6 @@ export default function ClinicalEdgeHome({ onNavigate }) {
             <CELogo />
             <span>Clinical Edge</span>
           </a>
-          <nav className="ce-home-nav" aria-label="Primary">
-            <a href="/download" onClick={(e) => { e.preventDefault(); onNavigate("/download"); }}>App Store</a>
-            <a href="/support" onClick={(e) => { e.preventDefault(); onNavigate("/support"); }}>Support</a>
-          </nav>
         </div>
       </header>
 
@@ -235,9 +225,9 @@ export default function ClinicalEdgeHome({ onNavigate }) {
         <section className="ce-home-hero">
           <div className="ce-home-hero__copy">
             <div className="ce-home-kicker">Shift command center</div>
-            <h1>Clinical tools for real-world nursing.</h1>
+            <h1>Clinical Edge</h1>
             <p>
-              Move from report to reasoning, reference, practice, and shift organization without digging through a static menu.
+              Fast clinical reasoning, reference, practice, and shift organization for nurses.
             </p>
             <div className="ce-home-hero__actions">
               <button type="button" className="ce-primary-action ce-pressable" onClick={() => onNavigate("/copilot")}>
@@ -249,19 +239,14 @@ export default function ClinicalEdgeHome({ onNavigate }) {
             </div>
           </div>
 
-          <aside className="ce-shift-panel" aria-label="Shift snapshot">
+          <aside className="ce-shift-panel" aria-label="Quick actions">
             <div className="ce-shift-panel__header">
-              <span>Today</span>
+              <span>Open a workflow</span>
               <strong>Ready</strong>
             </div>
-            <div className="ce-shift-metrics">
-              {shiftSnapshot.map((item) => (
-                <div className="ce-shift-metric" key={item.label}>
-                  <strong>{item.value}</strong>
-                  <span>{item.label}</span>
-                </div>
-              ))}
-            </div>
+            {latestPrompt && (
+              <RecentCase text={latestPrompt} savedCount={savedCount} onNavigate={onNavigate} />
+            )}
             <div className="ce-shift-actions">
               {QUICK_ACTIONS.map((action) => (
                 <QuickAction key={action.label} action={action} onNavigate={onNavigate} />
@@ -295,7 +280,10 @@ export default function ClinicalEdgeHome({ onNavigate }) {
             </div>
 
             {latestPrompt ? (
-              <RecentCase text={latestPrompt} onNavigate={onNavigate} />
+              <div className="ce-context-card">
+                <span className="ce-context-card__eyebrow">Recent activity</span>
+                <p>{activity.recent.length} recent Copilot prompt{activity.recent.length === 1 ? "" : "s"} available from this device.</p>
+              </div>
             ) : (
               <div className="ce-context-card">
                 <span className="ce-context-card__eyebrow">Continue faster</span>

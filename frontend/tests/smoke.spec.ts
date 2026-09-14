@@ -7,7 +7,8 @@ test.beforeEach(async ({ page }) => {
 
 test('home hub loads and shows module navigation', async ({ page }) => {
   await page.goto('/');
-  await expect(page.getByRole('heading', { name: 'Clinical tools for real-world nursing.' })).toBeVisible();
+  await expect(page.getByRole('heading', { name: 'Clinical Edge' })).toBeVisible();
+  await expect(page.getByRole('button', { name: 'Start with Copilot' })).toBeVisible();
   await expect(page.getByText('Copilot', { exact: true })).toBeVisible();
   await expect(page.getByText('Rhythm Lab', { exact: true })).toBeVisible();
   await expect(page.getByText('ICU Drips', { exact: true })).toBeVisible();

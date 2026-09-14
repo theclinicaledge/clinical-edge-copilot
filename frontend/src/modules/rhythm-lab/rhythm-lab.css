@@ -2919,7 +2919,7 @@
 /* ─── Phase 1: Foundations Section ──────────────────────────────────── */
 
 .foundations-section {
-  border: 1px solid var(--border);
+  border: 1px solid rgba(10, 191, 188, 0.18);
   border-radius: 5px;
   overflow: hidden;
   max-width: 100%;
@@ -2931,7 +2931,7 @@
   align-items: center;
   gap: 8px;
   padding: 10px 14px;
-  background: transparent;
+  background: var(--ce-navy-700);
   cursor: pointer;
   border: none;
   text-align: left;
@@ -2939,7 +2939,7 @@
 }
 
 .foundations-toggle:hover {
-  background: rgba(10, 191, 188, 0.04);
+  background: var(--ce-navy-600);
 }
 
 .foundations-toggle:active {
@@ -2953,25 +2953,22 @@
   font-weight: 600;
   letter-spacing: 0.10em;
   text-transform: uppercase;
-  color: var(--accent-teal);
+  color: var(--ce-teal);
   flex-shrink: 0;
-  opacity: 0.7;
 }
 
 .foundations-toggle__title {
-  font-family: var(--font-mono);
+  font-family: var(--ce-font-sans);
   font-size: 11px;
-  font-weight: 500;
-  color: var(--text-primary);
+  font-weight: 700;
+  color: var(--ce-text-light);
   flex: 1;
-  opacity: 0.8;
 }
 
 .foundations-toggle__chevron {
   font-size: 8px;
-  color: var(--text-secondary);
+  color: var(--ce-teal);
   flex-shrink: 0;
-  opacity: 0.5;
   transition: transform var(--ce-dur-base) var(--ce-ease-out);
 }
 .foundations-toggle[aria-expanded="true"] .foundations-toggle__chevron {
@@ -4224,4 +4221,3 @@
     transform: none;
   }
 }
-

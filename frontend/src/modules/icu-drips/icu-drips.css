@@ -3,7 +3,7 @@
 /* Module variables alias the shared Clinical Edge tokens (src/styles/tokens.css) */
 :root {
   --id-bg-dark:       var(--ce-navy-900);
-  --id-bg-hero:       var(--ce-navy-800);
+  --id-bg-hero:       var(--ce-navy-700);
   --id-bg-header:     var(--ce-navy-header);
   --id-bg-warm:       var(--ce-warm-bg);
   --id-bg-card:       var(--ce-warm-card);
@@ -68,8 +68,6 @@
   top: 0;
   z-index: 50;
   background: var(--id-bg-header);
-  backdrop-filter: blur(20px);
-  -webkit-backdrop-filter: blur(20px);
   border-bottom: 1px solid var(--ce-line-dark);
   padding-top: env(safe-area-inset-top);
   padding-left: max(16px, env(safe-area-inset-left));
@@ -164,9 +162,9 @@
 .id-search-input {
   flex: 1;
   min-width: 140px;
-  background: #FFFFFF;
+  background: var(--ce-warm-card);
   border: 1px solid var(--id-border-card);
-  border-radius: 7px;
+  border-radius: var(--ce-r-md);
   padding: 8px 12px;
   font-size: 13px;
   font-family: var(--id-font-sans);
@@ -189,7 +187,7 @@
 .id-filter-btn {
   background: rgba(17,24,39,0.06);
   border: 1px solid transparent;
-  border-radius: 6px;
+  border-radius: var(--ce-r-md);
   padding: 6px 10px;
   font-size: 10.5px;
   font-family: var(--id-font-mono);
@@ -275,7 +273,7 @@
 .id-drip-row {
   background: var(--id-bg-card);
   border: 1px solid var(--id-border-card);
-  border-radius: 7px;
+  border-radius: var(--ce-r-md);
   padding: 12px 13px 10px;
   margin-bottom: 5px;
   cursor: pointer;
@@ -298,7 +296,7 @@
 .id-drip-row:focus-visible {
   outline: 2px solid var(--id-teal);
   outline-offset: 2px;
-  border-radius: 7px;
+  border-radius: var(--ce-r-md);
 }
 
 .id-drip-row__category {

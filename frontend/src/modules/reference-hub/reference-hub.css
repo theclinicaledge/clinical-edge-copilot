@@ -2,8 +2,8 @@
 
 .rh-page {
   min-height: 100vh;
-  background: var(--ce-navy-900);
-  color: var(--ce-text-light-sec);
+  background: var(--ce-warm-bg);
+  color: var(--ce-text-mid);
   font-family: var(--ce-font-sans);
 }
 
@@ -11,7 +11,7 @@
 .rh-hero {
   margin-bottom: 22px;
   padding-bottom: 20px;
-  border-bottom: 1px solid rgba(255,255,255,0.06);
+  border-bottom: 1px solid var(--ce-warm-line);
 }
 .rh-hero__eyebrow {
   font-family: var(--ce-font-mono);
@@ -27,14 +27,14 @@
   font-family: var(--ce-font-sans);
   font-weight: 800;
   font-size: clamp(22px, 5vw, 30px);
-  color: var(--ce-text-light);
+  color: var(--ce-text-dark);
   margin: 0 0 8px;
   line-height: 1.12;
   letter-spacing: -0.04em;
 }
 .rh-hero__text {
   font-size: 13px;
-  color: var(--ce-text-dim);
+  color: var(--ce-text-muted);
   margin: 0 0 18px;
   line-height: 1.5;
 }
@@ -52,7 +52,7 @@
   font-family: var(--ce-font-mono);
   font-size: 18px;
   font-weight: 700;
-  color: var(--ce-text-light);
+  color: var(--ce-text-dark);
   line-height: 1;
   letter-spacing: -0.02em;
 }
@@ -66,7 +66,7 @@
 .rh-hero__stat-divider {
   width: 1px;
   height: 28px;
-  background: rgba(255,255,255,0.1);
+  background: var(--ce-warm-line);
   flex-shrink: 0;
 }
 
@@ -86,18 +86,18 @@
 }
 .rh-search {
   width: 100%;
-  background: var(--ce-navy-700);
-  border: 1px solid var(--ce-line-navy);
+  background: var(--ce-warm-card);
+  border: 1px solid var(--ce-warm-line);
   border-radius: var(--ce-r-md);
   padding: 12px 14px 12px 40px;
-  color: var(--ce-text-light);
+  color: var(--ce-text-dark);
   font-size: 15px;
   font-family: var(--ce-font-sans);
   outline: none;
   transition: border-color var(--ce-dur-base), box-shadow var(--ce-dur-base);
   box-sizing: border-box;
 }
-.rh-search::placeholder { color: var(--ce-text-dim); }
+.rh-search::placeholder { color: var(--ce-text-muted); }
 .rh-search:focus {
   border-color: var(--ce-teal);
   box-shadow: 0 0 0 3px rgba(10,191,188,0.12);
@@ -111,8 +111,8 @@
 }
 .rh-filter-btn {
   background: transparent;
-  border: 1px solid var(--ce-line-navy);
-  color: var(--ce-text-dim);
+  border: 1px solid var(--ce-warm-line);
+  color: var(--ce-text-muted);
   border-radius: var(--ce-r-pill);
   padding: 6px 14px;
   font-size: 12px;
@@ -126,7 +126,7 @@
 }
 .rh-filter-btn:hover {
   border-color: rgba(10,191,188,0.30);
-  color: var(--ce-text-light-sec);
+  color: var(--ce-text-dark);
 }
 .rh-filter-btn.active {
   background: rgba(10,191,188,0.12);
@@ -142,8 +142,8 @@
 
 /* ── Reference list ── */
 .rh-ref-card {
-  background: var(--ce-navy-700);
-  border: 1px solid var(--ce-line-navy);
+  background: var(--ce-warm-card);
+  border: 1px solid var(--ce-warm-line);
   border-radius: var(--ce-r-md);
   padding: 16px 18px;
   cursor: pointer;
@@ -180,7 +180,7 @@
 .rh-ref-title {
   font-size: 14px;
   font-weight: 600;
-  color: var(--ce-text-light);
+  color: var(--ce-text-dark);
   line-height: 1.3;
   letter-spacing: -0.01em;
   margin-bottom: 6px;
@@ -210,12 +210,12 @@
 
 /* ── Recently viewed ── */
 .rh-recent-chip {
-  background: var(--ce-navy-600);
-  border: 1px solid var(--ce-line-navy);
+  background: var(--ce-warm-card);
+  border: 1px solid var(--ce-warm-line);
   border-radius: var(--ce-r-pill);
   padding: 5px 12px;
   font-size: 12px;
-  color: var(--ce-text-dim);
+  color: var(--ce-text-muted);
   cursor: pointer;
   white-space: nowrap;
   font-family: var(--ce-font-sans);
@@ -224,7 +224,7 @@
 }
 .rh-recent-chip:hover {
   border-color: rgba(10,191,188,0.22);
-  color: var(--ce-text-light-sec);
+  color: var(--ce-text-dark);
 }
 .rh-recent-chip:active { transform: scale(0.97); transition-duration: 60ms; }
 .rh-recent-chip:focus-visible {
@@ -382,8 +382,8 @@
 
 /* ── Bedside Pathways — landing section ── */
 .rh-pathways {
-  border-top: 1px solid rgba(255,255,255,0.06);
-  border-bottom: 1px solid rgba(255,255,255,0.06);
+  border-top: 1px solid var(--ce-warm-line);
+  border-bottom: 1px solid var(--ce-warm-line);
   padding: 20px 0 24px;
 }
 .rh-pathways-grid {
@@ -392,8 +392,8 @@
   gap: 8px;
 }
 .rh-pathway-card {
-  background: var(--ce-navy-700);
-  border: 1px solid var(--ce-line-navy);
+  background: var(--ce-warm-card);
+  border: 1px solid var(--ce-warm-line);
   border-radius: var(--ce-r-md);
   padding: 14px 16px;
   cursor: pointer;
@@ -432,7 +432,7 @@
 .rh-pathway-card-title {
   font-size: 13px;
   font-weight: 600;
-  color: var(--ce-text-light);
+  color: var(--ce-text-dark);
   line-height: 1.3;
   letter-spacing: -0.01em;
   margin-bottom: 3px;
@@ -607,8 +607,8 @@
 
 /* ── Clinical Concepts — landing section ── */
 .rh-concepts {
-  border-top: 1px solid rgba(255,255,255,0.06);
-  border-bottom: 1px solid rgba(255,255,255,0.06);
+  border-top: 1px solid var(--ce-warm-line);
+  border-bottom: 1px solid var(--ce-warm-line);
   padding: 20px 0 24px;
 }
 .rh-concepts-grid {
@@ -617,8 +617,8 @@
   gap: 8px;
 }
 .rh-concept-card {
-  background: var(--ce-navy-800);
-  border: 1px solid var(--ce-line-navy);
+  background: var(--ce-warm-card);
+  border: 1px solid var(--ce-warm-line);
   border-left: 3px solid var(--ce-gold);
   border-radius: var(--ce-r-md);
   padding: 14px 16px;
@@ -658,7 +658,7 @@
 .rh-concept-card__title {
   font-size: 14px;
   font-weight: 700;
-  color: var(--ce-text-light);
+  color: var(--ce-text-dark);
   line-height: 1.25;
   letter-spacing: -0.02em;
   margin-bottom: 2px;
@@ -671,7 +671,7 @@
 }
 .rh-concept-card__summary {
   font-size: 12px;
-  color: var(--ce-text-light-sec);
+  color: var(--ce-text-muted);
   line-height: 1.5;
   margin-bottom: 7px;
   opacity: 0.85;

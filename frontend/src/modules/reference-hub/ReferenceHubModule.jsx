@@ -1,6 +1,7 @@
 import { useState, useMemo, useEffect, useCallback } from 'react';
 import { REFERENCES, CATEGORIES } from './data/references.js';
 import { trackEvent } from '../../analytics';
+import ModuleHeader from '../../components/ModuleHeader.jsx';
 import '../../styles/tokens.css';
 import './reference-hub.css';
 
@@ -274,67 +275,10 @@ const CLINICAL_CONCEPTS = [
   },
 ];
 
-// ── CE Logo (shared mark) ─────────────────────────────────────────────────────
-
-function CELogo() {
-  return (
-    <svg width="30" height="30" viewBox="0 0 225 200" xmlns="http://www.w3.org/2000/svg"
-      fill="var(--ce-teal)" aria-label="Clinical Edge" style={{ flexShrink: 0, display: 'block' }}>
-      <path d="M 159.1,24.3 A 96,96 0 1,0 159.1,175.7 L 135.7,145.7 A 58,58 0 1,1 135.7,54.3 Z" />
-      <path d="M 144.0,57 L 208,45 L 218,58 L 208,70 L 150.0,71 Z" />
-      <path d="M 158.0,92 L 215,82 L 225,95 L 215,107 L 158.0,108 Z" />
-      <path d="M 150.0,129 L 208,130 L 218,142 L 208,155 L 144.0,143 Z" />
-    </svg>
-  );
-}
-
 // ── Header ────────────────────────────────────────────────────────────────────
 
 function Header({ onGoHome, showBack, onBack, backLabel }) {
-  return (
-    <div style={{
-      borderBottom: '1px solid var(--ce-line-dark)',
-      paddingTop: 'env(safe-area-inset-top)',
-      paddingLeft: 'max(16px, env(safe-area-inset-left))',
-      paddingRight: 'max(16px, env(safe-area-inset-right))',
-      background: 'var(--ce-navy-header)',
-      backdropFilter: 'blur(20px)',
-      WebkitBackdropFilter: 'blur(20px)',
-      position: 'sticky',
-      top: 0,
-      zIndex: 50,
-    }}>
-      <div style={{
-        maxWidth: 800, margin: '0 auto', width: '100%',
-        display: 'flex', alignItems: 'center',
-        paddingTop: 14, paddingBottom: 14, gap: 11,
-      }}>
-        <CELogo />
-        <div style={{ display: 'flex', flexDirection: 'column', gap: 1 }}>
-          <span style={{ fontSize: 15, fontWeight: 700, color: 'var(--ce-text-light)', letterSpacing: '-0.3px', lineHeight: 1.15 }}>
-            Clinical Edge
-          </span>
-          <span style={{
-            fontSize: 'var(--ce-fs-eyebrow)', fontWeight: 700, color: 'var(--ce-text-dim)',
-            letterSpacing: 'var(--ce-track-eyebrow)', textTransform: 'uppercase',
-            fontFamily: 'var(--ce-font-mono)', lineHeight: 1,
-          }}>
-            Reference Hub
-          </span>
-        </div>
-
-        {showBack ? (
-          <button className="ce-back-link" onClick={onBack}>
-            ← {backLabel || 'Back'}
-          </button>
-        ) : onGoHome ? (
-          <button className="ce-back-link" onClick={onGoHome}>
-            ← All tools
-          </button>
-        ) : null}
-      </div>
-    </div>
-  );
+  return <ModuleHeader moduleName="Reference Hub" onGoHome={onGoHome} onBack={showBack ? onBack : undefined} backLabel={backLabel || 'Back'} maxWidth="800px" />;
 }
 
 // ── Pathway card (landing page) ───────────────────────────────────────────────
@@ -753,7 +697,7 @@ function HubView({ onSelect, onGoHome, onSelectPathway, onSelectConcept }) {
   [recent]);
 
   return (
-    <div className="rh-page">
+    <div className="rh-page ce-workspace">
       <Header onGoHome={onGoHome} />
 
       <div style={{ maxWidth: 800, margin: '0 auto', padding: '32px 20px 60px' }}>

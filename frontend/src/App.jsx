@@ -1,5 +1,6 @@
 import { useState, useRef, useEffect, useCallback } from "react";
 import { trackEvent, promptLengthBucket } from "./analytics";
+import ModuleHeader from "./components/ModuleHeader.jsx";
 
 // ─── API Config ───────────────────────────────────────────────────────────────
 
@@ -1343,79 +1344,7 @@ export default function App({ onGoHome, navigate, isOnline = true }) {
         }
       `}</style>
 
-      {/* ── Header ───────────────────────────────────────────────────────── */}
-      <div style={{
-        borderBottom: "1px solid var(--ce-line-dark)",
-        paddingTop: "env(safe-area-inset-top)",
-        paddingLeft: "max(14px, env(safe-area-inset-left))",
-        paddingRight: "max(14px, env(safe-area-inset-right))",
-        paddingBottom: 0,
-        background: "var(--ce-navy-header)",
-        backdropFilter: "blur(20px)",
-        position: "sticky",
-        top: 0,
-        zIndex: 50,
-      }}>
-        <div style={{
-          maxWidth: 800,
-          margin: "0 auto",
-          width: "100%",
-          display: "flex",
-          alignItems: "center",
-          paddingTop: 22,
-          paddingBottom: 16,
-          gap: 11,
-        }}>
-
-          {/* CE symbol — final filled brand mark */}
-          <svg
-            width="30"
-            height="30"
-            viewBox="0 0 225 200"
-            xmlns="http://www.w3.org/2000/svg"
-            style={{ flexShrink: 0, display: "block" }}
-            aria-label="Clinical Edge"
-            fill="var(--ce-teal)"
-          >
-            <path d="M 159.1,24.3 A 96,96 0 1,0 159.1,175.7 L 135.7,145.7 A 58,58 0 1,1 135.7,54.3 Z" />
-            <path d="M 144.0,57 L 208,45 L 218,58 L 208,70 L 150.0,71 Z" />
-            <path d="M 158.0,92 L 215,82 L 225,95 L 215,107 L 158.0,108 Z" />
-            <path d="M 150.0,129 L 208,130 L 218,142 L 208,155 L 144.0,143 Z" />
-          </svg>
-
-          {/* Wordmark — no divider, clean inline layout */}
-          <div style={{ display: "flex", flexDirection: "column", gap: 1 }}>
-            <span style={{
-              fontSize: 15,
-              fontWeight: 700,
-              color: "var(--ce-text-light)",
-              letterSpacing: "-0.3px",
-              lineHeight: 1.15,
-            }}>
-              Clinical Edge
-            </span>
-            <span style={{
-              fontSize: 10,
-              fontWeight: 500,
-              color: "var(--ce-text-dim)",
-              letterSpacing: "0.7px",
-              textTransform: "uppercase",
-              fontFamily: "'IBM Plex Mono', 'Courier New', monospace",
-              lineHeight: 1,
-            }}>
-              Copilot
-            </span>
-          </div>
-
-          {/* All tools — back navigation */}
-          {onGoHome && (
-            <button className="ce-back-link" onClick={onGoHome}>
-              ← All tools
-            </button>
-          )}
-
-        </div>
-      </div>
+      <ModuleHeader moduleName="Copilot" onGoHome={onGoHome} maxWidth="800px" />
 
       {/* ── Warm clinical workspace ──────────────────────────────────────── */}
       <div className="ce-page-enter" style={{ background: "var(--ce-warm-bg)", minHeight: "100vh" }}>

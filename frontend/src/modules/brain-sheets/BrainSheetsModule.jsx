@@ -2,6 +2,7 @@ import { useCallback, useEffect, useState } from 'react';
 import { useSeo, SITE_URL } from '../../seo/useSeo.js';
 import { STATIC_ROUTE_SEO } from '../../seo/routeSeo.js';
 import { trackEvent } from '../../analytics';
+import ModuleHeader from '../../components/ModuleHeader.jsx';
 import { TEMPLATES, getTemplateById } from './data/templates.jsx';
 // TEMPORARY — B2 review-only import. Remove alongside the branch below and
 // components/SheetFramePrototypeB2.jsx once B2 is approved and production
@@ -10,61 +11,8 @@ import SheetFramePrototypeB2 from './components/SheetFramePrototypeB2.jsx';
 import '../../styles/tokens.css';
 import './brain-sheets.css';
 
-// ── CE Logo (shared mark) ─────────────────────────────────────────────────────
-function CELogo() {
-  return (
-    <svg width="30" height="30" viewBox="0 0 225 200" xmlns="http://www.w3.org/2000/svg"
-      fill="var(--ce-teal)" aria-label="Clinical Edge" style={{ flexShrink: 0, display: 'block' }}>
-      <path d="M 159.1,24.3 A 96,96 0 1,0 159.1,175.7 L 135.7,145.7 A 58,58 0 1,1 135.7,54.3 Z" />
-      <path d="M 144.0,57 L 208,45 L 218,58 L 208,70 L 150.0,71 Z" />
-      <path d="M 158.0,92 L 215,82 L 225,95 L 215,107 L 158.0,108 Z" />
-      <path d="M 150.0,129 L 208,130 L 218,142 L 208,155 L 144.0,143 Z" />
-    </svg>
-  );
-}
-
-// ── Header (design-system.md §4.1 recipe) ──────────────────────────────────────
 function Header({ showBack, onBack, onGoHome }) {
-  return (
-    <div style={{
-      borderBottom: '1px solid var(--ce-line-dark)',
-      paddingTop: 'env(safe-area-inset-top)',
-      paddingLeft: 'max(16px, env(safe-area-inset-left))',
-      paddingRight: 'max(16px, env(safe-area-inset-right))',
-      background: 'var(--ce-navy-header)',
-      backdropFilter: 'blur(20px)',
-      WebkitBackdropFilter: 'blur(20px)',
-      position: 'sticky',
-      top: 0,
-      zIndex: 50,
-    }}>
-      <div style={{
-        maxWidth: 'var(--ce-content)', margin: '0 auto', width: '100%',
-        display: 'flex', alignItems: 'center',
-        paddingTop: 14, paddingBottom: 14, gap: 11,
-      }}>
-        <CELogo />
-        <div style={{ display: 'flex', flexDirection: 'column', gap: 1 }}>
-          <span style={{ fontSize: 15, fontWeight: 700, color: 'var(--ce-text-light)', letterSpacing: '-0.3px', lineHeight: 1.15 }}>
-            Clinical Edge
-          </span>
-          <span style={{
-            fontSize: 'var(--ce-fs-eyebrow)', fontWeight: 700, color: 'var(--ce-text-dim)',
-            letterSpacing: 'var(--ce-track-eyebrow)', textTransform: 'uppercase',
-            fontFamily: 'var(--ce-font-mono)', lineHeight: 1,
-          }}>
-            Brain Sheets
-          </span>
-        </div>
-
-        {showBack ? (
-          <button className="ce-back-link" onClick={onBack}>← Brain Sheets</button>
-        ) : onGoHome ? (
-          <button className="ce-back-link" onClick={onGoHome}>← All tools</button>
-        ) : null}
-      </div>
-    </div>
-  );
+  return <ModuleHeader moduleName="Brain Sheets" onGoHome={onGoHome} onBack={showBack ? onBack : undefined} backLabel="Brain Sheets" />;
 }
 
 // ── Library index ───────────────────────────────────────────────────────────────
@@ -72,7 +20,7 @@ function IndexView({ templates, onSelect, onGoHome }) {
   useSeo(STATIC_ROUTE_SEO['/brain-sheets']);
 
   return (
-    <div className="bs-page">
+    <div className="bs-page bs-page--library ce-workspace">
       <Header onGoHome={onGoHome} />
       <div className="bs-content">
         <div className="bs-eyebrow">Brain Sheet Library</div>

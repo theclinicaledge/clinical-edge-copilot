@@ -14,7 +14,13 @@ body {
   color: var(--ce-text-light);
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
-  padding-bottom: calc(72px + env(safe-area-inset-bottom));
+  padding-bottom: 0;
+}
+
+/* Keep the final routed content above the fixed dock. Applying clearance to
+   the route root preserves each module's own background through the spacer. */
+#root:has(> .ce-tool-dock) > :first-child {
+  padding-bottom: var(--ce-dock-clearance);
 }
 
 ::-webkit-scrollbar {
@@ -51,9 +57,8 @@ textarea::placeholder {
   align-items: center;
   border: 1px solid rgba(240, 237, 230, 0.14);
   border-radius: var(--ce-r-lg);
-  background: rgba(11, 24, 32, 0.9);
+  background: #0B1820;
   box-shadow: 0 14px 34px rgba(0, 0, 0, 0.26);
-  backdrop-filter: blur(18px);
   padding: 5px;
   pointer-events: auto;
   overflow-x: auto;
@@ -112,6 +117,10 @@ textarea::placeholder {
   .ce-tool-dock {
     display: none;
   }
+
+  #root:has(> .ce-tool-dock) > :first-child {
+    padding-bottom: 0;
+  }
 }
 
 /* ── Home Hub — Clinical Edge command center ──────────────────────────────── */
@@ -129,7 +138,6 @@ textarea::placeholder {
   padding: env(safe-area-inset-top) max(14px, env(safe-area-inset-right)) 0 max(14px, env(safe-area-inset-left));
   border-bottom: 1px solid var(--ce-line-dark);
   background: var(--ce-navy-header);
-  backdrop-filter: blur(18px);
 }
 
 .ce-home-content {

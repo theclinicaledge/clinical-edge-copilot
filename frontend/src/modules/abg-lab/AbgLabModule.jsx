@@ -1,6 +1,7 @@
 import { useState, useCallback } from 'react';
 import { trackEvent } from '../../analytics';
 import { interpretABG } from './abgRules.js';
+import ModuleHeader from '../../components/ModuleHeader.jsx';
 import '../../styles/tokens.css';
 import './abg-lab.css';
 
@@ -29,19 +30,6 @@ const EXAMPLES = [
 ];
 
 const EMPTY = { pH: '', paco2: '', hco3: '', pao2: '', fio2: '' };
-
-// ── CE Logo (shared mark) ─────────────────────────────────────────────────────
-function CELogo() {
-  return (
-    <svg width="30" height="30" viewBox="0 0 225 200" xmlns="http://www.w3.org/2000/svg"
-      fill="var(--ce-teal)" aria-label="Clinical Edge" style={{ flexShrink: 0, display: 'block' }}>
-      <path d="M 159.1,24.3 A 96,96 0 1,0 159.1,175.7 L 135.7,145.7 A 58,58 0 1,1 135.7,54.3 Z" />
-      <path d="M 144.0,57 L 208,45 L 218,58 L 208,70 L 150.0,71 Z" />
-      <path d="M 158.0,92 L 215,82 L 225,95 L 215,107 L 158.0,108 Z" />
-      <path d="M 150.0,129 L 208,130 L 218,142 L 208,155 L 144.0,143 Z" />
-    </svg>
-  );
-}
 
 function validateFields(f) {
   const pH    = parseFloat(f.pH);
@@ -211,19 +199,7 @@ export default function AbgLabModule({ onGoHome }) {
 
   return (
     <div className="abg-shell">
-      {/* Header */}
-      <div className="abg-header">
-        <div className="abg-header-inner">
-          <CELogo />
-          <div className="abg-header-titles">
-            <span className="abg-header-name">Clinical Edge</span>
-            <span className="abg-header-eyebrow">ABG Lab</span>
-          </div>
-          <button className="ce-back-link" onClick={onGoHome}>
-            ← All tools
-          </button>
-        </div>
-      </div>
+      <ModuleHeader moduleName="ABG Lab" onGoHome={onGoHome} maxWidth="680px" />
 
       {/* Scrollable content */}
       <div className="abg-main">

@@ -4,8 +4,6 @@ const cors = require("cors");
 const helmet = require("helmet");
 const rateLimit = require("express-rate-limit");
 const Anthropic = require("@anthropic-ai/sdk");
-const fs = require("fs");
-const path = require("path");
 const {
   ABBREVIATION_EXPANSIONS,
 } = require("./nurse-language-dataset");
@@ -17,6 +15,7 @@ const ALLOWED_ORIGINS = [
   "https://theclinicaledge.org",
   "https://www.theclinicaledge.org",
   "http://localhost:5173",
+  "http://127.0.0.1:5173",
 ];
 
 app.use(cors({
@@ -44,12 +43,542 @@ const apiLimiter = rateLimit({
 
 app.use(express.json());
 
-const client = new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY });
+const anthropicApiKey = process.env.ANTHROPIC_API_KEY;
+const client = anthropicApiKey
+  ? new Anthropic({ apiKey: anthropicApiKey, timeout: 45000, maxRetries: 0 })
+  : null;
 
-// ── Log setup ─────────────────────────────────────────────────────────────────
-const LOG_DIR  = path.join(__dirname, "logs");
-const LOG_FILE = path.join(LOG_DIR, "responses.jsonl");
-fs.mkdirSync(LOG_DIR, { recursive: true });
+function classifyProviderError(error) {
+  const status = Number(error?.status || 0);
+  const message = String(error?.message || "").toLowerCase();
+  if (status === 401 || status === 403 || message.includes("authentication") || message.includes("api key")) {
+    return { code: "provider_configuration", message: "The AI service is not configured correctly. Please contact support." };
+  }
+  if (status === 429) {
+    return { code: "provider_rate_limit", message: "The AI service is busy right now. Please wait a moment and try again." };
+  }
+  if (status === 408 || message.includes("timeout") || error?.name === "APIConnectionTimeoutError") {
+    return { code: "provider_timeout", message: "The AI service took too long to respond. Please try again." };
+  }
+  return { code: "provider_error", message: "The AI service could not complete this request. Please try again." };
+}
+
+const CLINICAL_RELIABILITY_CONTRACT = `CLINICAL RELIABILITY (MANDATORY):
+Reason in this order: OBSERVE -> TREND -> INTERPRET -> DIFFERENTIATE -> DISCRIMINATE -> PRIORITIZE -> ESCALATE -> TEACH.
+
+DATA FIDELITY:
+- Observed / Reported may contain only facts explicitly supplied by the user. Never place an etiology, diagnosis, or model inference there.
+- A trend may be stated only when the supplied data contain a previous/current comparison, repeated measurements, or an explicit direction over time for that same variable.
+- A single current measurement is only a current measurement. Never turn it into "rising," "falling," "increasing," "decreasing," "improving," "worsening," or "trending" language.
+- Do not infer a rate or time basis. For example, a current drain output reported as 40 mL is not 40 mL/hr and has no direction unless the user supplied that context.
+- Blank, unknown, omitted, and not-assessed fields remain missing. Never convert them into normal or negative findings.
+- Numeric measurements explicitly supplied by the user may and should be repeated accurately.
+- Never introduce a new numeric decision threshold, alarm cutoff, target, or escalation trigger unless the Snapshot explicitly identifies that number as an ordered goal, protocol criterion, alarm limit, or target. General model knowledge is not a validated Clinical Edge rule source.
+- Avoid magic-number framing such as "escalate if lactate reaches 4," "call if MAP falls below 60," or similar new cutoffs. Use trajectory, persistence, combinations of abnormalities, worsening findings, failure to improve, and actually supplied protocol criteria.
+
+INTERPRETATION AND DIFFERENTIAL:
+- First name the supported physiologic pattern, then present etiologies as possibilities requiring corroboration.
+- Avoid "classic for," "diagnostic of," "confirms," "strongly indicates," and equivalent certainty unless the supplied evidence genuinely supports it.
+- When a possible etiology fits some findings but another supplied finding is atypical, conflicting, or weakens it, say so explicitly and name the additional information that would help discriminate it from alternatives.
+- Do not erase a clinically important possibility solely because one finding is atypical. Calibrate confidence and explain what would strengthen or weaken it.
+- For every named etiology, account for the direction of all relevant supplied measurements. Do not cite an atypical directional finding as positive support. State that it is atypical or potentially confounded, then identify corroborating evidence needed.
+- In postoperative low-output states, structural complications may remain possibilities, but pressure direction alone does not establish them and atypical filling-pressure direction must be acknowledged rather than described as a classic trajectory.
+
+ACID-BASE REASONING:
+- Identify the observed pH direction, relevant PaCO2 and bicarbonate values, and true earlier-to-current changes before describing the supported acid-base pattern.
+- Distinguish immediate physicochemical buffering from respiratory compensation and from renal compensation, which develops on a substantially slower timescale.
+- Never explain a bicarbonate change over hours as newly developed renal compensation. A modest short-interval bicarbonate change may reflect immediate buffering, pre-existing baseline physiology, a mixed process, or measurement/sample variation; preserve that uncertainty.
+- Never infer chronic respiratory acidosis or chronic compensation from an elevated bicarbonate alone. Chronicity requires adequate historical or baseline information.
+- Consider mixed processes when the observations do not fit one simple pattern. Do not invent the mechanism responsible for a bicarbonate value.
+- Keep oxygenation and ventilation distinct. A preserved SpO2 does not establish adequate ventilation, particularly when oxygen support, work of breathing, PaCO2, pH, or mental status are changing.
+
+ASSOCIATION AND CAUSATION:
+- Distinguish temporal association, physiologic plausibility, a likely contributor supported by converging evidence, and an established cause.
+- Do not convert correlation or physiologic plausibility into causation. Use calibrated language such as "may be contributing" when the evidence supports a possible contribution, and name important competing causes or missing discriminating information.
+- This applies across clinical domains, including altered mental status, hemodynamics, rhythm changes, electrolyte abnormalities, anemia, glucose abnormalities, and medication effects.
+
+COMMUNICATION AND TEACHING:
+- Urgency and communication intensity must agree. HIGH urgency supports a clear request for prompt evaluation or escalation, without prescribing treatment.
+- Do not recommend medication doses, titrations, procedures, device changes, or autonomous treatment decisions.
+- Teaching must inherit the same evidence boundaries, preserve uncertainty, and never teach an unsupported inference or invented trend as fact.`;
+
+const SHIFT_BRAIN_RESPONSE_CONTRACT = `RESPONSE STRUCTURE (MANDATORY — exact headers, exact order):
+After the urgency line (and warning if applicable), output exactly these eight bold-header sections. The urgency line is rendered separately as the ninth element of the workspace. Do not add separators or vary the header names.
+
+**Priorities**
+Return 1–3 priorities, never more than three and never manufacture extras. Use this exact structure for each priority:
+### 1 · Concise nursing priority label
+Relevance: High priority | Important | Needs clarification
+Observed:
+- 1–3 observations or trends explicitly reported by the nurse
+Interpretation: One concise, uncertainty-aware sentence explaining why those observations matter.
+Assess now:
+- 1–3 focused bedside assessments that would most change the picture
+
+Repeat with ### 2 and ### 3 only when additional distinct priorities are genuinely supported. Ranking reflects nursing urgency and relevance. "Observed" may contain only supplied facts. "Interpretation" must not present a diagnosis as fact. For sparse input, use one priority labeled "Limited information" and orient toward the most important missing assessment without inventing specificity.
+
+**Assess first**
+3–5 prioritized bullets. Frame the bedside findings, comparisons, and questions that would most change the picture. Use nursing assessment language, never commands or treatment steps.
+
+**Possible patterns**
+2–4 bullets. Describe plausible clinical patterns using uncertainty-aware language such as "may fit," "could reflect," or "raises concern for." Frame possibilities rather than diagnoses. For each named etiology, state what supports it, what is missing or atypical, and what would help discriminate it when that distinction is clinically important.
+
+**Missing information**
+2–4 bullets. Name the absent context that materially limits interpretation. Do not invent values or imply that the missing information is normal.
+
+**Monitor and trend**
+3–5 bullets. Identify changes over time that would make the situation more or less concerning. Keep reported observations separate from future signals to watch. For a variable with only one supplied value, say to compare the current value with future measurements; never say "continued" rise/fall/decrease/increase because no initial direction is established.
+
+**Escalation triggers**
+2–4 bullets. Describe findings or trajectories that commonly prompt earlier provider or team awareness under local protocols. Support nursing communication; do not issue autonomous treatment decisions. Do not invent universal numeric thresholds or institution-specific cutoffs that the user did not supply; anchor escalation to the reported trajectory, worsening organ-perfusion findings, and local protocol.
+
+**SBAR-ready summary**
+Write a concise 3–5 sentence summary a nurse could adapt for communication. Use only supplied facts and clearly mark uncertainty. Do not invent background, assessment findings, or recommendations.
+
+**Teach me why**
+2–4 sentences explaining the physiology or reasoning that connects the observations to the possible patterns. Distinguish evidence from interpretation.
+
+OBSERVATION / INTERPRETATION SEPARATION:
+- Each priority's "Observed" list may contain only user-reported observations, measurements, and trends.
+- Each priority's "Interpretation" line is explicitly an inference and must use uncertainty-aware language.
+- "Possible patterns" contains interpretation and must remain explicitly provisional.
+- Never silently convert missing information into an assumed normal finding.
+- If supplied measurements conflict, surface the inconsistency and assessment needed to verify it. Never silently choose one value.
+
+${CLINICAL_RELIABILITY_CONTRACT}
+
+FOOTER (MANDATORY — always include as the final line):
+For educational support only. Use your clinical judgment and follow local protocol.`;
+
+const TEACH_ME_DOMAINS = [
+  "deterioration-recognition", "hemodynamics-perfusion", "respiratory-oxygenation",
+  "rhythm-cardiac", "neurologic", "renal-fluid-balance", "bleeding",
+  "glucose-metabolic", "electrolytes", "medication-safety", "postoperative-assessment",
+];
+const TEACH_ME_QUESTION_TYPES = [
+  "pattern-recognition", "prioritization", "trend-interpretation", "physiology",
+  "escalation-judgment", "discrimination",
+];
+
+const TEACH_ME_SYSTEM_PROMPT = `You create one short active-learning interaction for Clinical Edge Shift Brain, an educational clinical-reasoning support tool for nurses.
+
+Return JSON only, with this exact shape:
+{
+  "domain": one of ${JSON.stringify(TEACH_ME_DOMAINS)},
+  "conceptId": "stable-kebab-case-category",
+  "conceptLabel": "short human-readable concept",
+  "questionType": one of ${JSON.stringify(TEACH_ME_QUESTION_TYPES)},
+  "question": {
+    "stem": "one concise clinical-judgment question",
+    "choices": [{"id":"a","label":"..."},{"id":"b","label":"..."},{"id":"c","label":"..."}],
+    "correctChoiceId": "a",
+    "explanation": "2–4 concise sentences"
+  },
+  "scenarioConnection": "1–3 concise sentences connecting the concept to this encounter while preserving uncertainty",
+  "application": null OR {
+    "stem": "one concise transfer question",
+    "choices": [{"id":"a","label":"..."},{"id":"b","label":"..."},{"id":"c","label":"..."}],
+    "correctChoiceId": "a",
+    "explanation": "1–3 concise sentences"
+  },
+  "tags": ["2–4 abstract skill tags"]
+}
+
+RULES:
+- Select exactly one high-value learning objective tied to the #1 Priority Map reasoning problem.
+- Prefer a well-supported physiologic or trend principle over a narrow etiologic claim. When falling output and rising vascular resistance are supplied, compensation and perfusion are safer teaching anchors than declaring a structural diagnosis.
+- Do not describe a bedside sign or cluster as a definitive discriminator. Explain that findings can strengthen or weaken a possibility and may be insensitive or confounded.
+- Avoid "classic signs" and "classic presentation" phrasing when teaching uncertain etiologies.
+- Use 3–4 plausible choices. The correctChoiceId must match exactly one choice id.
+- Incorrect choices must remain plausible without introducing unsupported numeric cutoffs, protocol targets, diagnostic thresholds, medication doses, or device settings. A false magic number is still unsafe teaching content even when it is a distractor.
+- The nurse must be able to answer using general nursing knowledge and the de-identified encounter.
+- Teach clinical judgment, not trivia or institution-specific thresholds.
+- Preserve uncertainty. Pattern recognition is not diagnosis.
+- Do not provide medication dosing, titration, treatment orders, device-setting changes, or autonomous diagnosis.
+- Do not include patient identifiers.
+- Keep the interaction completable in about 45–60 seconds.
+- Include an application question only when it adds meaningful transfer practice.
+- Never include markdown fences, commentary, or keys outside the schema.`;
+
+const TEACH_ME_RELIABILITY_PROMPT = `${TEACH_ME_SYSTEM_PROMPT}
+
+${CLINICAL_RELIABILITY_CONTRACT}
+
+The Patient Snapshot is the source of truth. The completed Priority Map is interpretation context, not permission to repeat an unsupported claim. If the Priority Map overstates an etiology or trend, do not inherit the error. Scenario connections may repeat only measurements and temporal directions supported by the Snapshot.`;
+
+function isShortString(value, max) {
+  return typeof value === "string" && value.trim().length > 0 && value.trim().length <= max;
+}
+
+function validateLearningQuestion(question) {
+  if (!question || !isShortString(question.stem, 360) || !Array.isArray(question.choices)) return false;
+  if (question.choices.length < 3 || question.choices.length > 4) return false;
+  const ids = question.choices.map((choice) => choice?.id);
+  if (new Set(ids).size !== ids.length) return false;
+  if (!question.choices.every((choice) => isShortString(choice.id, 12) && isShortString(choice.label, 220))) return false;
+  if (!ids.includes(question.correctChoiceId)) return false;
+  return isShortString(question.explanation, 900);
+}
+
+function validateTeachMeLesson(lesson) {
+  if (!lesson || typeof lesson !== "object" || Array.isArray(lesson)) return null;
+  if (!TEACH_ME_DOMAINS.includes(lesson.domain)) return null;
+  if (!TEACH_ME_QUESTION_TYPES.includes(lesson.questionType)) return null;
+  if (!/^[a-z0-9]+(?:-[a-z0-9]+)*$/.test(lesson.conceptId || "")) return null;
+  if (!isShortString(lesson.conceptLabel, 100) || !isShortString(lesson.scenarioConnection, 700)) return null;
+  if (!validateLearningQuestion(lesson.question)) return null;
+  if (lesson.application !== null && lesson.application !== undefined && !validateLearningQuestion(lesson.application)) return null;
+  if (!Array.isArray(lesson.tags) || lesson.tags.length < 1 || lesson.tags.length > 4) return null;
+  if (!lesson.tags.every((tag) => isShortString(tag, 60))) return null;
+  return {
+    domain: lesson.domain,
+    conceptId: lesson.conceptId,
+    conceptLabel: lesson.conceptLabel.trim(),
+    questionType: lesson.questionType,
+    question: lesson.question,
+    scenarioConnection: lesson.scenarioConnection.trim(),
+    application: lesson.application || null,
+    tags: lesson.tags.map((tag) => tag.trim()),
+  };
+}
+
+function buildTeachMeFallback(priorityMapResponse = "", snapshot = "", fallbackReason = "invalid_contract") {
+  const respiratoryAcidemia = /\bPaCO2\b/i.test(snapshot) && /\bpH\b/i.test(snapshot)
+    && /\b(?:breath|respiratory|ventilat|oxygen)\b/i.test(snapshot);
+  if (respiratoryAcidemia) {
+    return {
+      active: false,
+      fallbackReason,
+      domain: "respiratory-oxygenation",
+      conceptId: "ventilation-respiratory-acidemia",
+      conceptLabel: "Ventilation and respiratory acidemia",
+      keyIdea: "Tachypnea does not guarantee effective ventilation. When PaCO2 rises while pH falls, the pattern supports worsening ventilation with respiratory acidemia.",
+      whyItMatters: "SpO2 describes oxygenation, not carbon-dioxide clearance. A patient can maintain a similar SpO2 with more oxygen support while ventilation worsens, so respiratory effort, mental status, oxygen requirement, and the blood-gas trajectory need to be interpreted together. A modest bicarbonate change over a short interval should not automatically be labeled new renal compensation; baseline physiology, timing, measurement or sample variation, and mixed acid-base processes may affect the value.",
+      scenarioConnection: "The reported rise in PaCO2 and fall in pH support worsening ventilation with respiratory acidemia. Hypercapnia may be contributing to the drowsiness, but medication or sedation exposure, neurologic and metabolic contributors, fatigue, baseline mentation, and other causes remain unresolved.",
+      tags: ["Ventilation", "Respiratory acidemia", "Trend interpretation"],
+    };
+  }
+  const trendLabels = String(snapshot).split("\n").map((line) =>
+    line.match(/^-\s*([^:]+):\s*(?:previous|earlier)\b.*(?:->|→).*\b(?:current|now)\b/i)?.[1]?.trim()
+  ).filter(Boolean).slice(0, 4);
+  const scenarioConnection = trendLabels.length
+    ? `This Snapshot contains explicit previous-to-current changes in ${trendLabels.join(", ")}. Interpret those reported directions together while keeping the underlying cause uncertain.`
+    : "Use only the observations explicitly reported in this Snapshot. Missing context remains unknown, and the available information does not establish a diagnosis.";
+  return {
+    active: false,
+    fallbackReason,
+    domain: "deterioration-recognition",
+    conceptId: "recognizing-meaningful-change",
+    conceptLabel: "Recognizing meaningful change",
+    keyIdea: "Use explicit previous-to-current comparisons to identify direction. A single current measurement has no direction until it is compared with another time point.",
+    whyItMatters: "Combining supported trends, persistence, and bedside findings can clarify whether concern is increasing without inventing a cutoff or assuming a diagnosis.",
+    scenarioConnection,
+    tags: ["Deterioration recognition", "Trend interpretation"],
+  };
+}
+
+const TREND_LANGUAGE = /\b(rise|rising|rose|fall|falling|fell|increase|increasing|increased|decrease|decreasing|decreased|decline|declining|declined|drop|dropping|dropped|improving|worsening|trending|trended)\b/i;
+const CERTAINTY_LANGUAGE = /\b(classic for|classic .* trajectory|diagnostic of|confirms?|strongly indicates?)\b/i;
+const QUALIFIER_LANGUAGE = /\b(may|might|could|possible|possibility|consideration|raises concern for|cannot exclude|uncertain)\b/i;
+const TREATMENT_DIRECTIVE = /\b(start|give|administer|bolus|titrate|increase|decrease|stop|discontinue)\b.{0,45}\b(medication|dose|infusion|drip|fluid|oxygen|device|ventilator|pacing)\b/i;
+const UNSUPPORTED_RENAL_COMPENSATION = /\b(?:early|new(?:ly)?(?: developed)?|developing|acute)\s+renal\s+(?:compensation|buffering)\b|\brenal\s+(?:compensation|buffering)\s+(?:has\s+)?(?:begun|started|developed|occurred)\b/i;
+const UNSUPPORTED_CHRONICITY = /\b(?:chronic respiratory acidosis|chronic(?:ally)? compensated|chronic compensation)\b/i;
+const CAUSAL_ATTRIBUTION = /\b(?:cause|caused|causes|causing|due to|explains?|responsible for|is from|result(?:s|ed)? from|directly impairs?|impairs? mentation|acts? as (?:a )?direct|produces?|drives?|leads? to)\b/i;
+
+function sourceSupportsTrend(source, term) {
+  const termPattern = term instanceof RegExp ? term : new RegExp(String(term).replace(/[.*+?^${}()|[\]\\]/g, "\\$&"), "i");
+  return String(source).split("\n").some((line) => termPattern.test(line) && (
+    /\b(previous|earlier)\b.*(?:->|→).*\b(current|now)\b/i.test(line) ||
+    /\b(previous|earlier)\b.*\b(current|now)\b/i.test(line) ||
+    TREND_LANGUAGE.test(line)
+  ));
+}
+
+function normalizedNumbers(text) {
+  return [...String(text).matchAll(/(?<![A-Za-z])\d+(?:\.\d+)?/g)].map((match) => Number(match[0]));
+}
+
+function unsupportedNumericThresholds(source, output) {
+  const suppliedTargets = String(source).split("\n")
+    .filter((line) => /\b(target|goal|ordered parameter|alarm|threshold|protocol|limit)\b/i.test(line))
+    .flatMap(normalizedNumbers);
+  const suppliedTarget = (value) => suppliedTargets.some((number) => Math.abs(number - value) < 0.0001);
+  const unsupported = [];
+  for (const statement of String(output).split(/(?<=[.!?])\s+|\n/)) {
+    const decisionContext = /\b(escalat\w*|call\w*|notif\w*|provider|team awareness|urgent|trigger\w*|concern\w*|evaluation|indicates?|defines?|diagnostic|threshold|cutoff)\b/i.test(statement);
+    if (!decisionContext) continue;
+    const comparison = statement.match(/\b(?:above|below|under|over|exceeds?|reaches?|drops?\s+below|falls?\s+below|rises?\s+above|greater\s+than|less\s+than|at\s+least|no\s+more\s+than)\s*(\d+(?:\.\d+)?)/i);
+    if (!comparison) continue;
+    const value = Number(comparison[1]);
+    if (!suppliedTarget(value) && !unsupported.includes(value)) unsupported.push(value);
+  }
+  return unsupported;
+}
+
+function unsupportedTrendClaims(source, output, terms) {
+  return terms.filter((term) => {
+    if (sourceSupportsTrend(source, term)) return false;
+    const termPattern = term instanceof RegExp ? term : new RegExp(String(term).replace(/[.*+?^${}()|[\]\\]/g, "\\$&"), "i");
+    return String(output).split(/(?<=[.!?])\s+|\n/).some((statement) => termPattern.test(statement) && TREND_LANGUAGE.test(statement));
+  });
+}
+
+function hasUnsupportedEstablishedTrendClaim(source, output, terms) {
+  return terms.some((term) => {
+    if (sourceSupportsTrend(source, term)) return false;
+    const termPattern = term instanceof RegExp ? term : new RegExp(String(term).replace(/[.*+?^${}()|[\]\\]/g, "\\$&"), "i");
+    return String(output).split(/(?<=[.!?])\s+|\n/).some((statement) => {
+      if (!termPattern.test(statement) || !TREND_LANGUAGE.test(statement)) return false;
+      if (/\b(if|would|could|may|might|future|upcoming|compare|watch for|whether)\b/i.test(statement)) return false;
+      return true;
+    });
+  });
+}
+
+function hasCertaintyOverstatement(output) {
+  return String(output).split(/(?<=[.!?])\s+|\n/).some((statement) =>
+    CERTAINTY_LANGUAGE.test(statement) && !/\b(not|isn't|is not|atypical|unlike|does not)\b/i.test(statement)
+  );
+}
+
+function hasAcidBaseReliabilityViolation(source, output) {
+  const text = String(output);
+  const sourceText = String(source);
+  const unsupportedRenalClaim = text.split(/(?<=[.!?;])\s+|\n/).some((statement) =>
+    UNSUPPORTED_RENAL_COMPENSATION.test(statement)
+      && !/\b(?:does not|do not|cannot|should not|must not|not enough|avoid|never)\b/i.test(statement)
+  );
+  if (unsupportedRenalClaim) return true;
+  const chronicitySupplied = /\b(?:known|documented|established)\s+chronic\b|\bchronic\s+(?:history|baseline|respiratory)/i.test(sourceText)
+    && !/\b(?:baseline|history|chronicity)\s+(?:is\s+)?(?:unknown|unavailable|not supplied|not known)\b/i.test(sourceText);
+  if (UNSUPPORTED_CHRONICITY.test(text) && !chronicitySupplied) return true;
+  return false;
+}
+
+function hasUnsupportedCausalAttribution(source, output) {
+  const sourceText = String(source);
+  return String(output).split(/(?<=[.!?])\s+|\n/).some((statement) => {
+    if (!CAUSAL_ATTRIBUTION.test(statement)) return false;
+    if (/\b(may|might|could|possibly|plausibly|can contribute|association|not establish|cannot establish|uncertain)\b/i.test(statement)) return false;
+    const claimsAlteredMentalStatusCause = /\b(drows\w*|somnolen\w*|letharg\w*|confus\w*|mentation|altered mental|mental status)\b/i.test(statement);
+    if (!claimsAlteredMentalStatusCause) return false;
+    return !/\b(?:cause|etiology)\s*(?:is|was)\s*(?:reported|known|established)\b/i.test(sourceText);
+  });
+}
+
+function unsupportedClinicalNumericClaims(source, output) {
+  const unsupported = unsupportedNumericThresholds(source, output).map((value) => `threshold:${value}`);
+  const timelinePattern = /\b(\d+(?:\.\d+)?)\s*(?:(?:to|[-–])\s*(\d+(?:\.\d+)?)\s*)?(seconds?|minutes?|hours?|days?|weeks?)\b/gi;
+  const sourceTimelines = [...String(source).matchAll(timelinePattern)].map((match) => ({
+    values: [Number(match[1]), match[2] ? Number(match[2]) : null].filter((value) => value !== null),
+    unit: match[3].toLowerCase().replace(/s$/, ""),
+  }));
+  for (const statement of String(output).split(/(?<=[.!?])\s+|\n/)) {
+    for (const match of statement.matchAll(timelinePattern)) {
+      const values = [Number(match[1]), match[2] ? Number(match[2]) : null].filter((value) => value !== null);
+      const unit = match[3].toLowerCase().replace(/s$/, "");
+      const grounded = sourceTimelines.some((known) => known.unit === unit
+        && known.values.length === values.length
+        && known.values.every((value, index) => Math.abs(value - values[index]) < 0.0001));
+      if (!grounded) {
+        const claim = `timeline:${match[0].toLowerCase()}`;
+        if (!unsupported.includes(claim)) unsupported.push(claim);
+      }
+    }
+  }
+  return unsupported;
+}
+
+function hasUnsupportedDiagnosticCertainty(output) {
+  return String(output).split(/(?<=[.!?])\s+|\n/).some((statement) => {
+    if (!/\b(?:respiratory|ventilatory|hypercapnic|hypoxemic)\s+failure\b/i.test(statement)) return false;
+    if (/\b(?:possible|possibly|may|might|could|concern(?:ing)? for|raises? concern for|risk of|progress(?:ing)? toward|if .* progresses)\b/i.test(statement)) return false;
+    return true;
+  });
+}
+
+function excludesUnresolvedAlternative(source, output) {
+  const sourceText = String(source);
+  if (/\b(?:sedation|sedative|opioid|medication)\b.{0,30}\b(?:known|reported|given|administered)\b/i.test(sourceText)) return false;
+  return /\b(?:not|isn't|is not|cannot be|rules? out|rather than|not simply)\b.{0,60}\b(?:sedation|sedative|opioid|medication effect|neurologic|metabolic)\b/i.test(String(output));
+}
+
+function validatePriorityMapReliability(source, output) {
+  const issues = [];
+  if (hasAcidBaseReliabilityViolation(source, output)) issues.push("acid_base_reliability");
+  if (hasUnsupportedCausalAttribution(source, output)) issues.push("unsupported_causality");
+  if (excludesUnresolvedAlternative(source, output)) issues.push("excluded_alternative");
+  if (hasUnsupportedDiagnosticCertainty(output)) issues.push("unsupported_diagnostic_certainty");
+  if (hasCertaintyOverstatement(output)) issues.push("certainty_overstatement");
+  if (unsupportedClinicalNumericClaims(source, output).length) issues.push("unsupported_numeric_claim");
+  return [...new Set(issues)];
+}
+
+function buildPriorityMapFallback(source, unsafeOutput = "") {
+  const urgency = parseUrgency(unsafeOutput) || "MODERATE";
+  const respiratoryAcidemia = /\bPaCO2\b/i.test(source) && /\bpH\b/i.test(source)
+    && /\b(?:breath|respiratory|ventilat|oxygen)\b/i.test(source);
+  const reported = String(source).split("\n")
+    .filter((line) => /^-\s+/.test(line))
+    .map((line) => line.replace(/^[-*]\s*/, ""));
+  const observations = reported.length ? reported : ["A clinical change was reported; the available details remain limited"];
+  if (respiratoryAcidemia) return `Urgency Level: ${urgency}
+
+**Priorities**
+### 1 · Worsening ventilation with respiratory acidemia
+Relevance: High priority
+Observed:
+${observations.map((line) => `- ${line}`).join("\n")}
+Interpretation: The rising PaCO2 with falling pH supports worsening ventilation with respiratory acidemia. Hypercapnia may be contributing to the new drowsiness, but medication or sedation exposure, neurologic and metabolic contributors, fatigue, baseline mentation, and other causes remain unresolved.
+Assess now:
+- Current depth and effectiveness of breathing, work of breathing, air movement, and ability to sustain respiratory effort
+- Current mental status compared with the reported earlier state, including airway protection and cough effectiveness
+- Current oxygen support, saturation, circulation, and any further change from the reported trajectory
+
+**Assess first**
+- Whether tachypnea is producing effective ventilation or is accompanied by shallow breathing, reduced air movement, or increasing fatigue
+- Whether drowsiness, work of breathing, oxygen requirement, or hemodynamic findings are worsening
+- Focused respiratory and neurologic findings that could distinguish among unresolved contributors
+
+**Possible patterns**
+- The ABG trajectory supports worsening ventilation with respiratory acidemia; it raises concern for possible ventilatory failure but does not establish a definitive diagnosis
+- Hypercapnia may be contributing to drowsiness, while medication or sedation effects, neurologic or metabolic causes, fatigue, and other contributors remain possible
+- The increased oxygen requirement with little change in SpO2 may reflect worsening oxygenation support needs; SpO2 alone does not establish adequate ventilation
+
+**Missing information**
+- Baseline respiratory and mental status, underlying pulmonary or neuromuscular history, and the reason for admission
+- Medication, opioid, or sedation exposure and relevant timing
+- Focused neurologic assessment, glucose and other metabolic context, cough effectiveness, secretion burden, and aspiration risk
+- Additional clinical context needed to interpret the modest bicarbonate change, including baseline values, timing, sample considerations, and possible mixed processes
+
+**Monitor and trend**
+- Subsequent pH and PaCO2 compared with the explicitly reported earlier and current values
+- Respiratory effort and effectiveness, mental-status trajectory, oxygen requirement, SpO2, and air movement
+- Hemodynamic and perfusion changes alongside the respiratory trajectory
+
+**Escalation triggers**
+- Further decline in responsiveness, airway protection, breathing effectiveness, oxygenation, or perfusion commonly prompts urgent team awareness under local protocol
+- Continued worsening across the reported respiratory, mental-status, or blood-gas trajectory commonly supports prompt bedside evaluation and escalation
+
+**SBAR-ready summary**
+The patient has worsening respiratory findings over the reported interval, including increased work of breathing and oxygen support, rising PaCO2, falling pH, and new drowsiness. This supports worsening ventilation with respiratory acidemia, while the cause of the mental-status change and the overall deterioration remains uncertain. Medication or sedation exposure and neurologic, metabolic, fatigue-related, and other contributors still need clarification. The trajectory supports prompt bedside evaluation and communication under local protocol.
+
+**Teach me why**
+Tachypnea does not guarantee effective ventilation. Rising PaCO2 with falling pH supports worsening respiratory acidemia, while hypercapnia may contribute to drowsiness without proving it is the sole cause. A modest short-interval bicarbonate change does not establish new renal compensation; baseline physiology, timing, measurement variation, and mixed processes may affect the value.
+
+For educational support only. Use your clinical judgment and follow local protocol.`;
+
+  return `Urgency Level: ${urgency}
+
+**Priorities**
+### 1 · Reported clinical deterioration
+Relevance: ${urgency === "HIGH" ? "High priority" : "Important"}
+Observed:
+${observations.map((line) => `- ${line}`).join("\n")}
+Interpretation: The reported changes raise concern for clinical deterioration, while the cause and contribution of individual findings remain uncertain.
+Assess now:
+- Current respiratory effort, mental status, oxygen support, circulation, and change from the reported baseline
+
+**Assess first**
+- Focused bedside reassessment of the reported changes and their current trajectory
+- Whether mental status, work of breathing, oxygen needs, or circulation are worsening
+
+**Possible patterns**
+- The combined changes may reflect worsening physiologic function, but the supplied information does not establish a diagnosis or cause
+
+**Missing information**
+- Baseline status, relevant medication or sedation exposure, and other clinical context that could clarify contributors
+- Current focused neurologic, respiratory, and metabolic assessment findings
+
+**Monitor and trend**
+- Compare the explicitly reported previous and current measurements with subsequent reassessment
+- Worsening mental status, respiratory effort, oxygen requirement, or circulation would increase concern
+
+**Escalation triggers**
+- Further clinical deterioration or inability to maintain adequate breathing, oxygenation, perfusion, or responsiveness commonly prompts urgent team awareness under local protocol
+
+**SBAR-ready summary**
+The patient has multiple reported changes from earlier, including the measurements and bedside findings listed above. The overall trajectory is concerning, but the cause remains uncertain. Prompt bedside reassessment and communication should follow the clinical context and institutional protocol.
+
+**Teach me why**
+Trends across multiple observations can identify deterioration without establishing a diagnosis or proving that one finding caused another.
+
+For educational support only. Use your clinical judgment and follow local protocol.`;
+}
+
+async function resolvePriorityMap({ source, initialOutput, repair }) {
+  const initialIssues = validatePriorityMapReliability(source, initialOutput);
+  if (!initialIssues.length) return { output: initialOutput, status: "validated", issues: [], repairIssues: null };
+  if (typeof repair === "function") {
+    try {
+      const repaired = await repair(initialIssues);
+      const repairIssues = validatePriorityMapReliability(source, repaired);
+      if (!repairIssues.length) return { output: repaired, status: "repaired", issues: initialIssues, repairIssues: [] };
+      return { output: buildPriorityMapFallback(source, initialOutput), status: "fallback", issues: initialIssues, repairIssues };
+    } catch {
+      // A failed repair is handled by the same grounded fallback as an invalid repair.
+      return { output: buildPriorityMapFallback(source, initialOutput), status: "fallback", issues: initialIssues, repairIssues: ["repair_error"] };
+    }
+  }
+  return { output: buildPriorityMapFallback(source, initialOutput), status: "fallback", issues: initialIssues, repairIssues: null };
+}
+
+function lessonGroundingText(lesson) {
+  if (!lesson) return "";
+  const correctChoice = lesson.question?.choices?.find((choice) => choice.id === lesson.question.correctChoiceId)?.label || "";
+  const correctApplication = lesson.application?.choices?.find((choice) => choice.id === lesson.application.correctChoiceId)?.label || "";
+  return [
+    lesson.conceptLabel,
+    lesson.question?.stem,
+    correctChoice,
+    lesson.question?.explanation,
+    lesson.scenarioConnection,
+    lesson.application?.stem,
+    correctApplication,
+    lesson.application?.explanation,
+  ].filter(Boolean).join("\n");
+}
+
+function extractObservedSections(output) {
+  return [...String(output).matchAll(/(?:^|\n)Observed:\s*\n([\s\S]*?)(?=\nInterpretation:|\nAssess now:|\n###|\n\*\*|$)/gi)]
+    .map((match) => match[1]).join("\n");
+}
+
+function possiblePatternsAreQualified(output) {
+  const block = String(output).match(/\*\*Possible patterns\*\*\s*([\s\S]*?)(?=\n\*\*|$)/i)?.[1] || "";
+  const bullets = block.split("\n").map((line) => line.replace(/^[-*›•]\s*/, "").trim()).filter(Boolean);
+  return bullets.length > 0 && bullets.every((line) => QUALIFIER_LANGUAGE.test(line));
+}
+
+function highUrgencyRecommendationIsAligned(recommendation) {
+  const text = String(recommendation);
+  return /\b(evaluate|assessment|assess|at the bedside|now|prompt|urgent|rapid response|escalat)\b/i.test(text) && !TREATMENT_DIRECTIVE.test(text);
+}
+
+function sanitizeSbarText(text) {
+  return String(text)
+    .replace(/\bThis pattern raises concern for possible\b/gi, "Something's been off with")
+    .replace(/\bThere is concern for possible\b/gi, "I'm seeing something that could be")
+    .replace(/\bRequesting provider evaluation\.?\b/gi, "Wanted to get your input.")
+    .replace(/\bI need you to come assess\b/gi, "I'd like you to come assess")
+    .replace(/\bI need you to\b/gi, "I'd like you to")
+    .replace(/\bdo you want me to start\b/gi, "wanted to check how you'd like to proceed with")
+    .replace(/\bdo you want me to draw\b/gi, "wanted to check if you'd like")
+    .replace(/\bshould I (?:start|give|draw|administer|bolus)\b/gi, "wanted to check about");
+}
+
+function evaluateReliabilityFixture({ source = "", priorityMap = "", lessonText = "", sbar = null, trendTerms = [], inferredTerms = [] }) {
+  const observed = extractObservedSections(priorityMap);
+  return {
+    unsupportedPriorityTrends: unsupportedTrendClaims(source, priorityMap, trendTerms),
+    observedInferenceTerms: inferredTerms.filter((term) => new RegExp(term, "i").test(observed)),
+    contributorsQualified: possiblePatternsAreQualified(priorityMap),
+    priorityCertaintyOverstatement: CERTAINTY_LANGUAGE.test(priorityMap),
+    unsupportedLessonTrends: unsupportedTrendClaims(source, lessonText, trendTerms),
+    lessonCertaintyOverstatement: CERTAINTY_LANGUAGE.test(lessonText),
+    highUrgencySbarAligned: sbar ? highUrgencyRecommendationIsAligned(sbar.recommendation) : null,
+  };
+}
 
 const QUICK_SYSTEM_PROMPT = `You are an experienced bedside nurse with 12–15 years across med-surg, stepdown, and ICU.
 
@@ -73,6 +602,9 @@ Examples: "pt confused vitals ok what am i missing", "hr 49 metop due", "K 2.9 r
 Interpret these charitably. Reconstruct the implied clinical context from the fragment and respond with full clinical reasoning depth.
 Do NOT ask for clarification if the core clinical concern is already clear.
 
+STRUCTURED PATIENT SNAPSHOT:
+When input begins with "PATIENT SNAPSHOT — USER-REPORTED / OBSERVED INFORMATION", treat every supplied value and selection as user-reported observation, not verified fact. Preserve Earlier -> Now trends exactly as reported. Treat "unknown" and omitted fields as missing information, never as normal. Do not repeat every field mechanically; organize the highest-value observations through the mandatory Shift Brain response structure.
+
 URGENCY:
 The very first line of every response must be exactly one of:
 Urgency Level: HIGH
@@ -89,34 +621,14 @@ Use this warning only when the scenario genuinely suggests instability.
 HIGH-RISK ESCALATION BEHAVIOR:
 When the scenario clearly involves any of the following — hypotension combined with tachycardia, acute or sudden mental status change, rapid desaturation or worsening respiratory distress, chest pain with concerning associated features, severe bradycardia or tachycardia with hemodynamic signs, new focal neuro deficits, rapid multi-system deterioration, significant active bleeding, or a clearly dangerous arrhythmia or electrolyte crisis — adjust your section language proportionately:
 
-- "Possible concerns": Name the risk directly. Be specific. End on the thing you wouldn't ignore.
-- "What to consider next": Move escalation considerations toward the top — not buried at the end.
-- "Closing": One sentence that reflects the weight without drama. Examples: "That kind of change is worth escalating early." / "If this is new or getting worse, I wouldn't wait on it." / "That's the kind of shift I'd call on sooner rather than later."
+- "Possible patterns": Name higher-risk possibilities directly while keeping them provisional.
+- "Assess first": Put the findings that would most change urgency first.
+- "Escalation triggers": Make the threshold for provider or team awareness concrete without issuing commands.
 
 Tone stays calm and grounded — never theatrical. Never use "immediately," "medical emergency," "life-threatening," or "critical condition."
 Do not apply this sharpened language to stable, low-acuity, or clearly non-urgent presentations.
 
-RESPONSE FORMAT:
-After the urgency line (and warning if applicable), output exactly these sections in this exact order using these exact bold headers. No --- separators. No variations in header names.
-
-**What this could be**
-1–2 sentences. What stands out — your best read on what's happening. Direct. Don't hedge more than the evidence demands.
-
-**Possible concerns**
-2–3 bullets. What you'd be thinking about. Name the part you wouldn't ignore. End on the key escalation trigger.
-
-**What to assess next**
-3–4 bullets. What it would be helpful to observe — patient appearance, trends, context. Frame each bullet observationally, not as a command. Prioritized by what changes the picture most.
-
-**What to consider next**
-3–4 bullets. Nursing-scope considerations in order: reassessment, early escalation, communication, documentation. No doses. No orders.
-
-**Closing**
-1 sentence. Say it like a charge nurse walking out — real, grounded, something they'd actually say.
-
-FOOTER (MANDATORY — always include):
-After the Closing sentence, append this exact line as the final line of the response:
-For educational support only. Use your clinical judgment and follow local protocol.
+${SHIFT_BRAIN_RESPONSE_CONTRACT}
 
 VOICE RULES:
 - Direct, calm, confident. One thought at a time.
@@ -254,6 +766,9 @@ Nurses often submit short, imperfect fragments — missing subject, no punctuati
 Examples: "pt confused vitals ok what am i missing", "hr 49 metop due", "K 2.9 runs of vtach", "sat 88 on 6L", "post op looks pale bp soft".
 Interpret these charitably. Reconstruct the implied clinical context from the fragment and respond as if the full scenario were described.
 Do NOT ask for clarification if the core clinical concern is already clear from the fragment.
+
+STRUCTURED PATIENT SNAPSHOT:
+When input begins with "PATIENT SNAPSHOT — USER-REPORTED / OBSERVED INFORMATION", treat every supplied value and selection as user-reported observation, not verified fact. Preserve Earlier -> Now trends exactly as reported. Treat "unknown" and omitted fields as missing information, never as normal. Do not repeat every field mechanically; organize the highest-value observations through the mandatory Shift Brain response structure.
 When a fragment implies a current bedside situation, treat it with full clinical reasoning depth.
 
 TONE AND POSITIONING:
@@ -342,23 +857,7 @@ If the scenario suggests genuine active instability — converging signals, pers
 
 Reserve this warning for situations with clear converging instability signals — not for early, borderline, or isolated findings.
 
-RESPONSE STRUCTURE (MANDATORY — exact headers, exact order):
-After the urgency line (and warning if applicable), output exactly these four sections using these exact bold headers. No extra separators. No header name variations.
-
-**What this could be**
-2–3 lines. What stands out in this specific situation. Frame possibilities, not conclusions. Use pattern recognition. Do not lead with worst-case unless the evidence is clearly there.
-
-**Possible concerns**
-3–5 bullets. Highlight what carries clinical weight. Prioritize higher-risk interpretations when appropriate. Name what would change the picture. Do not exaggerate or alarm unnecessarily.
-
-**What to assess next**
-4–6 bullets. What it would be helpful to observe — patient appearance, trends, context, missing pieces. Frame each bullet as an observation or a question worth answering, not a command. Prioritized by what changes the clinical picture most.
-
-**Where this may be heading**
-3–4 bullets. One idea per bullet. Keep them short and signal-heavy. Anticipate trajectory — what could develop next if this continues. Surface the clinical risks worth knowing about. Use framing like: "This pattern sometimes progresses to..." / "Changes like this may carry more weight if..." / "Situations like this are often brought to the provider's attention."
-
-FOOTER (MANDATORY — always include, as the final line):
-For educational support only. Use your clinical judgment and follow local protocol.
+${SHIFT_BRAIN_RESPONSE_CONTRACT}
 
 CLINICAL STRENGTH CALIBRATION:
 When scenarios suggest higher risk — instability, rapid changes, abnormal vitals, acute symptoms — respond with proportionately sharper language:
@@ -1200,25 +1699,43 @@ const CRASH_FALLBACK_TEXT = `Urgency Level: HIGH
 
 ⚠️ This type of presentation is often treated as an immediate clinical emergency requiring rapid team awareness and escalation through local emergency pathways.
 
-**What this could be**
-Sudden clinical deterioration can reflect airway compromise, respiratory failure, hemodynamic collapse, arrhythmia, or another rapidly evolving emergency.
+**Priorities**
+### 1 · Sudden severe deterioration
+Relevance: High priority
+Observed:
+- The reported presentation describes a sudden, severe change in responsiveness, breathing, circulation, or overall stability
+- The reported change was sudden
+Interpretation: This reported pattern may reflect rapidly worsening instability, but the cause is not established.
+Assess now:
+- Responsiveness, breathing effort, skin color, pulse quality, and any obvious change from baseline
+- Whether the current state reflects a true sudden decline or worsening trend already in motion
 
-**Possible concerns**
-› Changes in responsiveness, breathing pattern, circulation, and overall appearance carry the most weight here
-› Situations described this way are commonly treated as requiring immediate team-level attention
-› The speed of change is itself a major concern
-
-**What to assess next**
+**Assess first**
 › Responsiveness, breathing effort, skin color, pulse quality, and any obvious change from baseline
 › Whether the current state reflects a true sudden decline or worsening trend already in motion
 › What support is already in place and who is already aware
 
-**Where this may be heading**
-› Without rapid intervention, this type of deterioration can progress toward respiratory or cardiac arrest
-› Situations like this are typically managed through urgent escalation pathways already defined by local protocol
+**Possible patterns**
+› This may reflect airway compromise, respiratory failure, hemodynamic collapse, a dangerous arrhythmia, or another rapidly evolving emergency
+› The available description is not sufficient to determine which pattern is present
 
-**Closing**
-This kind of change is generally treated as something that needs immediate team awareness.
+**Missing information**
+› Current responsiveness, breathing pattern, pulse, rhythm, blood pressure, oxygenation, and recent trend
+› Which emergency supports and team members are already present
+
+**Monitor and trend**
+› Any further decline in responsiveness, breathing, circulation, or perfusion increases concern
+› Response to the emergency measures already underway helps clarify trajectory
+
+**Escalation triggers**
+› Findings consistent with absent or ineffective breathing, absent pulse, or rapidly worsening instability commonly activate the facility's emergency response pathway
+› This reported pattern generally warrants immediate team-level awareness under local protocol
+
+**SBAR-ready summary**
+The patient is reported to have a sudden severe deterioration. Current responsiveness, breathing, circulation, rhythm, vital signs, and the support already underway need to be included when communicating with the response team. The exact cause is uncertain from the available information.
+
+**Teach me why**
+Abrupt loss of effective breathing or circulation can reduce oxygen delivery to the brain and other organs within minutes. That is why this pattern is treated through established emergency pathways while the team determines the cause.
 
 For educational support only. Use your clinical judgment and follow local protocol.`;
 
@@ -1274,20 +1791,6 @@ function containsPHI(text) {
     if (re.test(text)) return label;
   }
   return null;
-}
-
-// ── Lightweight input redaction ───────────────────────────────────────────────
-// Secondary safety layer — PHI is already blocked upstream by containsPHI.
-// Scrubs residual structural patterns before writing to the log file.
-function redactInput(text) {
-  return text
-    .replace(/\b\d{3}-\d{2}-\d{4}\b/g, "[SSN]")
-    .replace(/\b(\+1[\s.-]?)?\(?\d{3}\)?[\s.-]\d{3}[\s.-]\d{4}\b/g, "[PHONE]")
-    .replace(/\b[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}\b/g, "[EMAIL]")
-    .replace(/\b(MRN|mrn|Medical Record)[:\s#]*\d{5,10}\b/gi, "[MRN]")
-    .replace(/\b(DOB|D\.O\.B\.|Date of Birth)[:\s]*\d{1,2}[\/\-]\d{1,2}[\/\-]\d{2,4}\b/gi, "[DOB]")
-    .replace(/\b\d{1,2}[\/\-]\d{1,2}[\/\-]\d{2,4}\b/g, "[DATE]")
-    .replace(/(?<![0-9])\d{7,10}(?![0-9mg/%])/g, "[ID]");
 }
 
 // ── Parse urgency from AI response ───────────────────────────────────────────
@@ -1364,16 +1867,24 @@ function inferCategory(qNorm) {
   return "general";
 }
 
-// ── Append one JSONL entry to the log file ────────────────────────────────────
-// Also emits to stdout so Render's log system captures it even after a
-// filesystem wipe on redeploy. Prefix [LOG] makes it grep-able in the dashboard.
-function appendLog(entry) {
-  console.log("[LOG]", JSON.stringify(entry));
-  try {
-    fs.appendFileSync(LOG_FILE, JSON.stringify(entry) + "\n", "utf8");
-  } catch (err) {
-    console.error("[LOG] Failed to write log entry:", err.message);
-  }
+function buildOperationalLogEntry(fields) {
+  const allowed = [
+    "timestamp", "route", "mode", "category", "word_count", "input_length",
+    "urgency", "status", "response_length", "duration_ms", "possible_failure",
+    "failure_reason", "retry_attempted", "fallback_used", "urgency_override",
+    "priority_map_original_status", "priority_map_repair_status", "priority_map_display_resolution",
+  ];
+  return Object.fromEntries(
+    allowed
+      .filter((key) => fields[key] !== undefined)
+      .map((key) => [key, fields[key]])
+  );
+}
+
+// Operational logs are metadata-only. Never add prompt text, normalized text,
+// response excerpts, identifiers, or user-authored content to this payload.
+function appendOperationalLog(fields) {
+  console.log("[OPERATIONAL]", JSON.stringify(buildOperationalLogEntry(fields)));
 }
 
 // ── Detect temporary Anthropic overload errors ────────────────────────────────
@@ -1387,7 +1898,8 @@ function isOverloadError(err) {
 
 // ── Streaming endpoint ────────────────────────────────────────────────────────
 app.post("/api/copilot", apiLimiter, async (req, res) => {
-  const { question, mode, isFollowUp } = req.body;
+  const { question, mode, isFollowUp, learningRequest, priorityMapResponse } = req.body;
+  const requestStartedAt = Date.now();
 
   if (!question || question.trim() === "") {
     return res.status(400).json({ error: "Please enter a clinical question before submitting." });
@@ -1409,10 +1921,86 @@ app.post("/api/copilot", apiLimiter, async (req, res) => {
     });
   }
 
-  const FOLLOW_UP_PREFIX = `CONTINUATION: The nurse is following up on a case they already submitted. Their input contains the original scenario and a new update. Your job is to respond to what changed — not restate or re-analyze the original scenario from scratch. Focus on: what the update means in the context of what you already know, whether the overall concern is rising or falling, and what matters most right now given the new information. Acknowledge the prior context naturally. Do not repeat what was already covered unless it directly clarifies the new picture. Stay concise.\n\n`;
+  if (!client) {
+    appendOperationalLog({
+      timestamp: new Date().toISOString(), route: learningRequest === true ? "TEACH_ME" : "COPILOT",
+      mode: learningRequest === true ? "learning" : (mode || "deep"), category: "configuration",
+      word_count: question.trim().split(/\s+/).length, input_length: question.trim().length,
+      status: "error", response_length: 0, duration_ms: Date.now() - requestStartedAt,
+      possible_failure: true, failure_reason: "provider_not_configured",
+    });
+    return res.status(503).json({
+      error: true,
+      code: "provider_not_configured",
+      message: "The AI service is not configured for this local environment. Add the required backend API key and restart the server.",
+    });
+  }
+
+  if (learningRequest === true) {
+    if (typeof priorityMapResponse !== "string" || priorityMapResponse.length > 12000) {
+      return res.status(400).json({ error: "A completed Priority Map is required for Teach Me." });
+    }
+    const learningStartedAt = Date.now();
+    try {
+      const message = await client.messages.create({
+        model: "claude-sonnet-4-6",
+        max_tokens: 1200,
+        system: TEACH_ME_RELIABILITY_PROMPT,
+        messages: [{
+          role: "user",
+          content: `Patient Snapshot (user-reported observations):\n${question.trim()}\n\nCompleted Priority Map:\n${priorityMapResponse.trim()}`,
+        }],
+      });
+      const raw = message.content.find((block) => block.type === "text")?.text || "";
+      let parsed = null;
+      try {
+        parsed = JSON.parse(raw.replace(/^```json\s*/i, "").replace(/```\s*$/, "").trim());
+      } catch {
+        parsed = null;
+      }
+      const validatedLesson = validateTeachMeLesson(parsed);
+      const lessonText = lessonGroundingText(validatedLesson);
+      const schemaValid = Boolean(validatedLesson);
+      const trendGrounded = schemaValid && !hasUnsupportedEstablishedTrendClaim(question, lessonText, ["drain", "chest tube", "output"]);
+      const certaintyGrounded = schemaValid && !hasCertaintyOverstatement(lessonText);
+      const thresholdGrounded = schemaValid && unsupportedNumericThresholds(question, JSON.stringify(validatedLesson)).length === 0;
+      const acidBaseGrounded = schemaValid && !hasAcidBaseReliabilityViolation(question, lessonText);
+      const causalityGrounded = schemaValid && !hasUnsupportedCausalAttribution(question, lessonText);
+      const grounded = schemaValid && trendGrounded && certaintyGrounded && thresholdGrounded && acidBaseGrounded && causalityGrounded;
+      const lesson = grounded ? validatedLesson : null;
+      const fallbackReason = !schemaValid ? "invalid_schema" : !trendGrounded ? "unsupported_trend" : !certaintyGrounded ? "unsupported_certainty" : !thresholdGrounded ? "unsupported_numeric_threshold" : !acidBaseGrounded ? "acid_base_reliability" : "unsupported_causality";
+      const response = lesson ? { active: true, ...lesson } : buildTeachMeFallback(priorityMapResponse, question, fallbackReason);
+      appendOperationalLog({
+        timestamp: new Date().toISOString(),
+        route: "TEACH_ME",
+        mode: "learning",
+        category: lesson?.domain || "fallback",
+        word_count: 0,
+        input_length: question.trim().length,
+        status: lesson ? "success" : "fallback",
+        response_length: raw.length,
+        duration_ms: Date.now() - learningStartedAt,
+        possible_failure: !lesson,
+        ...(lesson ? {} : { fallback_used: true, failure_reason: fallbackReason }),
+      });
+      return res.json({ lesson: response });
+    } catch (error) {
+      console.error("[TEACH-ME] Generation error:", error.status ?? "", error.message);
+      appendOperationalLog({
+        timestamp: new Date().toISOString(), route: "TEACH_ME", mode: "learning",
+        category: "fallback", word_count: 0, input_length: question.trim().length,
+        status: "fallback", response_length: 0, duration_ms: Date.now() - learningStartedAt,
+        possible_failure: true, fallback_used: true, failure_reason: "generation_error",
+      });
+      return res.json({ lesson: buildTeachMeFallback(priorityMapResponse, question, "generation_error") });
+    }
+  }
+
+  const FOLLOW_UP_PREFIX = `CONTINUATION: The nurse is following up on a case they already submitted. Their input contains the original scenario and a new update. Your job is to respond to what changed — not restate or re-analyze the original scenario from scratch. Focus on what the update means in context and what matters most now. Describe concern as rising or falling only when the original scenario plus update supply enough temporal evidence for that specific variable. Never convert a single new measurement into a trend. Preserve all uncertainty and evidence boundaries from the Clinical Reliability contract. Do not repeat what was already covered unless it directly clarifies the new picture. Stay concise.\n\n`;
 
   let selectedPrompt = detectPrompt(question.trim(), mode);
   if (isFollowUp === true) selectedPrompt = FOLLOW_UP_PREFIX + selectedPrompt;
+  selectedPrompt += `\n\nFINAL SOURCE-GROUNDING AUDIT BEFORE OUTPUT: Review every numeric comparison used as a trigger, cutoff, target, or escalation criterion. If that number was not explicitly labeled in the user's input as an ordered goal, alarm, target, or protocol criterion, remove the cutoff and describe the supported trajectory, persistence, combined abnormalities, or worsening clinical state instead. Keep all user-supplied measurements and trends.`;
 
   // ── promptName must be derived before any prompt mutation ──────────────────
   const promptName =
@@ -1432,14 +2020,12 @@ app.post("/api/copilot", apiLimiter, async (req, res) => {
       `Your response MUST begin with exactly:\nUrgency Level: HIGH\n` +
       `Do not output MODERATE or LOW urgency for this response under any circumstances.\n\n` +
       selectedPrompt;
-    console.log(`[URGENCY-OVERRIDE] HIGH forced | input: ${question.trim().slice(0, 80)}`);
+    console.log("[URGENCY-OVERRIDE] HIGH forced");
   }
 
-  // ── Pre-compute log fields before streaming starts ──────────────────────
-  // input_redacted: PHI already blocked above; this strips any residual patterns
-  // input_normalized: derived from the redacted form — what routing "heard"
-  const inputRedacted   = redactInput(question.trim());
-  const inputNormalized = normalizeExtended(inputRedacted.toLowerCase());
+  // Input is normalized in memory for coarse routing/category inference only.
+  // Neither the original nor normalized text is retained in operational logs.
+  const inputNormalized = normalizeExtended(question.trim().toLowerCase());
   const wordCount       = question.trim().split(/\s+/).length;
   const inputLength     = question.trim().length;
   const category        = inferCategory(inputNormalized);
@@ -1457,13 +2043,18 @@ app.post("/api/copilot", apiLimiter, async (req, res) => {
   let fullResponse    = "";
   let retryAttempted  = false;
   let fallbackUsed    = false;
+  let responseStreamed = false;
+  let priorityMapResolution = null;
+  let priorityMapOriginalStatus = null;
+  let priorityMapRepairStatus = null;
+  const structuredSnapshot = question.trim().startsWith("PATIENT SNAPSHOT — USER-REPORTED / OBSERVED INFORMATION");
 
   // Runs one full Anthropic stream, appending chunks to fullResponse and
   // writing each chunk to the SSE stream as it arrives.
   const callStream = async () => {
     const stream = await client.messages.stream({
       model: "claude-sonnet-4-6",
-      max_tokens: 1400,
+      max_tokens: 3000,
       system: selectedPrompt,
       messages: [{ role: "user", content: question.trim() }],
     });
@@ -1474,7 +2065,10 @@ app.post("/api/copilot", apiLimiter, async (req, res) => {
         chunk.delta?.text
       ) {
         fullResponse += chunk.delta.text;
-        res.write(`data: ${JSON.stringify({ text: chunk.delta.text })}\n\n`);
+        if (!structuredSnapshot) {
+          responseStreamed = true;
+          res.write(`data: ${JSON.stringify({ text: chunk.delta.text })}\n\n`);
+        }
       }
     }
   };
@@ -1486,6 +2080,7 @@ app.post("/api/copilot", apiLimiter, async (req, res) => {
     if (isCrashInput(question.trim())) {
       fallbackUsed = true;
       fullResponse = CRASH_FALLBACK_TEXT;
+      responseStreamed = true;
       res.write(`data: ${JSON.stringify({ text: CRASH_FALLBACK_TEXT })}\n\n`);
       console.log("[CRASH-FALLBACK] Returned structured response — skipped streaming.");
     } else {
@@ -1515,12 +2110,44 @@ app.post("/api/copilot", apiLimiter, async (req, res) => {
               ? "Something interrupted the full response, but changes like this can carry clinical significance and may warrant closer attention in context.\n\nFor educational support only. Use your clinical judgment and follow local protocol."
               : "Something interrupted the full response, but this still appears to be a situation worth thinking through carefully in clinical context.\n\nFor educational support only. Use your clinical judgment and follow local protocol.";
           fullResponse = fallbackText;
+          responseStreamed = true;
           res.write(`data: ${JSON.stringify({ text: fallbackText })}\n\n`);
         }
       }
     }
 
-    // ── Post-stream logging (covers real response, retry, and fallback) ──
+    if (structuredSnapshot && !fallbackUsed) {
+      const resolved = await resolvePriorityMap({
+        source: question.trim(),
+        initialOutput: fullResponse,
+        repair: async (issues) => {
+          const repairMessage = await client.messages.create({
+            model: "claude-sonnet-4-6",
+            max_tokens: 3000,
+            system: `${selectedPrompt}\n\nPRIORITY MAP REPAIR: Rewrite the draft so it satisfies the full response and clinical reliability contracts. Correct only the validator issues supplied by the application. Preserve the user's exact reported facts, urgency, and section structure. Do not add new numbers, thresholds, timelines, diagnoses, or causal claims. Return only the complete repaired Priority Map.`,
+            messages: [{
+              role: "user",
+              content: `Patient Snapshot:\n${question.trim()}\n\nValidator issues:\n${issues.join(", ")}\n\nDraft to repair:\n${fullResponse}`,
+            }],
+          });
+          return repairMessage.content.find((block) => block.type === "text")?.text || "";
+        },
+      });
+      fullResponse = resolved.output;
+      fallbackUsed = resolved.status === "fallback";
+      priorityMapResolution = resolved.status;
+      priorityMapOriginalStatus = resolved.issues.length ? "rejected" : "accepted";
+      priorityMapRepairStatus = resolved.repairIssues === null
+        ? "not_attempted"
+        : resolved.repairIssues.length ? "rejected" : "accepted";
+    }
+
+    if (!responseStreamed) {
+      res.write(`data: ${JSON.stringify({ text: fullResponse })}\n\n`);
+      responseStreamed = true;
+    }
+
+    // ── Post-stream logging (covers real response, repair, and fallback) ──
     const parsedUrgency = parseUrgency(fullResponse);
     const { possible_failure, failure_reason } = detectPossibleFailure({
       route:           promptName,
@@ -1529,32 +2156,40 @@ app.post("/api/copilot", apiLimiter, async (req, res) => {
       responsePreview: fullResponse.slice(0, 250),
       urgency:         parsedUrgency,
     });
-    appendLog({
+    appendOperationalLog({
       timestamp:        requestTimestamp,
       route:            promptName,
       mode:             uiMode,
       category:         category,
-      input_redacted:   inputRedacted,
-      input_normalized: inputNormalized,
       word_count:       wordCount,
       input_length:     inputLength,
       urgency:          parsedUrgency,
       status:           fallbackUsed ? "fallback" : "success",
-      response_preview: fullResponse.slice(0, 250),
       response_length:  fullResponse.length,
+      duration_ms:      Date.now() - requestStartedAt,
       possible_failure,
       failure_reason,
       ...(retryAttempted          && { retry_attempted:    true }),
       ...(fallbackUsed            && { fallback_used:      true }),
       ...(urgencyOverrideLevel    && { urgency_override:   urgencyOverrideLevel }),
+      ...(priorityMapOriginalStatus && { priority_map_original_status: priorityMapOriginalStatus }),
+      ...(priorityMapRepairStatus && { priority_map_repair_status: priorityMapRepairStatus }),
+      ...(priorityMapResolution && { priority_map_display_resolution: priorityMapResolution }),
     });
 
     // Signal stream completion
-    res.write(`data: ${JSON.stringify({ done: true, sourceCategoryNote: "Nursing assessment frameworks, standard monitoring and escalation practices, and general clinical education references" })}\n\n`);
+    res.write(`data: ${JSON.stringify({
+      done: true,
+      priorityMapResolution,
+      priorityMapOriginalStatus,
+      priorityMapRepairStatus,
+      sourceCategoryNote: "Nursing assessment frameworks, standard monitoring and escalation practices, and general clinical education references",
+    })}\n\n`);
     res.end();
   } catch (error) {
     // Non-overload errors, or overload after partial content — existing behavior.
     console.error("[Clinical Edge] Anthropic API error:", error.status ?? "", error.message);
+    const providerFailure = classifyProviderError(error);
     const { possible_failure: errFail, failure_reason: errReason } = detectPossibleFailure({
       route:           promptName,
       status:          "error",
@@ -1562,26 +2197,24 @@ app.post("/api/copilot", apiLimiter, async (req, res) => {
       responsePreview: null,
       urgency:         null,
     });
-    appendLog({
+    appendOperationalLog({
       timestamp:        requestTimestamp,
       route:            promptName,
       mode:             uiMode,
       category:         category,
-      input_redacted:   inputRedacted,
-      input_normalized: inputNormalized,
       word_count:       wordCount,
       input_length:     inputLength,
       urgency:          null,
       status:           "error",
-      response_preview: null,
       response_length:  0,
+      duration_ms:      Date.now() - requestStartedAt,
       possible_failure: errFail,
-      failure_reason:   errReason,
+      failure_reason:   providerFailure.code || errReason,
       ...(retryAttempted && { retry_attempted: true }),
     });
     // SSE headers are already sent — respond with an error SSE event so the
     // frontend can stop streaming and display the message cleanly.
-    res.write(`data: ${JSON.stringify({ error: "High usage right now. Please try again in a moment." })}\n\n`);
+    res.write(`data: ${JSON.stringify({ error: true, code: providerFailure.code, message: providerFailure.message })}\n\n`);
     res.end();
   }
 });
@@ -1606,20 +2239,28 @@ ASSESSMENT: 1–2 short sentences. Plain spoken observation — what you are not
 Good phrasing: "HR has been really elevated and the pressure is dropping." / "He is looking a lot more lethargic than before." / "Something just feels off — a significant change from earlier."
 Do NOT write: "This pattern raises concern for possible..." / "There is concern for..." / "This may reflect..." / "This indicates..." / "This suggests..."
 
-RECOMMENDATION: 1 short sentence. A calm non-directive request for input.
-Good phrasing: "Wanted to get your input." / "Wanted to update you and see how you would like to proceed." / "Wanted to check in before continuing."
-Do NOT write: "Requesting provider evaluation" / "I need you to..." / "Start fluids" / "Draw labs" / "Should I give..."
+RECOMMENDATION: 1 short sentence calibrated to the established Priority Map urgency.
+- HIGH: Clearly request prompt evaluation or escalation. Appropriate examples include "I'm concerned about the worsening hemodynamics and would like you to evaluate the patient now" or "Could you come assess the patient now?"
+- MODERATE: Clearly request timely review or guidance without implying an emergency.
+- LOW: A calm update or request for routine guidance is appropriate.
+Do NOT prescribe treatment or ask permission to start a medication, fluid, procedure, or device change.
 
 ABSOLUTE RULES:
 - No bracketed placeholders, no fill-in text, no template language
 - Every word must be speakable exactly as written
+- Do not invent sex, gender, pronouns, postoperative timing, procedure details, diagnoses, or interventions. If demographics are not supplied, use "the patient."
+- Do not turn "post-op" into "fresh post-op," "today," or any other timing claim unless timing was supplied.
 - No diagnostic certainty — do not say "this is sepsis," "this is a PE"
 - No treatment suggestions, medication orders, or specific procedure prompts
-- No "I am concerned" / "I need you to" / "I need you at the bedside"
+- Concern language is appropriate when urgency is HIGH, but do not claim a diagnosis.
 - No bullet points, no lists, no extra lines outside the four sections
 - Total length: speakable in about 20–30 seconds
 
 Output ONLY the four labeled sections, each on its own line, with content immediately following the label.
+
+${CLINICAL_RELIABILITY_CONTRACT}
+
+The Clinical scenario is the source of truth. The Copilot analysis may help organize concern but must not override or embellish the supplied data. Preserve single measurements as single measurements.
 
 SITUATION:
 BACKGROUND:
@@ -1645,13 +2286,14 @@ app.post("/api/sbar", apiLimiter, async (req, res) => {
   }
 
   try {
+    const establishedUrgency = parseUrgency(copilotResponse) || "UNKNOWN";
     const message = await client.messages.create({
       model: "claude-sonnet-4-6",
       max_tokens: 500,
       system: SBAR_SYSTEM_PROMPT,
       messages: [{
         role: "user",
-        content: `Clinical scenario:\n${question.trim()}\n\nCopilot analysis:\n${copilotResponse.trim()}`,
+        content: `Established Priority Map urgency: ${establishedUrgency}\n\nClinical scenario:\n${question.trim()}\n\nCopilot analysis:\n${copilotResponse.trim()}`,
       }],
     });
 
@@ -1669,23 +2311,16 @@ app.post("/api/sbar", apiLimiter, async (req, res) => {
     // ── SBAR safety post-processing ───────────────────────────────────────────
     // Catch residual risky phrasing that may slip through the model instruction.
     // Scoped strictly to SBAR output — does not touch any other response path.
-    const safeText = (t) => t
-      .replace(/\bI(?:'m| am) concerned about\b/gi,                   "I'm noticing some changes with")
-      .replace(/\bThis pattern raises concern for possible\b/gi,       "Something's been off with")
-      .replace(/\bThere is concern for possible\b/gi,                  "I'm seeing something that could be")
-      .replace(/\bRequesting provider evaluation\.?\b/gi,              "Wanted to get your input.")
-      .replace(/\bI need you to come assess\b/gi,                      "Wanted to get your eyes on this")
-      .replace(/\bI need you to\b/gi,                                  "Wanted to check —")
-      .replace(/\bdo you want me to start\b/gi,                        "wanted to check how you'd like to proceed with")
-      .replace(/\bdo you want me to draw\b/gi,                         "wanted to check if you'd like")
-      .replace(/\bshould I (?:start|give|draw|administer|bolus)\b/gi,  "wanted to check about");
-
     const sbar = {
-      situation:      safeText(parseSection("SITUATION",      "BACKGROUND")),
-      background:     safeText(parseSection("BACKGROUND",     "ASSESSMENT")),
-      assessment:     safeText(parseSection("ASSESSMENT",     "RECOMMENDATION")),
-      recommendation: safeText(parseSection("RECOMMENDATION", null)),
+      situation:      sanitizeSbarText(parseSection("SITUATION",      "BACKGROUND")),
+      background:     sanitizeSbarText(parseSection("BACKGROUND",     "ASSESSMENT")),
+      assessment:     sanitizeSbarText(parseSection("ASSESSMENT",     "RECOMMENDATION")),
+      recommendation: sanitizeSbarText(parseSection("RECOMMENDATION", null)),
     };
+
+    if (establishedUrgency === "HIGH" && !highUrgencyRecommendationIsAligned(sbar.recommendation)) {
+      sbar.recommendation = "I'm concerned about the worsening clinical picture and would like you to evaluate the patient now.";
+    }
 
     res.json({ sbar });
   } catch (error) {
@@ -1698,6 +2333,39 @@ app.get("/health", (_req, res) => res.json({ status: "ok" }));
 
 const PORT = process.env.PORT || 3001;
 
-app.listen(PORT, () => {
-  console.log(`Server running on port ${PORT}`);
-});
+if (require.main === module) {
+  app.listen(PORT, () => {
+    console.log(`Server running on port ${PORT}`);
+  });
+}
+
+module.exports = {
+  app,
+  buildOperationalLogEntry,
+  CLINICAL_RELIABILITY_CONTRACT,
+  containsPHI,
+  evaluateReliabilityFixture,
+  highUrgencyRecommendationIsAligned,
+  hasCertaintyOverstatement,
+  lessonGroundingText,
+  sourceSupportsTrend,
+  unsupportedTrendClaims,
+  unsupportedNumericThresholds,
+  hasAcidBaseReliabilityViolation,
+  hasUnsupportedCausalAttribution,
+  unsupportedClinicalNumericClaims,
+  hasUnsupportedDiagnosticCertainty,
+  excludesUnresolvedAlternative,
+  validatePriorityMapReliability,
+  buildPriorityMapFallback,
+  resolvePriorityMap,
+  sanitizeSbarText,
+  SHIFT_BRAIN_RESPONSE_CONTRACT,
+  SBAR_SYSTEM_PROMPT,
+  TEACH_ME_RELIABILITY_PROMPT,
+  TEACH_ME_DOMAINS,
+  TEACH_ME_QUESTION_TYPES,
+  validateTeachMeLesson,
+  buildTeachMeFallback,
+  classifyProviderError,
+};

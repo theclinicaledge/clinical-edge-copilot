@@ -1,6 +1,9 @@
 import { useState, useRef, useEffect, useCallback } from "react";
-import { trackEvent, promptLengthBucket } from "./analytics";
+import { trackEvent } from "./analytics";
 import ModuleHeader from "./components/ModuleHeader.jsx";
+import PatientSnapshot from "./components/PatientSnapshot.jsx";
+import PriorityMap from "./components/PriorityMap.jsx";
+import { parsePriorities } from "./components/priorityMapModel";
 
 // ─── API Config ───────────────────────────────────────────────────────────────
 
@@ -12,34 +15,16 @@ const API_BASE =
 
 // ─── Constants ────────────────────────────────────────────────────────────────
 
-// Context chips — set placeholder only, do not fill input
-const CONTEXT_CHIPS = [
-  { label: "Something feels off",       placeholder: "What changed, and what is worrying you most?" },
-  { label: "Before you call",           placeholder: "What are you about to call about?" },
-  { label: "Medication question",       placeholder: "What med or safety question are you trying to sort out?" },
-  { label: "Explain to the patient",   placeholder: "What do you need help explaining in simple terms?" },
-  { label: "Precautions / wound / device", placeholder: "What are you trying to clarify?" },
-];
-
-// Example prompts — these DO fill the input when tapped
-const EXAMPLES = [
-  "QTc is 520, patient just got Zofran. Should I be worried?",
-  "How do I explain why we're keeping them NPO for an ileus?",
-  "BP dropped to 88/50, HR 122, was stable an hour ago — help me think through this before I call.",
-  "Just got report — new confusion, sodium 118, poor PO intake. What matters most first?",
-];
-
 const SECTIONS = [
-  { name: "What this could be",       aliases: ["What this could be"],                                        accent: "var(--ce-teal-deep)", bg: "transparent"  },
-  { name: "Possible concerns",        aliases: ["Possible concerns",      "What concerns me most"],           accent: "var(--ce-gold-deep)", bg: "rgba(212,168,75,0.06)"  },
-  { name: "What to assess next",      aliases: ["What to assess next",    "What I'd assess next"],            accent: "var(--ce-teal-deep)", bg: "transparent"  },
-  { name: "What to consider next",    aliases: ["What to consider next",  "What I'd do right now"],           accent: "var(--ce-teal-deep)", bg: "transparent"  },
-  { name: "Where this may be heading",aliases: ["Where this may be heading"],                                 accent: "var(--ce-gold-deep)", bg: "rgba(212,168,75,0.06)"  },
-  { name: "Closing",                  aliases: ["Closing"],                                                   accent: "var(--ce-teal)", bg: "rgba(10,191,188,0.04)"  },
+  { name: "Priorities",            aliases: ["Priorities", "What stands out", "What this could be"], accent: "var(--ce-teal-deep)" },
+  { name: "Assess first",          aliases: ["Assess first", "What to assess next", "What I'd assess next"], accent: "var(--ce-teal-deep)" },
+  { name: "Possible patterns",     aliases: ["Possible patterns", "Possible concerns", "What concerns me most"], accent: "var(--ce-gold-deep)" },
+  { name: "Missing information",   aliases: ["Missing information"],   accent: "var(--ce-text-muted)" },
+  { name: "Monitor and trend",     aliases: ["Monitor and trend", "What to consider next", "What I'd do right now", "Where this may be heading"], accent: "var(--ce-teal-deep)" },
+  { name: "Escalation triggers",   aliases: ["Escalation triggers"],   accent: "var(--ce-urgency-mod)" },
+  { name: "SBAR-ready summary",    aliases: ["SBAR-ready summary"],    accent: "var(--ce-blue)" },
+  { name: "Teach me why",          aliases: ["Teach me why", "Closing"], accent: "var(--ce-gold-deep)" },
 ];
-
-const SECTION_CONFIG = {};
-SECTIONS.forEach((s) => { SECTION_CONFIG[s.name] = s; });
 
 const ALIAS_MAP = {};
 SECTIONS.forEach((s) => { s.aliases.forEach((a) => { ALIAS_MAP[a] = s.name; }); });
@@ -52,12 +37,11 @@ const URGENCY_STYLES = {
   LOW:      { color: "var(--ce-urgency-low)",  bg: "var(--ce-urgency-low-bg)",  border: "var(--ce-urgency-low-line)",  darkText: "var(--ce-urgency-low-dark)" },
 };
 
-const LS_HISTORY = "clinical_edge_history";
 const LS_SAVED   = "clinical_edge_saved_cases";
 const LS_MODE    = "clinical_edge_mode";
 
 // Loading state — single static caption (no rotating narration, §4.7)
-const LOADING_MESSAGE = "Thinking it through…";
+const LOADING_MESSAGE = "Organizing clinical signals…";
 
 // ─── Helpers ──────────────────────────────────────────────────────────────────
 
@@ -113,7 +97,8 @@ function parseResponse(rawText) {
   });
 
   const ordered = SECTIONS.map((s) => sections.find((sec) => sec.title === s.name)).filter(Boolean);
-  return { urgent, sections: ordered };
+  const prioritySection = ordered.find((section) => section.title === "Priorities");
+  return { urgent, priorities: parsePriorities(prioritySection?.content || ""), sections: ordered.filter((section) => section.title !== "Priorities") };
 }
 
 function extractUrgencyLevel(rawText) {
@@ -129,6 +114,16 @@ function formatTimestamp(ts) {
 
 function generateId() {
   return Date.now().toString(36) + Math.random().toString(36).slice(2, 7);
+}
+
+function apiErrorMessage(status, data = {}) {
+  if (typeof data.message === "string" && data.message.trim()) return data.message;
+  if (typeof data.error === "string" && data.error.trim()) return data.error;
+  if (status === 400 || status === 422) return "The submitted Snapshot could not be processed. Review the entered information and try again.";
+  if (status === 429) return "Too many requests were sent. Please wait a moment and try again.";
+  if (status === 503) return "The clinical reasoning service is temporarily unavailable or not configured.";
+  if (status === 504) return "The clinical reasoning service timed out. Please try again.";
+  return "The Clinical Edge server could not complete this request. Please try again.";
 }
 
 // ─── Style helpers ────────────────────────────────────────────────────────────
@@ -196,57 +191,6 @@ function renderInline(text) {
 }
 
 // ─── Sub-components ───────────────────────────────────────────────────────────
-
-function SectionCard({ title, content }) {
-  const cfg = SECTION_CONFIG[title] || { accent: "var(--ce-blue)", bg: "rgba(77,163,255,0.06)" };
-
-  // Closing — italic pull-quote treatment, no label
-  if (title === "Closing") {
-    return (
-      <div className="copilot-closing-card ce-card-enter">
-        <p>
-          {renderInline(content.trim())}
-        </p>
-      </div>
-    );
-  }
-
-  const lines = content.split("\n").filter((l) => l.trim());
-  return (
-    <section className="copilot-result-section ce-card-enter" style={{ "--section-accent": cfg.accent }}>
-      <div className="copilot-result-section__header">
-        <span className="copilot-result-section__marker" aria-hidden="true" />
-        <span>
-        {title}
-        </span>
-      </div>
-      <div className="copilot-result-section__body">
-        {lines.map((line, i) => {
-          const isBullet = /^[-\u2022*]\s/.test(line);
-          if (isBullet) return (
-            <div className="copilot-result-bullet" key={i}>
-              <span aria-hidden="true" />
-              <span>{renderInline(line.replace(/^[-\u2022*]\s+/, ""))}</span>
-            </div>
-          );
-          return <p key={i}>{renderInline(line)}</p>;
-        })}
-      </div>
-    </section>
-  );
-}
-
-function UrgencyBadge({ level }) {
-  if (!level) return null;
-  const s = URGENCY_STYLES[level];
-  if (!s) return null;
-  return (
-    <div className="copilot-urgency-badge" style={{ "--urgency-color": s.color, "--urgency-bg": s.bg, "--urgency-border": s.border }}>
-      <span aria-hidden="true" />
-      <strong>Urgency: {level}</strong>
-    </div>
-  );
-}
 
 function LoadingIndicator() {
   // Sole sanctioned loop (motion-system.md §6/§7): one quiet opacity breathe
@@ -440,30 +384,65 @@ const _SS_QUESTION =
 
 const _SS_RESPONSE = `Urgency Level: MODERATE
 
-**What this could be**
-- Undertreated pain — a gradual HR rise in the post-op period most often reflects pain that isn't fully covered
-- Early fluid imbalance — third-spacing and mild dehydration can present this way before vital signs shift more noticeably
-- Respiratory pattern — atelectasis and guarded breathing are common at this stage and can drive both fatigue and heart rate changes
-- Early infection response — post-op day 2 is the typical window for wound or systemic changes to begin to develop
+**Priorities**
+### 1 · Evolving postoperative change
+Relevance: Important
+Observed:
+- Heart rate increased from 78 to 96 over several hours
+- Blood pressure is reported as stable, temperature is 37.9, and fatigue is new since this morning
+Interpretation: The combined trend may reflect an evolving postoperative stressor that deserves focused reassessment.
+Assess now:
+- Current appearance, mentation, perfusion, pain, and work of breathing compared with earlier
+- Full vital-sign and oxygenation trend rather than a single current reading
 
-**What to assess next**
-- Pain score now versus earlier in the shift — is the patient's pain coverage keeping up?
-- Breath sounds and respiratory effort — are they taking full breaths or guarding against discomfort?
-- Intake and urine output over the last several hours — mild volume changes often show up quietly
-- Wound site — any warmth, drainage, or change compared to the morning assessment
-- How does the patient look compared to a few hours ago — affect, engagement, color
+### 2 · Volume or bleeding context
+Relevance: Needs clarification
+Observed:
+- The patient is postoperative and reports new fatigue
+Interpretation: Volume imbalance or blood loss could contribute, but current intake, output, wound, and hemoglobin information is missing.
+Assess now:
+- Intake, urine output, wound findings, and relevant laboratory trend
 
-**What to consider next**
-- Gather the vital sign trend from the last 4–6 hours before calling — one reading rarely tells the full story
-- Know the last documented pain score and what was ordered and given
-- Have the post-op orders and any baseline values from admission available
+**Assess first**
+- Current appearance, mentation, perfusion, pain, and work of breathing compared with earlier
+- Full vital-sign and oxygenation trend rather than a single current reading
+- Intake, urine output, wound findings, and mobility since surgery
 
-**Closing**
-A slow HR climb with new fatigue usually has a clear reason. Thinking it through before the call — not after — is the right instinct.`;
+**Possible patterns**
+- The gradual change may fit pain, evolving volume imbalance, or a respiratory contributor
+- Early postoperative infection or another developing stressor remains possible, not established
+
+**Missing information**
+- Current respiratory rate, oxygen saturation, pain trajectory, intake, urine output, and wound assessment
+- Relevant hemoglobin trend, medications, and postoperative baseline
+
+**Monitor and trend**
+- Continued heart-rate rise, falling pressure, increasing temperature, worsening fatigue, or reduced urine output would increase concern
+- Improvement with routine postoperative care would make a rapidly progressive pattern less likely
+
+**Escalation triggers**
+- New hypoxia, altered mentation, poor perfusion, chest symptoms, active bleeding, or a worsening hemodynamic trend commonly prompt earlier team awareness
+- A persistent unexplained trend may warrant provider communication under local protocol
+
+**SBAR-ready summary**
+Post-op day 2 after hip replacement, with heart rate gradually increasing from 78 to 96 over several hours. Blood pressure is reported as stable and temperature is 37.9, but the patient reports new fatigue. The cause is uncertain; current respiratory, perfusion, pain, volume, wound, and laboratory context would help clarify the picture.
+
+**Teach me why**
+Heart rate can rise when the body is compensating for pain, reduced circulating volume, impaired oxygen delivery, or inflammation. The trend matters because a developing stress response may appear before a single vital sign becomes clearly abnormal.`;
 
 // ─── Main App ──────────────────────────────────────────────────────────────────
 
 export default function App({ onGoHome, navigate, isOnline = true }) {
+  const [prefillNotes] = useState(() => {
+    if (_ssParam === "response") return "";
+    try {
+      const value = localStorage.getItem("copilot_prefill") || "";
+      localStorage.removeItem("copilot_prefill");
+      return value;
+    } catch {
+      return "";
+    }
+  });
   const [question, setQuestion]         = useState(() => _ssParam === 'response' ? _SS_QUESTION : "");
   const [result, setResult]             = useState(() => {
     if (_ssParam !== 'response') return null;
@@ -476,17 +455,15 @@ export default function App({ onGoHome, navigate, isOnline = true }) {
   const [loading, setLoading]           = useState(false);
   const [error, setError]               = useState(null);
   const [mode]                          = useState("deep");
-  const [history, setHistory]           = useState(() => lsGet(LS_HISTORY, []));
   const [savedCases, setSavedCases]     = useState(() => lsGet(LS_SAVED, []));
   const [justSaved, setJustSaved]       = useState(false);
   const [followUp, setFollowUp]         = useState("");
-  const [inputFocused, setInputFocused] = useState(false);
   const [sbar, setSbar]                 = useState(null);
   const [sbarLoading, setSbarLoading]   = useState(false);
   const [sbarCopied, setSbarCopied]     = useState(false);
   const [sourcesOpen, setSourcesOpen]   = useState(false);
+  const [followUpActive, setFollowUpActive] = useState(false);
 
-  const textareaRef           = useRef(null);
   const outputRef             = useRef(null);
   const lastSubmittedRef      = useRef("");
   const wasRecentlyHiddenRef  = useRef(false);
@@ -501,44 +478,12 @@ export default function App({ onGoHome, navigate, isOnline = true }) {
     trackEvent('copilot_opened', { route: '/copilot' });
   }, []);
 
-  // Auto-resize textarea
-  useEffect(() => {
-    const el = textareaRef.current;
-    if (!el) return;
-    el.style.height = "auto";
-    el.style.height = Math.min(el.scrollHeight, 200) + "px";
-  }, [question]);
-
   // Screenshot mode: scroll response into view immediately on mount
   useEffect(() => {
     if (_ssParam === 'response' && outputRef.current) {
       outputRef.current.scrollIntoView({ behavior: 'instant', block: 'start' });
     }
   }, []);
-
-  // Load QuickStart prefill on mount; fall back to sessionStorage draft
-  useEffect(() => {
-    if (_ssParam === 'response') return; // screenshot mode — skip prefill logic
-    try {
-      const prefill = localStorage.getItem("copilot_prefill");
-      if (prefill) {
-        setQuestion(prefill);
-        localStorage.removeItem("copilot_prefill");
-      } else {
-        const draft = sessionStorage.getItem("cec_draft");
-        if (draft) setQuestion(draft);
-      }
-    } catch {
-      // Prefill is optional; the app still works without stored drafts.
-    }
-  }, []);
-
-  // Persist typed question as a draft so it survives background/restore cycles
-  useEffect(() => {
-    try { sessionStorage.setItem("cec_draft", question); } catch {
-      // Draft persistence is best-effort only.
-    }
-  }, [question]);
 
   // Visibility resilience — track backgrounding and recover in-flight requests.
   // Uses only refs so the effect never needs to be torn down/re-added.
@@ -590,19 +535,27 @@ export default function App({ onGoHome, navigate, isOnline = true }) {
     // Cancel any previous in-flight request before starting a new one
     if (abortControllerRef.current) abortControllerRef.current.abort();
     const controller = new AbortController();
+    let didTimeout = false;
+    const timeoutId = setTimeout(() => {
+      didTimeout = true;
+      controller.abort();
+    }, 65000);
     abortControllerRef.current = controller;
     accumulatedRef.current = "";
     isActiveRef.current = true;
 
     setQuestion(q);
     setFollowUp("");
+    setFollowUpActive(isFollowUp);
     lastSubmittedRef.current = q;
-    trackEvent('copilot_prompt_submitted', { mode, prompt_length_bucket: promptLengthBucket(q) });
+    trackEvent('copilot_prompt_submitted', { mode, source: isFollowUp ? 'follow_up' : 'structured_snapshot' });
     setLoading(true);
     setStreaming(false);
     setError(null);
-    setResult(null);
-    setRawText("");
+    if (!isFollowUp) {
+      setResult(null);
+      setRawText("");
+    }
     setStreamBuffer("");
     setJustSaved(false);
     setSbar(null);
@@ -620,8 +573,9 @@ export default function App({ onGoHome, navigate, isOnline = true }) {
       if (!res.ok) {
         const data = await res.json().catch(() => ({}));
         trackEvent('copilot_response_error', { reason: 'http_error', status: res.status });
-        setError(data.message || (typeof data.error === "string" ? data.error : null) || "Something went wrong. Please try again.");
+        setError(apiErrorMessage(res.status, data));
         setLoading(false);
+        setFollowUpActive(false);
         isActiveRef.current = false;
         return;
       }
@@ -654,24 +608,21 @@ export default function App({ onGoHome, navigate, isOnline = true }) {
             trackEvent('copilot_response_error', { reason: 'api_error' });
             setError(parsed.message || (typeof parsed.error === "string" ? parsed.error : null) || "Something went wrong. Please try again.");
             setStreaming(false);
+            setFollowUpActive(false);
             isActiveRef.current = false;
             return;
           }
 
           if (parsed.done) {
             trackEvent('copilot_response_completed', { mode });
+            trackEvent('shift_brain_priority_map_completed', { mode });
             setStreaming(false);
             setStreamBuffer("");
             setRawText(accumulatedRef.current);
             const parsedResult = parseResponse(accumulatedRef.current);
             setResult({ ...parsedResult, urgencyLevel: extractUrgencyLevel(accumulatedRef.current) });
+            setFollowUpActive(false);
             isActiveRef.current = false;
-            // Save to recent cases — deduplicate, cap at 10, most-recent first
-            setHistory((prev) => {
-              const updated = [q, ...prev.filter((h) => h !== q)].slice(0, 10);
-              lsSet(LS_HISTORY, updated);
-              return updated;
-            });
             return;
           }
 
@@ -684,18 +635,28 @@ export default function App({ onGoHome, navigate, isOnline = true }) {
     } catch (err) {
       // AbortError = intentional cancel (new request started or long-hide recovery)
       if (err.name === "AbortError") {
+        if (didTimeout) {
+          trackEvent('copilot_response_error', { reason: 'timeout' });
+          setError("The request timed out before the clinical reasoning service responded. Please try again.");
+          setLoading(false);
+          setStreaming(false);
+        }
         isActiveRef.current = false;
+        setFollowUpActive(false);
         return;
       }
       trackEvent('copilot_response_error', { reason: 'network_error' });
       // Suppress the error when backgrounding caused the failure — the visibility
       // handler will attempt a retry or silently restore idle state.
       if (!wasRecentlyHiddenRef.current) {
-        setError("Connection issue — please try again.");
+        setError("Cannot reach the Clinical Edge server. Check that the local backend is running, then try again.");
       }
       setLoading(false);
       setStreaming(false);
+      setFollowUpActive(false);
       isActiveRef.current = false;
+    } finally {
+      clearTimeout(timeoutId);
     }
   };
 
@@ -703,17 +664,13 @@ export default function App({ onGoHome, navigate, isOnline = true }) {
   // (which has a [] dep array) can always call the latest version.
   runQueryRef.current = runQuery;
 
-  const handleSubmit = () => runQuery(question);
+  const handleSnapshotBuild = (serializedSnapshot) => runQuery(serializedSnapshot);
 
   const handleFollowUp = () => {
     if (!followUp.trim()) return;
     trackEvent('copilot_continue_thinking', { mode });
     const combined = `Original situation: ${lastSubmittedRef.current}\n\nUpdate: ${followUp.trim()}`;
     runQuery(combined, { isFollowUp: true });
-  };
-
-  const handleKey = (e) => {
-    if (e.key === "Enter" && (e.metaKey || e.ctrlKey)) handleSubmit();
   };
 
   const handleSaveCase = useCallback(() => {
@@ -749,6 +706,7 @@ export default function App({ onGoHome, navigate, isOnline = true }) {
 
   const handleSbar = useCallback(async () => {
     if (!rawText || !question) return;
+    trackEvent('priority_map_sbar_opened');
     setSbarLoading(true);
     setSbar(null);
     try {
@@ -773,6 +731,26 @@ export default function App({ onGoHome, navigate, isOnline = true }) {
     }
   }, [rawText, question]);
 
+  const handleTeachMe = useCallback(async () => {
+    if (!rawText || !question) throw new Error("Priority Map context is unavailable.");
+    const res = await fetch(`${API_BASE}/api/copilot`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        question,
+        mode,
+        learningRequest: true,
+        priorityMapResponse: rawText,
+      }),
+    });
+    const data = await res.json().catch(() => ({}));
+    if (!res.ok || !data.lesson) {
+      trackEvent("teach_me_error", { reason: "request_failed", status: res.status });
+      throw new Error("Teach Me is unavailable.");
+    }
+    return data.lesson;
+  }, [rawText, question, mode]);
+
   const handleCopySbar = useCallback((sbarData) => {
     const text = [
       `SITUATION:\n${sbarData.situation}`,
@@ -788,7 +766,7 @@ export default function App({ onGoHome, navigate, isOnline = true }) {
 
   const handleReopenCase = useCallback((q) => {
     trackEvent('saved_case_reopened', { source: 'saved_cases' });
-    setQuestion(q);
+    runQueryRef.current?.(q);
     window.scrollTo({ top: 0, behavior: "smooth" });
   }, []);
 
@@ -949,6 +927,26 @@ export default function App({ onGoHome, navigate, isOnline = true }) {
         }
         .copilot-input-header span:last-child {
           color: var(--ce-text-dim);
+        }
+        .copilot-phi-guard {
+          margin: 0 0 11px;
+          padding: 9px 10px;
+          border: 1px solid rgba(212,168,75,0.24);
+          border-left: 3px solid var(--ce-gold);
+          border-radius: var(--ce-r-sm);
+          background: rgba(212,168,75,0.07);
+          color: var(--ce-text-light-sec);
+          font-size: 11px;
+          line-height: 1.45;
+        }
+        .copilot-phi-guard strong,
+        .copilot-phi-guard span {
+          display: block;
+        }
+        .copilot-phi-guard strong {
+          margin-bottom: 3px;
+          color: var(--ce-text-light);
+          font-size: 11.5px;
         }
         .copilot-example-row {
           width: 100%;
@@ -1355,23 +1353,12 @@ export default function App({ onGoHome, navigate, isOnline = true }) {
         <div className="copilot-command-layout">
           <div className="copilot-command-main">
 
-        {/* Hero */}
-        <div className="hero" style={{ marginBottom: 18 }}>
-          <h2 style={{
-            fontFamily: "'Inter', sans-serif",
-            fontWeight: 700,
-            fontSize: "clamp(20px, 4.5vw, 26px)",
-            color: "var(--ce-text-dark)",
-            margin: "0 0 6px",
-            lineHeight: 1.15,
-            letterSpacing: "-0.03em",
-          }}>
-            What are you thinking through?
-          </h2>
-          <p style={{ fontSize: 13, color: "var(--ce-text-dim)", margin: 0, lineHeight: 1.5, fontWeight: 400 }}>
-            Ask a clinical reasoning question. No patient identifiers.
-          </p>
-        </div>
+        <PatientSnapshot
+          initialNotes={prefillNotes}
+          disabled={isActive}
+          isOnline={isOnline}
+          onBuild={handleSnapshotBuild}
+        />
 
         {/* Offline notice — shown only when network is unavailable */}
         {!isOnline && (
@@ -1396,189 +1383,6 @@ export default function App({ onGoHome, navigate, isOnline = true }) {
             <span style={{ fontSize: 13, color: "var(--ce-text-muted)", lineHeight: 1.55 }}>
               Copilot requires internet. <strong style={{ color: "var(--ce-blue)", fontWeight: 600 }}>Rhythm Lab</strong> and <strong style={{ color: "var(--ce-blue)", fontWeight: 600 }}>ICU Drips</strong> are available offline once loaded.
             </span>
-          </div>
-        )}
-
-        {/* Input card */}
-        <div className="input-card" style={{
-          background: "var(--ce-navy-700)",
-          border: inputFocused
-            ? "1px solid var(--ce-teal)"
-            : "1px solid rgba(240,237,230,0.10)",
-          borderRadius: 8,
-          padding: "15px 16px 12px",
-          boxShadow: inputFocused
-            ? "0 0 0 3px rgba(10,191,188,0.12), 0 6px 18px rgba(0,0,0,0.18)"
-            : "0 6px 18px rgba(0,0,0,0.18)",
-          marginBottom: 10,
-          transition: "border-color var(--ce-dur-fast) var(--ce-ease-out), box-shadow var(--ce-dur-fast) var(--ce-ease-out)",
-        }}>
-          <div className="copilot-input-header">
-            <strong>Clinical picture</strong>
-            <span>Reasoning support</span>
-          </div>
-          <textarea
-            ref={textareaRef}
-            value={question}
-            onChange={(e) => setQuestion(e.target.value)}
-            onKeyDown={handleKey}
-            onFocus={() => setInputFocused(true)}
-            onBlur={() => setInputFocused(false)}
-            placeholder="What are you thinking through right now?"
-            rows={2}
-            style={{
-              width: "100%",
-              background: "transparent",
-              border: "none",
-              color: "var(--ce-text-light)",
-              fontSize: 15,
-              lineHeight: 1.6,
-              resize: "none",
-              fontFamily: "inherit",
-              minHeight: 56,
-              display: "block",
-            }}
-          />
-          <div style={{
-            display: "flex",
-            justifyContent: "flex-end",
-            alignItems: "center",
-            marginTop: 8,
-            paddingTop: 8,
-            borderTop: "1px solid rgba(240,237,230,0.09)",
-          }}>
-            <button
-              className="submit-btn"
-              onClick={handleSubmit}
-              disabled={!question.trim() || isActive || !isOnline}
-              style={{
-                background: (!question.trim() || isActive || !isOnline) ? "rgba(10,191,188,0.08)" : "var(--ce-teal)",
-                color: (!question.trim() || isActive || !isOnline) ? "var(--ce-text-light-sec)" : "var(--ce-text-dark)",
-                border: "none",
-                borderRadius: 8,
-                padding: "10px 22px",
-                fontSize: 13,
-                fontWeight: 700,
-                cursor: (!question.trim() || isActive || !isOnline) ? "not-allowed" : "pointer",
-                display: "flex",
-                alignItems: "center",
-                gap: 8,
-                letterSpacing: "-0.1px",
-                boxShadow: "none",
-                transition:
-                  "background-color var(--ce-dur-fast) var(--ce-ease-out), " +
-                  "color var(--ce-dur-fast) var(--ce-ease-out), " +
-                  "transform var(--ce-dur-fast) var(--ce-ease-out)",
-              }}
-            >
-              {isActive ? <span className="ce-breathe">Analyzing...</span> : "Ask Copilot"}
-            </button>
-          </div>
-        </div>
-
-        {/* PHI note — muted inline */}
-        <div style={{
-          fontSize: 11,
-          color: "var(--ce-text-dim)",
-          marginTop: 6,
-          marginBottom: 14,
-          paddingLeft: 2,
-          lineHeight: 1.5,
-        }}>
-          No names, MRNs, dates of birth, phone numbers, or identifiers.
-        </div>
-
-        {/* Guidance chips — lightweight */}
-        <div style={{ marginBottom: 14 }}>
-          <div style={{
-            fontSize: 10,
-            color: "var(--ce-text-dim)",
-            fontFamily: "'IBM Plex Mono', monospace",
-            letterSpacing: "0.06em",
-            textTransform: "uppercase",
-            marginBottom: 7,
-          }}>
-            Try asking
-          </div>
-          <div className="chips-try" style={{ display: "flex", flexWrap: "wrap", gap: 5 }}>
-            {CONTEXT_CHIPS.map(({ label, placeholder }) => (
-              <button
-                key={label}
-                className="chip"
-                onClick={() => { if (textareaRef.current) { textareaRef.current.placeholder = placeholder; textareaRef.current.focus(); } }}
-                style={{
-                  background: "transparent",
-                  border: "1px solid var(--ce-warm-line)",
-                  color: "var(--ce-text-muted)",
-                  borderRadius: 4,
-                  padding: "3px 9px",
-                  fontSize: 11,
-                  fontWeight: 400,
-                  letterSpacing: "0.005em",
-                  whiteSpace: "nowrap",
-                  cursor: "pointer",
-                  fontFamily: "inherit",
-                }}
-              >
-                {label}
-              </button>
-            ))}
-          </div>
-        </div>
-
-        {/* Recent Cases */}
-        {history.length > 0 && (
-          <div style={{ marginBottom: 14 }}>
-            <div style={{
-              fontSize: 10,
-              fontWeight: 500,
-              letterSpacing: "0.10em",
-              textTransform: "uppercase",
-              color: "var(--ce-text-dim)",
-              marginBottom: 6,
-              fontFamily: "'IBM Plex Mono', monospace",
-            }}>Recent</div>
-            <div className="recent-list" style={{ display: "flex", flexDirection: "column", gap: 5 }}>
-              {history.slice(0, 5).map((item, i) => (
-                <button
-                  key={i}
-                  className="chip"
-                  onClick={() => { trackEvent('copilot_recent_case_used'); runQuery(item); }}
-                  style={{
-                    background: "rgba(0,0,0,0.04)",
-                    border: "1px solid rgba(0,0,0,0.08)",
-                    color: "var(--ce-text-muted)",
-                    padding: "7px 11px",
-                    borderRadius: 4,
-                    fontSize: 12,
-                    fontWeight: 400,
-                    letterSpacing: "-0.01em",
-                    cursor: "pointer",
-                    display: "flex",
-                    alignItems: "flex-start",
-                    gap: 8,
-                    textAlign: "left",
-                    lineHeight: 1.4,
-                    transition:
-                      "background-color var(--ce-dur-fast) var(--ce-ease-out), " +
-                      "border-color var(--ce-dur-fast) var(--ce-ease-out), " +
-                      "transform var(--ce-dur-fast) var(--ce-ease-out), " +
-                      "opacity var(--ce-dur-fast) var(--ce-ease-out)",
-                    width: "100%",
-                    overflow: "hidden",
-                  }}
-                >
-                  <span style={{ color: "var(--ce-text-dim)", fontSize: 8, flexShrink: 0, marginTop: 3 }}>↩</span>
-                  <span style={{
-                    display: "-webkit-box",
-                    WebkitLineClamp: 2,
-                    WebkitBoxOrient: "vertical",
-                    overflow: "hidden",
-                    textOverflow: "ellipsis",
-                  }}>{item}</span>
-                </button>
-              ))}
-            </div>
           </div>
         )}
 
@@ -1608,37 +1412,12 @@ export default function App({ onGoHome, navigate, isOnline = true }) {
           </div>
         )}
 
-        {/* Example prompts — tap to fill input */}
-        <div style={{ marginBottom: 28 }}>
-          <div style={{
-            fontFamily: "'IBM Plex Mono', monospace",
-            fontSize: 10,
-            fontWeight: 500,
-            letterSpacing: "0.09em",
-            textTransform: "uppercase",
-            color: "var(--ce-text-dim)",
-            marginBottom: 8,
-          }}>Examples</div>
-          <div className="chips-try" style={{ display: "flex", flexDirection: "column", gap: 5 }}>
-            {EXAMPLES.map((ex) => (
-              <button
-                key={ex}
-                className="copilot-example-row"
-                onClick={() => { setQuestion(ex); setTimeout(() => textareaRef.current?.focus(), 0); }}
-              >
-                <span aria-hidden="true">{"▶"}</span>
-                {ex}
-              </button>
-            ))}
-          </div>
-        </div>
-
           </div>
 
           <aside className="copilot-command-rail" aria-label="Copilot guidance">
             <div className="copilot-rail-card copilot-rail-card--dark">
               <span className="copilot-rail-label">First pass</span>
-              <p>Give Copilot the clinical picture, what changed, and what you are worried about. Keep identifiers out.</p>
+              <p>Select what changed, then add only the trends and bedside findings you know. Missing information can stay missing.</p>
             </div>
 
             <div className="copilot-context-strip" aria-label="Copilot workflow checkpoints">
@@ -1682,8 +1461,8 @@ export default function App({ onGoHome, navigate, isOnline = true }) {
             </div>
 
             <div className="copilot-rail-card">
-              <span className="copilot-rail-label">Good prompt shape</span>
-              <p>Situation, vitals, relevant labs, recent change, bedside assessment, and what decision you are trying to make.</p>
+              <span className="copilot-rail-label">Private by default</span>
+              <p>Your snapshot is not retained unless you deliberately save the completed case.</p>
             </div>
           </aside>
         </div>
@@ -1721,7 +1500,7 @@ export default function App({ onGoHome, navigate, isOnline = true }) {
         )}
 
         {/* Streaming preview */}
-        {streaming && streamBuffer && (
+        {streaming && streamBuffer && !followUpActive && (
           <div ref={outputRef}>
             <LoadingIndicator />
             <StreamPreview text={streamBuffer} />
@@ -1729,32 +1508,9 @@ export default function App({ onGoHome, navigate, isOnline = true }) {
         )}
 
         {/* Final structured result */}
-        {result && !streaming && (
+        {result && (!streaming || followUpActive) && (
           <div ref={outputRef} className="copilot-result-shell">
-            <div className="copilot-result-topper">
-              <div>
-                <span className="copilot-result-topper__label">Clinical reasoning readout</span>
-                <p>Structured support to compare against your bedside assessment, local policy, and provider guidance.</p>
-              </div>
-              <div className="copilot-result-topper__meta">
-                <span className="copilot-result-pill">Verify before use</span>
-                <span className="copilot-result-pill">No diagnosis</span>
-              </div>
-            </div>
-
-            <UrgencyBadge level={result.urgencyLevel} />
-
-            {result.urgent && (
-              <div className="copilot-urgent-callout">
-                {renderInline(result.urgent)}
-              </div>
-            )}
-
-            <div className="ce-stagger-children">
-              {result.sections.map((s) => (
-                <SectionCard key={s.title} title={s.title} content={s.content} />
-              ))}
-            </div>
+            <PriorityMap result={result} onRequestTeachMe={handleTeachMe} />
 
             {/* Action bar */}
             <div className="copilot-action-bar">
@@ -1862,7 +1618,7 @@ export default function App({ onGoHome, navigate, isOnline = true }) {
                 {sbarLoading ? (
                   <span className="ce-breathe">Building SBAR…</span>
                 ) : (
-                  "Turn into SBAR"
+                  "Prepare SBAR"
                 )}
               </button>
             </div>

@@ -165,43 +165,20 @@ function QuickAction({ action, onNavigate }) {
   );
 }
 
-function RecentCase({ text, savedCount, onNavigate }) {
-  return (
-    <button
-      type="button"
-      className="ce-home-continue"
-      onClick={() => {
-        trackEvent("home_recent_case_opened");
-        onNavigate("/copilot");
-      }}
-    >
-      <span>
-        <strong>Continue from last prompt</strong>
-        <small>{text}</small>
-      </span>
-      {savedCount > 0 && <em>{savedCount} saved</em>}
-    </button>
-  );
-}
-
 export default function ClinicalEdgeHome({ onNavigate }) {
   useSeo(STATIC_ROUTE_SEO["/"]);
-  const [activity, setActivity] = useState({ recent: [], saved: [] });
+  const [savedCases, setSavedCases] = useState([]);
 
   useEffect(() => {
     const timer = window.setTimeout(() => {
-      setActivity({
-        recent: readJson("clinical_edge_history", []),
-        saved: readJson("clinical_edge_saved_cases", []),
-      });
+      setSavedCases(readJson("clinical_edge_saved_cases", []));
     }, 0);
     return () => window.clearTimeout(timer);
   }, []);
 
   const primaryModules = MODULES.slice(0, 3);
   const secondaryModules = MODULES.slice(3);
-  const latestPrompt = activity.recent[0];
-  const savedCount = useMemo(() => activity.saved.length, [activity.saved.length]);
+  const savedCount = useMemo(() => savedCases.length, [savedCases.length]);
 
   return (
     <div className="ce-home-shell">
@@ -244,9 +221,6 @@ export default function ClinicalEdgeHome({ onNavigate }) {
               <span>Open a workflow</span>
               <strong>Ready</strong>
             </div>
-            {latestPrompt && (
-              <RecentCase text={latestPrompt} savedCount={savedCount} onNavigate={onNavigate} />
-            )}
             <div className="ce-shift-actions">
               {QUICK_ACTIONS.map((action) => (
                 <QuickAction key={action.label} action={action} onNavigate={onNavigate} />
@@ -279,15 +253,15 @@ export default function ClinicalEdgeHome({ onNavigate }) {
               <p>No PHI. No diagnosis. Use for education, organization, and clinical reasoning support.</p>
             </div>
 
-            {latestPrompt ? (
+            {savedCount > 0 ? (
               <div className="ce-context-card">
-                <span className="ce-context-card__eyebrow">Recent activity</span>
-                <p>{activity.recent.length} recent Copilot prompt{activity.recent.length === 1 ? "" : "s"} available from this device.</p>
+                <span className="ce-context-card__eyebrow">Saved intentionally</span>
+                <p>{savedCount} saved case{savedCount === 1 ? " is" : "s are"} available only on this device.</p>
               </div>
             ) : (
               <div className="ce-context-card">
-                <span className="ce-context-card__eyebrow">Continue faster</span>
-                <p>Your recent Copilot prompts will appear here after you use the reasoning workspace.</p>
+                <span className="ce-context-card__eyebrow">Private by default</span>
+                <p>Clinical snapshots are not kept unless you explicitly save a case.</p>
               </div>
             )}
 

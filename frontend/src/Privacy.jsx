@@ -111,11 +111,11 @@ export default function Privacy() {
             },
             {
               title: "Information you provide in prompts",
-              body: "When you submit a query, the text you enter is sent to our backend server and forwarded to Anthropic's Claude API to generate a response. We do not store your queries in a database. Queries are processed transiently to produce a response and are logged in a de-identified, non-attributable format for product improvement purposes only. Logs do not contain user account information because no accounts exist.",
+              body: "When you submit a query, the text you enter is sent to our backend server and forwarded to Anthropic's Claude API to generate a response. We do not store prompt text, normalized prompt text, or response excerpts in backend operational logs. Operational logs contain non-content metadata such as request category, length, completion status, timing, and error type. Automated identifier checks are limited and do not make the service HIPAA compliant or safe for PHI.",
             },
             {
               title: "Local storage",
-              body: "Clinical Edge Copilot stores data in your browser's localStorage to support features like recent cases, saved cases, and mode preferences. This data never leaves your device and is not transmitted to our servers. You can clear it at any time through your browser settings.",
+              body: "Clinical Edge does not automatically retain submitted clinical snapshots as recent history. If you explicitly select Save Case, the scenario, response, urgency level, timestamp, and any note you add are stored in your browser's localStorage on that device. Saved-case content is not sent through analytics. You can delete saved cases in the app or clear them through your browser settings.",
             },
             {
               title: "Analytics and usage data",
@@ -123,7 +123,7 @@ export default function Privacy() {
             },
             {
               title: "How information is used",
-              body: "Information processed through the app is used to: (1) generate AI responses to your clinical queries in real time; (2) improve routing and response quality through anonymized, non-attributable usage logs; and (3) understand aggregate product usage through analytics. We do not sell data. We do not share query content with third parties beyond what is necessary to generate responses.",
+              body: "Information processed through the app is used to: (1) generate AI responses to your clinical queries in real time; (2) monitor reliability through aggregate, non-content operational metadata; and (3) understand aggregate product usage through analytics. We do not sell data. We do not share query content with third parties beyond what is necessary to generate responses.",
             },
             {
               title: "Third-party services",

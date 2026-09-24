@@ -44,13 +44,34 @@ URL changes. All custom events go through `trackEvent()` in `src/analytics.ts`.
 | Event | When it fires | Payload |
 |-------|---------------|---------|
 | `copilot_opened` | Copilot module mounts (once per session open) | `{ route: "/copilot" }` |
-| `copilot_prompt_submitted` | User submits a query | `{ mode, prompt_length_bucket }` |
+| `copilot_prompt_submitted` | User submits a Snapshot or follow-up | `{ mode, source }` |
 | `copilot_response_completed` | Streaming response finishes successfully | `{ mode }` |
 | `copilot_response_error` | Any API or network error | `{ reason, status? }` |
 | `copilot_offline_blocked` | Submit attempted while offline | _(no payload)_ |
 | `copilot_continue_thinking` | User sends a follow-up update | `{ mode }` |
-| `copilot_recent_case_used` | User taps a recent case to re-run it | _(no payload)_ |
 | `copilot_response_copied` | User copies a response to the clipboard | `{ copy_scope, source }` |
+| `shift_brain_what_changed_viewed` | Structured Snapshot entry screen mounts | _(no payload)_ |
+| `shift_brain_signal_toggled` | A What Changed signal is selected or removed | `{ signal_category, selected, signal_count }` |
+| `shift_brain_multiple_signals_selected` | More than one signal is selected | `{ signal_count }` |
+| `shift_brain_something_off_selected` | The general-deterioration pathway is selected | _(no payload)_ |
+| `shift_brain_optional_section_opened` | A progressive-disclosure section opens | `{ section }` |
+| `shift_brain_advanced_opened` | Advanced acute-care data opens | `{ section: "advanced" }` |
+| `shift_brain_priority_map_requested` | Snapshot is submitted | `{ care_setting, signal_count, populated_field_count, free_text_used, advanced_used }` |
+| `shift_brain_priority_map_completed` | Streaming Priority Map completes | `{ mode }` |
+| `priority_map_viewed` | Completed Priority Map hierarchy renders | `{ urgency, priority_count }` |
+| `priority_map_secondary_priority_viewed` | A secondary ranked priority is engaged | `{ rank }` |
+| `priority_map_section_engaged` | An action/reasoning section is engaged | `{ section }` |
+| `priority_map_sbar_opened` | User deliberately opens Prepare SBAR | _(no payload)_ |
+| `teach_me_opened` | Contextual Teach Me panel opens | _(no payload)_ |
+| `teach_me_quick_check_shown` | Valid Quick Check renders | `{ domain, concept_id, question_type }` |
+| `teach_me_quick_check_answered` | Committed Quick Check answer | `{ domain, concept_id, question_type, correct }` |
+| `teach_me_explanation_viewed` | Explanation becomes visible after commitment | `{ domain, concept_id }` |
+| `teach_me_apply_shown` | Optional Apply question renders | `{ domain, concept_id }` |
+| `teach_me_apply_answered` | Committed Apply answer | `{ domain, concept_id, correct }` |
+| `teach_me_completed` | Lesson completion and return | `{ domain, concept_id, question_type, completion, duration_bucket }` |
+| `teach_me_abandoned` | Teach Me closes before completion | `{ completion: false, duration_bucket }` |
+| `teach_me_fallback_viewed` | Structured explanation fallback renders | `{ domain, concept_id }` |
+| `teach_me_error` | Teach Me request fails | `{ reason, status }` |
 
 **`prompt_length_bucket` values:** `short` (< 80 chars) · `medium` (< 300 chars) · `long` (≥ 300 chars)
 
@@ -59,6 +80,19 @@ URL changes. All custom events go through `trackEvent()` in `src/analytics.ts`.
 **`copy_scope` values for `copilot_response_copied`:** `full_response` (only shape currently in the UI — there is no per-section or formatted-copy variant)
 
 **`source` values for `copilot_response_copied`:** `copilot` (main response copy button) · `saved_cases` (copy button on a saved case row — same handler, different origin)
+
+Shift Brain Snapshot analytics are categorical and aggregate only. Vital values,
+lab values, assessment text, support/device details, optional free text, serialized
+Snapshot content, generated content, and saved-case content are never included.
+Teach Me analytics contain only the abstract learning domain, stable concept ID,
+question type, correctness, completion, and duration bucket. Question text,
+answer choices, explanations, scenario content, clinical values, and Priority Map
+content are excluded. No longitudinal competency record is created.
+
+Clinical snapshots are not retained as automatic recent history. Full scenario and
+response content is stored only when the user explicitly selects **Save Case**;
+that saved content remains in browser `localStorage` and is never included in an
+analytics payload.
 
 > Fired optimistically alongside the `navigator.clipboard.writeText()` call, matching the
 > existing UI's own optimistic "copied" feedback state — the app does not currently
@@ -325,6 +359,12 @@ mode.
 Events are visible in the Vercel project dashboard under the Analytics tab.
 `trackEvent()` in `src/analytics.ts` routes directly to Vercel's `track()` function.
 No additional infrastructure is required.
+
+The Copilot API emits separate metadata-only operational logs for reliability
+monitoring. Those records are allowlisted to route, mode, coarse category,
+length/count fields, urgency, status, latency, retry/fallback flags, and failure
+classification. Prompt text, normalized prompt text, response excerpts, saved
+cases, and notes are excluded.
 
 ---
 

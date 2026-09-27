@@ -26,7 +26,7 @@ function Relevance({ value }) {
   return <span className={`priority-relevance priority-relevance--${tone}`}>{value}</span>;
 }
 
-export default function PriorityMap({ result, onRequestTeachMe }) {
+export default function PriorityMap({ result, onRequestTeachMe, variant = "primary" }) {
   const [reasoningOpen, setReasoningOpen] = useState(false);
   const [teachOpen, setTeachOpen] = useState(false);
   const priorities = result.priorities.slice(0, 3);
@@ -38,9 +38,10 @@ export default function PriorityMap({ result, onRequestTeachMe }) {
   }, [priorities.length, result.urgencyLevel]);
 
   if (!primary) return null;
-  return <div className="priority-map">
+  const isClarification = variant === "clarification";
+  return <div className={`priority-map${isClarification ? " priority-map--clarification" : ""}`}>
     <header className="priority-map__header">
-      <div><span>Priority Map</span><h2>What matters first</h2></div>
+      <div><span>{isClarification ? "Focused follow-up" : "Priority Map"}</span><h2>{isClarification ? "Clarification" : "What matters first"}</h2></div>
       <div className={`priority-map__urgency priority-map__urgency--${(result.urgencyLevel || "low").toLowerCase()}`}><span aria-hidden="true" />Urgency: {result.urgencyLevel || "Not classified"}</div>
     </header>
 
@@ -48,23 +49,26 @@ export default function PriorityMap({ result, onRequestTeachMe }) {
 
     <article className="priority-primary">
       <div className="priority-primary__title"><span>{primary.rank}</span><div><h3>{plain(primary.label)}</h3><Relevance value={primary.relevance} /></div></div>
-      {primary.interpretation && <div className="priority-interpretation"><span>Clinical interpretation</span><p>{plain(primary.interpretation)}</p></div>}
-      {primary.observed.length > 0 && <div className="priority-observed"><span>Observed / reported</span><ul>{primary.observed.map((item, index) => <li key={index}>{plain(item)}</li>)}</ul></div>}
+      {primary.observed.length > 0 && <div className="priority-observed"><span>Reported / observed</span><small>From the Snapshot you entered</small><ul>{primary.observed.map((item, index) => <li key={index}>{plain(item)}</li>)}</ul></div>}
+      {primary.interpretation && <div className="priority-interpretation"><span>Clinical Edge interpretation</span><small>Reasoning, not a confirmed diagnosis</small><p>{plain(primary.interpretation)}</p></div>}
       {primary.assessNow.length > 0 && <div className="priority-assess"><span>Assess now</span><ul>{primary.assessNow.map((item, index) => <li key={index}>{plain(item)}</li>)}</ul></div>}
     </article>
 
     {priorities.length > 1 && <section className="priority-secondary">
       <span className="priority-map__eyebrow">Additional priorities</span>
-      {priorities.slice(1).map((priority) => <article key={priority.rank} onClick={() => trackEvent("priority_map_secondary_priority_viewed", { rank: priority.rank })}>
-        <div className="priority-secondary__heading"><strong>{priority.rank} · {plain(priority.label)}</strong><Relevance value={priority.relevance} /></div>
-        {priority.interpretation && <p>{plain(priority.interpretation)}</p>}
-        {priority.observed.length > 0 && <div><span>Observed</span>{priority.observed.map((item, index) => <small key={index}>{plain(item)}</small>)}</div>}
-      </article>)}
+      {priorities.slice(1).map((priority) => <details key={priority.rank} onToggle={(event) => { if (event.currentTarget.open) trackEvent("priority_map_secondary_priority_viewed", { rank: priority.rank }); }}>
+        <summary><span><strong>{priority.rank} · {plain(priority.label)}</strong><small>View supporting reasoning</small></span><Relevance value={priority.relevance} /></summary>
+        <div className="priority-secondary__content">
+          {priority.observed.length > 0 && <div><span>Reported / observed</span>{priority.observed.map((item, index) => <small key={index}>{plain(item)}</small>)}</div>}
+          {priority.interpretation && <p><strong>Interpretation</strong>{plain(priority.interpretation)}</p>}
+          {priority.assessNow.length > 0 && <div><span>Assess now</span>{priority.assessNow.map((item, index) => <small key={index}>{plain(item)}</small>)}</div>}
+        </div>
+      </details>)}
     </section>}
 
     <div className="priority-action-grid">
       <ActionSection eyebrow="Direction" title="Watch & trend" category="watch_trend" content={getSection("Monitor and trend")} />
-      <ActionSection eyebrow="Clarify" title="What’s still important to know" category="missing_information" content={getSection("Missing information")} />
+      <ActionSection eyebrow="Clarify" title="Helpful to clarify" category="missing_information" content={getSection("Missing information")} />
       <ActionSection eyebrow="Escalate" title="Escalation cues" category="escalation_cues" content={getSection("Escalation triggers")} />
     </div>
 
@@ -73,9 +77,12 @@ export default function PriorityMap({ result, onRequestTeachMe }) {
       {reasoningOpen && <div><p className="priority-uncertainty">These are possibilities, not diagnoses. Additional assessment helps distinguish among them.</p><ul>{bullets(getSection("Possible patterns")).map((item, index) => <li key={index}>{plain(item)}</li>)}</ul></div>}
     </section>
 
-    <section className="priority-learning">
-      <button type="button" aria-expanded={teachOpen} onClick={() => setTeachOpen((value) => !value)}>Teach me why <span aria-hidden="true">{teachOpen ? "−" : "+"}</span></button>
+    {!isClarification && <section className="priority-learning">
+      <button type="button" aria-expanded={teachOpen} onClick={() => {
+        if (!teachOpen) trackEvent("teach_me_opened");
+        setTeachOpen(!teachOpen);
+      }}><span><small>Learn from this Priority Map</small><strong>Teach me why</strong><em>Understand why this pattern matters.</em></span><span aria-hidden="true">{teachOpen ? "−" : "+"}</span></button>
       {teachOpen && <TeachMePanel onLoad={onRequestTeachMe} onClose={() => setTeachOpen(false)} />}
-    </section>
+    </section>}
   </div>;
 }

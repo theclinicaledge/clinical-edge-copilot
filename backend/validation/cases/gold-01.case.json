@@ -1,0 +1,6 @@
+{
+  "id": "gold-01", "title": "Postoperative hemodynamic deterioration", "clinicalDomain": "hemodynamics-perfusion", "careSetting": "CTICU", "difficulty": "advanced", "version": "1.0.0", "cohort": "regression",
+  "snapshotFile": "snapshots/gold-01.snapshot.txt", "answerKeyFile": "answer-keys/gold-01.eval.json", "historyFile": "history/gold-01.history.json",
+  "historicalRealProviderStatus": "REAL_PROVIDER_PASS", "lockState": "LOCKED",
+  "capabilityTags": ["observation_vs_inference", "trend_fidelity", "threshold_grounding", "uncertainty", "causality", "urgency_convergence", "perfusion_integration", "current_escalation", "treatment_boundary", "serialization"]
+}

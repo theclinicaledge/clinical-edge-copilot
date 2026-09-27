@@ -1,0 +1,6 @@
+{
+  "id": "gold-02", "title": "Worsening ventilation with respiratory acidemia", "clinicalDomain": "respiratory-acid-base", "careSetting": "PCU / Step-down", "difficulty": "advanced", "version": "1.0.0", "cohort": "regression",
+  "snapshotFile": "snapshots/gold-02.snapshot.txt", "answerKeyFile": "answer-keys/gold-02.eval.json", "historyFile": "history/gold-02.history.json",
+  "historicalRealProviderStatus": "REAL_PROVIDER_FAIL", "lockState": "NOT_LOCKED",
+  "capabilityTags": ["trend_fidelity", "threshold_grounding", "uncertainty", "causality", "acid_base_timing", "urgency_convergence", "current_escalation", "teach_me_grounding", "sbar_grounding", "serialization"]
+}

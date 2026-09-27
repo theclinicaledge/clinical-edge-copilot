@@ -1,0 +1,6 @@
+{
+  "id": "gold-04", "title": "Multi-system perfusion deterioration", "clinicalDomain": "systemic-perfusion", "careSetting": "PCU / Step-down", "difficulty": "advanced", "version": "1.0.0", "cohort": "regression",
+  "snapshotFile": "snapshots/gold-04.snapshot.txt", "answerKeyFile": "answer-keys/gold-04.eval.json", "historyFile": "history/gold-04.history.json",
+  "historicalRealProviderStatus": "REAL_PROVIDER_FAIL", "lockState": "NOT_LOCKED",
+  "capabilityTags": ["observation_vs_inference", "trend_fidelity", "unchanged_semantics", "uncertainty", "causality", "urgency_convergence", "perfusion_integration", "current_escalation", "treatment_boundary", "serialization"]
+}

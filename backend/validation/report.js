@@ -1,0 +1,41 @@
+function renderMarkdown(results, summary) {
+  const lines = [
+    "# Clinical Validation Harness Report",
+    "",
+    `Generated: ${new Date().toISOString()}`,
+    "",
+    "## Summary",
+    "",
+    `- Total cases: ${summary.totalCases}`,
+    `- Passed: ${summary.passed}`,
+    `- Failed: ${summary.failed}`,
+    `- Modes: ${Object.entries(summary.byMode).map(([key, value]) => `${key} ${value}`).join(", ") || "none"}`,
+    `- Provenance: ${Object.entries(summary.provenanceDistribution).map(([key, value]) => `${key} ${value}`).join(", ") || "none"}`,
+    `- Locked / not locked: ${summary.locked} / ${summary.notLocked}`,
+    `- Requiring live-provider validation: ${summary.requiringLiveProviderValidation.join(", ") || "none"}`,
+    "",
+    "## Cases",
+    "",
+    "| Case | Domain | Version | Mode | Result | Provenance | Component failures | Failure codes | Lock state |",
+    "| --- | --- | --- | --- | --- | --- | --- | --- | --- |",
+    ...results.map((result) => `| ${result.caseId}: ${result.title} | ${result.domain} | ${result.version} | ${result.mode} | ${result.status} | ${result.provenance?.displayed || "unknown"} | ${result.requiredFailures.join(", ") || "none"} | ${result.failureCodes.join(", ") || "none"} | ${result.lockState} |`),
+    "",
+    "## Clinical Domains",
+    "",
+    ...Object.entries(summary.byDomain).sort().map(([domain, count]) => `- ${domain}: ${count}`),
+    "",
+    "## Reliability Coverage",
+    "",
+    ...Object.entries(summary.byCapability).sort().map(([tag, value]) => `- ${tag}: ${value.passed} PASS, ${value.failed} FAIL, ${value.notApplicable} NOT_APPLICABLE (${value.cases} tagged cases)`),
+    "",
+    "## Failure Codes",
+    "",
+    ...(Object.keys(summary.failureCodeCounts).length ? Object.entries(summary.failureCodeCounts).sort().map(([code, count]) => `- ${code}: ${count}`) : ["- None"]),
+    "",
+    "> Deterministic passes are regression evidence. They do not replace or rewrite preserved real-provider outcomes.",
+    "",
+  ];
+  return lines.join("\n");
+}
+
+module.exports = { renderMarkdown };

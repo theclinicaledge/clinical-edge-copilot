@@ -4,7 +4,9 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "test": "node --test tests/*.test.js"
+    "test": "node --test tests/*.test.js",
+    "validate:clinical": "node validation/cli.js",
+    "validate:clinical:report": "node validation/cli.js --report"
   },
   "keywords": [],
   "author": "",

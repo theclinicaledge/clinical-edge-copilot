@@ -69,11 +69,25 @@ test("operational logs retain non-content Priority Map resolution metadata", () 
     priority_map_original_status: "rejected",
     priority_map_repair_status: "rejected",
     priority_map_display_resolution: "fallback",
+    request_id: "request-test-1",
+    provider_duration_ms: 40000,
+    provider_status: "timeout",
+    validation_duration_ms: 0,
+    validation_status: "not_started",
+    repair_attempted: false,
+    repair_status: "not_attempted",
+    repair_duration_ms: 0,
+    timeout_layer: "provider",
+    client_disconnected: false,
     original_response: "clinical text must not be retained",
   });
   assert.equal(entry.priority_map_original_status, "rejected");
   assert.equal(entry.priority_map_repair_status, "rejected");
   assert.equal(entry.priority_map_display_resolution, "fallback");
+  assert.equal(entry.request_id, "request-test-1");
+  assert.equal(entry.provider_status, "timeout");
+  assert.equal(entry.timeout_layer, "provider");
+  assert.equal(entry.client_disconnected, false);
   assert.equal(JSON.stringify(entry).includes("clinical text"), false);
 });
 

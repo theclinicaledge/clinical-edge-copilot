@@ -1,0 +1,18 @@
+PATIENT SNAPSHOT — USER-REPORTED / OBSERVED INFORMATION
+VALIDATION FIXTURE — EXPLICITLY SYNTHETIC; NO PHI
+What changed: Something feels off, Breathing
+Care setting: PCU / Step-down
+Clinical context: Respiratory
+Reported clinical data:
+- Mental status: Changed
+- Work of breathing: Increased
+- Respiratory findings: Previous: bilateral diminished breath sounds. Current: bilateral diminished breath sounds with new coarse breath sounds.
+- BP: previous 126/72 -> current 118/68 mmHg
+- Heart rate: previous 88 -> current 112 bpm
+- Respiratory rate: previous 18 -> current 30 /min
+- SpO2: previous 95 -> current 94 %
+- Oxygen support: previous 2 L/min nasal cannula -> current 6 L/min nasal cannula
+- Temperature: previous unknown -> current 37.2 C
+- Labs: selected=ABG / VBG; detail=Earlier ABG: pH 7.36, PaCO2 48 mmHg, PaO2 72 mmHg, HCO3 26 mEq/L. Current ABG: pH 7.29, PaCO2 60 mmHg, PaO2 68 mmHg, HCO3 28 mEq/L.
+Additional user-reported context: Timeframe: approximately 2 hours. Mental status: more drowsy than earlier. No chest pain reported.
+Treat omitted fields as unknown. Do not infer normal findings.

@@ -22,7 +22,7 @@ function Question({ data, submitted, selected, onSelect, onSubmit, label }) {
       })}
     </div>
     {!submitted && <button type="button" className="teach-commit" disabled={!selected} onClick={onSubmit}>Commit answer</button>}
-    {submitted && <div className={`teach-feedback ${correct ? "is-correct" : "is-not-quite"}`}><strong>{correct ? "Correct" : "Not quite"}</strong><p>{data.explanation}</p></div>}
+    {submitted && <div className={`teach-feedback ${correct ? "is-correct" : "is-not-quite"}`}><span className="teach-eyebrow">Explanation</span><strong>{correct ? "Correct" : "Not quite"}</strong><p>{data.explanation}</p></div>}
   </section>;
 }
 
@@ -36,12 +36,16 @@ export default function TeachMePanel({ onLoad, onClose }) {
   const [applySubmitted, setApplySubmitted] = useState(false);
   const completedRef = useRef(false);
   const startedAtRef = useRef(0);
+  const abandonTimerRef = useRef(null);
 
   useEffect(() => {
     let active = true;
     const startedAt = Date.now();
     startedAtRef.current = startedAt;
-    trackEvent("teach_me_opened");
+    if (abandonTimerRef.current) {
+      clearTimeout(abandonTimerRef.current);
+      abandonTimerRef.current = null;
+    }
     onLoad().then((nextLesson) => {
       if (!active) return;
       setLesson(nextLesson);
@@ -51,7 +55,11 @@ export default function TeachMePanel({ onLoad, onClose }) {
     }).catch(() => { if (active) { setError(true); setLoading(false); } });
     return () => {
       active = false;
-      if (!completedRef.current) trackEvent("teach_me_abandoned", { completion: false, duration_bucket: durationBucket(startedAt) });
+      abandonTimerRef.current = setTimeout(() => {
+        if (!completedRef.current) {
+          trackEvent("teach_me_abandoned", { completion: false, duration_bucket: durationBucket(startedAt) });
+        }
+      }, 0);
     };
   }, [onLoad]);
 
@@ -83,7 +91,7 @@ export default function TeachMePanel({ onLoad, onClose }) {
     <span className="teach-eyebrow">Key idea</span><h3>{lesson.conceptLabel}</h3><p>{lesson.keyIdea}</p>
     <h4>Why it matters</h4><p>{lesson.whyItMatters}</p><h4>In this situation</h4><p>{lesson.scenarioConnection}</p>
     <div className="teach-tags">{lesson.tags.map((tag) => <span key={tag}>{tag}</span>)}</div>
-    <button type="button" className="teach-return" onClick={complete}>Lesson complete · Return to Priority Map</button>
+    <button type="button" className="teach-return" onClick={complete}>Concept reviewed · Return to Priority Map</button>
   </div>;
 
   const completeReady = submitted && (!lesson.application || applySubmitted);
@@ -92,6 +100,6 @@ export default function TeachMePanel({ onLoad, onClose }) {
     <Question label="Quick check" data={lesson.question} selected={selected} submitted={submitted} onSelect={setSelected} onSubmit={submitPrimary} />
     {submitted && <section className="teach-scenario"><span className="teach-eyebrow">In this situation</span><p>{lesson.scenarioConnection}</p></section>}
     {submitted && lesson.application && <Question label="Apply it" data={lesson.application} selected={applySelected} submitted={applySubmitted} onSelect={setApplySelected} onSubmit={submitApply} />}
-    {completeReady && <section className="teach-complete"><span className="teach-eyebrow">Lesson complete</span><h3>You practiced</h3><div className="teach-tags">{lesson.tags.map((tag) => <span key={tag}>{tag}</span>)}</div><button type="button" className="teach-return" onClick={complete}>Return to Priority Map</button></section>}
+    {completeReady && <section className="teach-complete"><span className="teach-eyebrow">Concept reviewed</span><h3>{lesson.conceptLabel}</h3><div className="teach-tags">{lesson.tags.map((tag) => <span key={tag}>{tag}</span>)}</div><button type="button" className="teach-return" onClick={complete}>Return to Priority Map</button></section>}
   </div>;
 }

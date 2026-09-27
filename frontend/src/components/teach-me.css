@@ -18,6 +18,7 @@
 .teach-feedback { margin-top:12px; padding:12px 13px; border-left:3px solid var(--ce-teal-deep); background:rgba(10,191,188,.06); }
 .teach-feedback.is-not-quite { border-left-color:var(--ce-gold-deep); background:rgba(212,168,75,.07); }
 .teach-feedback strong { font-size:13px; }
+.teach-feedback .teach-eyebrow { display:block; margin-bottom:5px; }
 .teach-feedback p, .teach-scenario p, .teach-fallback p { margin:5px 0 0; color:var(--ce-text-muted); font-size:12.5px; line-height:1.55; }
 .teach-scenario { padding:14px 0 18px; border-top:1px solid var(--ce-warm-line); }
 .teach-complete { padding-top:16px; border-top:1px solid var(--ce-warm-line); }

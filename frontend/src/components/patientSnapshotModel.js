@@ -12,7 +12,8 @@ const FIELD_LABELS = {
   fluidContext: "Fluid context", bleedingSource: "Source / type", drainage: "Drainage / output trend",
   hgb: "Hgb / Hct trend", labName: "Lab or glucose", labEarlier: "Lab earlier",
   labNow: "Lab now", painDetail: "Pain or other change",
-  timeframe: "Timeframe of change", mentalDetail: "Mental status detail", skinTemperature: "Skin temperature",
+  timeframe: "Timeframe of change", urineTimeframe: "Urine-output timeframe", overallConcern: "Brief overall concern",
+  mentalDetail: "Mental status detail", skinTemperature: "Skin temperature",
   capillaryRefill: "Capillary refill", pulses: "Pulses", mottling: "Mottling", extremities: "Extremity findings",
   otherPerfusion: "Other perfusion assessment", otherHemodynamic: "Other advanced measurement",
 };
@@ -22,7 +23,8 @@ const TREND_FIELDS = {
   rr: ["Respiratory rate", "/min"], spo2: ["SpO2", "%"], oxygen: ["Oxygen support", ""],
   temp: ["Temperature", ""], urine: ["Urine output", "mL/hr"], cvp: ["CVP", "mmHg"],
   co: ["CO", "L/min"], ci: ["CI", "L/min/m2"], svr: ["SVR", "dynes-sec/cm5"],
-  pap: ["PAP systolic / diastolic", "mmHg"], paMean: ["PA mean", "mmHg"], svo2: ["SvO2 / ScvO2", "%"],
+  pap: ["PAP systolic / diastolic", "mmHg"], paSystolic: ["PA systolic", "mmHg"],
+  paDiastolic: ["PA diastolic", "mmHg"], paMean: ["PA mean", "mmHg"], svo2: ["SvO2 / ScvO2", "%"],
   lactate: ["Lactate", "mmol/L"], hemoglobin: ["Hemoglobin", "g/dL"], hematocrit: ["Hematocrit", "%"],
   creatinine: ["Creatinine", "mg/dL"], potassium: ["Potassium", "mmol/L"],
 };

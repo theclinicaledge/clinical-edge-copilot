@@ -1,0 +1,16 @@
+PATIENT SNAPSHOT — USER-REPORTED / OBSERVED INFORMATION
+VALIDATION FIXTURE — EXPLICITLY SYNTHETIC; NO PHI
+What changed: BP / perfusion
+Care setting: CTICU
+Clinical context: Post-op, Cardiac
+Reported clinical data:
+- MAP: previous 74 -> current 61 mmHg
+- Heart rate: previous 88 -> current 104 bpm
+- Urine output: previous 60–75 -> current 20 mL/hr
+- CI: previous 2.4 -> current 1.7 L/min/m2
+- SVR: previous 1050 -> current 1620 dynes-sec/cm5
+- CVP: previous 9 -> current 4 mmHg
+- Lactate: previous 1.8 -> current 3.1 mmol/L
+- Hemoglobin: previous 10.2 -> current 9.4 g/dL
+- Drains / bleeding: type=mediastinal drain, currentOutput=40 mL
+Treat omitted fields as unknown. Do not infer normal findings.

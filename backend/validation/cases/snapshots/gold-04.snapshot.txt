@@ -1,0 +1,22 @@
+PATIENT SNAPSHOT — USER-REPORTED / OBSERVED INFORMATION
+VALIDATION FIXTURE — EXPLICITLY SYNTHETIC; NO PHI
+What changed: Something feels off, BP / perfusion, Neuro, Labs / glucose
+Care setting: PCU / Step-down
+Clinical context: Infection / sepsis concern
+Reported clinical data:
+- Timeframe of change: Approximately 4 hours
+- Urine-output timeframe: Recent monitoring period
+- Mental status: Changed
+- Lab or glucose: WBC
+- BP: previous 118/68 -> current 92/54 mmHg
+- MAP: previous 85 -> current 67 mmHg
+- Heart rate: previous 88 -> current 112 bpm
+- Respiratory rate: previous 18 -> current 26 /min
+- SpO2: previous 96 -> current 95 %
+- Oxygen support: previous Room air -> current Room air
+- Temperature: previous 37.2 C -> current 38.6 C
+- Urine output: previous 50-60 -> current 20 mL/hr
+- Lactate: previous 1.7 -> current 3.2 mmol/L
+- Creatinine: previous 0.9 -> current 1.4 mg/dL
+Additional user-reported context: Earlier: awake and oriented with warm extremities. Current: more confused than earlier, answers slowly but remains arousable; extremities cool with capillary refill approximately 4 seconds. Lactate earlier 1.7 mmol/L and current 3.2 mmol/L. Current WBC 18.4 x10^3/uL; no earlier WBC is available. Creatinine earlier 0.9 mg/dL and current 1.4 mg/dL. New productive cough is reported. No chest pain or active bleeding is reported. No current vasopressor or inotrope support is reported. No culture or imaging results are available. No confirmed infectious source is available. Medication administration history relevant to the current deterioration is incomplete.
+Treat omitted fields as unknown. Do not infer normal findings.

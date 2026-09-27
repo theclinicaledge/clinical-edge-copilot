@@ -4,6 +4,7 @@ const cors = require("cors");
 const helmet = require("helmet");
 const rateLimit = require("express-rate-limit");
 const Anthropic = require("@anthropic-ai/sdk");
+const { randomUUID } = require("node:crypto");
 const {
   ABBREVIATION_EXPANSIONS,
 } = require("./nurse-language-dataset");
@@ -48,6 +49,47 @@ const client = anthropicApiKey
   ? new Anthropic({ apiKey: anthropicApiKey, timeout: 45000, maxRetries: 0 })
   : null;
 
+const COPILOT_TOTAL_BUDGET_MS = 58000;
+const COPILOT_ORIGINAL_BUDGET_MS = 40000;
+const COPILOT_REPAIR_BUDGET_MS = 12000;
+const COPILOT_RETURN_RESERVE_MS = 3000;
+const COPILOT_MIN_REPAIR_BUDGET_MS = 3000;
+
+function stageTimeoutError(layer) {
+  const error = new Error(`${layer} timeout`);
+  error.code = layer;
+  return error;
+}
+
+async function runWithStageTimeout(work, timeoutMs, layer, externalSignal) {
+  const controller = new AbortController();
+  let timer;
+  let abortHandler;
+  try {
+    return await Promise.race([
+      work(controller.signal),
+      new Promise((_, reject) => {
+        timer = setTimeout(() => {
+          controller.abort();
+          reject(stageTimeoutError(layer));
+        }, timeoutMs);
+      }),
+      new Promise((_, reject) => {
+        if (!externalSignal) return;
+        abortHandler = () => {
+          controller.abort();
+          reject(stageTimeoutError("client_disconnect"));
+        };
+        if (externalSignal.aborted) abortHandler();
+        else externalSignal.addEventListener("abort", abortHandler, { once: true });
+      }),
+    ]);
+  } finally {
+    clearTimeout(timer);
+    if (abortHandler) externalSignal?.removeEventListener("abort", abortHandler);
+  }
+}
+
 function classifyProviderError(error) {
   const status = Number(error?.status || 0);
   const message = String(error?.message || "").toLowerCase();
@@ -69,6 +111,7 @@ Reason in this order: OBSERVE -> TREND -> INTERPRET -> DIFFERENTIATE -> DISCRIMI
 DATA FIDELITY:
 - Observed / Reported may contain only facts explicitly supplied by the user. Never place an etiology, diagnosis, or model inference there.
 - A trend may be stated only when the supplied data contain a previous/current comparison, repeated measurements, or an explicit direction over time for that same variable.
+- Earlier/current fields are not automatically a change. Equal values must be described as unchanged; a missing or unknown comparison remains insufficient to establish direction.
 - A single current measurement is only a current measurement. Never turn it into "rising," "falling," "increasing," "decreasing," "improving," "worsening," or "trending" language.
 - Do not infer a rate or time basis. For example, a current drain output reported as 40 mL is not 40 mL/hr and has no direction unless the user supplied that context.
 - Blank, unknown, omitted, and not-assessed fields remain missing. Never convert them into normal or negative findings.
@@ -96,6 +139,11 @@ ASSOCIATION AND CAUSATION:
 - Distinguish temporal association, physiologic plausibility, a likely contributor supported by converging evidence, and an established cause.
 - Do not convert correlation or physiologic plausibility into causation. Use calibrated language such as "may be contributing" when the evidence supports a possible contribution, and name important competing causes or missing discriminating information.
 - This applies across clinical domains, including altered mental status, hemodynamics, rhythm changes, electrolyte abnormalities, anemia, glucose abnormalities, and medication effects.
+
+TEMPORAL FIDELITY:
+- Symptom onset, time first recognized, last known well/baseline, assessment time, duration, and an approximate reported timeframe are distinct facts and must not be substituted for one another.
+- If only recognition time is supplied, say the change was recognized in that interval; do not say symptoms began, developed, or started then.
+- If exact onset or last known well is unknown, preserve that uncertainty whenever timing is clinically relevant.
 
 COMMUNICATION AND TEACHING:
 - Urgency and communication intensity must agree. HIGH urgency supports a clear request for prompt evaluation or escalation, without prescribing treatment.
@@ -243,6 +291,35 @@ function validateTeachMeLesson(lesson) {
 }
 
 function buildTeachMeFallback(priorityMapResponse = "", snapshot = "", fallbackReason = "invalid_contract") {
+  const neurologic = assessNeurologicPattern(snapshot);
+  if (neurologic.convergingFocalDeterioration) {
+    const timing = temporalGroundingSummary(snapshot);
+    return {
+      active: false,
+      fallbackReason,
+      domain: "neurologic",
+      conceptId: "focal-neurologic-change",
+      conceptLabel: "Focal neurologic change",
+      keyIdea: "A new focal deficit changes the meaning of altered mental status. Weakness affecting one side, facial asymmetry, or a new speech change localizes concern differently from diffuse confusion alone, but the observations do not establish the cause.",
+      whyItMatters: "Several new focal findings occurring together form a time-sensitive neurologic deterioration pattern. Possible neurologic and systemic contributors still require differentiation, so assessment and communication should preserve what was observed, what remains unknown, and whether the findings are progressing rather than naming a diagnosis.",
+      scenarioConnection: `The Snapshot reports ${neurologic.summary}. ${timing || "Exact onset and last known baseline remain important to clarify when they were not supplied."}`,
+      tags: ["Focal neurologic assessment", "Observation versus diagnosis", "Temporal fidelity"],
+    };
+  }
+  const rhythmHemodynamics = assessRhythmHemodynamicPattern(snapshot);
+  if (rhythmHemodynamics.convergingHemodynamicIntolerance) {
+    return {
+      active: false,
+      fallbackReason,
+      domain: "rhythm-recognition",
+      conceptId: "rhythm-hemodynamic-tolerance",
+      conceptLabel: "Rhythm change and hemodynamic tolerance",
+      keyIdea: "A rhythm or rate change is interpreted by how the patient is tolerating it, not by the monitor description or rate alone. Blood pressure, symptoms, mentation, and peripheral perfusion help show physiologic impact.",
+      whyItMatters: "A bedside monitor can report a new rapid irregular rhythm without establishing the exact rhythm diagnosis. Concurrent hemodynamic and perfusion deterioration increases urgency while rhythm confirmation, onset, baseline history, medication exposure, and other contributors remain unresolved. Relatively preserved SpO2 does not negate circulatory concern.",
+      scenarioConnection: "The Snapshot reports a new rapid irregular monitor rhythm with a rising heart rate, falling BP and MAP, lightheadedness, palpitations, and cool extremities. This supports hemodynamic intolerance of the current rhythm or rate change, while the exact rhythm, onset, mechanism, and contribution of the current-only potassium and magnesium values remain unestablished.",
+      tags: ["Rhythm recognition", "Hemodynamic tolerance", "Observation versus diagnosis"],
+    };
+  }
   const respiratoryAcidemia = /\bPaCO2\b/i.test(snapshot) && /\bpH\b/i.test(snapshot)
     && /\b(?:breath|respiratory|ventilat|oxygen)\b/i.test(snapshot);
   if (respiratoryAcidemia) {
@@ -258,11 +335,13 @@ function buildTeachMeFallback(priorityMapResponse = "", snapshot = "", fallbackR
       tags: ["Ventilation", "Respiratory acidemia", "Trend interpretation"],
     };
   }
-  const trendLabels = String(snapshot).split("\n").map((line) =>
-    line.match(/^-\s*([^:]+):\s*(?:previous|earlier)\b.*(?:->|→).*\b(?:current|now)\b/i)?.[1]?.trim()
-  ).filter(Boolean).slice(0, 4);
-  const scenarioConnection = trendLabels.length
-    ? `This Snapshot contains explicit previous-to-current changes in ${trendLabels.join(", ")}. Interpret those reported directions together while keeping the underlying cause uncertain.`
+  const comparisons = comparisonSemantics(snapshot);
+  const changedLabels = comparisons.filter((item) => item.status === "changed").map((item) => item.label).slice(0, 4);
+  const unchangedLabels = comparisons.filter((item) => item.status === "unchanged").map((item) => item.label).slice(0, 4);
+  const scenarioConnection = changedLabels.length
+    ? `This Snapshot contains supported previous-to-current changes in ${changedLabels.join(", ")}.${unchangedLabels.length ? ` ${unchangedLabels.join(", ")} remained unchanged.` : ""} Interpret only the reported directions while keeping the underlying cause uncertain.`
+    : unchangedLabels.length
+      ? `${unchangedLabels.join(", ")} remained unchanged across the supplied comparisons. Those stable comparisons should not be described as trends; other reported bedside findings still require interpretation in context.`
     : "Use only the observations explicitly reported in this Snapshot. Missing context remains unknown, and the available information does not establish a diagnosis.";
   return {
     active: false,
@@ -285,13 +364,120 @@ const UNSUPPORTED_RENAL_COMPENSATION = /\b(?:early|new(?:ly)?(?: developed)?|dev
 const UNSUPPORTED_CHRONICITY = /\b(?:chronic respiratory acidosis|chronic(?:ally)? compensated|chronic compensation)\b/i;
 const CAUSAL_ATTRIBUTION = /\b(?:cause|caused|causes|causing|due to|explains?|responsible for|is from|result(?:s|ed)? from|directly impairs?|impairs? mentation|acts? as (?:a )?direct|produces?|drives?|leads? to)\b/i;
 
+const COMPARISON_UNIT_SUFFIX = /\s*(?:mmHg|bpm|%|°?[CF]|mg\/dL|mEq\/L|mmol\/L|mL\/hr|mL|L\/min(?:\/m2)?|dynes-sec\/cm5|\/min)\s*$/i;
+
+function normalizeComparisonValue(value) {
+  return String(value).trim().replace(COMPARISON_UNIT_SUFFIX, "").trim().toLowerCase().replace(/\s+/g, " ");
+}
+
+function comparisonSemantics(source) {
+  return String(source).split("\n").flatMap((line) => {
+    const match = line.match(/^-\s*([^:]+):\s*(?:previous|earlier)\s+(.*?)\s*(?:->|→)\s*(?:current|now)\s+(.+)$/i);
+    if (!match) return [];
+    const previous = normalizeComparisonValue(match[2]);
+    const current = normalizeComparisonValue(match[3]);
+    const unavailable = /^(?:unknown|not assessed|unavailable|missing|not supplied)$/.test(previous)
+      || /^(?:unknown|not assessed|unavailable|missing|not supplied)$/.test(current);
+    return [{
+      label: match[1].trim(),
+      previous,
+      current,
+      status: unavailable ? "insufficient" : previous === current ? "unchanged" : "changed",
+    }];
+  });
+}
+
+function assessNeurologicPattern(source) {
+  const text = String(source);
+  const focalMotor = /\b(?:new\s+)?(?:left|right|unilateral|one-sided|focal)[^.;\n]{0,45}\b(?:weakness|weak|drift|paresis)\b|\b(?:weakness|weak|drift|paresis)[^.;\n]{0,45}\b(?:left|right|unilateral|one-sided|focal)\b/i.test(text);
+  const facialAsymmetry = /\b(?:new\s+)?(?:left|right)?\s*(?:facial|face)[^.;\n]{0,35}\b(?:asymmetry|droop|uneven)\b/i.test(text);
+  const speechChange = /\b(?:new\s+)?(?:slurred speech|dysarthria|aphasia|word-finding|speech change|language change)\b/i.test(text);
+  const mentalStatusChange = /\b(?:new\s+)?(?:confus\w*|disorient\w*|altered mental status)\b|mental status:\s*changed/i.test(text);
+  const levelOfConsciousnessChange = /\b(?:new|more|increasingly)\s+(?:drowsy|somnolent|lethargic)|difficult to arouse|less responsive/i.test(text);
+  const seizureRelatedChange = /\b(?:new|witnessed|recent)\s+seizure\b|postictal/i.test(text)
+    && !/\bno seizure was witnessed\b/i.test(text);
+  const concerningHeadache = /\bnew\s+(?:severe\s+|sudden\s+|concerning\s+)?headache\b/i.test(text);
+  const pupillaryOrOtherFocal = /\b(?:new\s+)?(?:unequal pupils?|pupillary change|visual field loss|gaze deviation|new ataxia)\b/i.test(text);
+  const explicitFocalChange = /focal neurologic change:\s*(?:present|possible)/i.test(text);
+
+  const focalCoreConvergence = (focalMotor && facialAsymmetry)
+    || (focalMotor && speechChange)
+    || (facialAsymmetry && speechChange);
+  const focalWithGlobalChange = (focalMotor || facialAsymmetry || speechChange || pupillaryOrOtherFocal || explicitFocalChange)
+    && (mentalStatusChange || levelOfConsciousnessChange || seizureRelatedChange);
+  const convergingFocalDeterioration = focalCoreConvergence || focalWithGlobalChange;
+
+  const observations = [];
+  if (focalMotor) observations.push("new focal or unilateral motor weakness");
+  if (facialAsymmetry) observations.push("new facial asymmetry");
+  if (speechChange) observations.push("new speech or language change");
+  if (mentalStatusChange) observations.push("new confusion or mental-status change");
+  if (levelOfConsciousnessChange) observations.push("new level-of-consciousness change");
+  if (seizureRelatedChange) observations.push("new seizure-related change");
+  if (concerningHeadache) observations.push("new headache");
+  if (pupillaryOrOtherFocal) observations.push("another new focal neurologic finding");
+
+  return {
+    focalMotor,
+    facialAsymmetry,
+    speechChange,
+    mentalStatusChange,
+    levelOfConsciousnessChange,
+    seizureRelatedChange,
+    concerningHeadache,
+    pupillaryOrOtherFocal,
+    explicitFocalChange,
+    convergingFocalDeterioration,
+    observations,
+    summary: observations.length ? observations.join(", ") : "a neurologic concern with limited detail",
+  };
+}
+
+function temporalGroundingSummary(source) {
+  const text = String(source);
+  const recognition = text.match(/\b(?:change|finding|symptoms?|deficits?)\s+(?:was|were\s+)?recognized\s+(within|over)\s+([^.;\n]+)/i);
+  const rhythmOnsetUnknown = /\b(?:exact\s+)?rhythm\s+onset[^.;\n]*(?:unknown|unavailable|not known)/i.test(text);
+  const symptomOnsetUnknown = /\b(?:exact\s+)?(?:symptom\s+)?onset[^.;\n]*(?:unknown|unavailable|not known)/i.test(text)
+    && !rhythmOnsetUnknown;
+  const onsetUnknown = rhythmOnsetUnknown || symptomOnsetUnknown;
+  const lkwUnknown = /\blast known (?:well|baseline)[^.;\n]*(?:unknown|unavailable|not known)/i.test(text);
+  const parts = [];
+  if (recognition) parts.push(`The change was recognized ${recognition[1].toLowerCase()} ${recognition[2].trim()}.`);
+  if (onsetUnknown && lkwUnknown) parts.push(`Exact ${rhythmOnsetUnknown ? "rhythm" : "symptom"} onset and last known well are unknown.`);
+  else if (onsetUnknown) parts.push(`Exact ${rhythmOnsetUnknown ? "rhythm" : "symptom"} onset is unknown.`);
+  else if (lkwUnknown) parts.push("Last known well is unknown.");
+  return parts.join(" ");
+}
+
+function hasTemporalGroundingViolation(source, output) {
+  const sourceText = String(source);
+  const outputText = String(output);
+  const recognitionOnly = /\b(?:change|finding|symptoms?|deficits?)\s+(?:was|were\s+)?recognized\s+(?:within|over)\b/i.test(sourceText)
+    && /\b(?:exact\s+)?(?:(?:symptom|rhythm)\s+)?onset[^.;\n]*(?:unknown|unavailable|not known)/i.test(sourceText);
+  if (!recognitionOnly) return false;
+  return /\b(?:symptoms?|deficits?|changes?|rhythm|arrhythmia)\s+(?:began|started|developed|occurred)\b[^.;\n]*(?:ago|within|last|past)\b/i.test(outputText)
+    || /\bwithin\b[^.;\n]{0,100}\b(?:things (?:have\s+)?shifted|symptoms? began|deficits? developed|changes? occurred)\b/i.test(outputText);
+}
+
+function hasUnchangedValueTrendViolation(source, output) {
+  const unchanged = comparisonSemantics(source).filter((item) => item.status === "unchanged");
+  return unchanged.some(({ label }) => {
+    const term = new RegExp(String(label).replace(/[.*+?^${}()|[\]\\]/g, "\\$&"), "i");
+    return String(output).split(/(?<=[.!?])\s+|\n/).some((statement) =>
+      term.test(statement) && (TREND_LANGUAGE.test(statement) || /\bchang(?:e|ed|es|ing)\b/i.test(statement))
+        && !/\b(?:unchanged|stable|remained|same)\b/i.test(statement)
+    );
+  });
+}
+
 function sourceSupportsTrend(source, term) {
   const termPattern = term instanceof RegExp ? term : new RegExp(String(term).replace(/[.*+?^${}()|[\]\\]/g, "\\$&"), "i");
-  return String(source).split("\n").some((line) => termPattern.test(line) && (
-    /\b(previous|earlier)\b.*(?:->|→).*\b(current|now)\b/i.test(line) ||
-    /\b(previous|earlier)\b.*\b(current|now)\b/i.test(line) ||
-    TREND_LANGUAGE.test(line)
-  ));
+  const changedComparisons = comparisonSemantics(source)
+    .filter((item) => item.status === "changed")
+    .some((item) => termPattern.test(item.label));
+  return changedComparisons || String(source).split("\n").some((line) =>
+    termPattern.test(line) && TREND_LANGUAGE.test(line)
+  );
 }
 
 function normalizedNumbers(text) {
@@ -391,8 +577,9 @@ function unsupportedClinicalNumericClaims(source, output) {
 
 function hasUnsupportedDiagnosticCertainty(output) {
   return String(output).split(/(?<=[.!?])\s+|\n/).some((statement) => {
-    if (!/\b(?:respiratory|ventilatory|hypercapnic|hypoxemic)\s+failure\b/i.test(statement)) return false;
-    if (/\b(?:possible|possibly|may|might|could|concern(?:ing)? for|raises? concern for|risk of|progress(?:ing)? toward|if .* progresses)\b/i.test(statement)) return false;
+    const diagnosis = /\b(?:respiratory|ventilatory|hypercapnic|hypoxemic)\s+failure\b|\b(?:ischemic|hemorrhagic)\s+stroke\b|\bstroke\b|\bintracranial hemorrhage\b|\bpostictal state\b|\batrial fibrillation\b|\batrial flutter\b|\bsupraventricular tachycardia\b|\bventricular tachycardia\b|\b(?:SVT|VT)\b/i.test(statement);
+    if (!diagnosis) return false;
+    if (/\b(?:possible|possibly|may|might|could|concern(?:ing)? for|raises? concern for|risk of|progress(?:ing)? toward|if .* progresses|not established|does not establish|cannot determine|uncertain)\b/i.test(statement)) return false;
     return true;
   });
 }
@@ -400,7 +587,186 @@ function hasUnsupportedDiagnosticCertainty(output) {
 function excludesUnresolvedAlternative(source, output) {
   const sourceText = String(source);
   if (/\b(?:sedation|sedative|opioid|medication)\b.{0,30}\b(?:known|reported|given|administered)\b/i.test(sourceText)) return false;
-  return /\b(?:not|isn't|is not|cannot be|rules? out|rather than|not simply)\b.{0,60}\b(?:sedation|sedative|opioid|medication effect|neurologic|metabolic)\b/i.test(String(output));
+  return String(output).split(/(?<=[.!?])\s+|\n/).some((statement) => {
+    if (/\b(?:does not|cannot|can't) exclude\b|\bdoes not establish\b/i.test(statement)) return false;
+    return /\b(?:not|isn't|is not|cannot be|rules? out|rather than|not simply)\b.{0,60}\b(?:sedation|sedative|opioid|medication effect|neurologic|metabolic)\b/i.test(statement);
+  });
+}
+
+const URGENCY_RANK = { LOW: 0, MODERATE: 1, HIGH: 2 };
+
+function numericTrend(lines, labelPattern, direction) {
+  const line = lines.find((candidate) => labelPattern.test(candidate));
+  if (!line) return false;
+  const match = line.match(/previous\s+(-?\d+(?:\.\d+)?)[^\n]*?current\s+(-?\d+(?:\.\d+)?)/i);
+  if (!match) return false;
+  const previous = Number(match[1]);
+  const current = Number(match[2]);
+  return direction === "up" ? current > previous : current < previous;
+}
+
+function pairedMetricTrend(text, labelPattern, direction) {
+  const paired = String(text).match(/earlier[^:]*:\s*([^\n]*?)(?:current|now)[^:]*:\s*([^\n]*)/i);
+  if (!paired) return false;
+  const previousMatch = paired[1].match(labelPattern);
+  const currentMatch = paired[2].match(labelPattern);
+  if (!previousMatch || !currentMatch) return false;
+  const previous = Number(previousMatch[1]);
+  const current = Number(currentMatch[1]);
+  return direction === "up" ? current > previous : current < previous;
+}
+
+function assessPerfusionPattern(source) {
+  const text = String(source);
+  const lines = text.split("\n");
+  const findings = {
+    fallingBloodPressure: numericTrend(lines, /^-\s*BP\b/i, "down"),
+    fallingMap: numericTrend(lines, /\bMAP\b/i, "down"),
+    fallingCardiacIndex: numericTrend(lines, /cardiac index|\bCI\b/i, "down"),
+    risingHeartRate: numericTrend(lines, /heart rate/i, "up"),
+    risingSvr: numericTrend(lines, /\bSVR\b/i, "up"),
+    peripheralPerfusionChange: /\b(?:cool|clammy)\s+extremit|\bextremit[^.;\n]{0,20}\b(?:cool|clammy)\b|\bdelayed capillary refill\b|capillary refill[^.;\n]*(?:approximately\s+)?\d/i.test(text),
+    fallingUrineOutput: numericTrend(lines, /urine output/i, "down"),
+    risingCreatinine: numericTrend(lines, /creatinine/i, "up"),
+    risingLactate: numericTrend(lines, /lactate/i, "up"),
+    mentalStatusDeterioration: /mental status[^\n]*(?:changed|declin|drows|confus|letharg)|(?:new|more|increasingly)\s+(?:drows|confus|letharg)|answers slowly/i.test(text),
+    risingRespiratoryRate: numericTrend(lines, /respiratory rate/i, "up"),
+  };
+  const domains = {
+    hemodynamic: findings.fallingBloodPressure || findings.fallingMap || findings.fallingCardiacIndex,
+    peripheral: findings.peripheralPerfusionChange,
+    renal: findings.fallingUrineOutput || findings.risingCreatinine,
+    metabolic: findings.risingLactate,
+    neurologic: findings.mentalStatusDeterioration,
+    systemicStress: findings.risingHeartRate || findings.risingSvr || findings.risingRespiratoryRate,
+  };
+  const domainCount = Object.values(domains).filter(Boolean).length;
+  const endOrganConcern = domains.renal || domains.metabolic || domains.neurologic;
+  const convergingSystemicPerfusion = domainCount >= 3
+    && endOrganConcern
+    && (domains.hemodynamic || domains.peripheral);
+
+  return { findings, domains, domainCount, endOrganConcern, convergingSystemicPerfusion };
+}
+
+function assessRhythmHemodynamicPattern(source) {
+  const text = String(source);
+  const lines = text.split("\n");
+  const findings = {
+    rhythmChange: /(?:^|\n)-\s*Rhythm change:\s*/i.test(text)
+      || /\bnew\s+(?:rapid\s+)?irregular rhythm\b/i.test(text)
+      || /\brhythm\s+(?:changed|change reported)\b/i.test(text),
+    exactRhythmUnconfirmed: /\bexact rhythm\b[^\n]*(?:not confirmed|unknown)|\brhythm\b[^\n]*(?:not confirmed|unconfirmed)/i.test(text),
+    heartRateChange: numericTrend(lines, /heart rate/i, "up") || numericTrend(lines, /heart rate/i, "down"),
+    fallingBloodPressure: numericTrend(lines, /^-\s*BP\b/i, "down"),
+    fallingMap: numericTrend(lines, /\bMAP\b/i, "down"),
+    concerningSymptoms: /\b(?:lightheaded\w*|presyncope|palpitations?)\b/i.test(text)
+      || (/\bsyncope\b/i.test(text) && !/\bno syncope\b/i.test(text))
+      || (/\b(?:chest discomfort|chest pain)\b/i.test(text) && !/\bno (?:chest discomfort|chest pain)\b/i.test(text))
+      || (/\b(?:dyspnea|shortness of breath)\b/i.test(text) && !/\bno (?:dyspnea|shortness of breath)\b/i.test(text)),
+    peripheralPerfusionChange: /\b(?:cool|clammy)\s+extremit|\bextremit[^.;\n]{0,20}\b(?:cool|clammy)\b|\bdelayed capillary refill\b|capillary refill[^.;\n]*(?:approximately\s+)?\d/i.test(text),
+    alteredMentation: /\b(?:new|more|increasingly)\s+(?:confus|drows|letharg)|mental status:\s*changed|difficult to arouse/i.test(text),
+  };
+  const rhythmOrRateChange = findings.rhythmChange;
+  const hemodynamicDeterioration = findings.fallingBloodPressure || findings.fallingMap;
+  const toleranceDomains = [
+    findings.concerningSymptoms,
+    findings.peripheralPerfusionChange,
+    findings.alteredMentation,
+  ].filter(Boolean).length;
+  const convergingHemodynamicIntolerance = rhythmOrRateChange
+    && hemodynamicDeterioration
+    && toleranceDomains >= 1;
+  return {
+    findings,
+    rhythmOrRateChange,
+    hemodynamicDeterioration,
+    toleranceDomains,
+    convergingHemodynamicIntolerance,
+  };
+}
+
+function assessDeterministicUrgency(source) {
+  const text = String(source);
+  const lines = text.split("\n");
+  const signals = [];
+  const addSignal = (signal, present) => {
+    if (present) signals.push(signal);
+  };
+
+  const mentalStatusDeterioration = /(?:mental status[^\n]*(?:declin|drows|confus|letharg|harder to arouse)|(?:new|more|increasingly)\s+drows|declin(?:e|ing)[^\n]*responsiveness)/i.test(text)
+    || (/mental status[^\n]*changed/i.test(text) && /\b(?:drows|confus|letharg|harder to arouse|less responsive)\b/i.test(text));
+  const increasedWorkOfBreathing = /work of breathing[^\n]*(?:increased|worsen|labored)|increased work of breathing/i.test(text);
+  const oxygenSupportChange = lines.some((line) => {
+    if (!/oxygen support/i.test(line)) return false;
+    if (/(?:increas|escalat|worsen)/i.test(line)) return true;
+    const numeric = line.match(/previous\s+(\d+(?:\.\d+)?)[^\n]*?current\s+(\d+(?:\.\d+)?)/i);
+    if (numeric) return Number(numeric[2]) > Number(numeric[1]);
+    return /previous\s+room air[^\n]*current\s+(?!room air)/i.test(line);
+  });
+  const fallingPh = numericTrend(lines, /\bpH\b/i, "down")
+    || pairedMetricTrend(text, /\bpH\s*(-?\d+(?:\.\d+)?)/i, "down");
+  const risingPaco2 = numericTrend(lines, /PaCO2/i, "up")
+    || pairedMetricTrend(text, /PaCO2\s*(-?\d+(?:\.\d+)?)/i, "up");
+  const acidBaseDeterioration = fallingPh && risingPaco2;
+
+  const perfusion = assessPerfusionPattern(text);
+  const perfusionConvergence = perfusion.convergingSystemicPerfusion;
+  const rhythmHemodynamics = assessRhythmHemodynamicPattern(text);
+  const neurologic = assessNeurologicPattern(text);
+
+  addSignal("mental_status_deterioration", mentalStatusDeterioration);
+  addSignal("increased_work_of_breathing", increasedWorkOfBreathing);
+  addSignal("increased_oxygen_support", oxygenSupportChange);
+  addSignal("worsening_respiratory_acidemia", acidBaseDeterioration);
+  addSignal("converging_perfusion_trends", perfusionConvergence);
+  addSignal("rhythm_hemodynamic_intolerance", rhythmHemodynamics.convergingHemodynamicIntolerance);
+  addSignal("converging_focal_neurologic_deterioration", neurologic.convergingFocalDeterioration);
+
+  const respiratoryBedsideConvergence = (mentalStatusDeterioration && increasedWorkOfBreathing)
+    || (mentalStatusDeterioration && oxygenSupportChange)
+    || (increasedWorkOfBreathing && oxygenSupportChange);
+  const convergingRespiratoryDeterioration = acidBaseDeterioration && respiratoryBedsideConvergence;
+  const convergingDeterioration = convergingRespiratoryDeterioration
+    || perfusionConvergence
+    || rhythmHemodynamics.convergingHemodynamicIntolerance
+    || neurologic.convergingFocalDeterioration;
+
+  let urgency = "LOW";
+  if (convergingDeterioration) urgency = "HIGH";
+  else if (signals.length || /\b(?:worsen|deteriorat|declin|increased|decreased|changed)\b/i.test(text)) urgency = "MODERATE";
+
+  return { urgency, signals, convergingDeterioration, perfusion, rhythmHemodynamics };
+}
+
+function hasPresentPromptEscalation(output) {
+  return String(output).split(/(?<=[.!?])\s+|\n/).some((statement) => {
+    const prompt = /\b(?:urgent|prompt|immediate|evaluate (?:the patient )?now|come (?:assess|evaluate)|rapid bedside evaluation)\b/i.test(statement);
+    if (!prompt) return false;
+    return !/^\s*[-*]?\s*(?:if|further|continued|additional|new or worsening|should .* worsen|would .* worsen)\b/i.test(statement)
+      && !/\b(?:if|unless)\b[^.;]*\b(?:worsen|declin|deteriorat)/i.test(statement);
+  });
+}
+
+function validateUrgencyConsistency(source, output) {
+  const expected = assessDeterministicUrgency(source);
+  const declared = parseUrgency(output);
+  if (!declared) return [];
+
+  const text = String(output);
+  const issues = [];
+  const highPriorityLanguage = /\b(?:relevance\s*:\s*high priority|high priority)\b/i.test(text);
+  const promptEscalation = hasPresentPromptEscalation(text);
+  const routineOnly = /\b(?:routine monitoring|routine reassessment|continue routine)\b/i.test(text) && !promptEscalation;
+
+  if (URGENCY_RANK[declared] < URGENCY_RANK[expected.urgency]) issues.push("urgency_underclassified");
+  if (declared === "HIGH" && expected.urgency === "LOW") issues.push("urgency_overclassified");
+  if (declared !== "HIGH" && highPriorityLanguage) issues.push("urgency_priority_conflict");
+  if (declared === "LOW" && promptEscalation) issues.push("urgency_escalation_conflict");
+  if (declared === "HIGH" && routineOnly) issues.push("urgency_escalation_conflict");
+  if (expected.urgency === "HIGH" && !promptEscalation) issues.push("urgency_escalation_conflict");
+
+  return [...new Set(issues)];
 }
 
 function validatePriorityMapReliability(source, output) {
@@ -411,22 +777,76 @@ function validatePriorityMapReliability(source, output) {
   if (hasUnsupportedDiagnosticCertainty(output)) issues.push("unsupported_diagnostic_certainty");
   if (hasCertaintyOverstatement(output)) issues.push("certainty_overstatement");
   if (unsupportedClinicalNumericClaims(source, output).length) issues.push("unsupported_numeric_claim");
+  if (hasTemporalGroundingViolation(source, output)) issues.push("temporal_grounding");
+  if (hasUnchangedValueTrendViolation(source, output)) issues.push("unchanged_value_as_trend");
+  issues.push(...validateUrgencyConsistency(source, output));
   return [...new Set(issues)];
 }
 
 function buildPriorityMapFallback(source, unsafeOutput = "") {
-  const urgency = parseUrgency(unsafeOutput) || "MODERATE";
+  const { urgency } = assessDeterministicUrgency(source);
+  const neurologic = assessNeurologicPattern(source);
+  const perfusion = assessPerfusionPattern(source);
+  const rhythmHemodynamics = assessRhythmHemodynamicPattern(source);
   const respiratoryAcidemia = /\bPaCO2\b/i.test(source) && /\bpH\b/i.test(source)
     && /\b(?:breath|respiratory|ventilat|oxygen)\b/i.test(source);
   const reported = String(source).split("\n")
     .filter((line) => /^-\s+/.test(line))
     .map((line) => line.replace(/^[-*]\s*/, ""));
   const observations = reported.length ? reported : ["A clinical change was reported; the available details remain limited"];
+  if (neurologic.convergingFocalDeterioration) {
+    const temporalSummary = temporalGroundingSummary(source);
+    const neurologicObservations = neurologic.observations.map((item) => item[0].toUpperCase() + item.slice(1));
+    return `Urgency Level: ${urgency}
+
+**Priorities**
+### 1 · Acute focal neurologic deterioration
+Relevance: High priority
+Observed:
+${neurologicObservations.map((line) => `- ${line}`).join("\n")}
+Interpretation: The combination supports an acute focal neurologic deterioration pattern that is time-sensitive, while the underlying etiology is not established.
+Assess now:
+- Current focal motor, facial, speech and language, mental-status, and level-of-consciousness findings compared with the reported baseline
+- Whether the reported deficits are persistent, resolving, fluctuating, or progressing
+- Airway protection, breathing, circulation, glucose context, and other bedside findings that could alter urgency or help distinguish contributors
+
+**Assess first**
+- Repeat focused neurologic comparison of side-to-side strength, facial symmetry, speech and language, orientation, and level of consciousness
+- Clarify when the change was first recognized separately from exact symptom onset and last known well
+- Clarify relevant medication, anticoagulant or antiplatelet, exposure, seizure, trauma, and baseline neurologic context without assuming missing findings
+
+**Possible patterns**
+- The focal deficits with mental-status change may reflect an acute neurologic process, but ischemia, hemorrhage, seizure-related physiology, medication effects, metabolic causes, and other contributors are not established by the Snapshot
+- The supplied glucose does not show a marked abnormality, but that single finding does not exclude other metabolic or systemic contributors
+- The blood-pressure change is an associated observation; it does not establish the cause of the neurologic findings or support an autonomous treatment decision
+
+**Missing information**
+- Exact symptom onset and last known well or last known neurologic baseline, if they can be established
+- Additional focused neurologic findings, including progression or fluctuation from the reported exam
+- Medication and anticoagulant or antiplatelet context, relevant exposures, prior neurologic history, and available clinician evaluation
+
+**Monitor and trend**
+- Persistence, resolution, fluctuation, or progression of the reported focal weakness, facial asymmetry, speech change, confusion, headache, or any new neurologic finding
+- Level of consciousness, airway protection, breathing, circulation, and associated hemodynamic or metabolic changes
+- Subsequent observations compared with the supplied baseline; unchanged values should remain documented as unchanged rather than described as worsening trends
+
+**Escalation triggers**
+- This existing combination of new focal neurologic findings and mental-status change supports prompt team awareness and bedside evaluation under local protocol
+- Progression, additional focal deficits, declining level of consciousness, impaired airway protection, seizure activity, or associated respiratory or hemodynamic deterioration would further increase concern
+
+**SBAR-ready summary**
+The patient has new focal neurologic findings with confusion compared with the reported earlier baseline, including focal weakness, facial asymmetry, and a speech change. This supports an acute focal neurologic deterioration pattern, but the etiology is not established. ${temporalSummary || "The timing of symptom onset and last known well remains important to clarify."} The current pattern supports prompt bedside evaluation and communication under local protocol.
+
+**Teach me why**
+Focal findings such as unilateral weakness, facial asymmetry, or a new speech change make altered mental status more concerning for a localized neurologic process than confusion alone. The pattern is time-sensitive, but observation is not diagnosis; onset, last known well, progression, focused reassessment, and missing clinical context help the team differentiate possible causes.
+
+For educational support only. Use your clinical judgment and follow local protocol.`;
+  }
   if (respiratoryAcidemia) return `Urgency Level: ${urgency}
 
 **Priorities**
 ### 1 · Worsening ventilation with respiratory acidemia
-Relevance: High priority
+Relevance: ${urgency === "HIGH" ? "High priority" : "Important"}
 Observed:
 ${observations.map((line) => `- ${line}`).join("\n")}
 Interpretation: The rising PaCO2 with falling pH supports worsening ventilation with respiratory acidemia. Hypercapnia may be contributing to the new drowsiness, but medication or sedation exposure, neurologic and metabolic contributors, fatigue, baseline mentation, and other causes remain unresolved.
@@ -457,8 +877,9 @@ Assess now:
 - Hemodynamic and perfusion changes alongside the respiratory trajectory
 
 **Escalation triggers**
-- Further decline in responsiveness, airway protection, breathing effectiveness, oxygenation, or perfusion commonly prompts urgent team awareness under local protocol
-- Continued worsening across the reported respiratory, mental-status, or blood-gas trajectory commonly supports prompt bedside evaluation and escalation
+${urgency === "HIGH"
+    ? "- Further decline in responsiveness, airway protection, breathing effectiveness, oxygenation, or perfusion commonly prompts urgent team awareness under local protocol\n- Continued worsening across the reported respiratory, mental-status, or blood-gas trajectory commonly supports prompt bedside evaluation and escalation"
+    : "- Further decline in responsiveness, airway protection, breathing effectiveness, oxygenation, or perfusion should prompt timely team awareness under local protocol\n- Continued worsening across the reported respiratory, mental-status, or blood-gas trajectory should prompt bedside reassessment and communication"}
 
 **SBAR-ready summary**
 The patient has worsening respiratory findings over the reported interval, including increased work of breathing and oxygen support, rising PaCO2, falling pH, and new drowsiness. This supports worsening ventilation with respiratory acidemia, while the cause of the mental-status change and the overall deterioration remains uncertain. Medication or sedation exposure and neurologic, metabolic, fatigue-related, and other contributors still need clarification. The trajectory supports prompt bedside evaluation and communication under local protocol.
@@ -467,6 +888,151 @@ The patient has worsening respiratory findings over the reported interval, inclu
 Tachypnea does not guarantee effective ventilation. Rising PaCO2 with falling pH supports worsening respiratory acidemia, while hypercapnia may contribute to drowsiness without proving it is the sole cause. A modest short-interval bicarbonate change does not establish new renal compensation; baseline physiology, timing, measurement variation, and mixed processes may affect the value.
 
 For educational support only. Use your clinical judgment and follow local protocol.`;
+
+  if (rhythmHemodynamics.convergingHemodynamicIntolerance) {
+    const lines = String(source).split("\n");
+    const observedLabels = /^(?:Rhythm change|BP|MAP|Heart rate|Respiratory rate|SpO2|Oxygen support|Temperature|Potassium|Labs|Pain or other change|Mental status)$/i;
+    const structuredObservations = lines
+      .map((line) => line.match(/^-\s*([^:]+):\s*(.+)$/))
+      .filter((match) => match && observedLabels.test(match[1].trim()))
+      .map((match) => match[1].trim() + ": " + match[2].trim());
+    const extraObservations = [];
+    if (rhythmHemodynamics.findings.peripheralPerfusionChange) {
+      extraObservations.push("Current extremities are reported as cool; no earlier peripheral-perfusion comparison is supplied");
+    }
+    const recognition = temporalGroundingSummary(source);
+    return [
+      "Urgency Level: " + urgency,
+      "",
+      "**Priorities**",
+      "### 1 · New rhythm and rate change with hemodynamic intolerance",
+      "Relevance: High priority",
+      "Observed:",
+      ...structuredObservations.map((line) => "- " + line),
+      ...extraObservations.map((line) => "- " + line),
+      "Interpretation: The new rapid irregular monitor rhythm is occurring with falling BP and MAP, symptoms, and impaired peripheral perfusion. Together these findings support hemodynamic intolerance of the rhythm or rate change, while the exact rhythm, cause, and direction of causality are not established.",
+      "Assess now:",
+      "- Current rhythm and rate, blood pressure and MAP, symptoms, mental status, peripheral perfusion, breathing, and change from the reported baseline",
+      "- Whether the monitor observation persists or changes and whether the patient remains awake, appropriately responsive, and able to report symptoms",
+      "",
+      "**Assess first**",
+      "- Clarify the rhythm with available clinical assessment and rhythm data rather than assigning a diagnosis from monitor irregularity alone",
+      "- Reassess hemodynamic tolerance through BP and MAP trajectory, mentation, symptoms, peripheral perfusion, and other current bedside findings",
+      "- Clarify rhythm-onset uncertainty, baseline rhythm and cardiac history, medication exposure, and device history",
+      "",
+      "**Possible patterns**",
+      "- A new rhythm or rate disturbance may be contributing to the hemodynamic deterioration, but the Snapshot does not establish a specific rhythm or prove causality",
+      "- Hemodynamic, medication-related, metabolic, electrolyte-related, and other contributors remain possible and require clinical differentiation",
+      "- The current potassium and magnesium are single measurements that may be relevant context; they do not establish a trend or the cause of the rhythm change",
+      "",
+      "**Missing information**",
+      "- Rhythm confirmation and available 12-lead or rhythm-strip findings",
+      "- Exact rhythm onset, baseline rhythm and cardiac history, relevant medication exposure, and pacemaker or device context",
+      "- Subsequent symptom, perfusion, BP, MAP, heart-rate, and rhythm observations compared with the supplied baseline",
+      "",
+      "**Monitor and trend**",
+      "- Rhythm and rate, BP and MAP, mental status, palpitations, lightheadedness, chest symptoms, breathing, and peripheral perfusion",
+      "- Additional decline in circulation, responsiveness, symptoms, or breathing would further increase concern beyond the deterioration already present",
+      "- Oxygen support remained room air in the supplied comparison; current-only temperature, potassium, magnesium, and peripheral-perfusion findings should not be described as trends",
+      "",
+      "**Escalation triggers**",
+      "- The existing rhythm and rate change with BP and MAP decline, lightheadedness, and cool extremities supports prompt team awareness and bedside evaluation now under local protocol",
+      "- Further hemodynamic, neurologic, respiratory, or symptom deterioration would increase concern but is not required before escalation",
+      "",
+      "**SBAR-ready summary**",
+      "A new rapid irregular rhythm reported on bedside monitoring is occurring with a rising heart rate, falling BP and MAP, lightheadedness, palpitations, and cool extremities. The exact rhythm and cause are not established. "
+        + (recognition ? recognition + " " : "")
+        + "The current pattern supports prompt bedside evaluation and communication under local protocol.",
+      "",
+      "**Teach me why**",
+      "The urgency of a rhythm or rate change depends on physiologic tolerance, not the monitor label or rate alone. Blood pressure, symptoms, mentation, and peripheral perfusion help show impact, while rhythm confirmation and missing context help distinguish possibilities without prematurely naming a diagnosis.",
+      "",
+      "For educational support only. Use your clinical judgment and follow local protocol.",
+    ].join("\n");
+  }
+
+  if (perfusion.convergingSystemicPerfusion) {
+    const lines = String(source).split("\n");
+    const observedLabels = /^(?:BP|MAP|Heart rate|Respiratory rate|SpO2|Oxygen support|Temperature|Urine output|Lactate|Creatinine)$/i;
+    const structuredObservations = lines
+      .map((line) => line.match(/^-\s*([^:]+):\s*(.+)$/))
+      .filter((match) => match && observedLabels.test(match[1].trim()))
+      .map((match) => match[1].trim() + ": " + match[2].trim());
+    const bedsideObservations = [];
+    if (perfusion.findings.mentalStatusDeterioration) {
+      bedsideObservations.push("Mental status is reported as changed, with current confusion or slower responses compared with earlier");
+    }
+    if (perfusion.findings.peripheralPerfusionChange) {
+      bedsideObservations.push("Current peripheral findings include cool extremities and delayed capillary refill as reported in the Snapshot");
+    }
+    const wbc = String(source).match(/Current WBC\s+(?:is\s+)?([^;\n]+)/i);
+    if (wbc) {
+      bedsideObservations.push("Current WBC is reported as " + wbc[1].trim() + "; no direction is inferred without an earlier value");
+    }
+    if (/productive cough/i.test(source)) bedsideObservations.push("A new productive cough is reported");
+    const infectionPossible = /\b(?:fever|productive cough|current WBC|infection\s*\/\s*sepsis concern)\b/i.test(source);
+    const unchangedOxygen = comparisonSemantics(source).some((item) =>
+      item.label === "Oxygen support" && item.status === "unchanged"
+    );
+    const observationsForMap = [...structuredObservations, ...bedsideObservations];
+    const infectionPattern = infectionPossible
+      ? "- Fever, productive cough, and the current WBC make an infectious process a possible contributor; they do not establish sepsis, septic shock, pneumonia, or a confirmed source"
+      : "- Infectious, volume-related, cardiac, medication-related, and other contributors should remain qualified and guided by the supplied context rather than assumed";
+    const infectionMissing = infectionPossible
+      ? "- Culture, imaging, and source information needed to assess a possible infectious contributor"
+      : "- Additional history and bedside findings that would help distinguish among unresolved contributors";
+    const infectionSummary = infectionPossible
+      ? "; an infectious process is one possible contributor, but no source or diagnosis is established"
+      : "";
+
+    return [
+      "Urgency Level: " + urgency,
+      "",
+      "**Priorities**",
+      "### 1 · Worsening systemic perfusion with end-organ warning signs",
+      "Relevance: High priority",
+      "Observed:",
+      ...observationsForMap.map((line) => "- " + line),
+      "Interpretation: The concordant hemodynamic, peripheral-perfusion, renal, metabolic, and mental-status changes support worsening systemic perfusion with end-organ warning signs. The pattern establishes clinically meaningful deterioration, but it does not establish the cause or mechanism."
+        + (unchangedOxygen ? " Oxygen support remained unchanged in the supplied comparison." : ""),
+      "Assess now:",
+      "- Current blood pressure and MAP trajectory, peripheral perfusion, mental status, urine output, respiratory effort, and overall change from the reported baseline",
+      "- Whether the reported findings persist, progress, fluctuate, or respond to interventions already directed by the treating team",
+      "",
+      "**Assess first**",
+      "- Repeat focused circulation and perfusion assessment, including pulses, skin findings, capillary refill, mental status, and urine-output context",
+      "- Reconcile the supported hemodynamic, lactate, renal, respiratory-rate, and mental-status trends without treating any single value as diagnostic",
+      "- Clarify relevant medication exposure, fluid or intervention history, bleeding assessment, baseline renal status, and other missing context",
+      "",
+      "**Possible patterns**",
+      "- The converging findings may reflect impaired systemic perfusion affecting organ function, but the mechanism remains uncertain",
+      infectionPattern,
+      "- The worsening creatinine and falling urine output may be consistent with renal or end-organ deterioration in the overall pattern, but the Snapshot does not establish a specific etiology",
+      "",
+      "**Missing information**",
+      "- Focused reassessment findings and any subsequent direction of the reported hemodynamic, perfusion, renal, metabolic, respiratory, and neurologic changes",
+      "- Relevant medication administration, fluid or intervention response, bleeding assessment, baseline renal function, and treating-team evaluation",
+      infectionMissing,
+      "",
+      "**Monitor and trend**",
+      "- Subsequent BP and MAP, heart rate, respiratory rate, peripheral perfusion, mental status, urine output, lactate, and renal markers compared with the supplied earlier and current findings",
+      "- Further decline in responsiveness, circulation, urine output, respiratory status, or other organ-function indicators would increase concern beyond the deterioration already present",
+      "- Single measurements should remain single measurements, and unchanged comparisons should remain documented as unchanged",
+      "",
+      "**Escalation triggers**",
+      "- The existing combination of worsening hemodynamics, peripheral perfusion, urine output, lactate, renal markers, and mental status supports prompt team awareness and bedside evaluation now under local protocol",
+      "- Additional decline in responsiveness, breathing, circulation, or organ-function indicators would further increase concern but is not required before escalation",
+      "",
+      "**SBAR-ready summary**",
+      "The patient has an existing pattern of worsening systemic perfusion with end-organ warning signs across hemodynamic, peripheral, renal, metabolic, and mental-status findings. The cause remains uncertain"
+        + infectionSummary + ". The current pattern supports prompt bedside evaluation and communication under local protocol.",
+      "",
+      "**Teach me why**",
+      "Concordant changes across circulation, peripheral perfusion, urine output, renal markers, lactate, and mental status carry more meaning together than any single value. This convergence can support urgent recognition of systemic deterioration while the cause and mechanism remain unresolved.",
+      "",
+      "For educational support only. Use your clinical judgment and follow local protocol.",
+    ].join("\n");
+  }
 
   return `Urgency Level: ${urgency}
 
@@ -495,10 +1061,14 @@ Assess now:
 - Worsening mental status, respiratory effort, oxygen requirement, or circulation would increase concern
 
 **Escalation triggers**
-- Further clinical deterioration or inability to maintain adequate breathing, oxygenation, perfusion, or responsiveness commonly prompts urgent team awareness under local protocol
+${urgency === "HIGH"
+    ? "- Further clinical deterioration or inability to maintain adequate breathing, oxygenation, perfusion, or responsiveness commonly prompts urgent team awareness and prompt bedside evaluation under local protocol"
+    : urgency === "MODERATE"
+      ? "- Further deterioration in breathing, oxygenation, perfusion, or responsiveness should prompt timely team awareness and bedside reassessment under local protocol"
+      : "- New or worsening changes should prompt reassessment and communication under local protocol"}
 
 **SBAR-ready summary**
-The patient has multiple reported changes from earlier, including the measurements and bedside findings listed above. The overall trajectory is concerning, but the cause remains uncertain. Prompt bedside reassessment and communication should follow the clinical context and institutional protocol.
+The patient has reported changes from earlier, including the measurements and bedside findings listed above. The overall trajectory requires reassessment, but the cause remains uncertain. ${urgency === "HIGH" ? "Prompt bedside evaluation and communication" : "Bedside reassessment and communication"} should follow the clinical context and institutional protocol.
 
 **Teach me why**
 Trends across multiple observations can identify deterioration without establishing a diagnosis or proving that one finding caused another.
@@ -521,6 +1091,82 @@ async function resolvePriorityMap({ source, initialOutput, repair }) {
     }
   }
   return { output: buildPriorityMapFallback(source, initialOutput), status: "fallback", issues: initialIssues, repairIssues: null };
+}
+
+async function runPriorityMapWithBudget({
+  source,
+  generateOriginal,
+  repair,
+  now = Date.now,
+  totalBudgetMs = COPILOT_TOTAL_BUDGET_MS,
+  originalBudgetMs = COPILOT_ORIGINAL_BUDGET_MS,
+  repairBudgetMs = COPILOT_REPAIR_BUDGET_MS,
+  returnReserveMs = COPILOT_RETURN_RESERVE_MS,
+  minRepairBudgetMs = COPILOT_MIN_REPAIR_BUDGET_MS,
+  signal,
+}) {
+  const startedAt = now();
+  const timing = {
+    provider_status: "not_started",
+    provider_duration_ms: 0,
+    validation_status: "not_started",
+    validation_duration_ms: 0,
+    repair_attempted: false,
+    repair_status: "not_attempted",
+    repair_duration_ms: 0,
+    timeout_layer: null,
+  };
+
+  let originalOutput = "";
+  const providerStartedAt = now();
+  timing.provider_status = "started";
+  try {
+    originalOutput = await runWithStageTimeout(generateOriginal, originalBudgetMs, "provider_timeout", signal);
+    timing.provider_status = "success";
+  } catch (error) {
+    if (error?.code !== "provider_timeout" && error?.code !== "client_disconnect") throw error;
+    timing.provider_status = error?.code === "provider_timeout" ? "timeout" : "error";
+    timing.timeout_layer = error?.code === "provider_timeout" ? "provider" : error?.code;
+    timing.provider_duration_ms = now() - providerStartedAt;
+    return { output: buildPriorityMapFallback(source, originalOutput), status: "fallback", issues: [timing.provider_status], repairIssues: null, timing };
+  }
+  timing.provider_duration_ms = now() - providerStartedAt;
+
+  const validationStartedAt = now();
+  const issues = validatePriorityMapReliability(source, originalOutput);
+  timing.validation_duration_ms = now() - validationStartedAt;
+  timing.validation_status = issues.length ? "rejected" : "accepted";
+  if (!issues.length) return { output: originalOutput, status: "validated", issues, repairIssues: null, timing };
+
+  const remainingForRepair = totalBudgetMs - (now() - startedAt) - returnReserveMs;
+  if (remainingForRepair < minRepairBudgetMs || typeof repair !== "function") {
+    timing.repair_status = remainingForRepair < minRepairBudgetMs ? "skipped_insufficient_budget" : "not_available";
+    timing.timeout_layer = remainingForRepair < minRepairBudgetMs ? "total_budget" : null;
+    return { output: buildPriorityMapFallback(source, originalOutput), status: "fallback", issues, repairIssues: null, timing };
+  }
+
+  timing.repair_attempted = true;
+  const repairStartedAt = now();
+  try {
+    const repaired = await runWithStageTimeout(
+      (signal) => repair(issues, signal),
+      Math.min(repairBudgetMs, remainingForRepair),
+      "repair_timeout",
+      signal,
+    );
+    timing.repair_duration_ms = now() - repairStartedAt;
+    const repairValidationStartedAt = now();
+    const repairIssues = validatePriorityMapReliability(source, repaired);
+    timing.validation_duration_ms += now() - repairValidationStartedAt;
+    timing.repair_status = repairIssues.length ? "rejected" : "accepted";
+    if (!repairIssues.length) return { output: repaired, status: "repaired", issues, repairIssues: [], timing };
+    return { output: buildPriorityMapFallback(source, originalOutput), status: "fallback", issues, repairIssues, timing };
+  } catch (error) {
+    timing.repair_duration_ms = now() - repairStartedAt;
+    timing.repair_status = error?.code === "repair_timeout" ? "timeout" : "error";
+    timing.timeout_layer = error?.code === "repair_timeout" ? "repair" : error?.code;
+    return { output: buildPriorityMapFallback(source, originalOutput), status: "fallback", issues, repairIssues: [timing.repair_status], timing };
+  }
 }
 
 function lessonGroundingText(lesson) {
@@ -552,7 +1198,9 @@ function possiblePatternsAreQualified(output) {
 
 function highUrgencyRecommendationIsAligned(recommendation) {
   const text = String(recommendation);
-  return /\b(evaluate|assessment|assess|at the bedside|now|prompt|urgent|rapid response|escalat)\b/i.test(text) && !TREATMENT_DIRECTIVE.test(text);
+  const promptRequest = /\b(?:now|prompt(?:ly)?|urgent(?:ly)?|immediate(?:ly)?|rapid response|escalat)\b/i.test(text)
+    && /\b(?:evaluate|evaluation|assessment|assess|at the bedside|come|team|provider|rapid response|escalat)\b/i.test(text);
+  return promptRequest && !TREATMENT_DIRECTIVE.test(text);
 }
 
 function sanitizeSbarText(text) {
@@ -565,6 +1213,22 @@ function sanitizeSbarText(text) {
     .replace(/\bdo you want me to start\b/gi, "wanted to check how you'd like to proceed with")
     .replace(/\bdo you want me to draw\b/gi, "wanted to check if you'd like")
     .replace(/\bshould I (?:start|give|draw|administer|bolus)\b/gi, "wanted to check about");
+}
+
+function groundSbarTemporalFidelity(source, sbar) {
+  const summary = temporalGroundingSummary(source);
+  if (!summary) return { ...sbar };
+
+  const grounded = { ...sbar };
+  grounded.background = String(grounded.background || "")
+    .replace(/\s*[—-]\s*within\b[^.!?]{0,120}\b(?:things (?:have\s+)?shifted|symptoms? began|deficits? developed|changes? occurred)[^.!?]*[.!?]?/gi, "")
+    .replace(/\b(?:symptoms?|deficits?|changes?)\s+(?:began|started|developed|occurred)\b[^.!?]*(?:ago|within|last|past)[^.!?]*[.!?]?/gi, "")
+    .trim();
+  if (!grounded.background.endsWith(".") && grounded.background) grounded.background += ".";
+  if (!grounded.background.toLowerCase().includes("recognized within")) {
+    grounded.background = [grounded.background, summary].filter(Boolean).join(" ");
+  }
+  return grounded;
 }
 
 function evaluateReliabilityFixture({ source = "", priorityMap = "", lessonText = "", sbar = null, trendTerms = [], inferredTerms = [] }) {
@@ -1873,6 +2537,9 @@ function buildOperationalLogEntry(fields) {
     "urgency", "status", "response_length", "duration_ms", "possible_failure",
     "failure_reason", "retry_attempted", "fallback_used", "urgency_override",
     "priority_map_original_status", "priority_map_repair_status", "priority_map_display_resolution",
+    "request_id", "request_started_at", "request_ended_at", "total_duration_ms",
+    "provider_duration_ms", "provider_status", "validation_duration_ms", "validation_status",
+    "repair_attempted", "repair_status", "repair_duration_ms", "timeout_layer", "client_disconnected",
   ];
   return Object.fromEntries(
     allowed
@@ -1900,6 +2567,17 @@ function isOverloadError(err) {
 app.post("/api/copilot", apiLimiter, async (req, res) => {
   const { question, mode, isFollowUp, learningRequest, priorityMapResponse } = req.body;
   const requestStartedAt = Date.now();
+  const requestId = randomUUID();
+  let responseFinished = false;
+  let clientDisconnected = false;
+  const disconnectController = new AbortController();
+  res.on("finish", () => { responseFinished = true; });
+  res.on("close", () => {
+    if (!responseFinished) {
+      clientDisconnected = true;
+      disconnectController.abort();
+    }
+  });
 
   if (!question || question.trim() === "") {
     return res.status(400).json({ error: "Please enter a clinical question before submitting." });
@@ -2032,13 +2710,14 @@ app.post("/api/copilot", apiLimiter, async (req, res) => {
   const uiMode          = mode || "quick";
 
   const requestTimestamp = new Date().toISOString();
-  console.log(`[REQUEST] ${requestTimestamp} | route=${promptName} | mode=${uiMode} | category=${category} | words=${wordCount}`);
+  console.log(`[REQUEST] ${requestTimestamp} | id=${requestId} | route=${promptName} | mode=${uiMode} | category=${category} | words=${wordCount}`);
 
   // Set SSE headers so the frontend can read chunks as they arrive
   res.setHeader("Content-Type", "text/event-stream");
   res.setHeader("Cache-Control", "no-cache");
   res.setHeader("Connection", "keep-alive");
   res.setHeader("X-Accel-Buffering", "no"); // disables Nginx buffering on Render
+  res.write(`data: ${JSON.stringify({ progress: "organizing" })}\n\n`);
 
   let fullResponse    = "";
   let retryAttempted  = false;
@@ -2047,17 +2726,18 @@ app.post("/api/copilot", apiLimiter, async (req, res) => {
   let priorityMapResolution = null;
   let priorityMapOriginalStatus = null;
   let priorityMapRepairStatus = null;
+  let priorityMapTiming = null;
   const structuredSnapshot = question.trim().startsWith("PATIENT SNAPSHOT — USER-REPORTED / OBSERVED INFORMATION");
 
   // Runs one full Anthropic stream, appending chunks to fullResponse and
   // writing each chunk to the SSE stream as it arrives.
-  const callStream = async () => {
+  const callStream = async (signal) => {
     const stream = await client.messages.stream({
       model: "claude-sonnet-4-6",
       max_tokens: 3000,
       system: selectedPrompt,
       messages: [{ role: "user", content: question.trim() }],
-    });
+    }, { signal });
     for await (const chunk of stream) {
       if (
         chunk.type === "content_block_delta" &&
@@ -2083,6 +2763,32 @@ app.post("/api/copilot", apiLimiter, async (req, res) => {
       responseStreamed = true;
       res.write(`data: ${JSON.stringify({ text: CRASH_FALLBACK_TEXT })}\n\n`);
       console.log("[CRASH-FALLBACK] Returned structured response — skipped streaming.");
+    } else if (structuredSnapshot) {
+      res.write(`data: ${JSON.stringify({ progress: "checking" })}\n\n`);
+      const resolved = await runPriorityMapWithBudget({
+        source: question.trim(),
+        generateOriginal: async (signal) => {
+          await callStream(signal);
+          return fullResponse;
+        },
+        repair: async (issues, signal) => {
+          const repairMessage = await client.messages.create({
+            model: "claude-sonnet-4-6",
+            max_tokens: 3000,
+            system: `${selectedPrompt}\n\nPRIORITY MAP REPAIR: Rewrite the draft so it satisfies the full response and clinical reliability contracts. Correct only the validator issues supplied by the application. Preserve the user's exact reported facts, urgency, and section structure. Do not add new numbers, thresholds, timelines, diagnoses, or causal claims. Return only the complete repaired Priority Map.`,
+            messages: [{ role: "user", content: `Patient Snapshot:\n${question.trim()}\n\nValidator issue codes: ${issues.join(", ")}\n\nDraft to repair:\n${fullResponse}` }],
+          }, { signal });
+          return repairMessage.content.find((block) => block.type === "text")?.text || "";
+        },
+        signal: disconnectController.signal,
+      });
+      fullResponse = resolved.output;
+      fallbackUsed = resolved.status === "fallback";
+      priorityMapResolution = resolved.status;
+      priorityMapOriginalStatus = resolved.issues.length ? "rejected" : "accepted";
+      priorityMapRepairStatus = resolved.timing.repair_status;
+      priorityMapTiming = resolved.timing;
+      if (!clientDisconnected) res.write(`data: ${JSON.stringify({ progress: "finalizing" })}\n\n`);
     } else {
       // ── First attempt ───────────────────────────────────────────────────
       try {
@@ -2116,7 +2822,7 @@ app.post("/api/copilot", apiLimiter, async (req, res) => {
       }
     }
 
-    if (structuredSnapshot && !fallbackUsed) {
+    if (structuredSnapshot && !priorityMapResolution && !fallbackUsed) {
       const resolved = await resolvePriorityMap({
         source: question.trim(),
         initialOutput: fullResponse,
@@ -2142,7 +2848,7 @@ app.post("/api/copilot", apiLimiter, async (req, res) => {
         : resolved.repairIssues.length ? "rejected" : "accepted";
     }
 
-    if (!responseStreamed) {
+    if (!responseStreamed && !clientDisconnected) {
       res.write(`data: ${JSON.stringify({ text: fullResponse })}\n\n`);
       responseStreamed = true;
     }
@@ -2167,6 +2873,19 @@ app.post("/api/copilot", apiLimiter, async (req, res) => {
       status:           fallbackUsed ? "fallback" : "success",
       response_length:  fullResponse.length,
       duration_ms:      Date.now() - requestStartedAt,
+      request_id:       requestId,
+      request_started_at: requestTimestamp,
+      request_ended_at: new Date().toISOString(),
+      total_duration_ms: Date.now() - requestStartedAt,
+      provider_duration_ms: priorityMapTiming?.provider_duration_ms,
+      provider_status: priorityMapTiming?.provider_status,
+      validation_duration_ms: priorityMapTiming?.validation_duration_ms,
+      validation_status: priorityMapTiming?.validation_status,
+      repair_attempted: priorityMapTiming?.repair_attempted,
+      repair_status: priorityMapTiming?.repair_status,
+      repair_duration_ms: priorityMapTiming?.repair_duration_ms,
+      timeout_layer: priorityMapTiming?.timeout_layer,
+      client_disconnected: clientDisconnected,
       possible_failure,
       failure_reason,
       ...(retryAttempted          && { retry_attempted:    true }),
@@ -2178,6 +2897,7 @@ app.post("/api/copilot", apiLimiter, async (req, res) => {
     });
 
     // Signal stream completion
+    if (clientDisconnected) return;
     res.write(`data: ${JSON.stringify({
       done: true,
       priorityMapResolution,
@@ -2208,10 +2928,17 @@ app.post("/api/copilot", apiLimiter, async (req, res) => {
       status:           "error",
       response_length:  0,
       duration_ms:      Date.now() - requestStartedAt,
+      request_id:       requestId,
+      request_started_at: requestTimestamp,
+      request_ended_at: new Date().toISOString(),
+      total_duration_ms: Date.now() - requestStartedAt,
+      timeout_layer: providerFailure.code === "provider_timeout" ? "provider" : null,
+      client_disconnected: clientDisconnected,
       possible_failure: errFail,
       failure_reason:   providerFailure.code || errReason,
       ...(retryAttempted && { retry_attempted: true }),
     });
+    if (clientDisconnected) return;
     // SSE headers are already sent — respond with an error SSE event so the
     // frontend can stop streaming and display the message cleanly.
     res.write(`data: ${JSON.stringify({ error: true, code: providerFailure.code, message: providerFailure.message })}\n\n`);
@@ -2250,6 +2977,7 @@ ABSOLUTE RULES:
 - Every word must be speakable exactly as written
 - Do not invent sex, gender, pronouns, postoperative timing, procedure details, diagnoses, or interventions. If demographics are not supplied, use "the patient."
 - Do not turn "post-op" into "fresh post-op," "today," or any other timing claim unless timing was supplied.
+- Keep symptom onset, time first recognized, last known well/baseline, assessment time, and duration distinct. Never convert a recognition timeframe into an onset timeframe. When onset or last known well is explicitly unknown and clinically relevant, say so directly.
 - No diagnostic certainty — do not say "this is sepsis," "this is a PE"
 - No treatment suggestions, medication orders, or specific procedure prompts
 - Concern language is appropriate when urgency is HIGH, but do not claim a diagnosis.
@@ -2311,12 +3039,12 @@ app.post("/api/sbar", apiLimiter, async (req, res) => {
     // ── SBAR safety post-processing ───────────────────────────────────────────
     // Catch residual risky phrasing that may slip through the model instruction.
     // Scoped strictly to SBAR output — does not touch any other response path.
-    const sbar = {
+    const sbar = groundSbarTemporalFidelity(question, {
       situation:      sanitizeSbarText(parseSection("SITUATION",      "BACKGROUND")),
       background:     sanitizeSbarText(parseSection("BACKGROUND",     "ASSESSMENT")),
       assessment:     sanitizeSbarText(parseSection("ASSESSMENT",     "RECOMMENDATION")),
       recommendation: sanitizeSbarText(parseSection("RECOMMENDATION", null)),
-    };
+    });
 
     if (establishedUrgency === "HIGH" && !highUrgencyRecommendationIsAligned(sbar.recommendation)) {
       sbar.recommendation = "I'm concerned about the worsening clinical picture and would like you to evaluate the patient now.";
@@ -2348,18 +3076,31 @@ module.exports = {
   highUrgencyRecommendationIsAligned,
   hasCertaintyOverstatement,
   lessonGroundingText,
+  comparisonSemantics,
   sourceSupportsTrend,
   unsupportedTrendClaims,
+  hasUnsupportedEstablishedTrendClaim,
   unsupportedNumericThresholds,
   hasAcidBaseReliabilityViolation,
   hasUnsupportedCausalAttribution,
   unsupportedClinicalNumericClaims,
   hasUnsupportedDiagnosticCertainty,
   excludesUnresolvedAlternative,
+  assessNeurologicPattern,
+  temporalGroundingSummary,
+  hasTemporalGroundingViolation,
+  hasUnchangedValueTrendViolation,
+  assessPerfusionPattern,
+  assessRhythmHemodynamicPattern,
+  assessDeterministicUrgency,
+  hasPresentPromptEscalation,
+  validateUrgencyConsistency,
   validatePriorityMapReliability,
   buildPriorityMapFallback,
   resolvePriorityMap,
+  runPriorityMapWithBudget,
   sanitizeSbarText,
+  groundSbarTemporalFidelity,
   SHIFT_BRAIN_RESPONSE_CONTRACT,
   SBAR_SYSTEM_PROMPT,
   TEACH_ME_RELIABILITY_PROMPT,

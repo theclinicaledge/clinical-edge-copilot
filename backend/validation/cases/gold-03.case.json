@@ -1,0 +1,6 @@
+{
+  "id": "gold-03", "title": "Acute focal neurologic deterioration", "clinicalDomain": "neurologic", "careSetting": "PCU / Step-down", "difficulty": "advanced", "version": "1.0.0", "cohort": "regression",
+  "snapshotFile": "snapshots/gold-03.snapshot.txt", "answerKeyFile": "answer-keys/gold-03.eval.json", "historyFile": "history/gold-03.history.json",
+  "historicalRealProviderStatus": "REAL_PROVIDER_FAIL", "lockState": "NOT_LOCKED",
+  "capabilityTags": ["observation_vs_inference", "unchanged_semantics", "uncertainty", "urgency_convergence", "focal_neurologic_recognition", "temporal_grounding", "current_escalation", "teach_me_grounding", "sbar_grounding", "serialization"]
+}

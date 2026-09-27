@@ -1,0 +1,16 @@
+PATIENT SNAPSHOT — USER-REPORTED / OBSERVED INFORMATION
+VALIDATION FIXTURE — EXPLICITLY SYNTHETIC; NO PHI
+What changed: Something feels off, Neuro
+Care setting: PCU / Step-down
+Clinical context: Neurologic
+Reported clinical data:
+- Mental status: Changed
+- Focal neurologic change: Present
+- Glucose: 112 mg/dL
+- BP: previous 138/76 -> current 178/94 mmHg
+- Heart rate: previous 82 -> current 88 bpm
+- SpO2: previous 97 -> current 97 %
+- Oxygen support: previous Room air -> current Room air
+- Temperature: previous unknown -> current 36.9 C
+Additional user-reported context: Change recognized within approximately the last 30 minutes; exact symptom onset and last known well are unknown. Earlier: awake, oriented, interacting normally; speech clear; face symmetric; moved all extremities without reported focal weakness. Now: confused with difficulty answering orientation questions; new slurred speech; new left facial asymmetry; new left arm weakness compared with the right; new headache reported, with no severity score supplied. No seizure was witnessed. No fall was reported. Sedative or opioid administration information is unavailable. Anticoagulant or antiplatelet status is unknown. No imaging results are available.
+Treat omitted fields as unknown. Do not infer normal findings.

@@ -1,7 +1,7 @@
 import { useState, useRef, useEffect, useCallback } from "react";
 import { trackEvent } from "./analytics";
 import ModuleHeader from "./components/ModuleHeader.jsx";
-import PatientSnapshot from "./components/PatientSnapshot.jsx";
+import PatientSnapshot, { SubmittedSnapshotSummary } from "./components/PatientSnapshot.jsx";
 import PriorityMap from "./components/PriorityMap.jsx";
 import { parsePriorities } from "./components/priorityMapModel";
 
@@ -41,7 +41,11 @@ const LS_SAVED   = "clinical_edge_saved_cases";
 const LS_MODE    = "clinical_edge_mode";
 
 // Loading state — single static caption (no rotating narration, §4.7)
-const LOADING_MESSAGE = "Organizing clinical signals…";
+const PROCESSING_MESSAGES = {
+  organizing: "Organizing your snapshot",
+  checking: "Checking the clinical reasoning",
+  finalizing: "Finalizing your Priority Map",
+};
 
 // ─── Helpers ──────────────────────────────────────────────────────────────────
 
@@ -192,7 +196,12 @@ function renderInline(text) {
 
 // ─── Sub-components ───────────────────────────────────────────────────────────
 
-function LoadingIndicator() {
+function LoadingIndicator({ stage = "organizing" }) {
+  const [longWait, setLongWait] = useState(false);
+  useEffect(() => {
+    const timer = setTimeout(() => setLongWait(true), 10000);
+    return () => clearTimeout(timer);
+  }, []);
   // Sole sanctioned loop (motion-system.md §6/§7): one quiet opacity breathe
   // on the whole indicator. No per-bar pulsing, no progress theater.
   return (
@@ -202,28 +211,10 @@ function LoadingIndicator() {
           <span key={i} />
         ))}
       </div>
-      <strong>{LOADING_MESSAGE}</strong>
-      <small>Building a structured readout you can verify against your assessment.</small>
-    </div>
-  );
-}
-
-function StreamPreview({ text }) {
-  if (!text) return null;
-  return (
-    <div className="copilot-stream-card">
-      {text}
-      <span style={{
-        display: "inline-block",
-        width: 6,
-        height: 14,
-        background: "var(--ce-teal)",
-        marginLeft: 3,
-        verticalAlign: "middle",
-        animation: "cursorBlink 1s step-end infinite",
-        borderRadius: 1,
-        opacity: 0.7,
-      }} />
+      <span className="copilot-loading-eyebrow">Building your Priority Map</span>
+      <strong>{PROCESSING_MESSAGES[stage] || PROCESSING_MESSAGES.organizing}</strong>
+      <small>Checking the reasoning against the observations you provided.</small>
+      {longWait && <small className="copilot-loading-reassurance">Still working. Your submitted Snapshot remains available above.</small>}
     </div>
   );
 }
@@ -449,8 +440,9 @@ export default function App({ onGoHome, navigate, isOnline = true }) {
     const parsed = parseResponse(_SS_RESPONSE);
     return { ...parsed, urgencyLevel: extractUrgencyLevel(_SS_RESPONSE) };
   });
+  const [followUpResult, setFollowUpResult] = useState(null);
   const [rawText, setRawText]           = useState(() => _ssParam === 'response' ? _SS_RESPONSE : "");
-  const [streamBuffer, setStreamBuffer] = useState("");
+  const [, setStreamBuffer] = useState("");
   const [streaming, setStreaming]       = useState(false);
   const [loading, setLoading]           = useState(false);
   const [error, setError]               = useState(null);
@@ -458,13 +450,17 @@ export default function App({ onGoHome, navigate, isOnline = true }) {
   const [savedCases, setSavedCases]     = useState(() => lsGet(LS_SAVED, []));
   const [justSaved, setJustSaved]       = useState(false);
   const [followUp, setFollowUp]         = useState("");
+  const [followUpOpen, setFollowUpOpen] = useState(false);
   const [sbar, setSbar]                 = useState(null);
   const [sbarLoading, setSbarLoading]   = useState(false);
   const [sbarCopied, setSbarCopied]     = useState(false);
   const [sourcesOpen, setSourcesOpen]   = useState(false);
   const [followUpActive, setFollowUpActive] = useState(false);
+  const [processingStage, setProcessingStage] = useState("organizing");
+  const [submittedSnapshot, setSubmittedSnapshot] = useState(null);
 
   const outputRef             = useRef(null);
+  const workspaceTopRef       = useRef(null);
   const lastSubmittedRef      = useRef("");
   const wasRecentlyHiddenRef  = useRef(false);
   const hiddenAtRef           = useRef(null);
@@ -472,6 +468,7 @@ export default function App({ onGoHome, navigate, isOnline = true }) {
   const accumulatedRef        = useRef("");
   const isActiveRef           = useRef(false);
   const runQueryRef           = useRef(null);
+  const teachMeRequestRef     = useRef(null);
 
   // Track module open — fires once on mount
   useEffect(() => {
@@ -527,6 +524,7 @@ export default function App({ onGoHome, navigate, isOnline = true }) {
   // AbortController lets the visibility handler cancel and restart cleanly.
   const runQuery = async (q, { isFollowUp = false } = {}) => {
     if (!q.trim()) return;
+    if (isActiveRef.current) return;
     if (!isOnline) {
       trackEvent('copilot_offline_blocked');
       return;
@@ -544,17 +542,21 @@ export default function App({ onGoHome, navigate, isOnline = true }) {
     accumulatedRef.current = "";
     isActiveRef.current = true;
 
-    setQuestion(q);
+    if (!isFollowUp) setQuestion(q);
     setFollowUp("");
     setFollowUpActive(isFollowUp);
     lastSubmittedRef.current = q;
     trackEvent('copilot_prompt_submitted', { mode, source: isFollowUp ? 'follow_up' : 'structured_snapshot' });
     setLoading(true);
+    setProcessingStage("organizing");
     setStreaming(false);
     setError(null);
     if (!isFollowUp) {
       setResult(null);
+      setFollowUpResult(null);
       setRawText("");
+    } else {
+      setFollowUpResult(null);
     }
     setStreamBuffer("");
     setJustSaved(false);
@@ -582,7 +584,6 @@ export default function App({ onGoHome, navigate, isOnline = true }) {
 
       setStreaming(true);
       setLoading(false);
-      setTimeout(() => outputRef.current?.scrollIntoView({ behavior: "smooth", block: "start" }), 80);
 
       const reader = res.body.getReader();
       const decoder = new TextDecoder();
@@ -604,6 +605,11 @@ export default function App({ onGoHome, navigate, isOnline = true }) {
           let parsed;
           try { parsed = JSON.parse(jsonStr); } catch { continue; }
 
+          if (parsed.progress) {
+            setProcessingStage(parsed.progress);
+            continue;
+          }
+
           if (parsed.error) {
             trackEvent('copilot_response_error', { reason: 'api_error' });
             setError(parsed.message || (typeof parsed.error === "string" ? parsed.error : null) || "Something went wrong. Please try again.");
@@ -618,9 +624,14 @@ export default function App({ onGoHome, navigate, isOnline = true }) {
             trackEvent('shift_brain_priority_map_completed', { mode });
             setStreaming(false);
             setStreamBuffer("");
-            setRawText(accumulatedRef.current);
             const parsedResult = parseResponse(accumulatedRef.current);
-            setResult({ ...parsedResult, urgencyLevel: extractUrgencyLevel(accumulatedRef.current) });
+            const nextResult = { ...parsedResult, urgencyLevel: extractUrgencyLevel(accumulatedRef.current) };
+            if (isFollowUp) {
+              setFollowUpResult(nextResult);
+            } else {
+              setRawText(accumulatedRef.current);
+              setResult(nextResult);
+            }
             setFollowUpActive(false);
             isActiveRef.current = false;
             return;
@@ -664,12 +675,16 @@ export default function App({ onGoHome, navigate, isOnline = true }) {
   // (which has a [] dep array) can always call the latest version.
   runQueryRef.current = runQuery;
 
-  const handleSnapshotBuild = (serializedSnapshot) => runQuery(serializedSnapshot);
+  const handleSnapshotBuild = (serializedSnapshot, snapshot) => {
+    setSubmittedSnapshot({ serializedSnapshot, snapshot });
+    runQuery(serializedSnapshot);
+  };
 
   const handleFollowUp = () => {
     if (!followUp.trim()) return;
     trackEvent('copilot_continue_thinking', { mode });
     const combined = `Original situation: ${lastSubmittedRef.current}\n\nUpdate: ${followUp.trim()}`;
+    setFollowUpOpen(false);
     runQuery(combined, { isFollowUp: true });
   };
 
@@ -733,22 +748,31 @@ export default function App({ onGoHome, navigate, isOnline = true }) {
 
   const handleTeachMe = useCallback(async () => {
     if (!rawText || !question) throw new Error("Priority Map context is unavailable.");
-    const res = await fetch(`${API_BASE}/api/copilot`, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        question,
-        mode,
-        learningRequest: true,
-        priorityMapResponse: rawText,
-      }),
-    });
-    const data = await res.json().catch(() => ({}));
-    if (!res.ok || !data.lesson) {
-      trackEvent("teach_me_error", { reason: "request_failed", status: res.status });
-      throw new Error("Teach Me is unavailable.");
+    if (teachMeRequestRef.current) return teachMeRequestRef.current;
+    const request = (async () => {
+      const res = await fetch(`${API_BASE}/api/copilot`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          question,
+          mode,
+          learningRequest: true,
+          priorityMapResponse: rawText,
+        }),
+      });
+      const data = await res.json().catch(() => ({}));
+      if (!res.ok || !data.lesson) {
+        trackEvent("teach_me_error", { reason: "request_failed", status: res.status });
+        throw new Error("Teach Me is unavailable.");
+      }
+      return data.lesson;
+    })();
+    teachMeRequestRef.current = request;
+    try {
+      return await request;
+    } finally {
+      if (teachMeRequestRef.current === request) teachMeRequestRef.current = null;
     }
-    return data.lesson;
   }, [rawText, question, mode]);
 
   const handleCopySbar = useCallback((sbarData) => {
@@ -771,6 +795,16 @@ export default function App({ onGoHome, navigate, isOnline = true }) {
   }, []);
 
   const isActive = loading || streaming;
+  const initialProcessing = isActive && !followUpActive;
+  const workspaceState = initialProcessing ? "process" : result ? "priority-map" : "capture";
+
+  useEffect(() => {
+    if (workspaceState === "capture" || !submittedSnapshot) return;
+    const frame = requestAnimationFrame(() => {
+      workspaceTopRef.current?.scrollIntoView({ behavior: "smooth", block: "start" });
+    });
+    return () => cancelAnimationFrame(frame);
+  }, [workspaceState, submittedSnapshot]);
 
   return (
     <div style={{
@@ -1161,14 +1195,91 @@ export default function App({ onGoHome, navigate, isOnline = true }) {
         .copilot-action-bar {
           display: flex;
           align-items: center;
-          gap: 10px;
+          justify-content: space-between;
+          gap: 12px;
           margin-top: 16px;
-          padding: 12px;
-          border: 1px solid var(--ce-warm-line);
-          border-radius: var(--ce-r-md);
-          background: rgba(255,253,248,0.62);
+          padding: 14px 0 0;
+          border-top: 1px solid var(--ce-warm-line);
           flex-wrap: wrap;
         }
+        .sbar-trigger-btn {
+          min-height: 46px;
+          padding: 0 18px;
+          border: 1px solid var(--ce-teal);
+          border-radius: 7px;
+          background: var(--ce-teal);
+          color: var(--ce-navy-900);
+          font-size: 13px;
+          font-weight: 800;
+        }
+        .sbar-trigger-btn:disabled {
+          cursor: wait;
+          opacity: 0.68;
+        }
+        .copilot-action-utilities {
+          display: flex;
+          align-items: center;
+          gap: 4px;
+          flex-wrap: wrap;
+        }
+        .copilot-action-utilities button {
+          min-height: 44px;
+          padding: 0 10px;
+          border: 1px solid transparent;
+          border-radius: 7px;
+          background: transparent;
+          color: var(--ce-text-muted);
+          font-size: 12px;
+          font-weight: 700;
+        }
+        .copilot-followup {
+          margin-top: 18px;
+          border-top: 1px solid var(--ce-warm-line);
+          border-bottom: 1px solid var(--ce-warm-line);
+        }
+        .copilot-followup__trigger {
+          width: 100%;
+          min-height: 72px;
+          display: flex;
+          align-items: center;
+          justify-content: space-between;
+          gap: 16px;
+          border: 0;
+          background: transparent;
+          color: var(--ce-text-dark);
+          padding: 10px 0;
+          text-align: left;
+        }
+        .copilot-followup__trigger small,
+        .copilot-followup__trigger strong,
+        .copilot-followup__trigger em { display: block; }
+        .copilot-followup__trigger small {
+          color: var(--ce-teal-deep);
+          font: 700 9px/1.2 var(--ce-font-mono);
+          text-transform: uppercase;
+        }
+        .copilot-followup__trigger strong { margin-top: 4px; font-size: 14px; }
+        .copilot-followup__trigger em { margin-top: 3px; color: var(--ce-text-muted); font-size: 11px; font-style: normal; font-weight: 500; }
+        .copilot-followup__trigger > span:last-child { color: var(--ce-teal-deep); font-size: 19px; }
+        .copilot-followup__body { padding: 0 0 16px; }
+        .copilot-followup__body > label { display: block; margin: 12px 0 6px; color: var(--ce-text-dark); font-size: 11px; font-weight: 750; }
+        .copilot-followup__suggestions { display: flex; flex-wrap: wrap; gap: 6px; }
+        .copilot-followup__suggestions button { min-height: 38px; border: 1px solid var(--ce-warm-line); border-radius: 6px; background: transparent; color: var(--ce-text-muted); padding: 6px 10px; font-size: 11px; }
+        .copilot-followup .followup-textarea { width: 100%; min-height: 76px; resize: vertical; border: 1px solid var(--ce-warm-line); border-radius: 6px; background: var(--ce-warm-card); color: var(--ce-text-dark); padding: 10px 11px; font: 400 13px/1.5 inherit; }
+        .copilot-followup__submit { display: flex; justify-content: flex-end; margin-top: 8px; }
+        .copilot-followup__submit button { min-height: 42px; border: 1px solid rgba(10,143,141,.25); border-radius: 6px; background: rgba(10,191,188,.08); color: var(--ce-teal-deep); padding: 0 14px; font-size: 12px; font-weight: 750; }
+        .copilot-followup__submit button:disabled { opacity: .45; cursor: not-allowed; }
+        .sbar-panel { margin-top: 18px; border-top: 3px solid var(--ce-teal-deep); background: var(--ce-warm-card); box-shadow: var(--ce-shadow-card); padding: 18px; }
+        .sbar-panel__header { display: flex; align-items: flex-start; justify-content: space-between; gap: 16px; margin-bottom: 16px; }
+        .sbar-panel__header span { color: var(--ce-teal-deep); font: 700 9px/1.2 var(--ce-font-mono); text-transform: uppercase; }
+        .sbar-panel__header h2 { margin: 4px 0 0; color: var(--ce-text-dark); font-size: 20px; }
+        .sbar-copy-btn { min-height: 40px; border: 1px solid rgba(10,143,141,.22); border-radius: 6px; background: transparent; color: var(--ce-teal-deep); padding: 0 12px; font-size: 11px; font-weight: 750; }
+        .sbar-panel__sections { display: grid; grid-template-columns: repeat(2,minmax(0,1fr)); gap: 0 20px; }
+        .sbar-panel__sections section { display: grid; grid-template-columns: 30px 1fr; gap: 10px; padding: 14px 0; border-top: 1px solid var(--ce-warm-line); }
+        .sbar-panel__sections section > span { width: 28px; height: 28px; display: grid; place-items: center; border-radius: 50%; background: var(--ce-navy-900); color: var(--ce-teal); font: 700 11px/1 var(--ce-font-mono); }
+        .sbar-panel__sections h3 { margin: 0; color: var(--ce-text-dark); font-size: 13px; }
+        .sbar-panel__sections p { margin: 4px 0 0; color: var(--ce-text-muted); font-size: 12.5px; line-height: 1.55; }
+        .sbar-panel__note { margin-top: 10px; color: var(--ce-text-muted); font-size: 10.5px; line-height: 1.5; }
         .copilot-loading-card,
         .copilot-stream-card {
           border: 1px solid var(--ce-warm-line);
@@ -1177,8 +1288,12 @@ export default function App({ onGoHome, navigate, isOnline = true }) {
           box-shadow: var(--ce-shadow-card);
         }
         .copilot-loading-card {
-          padding: 20px;
-          margin: 12px 0 16px;
+          min-height: 220px;
+          display: flex;
+          flex-direction: column;
+          justify-content: center;
+          padding: 28px;
+          margin: 0 0 16px;
         }
         .copilot-loading-meter {
           display: flex;
@@ -1196,8 +1311,8 @@ export default function App({ onGoHome, navigate, isOnline = true }) {
         .copilot-loading-card strong {
           display: block;
           color: var(--ce-text-dark);
-          font-size: 14px;
-          margin-bottom: 4px;
+          font-size: 21px;
+          margin-bottom: 7px;
         }
         .copilot-loading-card small {
           display: block;
@@ -1205,6 +1320,24 @@ export default function App({ onGoHome, navigate, isOnline = true }) {
           font-size: 12px;
           line-height: 1.45;
         }
+        .copilot-loading-eyebrow {
+          margin-bottom: 8px;
+          color: var(--ce-teal-deep);
+          font: 700 10px/1.2 var(--ce-font-mono);
+          text-transform: uppercase;
+        }
+        .copilot-loading-reassurance {
+          margin-top: 14px;
+          padding-top: 12px;
+          border-top: 1px solid var(--ce-warm-line);
+        }
+        .copilot-workspace-stage {
+          width: 100%;
+          max-width: 960px;
+          margin: 0 auto;
+          scroll-margin-top: 72px;
+        }
+        .copilot-capture[hidden] { display: none !important; }
         .copilot-stream-card {
           padding: 18px 20px;
           margin-bottom: 10px;
@@ -1262,8 +1395,9 @@ export default function App({ onGoHome, navigate, isOnline = true }) {
           transition-duration: 60ms !important;
         }
         .sbar-trigger-btn:hover:not(:disabled) {
-          border-color: rgba(10,191,188,0.32) !important;
-          background: rgba(10,191,188,0.11) !important;
+          border-color: var(--ce-teal-deep) !important;
+          background: var(--ce-teal-deep) !important;
+          color: #fff !important;
         }
         .sbar-trigger-btn:active:not(:disabled) {
           transform: scale(0.98);
@@ -1331,7 +1465,17 @@ export default function App({ onGoHome, navigate, isOnline = true }) {
           .copilot-context-strip { grid-template-columns: 1fr; }
           .copilot-result-topper { grid-template-columns: 1fr; }
           .copilot-result-topper__meta { min-width: 0; flex-direction: row; flex-wrap: wrap; }
-          .copilot-action-bar { padding: 10px; }
+          .copilot-action-bar { align-items: stretch; flex-direction: column; padding-top: 12px; }
+          .sbar-trigger-btn { width: 100%; }
+          .copilot-action-utilities { justify-content: center; }
+          .copilot-followup__suggestions { flex-direction: column; align-items: stretch; }
+          .copilot-followup__suggestions button { min-height: 44px; text-align: left; }
+          .sbar-panel { padding: 16px 14px; }
+          .sbar-panel__header { align-items: stretch; flex-direction: column; }
+          .sbar-copy-btn { align-self: flex-start; }
+          .sbar-panel__sections { grid-template-columns: 1fr; }
+          .copilot-loading-card { min-height: 190px; padding: 22px 18px; }
+          .copilot-loading-card strong { font-size: 19px; }
           .hero { margin-bottom: 12px !important; }
           /* Reduce try-asking chip density — show max 3 */
           .chips-try button:nth-child(n+4) { display: none !important; }
@@ -1348,9 +1492,9 @@ export default function App({ onGoHome, navigate, isOnline = true }) {
       <div className="ce-page-enter" style={{ background: "var(--ce-warm-bg)", minHeight: "100vh" }}>
 
       {/* ── Main ─────────────────────────────────────────────────────────── */}
-      <div className="main-container" style={{ maxWidth: 1120, margin: "0 auto", width: "100%", padding: "40px 20px 0", display: "flex", flexDirection: "column", alignItems: "stretch" }}>
+      <div className="main-container" data-workspace-state={workspaceState} style={{ maxWidth: 1120, margin: "0 auto", width: "100%", padding: "40px 20px 0", display: "flex", flexDirection: "column", alignItems: "stretch" }}>
 
-        <div className="copilot-command-layout">
+        <div className="copilot-command-layout copilot-capture" hidden={workspaceState !== "capture"}>
           <div className="copilot-command-main">
 
         <PatientSnapshot
@@ -1467,9 +1611,19 @@ export default function App({ onGoHome, navigate, isOnline = true }) {
           </aside>
         </div>
 
+        {workspaceState !== "capture" && submittedSnapshot && (
+          <div ref={workspaceTopRef} className="copilot-workspace-stage ce-section-enter">
+            <SubmittedSnapshotSummary
+              snapshot={submittedSnapshot.snapshot}
+              serializedSnapshot={submittedSnapshot.serializedSnapshot}
+              state={workspaceState === "process" ? "process" : "result"}
+            />
+          </div>
+        )}
+
         {/* Error */}
         {error && (
-          <div className="ce-section-enter" style={{
+          <div className="ce-section-enter" role="alert" style={{
             display: "flex",
             gap: 10,
             alignItems: "center",
@@ -1492,128 +1646,24 @@ export default function App({ onGoHome, navigate, isOnline = true }) {
           </div>
         )}
 
-        {/* Loading */}
-        {loading && (
-          <div ref={outputRef}>
-            <LoadingIndicator />
-          </div>
-        )}
-
-        {/* Streaming preview */}
-        {streaming && streamBuffer && !followUpActive && (
-          <div ref={outputRef}>
-            <LoadingIndicator />
-            <StreamPreview text={streamBuffer} />
+        {/* Initial processing */}
+        {initialProcessing && (
+          <div ref={outputRef} className="copilot-workspace-stage ce-section-enter" aria-live="polite">
+            <LoadingIndicator stage={processingStage} />
           </div>
         )}
 
         {/* Final structured result */}
         {result && (!streaming || followUpActive) && (
-          <div ref={outputRef} className="copilot-result-shell">
+          <div ref={outputRef} className="copilot-result-shell copilot-workspace-stage ce-section-enter">
             <PriorityMap result={result} onRequestTeachMe={handleTeachMe} />
 
             {/* Action bar */}
             <div className="copilot-action-bar">
-              {/* Save — primary action */}
-              <button
-                className="save-case-btn"
-                onClick={handleSaveCase}
-                disabled={justSaved}
-                style={{
-                  background: justSaved ? "rgba(10,191,188,0.10)" : "rgba(10,191,188,0.04)",
-                  border: "1px solid " + (justSaved ? "rgba(10,191,188,0.30)" : "rgba(10,191,188,0.22)"),
-                  color: "var(--ce-teal-deep)",
-                  borderRadius: 8,
-                  padding: "9px 20px",
-                  fontSize: 13,
-                  fontWeight: 600,
-                  cursor: justSaved ? "default" : "pointer",
-                  display: "flex",
-                  alignItems: "center",
-                  gap: 7,
-                  transition:
-                    "background-color var(--ce-dur-fast) var(--ce-ease-out), " +
-                    "border-color var(--ce-dur-fast) var(--ce-ease-out), " +
-                    "color var(--ce-dur-fast) var(--ce-ease-out), " +
-                    "transform var(--ce-dur-fast) var(--ce-ease-out)",
-                  letterSpacing: "-0.1px",
-                }}
-              >
-                <span key={justSaved ? "saved" : "save"} className="ce-swap-fast">{justSaved ? "\u2713 Case Saved" : "+ Save Case"}</span>
-              </button>
-
-              {/* Copy — secondary, quieter */}
-              <button
-                className="copy-btn"
-                onClick={() => handleCopyResponse(rawText)}
-                style={{
-                  background: "transparent",
-                  border: "1px solid rgba(0,0,0,0.12)",
-                  color: "var(--ce-text-muted)",
-                  borderRadius: 8,
-                  padding: "9px 18px",
-                  fontSize: 13,
-                  fontWeight: 400,
-                  cursor: "pointer",
-                  transition:
-                    "border-color var(--ce-dur-fast) var(--ce-ease-out), " +
-                    "color var(--ce-dur-fast) var(--ce-ease-out), " +
-                    "transform var(--ce-dur-fast) var(--ce-ease-out)",
-                  letterSpacing: "-0.1px",
-                }}
-              >
-                Copy Response
-              </button>
-
-              {/* Sources — regulatory affordance */}
-              <button
-                className="sources-btn"
-                onClick={() => setSourcesOpen(o => !o)}
-                style={{
-                  background: "transparent",
-                  border: "1px solid rgba(0,0,0,0.10)",
-                  color: "var(--ce-text-muted)",
-                  borderRadius: 8,
-                  padding: "9px 16px",
-                  fontSize: 12.5,
-                  fontWeight: 400,
-                  cursor: "pointer",
-                  transition:
-                    "background-color var(--ce-dur-fast) var(--ce-ease-out), " +
-                    "border-color var(--ce-dur-fast) var(--ce-ease-out), " +
-                    "transform var(--ce-dur-fast) var(--ce-ease-out)",
-                  letterSpacing: "-0.1px",
-                }}
-              >
-                Sources
-              </button>
-
-              {/* SBAR — tertiary, accent */}
               <button
                 className="sbar-trigger-btn"
                 onClick={handleSbar}
                 disabled={sbarLoading}
-                style={{
-                  marginLeft: "auto",
-                  background: sbar && !sbar.error ? "rgba(10,191,188,0.07)" : "transparent",
-                  border: "1px solid " + (sbar && !sbar.error ? "rgba(10,191,188,0.25)" : "rgba(10,191,188,0.14)"),
-                  color: sbarLoading ? "rgba(10,191,188,0.35)" : "var(--ce-teal)",
-                  borderRadius: 8,
-                  padding: "9px 16px",
-                  fontSize: 12.5,
-                  fontWeight: 500,
-                  cursor: sbarLoading ? "default" : "pointer",
-                  transition:
-                    "background-color var(--ce-dur-fast) var(--ce-ease-out), " +
-                    "border-color var(--ce-dur-fast) var(--ce-ease-out), " +
-                    "color var(--ce-dur-fast) var(--ce-ease-out), " +
-                    "transform var(--ce-dur-fast) var(--ce-ease-out)",
-                  letterSpacing: "-0.1px",
-                  display: "flex",
-                  alignItems: "center",
-                  gap: 6,
-                  flexShrink: 0,
-                }}
               >
                 {sbarLoading ? (
                   <span className="ce-breathe">Building SBAR…</span>
@@ -1621,6 +1671,13 @@ export default function App({ onGoHome, navigate, isOnline = true }) {
                   "Prepare SBAR"
                 )}
               </button>
+              <div className="copilot-action-utilities" aria-label="Priority Map utilities">
+                <button className="save-case-btn" onClick={handleSaveCase} disabled={justSaved}>
+                  <span key={justSaved ? "saved" : "save"} className="ce-swap-fast">{justSaved ? "\u2713 Case saved locally" : "Save case locally"}</span>
+                </button>
+                <button className="copy-btn" onClick={() => handleCopyResponse(rawText)}>Copy</button>
+                <button className="sources-btn" onClick={() => setSourcesOpen((open) => !open)}>Sources</button>
+              </div>
             </div>
 
             {/* ── Sources panel ─────────────────────────────────────────── */}
@@ -1700,116 +1757,46 @@ export default function App({ onGoHome, navigate, isOnline = true }) {
               </div>
             )}
 
-            {/* ── Continue Thinking ─────────────────────────────────────── */}
-            <div style={{
-              marginTop: 22,
-              background: "var(--ce-navy-700)",
-              border: "1px solid var(--ce-line-navy)",
-              borderRadius: 8,
-              padding: "16px 18px",
-            }}>
-              <div style={{
-                fontSize: 9,
-                fontWeight: 700,
-                textTransform: "uppercase",
-                letterSpacing: "1.3px",
-                color: "var(--ce-text-dim)",
-                marginBottom: 10,
-                fontFamily: "'IBM Plex Mono', monospace",
-              }}>
-                Anything change?
-              </div>
-              <textarea
-                className="followup-textarea"
-                value={followUp}
-                onChange={(e) => setFollowUp(e.target.value)}
-                onKeyDown={(e) => { if (e.key === "Enter" && (e.metaKey || e.ctrlKey)) handleFollowUp(); }}
-                placeholder="New vitals, labs, or anything different?"
-                rows={2}
-                style={{
-                  width: "100%",
-                  background: "transparent",
-                  border: "none",
-                  borderBottom: "1px solid rgba(10,191,188,0.15)",
-                  color: "var(--ce-text-light)",
-                  fontSize: 14,
-                  lineHeight: 1.6,
-                  resize: "none",
-                  fontFamily: "inherit",
-                  paddingBottom: 8,
-                  marginBottom: 10,
-                  display: "block",
-                  outline: "none",
-                }}
-              />
-              <div style={{ display: "flex", justifyContent: "flex-end" }}>
-                <button
-                  className="send-update-btn"
-                  onClick={handleFollowUp}
-                  disabled={!followUp.trim()}
-                  style={{
-                    background: followUp.trim() ? "rgba(10,191,188,0.10)" : "transparent",
-                    border: "1px solid " + (followUp.trim() ? "rgba(10,191,188,0.30)" : "rgba(255,255,255,0.10)"),
-                    color: followUp.trim() ? "var(--ce-teal)" : "var(--ce-text-dim)",
-                    borderRadius: 8,
-                    padding: "7px 16px",
-                    fontSize: 12,
-                    fontWeight: 600,
-                    cursor: followUp.trim() ? "pointer" : "not-allowed",
-                    fontFamily: "inherit",
-                    transition:
-                      "background-color var(--ce-dur-fast) var(--ce-ease-out), " +
-                      "border-color var(--ce-dur-fast) var(--ce-ease-out), " +
-                      "color var(--ce-dur-fast) var(--ce-ease-out), " +
-                      "transform var(--ce-dur-fast) var(--ce-ease-out)",
-                  }}
-                >
-                  Send update
-                </button>
-              </div>
-            </div>
+            {/* ── Focused clarification ─────────────────────────────────── */}
+            <section className="copilot-followup">
+              <button type="button" className="copilot-followup__trigger" aria-expanded={followUpOpen} onClick={() => setFollowUpOpen((open) => !open)}>
+                <span><small>Focused clarification</small><strong>Ask about this Priority Map</strong><em>Add a new finding or ask for explanation without starting over.</em></span>
+                <span aria-hidden="true">{followUpOpen ? "−" : "+"}</span>
+              </button>
+              {followUpOpen && <div className="copilot-followup__body">
+                <div className="copilot-followup__suggestions" aria-label="Suggested follow-ups">
+                  {["What should I reassess first?", "What finding would raise concern?", "Explain the physiology."].map((suggestion) => <button type="button" key={suggestion} onClick={() => setFollowUp(suggestion)}>{suggestion}</button>)}
+                </div>
+                <label htmlFor="copilot-followup-input">Your focused question or update</label>
+                <textarea
+                  id="copilot-followup-input"
+                  className="followup-textarea"
+                  value={followUp}
+                  onChange={(e) => setFollowUp(e.target.value)}
+                  onKeyDown={(e) => { if (e.key === "Enter" && (e.metaKey || e.ctrlKey)) handleFollowUp(); }}
+                  placeholder="New finding, reassessment, or focused question"
+                  rows={2}
+                />
+                <div className="copilot-followup__submit"><button className="send-update-btn" onClick={handleFollowUp} disabled={!followUp.trim() || isActive}>{isActive ? "Working…" : "Ask about this map"}</button></div>
+              </div>}
+            </section>
+
+            {followUpResult && <section className="copilot-followup-result" aria-label="Focused clarification response">
+              <PriorityMap result={followUpResult} onRequestTeachMe={handleTeachMe} variant="clarification" />
+            </section>}
 
           {/* ── SBAR Card ────────────────────────────────────────────── */}
           {(sbar || sbarLoading) && (
-            <div style={{
-              marginTop: 16,
-              background: "var(--ce-navy-700)",
-              border: "1px solid var(--ce-line-navy)",
-              borderRadius: 8,
-              padding: "20px 20px 16px",
-            }}>
+            <section className="sbar-panel" aria-labelledby="sbar-heading">
               {/* Header */}
-              <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 16 }}>
-                <div style={{
-                  fontSize: 9,
-                  fontWeight: 700,
-                  textTransform: "uppercase",
-                  letterSpacing: "1.4px",
-                  color: "var(--ce-text-dim)",
-                  fontFamily: "'IBM Plex Mono', monospace",
-                }}>
-                  SBAR Handoff Draft
-                </div>
+              <div className="sbar-panel__header">
+                <div><span>Communication draft</span><h2 id="sbar-heading">SBAR handoff</h2></div>
                 {sbar && !sbar.error && (
                   <button
                     className="sbar-copy-btn"
                     onClick={() => handleCopySbar(sbar)}
-                    style={{
-                      background: "transparent",
-                      border: "1px solid rgba(10,191,188,0.18)",
-                      color: sbarCopied ? "var(--ce-teal)" : "rgba(10,191,188,0.55)",
-                      borderRadius: 8,
-                      padding: "4px 11px",
-                      fontSize: 11,
-                      fontWeight: 500,
-                      cursor: "pointer",
-                      transition:
-                        "border-color var(--ce-dur-fast) var(--ce-ease-out), " +
-                        "color var(--ce-dur-fast) var(--ce-ease-out), " +
-                        "transform var(--ce-dur-fast) var(--ce-ease-out)",
-                    }}
                   >
-                    <span key={sbarCopied ? "copied" : "copy"} className="ce-swap-fast">{sbarCopied ? "✓ Copied" : "Copy"}</span>
+                    <span key={sbarCopied ? "copied" : "copy"} className="ce-swap-fast">{sbarCopied ? "✓ SBAR copied" : "Copy SBAR"}</span>
                   </button>
                 )}
               </div>
@@ -1825,42 +1812,22 @@ export default function App({ onGoHome, navigate, isOnline = true }) {
               )}
 
               {sbar && !sbar.error && (
-                <div style={{ display: "flex", flexDirection: "column", gap: 14 }}>
+                <div className="sbar-panel__sections">
                   {[
-                    { label: "Situation",      value: sbar.situation,      accent: "var(--ce-blue)" },
-                    { label: "Background",     value: sbar.background,     accent: "var(--ce-text-light-body)" },
-                    { label: "Assessment",     value: sbar.assessment,     accent: "var(--ce-text-dim)" },
-                    { label: "Recommendation", value: sbar.recommendation, accent: "var(--ce-text-dim)" },
-                  ].map(({ label, value, accent }) => (
-                    <div key={label}>
-                      <div style={{
-                        fontSize: 9,
-                        fontWeight: 700,
-                        textTransform: "uppercase",
-                        letterSpacing: "1px",
-                        color: accent,
-                        fontFamily: "'IBM Plex Mono', monospace",
-                        marginBottom: 5,
-                        opacity: 0.85,
-                      }}>
-                        {label}
-                      </div>
-                      <div style={{
-                        fontSize: 13.5,
-                        lineHeight: 1.65,
-                        color: "var(--ce-text-light-body)",
-                      }}>
-                        {value ? renderInline(value) : "—"}
-                      </div>
-                    </div>
+                    { label: "Situation", value: sbar.situation, letter: "S" },
+                    { label: "Background", value: sbar.background, letter: "B" },
+                    { label: "Assessment", value: sbar.assessment, letter: "A" },
+                    { label: "Recommendation", value: sbar.recommendation, letter: "R" },
+                  ].map(({ label, value, letter }) => (
+                    <section key={label}><span aria-hidden="true">{letter}</span><div><h3>{label}</h3><p>{value ? renderInline(value) : "—"}</p></div></section>
                   ))}
                 </div>
               )}
 
-              <div style={{ marginTop: 14, fontSize: 10.5, color: "rgba(168,193,204,0.28)", lineHeight: 1.5 }}>
+              <div className="sbar-panel__note">
                 AI-generated draft — verify all details before use. Do not include patient identifiers.
               </div>
-            </div>
+            </section>
           )}
 
         </div>

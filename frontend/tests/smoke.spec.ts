@@ -1,5 +1,37 @@
 import { test, expect } from '@playwright/test';
 
+const GROUNDED_TEST_PRIORITY_MAP = `Urgency Level: MODERATE
+
+**Priorities**
+### 1 · Reported perfusion change
+Relevance: Important
+Observed:
+- A blood-pressure value was reported
+Interpretation: The cause is not established.
+Assess now:
+- Focused reassessment
+
+**Assess first**
+- Focused reassessment
+
+**Possible patterns**
+- Several contributors remain possible
+
+**Missing information**
+- Additional trend context
+
+**Monitor and trend**
+- Direction of change
+
+**Escalation triggers**
+- Worsening clinical status
+
+**SBAR-ready summary**
+A perfusion change was reported.
+
+**Teach me why**
+Trends add context without establishing a diagnosis.`;
+
 test.beforeEach(async ({ page }) => {
   // Fresh browser storage so saved-case/prefill state cannot leak between tests.
   await page.addInitScript(() => {
@@ -31,8 +63,9 @@ test('copilot starts with the adaptive What Changed snapshot', async ({ page }) 
 test('snapshot supports multi-select, adaptive fields, removal, and progressive disclosure', async ({ page }) => {
   await page.goto('/copilot');
   const perfusion = page.getByRole('button', { name: /BP \/ perfusion/ });
-  const breathing = page.getByRole('button', { name: /^Breathing/ });
   await perfusion.click();
+  await page.getByText('Add another change').click();
+  const breathing = page.getByRole('button', { name: /^Breathing/ });
   await breathing.click();
   await expect(perfusion).toHaveAttribute('aria-pressed', 'true');
   await expect(breathing).toHaveAttribute('aria-pressed', 'true');
@@ -71,7 +104,7 @@ test('BP perfusion builder reveals contextual modules and preserves structured t
   await page.getByLabel('Current dose').fill('0.08');
   await page.getByLabel('Unit').fill('mcg/kg/min');
   await page.getByText('Review Snapshot before building').click();
-  await expect(page.locator('.snapshot-review')).toContainText('CI: previous 2.4 -> current 1.8 L/min/m2');
+  await expect(page.locator('.snapshot-review')).toContainText('Earlier 2.4 L/min/m2 → Now 1.8 L/min/m2');
   await page.getByRole('button', { name: 'Build my Priority Map →' }).click();
   await expect.poll(() => submittedQuestion).toContain('BP: previous 118/72 -> current 86/48 mmHg');
   expect(submittedQuestion).toContain('BP: previous 118/72 -> current 86/48 mmHg');
@@ -85,10 +118,298 @@ test('BP perfusion builder supports explicit unknown and not-assessed states', a
   await page.goto('/copilot');
   await page.getByRole('button', { name: /BP \/ perfusion/ }).click();
   const mapField = page.locator('fieldset.snapshot-trend').filter({ has: page.locator('legend', { hasText: /^MAP/ }) });
-  await mapField.getByRole('button', { name: 'Unknown' }).click();
+  await mapField.getByLabel('MAP state').selectOption('Unknown');
   await page.getByText('Review Snapshot before building').click();
-  await expect(page.locator('.snapshot-review')).toContainText('MAP: Unknown');
-  await expect(page.locator('.snapshot-review')).not.toContainText('Mental-status change:');
+  await expect(page.locator('.snapshot-review')).toContainText('Unknown / not assessed');
+  await expect(page.locator('.snapshot-review')).toContainText('MAP');
+  await expect(page.locator('.snapshot-review')).not.toContainText('Mental-status change');
+});
+
+test('semantic Snapshot review preserves temporal and explicit-state evidence boundaries', async ({ page }) => {
+  let submittedQuestion = '';
+  await page.route('**/api/copilot', async (route) => {
+    submittedQuestion = (await route.request().postDataJSON()).question;
+    await route.fulfill({ status: 200, contentType: 'text/event-stream', body: `data: ${JSON.stringify({ text: GROUNDED_TEST_PRIORITY_MAP })}\n\ndata: ${JSON.stringify({ done: true })}\n\n` });
+  });
+  await page.goto('/copilot');
+  await page.getByRole('button', { name: /BP \/ perfusion/ }).click();
+  await page.getByRole('button', { name: 'CTICU' }).click();
+  await page.getByLabel('Blood pressure previous').fill('118/70');
+  await page.getByLabel('Blood pressure current').fill('92/58');
+  await page.getByLabel('MAP current').fill('61');
+  await page.getByLabel('Heart rate previous').fill('80');
+  await page.getByLabel('Heart rate current').fill('80');
+  await page.getByLabel('Urine output previous').fill('40');
+  await page.getByRole('button', { name: /Hemodynamics/ }).click();
+  const ciField = page.locator('fieldset.snapshot-trend').filter({ has: page.locator('legend', { hasText: /^CI/ }) });
+  const cvpField = page.locator('fieldset.snapshot-trend').filter({ has: page.locator('legend', { hasText: /^CVP/ }) });
+  await ciField.getByLabel('CI state').selectOption('Unknown');
+  await cvpField.getByLabel('CVP state').selectOption('Not assessed');
+  await page.getByLabel('Brief overall concern').fill('Fictional review-only context');
+  await page.getByText('Review Snapshot before building').click();
+
+  const review = page.locator('.snapshot-review-content');
+  await expect(review).toContainText('Earlier 118/70 mmHg → Now 92/58 mmHg');
+  await expect(review).toContainText('Earlier 80 bpm → Now 80 bpm');
+  await expect(review).not.toContainText(/worsen|improv|deteriorat/i);
+  await expect(review).toContainText('Now 61 mmHg');
+  await expect(review).not.toContainText('MAP Unknown');
+  await expect(review).toContainText('Earlier 40 mL/hr; now not entered');
+  await expect(review).toContainText('CI');
+  await expect(review).toContainText('Unknown');
+  await expect(review).toContainText('CVP');
+  await expect(review).toContainText('Not assessed');
+  await expect(review).not.toContainText('Potassium');
+  await expect(review).toContainText('Fictional review-only context');
+
+  await page.getByRole('button', { name: 'Build my Priority Map →' }).click();
+  await expect.poll(() => submittedQuestion).toContain('BP: previous 118/70 -> current 92/58 mmHg');
+  expect(submittedQuestion).toContain('MAP: previous unknown -> current 61 mmHg');
+  expect(submittedQuestion).toContain('Heart rate: previous 80 -> current 80 bpm');
+  expect(submittedQuestion).toContain('Urine output: previous 40 -> current unknown mL/hr');
+  expect(submittedQuestion).toContain('CI: Unknown');
+  expect(submittedQuestion).toContain('CVP: Not assessed');
+  expect(submittedQuestion).not.toContain('Potassium:');
+});
+
+test('guided BP perfusion modules preserve structured values through collapse and serialization', async ({ page }) => {
+  let submittedQuestion = '';
+  await page.route('**/api/copilot', async (route) => {
+    submittedQuestion = (await route.request().postDataJSON()).question;
+    await route.fulfill({ status: 200, contentType: 'text/event-stream', body: `data: ${JSON.stringify({ text: '**What stands out**\n- Reported perfusion change' })}\n\ndata: ${JSON.stringify({ done: true })}\n\n` });
+  });
+  await page.goto('/copilot');
+  await page.getByRole('button', { name: /BP \/ perfusion/ }).click();
+  await page.getByRole('button', { name: 'CTICU' }).click();
+  await page.getByRole('button', { name: 'Post-op' }).click();
+
+  await expect(page.getByLabel('Timeframe of change')).toBeVisible();
+  await expect(page.getByLabel('Blood pressure previous')).toBeVisible();
+  await expect(page.getByLabel('MAP current')).toBeVisible();
+  await expect(page.getByLabel('Heart rate current')).toBeVisible();
+  await expect(page.getByLabel('Rhythm')).toBeVisible();
+  await expect(page.getByLabel('Urine-output timeframe')).toBeVisible();
+  await expect(page.getByLabel('Brief overall concern')).toBeVisible();
+
+  const mentalField = page.locator('fieldset.snapshot-choice-field').filter({ has: page.locator('legend', { hasText: 'Mental-status change' }) });
+  await expect(mentalField.getByLabel('Mental-status change state')).toHaveCount(1);
+  await expect(mentalField.getByLabel('Mental-status change state')).toContainText('Unknown');
+  await expect(mentalField.getByLabel('Mental-status change state')).toContainText('Not assessed');
+
+  const hemodynamics = page.getByRole('button', { name: /Hemodynamics/ });
+  await hemodynamics.click();
+  for (const label of ['CVP previous', 'CO current', 'CI current', 'SVR current', 'PA systolic current', 'PA diastolic current', 'PA mean current', 'SvO2 / ScvO2 current']) {
+    await expect(page.getByLabel(label)).toBeVisible();
+  }
+  await page.getByLabel('CI previous').fill('2.4');
+  await page.getByLabel('CI current').fill('1.8');
+
+  const labs = page.locator('.snapshot-disclosure').filter({ has: page.getByText('Labs', { exact: true }) });
+  await labs.click();
+  await expect(page.getByLabel('CI current')).toBeVisible();
+  await page.getByLabel('Lactate previous').fill('1.8');
+  await page.getByLabel('Lactate current').fill('3.1');
+  await page.getByLabel('Hemoglobin current').fill('9.4');
+  await page.getByRole('button', { name: '+ Add lab' }).click();
+  const otherLab = page.locator('.snapshot-repeatable fieldset').filter({ has: page.getByText('Lab 1', { exact: true }) });
+  await otherLab.getByLabel('Lab name').fill('Troponin');
+  await otherLab.getByLabel('Current').fill('18');
+  await otherLab.getByLabel('Unit').fill('ng/L');
+  await otherLab.getByLabel('Timeframe').fill('Current');
+  await labs.click();
+  await expect(labs).toContainText('Added · open to review or edit');
+
+  const drips = page.getByRole('button', { name: /^Drips/ });
+  await drips.click();
+  await page.getByRole('button', { name: '+ Add drip' }).click();
+  await page.getByRole('button', { name: '+ Add drip' }).click();
+  const dripRows = page.locator('.snapshot-repeatable fieldset').filter({ has: page.getByLabel('Medication') });
+  await dripRows.nth(0).getByLabel('Medication').fill('Norepinephrine');
+  await dripRows.nth(0).getByLabel('Current dose').fill('0.08');
+  await dripRows.nth(0).getByLabel('Unit').fill('mcg/kg/min');
+  await dripRows.nth(1).getByLabel('Medication').fill('Vasopressin');
+
+  const interventions = page.getByRole('button', { name: /Fluids \/ interventions/ });
+  await interventions.click();
+  await page.getByRole('button', { name: '+ Add intervention' }).click();
+  const intervention = page.locator('.snapshot-repeatable fieldset').filter({ has: page.getByText('Intervention 1', { exact: true }) });
+  await intervention.getByLabel('Intervention').fill('Fluid bolus');
+  await intervention.getByLabel('Amount').fill('250');
+  await intervention.getByLabel('Unit').fill('mL');
+  await intervention.getByLabel('Observed response').fill('No sustained pressure change');
+
+  const drains = page.getByRole('button', { name: /Drains \/ bleeding/ });
+  await drains.click();
+  await page.getByRole('button', { name: '+ Add drain' }).click();
+  await page.getByRole('button', { name: '+ Add drain' }).click();
+  const drainRows = page.locator('.snapshot-repeatable fieldset').filter({ has: page.getByLabel('Drain / device type') });
+  await drainRows.nth(0).getByLabel('Drain / device type').fill('Mediastinal drain');
+  await drainRows.nth(0).getByLabel('Current output').fill('40');
+  await drainRows.nth(0).getByLabel('Output timeframe').fill('mL over 1 hour');
+  await drainRows.nth(1).getByLabel('Drain / device type').fill('Pleural drain');
+
+  await page.getByRole('button', { name: 'Build my Priority Map →' }).click();
+  await expect.poll(() => submittedQuestion).toContain('CI: previous 2.4 -> current 1.8 L/min/m2');
+  expect(submittedQuestion).toContain('Lactate: previous 1.8 -> current 3.1 mmol/L');
+  expect(submittedQuestion).toContain('name=Troponin');
+  expect(submittedQuestion).toContain('medication=Norepinephrine');
+  expect(submittedQuestion).toContain('medication=Vasopressin');
+  expect(submittedQuestion).toContain('type=Fluid bolus');
+  expect(submittedQuestion).toContain('response=No sustained pressure change');
+  expect(submittedQuestion).toContain('type=Mediastinal drain');
+  expect(submittedQuestion).toContain('type=Pleural drain');
+  expect(submittedQuestion).not.toContain('otherHemodynamic=');
+});
+
+test('Priority Map submission blocks duplicate work while a request is active', async ({ page }) => {
+  let requestCount = 0;
+  await page.route('**/api/copilot', async (route) => {
+    requestCount += 1;
+    await new Promise((resolve) => setTimeout(resolve, 250));
+    await route.fulfill({
+      status: 200,
+      contentType: 'text/event-stream',
+      body: `data: ${JSON.stringify({ progress: 'checking' })}\n\ndata: ${JSON.stringify({ text: GROUNDED_TEST_PRIORITY_MAP })}\n\ndata: ${JSON.stringify({ done: true })}\n\n`,
+    });
+  });
+  await page.goto('/copilot');
+  await page.getByRole('button', { name: /BP \/ perfusion/ }).click();
+  await page.getByLabel('Blood pressure current').fill('92/58');
+  const submit = page.getByRole('button', { name: 'Build my Priority Map →' });
+  await submit.evaluate((button) => { button.click(); button.click(); });
+  await expect(page.getByText('Organizing your snapshot')).toBeVisible();
+  await expect.poll(() => requestCount).toBe(1);
+  await expect(page.locator('.main-container')).toHaveAttribute('data-workspace-state', 'process');
+  await expect(page.getByText('Snapshot submitted')).toBeVisible();
+  await expect(page.getByRole('button', { name: 'Build my Priority Map →' })).toBeHidden();
+  await expect(page.getByText('Priority Map', { exact: true })).toBeVisible();
+  expect(requestCount).toBe(1);
+});
+
+for (const viewport of [{ width: 390, height: 844 }, { width: 1280, height: 900 }]) {
+  test(`Snapshot transitions through capture, process, and Priority Map at ${viewport.width}px`, async ({ page }) => {
+    await page.setViewportSize(viewport);
+    let releaseResponse;
+    const responseReady = new Promise((resolve) => { releaseResponse = resolve; });
+    await page.route('**/api/copilot', async (route) => {
+      await responseReady;
+      await route.fulfill({
+        status: 200,
+        contentType: 'text/event-stream',
+        body: `data: ${JSON.stringify({ text: GROUNDED_TEST_PRIORITY_MAP })}\n\ndata: ${JSON.stringify({ done: true })}\n\n`,
+      });
+    });
+
+    await page.goto('/copilot');
+    await expect(page.locator('.main-container')).toHaveAttribute('data-workspace-state', 'capture');
+    await page.getByRole('button', { name: /BP \/ perfusion/ }).click();
+    await page.getByLabel('MAP current').fill('61');
+    await page.getByRole('button', { name: 'Build my Priority Map →' }).click();
+
+    await expect(page.locator('.main-container')).toHaveAttribute('data-workspace-state', 'process');
+    await expect(page.getByText('Snapshot submitted')).toBeVisible();
+    await expect(page.getByLabel('Submitted Snapshot').locator('.submitted-snapshot__status strong')).toHaveText('BP / perfusion');
+    await expect(page.getByRole('heading', { name: 'What changed?' })).toBeHidden();
+    await expect(page.getByText('Organizing your snapshot')).toBeVisible();
+    await page.getByText('View submitted Snapshot').click();
+    await expect(page.locator('.submitted-snapshot__details .snapshot-review-content')).toContainText('Now 61 mmHg');
+    expect(await page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth)).toBe(true);
+
+    releaseResponse();
+    await expect(page.locator('.main-container')).toHaveAttribute('data-workspace-state', 'priority-map');
+    await expect(page.getByRole('heading', { name: 'What matters first' })).toBeVisible();
+    await expect(page.getByRole('heading', { name: 'Reported perfusion change' })).toBeVisible();
+    await expect(page.getByRole('button', { name: 'Prepare SBAR' })).toBeVisible();
+    await expect(page.getByRole('button', { name: 'Save case locally' })).toBeVisible();
+    await expect(page.getByRole('heading', { name: 'What changed?' })).toBeHidden();
+    expect(await page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth)).toBe(true);
+  });
+}
+
+test('result actions keep SBAR primary and follow-up deliberate, contextual, and private', async ({ page }) => {
+  await page.addInitScript(() => {
+    (window as typeof window & { __analyticsDebug: unknown[]; __copiedText: string }).__analyticsDebug = [];
+    Object.defineProperty(navigator, 'clipboard', { value: { writeText: async (text: string) => { (window as typeof window & { __copiedText: string }).__copiedText = text; } }, configurable: true });
+    const original = console.debug;
+    console.debug = (...args) => {
+      (window as typeof window & { __analyticsDebug: unknown[] }).__analyticsDebug.push(args);
+      original(...args);
+    };
+  });
+  let copilotRequests = 0;
+  let followUpBody;
+  await page.route('**/api/sbar', async (route) => route.fulfill({
+    status: 200,
+    contentType: 'application/json',
+    body: JSON.stringify({ sbar: { situation: 'Situation exact.', background: 'Background exact.', assessment: 'Assessment exact.', recommendation: 'Recommendation exact.' } }),
+  }));
+  await page.route('**/api/copilot', async (route) => {
+    copilotRequests += 1;
+    followUpBody = await route.request().postDataJSON();
+    await new Promise((resolve) => setTimeout(resolve, 100));
+    await route.fulfill({ status: 200, contentType: 'text/event-stream', body: `data: ${JSON.stringify({ text: GROUNDED_TEST_PRIORITY_MAP })}\n\ndata: ${JSON.stringify({ done: true })}\n\n` });
+  });
+
+  await page.goto('/copilot?screenshot=response');
+  await expect(page.getByRole('heading', { name: 'What matters first' })).toBeVisible();
+  await expect(page.getByRole('heading', { name: 'Evolving postoperative change' })).toBeVisible();
+  await expect(page.getByRole('button', { name: 'Prepare SBAR' })).toBeVisible();
+  await expect(page.getByLabel('Your focused question or update')).toHaveCount(0);
+
+  await page.getByRole('button', { name: /Ask about this Priority Map/ }).click();
+  await page.getByRole('button', { name: 'What should I reassess first?' }).click();
+  const followUpInput = page.getByLabel('Your focused question or update');
+  await expect(followUpInput).toHaveValue('What should I reassess first?');
+  const submit = page.getByRole('button', { name: 'Ask about this map' });
+  await submit.evaluate((button) => { button.click(); button.click(); });
+  await expect.poll(() => copilotRequests).toBe(1);
+  expect(followUpBody.isFollowUp).toBe(true);
+  expect(followUpBody.question).toContain('What should I reassess first?');
+  await expect(page.getByRole('heading', { name: 'Clarification' })).toBeVisible();
+  await expect(page.getByRole('heading', { name: 'Reported perfusion change' })).toBeVisible();
+  await expect(page.getByRole('heading', { name: 'Evolving postoperative change' })).toBeVisible();
+
+  await page.getByRole('button', { name: 'Prepare SBAR' }).click();
+  for (const heading of ['Situation', 'Background', 'Assessment', 'Recommendation']) await expect(page.getByRole('heading', { name: heading, exact: true })).toBeVisible();
+  await page.getByRole('button', { name: 'Copy SBAR' }).click();
+  expect(await page.evaluate(() => (window as typeof window & { __copiedText: string }).__copiedText)).toBe('SITUATION:\nSituation exact.\n\nBACKGROUND:\nBackground exact.\n\nASSESSMENT:\nAssessment exact.\n\nRECOMMENDATION:\nRecommendation exact.');
+  const analytics = await page.evaluate(() => JSON.stringify((window as typeof window & { __analyticsDebug: unknown[] }).__analyticsDebug));
+  expect(analytics).not.toContain('What should I reassess first?');
+  expect(analytics).not.toContain('Situation exact.');
+});
+
+test('timeout-style failure keeps Snapshot values and exposes an accessible mobile error', async ({ page }) => {
+  await page.setViewportSize({ width: 390, height: 844 });
+  await page.route('**/api/copilot', async (route) => {
+    await route.fulfill({ status: 504, contentType: 'application/json', body: JSON.stringify({ code: 'request_timeout' }) });
+  });
+  await page.goto('/copilot');
+  await page.getByRole('button', { name: /BP \/ perfusion/ }).click();
+  await page.getByLabel('Blood pressure previous').fill('118/72');
+  await page.getByLabel('Blood pressure current').fill('92/58');
+  await page.getByRole('button', { name: 'Build my Priority Map →' }).click();
+  await expect(page.getByRole('alert')).toContainText('clinical reasoning service timed out');
+  await expect(page.getByLabel('Blood pressure previous')).toHaveValue('118/72');
+  await expect(page.getByLabel('Blood pressure current')).toHaveValue('92/58');
+  await expect(page.getByRole('button', { name: 'Build my Priority Map →' })).toBeEnabled();
+});
+
+test('BP perfusion disclosures behave as an accordion on mobile and independently on desktop', async ({ page }) => {
+  await page.setViewportSize({ width: 390, height: 844 });
+  await page.goto('/copilot');
+  await page.getByRole('button', { name: /BP \/ perfusion/ }).click();
+  const assessment = page.getByRole('button', { name: /Perfusion assessment/ });
+  const labs = page.getByRole('button', { name: /Labs Relevant/ });
+  await assessment.click();
+  await expect(assessment).toHaveAttribute('aria-expanded', 'true');
+  await labs.click();
+  await expect(labs).toHaveAttribute('aria-expanded', 'true');
+  await expect(assessment).toHaveAttribute('aria-expanded', 'false');
+
+  await page.setViewportSize({ width: 1280, height: 900 });
+  await assessment.click();
+  await expect(assessment).toHaveAttribute('aria-expanded', 'true');
+  await expect(labs).toHaveAttribute('aria-expanded', 'true');
 });
 
 test('Something feels off exposes a general deterioration snapshot and accepts incomplete trends', async ({ page }) => {
@@ -210,8 +531,11 @@ Lower circulating volume can reduce preload and cardiac output while sympathetic
 
   await expect(page.getByRole('heading', { name: 'What matters first' })).toBeVisible();
   await expect(page.getByRole('heading', { name: 'Perfusion concern' })).toBeVisible();
-  await expect(page.getByText('Observed / reported', { exact: true })).toBeVisible();
-  await expect(page.getByText('Clinical interpretation', { exact: true })).toBeVisible();
+  await expect(page.locator('.priority-primary h3')).toHaveText('Perfusion concern');
+  await expect(page.locator('.priority-secondary summary strong')).toHaveText('2 · Possible volume loss');
+  await expect(page.locator('.priority-secondary details')).not.toHaveAttribute('open', '');
+  await expect(page.locator('.priority-primary').getByText('Reported / observed', { exact: true })).toBeVisible();
+  await expect(page.locator('.priority-primary').getByText('Clinical Edge interpretation', { exact: true })).toBeVisible();
   await expect(page.getByText('Blood pressure fell from 118/72 to 88/50')).toBeVisible();
   await expect(page.getByText('Heart rate is 122')).toBeVisible();
   await expect(page.getByText('This pattern may reflect impaired perfusion; the cause is not established.')).toBeVisible();
@@ -233,7 +557,7 @@ Lower circulating volume can reduce preload and cardiac output while sympathetic
   await expect(page.getByText('Which information would best help clarify the contributor?')).toBeVisible();
   await page.getByRole('radio', { name: /Bleeding and intake\/output context/ }).click();
   await page.getByRole('button', { name: 'Commit answer' }).click();
-  await expect(page.getByText('Lesson complete', { exact: true })).toBeVisible();
+  await expect(page.getByText('Concept reviewed', { exact: true })).toBeVisible();
   await expect(page.getByText('Hemodynamics', { exact: true })).toBeVisible();
 
   const beforeSave = await page.evaluate(() => ({
@@ -243,7 +567,7 @@ Lower circulating volume can reduce preload and cardiac output while sympathetic
   }));
   expect(beforeSave).toEqual({ recent: null, saved: null, draft: null });
 
-  await page.getByRole('button', { name: '+ Save Case' }).click();
+  await page.getByRole('button', { name: 'Save case locally' }).click();
   const saved = await page.evaluate(() => JSON.parse(localStorage.getItem('clinical_edge_saved_cases') || '[]'));
   expect(saved).toHaveLength(1);
   expect(saved[0].question).toContain('PATIENT SNAPSHOT');
@@ -294,7 +618,7 @@ test('Teach Me locks an incorrect answer and keeps clinical content out of analy
   await page.getByRole('button', { name: 'Commit answer' }).click();
   await expect(page.getByText('Not quite', { exact: true })).toBeVisible();
   await expect(wrong).toBeDisabled();
-  await expect(page.getByText('Lesson complete', { exact: true })).toBeVisible();
+  await expect(page.getByText('Concept reviewed', { exact: true })).toBeVisible();
   const analytics = await page.evaluate(() => JSON.stringify((window as typeof window & { __analyticsDebug: unknown[] }).__analyticsDebug));
   expect(analytics).not.toContain('MAP 61');
   expect(analytics).not.toContain('The number in isolation');
@@ -309,7 +633,52 @@ test('Teach Me gracefully renders the structured explanation fallback', async ({
   await page.getByRole('button', { name: /Teach me why/ }).click();
   await expect(page.getByText('Key idea', { exact: true })).toBeVisible();
   await expect(page.getByText(/developing trend can matter/)).toBeVisible();
-  await expect(page.getByRole('button', { name: /Lesson complete/ })).toBeVisible();
+  await expect(page.getByRole('button', { name: /Concept reviewed/ })).toBeVisible();
+});
+
+test('one Teach Me action creates one request and a later completed action can create another', async ({ page }) => {
+  await page.addInitScript(() => {
+    (window as typeof window & { __analyticsDebug: unknown[] }).__analyticsDebug = [];
+    const original = console.debug;
+    console.debug = (...args) => {
+      (window as typeof window & { __analyticsDebug: unknown[] }).__analyticsDebug.push(args);
+      original(...args);
+    };
+  });
+  let learningRequests = 0;
+  const lesson = {
+    active: false,
+    domain: 'rhythm-recognition',
+    conceptId: 'rhythm-hemodynamic-tolerance',
+    conceptLabel: 'Rhythm change and hemodynamic tolerance',
+    keyIdea: 'Interpret the rhythm alongside symptoms, blood pressure, mentation, and perfusion.',
+    whyItMatters: 'A monitor observation does not establish the exact rhythm diagnosis.',
+    scenarioConnection: 'The reported pattern includes a rhythm change with hemodynamic deterioration.',
+    tags: ['Rhythm recognition', 'Hemodynamic tolerance'],
+  };
+  await page.route('**/api/copilot', async (route) => {
+    const body = await route.request().postDataJSON();
+    if (body.learningRequest) {
+      learningRequests += 1;
+      await new Promise((resolve) => setTimeout(resolve, 75));
+      return route.fulfill({ status: 200, contentType: 'application/json', body: JSON.stringify({ lesson }) });
+    }
+    return route.continue();
+  });
+
+  await page.goto('/copilot?screenshot=response');
+  await page.getByRole('button', { name: /Teach me why/ }).click();
+  await expect(page.getByText('Rhythm change and hemodynamic tolerance')).toBeVisible();
+  expect(learningRequests).toBe(1);
+  let analytics = await page.evaluate(() => (window as typeof window & { __analyticsDebug: unknown[][] }).__analyticsDebug);
+  expect(analytics.filter((entry) => entry[1] === 'teach_me_opened')).toHaveLength(1);
+
+  await page.getByRole('button', { name: /Concept reviewed/ }).click();
+  await page.getByRole('button', { name: /Teach me why/ }).click();
+  await expect(page.getByText('Rhythm change and hemodynamic tolerance')).toBeVisible();
+  expect(learningRequests).toBe(2);
+  analytics = await page.evaluate(() => (window as typeof window & { __analyticsDebug: unknown[][] }).__analyticsDebug);
+  expect(analytics.filter((entry) => entry[1] === 'teach_me_opened')).toHaveLength(2);
 });
 
 test('snapshot values stay out of analytics and the structured handoff preserves unknowns', async ({ page }) => {
@@ -329,7 +698,10 @@ test('snapshot values stay out of analytics and the structured handoff preserves
   await page.goto('/copilot');
   await page.getByRole('button', { name: /BP \/ perfusion/ }).click();
   await page.getByLabel('Blood pressure current').fill('88/50');
-  await page.getByPlaceholder('Add only relevant clinical context').fill('looks pale');
+  await page.getByPlaceholder('Add a brief relevant detail').fill('looks pale');
+  await page.getByText('Review Snapshot before building').click();
+  await expect(page.locator('.snapshot-review-content')).toContainText('looks pale');
+  expect(await page.evaluate(() => ({ recent: localStorage.getItem('clinical_edge_history'), saved: localStorage.getItem('clinical_edge_saved_cases'), draft: sessionStorage.getItem('cec_draft') }))).toEqual({ recent: null, saved: null, draft: null });
   await page.getByRole('button', { name: 'Build my Priority Map →' }).click();
   await expect.poll(() => submittedQuestion).toContain('BP: previous unknown -> current 88/50');
   expect(submittedQuestion).toContain('Additional user-reported context: looks pale');
@@ -461,7 +833,7 @@ test('quickstart option can be selected and completed', async ({ page }) => {
   await page.getByRole('button', { name: 'Start thinking it through →' }).click();
   await page.waitForURL('**/copilot');
   await page.getByRole('button', { name: /BP \/ perfusion/ }).click();
-  await expect(page.getByPlaceholder('Add only relevant clinical context')).toHaveValue('BP dropping post-op');
+  await expect(page.getByPlaceholder('Add a brief relevant detail')).toHaveValue('BP dropping post-op');
 });
 
 test('scenario advances from the first step to the next step', async ({ page }) => {

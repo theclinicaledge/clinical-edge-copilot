@@ -1,0 +1,21 @@
+PATIENT SNAPSHOT — USER-REPORTED / OBSERVED INFORMATION
+VALIDATION FIXTURE — EXPLICITLY SYNTHETIC; NO PHI
+What changed: Something feels off, BP / perfusion, Heart / rhythm, Pain / other
+Care setting: PCU / Step-down
+Reported clinical data:
+- Timeframe of change: Change recognized over approximately 20 minutes; exact rhythm onset unknown
+- Rhythm change: Earlier sinus rhythm; current new irregular rhythm reported on bedside monitoring; exact rhythm not confirmed
+- Mental status: At baseline
+- Chest discomfort: None reported
+- Pain or other change: Palpitations and lightheadedness
+- BP: previous 124/70 -> current 88/54 mmHg
+- MAP: previous 88 -> current 65 mmHg
+- Heart rate: previous 82 -> current 148 bpm
+- Respiratory rate: previous 18 -> current 22 /min
+- SpO2: previous 97 -> current 96 %
+- Oxygen support: previous Room air -> current Room air
+- Temperature: previous unknown -> current 36.8 C
+- Potassium: previous unknown -> current 3.4 mmol/L
+- Labs: otherLabs=1) name=Magnesium, current=1.8, unit=mg/dL
+Additional user-reported context: Earlier: awake and oriented. Current: awake, reports feeling lightheaded, and answers appropriately. Current extremities are cool; no earlier peripheral-perfusion comparison is available. Current potassium is 3.4 mEq/L and current magnesium is 1.8 mg/dL; no earlier potassium or magnesium is available. No syncope or chest pain is reported. Exact rhythm onset is unknown. No 12-lead ECG interpretation is available. Medication administration relevant to the rhythm change is unknown. Baseline cardiac rhythm history is unavailable. No pacemaker or device information is supplied. No treatment has been supplied.
+Treat omitted fields as unknown. Do not infer normal findings.

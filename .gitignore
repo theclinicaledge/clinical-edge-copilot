@@ -44,6 +44,7 @@ content/instagram-carousel/exports/
 content/instagram-carousel/archive/
 content/instagram-carousel/*.png
 backend/node_modules/
+backend/.env
 frontend/node_modules/
 frontend/dist/
 

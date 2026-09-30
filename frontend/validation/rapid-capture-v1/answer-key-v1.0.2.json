@@ -1,0 +1,16 @@
+{
+  "answerKeyVersion": "1.0.2",
+  "basedOn": "answer-key.json",
+  "adjudication": "RC044 removes an unsupported unit. RC015 canonicalizes the explicitly supplied phrase 'four liters' to the schema-equivalent '4 L'. No clinical meaning changed.",
+  "corpusVersion": "1.0.0",
+  "patches": {
+    "RC015": {
+      "remove": ["values.oxygenNow=4 liters"],
+      "add": ["values.oxygenNow=4 L"]
+    },
+    "RC044": {
+      "remove": ["optional.drains.items[0].currentOutput=35 mL"],
+      "add": ["optional.drains.items[0].currentOutput=35"]
+    }
+  }
+}

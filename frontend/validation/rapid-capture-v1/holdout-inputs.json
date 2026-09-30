@@ -1,0 +1,22 @@
+{
+  "corpusVersion": "1.0.0-holdout",
+  "syntheticOnly": true,
+  "cases": [
+    { "id": "RH001", "domain": "vitals-hemodynamics", "narrative": "At shift change BP was 104/66; latest cuff is 90/52." },
+    { "id": "RH002", "domain": "oxygen-respiratory", "narrative": "Resp rate 24, sats are 93 percent on 3 L nasal cannula." },
+    { "id": "RH003", "domain": "neuro-mental-status", "narrative": "Awake earlier, now much harder to wake." },
+    { "id": "RH004", "domain": "perfusion", "narrative": "Fingers are cool with four-second cap refill." },
+    { "id": "RH005", "domain": "urine-output", "narrative": "Foley drained 22 mL in the past sixty minutes." },
+    { "id": "RH006", "domain": "labs", "narrative": "Repeat lactate 3.8; the earlier result was 2.1 mmol/L." },
+    { "id": "RH007", "domain": "medications-drips", "narrative": "Currently receiving levo, rate unavailable." },
+    { "id": "RH008", "domain": "drains-bleeding", "narrative": "Right pleural tube drained 28 mL over the past hour." },
+    { "id": "RH009", "domain": "advanced-hemodynamics", "narrative": "The latest CI is 1.9; prior index was 2.4." },
+    { "id": "RH010", "domain": "rhythm", "narrative": "Telemetry is irregular at 124." },
+    { "id": "RH011", "domain": "adversarial", "narrative": "Not receiving levo. MAP may have been 64 earlier, but I cannot verify it." },
+    { "id": "RH012", "domain": "adversarial", "narrative": "Pressure 84/46, correction, the confirmed repeat is 96/58." },
+    { "id": "RH013", "domain": "multi-domain", "narrative": "BP 98/60 now, RR 25, and only 18 mL urine over two hours." },
+    { "id": "RH014", "domain": "adversarial", "narrative": "The family arrived at 1400 and room temperature is 72 degrees." },
+    { "id": "RH015", "domain": "oxygen-respiratory", "narrative": "Oxygen support went from room air to 2 L NC; saturation stayed 95%." },
+    { "id": "RH016", "domain": "drains-bleeding", "narrative": "Chest tube had 25 mL, though nobody knows whether that was one hour or two." }
+  ]
+}

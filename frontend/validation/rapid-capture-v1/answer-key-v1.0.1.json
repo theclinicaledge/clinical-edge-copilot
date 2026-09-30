@@ -1,0 +1,12 @@
+{
+  "answerKeyVersion": "1.0.1",
+  "basedOn": "answer-key.json",
+  "adjudication": "RC044 currentOutput changed from '35 mL' to '35' because the synthetic narrative supplied no unit. No other expected claim changed.",
+  "corpusVersion": "1.0.0",
+  "patches": {
+    "RC044": {
+      "remove": ["optional.drains.items[0].currentOutput=35 mL"],
+      "add": ["optional.drains.items[0].currentOutput=35"]
+    }
+  }
+}

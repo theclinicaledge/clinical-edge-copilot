@@ -10,6 +10,15 @@ export const PERFUSION_CORE_FIELDS = [
   { id: "overallConcern", type: "text", label: "Brief overall concern", placeholder: "What feels most concerning?" },
 ];
 
+export const QUICK_CAPTURE_FIELDS = [
+  { id: "bp", label: "Blood pressure", shortLabel: "BP", unit: "mmHg", placeholder: "88/50", inputMode: "text", signal: "perfusion" },
+  { id: "map", label: "MAP", shortLabel: "MAP", unit: "mmHg", placeholder: "61", inputMode: "numeric", signal: "perfusion" },
+  { id: "hr", label: "Heart rate", shortLabel: "HR", unit: "bpm", placeholder: "104", inputMode: "numeric", signal: "heart" },
+  { id: "rr", label: "Respiratory rate", shortLabel: "RR", unit: "/min", placeholder: "26", inputMode: "numeric", signal: "breathing" },
+  { id: "temp", label: "Temperature", shortLabel: "Temp", unit: "°C", placeholder: "38.2", inputMode: "decimal", signal: "off" },
+  { id: "spo2", label: "SpO₂", shortLabel: "SpO₂", unit: "%", placeholder: "94", inputMode: "numeric", signal: "breathing" },
+];
+
 export const PERFUSION_MODULES = [
   {
     id: "perfusionAssessment", label: "Perfusion assessment", description: "Focused bedside findings",

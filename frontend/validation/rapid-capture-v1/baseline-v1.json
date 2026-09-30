@@ -1,0 +1,5135 @@
+{
+  "validation": "Rapid Capture Validation Corpus v1",
+  "generatedAt": "2026-09-29T04:25:39.463Z",
+  "corpusVersion": "1.0.0",
+  "answerKeyVersion": "1.0.0",
+  "caseCount": 64,
+  "syntheticOnly": true,
+  "extractorRevision": {
+    "gitHead": "b1e82d6b570628aedcf93c01df3b6ee23d79bd3a",
+    "sha256": "eb45bbb9e591dc9cd2d2f0eb62e14ce4c01fd81bbd2c45d473b9bb9774419642",
+    "path": "frontend/src/components/rapidCaptureExtractor.js"
+  },
+  "aggregate": {
+    "truePositives": 68,
+    "falsePositives": 3,
+    "falseNegatives": 78,
+    "expectedTemporal": 89,
+    "matchedTemporal": 46,
+    "unexpectedTemporal": 1,
+    "needsReviewCorrect": 31,
+    "ambiguousCases": 14,
+    "ambiguousRouted": 12,
+    "severity": {
+      "P0": 3,
+      "P1": 80,
+      "P2": 31
+    },
+    "precision": 0.9577464788732394,
+    "recall": 0.4657534246575342,
+    "unsafeFalsePositiveRatePerStructuredClaim": 0.04225352112676056,
+    "casesWithUnsafeFalsePositive": 3,
+    "needsReviewAccuracy": 0.484375,
+    "ambiguousRoutingAccuracy": 0.8571428571428571,
+    "temporalFidelity": 0.5168539325842697
+  },
+  "latencyMs": {
+    "min": 0.012541999999996278,
+    "median": 0.021999999999998465,
+    "p95": 0.08966700000000216,
+    "max": 1.8675420000000003,
+    "mean": 0.07649745312499978
+  },
+  "results": [
+    {
+      "id": "RC001",
+      "domain": "vitals-hemodynamics",
+      "narrative": "Pressure was 112/70 at handoff. It is 88/52 on the repeat.",
+      "expected": {
+        "claims": [
+          "values.bpEarlier=112/70",
+          "values.bpNow=88/52"
+        ],
+        "needsReview": false,
+        "temporalClaims": [
+          "values.bpEarlier=112/70",
+          "values.bpNow=88/52"
+        ],
+        "risk": null
+      },
+      "actual": {
+        "claims": [],
+        "needsReview": true,
+        "rawExtraction": {
+          "status": "needs_review",
+          "snapshot": {
+            "signals": [
+              "off"
+            ],
+            "setting": "",
+            "contexts": [],
+            "values": {},
+            "optional": {},
+            "units": {},
+            "notes": ""
+          },
+          "items": [],
+          "needsReview": [
+            {
+              "id": "review-1",
+              "text": "Pressure was 112/70 at handoff.",
+              "reason": "Could not map confidently without interpretation."
+            },
+            {
+              "id": "review-2",
+              "text": "It is 88/52 on the repeat.",
+              "reason": "Could not map confidently without interpretation."
+            }
+          ],
+          "uncaptured": [
+            "Pressure was 112/70 at handoff.",
+            "It is 88/52 on the repeat."
+          ]
+        }
+      },
+      "scoring": {
+        "truePositives": [],
+        "falsePositives": [],
+        "falseNegatives": [
+          "values.bpEarlier=112/70",
+          "values.bpNow=88/52"
+        ],
+        "matchedTemporal": [],
+        "unexpectedTemporal": [],
+        "findings": [
+          {
+            "severity": "P1",
+            "type": "supported_claim_missed",
+            "claim": "values.bpEarlier=112/70"
+          },
+          {
+            "severity": "P1",
+            "type": "supported_claim_missed",
+            "claim": "values.bpNow=88/52"
+          },
+          {
+            "severity": "P2",
+            "type": "unnecessary_needs_review"
+          }
+        ]
+      },
+      "latencyMs": 1.8675420000000003
+    },
+    {
+      "id": "RC002",
+      "domain": "vitals-hemodynamics",
+      "narrative": "BP went from 108/64 to 86/48 over the last few hours.",
+      "expected": {
+        "claims": [
+          "values.bpEarlier=108/64",
+          "values.bpNow=86/48"
+        ],
+        "needsReview": false,
+        "temporalClaims": [
+          "values.bpEarlier=108/64",
+          "values.bpNow=86/48"
+        ],
+        "risk": null
+      },
+      "actual": {
+        "claims": [
+          "values.bpEarlier=108/64",
+          "values.bpNow=86/48"
+        ],
+        "needsReview": false,
+        "rawExtraction": {
+          "status": "ready",
+          "snapshot": {
+            "signals": [
+              "off",
+              "perfusion"
+            ],
+            "setting": "",
+            "contexts": [],
+            "values": {
+              "bpEarlier": "108/64",
+              "bpNow": "86/48"
+            },
+            "optional": {},
+            "units": {
+              "bp": "mmHg"
+            },
+            "notes": ""
+          },
+          "items": [
+            {
+              "id": "bp",
+              "label": "Blood pressure",
+              "fields": [
+                {
+                  "path": "values.bpEarlier",
+                  "label": "Earlier"
+                },
+                {
+                  "path": "values.bpNow",
+                  "label": "Now"
+                }
+              ],
+              "clearPaths": [
+                "values.bpEarlier",
+                "values.bpNow"
+              ]
+            }
+          ],
+          "needsReview": [],
+          "uncaptured": []
+        }
+      },
+      "scoring": {
+        "truePositives": [
+          "values.bpEarlier=108/64",
+          "values.bpNow=86/48"
+        ],
+        "falsePositives": [],
+        "falseNegatives": [],
+        "matchedTemporal": [
+          "values.bpEarlier=108/64",
+          "values.bpNow=86/48"
+        ],
+        "unexpectedTemporal": [],
+        "findings": []
+      },
+      "latencyMs": 0.08966700000000216
+    },
+    {
+      "id": "RC003",
+      "domain": "vitals-hemodynamics",
+      "narrative": "Pressure is softer, 86 over 48 now.",
+      "expected": {
+        "claims": [
+          "values.bpNow=86/48"
+        ],
+        "needsReview": false,
+        "temporalClaims": [
+          "values.bpNow=86/48"
+        ],
+        "risk": null
+      },
+      "actual": {
+        "claims": [],
+        "needsReview": true,
+        "rawExtraction": {
+          "status": "needs_review",
+          "snapshot": {
+            "signals": [
+              "off"
+            ],
+            "setting": "",
+            "contexts": [],
+            "values": {},
+            "optional": {},
+            "units": {},
+            "notes": ""
+          },
+          "items": [],
+          "needsReview": [
+            {
+              "id": "review-1",
+              "text": "Pressure is softer, 86 over 48 now.",
+              "reason": "Could not map confidently without interpretation."
+            }
+          ],
+          "uncaptured": [
+            "Pressure is softer, 86 over 48 now."
+          ]
+        }
+      },
+      "scoring": {
+        "truePositives": [],
+        "falsePositives": [],
+        "falseNegatives": [
+          "values.bpNow=86/48"
+        ],
+        "matchedTemporal": [],
+        "unexpectedTemporal": [],
+        "findings": [
+          {
+            "severity": "P1",
+            "type": "supported_claim_missed",
+            "claim": "values.bpNow=86/48"
+          },
+          {
+            "severity": "P2",
+            "type": "unnecessary_needs_review"
+          }
+        ]
+      },
+      "latencyMs": 0.0342090000000006
+    },
+    {
+      "id": "RC004",
+      "domain": "vitals-hemodynamics",
+      "narrative": "MAP is 61 right now.",
+      "expected": {
+        "claims": [
+          "values.mapNow=61"
+        ],
+        "needsReview": false,
+        "temporalClaims": [
+          "values.mapNow=61"
+        ],
+        "risk": null
+      },
+      "actual": {
+        "claims": [
+          "values.mapNow=61"
+        ],
+        "needsReview": false,
+        "rawExtraction": {
+          "status": "ready",
+          "snapshot": {
+            "signals": [
+              "off",
+              "perfusion"
+            ],
+            "setting": "",
+            "contexts": [],
+            "values": {
+              "mapNow": "61"
+            },
+            "optional": {},
+            "units": {
+              "map": "mmHg"
+            },
+            "notes": ""
+          },
+          "items": [
+            {
+              "id": "map",
+              "label": "MAP",
+              "fields": [
+                {
+                  "path": "values.mapNow",
+                  "label": "Current"
+                }
+              ],
+              "clearPaths": [
+                "values.mapNow"
+              ]
+            }
+          ],
+          "needsReview": [],
+          "uncaptured": []
+        }
+      },
+      "scoring": {
+        "truePositives": [
+          "values.mapNow=61"
+        ],
+        "falsePositives": [],
+        "falseNegatives": [],
+        "matchedTemporal": [
+          "values.mapNow=61"
+        ],
+        "unexpectedTemporal": [],
+        "findings": []
+      },
+      "latencyMs": 0.038000000000000256
+    },
+    {
+      "id": "RC005",
+      "domain": "vitals-hemodynamics",
+      "narrative": "MAP was 76, repeat MAP 62.",
+      "expected": {
+        "claims": [
+          "values.mapEarlier=76",
+          "values.mapNow=62"
+        ],
+        "needsReview": false,
+        "temporalClaims": [
+          "values.mapEarlier=76",
+          "values.mapNow=62"
+        ],
+        "risk": null
+      },
+      "actual": {
+        "claims": [
+          "values.mapNow=76"
+        ],
+        "needsReview": false,
+        "rawExtraction": {
+          "status": "ready",
+          "snapshot": {
+            "signals": [
+              "off",
+              "perfusion"
+            ],
+            "setting": "",
+            "contexts": [],
+            "values": {
+              "mapNow": "76"
+            },
+            "optional": {},
+            "units": {
+              "map": "mmHg"
+            },
+            "notes": ""
+          },
+          "items": [
+            {
+              "id": "map",
+              "label": "MAP",
+              "fields": [
+                {
+                  "path": "values.mapNow",
+                  "label": "Current"
+                }
+              ],
+              "clearPaths": [
+                "values.mapNow"
+              ]
+            }
+          ],
+          "needsReview": [],
+          "uncaptured": []
+        }
+      },
+      "scoring": {
+        "truePositives": [],
+        "falsePositives": [
+          "values.mapNow=76"
+        ],
+        "falseNegatives": [
+          "values.mapEarlier=76",
+          "values.mapNow=62"
+        ],
+        "matchedTemporal": [],
+        "unexpectedTemporal": [
+          "values.mapNow=76"
+        ],
+        "findings": [
+          {
+            "severity": "P0",
+            "type": "unsupported_structured_claim",
+            "claim": "values.mapNow=76"
+          },
+          {
+            "severity": "P1",
+            "type": "supported_claim_missed",
+            "claim": "values.mapEarlier=76"
+          },
+          {
+            "severity": "P1",
+            "type": "supported_claim_missed",
+            "claim": "values.mapNow=62"
+          }
+        ]
+      },
+      "latencyMs": 0.03833399999999898
+    },
+    {
+      "id": "RC006",
+      "domain": "vitals-hemodynamics",
+      "narrative": "Pulse 118 now, was 90 when I came on.",
+      "expected": {
+        "claims": [
+          "values.hrEarlier=90",
+          "values.hrNow=118"
+        ],
+        "needsReview": false,
+        "temporalClaims": [
+          "values.hrEarlier=90",
+          "values.hrNow=118"
+        ],
+        "risk": null
+      },
+      "actual": {
+        "claims": [],
+        "needsReview": true,
+        "rawExtraction": {
+          "status": "needs_review",
+          "snapshot": {
+            "signals": [
+              "off"
+            ],
+            "setting": "",
+            "contexts": [],
+            "values": {},
+            "optional": {},
+            "units": {},
+            "notes": ""
+          },
+          "items": [],
+          "needsReview": [
+            {
+              "id": "review-1",
+              "text": "Pulse 118 now, was 90 when I came on.",
+              "reason": "Could not map confidently without interpretation."
+            }
+          ],
+          "uncaptured": [
+            "Pulse 118 now, was 90 when I came on."
+          ]
+        }
+      },
+      "scoring": {
+        "truePositives": [],
+        "falsePositives": [],
+        "falseNegatives": [
+          "values.hrEarlier=90",
+          "values.hrNow=118"
+        ],
+        "matchedTemporal": [],
+        "unexpectedTemporal": [],
+        "findings": [
+          {
+            "severity": "P1",
+            "type": "supported_claim_missed",
+            "claim": "values.hrEarlier=90"
+          },
+          {
+            "severity": "P1",
+            "type": "supported_claim_missed",
+            "claim": "values.hrNow=118"
+          },
+          {
+            "severity": "P2",
+            "type": "unnecessary_needs_review"
+          }
+        ]
+      },
+      "latencyMs": 0.029500000000002302
+    },
+    {
+      "id": "RC007",
+      "domain": "vitals-hemodynamics",
+      "narrative": "HR went from 92 to 118.",
+      "expected": {
+        "claims": [
+          "values.hrEarlier=92",
+          "values.hrNow=118"
+        ],
+        "needsReview": false,
+        "temporalClaims": [
+          "values.hrEarlier=92",
+          "values.hrNow=118"
+        ],
+        "risk": null
+      },
+      "actual": {
+        "claims": [
+          "values.hrEarlier=92",
+          "values.hrNow=118"
+        ],
+        "needsReview": false,
+        "rawExtraction": {
+          "status": "ready",
+          "snapshot": {
+            "signals": [
+              "off",
+              "heart"
+            ],
+            "setting": "",
+            "contexts": [],
+            "values": {
+              "hrEarlier": "92",
+              "hrNow": "118"
+            },
+            "optional": {},
+            "units": {
+              "hr": "bpm"
+            },
+            "notes": ""
+          },
+          "items": [
+            {
+              "id": "hr",
+              "label": "Heart rate",
+              "fields": [
+                {
+                  "path": "values.hrEarlier",
+                  "label": "Earlier"
+                },
+                {
+                  "path": "values.hrNow",
+                  "label": "Now"
+                }
+              ],
+              "clearPaths": [
+                "values.hrEarlier",
+                "values.hrNow"
+              ]
+            }
+          ],
+          "needsReview": [],
+          "uncaptured": []
+        }
+      },
+      "scoring": {
+        "truePositives": [
+          "values.hrEarlier=92",
+          "values.hrNow=118"
+        ],
+        "falsePositives": [],
+        "falseNegatives": [],
+        "matchedTemporal": [
+          "values.hrEarlier=92",
+          "values.hrNow=118"
+        ],
+        "unexpectedTemporal": [],
+        "findings": []
+      },
+      "latencyMs": 0.02787500000000165
+    },
+    {
+      "id": "RC008",
+      "domain": "vitals-hemodynamics",
+      "narrative": "Pressure is somewhere in the 80s.",
+      "expected": {
+        "claims": [],
+        "needsReview": true,
+        "temporalClaims": [],
+        "risk": "ambiguous-number"
+      },
+      "actual": {
+        "claims": [],
+        "needsReview": true,
+        "rawExtraction": {
+          "status": "needs_review",
+          "snapshot": {
+            "signals": [
+              "off"
+            ],
+            "setting": "",
+            "contexts": [],
+            "values": {},
+            "optional": {},
+            "units": {},
+            "notes": ""
+          },
+          "items": [],
+          "needsReview": [
+            {
+              "id": "review-1",
+              "text": "Pressure is somewhere in the 80s.",
+              "reason": "Could not map confidently without interpretation."
+            }
+          ],
+          "uncaptured": [
+            "Pressure is somewhere in the 80s."
+          ]
+        }
+      },
+      "scoring": {
+        "truePositives": [],
+        "falsePositives": [],
+        "falseNegatives": [],
+        "matchedTemporal": [],
+        "unexpectedTemporal": [],
+        "findings": []
+      },
+      "latencyMs": 0.019000000000001904
+    },
+    {
+      "id": "RC009",
+      "domain": "oxygen-respiratory",
+      "narrative": "RR is 27 and work of breathing looks increased.",
+      "expected": {
+        "claims": [
+          "values.rrNow=27",
+          "values.workOfBreathing=Increased"
+        ],
+        "needsReview": false,
+        "temporalClaims": [
+          "values.rrNow=27"
+        ],
+        "risk": null
+      },
+      "actual": {
+        "claims": [
+          "values.rrNow=27"
+        ],
+        "needsReview": false,
+        "rawExtraction": {
+          "status": "ready",
+          "snapshot": {
+            "signals": [
+              "off",
+              "breathing"
+            ],
+            "setting": "",
+            "contexts": [],
+            "values": {
+              "rrNow": "27"
+            },
+            "optional": {},
+            "units": {
+              "rr": "/min"
+            },
+            "notes": ""
+          },
+          "items": [
+            {
+              "id": "rr",
+              "label": "Respiratory rate",
+              "fields": [
+                {
+                  "path": "values.rrNow",
+                  "label": "Current"
+                }
+              ],
+              "clearPaths": [
+                "values.rrNow"
+              ]
+            }
+          ],
+          "needsReview": [],
+          "uncaptured": []
+        }
+      },
+      "scoring": {
+        "truePositives": [
+          "values.rrNow=27"
+        ],
+        "falsePositives": [],
+        "falseNegatives": [
+          "values.workOfBreathing=Increased"
+        ],
+        "matchedTemporal": [
+          "values.rrNow=27"
+        ],
+        "unexpectedTemporal": [],
+        "findings": [
+          {
+            "severity": "P1",
+            "type": "supported_claim_missed",
+            "claim": "values.workOfBreathing=Increased"
+          }
+        ]
+      },
+      "latencyMs": 0.02537500000000037
+    },
+    {
+      "id": "RC010",
+      "domain": "oxygen-respiratory",
+      "narrative": "Respers twenty-seven. Sat is ninety-two.",
+      "expected": {
+        "claims": [
+          "values.rrNow=27",
+          "values.spo2Now=92"
+        ],
+        "needsReview": false,
+        "temporalClaims": [
+          "values.rrNow=27",
+          "values.spo2Now=92"
+        ],
+        "risk": null
+      },
+      "actual": {
+        "claims": [],
+        "needsReview": true,
+        "rawExtraction": {
+          "status": "needs_review",
+          "snapshot": {
+            "signals": [
+              "off"
+            ],
+            "setting": "",
+            "contexts": [],
+            "values": {},
+            "optional": {},
+            "units": {},
+            "notes": ""
+          },
+          "items": [],
+          "needsReview": [
+            {
+              "id": "review-1",
+              "text": "Respers twenty-seven.",
+              "reason": "Could not map confidently without interpretation."
+            },
+            {
+              "id": "review-2",
+              "text": "Sat is ninety-two.",
+              "reason": "Could not map confidently without interpretation."
+            }
+          ],
+          "uncaptured": [
+            "Respers twenty-seven.",
+            "Sat is ninety-two."
+          ]
+        }
+      },
+      "scoring": {
+        "truePositives": [],
+        "falsePositives": [],
+        "falseNegatives": [
+          "values.rrNow=27",
+          "values.spo2Now=92"
+        ],
+        "matchedTemporal": [],
+        "unexpectedTemporal": [],
+        "findings": [
+          {
+            "severity": "P1",
+            "type": "supported_claim_missed",
+            "claim": "values.rrNow=27"
+          },
+          {
+            "severity": "P1",
+            "type": "supported_claim_missed",
+            "claim": "values.spo2Now=92"
+          },
+          {
+            "severity": "P2",
+            "type": "unnecessary_needs_review"
+          }
+        ]
+      },
+      "latencyMs": 0.035708999999997104
+    },
+    {
+      "id": "RC011",
+      "domain": "oxygen-respiratory",
+      "narrative": "SpO2 dropped from 95% to 92%.",
+      "expected": {
+        "claims": [
+          "values.spo2Earlier=95",
+          "values.spo2Now=92"
+        ],
+        "needsReview": false,
+        "temporalClaims": [
+          "values.spo2Earlier=95",
+          "values.spo2Now=92"
+        ],
+        "risk": null
+      },
+      "actual": {
+        "claims": [
+          "values.spo2Earlier=95",
+          "values.spo2Now=92"
+        ],
+        "needsReview": false,
+        "rawExtraction": {
+          "status": "ready",
+          "snapshot": {
+            "signals": [
+              "off",
+              "breathing"
+            ],
+            "setting": "",
+            "contexts": [],
+            "values": {
+              "spo2Earlier": "95",
+              "spo2Now": "92"
+            },
+            "optional": {},
+            "units": {
+              "spo2": "%"
+            },
+            "notes": ""
+          },
+          "items": [
+            {
+              "id": "spo2",
+              "label": "SpO₂",
+              "fields": [
+                {
+                  "path": "values.spo2Earlier",
+                  "label": "Earlier"
+                },
+                {
+                  "path": "values.spo2Now",
+                  "label": "Now"
+                }
+              ],
+              "clearPaths": [
+                "values.spo2Earlier",
+                "values.spo2Now"
+              ]
+            }
+          ],
+          "needsReview": [],
+          "uncaptured": []
+        }
+      },
+      "scoring": {
+        "truePositives": [
+          "values.spo2Earlier=95",
+          "values.spo2Now=92"
+        ],
+        "falsePositives": [],
+        "falseNegatives": [],
+        "matchedTemporal": [
+          "values.spo2Earlier=95",
+          "values.spo2Now=92"
+        ],
+        "unexpectedTemporal": [],
+        "findings": []
+      },
+      "latencyMs": 0.06095900000000043
+    },
+    {
+      "id": "RC012",
+      "domain": "oxygen-respiratory",
+      "narrative": "Sats went 95 to 92.",
+      "expected": {
+        "claims": [
+          "values.spo2Earlier=95",
+          "values.spo2Now=92"
+        ],
+        "needsReview": false,
+        "temporalClaims": [
+          "values.spo2Earlier=95",
+          "values.spo2Now=92"
+        ],
+        "risk": null
+      },
+      "actual": {
+        "claims": [],
+        "needsReview": true,
+        "rawExtraction": {
+          "status": "needs_review",
+          "snapshot": {
+            "signals": [
+              "off"
+            ],
+            "setting": "",
+            "contexts": [],
+            "values": {},
+            "optional": {},
+            "units": {},
+            "notes": ""
+          },
+          "items": [],
+          "needsReview": [
+            {
+              "id": "review-1",
+              "text": "Sats went 95 to 92.",
+              "reason": "Could not map confidently without interpretation."
+            }
+          ],
+          "uncaptured": [
+            "Sats went 95 to 92."
+          ]
+        }
+      },
+      "scoring": {
+        "truePositives": [],
+        "falsePositives": [],
+        "falseNegatives": [
+          "values.spo2Earlier=95",
+          "values.spo2Now=92"
+        ],
+        "matchedTemporal": [],
+        "unexpectedTemporal": [],
+        "findings": [
+          {
+            "severity": "P1",
+            "type": "supported_claim_missed",
+            "claim": "values.spo2Earlier=95"
+          },
+          {
+            "severity": "P1",
+            "type": "supported_claim_missed",
+            "claim": "values.spo2Now=92"
+          },
+          {
+            "severity": "P2",
+            "type": "unnecessary_needs_review"
+          }
+        ]
+      },
+      "latencyMs": 0.03125
+    },
+    {
+      "id": "RC013",
+      "domain": "oxygen-respiratory",
+      "narrative": "Had her on 2 liters nasal cannula earlier; now she needs 4 liters nasal cannula.",
+      "expected": {
+        "claims": [
+          "values.oxygenEarlier=2 L nasal cannula",
+          "values.oxygenNow=4 L nasal cannula"
+        ],
+        "needsReview": false,
+        "temporalClaims": [
+          "values.oxygenEarlier=2 L nasal cannula",
+          "values.oxygenNow=4 L nasal cannula"
+        ],
+        "risk": null
+      },
+      "actual": {
+        "claims": [],
+        "needsReview": true,
+        "rawExtraction": {
+          "status": "needs_review",
+          "snapshot": {
+            "signals": [
+              "off"
+            ],
+            "setting": "",
+            "contexts": [],
+            "values": {},
+            "optional": {},
+            "units": {},
+            "notes": ""
+          },
+          "items": [],
+          "needsReview": [
+            {
+              "id": "review-1",
+              "text": "Had her on 2 liters nasal cannula earlier; now she needs 4 liters nasal cannula.",
+              "reason": "Could not map confidently without interpretation."
+            }
+          ],
+          "uncaptured": [
+            "Had her on 2 liters nasal cannula earlier; now she needs 4 liters nasal cannula."
+          ]
+        }
+      },
+      "scoring": {
+        "truePositives": [],
+        "falsePositives": [],
+        "falseNegatives": [
+          "values.oxygenEarlier=2 L nasal cannula",
+          "values.oxygenNow=4 L nasal cannula"
+        ],
+        "matchedTemporal": [],
+        "unexpectedTemporal": [],
+        "findings": [
+          {
+            "severity": "P1",
+            "type": "supported_claim_missed",
+            "claim": "values.oxygenEarlier=2 L nasal cannula"
+          },
+          {
+            "severity": "P1",
+            "type": "supported_claim_missed",
+            "claim": "values.oxygenNow=4 L nasal cannula"
+          },
+          {
+            "severity": "P2",
+            "type": "unnecessary_needs_review"
+          }
+        ]
+      },
+      "latencyMs": 0.0247909999999969
+    },
+    {
+      "id": "RC014",
+      "domain": "oxygen-respiratory",
+      "narrative": "Oxygen increased from 2 L NC to 4 L NC.",
+      "expected": {
+        "claims": [
+          "values.oxygenEarlier=2 L NC",
+          "values.oxygenNow=4 L NC"
+        ],
+        "needsReview": false,
+        "temporalClaims": [
+          "values.oxygenEarlier=2 L NC",
+          "values.oxygenNow=4 L NC"
+        ],
+        "risk": null
+      },
+      "actual": {
+        "claims": [
+          "values.oxygenEarlier=2 L NC",
+          "values.oxygenNow=4 L NC"
+        ],
+        "needsReview": false,
+        "rawExtraction": {
+          "status": "ready",
+          "snapshot": {
+            "signals": [
+              "off",
+              "breathing"
+            ],
+            "setting": "",
+            "contexts": [],
+            "values": {
+              "oxygenEarlier": "2 L NC",
+              "oxygenNow": "4 L NC"
+            },
+            "optional": {},
+            "units": {
+              "oxygen": ""
+            },
+            "notes": ""
+          },
+          "items": [
+            {
+              "id": "oxygen",
+              "label": "Oxygen support",
+              "fields": [
+                {
+                  "path": "values.oxygenEarlier",
+                  "label": "Earlier"
+                },
+                {
+                  "path": "values.oxygenNow",
+                  "label": "Now"
+                }
+              ],
+              "clearPaths": [
+                "values.oxygenEarlier",
+                "values.oxygenNow"
+              ]
+            }
+          ],
+          "needsReview": [],
+          "uncaptured": []
+        }
+      },
+      "scoring": {
+        "truePositives": [
+          "values.oxygenEarlier=2 L NC",
+          "values.oxygenNow=4 L NC"
+        ],
+        "falsePositives": [],
+        "falseNegatives": [],
+        "matchedTemporal": [
+          "values.oxygenEarlier=2 L NC",
+          "values.oxygenNow=4 L NC"
+        ],
+        "unexpectedTemporal": [],
+        "findings": []
+      },
+      "latencyMs": 0.029208000000000567
+    },
+    {
+      "id": "RC015",
+      "domain": "oxygen-respiratory",
+      "narrative": "Sat 92 on four liters. I do not know what it was before.",
+      "expected": {
+        "claims": [
+          "values.spo2Now=92",
+          "values.oxygenNow=4 liters"
+        ],
+        "needsReview": false,
+        "temporalClaims": [
+          "values.spo2Now=92",
+          "values.oxygenNow=4 liters"
+        ],
+        "risk": null
+      },
+      "actual": {
+        "claims": [],
+        "needsReview": true,
+        "rawExtraction": {
+          "status": "needs_review",
+          "snapshot": {
+            "signals": [
+              "off"
+            ],
+            "setting": "",
+            "contexts": [],
+            "values": {},
+            "optional": {},
+            "units": {},
+            "notes": ""
+          },
+          "items": [],
+          "needsReview": [
+            {
+              "id": "review-1",
+              "text": "Sat 92 on four liters.",
+              "reason": "Could not map confidently without interpretation."
+            },
+            {
+              "id": "review-2",
+              "text": "I do not know what it was before.",
+              "reason": "Could not map confidently without interpretation."
+            }
+          ],
+          "uncaptured": [
+            "Sat 92 on four liters.",
+            "I do not know what it was before."
+          ]
+        }
+      },
+      "scoring": {
+        "truePositives": [],
+        "falsePositives": [],
+        "falseNegatives": [
+          "values.spo2Now=92",
+          "values.oxygenNow=4 liters"
+        ],
+        "matchedTemporal": [],
+        "unexpectedTemporal": [],
+        "findings": [
+          {
+            "severity": "P1",
+            "type": "supported_claim_missed",
+            "claim": "values.spo2Now=92"
+          },
+          {
+            "severity": "P1",
+            "type": "supported_claim_missed",
+            "claim": "values.oxygenNow=4 liters"
+          },
+          {
+            "severity": "P2",
+            "type": "unnecessary_needs_review"
+          }
+        ]
+      },
+      "latencyMs": 0.0313750000000006
+    },
+    {
+      "id": "RC016",
+      "domain": "oxygen-respiratory",
+      "narrative": "If the oxygen drops again we may need to call.",
+      "expected": {
+        "claims": [],
+        "needsReview": true,
+        "temporalClaims": [],
+        "risk": "hypothetical"
+      },
+      "actual": {
+        "claims": [],
+        "needsReview": true,
+        "rawExtraction": {
+          "status": "needs_review",
+          "snapshot": {
+            "signals": [
+              "off"
+            ],
+            "setting": "",
+            "contexts": [],
+            "values": {},
+            "optional": {},
+            "units": {},
+            "notes": ""
+          },
+          "items": [],
+          "needsReview": [
+            {
+              "id": "review-1",
+              "text": "If the oxygen drops again we may need to call.",
+              "reason": "Could not map confidently without interpretation."
+            }
+          ],
+          "uncaptured": [
+            "If the oxygen drops again we may need to call."
+          ]
+        }
+      },
+      "scoring": {
+        "truePositives": [],
+        "falsePositives": [],
+        "falseNegatives": [],
+        "matchedTemporal": [],
+        "unexpectedTemporal": [],
+        "findings": []
+      },
+      "latencyMs": 0.016499999999997073
+    },
+    {
+      "id": "RC017",
+      "domain": "neuro-mental-status",
+      "narrative": "He is more drowsy than he was at the start of shift.",
+      "expected": {
+        "claims": [
+          "values.mental=Changed",
+          "values.mentalDetail=More drowsy"
+        ],
+        "needsReview": false,
+        "temporalClaims": [
+          "values.mentalDetail=More drowsy"
+        ],
+        "risk": null
+      },
+      "actual": {
+        "claims": [
+          "values.mental=Changed",
+          "values.mentalDetail=More drowsy"
+        ],
+        "needsReview": false,
+        "rawExtraction": {
+          "status": "ready",
+          "snapshot": {
+            "signals": [
+              "off",
+              "neuro"
+            ],
+            "setting": "",
+            "contexts": [],
+            "values": {
+              "loc": "More drowsy"
+            },
+            "optional": {},
+            "units": {},
+            "notes": ""
+          },
+          "items": [
+            {
+              "id": "loc",
+              "label": "Mental status",
+              "fields": [
+                {
+                  "path": "values.loc",
+                  "label": "Finding"
+                }
+              ],
+              "clearPaths": [
+                "values.loc"
+              ]
+            }
+          ],
+          "needsReview": [],
+          "uncaptured": []
+        }
+      },
+      "scoring": {
+        "truePositives": [
+          "values.mental=Changed",
+          "values.mentalDetail=More drowsy"
+        ],
+        "falsePositives": [],
+        "falseNegatives": [],
+        "matchedTemporal": [
+          "values.mentalDetail=More drowsy"
+        ],
+        "unexpectedTemporal": [],
+        "findings": []
+      },
+      "latencyMs": 0.023082999999999743
+    },
+    {
+      "id": "RC018",
+      "domain": "neuro-mental-status",
+      "narrative": "Definitely sleepier than when I came on.",
+      "expected": {
+        "claims": [
+          "values.mental=Changed",
+          "values.mentalDetail=More drowsy"
+        ],
+        "needsReview": false,
+        "temporalClaims": [
+          "values.mentalDetail=More drowsy"
+        ],
+        "risk": null
+      },
+      "actual": {
+        "claims": [],
+        "needsReview": true,
+        "rawExtraction": {
+          "status": "needs_review",
+          "snapshot": {
+            "signals": [
+              "off"
+            ],
+            "setting": "",
+            "contexts": [],
+            "values": {},
+            "optional": {},
+            "units": {},
+            "notes": ""
+          },
+          "items": [],
+          "needsReview": [
+            {
+              "id": "review-1",
+              "text": "Definitely sleepier than when I came on.",
+              "reason": "Could not map confidently without interpretation."
+            }
+          ],
+          "uncaptured": [
+            "Definitely sleepier than when I came on."
+          ]
+        }
+      },
+      "scoring": {
+        "truePositives": [],
+        "falsePositives": [],
+        "falseNegatives": [
+          "values.mental=Changed",
+          "values.mentalDetail=More drowsy"
+        ],
+        "matchedTemporal": [],
+        "unexpectedTemporal": [],
+        "findings": [
+          {
+            "severity": "P1",
+            "type": "supported_claim_missed",
+            "claim": "values.mental=Changed"
+          },
+          {
+            "severity": "P1",
+            "type": "supported_claim_missed",
+            "claim": "values.mentalDetail=More drowsy"
+          },
+          {
+            "severity": "P2",
+            "type": "unnecessary_needs_review"
+          }
+        ]
+      },
+      "latencyMs": 0.01737500000000125
+    },
+    {
+      "id": "RC019",
+      "domain": "neuro-mental-status",
+      "narrative": "Patient is difficult to arouse now.",
+      "expected": {
+        "claims": [
+          "values.mental=Changed",
+          "values.mentalDetail=Difficult to arouse"
+        ],
+        "needsReview": false,
+        "temporalClaims": [
+          "values.mentalDetail=Difficult to arouse"
+        ],
+        "risk": null
+      },
+      "actual": {
+        "claims": [],
+        "needsReview": true,
+        "rawExtraction": {
+          "status": "needs_review",
+          "snapshot": {
+            "signals": [
+              "off"
+            ],
+            "setting": "",
+            "contexts": [],
+            "values": {},
+            "optional": {},
+            "units": {},
+            "notes": ""
+          },
+          "items": [],
+          "needsReview": [
+            {
+              "id": "review-1",
+              "text": "Patient is difficult to arouse now.",
+              "reason": "Could not map confidently without interpretation."
+            }
+          ],
+          "uncaptured": [
+            "Patient is difficult to arouse now."
+          ]
+        }
+      },
+      "scoring": {
+        "truePositives": [],
+        "falsePositives": [],
+        "falseNegatives": [
+          "values.mental=Changed",
+          "values.mentalDetail=Difficult to arouse"
+        ],
+        "matchedTemporal": [],
+        "unexpectedTemporal": [],
+        "findings": [
+          {
+            "severity": "P1",
+            "type": "supported_claim_missed",
+            "claim": "values.mental=Changed"
+          },
+          {
+            "severity": "P1",
+            "type": "supported_claim_missed",
+            "claim": "values.mentalDetail=Difficult to arouse"
+          },
+          {
+            "severity": "P2",
+            "type": "unnecessary_needs_review"
+          }
+        ]
+      },
+      "latencyMs": 0.01616599999999835
+    },
+    {
+      "id": "RC020",
+      "domain": "neuro-mental-status",
+      "narrative": "I noticed the left-sided weakness twenty minutes ago, but onset is unknown.",
+      "expected": {
+        "claims": [
+          "values.focal=Present"
+        ],
+        "needsReview": true,
+        "temporalClaims": [],
+        "risk": "recognition-versus-onset"
+      },
+      "actual": {
+        "claims": [],
+        "needsReview": true,
+        "rawExtraction": {
+          "status": "needs_review",
+          "snapshot": {
+            "signals": [
+              "off"
+            ],
+            "setting": "",
+            "contexts": [],
+            "values": {},
+            "optional": {},
+            "units": {},
+            "notes": ""
+          },
+          "items": [],
+          "needsReview": [
+            {
+              "id": "review-1",
+              "text": "I noticed the left-sided weakness twenty minutes ago, but onset is unknown.",
+              "reason": "Could not map confidently without interpretation."
+            }
+          ],
+          "uncaptured": [
+            "I noticed the left-sided weakness twenty minutes ago, but onset is unknown."
+          ]
+        }
+      },
+      "scoring": {
+        "truePositives": [],
+        "falsePositives": [],
+        "falseNegatives": [
+          "values.focal=Present"
+        ],
+        "matchedTemporal": [],
+        "unexpectedTemporal": [],
+        "findings": [
+          {
+            "severity": "P1",
+            "type": "supported_claim_missed",
+            "claim": "values.focal=Present"
+          }
+        ]
+      },
+      "latencyMs": 0.017500000000001847
+    },
+    {
+      "id": "RC021",
+      "domain": "perfusion",
+      "narrative": "Extremities are cool and cap refill is delayed.",
+      "expected": {
+        "claims": [
+          "values.skinTemperature=Cool",
+          "values.capillaryRefill=Delayed"
+        ],
+        "needsReview": false,
+        "temporalClaims": [],
+        "risk": null
+      },
+      "actual": {
+        "claims": [
+          "values.capillaryRefill=Delayed",
+          "values.skinTemperature=Cool"
+        ],
+        "needsReview": false,
+        "rawExtraction": {
+          "status": "ready",
+          "snapshot": {
+            "signals": [
+              "off",
+              "perfusion"
+            ],
+            "setting": "",
+            "contexts": [],
+            "values": {
+              "perfusionFindings": [
+                "Cool / clammy",
+                "Delayed capillary refill"
+              ]
+            },
+            "optional": {},
+            "units": {},
+            "notes": ""
+          },
+          "items": [
+            {
+              "id": "perfusion",
+              "label": "Perfusion",
+              "fields": [
+                {
+                  "path": "values.perfusionFindings",
+                  "label": "Findings",
+                  "type": "list"
+                }
+              ],
+              "clearPaths": [
+                "values.perfusionFindings"
+              ]
+            }
+          ],
+          "needsReview": [],
+          "uncaptured": []
+        }
+      },
+      "scoring": {
+        "truePositives": [
+          "values.capillaryRefill=Delayed",
+          "values.skinTemperature=Cool"
+        ],
+        "falsePositives": [],
+        "falseNegatives": [],
+        "matchedTemporal": [],
+        "unexpectedTemporal": [],
+        "findings": []
+      },
+      "latencyMs": 0.03887500000000088
+    },
+    {
+      "id": "RC022",
+      "domain": "perfusion",
+      "narrative": "Hands feel cold; refill is around three seconds.",
+      "expected": {
+        "claims": [
+          "values.skinTemperature=Cold",
+          "values.capillaryRefill=3"
+        ],
+        "needsReview": false,
+        "temporalClaims": [],
+        "risk": null
+      },
+      "actual": {
+        "claims": [],
+        "needsReview": true,
+        "rawExtraction": {
+          "status": "needs_review",
+          "snapshot": {
+            "signals": [
+              "off"
+            ],
+            "setting": "",
+            "contexts": [],
+            "values": {},
+            "optional": {},
+            "units": {},
+            "notes": ""
+          },
+          "items": [],
+          "needsReview": [
+            {
+              "id": "review-1",
+              "text": "Hands feel cold; refill is around three seconds.",
+              "reason": "Could not map confidently without interpretation."
+            }
+          ],
+          "uncaptured": [
+            "Hands feel cold; refill is around three seconds."
+          ]
+        }
+      },
+      "scoring": {
+        "truePositives": [],
+        "falsePositives": [],
+        "falseNegatives": [
+          "values.skinTemperature=Cold",
+          "values.capillaryRefill=3"
+        ],
+        "matchedTemporal": [],
+        "unexpectedTemporal": [],
+        "findings": [
+          {
+            "severity": "P1",
+            "type": "supported_claim_missed",
+            "claim": "values.skinTemperature=Cold"
+          },
+          {
+            "severity": "P1",
+            "type": "supported_claim_missed",
+            "claim": "values.capillaryRefill=3"
+          },
+          {
+            "severity": "P2",
+            "type": "unnecessary_needs_review"
+          }
+        ]
+      },
+      "latencyMs": 0.017666999999999433
+    },
+    {
+      "id": "RC023",
+      "domain": "perfusion",
+      "narrative": "Cool feet, weak pedal pulses, no mottling.",
+      "expected": {
+        "claims": [
+          "values.skinTemperature=Cool",
+          "values.pulses=Weak pedal pulses",
+          "values.mottling=Not observed"
+        ],
+        "needsReview": false,
+        "temporalClaims": [],
+        "risk": null
+      },
+      "actual": {
+        "claims": [
+          "values.skinTemperature=Cool"
+        ],
+        "needsReview": false,
+        "rawExtraction": {
+          "status": "ready",
+          "snapshot": {
+            "signals": [
+              "off",
+              "perfusion"
+            ],
+            "setting": "",
+            "contexts": [],
+            "values": {
+              "perfusionFindings": [
+                "Cool / clammy"
+              ]
+            },
+            "optional": {},
+            "units": {},
+            "notes": ""
+          },
+          "items": [
+            {
+              "id": "perfusion",
+              "label": "Perfusion",
+              "fields": [
+                {
+                  "path": "values.perfusionFindings",
+                  "label": "Findings",
+                  "type": "list"
+                }
+              ],
+              "clearPaths": [
+                "values.perfusionFindings"
+              ]
+            }
+          ],
+          "needsReview": [],
+          "uncaptured": []
+        }
+      },
+      "scoring": {
+        "truePositives": [
+          "values.skinTemperature=Cool"
+        ],
+        "falsePositives": [],
+        "falseNegatives": [
+          "values.pulses=Weak pedal pulses",
+          "values.mottling=Not observed"
+        ],
+        "matchedTemporal": [],
+        "unexpectedTemporal": [],
+        "findings": [
+          {
+            "severity": "P1",
+            "type": "supported_claim_missed",
+            "claim": "values.pulses=Weak pedal pulses"
+          },
+          {
+            "severity": "P1",
+            "type": "supported_claim_missed",
+            "claim": "values.mottling=Not observed"
+          }
+        ]
+      },
+      "latencyMs": 0.02712500000000162
+    },
+    {
+      "id": "RC024",
+      "domain": "perfusion",
+      "narrative": "Cap refill may be a little sluggish, hard to tell.",
+      "expected": {
+        "claims": [],
+        "needsReview": true,
+        "temporalClaims": [],
+        "risk": "uncertain-finding"
+      },
+      "actual": {
+        "claims": [],
+        "needsReview": true,
+        "rawExtraction": {
+          "status": "needs_review",
+          "snapshot": {
+            "signals": [
+              "off"
+            ],
+            "setting": "",
+            "contexts": [],
+            "values": {},
+            "optional": {},
+            "units": {},
+            "notes": ""
+          },
+          "items": [],
+          "needsReview": [
+            {
+              "id": "review-1",
+              "text": "Cap refill may be a little sluggish, hard to tell.",
+              "reason": "Could not map confidently without interpretation."
+            }
+          ],
+          "uncaptured": [
+            "Cap refill may be a little sluggish, hard to tell."
+          ]
+        }
+      },
+      "scoring": {
+        "truePositives": [],
+        "falsePositives": [],
+        "falseNegatives": [],
+        "matchedTemporal": [],
+        "unexpectedTemporal": [],
+        "findings": []
+      },
+      "latencyMs": 0.016875000000002416
+    },
+    {
+      "id": "RC025",
+      "domain": "urine-output",
+      "narrative": "Urine output was 20 mL over the last hour.",
+      "expected": {
+        "claims": [
+          "values.urineAmount=20",
+          "values.urineIntervalValue=1",
+          "values.urineIntervalUnit=hour"
+        ],
+        "needsReview": false,
+        "temporalClaims": [
+          "values.urineIntervalValue=1",
+          "values.urineIntervalUnit=hour"
+        ],
+        "risk": null
+      },
+      "actual": {
+        "claims": [
+          "values.urineAmount=20",
+          "values.urineIntervalUnit=hour",
+          "values.urineIntervalValue=1"
+        ],
+        "needsReview": false,
+        "rawExtraction": {
+          "status": "ready",
+          "snapshot": {
+            "signals": [
+              "off",
+              "urine"
+            ],
+            "setting": "",
+            "contexts": [],
+            "values": {
+              "urineAmount": "20",
+              "urineIntervalValue": "1",
+              "urineIntervalUnit": "hour"
+            },
+            "optional": {},
+            "units": {},
+            "notes": ""
+          },
+          "items": [
+            {
+              "id": "urine",
+              "label": "Urine output",
+              "fields": [
+                {
+                  "path": "values.urineAmount",
+                  "label": "Amount"
+                },
+                {
+                  "path": "values.urineIntervalValue",
+                  "label": "Period"
+                }
+              ],
+              "clearPaths": [
+                "values.urineAmount",
+                "values.urineIntervalValue",
+                "values.urineIntervalUnit"
+              ]
+            }
+          ],
+          "needsReview": [],
+          "uncaptured": []
+        }
+      },
+      "scoring": {
+        "truePositives": [
+          "values.urineAmount=20",
+          "values.urineIntervalUnit=hour",
+          "values.urineIntervalValue=1"
+        ],
+        "falsePositives": [],
+        "falseNegatives": [],
+        "matchedTemporal": [
+          "values.urineIntervalUnit=hour",
+          "values.urineIntervalValue=1"
+        ],
+        "unexpectedTemporal": [],
+        "findings": []
+      },
+      "latencyMs": 0.039291000000002185
+    },
+    {
+      "id": "RC026",
+      "domain": "urine-output",
+      "narrative": "UOP twenty cc past hr.",
+      "expected": {
+        "claims": [
+          "values.urineAmount=20",
+          "values.urineIntervalValue=1",
+          "values.urineIntervalUnit=hour"
+        ],
+        "needsReview": false,
+        "temporalClaims": [
+          "values.urineIntervalValue=1",
+          "values.urineIntervalUnit=hour"
+        ],
+        "risk": null
+      },
+      "actual": {
+        "claims": [],
+        "needsReview": true,
+        "rawExtraction": {
+          "status": "needs_review",
+          "snapshot": {
+            "signals": [
+              "off"
+            ],
+            "setting": "",
+            "contexts": [],
+            "values": {},
+            "optional": {},
+            "units": {},
+            "notes": ""
+          },
+          "items": [],
+          "needsReview": [
+            {
+              "id": "review-1",
+              "text": "UOP twenty cc past hr.",
+              "reason": "Could not map confidently without interpretation."
+            }
+          ],
+          "uncaptured": [
+            "UOP twenty cc past hr."
+          ]
+        }
+      },
+      "scoring": {
+        "truePositives": [],
+        "falsePositives": [],
+        "falseNegatives": [
+          "values.urineAmount=20",
+          "values.urineIntervalValue=1",
+          "values.urineIntervalUnit=hour"
+        ],
+        "matchedTemporal": [],
+        "unexpectedTemporal": [],
+        "findings": [
+          {
+            "severity": "P1",
+            "type": "supported_claim_missed",
+            "claim": "values.urineAmount=20"
+          },
+          {
+            "severity": "P1",
+            "type": "supported_claim_missed",
+            "claim": "values.urineIntervalValue=1"
+          },
+          {
+            "severity": "P1",
+            "type": "supported_claim_missed",
+            "claim": "values.urineIntervalUnit=hour"
+          },
+          {
+            "severity": "P2",
+            "type": "unnecessary_needs_review"
+          }
+        ]
+      },
+      "latencyMs": 0.014959000000001055
+    },
+    {
+      "id": "RC027",
+      "domain": "urine-output",
+      "narrative": "Only 15 out since 0700.",
+      "expected": {
+        "claims": [
+          "values.urineAmount=15"
+        ],
+        "needsReview": true,
+        "temporalClaims": [],
+        "risk": "clock-time-without-date"
+      },
+      "actual": {
+        "claims": [],
+        "needsReview": true,
+        "rawExtraction": {
+          "status": "needs_review",
+          "snapshot": {
+            "signals": [
+              "off"
+            ],
+            "setting": "",
+            "contexts": [],
+            "values": {},
+            "optional": {},
+            "units": {},
+            "notes": ""
+          },
+          "items": [],
+          "needsReview": [
+            {
+              "id": "review-1",
+              "text": "Only 15 out since 0700.",
+              "reason": "Could not map confidently without interpretation."
+            }
+          ],
+          "uncaptured": [
+            "Only 15 out since 0700."
+          ]
+        }
+      },
+      "scoring": {
+        "truePositives": [],
+        "falsePositives": [],
+        "falseNegatives": [
+          "values.urineAmount=15"
+        ],
+        "matchedTemporal": [],
+        "unexpectedTemporal": [],
+        "findings": [
+          {
+            "severity": "P1",
+            "type": "supported_claim_missed",
+            "claim": "values.urineAmount=15"
+          }
+        ]
+      },
+      "latencyMs": 0.015750000000000597
+    },
+    {
+      "id": "RC028",
+      "domain": "urine-output",
+      "narrative": "Urine was 20, actually that may have been the prior hour.",
+      "expected": {
+        "claims": [],
+        "needsReview": true,
+        "temporalClaims": [],
+        "risk": "self-correction"
+      },
+      "actual": {
+        "claims": [],
+        "needsReview": true,
+        "rawExtraction": {
+          "status": "needs_review",
+          "snapshot": {
+            "signals": [
+              "off"
+            ],
+            "setting": "",
+            "contexts": [],
+            "values": {},
+            "optional": {},
+            "units": {},
+            "notes": ""
+          },
+          "items": [],
+          "needsReview": [
+            {
+              "id": "review-1",
+              "text": "Urine was 20, actually that may have been the prior hour.",
+              "reason": "Could not map confidently without interpretation."
+            }
+          ],
+          "uncaptured": [
+            "Urine was 20, actually that may have been the prior hour."
+          ]
+        }
+      },
+      "scoring": {
+        "truePositives": [],
+        "falsePositives": [],
+        "falseNegatives": [],
+        "matchedTemporal": [],
+        "unexpectedTemporal": [],
+        "findings": []
+      },
+      "latencyMs": 0.01637500000000003
+    },
+    {
+      "id": "RC029",
+      "domain": "urine-output",
+      "narrative": "Foley has had no output this hour.",
+      "expected": {
+        "claims": [
+          "values.urineState=None"
+        ],
+        "needsReview": false,
+        "temporalClaims": [],
+        "risk": null
+      },
+      "actual": {
+        "claims": [],
+        "needsReview": true,
+        "rawExtraction": {
+          "status": "needs_review",
+          "snapshot": {
+            "signals": [
+              "off"
+            ],
+            "setting": "",
+            "contexts": [],
+            "values": {},
+            "optional": {},
+            "units": {},
+            "notes": ""
+          },
+          "items": [],
+          "needsReview": [
+            {
+              "id": "review-1",
+              "text": "Foley has had no output this hour.",
+              "reason": "Could not map confidently without interpretation."
+            }
+          ],
+          "uncaptured": [
+            "Foley has had no output this hour."
+          ]
+        }
+      },
+      "scoring": {
+        "truePositives": [],
+        "falsePositives": [],
+        "falseNegatives": [
+          "values.urineState=None"
+        ],
+        "matchedTemporal": [],
+        "unexpectedTemporal": [],
+        "findings": [
+          {
+            "severity": "P1",
+            "type": "supported_claim_missed",
+            "claim": "values.urineState=None"
+          },
+          {
+            "severity": "P2",
+            "type": "unnecessary_needs_review"
+          }
+        ]
+      },
+      "latencyMs": 0.4003749999999968
+    },
+    {
+      "id": "RC030",
+      "domain": "urine-output",
+      "narrative": "Documented urine rate is 18 mL per hour.",
+      "expected": {
+        "claims": [
+          "values.urineRate=18"
+        ],
+        "needsReview": false,
+        "temporalClaims": [],
+        "risk": null
+      },
+      "actual": {
+        "claims": [],
+        "needsReview": true,
+        "rawExtraction": {
+          "status": "needs_review",
+          "snapshot": {
+            "signals": [
+              "off"
+            ],
+            "setting": "",
+            "contexts": [],
+            "values": {},
+            "optional": {},
+            "units": {},
+            "notes": ""
+          },
+          "items": [],
+          "needsReview": [
+            {
+              "id": "review-1",
+              "text": "Documented urine rate is 18 mL per hour.",
+              "reason": "Could not map confidently without interpretation."
+            }
+          ],
+          "uncaptured": [
+            "Documented urine rate is 18 mL per hour."
+          ]
+        }
+      },
+      "scoring": {
+        "truePositives": [],
+        "falsePositives": [],
+        "falseNegatives": [
+          "values.urineRate=18"
+        ],
+        "matchedTemporal": [],
+        "unexpectedTemporal": [],
+        "findings": [
+          {
+            "severity": "P1",
+            "type": "supported_claim_missed",
+            "claim": "values.urineRate=18"
+          },
+          {
+            "severity": "P2",
+            "type": "unnecessary_needs_review"
+          }
+        ]
+      },
+      "latencyMs": 0.017082999999999515
+    },
+    {
+      "id": "RC031",
+      "domain": "labs",
+      "narrative": "Lactate went from 2.0 to 4.1 mmol/L.",
+      "expected": {
+        "claims": [
+          "values.lactateEarlier=2.0",
+          "values.lactateNow=4.1",
+          "units.lactate=mmol/L"
+        ],
+        "needsReview": false,
+        "temporalClaims": [
+          "values.lactateEarlier=2.0",
+          "values.lactateNow=4.1"
+        ],
+        "risk": null
+      },
+      "actual": {
+        "claims": [
+          "units.lactate=mmol/L",
+          "values.lactateEarlier=2.0",
+          "values.lactateNow=4.1"
+        ],
+        "needsReview": false,
+        "rawExtraction": {
+          "status": "ready",
+          "snapshot": {
+            "signals": [
+              "off",
+              "labs"
+            ],
+            "setting": "",
+            "contexts": [],
+            "values": {
+              "lactateEarlier": "2.0",
+              "lactateNow": "4.1"
+            },
+            "optional": {},
+            "units": {
+              "lactate": "mmol/L"
+            },
+            "notes": ""
+          },
+          "items": [
+            {
+              "id": "lactate",
+              "label": "Lactate",
+              "fields": [
+                {
+                  "path": "values.lactateEarlier",
+                  "label": "Earlier"
+                },
+                {
+                  "path": "values.lactateNow",
+                  "label": "Now"
+                }
+              ],
+              "clearPaths": [
+                "values.lactateEarlier",
+                "values.lactateNow"
+              ]
+            }
+          ],
+          "needsReview": [],
+          "uncaptured": []
+        }
+      },
+      "scoring": {
+        "truePositives": [
+          "units.lactate=mmol/L",
+          "values.lactateEarlier=2.0",
+          "values.lactateNow=4.1"
+        ],
+        "falsePositives": [],
+        "falseNegatives": [],
+        "matchedTemporal": [
+          "values.lactateEarlier=2.0",
+          "values.lactateNow=4.1"
+        ],
+        "unexpectedTemporal": [],
+        "findings": []
+      },
+      "latencyMs": 0.08966699999999861
+    },
+    {
+      "id": "RC032",
+      "domain": "labs",
+      "narrative": "Lactate was two; repeat came back four point one.",
+      "expected": {
+        "claims": [
+          "values.lactateEarlier=2",
+          "values.lactateNow=4.1",
+          "units.lactate=unspecified"
+        ],
+        "needsReview": false,
+        "temporalClaims": [
+          "values.lactateEarlier=2",
+          "values.lactateNow=4.1"
+        ],
+        "risk": null
+      },
+      "actual": {
+        "claims": [],
+        "needsReview": true,
+        "rawExtraction": {
+          "status": "needs_review",
+          "snapshot": {
+            "signals": [
+              "off"
+            ],
+            "setting": "",
+            "contexts": [],
+            "values": {},
+            "optional": {},
+            "units": {},
+            "notes": ""
+          },
+          "items": [],
+          "needsReview": [
+            {
+              "id": "review-1",
+              "text": "Lactate was two; repeat came back four point one.",
+              "reason": "Could not map confidently without interpretation."
+            }
+          ],
+          "uncaptured": [
+            "Lactate was two; repeat came back four point one."
+          ]
+        }
+      },
+      "scoring": {
+        "truePositives": [],
+        "falsePositives": [],
+        "falseNegatives": [
+          "values.lactateEarlier=2",
+          "values.lactateNow=4.1",
+          "units.lactate=unspecified"
+        ],
+        "matchedTemporal": [],
+        "unexpectedTemporal": [],
+        "findings": [
+          {
+            "severity": "P1",
+            "type": "supported_claim_missed",
+            "claim": "values.lactateEarlier=2"
+          },
+          {
+            "severity": "P1",
+            "type": "supported_claim_missed",
+            "claim": "values.lactateNow=4.1"
+          },
+          {
+            "severity": "P1",
+            "type": "supported_claim_missed",
+            "claim": "units.lactate=unspecified"
+          },
+          {
+            "severity": "P2",
+            "type": "unnecessary_needs_review"
+          }
+        ]
+      },
+      "latencyMs": 0.01604199999999878
+    },
+    {
+      "id": "RC033",
+      "domain": "labs",
+      "narrative": "Lactate is 4.1.",
+      "expected": {
+        "claims": [
+          "values.lactateNow=4.1",
+          "units.lactate=unspecified"
+        ],
+        "needsReview": false,
+        "temporalClaims": [
+          "values.lactateNow=4.1"
+        ],
+        "risk": null
+      },
+      "actual": {
+        "claims": [],
+        "needsReview": true,
+        "rawExtraction": {
+          "status": "needs_review",
+          "snapshot": {
+            "signals": [
+              "off"
+            ],
+            "setting": "",
+            "contexts": [],
+            "values": {},
+            "optional": {},
+            "units": {},
+            "notes": ""
+          },
+          "items": [],
+          "needsReview": [
+            {
+              "id": "review-1",
+              "text": "Lactate is 4.1.",
+              "reason": "Could not map confidently without interpretation."
+            }
+          ],
+          "uncaptured": [
+            "Lactate is 4.1."
+          ]
+        }
+      },
+      "scoring": {
+        "truePositives": [],
+        "falsePositives": [],
+        "falseNegatives": [
+          "values.lactateNow=4.1",
+          "units.lactate=unspecified"
+        ],
+        "matchedTemporal": [],
+        "unexpectedTemporal": [],
+        "findings": [
+          {
+            "severity": "P1",
+            "type": "supported_claim_missed",
+            "claim": "values.lactateNow=4.1"
+          },
+          {
+            "severity": "P1",
+            "type": "supported_claim_missed",
+            "claim": "units.lactate=unspecified"
+          },
+          {
+            "severity": "P2",
+            "type": "unnecessary_needs_review"
+          }
+        ]
+      },
+      "latencyMs": 0.012750000000000483
+    },
+    {
+      "id": "RC034",
+      "domain": "labs",
+      "narrative": "Creatinine went from 1.1 to 1.6 mg/dL.",
+      "expected": {
+        "claims": [
+          "values.creatinineEarlier=1.1",
+          "values.creatinineNow=1.6",
+          "units.creatinine=mg/dL"
+        ],
+        "needsReview": false,
+        "temporalClaims": [
+          "values.creatinineEarlier=1.1",
+          "values.creatinineNow=1.6"
+        ],
+        "risk": null
+      },
+      "actual": {
+        "claims": [
+          "units.creatinine=mg/dL",
+          "values.creatinineEarlier=1.1",
+          "values.creatinineNow=1.6"
+        ],
+        "needsReview": false,
+        "rawExtraction": {
+          "status": "ready",
+          "snapshot": {
+            "signals": [
+              "off",
+              "labs"
+            ],
+            "setting": "",
+            "contexts": [],
+            "values": {
+              "creatinineEarlier": "1.1",
+              "creatinineNow": "1.6"
+            },
+            "optional": {},
+            "units": {
+              "creatinine": "mg/dL"
+            },
+            "notes": ""
+          },
+          "items": [
+            {
+              "id": "creatinine",
+              "label": "Creatinine",
+              "fields": [
+                {
+                  "path": "values.creatinineEarlier",
+                  "label": "Earlier"
+                },
+                {
+                  "path": "values.creatinineNow",
+                  "label": "Now"
+                }
+              ],
+              "clearPaths": [
+                "values.creatinineEarlier",
+                "values.creatinineNow"
+              ]
+            }
+          ],
+          "needsReview": [],
+          "uncaptured": []
+        }
+      },
+      "scoring": {
+        "truePositives": [
+          "units.creatinine=mg/dL",
+          "values.creatinineEarlier=1.1",
+          "values.creatinineNow=1.6"
+        ],
+        "falsePositives": [],
+        "falseNegatives": [],
+        "matchedTemporal": [
+          "values.creatinineEarlier=1.1",
+          "values.creatinineNow=1.6"
+        ],
+        "unexpectedTemporal": [],
+        "findings": []
+      },
+      "latencyMs": 0.05387500000000145
+    },
+    {
+      "id": "RC035",
+      "domain": "labs",
+      "narrative": "Creat bumped 1.1 to 1.6.",
+      "expected": {
+        "claims": [
+          "values.creatinineEarlier=1.1",
+          "values.creatinineNow=1.6",
+          "units.creatinine=unspecified"
+        ],
+        "needsReview": false,
+        "temporalClaims": [
+          "values.creatinineEarlier=1.1",
+          "values.creatinineNow=1.6"
+        ],
+        "risk": null
+      },
+      "actual": {
+        "claims": [],
+        "needsReview": true,
+        "rawExtraction": {
+          "status": "needs_review",
+          "snapshot": {
+            "signals": [
+              "off"
+            ],
+            "setting": "",
+            "contexts": [],
+            "values": {},
+            "optional": {},
+            "units": {},
+            "notes": ""
+          },
+          "items": [],
+          "needsReview": [
+            {
+              "id": "review-1",
+              "text": "Creat bumped 1.1 to 1.6.",
+              "reason": "Could not map confidently without interpretation."
+            }
+          ],
+          "uncaptured": [
+            "Creat bumped 1.1 to 1.6."
+          ]
+        }
+      },
+      "scoring": {
+        "truePositives": [],
+        "falsePositives": [],
+        "falseNegatives": [
+          "values.creatinineEarlier=1.1",
+          "values.creatinineNow=1.6",
+          "units.creatinine=unspecified"
+        ],
+        "matchedTemporal": [],
+        "unexpectedTemporal": [],
+        "findings": [
+          {
+            "severity": "P1",
+            "type": "supported_claim_missed",
+            "claim": "values.creatinineEarlier=1.1"
+          },
+          {
+            "severity": "P1",
+            "type": "supported_claim_missed",
+            "claim": "values.creatinineNow=1.6"
+          },
+          {
+            "severity": "P1",
+            "type": "supported_claim_missed",
+            "claim": "units.creatinine=unspecified"
+          },
+          {
+            "severity": "P2",
+            "type": "unnecessary_needs_review"
+          }
+        ]
+      },
+      "latencyMs": 0.013708000000001164
+    },
+    {
+      "id": "RC036",
+      "domain": "labs",
+      "narrative": "Potassium is 3.2 and magnesium is 1.7.",
+      "expected": {
+        "claims": [
+          "values.potassiumNow=3.2",
+          "units.potassium=unspecified",
+          "optional.perfusionLabs.otherLabs[0].name=Magnesium",
+          "optional.perfusionLabs.otherLabs[0].current=1.7",
+          "optional.perfusionLabs.otherLabs[0].unit=unspecified"
+        ],
+        "needsReview": false,
+        "temporalClaims": [
+          "values.potassiumNow=3.2",
+          "optional.perfusionLabs.otherLabs[0].current=1.7"
+        ],
+        "risk": null
+      },
+      "actual": {
+        "claims": [],
+        "needsReview": true,
+        "rawExtraction": {
+          "status": "needs_review",
+          "snapshot": {
+            "signals": [
+              "off"
+            ],
+            "setting": "",
+            "contexts": [],
+            "values": {},
+            "optional": {},
+            "units": {},
+            "notes": ""
+          },
+          "items": [],
+          "needsReview": [
+            {
+              "id": "review-1",
+              "text": "Potassium is 3.2 and magnesium is 1.7.",
+              "reason": "Could not map confidently without interpretation."
+            }
+          ],
+          "uncaptured": [
+            "Potassium is 3.2 and magnesium is 1.7."
+          ]
+        }
+      },
+      "scoring": {
+        "truePositives": [],
+        "falsePositives": [],
+        "falseNegatives": [
+          "values.potassiumNow=3.2",
+          "units.potassium=unspecified",
+          "optional.perfusionLabs.otherLabs[0].name=Magnesium",
+          "optional.perfusionLabs.otherLabs[0].current=1.7",
+          "optional.perfusionLabs.otherLabs[0].unit=unspecified"
+        ],
+        "matchedTemporal": [],
+        "unexpectedTemporal": [],
+        "findings": [
+          {
+            "severity": "P1",
+            "type": "supported_claim_missed",
+            "claim": "values.potassiumNow=3.2"
+          },
+          {
+            "severity": "P1",
+            "type": "supported_claim_missed",
+            "claim": "units.potassium=unspecified"
+          },
+          {
+            "severity": "P1",
+            "type": "supported_claim_missed",
+            "claim": "optional.perfusionLabs.otherLabs[0].name=Magnesium"
+          },
+          {
+            "severity": "P1",
+            "type": "supported_claim_missed",
+            "claim": "optional.perfusionLabs.otherLabs[0].current=1.7"
+          },
+          {
+            "severity": "P1",
+            "type": "supported_claim_missed",
+            "claim": "optional.perfusionLabs.otherLabs[0].unit=unspecified"
+          },
+          {
+            "severity": "P2",
+            "type": "unnecessary_needs_review"
+          }
+        ]
+      },
+      "latencyMs": 0.012750000000004036
+    },
+    {
+      "id": "RC037",
+      "domain": "medications-drips",
+      "narrative": "Norepinephrine is running, dose unknown.",
+      "expected": {
+        "claims": [
+          "optional.drips.items[0].medication=Norepinephrine"
+        ],
+        "needsReview": true,
+        "temporalClaims": [],
+        "risk": "unknown-dose"
+      },
+      "actual": {
+        "claims": [
+          "optional.drips.items[0].medication=Norepinephrine"
+        ],
+        "needsReview": false,
+        "rawExtraction": {
+          "status": "ready",
+          "snapshot": {
+            "signals": [
+              "off",
+              "perfusion"
+            ],
+            "setting": "",
+            "contexts": [],
+            "values": {},
+            "optional": {
+              "drips": {
+                "items": [
+                  {
+                    "medication": "Norepinephrine"
+                  }
+                ]
+              }
+            },
+            "units": {},
+            "notes": ""
+          },
+          "items": [
+            {
+              "id": "norepinephrine",
+              "label": "Support",
+              "fields": [
+                {
+                  "path": "optional.drips.items.0.medication",
+                  "label": "Medication"
+                },
+                {
+                  "path": "optional.drips.items.0.currentDose",
+                  "label": "Dose"
+                }
+              ],
+              "clearPaths": [
+                "optional.drips.items.0.medication",
+                "optional.drips.items.0.currentDose"
+              ]
+            }
+          ],
+          "needsReview": [],
+          "uncaptured": []
+        }
+      },
+      "scoring": {
+        "truePositives": [
+          "optional.drips.items[0].medication=Norepinephrine"
+        ],
+        "falsePositives": [],
+        "falseNegatives": [],
+        "matchedTemporal": [],
+        "unexpectedTemporal": [],
+        "findings": [
+          {
+            "severity": "P1",
+            "type": "ambiguity_not_routed_to_review"
+          }
+        ]
+      },
+      "latencyMs": 0.03770899999999955
+    },
+    {
+      "id": "RC038",
+      "domain": "medications-drips",
+      "narrative": "Levo is on. I do not have the rate.",
+      "expected": {
+        "claims": [
+          "optional.drips.items[0].medication=Norepinephrine"
+        ],
+        "needsReview": true,
+        "temporalClaims": [],
+        "risk": "unknown-dose"
+      },
+      "actual": {
+        "claims": [],
+        "needsReview": true,
+        "rawExtraction": {
+          "status": "needs_review",
+          "snapshot": {
+            "signals": [
+              "off"
+            ],
+            "setting": "",
+            "contexts": [],
+            "values": {},
+            "optional": {},
+            "units": {},
+            "notes": ""
+          },
+          "items": [],
+          "needsReview": [
+            {
+              "id": "review-1",
+              "text": "Levo is on.",
+              "reason": "Could not map confidently without interpretation."
+            },
+            {
+              "id": "review-2",
+              "text": "I do not have the rate.",
+              "reason": "Could not map confidently without interpretation."
+            }
+          ],
+          "uncaptured": [
+            "Levo is on.",
+            "I do not have the rate."
+          ]
+        }
+      },
+      "scoring": {
+        "truePositives": [],
+        "falsePositives": [],
+        "falseNegatives": [
+          "optional.drips.items[0].medication=Norepinephrine"
+        ],
+        "matchedTemporal": [],
+        "unexpectedTemporal": [],
+        "findings": [
+          {
+            "severity": "P1",
+            "type": "supported_claim_missed",
+            "claim": "optional.drips.items[0].medication=Norepinephrine"
+          }
+        ]
+      },
+      "latencyMs": 0.023915999999999826
+    },
+    {
+      "id": "RC039",
+      "domain": "medications-drips",
+      "narrative": "Norepi was increased from 0.04 to 0.08 mcg/kg/min.",
+      "expected": {
+        "claims": [
+          "optional.drips.items[0].medication=Norepinephrine",
+          "optional.drips.items[0].previousDose=0.04",
+          "optional.drips.items[0].currentDose=0.08",
+          "optional.drips.items[0].unit=mcg/kg/min",
+          "optional.drips.items[0].direction=Increased"
+        ],
+        "needsReview": false,
+        "temporalClaims": [
+          "optional.drips.items[0].previousDose=0.04",
+          "optional.drips.items[0].currentDose=0.08",
+          "optional.drips.items[0].direction=Increased"
+        ],
+        "risk": null
+      },
+      "actual": {
+        "claims": [],
+        "needsReview": true,
+        "rawExtraction": {
+          "status": "needs_review",
+          "snapshot": {
+            "signals": [
+              "off"
+            ],
+            "setting": "",
+            "contexts": [],
+            "values": {},
+            "optional": {},
+            "units": {},
+            "notes": ""
+          },
+          "items": [],
+          "needsReview": [
+            {
+              "id": "review-1",
+              "text": "Norepi was increased from 0.04 to 0.08 mcg/kg/min.",
+              "reason": "Could not map confidently without interpretation."
+            }
+          ],
+          "uncaptured": [
+            "Norepi was increased from 0.04 to 0.08 mcg/kg/min."
+          ]
+        }
+      },
+      "scoring": {
+        "truePositives": [],
+        "falsePositives": [],
+        "falseNegatives": [
+          "optional.drips.items[0].medication=Norepinephrine",
+          "optional.drips.items[0].previousDose=0.04",
+          "optional.drips.items[0].currentDose=0.08",
+          "optional.drips.items[0].unit=mcg/kg/min",
+          "optional.drips.items[0].direction=Increased"
+        ],
+        "matchedTemporal": [],
+        "unexpectedTemporal": [],
+        "findings": [
+          {
+            "severity": "P1",
+            "type": "supported_claim_missed",
+            "claim": "optional.drips.items[0].medication=Norepinephrine"
+          },
+          {
+            "severity": "P1",
+            "type": "supported_claim_missed",
+            "claim": "optional.drips.items[0].previousDose=0.04"
+          },
+          {
+            "severity": "P1",
+            "type": "supported_claim_missed",
+            "claim": "optional.drips.items[0].currentDose=0.08"
+          },
+          {
+            "severity": "P1",
+            "type": "supported_claim_missed",
+            "claim": "optional.drips.items[0].unit=mcg/kg/min"
+          },
+          {
+            "severity": "P1",
+            "type": "supported_claim_missed",
+            "claim": "optional.drips.items[0].direction=Increased"
+          },
+          {
+            "severity": "P2",
+            "type": "unnecessary_needs_review"
+          }
+        ]
+      },
+      "latencyMs": 0.014124999999999943
+    },
+    {
+      "id": "RC040",
+      "domain": "medications-drips",
+      "narrative": "He is not on norepinephrine or any other pressor.",
+      "expected": {
+        "claims": [],
+        "needsReview": false,
+        "temporalClaims": [],
+        "risk": "negated-support"
+      },
+      "actual": {
+        "claims": [
+          "optional.drips.items[0].medication=Norepinephrine"
+        ],
+        "needsReview": false,
+        "rawExtraction": {
+          "status": "ready",
+          "snapshot": {
+            "signals": [
+              "off",
+              "perfusion"
+            ],
+            "setting": "",
+            "contexts": [],
+            "values": {},
+            "optional": {
+              "drips": {
+                "items": [
+                  {
+                    "medication": "Norepinephrine"
+                  }
+                ]
+              }
+            },
+            "units": {},
+            "notes": ""
+          },
+          "items": [
+            {
+              "id": "norepinephrine",
+              "label": "Support",
+              "fields": [
+                {
+                  "path": "optional.drips.items.0.medication",
+                  "label": "Medication"
+                },
+                {
+                  "path": "optional.drips.items.0.currentDose",
+                  "label": "Dose"
+                }
+              ],
+              "clearPaths": [
+                "optional.drips.items.0.medication",
+                "optional.drips.items.0.currentDose"
+              ]
+            }
+          ],
+          "needsReview": [],
+          "uncaptured": []
+        }
+      },
+      "scoring": {
+        "truePositives": [],
+        "falsePositives": [
+          "optional.drips.items[0].medication=Norepinephrine"
+        ],
+        "falseNegatives": [],
+        "matchedTemporal": [],
+        "unexpectedTemporal": [],
+        "findings": [
+          {
+            "severity": "P0",
+            "type": "unsupported_structured_claim",
+            "claim": "optional.drips.items[0].medication=Norepinephrine"
+          }
+        ]
+      },
+      "latencyMs": 0.03216700000000117
+    },
+    {
+      "id": "RC041",
+      "domain": "medications-drips",
+      "narrative": "Norepi was stopped before this shift.",
+      "expected": {
+        "claims": [],
+        "needsReview": false,
+        "temporalClaims": [],
+        "risk": "historical-medication"
+      },
+      "actual": {
+        "claims": [],
+        "needsReview": true,
+        "rawExtraction": {
+          "status": "needs_review",
+          "snapshot": {
+            "signals": [
+              "off"
+            ],
+            "setting": "",
+            "contexts": [],
+            "values": {},
+            "optional": {},
+            "units": {},
+            "notes": ""
+          },
+          "items": [],
+          "needsReview": [
+            {
+              "id": "review-1",
+              "text": "Norepi was stopped before this shift.",
+              "reason": "Could not map confidently without interpretation."
+            }
+          ],
+          "uncaptured": [
+            "Norepi was stopped before this shift."
+          ]
+        }
+      },
+      "scoring": {
+        "truePositives": [],
+        "falsePositives": [],
+        "falseNegatives": [],
+        "matchedTemporal": [],
+        "unexpectedTemporal": [],
+        "findings": [
+          {
+            "severity": "P2",
+            "type": "unnecessary_needs_review"
+          }
+        ]
+      },
+      "latencyMs": 0.015124999999997613
+    },
+    {
+      "id": "RC042",
+      "domain": "medications-drips",
+      "narrative": "If the pressure falls, norepi might be started.",
+      "expected": {
+        "claims": [],
+        "needsReview": false,
+        "temporalClaims": [],
+        "risk": "hypothetical-medication"
+      },
+      "actual": {
+        "claims": [],
+        "needsReview": true,
+        "rawExtraction": {
+          "status": "needs_review",
+          "snapshot": {
+            "signals": [
+              "off"
+            ],
+            "setting": "",
+            "contexts": [],
+            "values": {},
+            "optional": {},
+            "units": {},
+            "notes": ""
+          },
+          "items": [],
+          "needsReview": [
+            {
+              "id": "review-1",
+              "text": "If the pressure falls, norepi might be started.",
+              "reason": "Could not map confidently without interpretation."
+            }
+          ],
+          "uncaptured": [
+            "If the pressure falls, norepi might be started."
+          ]
+        }
+      },
+      "scoring": {
+        "truePositives": [],
+        "falsePositives": [],
+        "falseNegatives": [],
+        "matchedTemporal": [],
+        "unexpectedTemporal": [],
+        "findings": [
+          {
+            "severity": "P2",
+            "type": "unnecessary_needs_review"
+          }
+        ]
+      },
+      "latencyMs": 0.013500000000000512
+    },
+    {
+      "id": "RC043",
+      "domain": "drains-bleeding",
+      "narrative": "Chest tube output was 35 mL during the most recent hour.",
+      "expected": {
+        "claims": [
+          "optional.drains.items[0].type=Chest tube",
+          "optional.drains.items[0].currentOutput=35 mL",
+          "optional.drains.items[0].outputTimeframe=most recent hour"
+        ],
+        "needsReview": false,
+        "temporalClaims": [
+          "optional.drains.items[0].outputTimeframe=most recent hour"
+        ],
+        "risk": null
+      },
+      "actual": {
+        "claims": [
+          "optional.drains.items[0].currentOutput=35 mL",
+          "optional.drains.items[0].outputTimeframe=most recent hour",
+          "optional.drains.items[0].type=Chest tube"
+        ],
+        "needsReview": false,
+        "rawExtraction": {
+          "status": "ready",
+          "snapshot": {
+            "signals": [
+              "off",
+              "bleeding"
+            ],
+            "setting": "",
+            "contexts": [],
+            "values": {},
+            "optional": {
+              "drains": {
+                "items": [
+                  {
+                    "type": "Chest tube",
+                    "currentOutput": "35 mL",
+                    "outputTimeframe": "most recent hour"
+                  }
+                ]
+              }
+            },
+            "units": {},
+            "notes": ""
+          },
+          "items": [
+            {
+              "id": "chest-tube",
+              "label": "Chest tube",
+              "fields": [
+                {
+                  "path": "optional.drains.items.0.currentOutput",
+                  "label": "Current output"
+                },
+                {
+                  "path": "optional.drains.items.0.outputTimeframe",
+                  "label": "Timeframe"
+                }
+              ],
+              "clearPaths": [
+                "optional.drains.items.0.type",
+                "optional.drains.items.0.currentOutput",
+                "optional.drains.items.0.outputTimeframe"
+              ]
+            }
+          ],
+          "needsReview": [],
+          "uncaptured": []
+        }
+      },
+      "scoring": {
+        "truePositives": [
+          "optional.drains.items[0].currentOutput=35 mL",
+          "optional.drains.items[0].outputTimeframe=most recent hour",
+          "optional.drains.items[0].type=Chest tube"
+        ],
+        "falsePositives": [],
+        "falseNegatives": [],
+        "matchedTemporal": [
+          "optional.drains.items[0].outputTimeframe=most recent hour"
+        ],
+        "unexpectedTemporal": [],
+        "findings": []
+      },
+      "latencyMs": 0.02316699999999372
+    },
+    {
+      "id": "RC044",
+      "domain": "drains-bleeding",
+      "narrative": "CT put out thirty-five this hour.",
+      "expected": {
+        "claims": [
+          "optional.drains.items[0].type=Chest tube",
+          "optional.drains.items[0].currentOutput=35 mL",
+          "optional.drains.items[0].outputTimeframe=this hour"
+        ],
+        "needsReview": false,
+        "temporalClaims": [
+          "optional.drains.items[0].outputTimeframe=this hour"
+        ],
+        "risk": null
+      },
+      "actual": {
+        "claims": [],
+        "needsReview": true,
+        "rawExtraction": {
+          "status": "needs_review",
+          "snapshot": {
+            "signals": [
+              "off"
+            ],
+            "setting": "",
+            "contexts": [],
+            "values": {},
+            "optional": {},
+            "units": {},
+            "notes": ""
+          },
+          "items": [],
+          "needsReview": [
+            {
+              "id": "review-1",
+              "text": "CT put out thirty-five this hour.",
+              "reason": "Could not map confidently without interpretation."
+            }
+          ],
+          "uncaptured": [
+            "CT put out thirty-five this hour."
+          ]
+        }
+      },
+      "scoring": {
+        "truePositives": [],
+        "falsePositives": [],
+        "falseNegatives": [
+          "optional.drains.items[0].type=Chest tube",
+          "optional.drains.items[0].currentOutput=35 mL",
+          "optional.drains.items[0].outputTimeframe=this hour"
+        ],
+        "matchedTemporal": [],
+        "unexpectedTemporal": [],
+        "findings": [
+          {
+            "severity": "P1",
+            "type": "supported_claim_missed",
+            "claim": "optional.drains.items[0].type=Chest tube"
+          },
+          {
+            "severity": "P1",
+            "type": "supported_claim_missed",
+            "claim": "optional.drains.items[0].currentOutput=35 mL"
+          },
+          {
+            "severity": "P1",
+            "type": "supported_claim_missed",
+            "claim": "optional.drains.items[0].outputTimeframe=this hour"
+          },
+          {
+            "severity": "P2",
+            "type": "unnecessary_needs_review"
+          }
+        ]
+      },
+      "latencyMs": 0.013542000000001053
+    },
+    {
+      "id": "RC045",
+      "domain": "drains-bleeding",
+      "narrative": "Mediastinal tubes had 40 cc since the last check.",
+      "expected": {
+        "claims": [
+          "optional.drains.items[0].type=Mediastinal tubes",
+          "optional.drains.items[0].currentOutput=40 cc",
+          "optional.drains.items[0].outputTimeframe=since the last check"
+        ],
+        "needsReview": false,
+        "temporalClaims": [
+          "optional.drains.items[0].outputTimeframe=since the last check"
+        ],
+        "risk": null
+      },
+      "actual": {
+        "claims": [],
+        "needsReview": true,
+        "rawExtraction": {
+          "status": "needs_review",
+          "snapshot": {
+            "signals": [
+              "off"
+            ],
+            "setting": "",
+            "contexts": [],
+            "values": {},
+            "optional": {},
+            "units": {},
+            "notes": ""
+          },
+          "items": [],
+          "needsReview": [
+            {
+              "id": "review-1",
+              "text": "Mediastinal tubes had 40 cc since the last check.",
+              "reason": "Could not map confidently without interpretation."
+            }
+          ],
+          "uncaptured": [
+            "Mediastinal tubes had 40 cc since the last check."
+          ]
+        }
+      },
+      "scoring": {
+        "truePositives": [],
+        "falsePositives": [],
+        "falseNegatives": [
+          "optional.drains.items[0].type=Mediastinal tubes",
+          "optional.drains.items[0].currentOutput=40 cc",
+          "optional.drains.items[0].outputTimeframe=since the last check"
+        ],
+        "matchedTemporal": [],
+        "unexpectedTemporal": [],
+        "findings": [
+          {
+            "severity": "P1",
+            "type": "supported_claim_missed",
+            "claim": "optional.drains.items[0].type=Mediastinal tubes"
+          },
+          {
+            "severity": "P1",
+            "type": "supported_claim_missed",
+            "claim": "optional.drains.items[0].currentOutput=40 cc"
+          },
+          {
+            "severity": "P1",
+            "type": "supported_claim_missed",
+            "claim": "optional.drains.items[0].outputTimeframe=since the last check"
+          },
+          {
+            "severity": "P2",
+            "type": "unnecessary_needs_review"
+          }
+        ]
+      },
+      "latencyMs": 0.013082999999994627
+    },
+    {
+      "id": "RC046",
+      "domain": "drains-bleeding",
+      "narrative": "Chest tube has 35 out, but I am not sure over what interval.",
+      "expected": {
+        "claims": [
+          "optional.drains.items[0].type=Chest tube",
+          "optional.drains.items[0].currentOutput=35"
+        ],
+        "needsReview": true,
+        "temporalClaims": [],
+        "risk": "unknown-interval"
+      },
+      "actual": {
+        "claims": [],
+        "needsReview": true,
+        "rawExtraction": {
+          "status": "needs_review",
+          "snapshot": {
+            "signals": [
+              "off"
+            ],
+            "setting": "",
+            "contexts": [],
+            "values": {},
+            "optional": {},
+            "units": {},
+            "notes": ""
+          },
+          "items": [],
+          "needsReview": [
+            {
+              "id": "review-1",
+              "text": "Chest tube has 35 out, but I am not sure over what interval.",
+              "reason": "Could not map confidently without interpretation."
+            }
+          ],
+          "uncaptured": [
+            "Chest tube has 35 out, but I am not sure over what interval."
+          ]
+        }
+      },
+      "scoring": {
+        "truePositives": [],
+        "falsePositives": [],
+        "falseNegatives": [
+          "optional.drains.items[0].type=Chest tube",
+          "optional.drains.items[0].currentOutput=35"
+        ],
+        "matchedTemporal": [],
+        "unexpectedTemporal": [],
+        "findings": [
+          {
+            "severity": "P1",
+            "type": "supported_claim_missed",
+            "claim": "optional.drains.items[0].type=Chest tube"
+          },
+          {
+            "severity": "P1",
+            "type": "supported_claim_missed",
+            "claim": "optional.drains.items[0].currentOutput=35"
+          }
+        ]
+      },
+      "latencyMs": 0.01358399999999449
+    },
+    {
+      "id": "RC047",
+      "domain": "drains-bleeding",
+      "narrative": "Chest tube output is up to 35 this hour from 20 the hour before.",
+      "expected": {
+        "claims": [
+          "optional.drains.items[0].type=Chest tube",
+          "optional.drains.items[0].previousOutput=20",
+          "optional.drains.items[0].currentOutput=35",
+          "optional.drains.items[0].outputTimeframe=this hour"
+        ],
+        "needsReview": false,
+        "temporalClaims": [
+          "optional.drains.items[0].previousOutput=20",
+          "optional.drains.items[0].currentOutput=35",
+          "optional.drains.items[0].outputTimeframe=this hour"
+        ],
+        "risk": null
+      },
+      "actual": {
+        "claims": [],
+        "needsReview": true,
+        "rawExtraction": {
+          "status": "needs_review",
+          "snapshot": {
+            "signals": [
+              "off"
+            ],
+            "setting": "",
+            "contexts": [],
+            "values": {},
+            "optional": {},
+            "units": {},
+            "notes": ""
+          },
+          "items": [],
+          "needsReview": [
+            {
+              "id": "review-1",
+              "text": "Chest tube output is up to 35 this hour from 20 the hour before.",
+              "reason": "Could not map confidently without interpretation."
+            }
+          ],
+          "uncaptured": [
+            "Chest tube output is up to 35 this hour from 20 the hour before."
+          ]
+        }
+      },
+      "scoring": {
+        "truePositives": [],
+        "falsePositives": [],
+        "falseNegatives": [
+          "optional.drains.items[0].type=Chest tube",
+          "optional.drains.items[0].previousOutput=20",
+          "optional.drains.items[0].currentOutput=35",
+          "optional.drains.items[0].outputTimeframe=this hour"
+        ],
+        "matchedTemporal": [],
+        "unexpectedTemporal": [],
+        "findings": [
+          {
+            "severity": "P1",
+            "type": "supported_claim_missed",
+            "claim": "optional.drains.items[0].type=Chest tube"
+          },
+          {
+            "severity": "P1",
+            "type": "supported_claim_missed",
+            "claim": "optional.drains.items[0].previousOutput=20"
+          },
+          {
+            "severity": "P1",
+            "type": "supported_claim_missed",
+            "claim": "optional.drains.items[0].currentOutput=35"
+          },
+          {
+            "severity": "P1",
+            "type": "supported_claim_missed",
+            "claim": "optional.drains.items[0].outputTimeframe=this hour"
+          },
+          {
+            "severity": "P2",
+            "type": "unnecessary_needs_review"
+          }
+        ]
+      },
+      "latencyMs": 0.014375000000001137
+    },
+    {
+      "id": "RC048",
+      "domain": "advanced-hemodynamics",
+      "narrative": "CVP went from 8 to 5 mmHg.",
+      "expected": {
+        "claims": [
+          "values.cvpEarlier=8",
+          "values.cvpNow=5",
+          "units.cvp=mmHg"
+        ],
+        "needsReview": false,
+        "temporalClaims": [
+          "values.cvpEarlier=8",
+          "values.cvpNow=5"
+        ],
+        "risk": null
+      },
+      "actual": {
+        "claims": [
+          "units.cvp=mmHg",
+          "values.cvpEarlier=8",
+          "values.cvpNow=5"
+        ],
+        "needsReview": false,
+        "rawExtraction": {
+          "status": "ready",
+          "snapshot": {
+            "signals": [
+              "off",
+              "perfusion"
+            ],
+            "setting": "",
+            "contexts": [],
+            "values": {
+              "cvpEarlier": "8",
+              "cvpNow": "5"
+            },
+            "optional": {},
+            "units": {
+              "cvp": "mmHg"
+            },
+            "notes": ""
+          },
+          "items": [
+            {
+              "id": "cvp",
+              "label": "CVP",
+              "fields": [
+                {
+                  "path": "values.cvpEarlier",
+                  "label": "Earlier"
+                },
+                {
+                  "path": "values.cvpNow",
+                  "label": "Now"
+                }
+              ],
+              "clearPaths": [
+                "values.cvpEarlier",
+                "values.cvpNow"
+              ]
+            }
+          ],
+          "needsReview": [],
+          "uncaptured": []
+        }
+      },
+      "scoring": {
+        "truePositives": [
+          "units.cvp=mmHg",
+          "values.cvpEarlier=8",
+          "values.cvpNow=5"
+        ],
+        "falsePositives": [],
+        "falseNegatives": [],
+        "matchedTemporal": [
+          "values.cvpEarlier=8",
+          "values.cvpNow=5"
+        ],
+        "unexpectedTemporal": [],
+        "findings": []
+      },
+      "latencyMs": 0.0402079999999998
+    },
+    {
+      "id": "RC049",
+      "domain": "advanced-hemodynamics",
+      "narrative": "CVP eight earlier, five now.",
+      "expected": {
+        "claims": [
+          "values.cvpEarlier=8",
+          "values.cvpNow=5",
+          "units.cvp=unspecified"
+        ],
+        "needsReview": false,
+        "temporalClaims": [
+          "values.cvpEarlier=8",
+          "values.cvpNow=5"
+        ],
+        "risk": null
+      },
+      "actual": {
+        "claims": [],
+        "needsReview": true,
+        "rawExtraction": {
+          "status": "needs_review",
+          "snapshot": {
+            "signals": [
+              "off"
+            ],
+            "setting": "",
+            "contexts": [],
+            "values": {},
+            "optional": {},
+            "units": {},
+            "notes": ""
+          },
+          "items": [],
+          "needsReview": [
+            {
+              "id": "review-1",
+              "text": "CVP eight earlier, five now.",
+              "reason": "Could not map confidently without interpretation."
+            }
+          ],
+          "uncaptured": [
+            "CVP eight earlier, five now."
+          ]
+        }
+      },
+      "scoring": {
+        "truePositives": [],
+        "falsePositives": [],
+        "falseNegatives": [
+          "values.cvpEarlier=8",
+          "values.cvpNow=5",
+          "units.cvp=unspecified"
+        ],
+        "matchedTemporal": [],
+        "unexpectedTemporal": [],
+        "findings": [
+          {
+            "severity": "P1",
+            "type": "supported_claim_missed",
+            "claim": "values.cvpEarlier=8"
+          },
+          {
+            "severity": "P1",
+            "type": "supported_claim_missed",
+            "claim": "values.cvpNow=5"
+          },
+          {
+            "severity": "P1",
+            "type": "supported_claim_missed",
+            "claim": "units.cvp=unspecified"
+          },
+          {
+            "severity": "P2",
+            "type": "unnecessary_needs_review"
+          }
+        ]
+      },
+      "latencyMs": 0.013708000000001164
+    },
+    {
+      "id": "RC050",
+      "domain": "advanced-hemodynamics",
+      "narrative": "Cardiac index went from 2.3 to 1.8 L/min/m2.",
+      "expected": {
+        "claims": [
+          "values.ciEarlier=2.3",
+          "values.ciNow=1.8",
+          "units.ci=L/min/m2"
+        ],
+        "needsReview": false,
+        "temporalClaims": [
+          "values.ciEarlier=2.3",
+          "values.ciNow=1.8"
+        ],
+        "risk": null
+      },
+      "actual": {
+        "claims": [
+          "units.ci=L/min/m2",
+          "values.ciEarlier=2.3",
+          "values.ciNow=1.8"
+        ],
+        "needsReview": false,
+        "rawExtraction": {
+          "status": "ready",
+          "snapshot": {
+            "signals": [
+              "off",
+              "perfusion"
+            ],
+            "setting": "",
+            "contexts": [],
+            "values": {
+              "ciEarlier": "2.3",
+              "ciNow": "1.8"
+            },
+            "optional": {},
+            "units": {
+              "ci": "L/min/m2"
+            },
+            "notes": ""
+          },
+          "items": [
+            {
+              "id": "ci",
+              "label": "Cardiac index",
+              "fields": [
+                {
+                  "path": "values.ciEarlier",
+                  "label": "Earlier"
+                },
+                {
+                  "path": "values.ciNow",
+                  "label": "Now"
+                }
+              ],
+              "clearPaths": [
+                "values.ciEarlier",
+                "values.ciNow"
+              ]
+            }
+          ],
+          "needsReview": [],
+          "uncaptured": []
+        }
+      },
+      "scoring": {
+        "truePositives": [
+          "units.ci=L/min/m2",
+          "values.ciEarlier=2.3",
+          "values.ciNow=1.8"
+        ],
+        "falsePositives": [],
+        "falseNegatives": [],
+        "matchedTemporal": [
+          "values.ciEarlier=2.3",
+          "values.ciNow=1.8"
+        ],
+        "unexpectedTemporal": [],
+        "findings": []
+      },
+      "latencyMs": 0.07133300000000276
+    },
+    {
+      "id": "RC051",
+      "domain": "advanced-hemodynamics",
+      "narrative": "Index was 2.3, now 1.8.",
+      "expected": {
+        "claims": [
+          "values.ciEarlier=2.3",
+          "values.ciNow=1.8",
+          "units.ci=unspecified"
+        ],
+        "needsReview": false,
+        "temporalClaims": [
+          "values.ciEarlier=2.3",
+          "values.ciNow=1.8"
+        ],
+        "risk": null
+      },
+      "actual": {
+        "claims": [],
+        "needsReview": true,
+        "rawExtraction": {
+          "status": "needs_review",
+          "snapshot": {
+            "signals": [
+              "off"
+            ],
+            "setting": "",
+            "contexts": [],
+            "values": {},
+            "optional": {},
+            "units": {},
+            "notes": ""
+          },
+          "items": [],
+          "needsReview": [
+            {
+              "id": "review-1",
+              "text": "Index was 2.3, now 1.8.",
+              "reason": "Could not map confidently without interpretation."
+            }
+          ],
+          "uncaptured": [
+            "Index was 2.3, now 1.8."
+          ]
+        }
+      },
+      "scoring": {
+        "truePositives": [],
+        "falsePositives": [],
+        "falseNegatives": [
+          "values.ciEarlier=2.3",
+          "values.ciNow=1.8",
+          "units.ci=unspecified"
+        ],
+        "matchedTemporal": [],
+        "unexpectedTemporal": [],
+        "findings": [
+          {
+            "severity": "P1",
+            "type": "supported_claim_missed",
+            "claim": "values.ciEarlier=2.3"
+          },
+          {
+            "severity": "P1",
+            "type": "supported_claim_missed",
+            "claim": "values.ciNow=1.8"
+          },
+          {
+            "severity": "P1",
+            "type": "supported_claim_missed",
+            "claim": "units.ci=unspecified"
+          },
+          {
+            "severity": "P2",
+            "type": "unnecessary_needs_review"
+          }
+        ]
+      },
+      "latencyMs": 0.013624999999997556
+    },
+    {
+      "id": "RC052",
+      "domain": "advanced-hemodynamics",
+      "narrative": "CI 1.8. No earlier index available.",
+      "expected": {
+        "claims": [
+          "values.ciNow=1.8",
+          "units.ci=unspecified"
+        ],
+        "needsReview": false,
+        "temporalClaims": [
+          "values.ciNow=1.8"
+        ],
+        "risk": null
+      },
+      "actual": {
+        "claims": [],
+        "needsReview": true,
+        "rawExtraction": {
+          "status": "needs_review",
+          "snapshot": {
+            "signals": [
+              "off"
+            ],
+            "setting": "",
+            "contexts": [],
+            "values": {},
+            "optional": {},
+            "units": {},
+            "notes": ""
+          },
+          "items": [],
+          "needsReview": [
+            {
+              "id": "review-1",
+              "text": "CI 1.8.",
+              "reason": "Could not map confidently without interpretation."
+            },
+            {
+              "id": "review-2",
+              "text": "No earlier index available.",
+              "reason": "Could not map confidently without interpretation."
+            }
+          ],
+          "uncaptured": [
+            "CI 1.8.",
+            "No earlier index available."
+          ]
+        }
+      },
+      "scoring": {
+        "truePositives": [],
+        "falsePositives": [],
+        "falseNegatives": [
+          "values.ciNow=1.8",
+          "units.ci=unspecified"
+        ],
+        "matchedTemporal": [],
+        "unexpectedTemporal": [],
+        "findings": [
+          {
+            "severity": "P1",
+            "type": "supported_claim_missed",
+            "claim": "values.ciNow=1.8"
+          },
+          {
+            "severity": "P1",
+            "type": "supported_claim_missed",
+            "claim": "units.ci=unspecified"
+          },
+          {
+            "severity": "P2",
+            "type": "unnecessary_needs_review"
+          }
+        ]
+      },
+      "latencyMs": 0.021374999999999034
+    },
+    {
+      "id": "RC053",
+      "domain": "rhythm",
+      "narrative": "Heart rate is 118 and the monitor now looks irregular.",
+      "expected": {
+        "claims": [
+          "values.hrNow=118",
+          "values.rhythm=Irregular"
+        ],
+        "needsReview": false,
+        "temporalClaims": [
+          "values.hrNow=118"
+        ],
+        "risk": null
+      },
+      "actual": {
+        "claims": [],
+        "needsReview": true,
+        "rawExtraction": {
+          "status": "needs_review",
+          "snapshot": {
+            "signals": [
+              "off"
+            ],
+            "setting": "",
+            "contexts": [],
+            "values": {},
+            "optional": {},
+            "units": {},
+            "notes": ""
+          },
+          "items": [],
+          "needsReview": [
+            {
+              "id": "review-1",
+              "text": "Heart rate is 118 and the monitor now looks irregular.",
+              "reason": "Could not map confidently without interpretation."
+            }
+          ],
+          "uncaptured": [
+            "Heart rate is 118 and the monitor now looks irregular."
+          ]
+        }
+      },
+      "scoring": {
+        "truePositives": [],
+        "falsePositives": [],
+        "falseNegatives": [
+          "values.hrNow=118",
+          "values.rhythm=Irregular"
+        ],
+        "matchedTemporal": [],
+        "unexpectedTemporal": [],
+        "findings": [
+          {
+            "severity": "P1",
+            "type": "supported_claim_missed",
+            "claim": "values.hrNow=118"
+          },
+          {
+            "severity": "P1",
+            "type": "supported_claim_missed",
+            "claim": "values.rhythm=Irregular"
+          },
+          {
+            "severity": "P2",
+            "type": "unnecessary_needs_review"
+          }
+        ]
+      },
+      "latencyMs": 0.01345900000000455
+    },
+    {
+      "id": "RC054",
+      "domain": "rhythm",
+      "narrative": "New irregular rhythm noted; rate 130.",
+      "expected": {
+        "claims": [
+          "values.hrNow=130",
+          "values.rhythm=Irregular"
+        ],
+        "needsReview": false,
+        "temporalClaims": [
+          "values.hrNow=130"
+        ],
+        "risk": null
+      },
+      "actual": {
+        "claims": [],
+        "needsReview": true,
+        "rawExtraction": {
+          "status": "needs_review",
+          "snapshot": {
+            "signals": [
+              "off"
+            ],
+            "setting": "",
+            "contexts": [],
+            "values": {},
+            "optional": {},
+            "units": {},
+            "notes": ""
+          },
+          "items": [],
+          "needsReview": [
+            {
+              "id": "review-1",
+              "text": "New irregular rhythm noted; rate 130.",
+              "reason": "Could not map confidently without interpretation."
+            }
+          ],
+          "uncaptured": [
+            "New irregular rhythm noted; rate 130."
+          ]
+        }
+      },
+      "scoring": {
+        "truePositives": [],
+        "falsePositives": [],
+        "falseNegatives": [
+          "values.hrNow=130",
+          "values.rhythm=Irregular"
+        ],
+        "matchedTemporal": [],
+        "unexpectedTemporal": [],
+        "findings": [
+          {
+            "severity": "P1",
+            "type": "supported_claim_missed",
+            "claim": "values.hrNow=130"
+          },
+          {
+            "severity": "P1",
+            "type": "supported_claim_missed",
+            "claim": "values.rhythm=Irregular"
+          },
+          {
+            "severity": "P2",
+            "type": "unnecessary_needs_review"
+          }
+        ]
+      },
+      "latencyMs": 0.012541999999996278
+    },
+    {
+      "id": "RC055",
+      "domain": "rhythm",
+      "narrative": "Monitor alarmed for AF, but I have not confirmed the rhythm.",
+      "expected": {
+        "claims": [],
+        "needsReview": true,
+        "temporalClaims": [],
+        "risk": "unconfirmed-rhythm"
+      },
+      "actual": {
+        "claims": [],
+        "needsReview": true,
+        "rawExtraction": {
+          "status": "needs_review",
+          "snapshot": {
+            "signals": [
+              "off"
+            ],
+            "setting": "",
+            "contexts": [],
+            "values": {},
+            "optional": {},
+            "units": {},
+            "notes": ""
+          },
+          "items": [],
+          "needsReview": [
+            {
+              "id": "review-1",
+              "text": "Monitor alarmed for AF, but I have not confirmed the rhythm.",
+              "reason": "Could not map confidently without interpretation."
+            }
+          ],
+          "uncaptured": [
+            "Monitor alarmed for AF, but I have not confirmed the rhythm."
+          ]
+        }
+      },
+      "scoring": {
+        "truePositives": [],
+        "falsePositives": [],
+        "falseNegatives": [],
+        "matchedTemporal": [],
+        "unexpectedTemporal": [],
+        "findings": []
+      },
+      "latencyMs": 0.013165999999998235
+    },
+    {
+      "id": "RC056",
+      "domain": "adversarial",
+      "narrative": "No chest pain now. He had chest pain yesterday.",
+      "expected": {
+        "claims": [
+          "values.chestPain=None reported"
+        ],
+        "needsReview": false,
+        "temporalClaims": [],
+        "risk": "historical-versus-current"
+      },
+      "actual": {
+        "claims": [],
+        "needsReview": true,
+        "rawExtraction": {
+          "status": "needs_review",
+          "snapshot": {
+            "signals": [
+              "off"
+            ],
+            "setting": "",
+            "contexts": [],
+            "values": {},
+            "optional": {},
+            "units": {},
+            "notes": ""
+          },
+          "items": [],
+          "needsReview": [
+            {
+              "id": "review-1",
+              "text": "No chest pain now.",
+              "reason": "Could not map confidently without interpretation."
+            },
+            {
+              "id": "review-2",
+              "text": "He had chest pain yesterday.",
+              "reason": "Could not map confidently without interpretation."
+            }
+          ],
+          "uncaptured": [
+            "No chest pain now.",
+            "He had chest pain yesterday."
+          ]
+        }
+      },
+      "scoring": {
+        "truePositives": [],
+        "falsePositives": [],
+        "falseNegatives": [
+          "values.chestPain=None reported"
+        ],
+        "matchedTemporal": [],
+        "unexpectedTemporal": [],
+        "findings": [
+          {
+            "severity": "P1",
+            "type": "supported_claim_missed",
+            "claim": "values.chestPain=None reported"
+          },
+          {
+            "severity": "P2",
+            "type": "unnecessary_needs_review"
+          }
+        ]
+      },
+      "latencyMs": 0.021374999999999034
+    },
+    {
+      "id": "RC057",
+      "domain": "adversarial",
+      "narrative": "BP is 86/48—sorry, the repeat was 92/54.",
+      "expected": {
+        "claims": [],
+        "needsReview": true,
+        "temporalClaims": [],
+        "risk": "self-correction"
+      },
+      "actual": {
+        "claims": [],
+        "needsReview": true,
+        "rawExtraction": {
+          "status": "needs_review",
+          "snapshot": {
+            "signals": [
+              "off"
+            ],
+            "setting": "",
+            "contexts": [],
+            "values": {},
+            "optional": {},
+            "units": {},
+            "notes": ""
+          },
+          "items": [],
+          "needsReview": [
+            {
+              "id": "review-1",
+              "text": "BP is 86/48—sorry, the repeat was 92/54.",
+              "reason": "Could not map confidently without interpretation."
+            }
+          ],
+          "uncaptured": [
+            "BP is 86/48—sorry, the repeat was 92/54."
+          ]
+        }
+      },
+      "scoring": {
+        "truePositives": [],
+        "falsePositives": [],
+        "falseNegatives": [],
+        "matchedTemporal": [],
+        "unexpectedTemporal": [],
+        "findings": []
+      },
+      "latencyMs": 0.889916999999997
+    },
+    {
+      "id": "RC058",
+      "domain": "adversarial",
+      "narrative": "HR 118, systolic 86, respirations 27.",
+      "expected": {
+        "claims": [
+          "values.hrNow=118",
+          "values.rrNow=27"
+        ],
+        "needsReview": true,
+        "temporalClaims": [
+          "values.hrNow=118",
+          "values.rrNow=27"
+        ],
+        "risk": "incomplete-blood-pressure"
+      },
+      "actual": {
+        "claims": [],
+        "needsReview": true,
+        "rawExtraction": {
+          "status": "needs_review",
+          "snapshot": {
+            "signals": [
+              "off"
+            ],
+            "setting": "",
+            "contexts": [],
+            "values": {},
+            "optional": {},
+            "units": {},
+            "notes": ""
+          },
+          "items": [],
+          "needsReview": [
+            {
+              "id": "review-1",
+              "text": "HR 118, systolic 86, respirations 27.",
+              "reason": "Could not map confidently without interpretation."
+            }
+          ],
+          "uncaptured": [
+            "HR 118, systolic 86, respirations 27."
+          ]
+        }
+      },
+      "scoring": {
+        "truePositives": [],
+        "falsePositives": [],
+        "falseNegatives": [
+          "values.hrNow=118",
+          "values.rrNow=27"
+        ],
+        "matchedTemporal": [],
+        "unexpectedTemporal": [],
+        "findings": [
+          {
+            "severity": "P1",
+            "type": "supported_claim_missed",
+            "claim": "values.hrNow=118"
+          },
+          {
+            "severity": "P1",
+            "type": "supported_claim_missed",
+            "claim": "values.rrNow=27"
+          }
+        ]
+      },
+      "latencyMs": 0.016916999999999405
+    },
+    {
+      "id": "RC059",
+      "domain": "adversarial",
+      "narrative": "Room 27, bed 2. Nothing else to add.",
+      "expected": {
+        "claims": [],
+        "needsReview": false,
+        "temporalClaims": [],
+        "risk": "irrelevant-numbers"
+      },
+      "actual": {
+        "claims": [],
+        "needsReview": true,
+        "rawExtraction": {
+          "status": "needs_review",
+          "snapshot": {
+            "signals": [
+              "off"
+            ],
+            "setting": "",
+            "contexts": [],
+            "values": {},
+            "optional": {},
+            "units": {},
+            "notes": ""
+          },
+          "items": [],
+          "needsReview": [
+            {
+              "id": "review-1",
+              "text": "Room 27, bed 2.",
+              "reason": "Could not map confidently without interpretation."
+            },
+            {
+              "id": "review-2",
+              "text": "Nothing else to add.",
+              "reason": "Could not map confidently without interpretation."
+            }
+          ],
+          "uncaptured": [
+            "Room 27, bed 2.",
+            "Nothing else to add."
+          ]
+        }
+      },
+      "scoring": {
+        "truePositives": [],
+        "falsePositives": [],
+        "falseNegatives": [],
+        "matchedTemporal": [],
+        "unexpectedTemporal": [],
+        "findings": [
+          {
+            "severity": "P2",
+            "type": "unnecessary_needs_review"
+          }
+        ]
+      },
+      "latencyMs": 0.021999999999998465
+    },
+    {
+      "id": "RC060",
+      "domain": "multi-domain",
+      "narrative": "BP dropped from 110/68 to 90/56. HR went from 88 to 116. SpO2 fell from 96% to 91% and oxygen increased from 2 L NC to 4 L NC. She is more drowsy and her extremities are cool.",
+      "expected": {
+        "claims": [
+          "values.bpEarlier=110/68",
+          "values.bpNow=90/56",
+          "values.hrEarlier=88",
+          "values.hrNow=116",
+          "values.spo2Earlier=96",
+          "values.spo2Now=91",
+          "values.oxygenEarlier=2 L NC",
+          "values.oxygenNow=4 L NC",
+          "values.mental=Changed",
+          "values.mentalDetail=More drowsy",
+          "values.skinTemperature=Cool"
+        ],
+        "needsReview": false,
+        "temporalClaims": [
+          "values.bpEarlier=110/68",
+          "values.bpNow=90/56",
+          "values.hrEarlier=88",
+          "values.hrNow=116",
+          "values.spo2Earlier=96",
+          "values.spo2Now=91",
+          "values.oxygenEarlier=2 L NC",
+          "values.oxygenNow=4 L NC",
+          "values.mentalDetail=More drowsy"
+        ],
+        "risk": null
+      },
+      "actual": {
+        "claims": [
+          "values.bpEarlier=110/68",
+          "values.bpNow=90/56",
+          "values.hrEarlier=88",
+          "values.hrNow=116",
+          "values.mental=Changed",
+          "values.mentalDetail=More drowsy",
+          "values.oxygenEarlier=2 L NC",
+          "values.oxygenNow=4 L NC",
+          "values.skinTemperature=Cool",
+          "values.spo2Earlier=96",
+          "values.spo2Now=91"
+        ],
+        "needsReview": false,
+        "rawExtraction": {
+          "status": "ready",
+          "snapshot": {
+            "signals": [
+              "off",
+              "perfusion",
+              "heart",
+              "breathing",
+              "neuro"
+            ],
+            "setting": "",
+            "contexts": [],
+            "values": {
+              "bpEarlier": "110/68",
+              "bpNow": "90/56",
+              "hrEarlier": "88",
+              "hrNow": "116",
+              "spo2Earlier": "96",
+              "spo2Now": "91",
+              "oxygenEarlier": "2 L NC",
+              "oxygenNow": "4 L NC",
+              "loc": "More drowsy",
+              "perfusionFindings": [
+                "Cool / clammy"
+              ]
+            },
+            "optional": {},
+            "units": {
+              "bp": "mmHg",
+              "hr": "bpm",
+              "spo2": "%",
+              "oxygen": ""
+            },
+            "notes": ""
+          },
+          "items": [
+            {
+              "id": "bp",
+              "label": "Blood pressure",
+              "fields": [
+                {
+                  "path": "values.bpEarlier",
+                  "label": "Earlier"
+                },
+                {
+                  "path": "values.bpNow",
+                  "label": "Now"
+                }
+              ],
+              "clearPaths": [
+                "values.bpEarlier",
+                "values.bpNow"
+              ]
+            },
+            {
+              "id": "hr",
+              "label": "Heart rate",
+              "fields": [
+                {
+                  "path": "values.hrEarlier",
+                  "label": "Earlier"
+                },
+                {
+                  "path": "values.hrNow",
+                  "label": "Now"
+                }
+              ],
+              "clearPaths": [
+                "values.hrEarlier",
+                "values.hrNow"
+              ]
+            },
+            {
+              "id": "spo2",
+              "label": "SpO₂",
+              "fields": [
+                {
+                  "path": "values.spo2Earlier",
+                  "label": "Earlier"
+                },
+                {
+                  "path": "values.spo2Now",
+                  "label": "Now"
+                }
+              ],
+              "clearPaths": [
+                "values.spo2Earlier",
+                "values.spo2Now"
+              ]
+            },
+            {
+              "id": "oxygen",
+              "label": "Oxygen support",
+              "fields": [
+                {
+                  "path": "values.oxygenEarlier",
+                  "label": "Earlier"
+                },
+                {
+                  "path": "values.oxygenNow",
+                  "label": "Now"
+                }
+              ],
+              "clearPaths": [
+                "values.oxygenEarlier",
+                "values.oxygenNow"
+              ]
+            },
+            {
+              "id": "loc",
+              "label": "Mental status",
+              "fields": [
+                {
+                  "path": "values.loc",
+                  "label": "Finding"
+                }
+              ],
+              "clearPaths": [
+                "values.loc"
+              ]
+            },
+            {
+              "id": "perfusion",
+              "label": "Perfusion",
+              "fields": [
+                {
+                  "path": "values.perfusionFindings",
+                  "label": "Findings",
+                  "type": "list"
+                }
+              ],
+              "clearPaths": [
+                "values.perfusionFindings"
+              ]
+            }
+          ],
+          "needsReview": [],
+          "uncaptured": []
+        }
+      },
+      "scoring": {
+        "truePositives": [
+          "values.bpEarlier=110/68",
+          "values.bpNow=90/56",
+          "values.hrEarlier=88",
+          "values.hrNow=116",
+          "values.mental=Changed",
+          "values.mentalDetail=More drowsy",
+          "values.oxygenEarlier=2 L NC",
+          "values.oxygenNow=4 L NC",
+          "values.skinTemperature=Cool",
+          "values.spo2Earlier=96",
+          "values.spo2Now=91"
+        ],
+        "falsePositives": [],
+        "falseNegatives": [],
+        "matchedTemporal": [
+          "values.bpEarlier=110/68",
+          "values.bpNow=90/56",
+          "values.hrEarlier=88",
+          "values.hrNow=116",
+          "values.mentalDetail=More drowsy",
+          "values.oxygenEarlier=2 L NC",
+          "values.oxygenNow=4 L NC",
+          "values.spo2Earlier=96",
+          "values.spo2Now=91"
+        ],
+        "unexpectedTemporal": [],
+        "findings": []
+      },
+      "latencyMs": 0.0659169999999989
+    },
+    {
+      "id": "RC061",
+      "domain": "multi-domain",
+      "narrative": "MAP is 63. RR is 28. Urine output was 25 mL over the last hour. Norepinephrine is running and the dose was not provided.",
+      "expected": {
+        "claims": [
+          "values.mapNow=63",
+          "values.rrNow=28",
+          "values.urineAmount=25",
+          "values.urineIntervalValue=1",
+          "values.urineIntervalUnit=hour",
+          "optional.drips.items[0].medication=Norepinephrine"
+        ],
+        "needsReview": true,
+        "temporalClaims": [
+          "values.mapNow=63",
+          "values.rrNow=28",
+          "values.urineIntervalValue=1",
+          "values.urineIntervalUnit=hour"
+        ],
+        "risk": "unknown-dose"
+      },
+      "actual": {
+        "claims": [
+          "optional.drips.items[0].medication=Norepinephrine",
+          "values.mapNow=63",
+          "values.rrNow=28",
+          "values.urineAmount=25",
+          "values.urineIntervalUnit=hour",
+          "values.urineIntervalValue=1"
+        ],
+        "needsReview": false,
+        "rawExtraction": {
+          "status": "ready",
+          "snapshot": {
+            "signals": [
+              "off",
+              "perfusion",
+              "breathing",
+              "urine"
+            ],
+            "setting": "",
+            "contexts": [],
+            "values": {
+              "mapNow": "63",
+              "rrNow": "28",
+              "urineAmount": "25",
+              "urineIntervalValue": "1",
+              "urineIntervalUnit": "hour"
+            },
+            "optional": {
+              "drips": {
+                "items": [
+                  {
+                    "medication": "Norepinephrine"
+                  }
+                ]
+              }
+            },
+            "units": {
+              "map": "mmHg",
+              "rr": "/min"
+            },
+            "notes": ""
+          },
+          "items": [
+            {
+              "id": "map",
+              "label": "MAP",
+              "fields": [
+                {
+                  "path": "values.mapNow",
+                  "label": "Current"
+                }
+              ],
+              "clearPaths": [
+                "values.mapNow"
+              ]
+            },
+            {
+              "id": "rr",
+              "label": "Respiratory rate",
+              "fields": [
+                {
+                  "path": "values.rrNow",
+                  "label": "Current"
+                }
+              ],
+              "clearPaths": [
+                "values.rrNow"
+              ]
+            },
+            {
+              "id": "urine",
+              "label": "Urine output",
+              "fields": [
+                {
+                  "path": "values.urineAmount",
+                  "label": "Amount"
+                },
+                {
+                  "path": "values.urineIntervalValue",
+                  "label": "Period"
+                }
+              ],
+              "clearPaths": [
+                "values.urineAmount",
+                "values.urineIntervalValue",
+                "values.urineIntervalUnit"
+              ]
+            },
+            {
+              "id": "norepinephrine",
+              "label": "Support",
+              "fields": [
+                {
+                  "path": "optional.drips.items.0.medication",
+                  "label": "Medication"
+                },
+                {
+                  "path": "optional.drips.items.0.currentDose",
+                  "label": "Dose"
+                }
+              ],
+              "clearPaths": [
+                "optional.drips.items.0.medication",
+                "optional.drips.items.0.currentDose"
+              ]
+            }
+          ],
+          "needsReview": [],
+          "uncaptured": []
+        }
+      },
+      "scoring": {
+        "truePositives": [
+          "optional.drips.items[0].medication=Norepinephrine",
+          "values.mapNow=63",
+          "values.rrNow=28",
+          "values.urineAmount=25",
+          "values.urineIntervalUnit=hour",
+          "values.urineIntervalValue=1"
+        ],
+        "falsePositives": [],
+        "falseNegatives": [],
+        "matchedTemporal": [
+          "values.mapNow=63",
+          "values.rrNow=28",
+          "values.urineIntervalUnit=hour",
+          "values.urineIntervalValue=1"
+        ],
+        "unexpectedTemporal": [],
+        "findings": [
+          {
+            "severity": "P1",
+            "type": "ambiguity_not_routed_to_review"
+          }
+        ]
+      },
+      "latencyMs": 0.062375000000002956
+    },
+    {
+      "id": "RC062",
+      "domain": "multi-domain",
+      "narrative": "Lactate went from 1.8 to 3.9. Creatinine went from 0.9 to 1.4. CVP went from 10 to 6. Chest tube output was 30 mL during the last hour.",
+      "expected": {
+        "claims": [
+          "values.lactateEarlier=1.8",
+          "values.lactateNow=3.9",
+          "units.lactate=unspecified",
+          "values.creatinineEarlier=0.9",
+          "values.creatinineNow=1.4",
+          "units.creatinine=unspecified",
+          "values.cvpEarlier=10",
+          "values.cvpNow=6",
+          "units.cvp=unspecified",
+          "optional.drains.items[0].type=Chest tube",
+          "optional.drains.items[0].currentOutput=30 mL",
+          "optional.drains.items[0].outputTimeframe=last hour"
+        ],
+        "needsReview": false,
+        "temporalClaims": [
+          "values.lactateEarlier=1.8",
+          "values.lactateNow=3.9",
+          "values.creatinineEarlier=0.9",
+          "values.creatinineNow=1.4",
+          "values.cvpEarlier=10",
+          "values.cvpNow=6",
+          "optional.drains.items[0].outputTimeframe=last hour"
+        ],
+        "risk": null
+      },
+      "actual": {
+        "claims": [
+          "optional.drains.items[0].currentOutput=30 mL",
+          "optional.drains.items[0].outputTimeframe=last hour",
+          "optional.drains.items[0].type=Chest tube",
+          "units.creatinine=unspecified",
+          "units.cvp=unspecified",
+          "units.lactate=unspecified",
+          "values.creatinineEarlier=0.9",
+          "values.creatinineNow=1.4",
+          "values.cvpEarlier=10",
+          "values.cvpNow=6",
+          "values.lactateEarlier=1.8",
+          "values.lactateNow=3.9"
+        ],
+        "needsReview": false,
+        "rawExtraction": {
+          "status": "ready",
+          "snapshot": {
+            "signals": [
+              "off",
+              "labs",
+              "perfusion",
+              "bleeding"
+            ],
+            "setting": "",
+            "contexts": [],
+            "values": {
+              "lactateEarlier": "1.8",
+              "lactateNow": "3.9",
+              "creatinineEarlier": "0.9",
+              "creatinineNow": "1.4",
+              "cvpEarlier": "10",
+              "cvpNow": "6"
+            },
+            "optional": {
+              "drains": {
+                "items": [
+                  {
+                    "type": "Chest tube",
+                    "currentOutput": "30 mL",
+                    "outputTimeframe": "last hour"
+                  }
+                ]
+              }
+            },
+            "units": {
+              "lactate": "",
+              "creatinine": "",
+              "cvp": ""
+            },
+            "notes": ""
+          },
+          "items": [
+            {
+              "id": "lactate",
+              "label": "Lactate",
+              "fields": [
+                {
+                  "path": "values.lactateEarlier",
+                  "label": "Earlier"
+                },
+                {
+                  "path": "values.lactateNow",
+                  "label": "Now"
+                }
+              ],
+              "clearPaths": [
+                "values.lactateEarlier",
+                "values.lactateNow"
+              ]
+            },
+            {
+              "id": "creatinine",
+              "label": "Creatinine",
+              "fields": [
+                {
+                  "path": "values.creatinineEarlier",
+                  "label": "Earlier"
+                },
+                {
+                  "path": "values.creatinineNow",
+                  "label": "Now"
+                }
+              ],
+              "clearPaths": [
+                "values.creatinineEarlier",
+                "values.creatinineNow"
+              ]
+            },
+            {
+              "id": "cvp",
+              "label": "CVP",
+              "fields": [
+                {
+                  "path": "values.cvpEarlier",
+                  "label": "Earlier"
+                },
+                {
+                  "path": "values.cvpNow",
+                  "label": "Now"
+                }
+              ],
+              "clearPaths": [
+                "values.cvpEarlier",
+                "values.cvpNow"
+              ]
+            },
+            {
+              "id": "chest-tube",
+              "label": "Chest tube",
+              "fields": [
+                {
+                  "path": "optional.drains.items.0.currentOutput",
+                  "label": "Current output"
+                },
+                {
+                  "path": "optional.drains.items.0.outputTimeframe",
+                  "label": "Timeframe"
+                }
+              ],
+              "clearPaths": [
+                "optional.drains.items.0.type",
+                "optional.drains.items.0.currentOutput",
+                "optional.drains.items.0.outputTimeframe"
+              ]
+            }
+          ],
+          "needsReview": [],
+          "uncaptured": []
+        }
+      },
+      "scoring": {
+        "truePositives": [
+          "optional.drains.items[0].currentOutput=30 mL",
+          "optional.drains.items[0].outputTimeframe=last hour",
+          "optional.drains.items[0].type=Chest tube",
+          "units.creatinine=unspecified",
+          "units.cvp=unspecified",
+          "units.lactate=unspecified",
+          "values.creatinineEarlier=0.9",
+          "values.creatinineNow=1.4",
+          "values.cvpEarlier=10",
+          "values.cvpNow=6",
+          "values.lactateEarlier=1.8",
+          "values.lactateNow=3.9"
+        ],
+        "falsePositives": [],
+        "falseNegatives": [],
+        "matchedTemporal": [
+          "optional.drains.items[0].outputTimeframe=last hour",
+          "values.creatinineEarlier=0.9",
+          "values.creatinineNow=1.4",
+          "values.cvpEarlier=10",
+          "values.cvpNow=6",
+          "values.lactateEarlier=1.8",
+          "values.lactateNow=3.9"
+        ],
+        "unexpectedTemporal": [],
+        "findings": []
+      },
+      "latencyMs": 0.052666999999999575
+    },
+    {
+      "id": "RC063",
+      "domain": "multi-domain",
+      "narrative": "Pressure maybe around 90 systolic, sat about 91, and he seems kind of sleepy.",
+      "expected": {
+        "claims": [],
+        "needsReview": true,
+        "temporalClaims": [],
+        "risk": "multi-domain-uncertainty"
+      },
+      "actual": {
+        "claims": [],
+        "needsReview": true,
+        "rawExtraction": {
+          "status": "needs_review",
+          "snapshot": {
+            "signals": [
+              "off"
+            ],
+            "setting": "",
+            "contexts": [],
+            "values": {},
+            "optional": {},
+            "units": {},
+            "notes": ""
+          },
+          "items": [],
+          "needsReview": [
+            {
+              "id": "review-1",
+              "text": "Pressure maybe around 90 systolic, sat about 91, and he seems kind of sleepy.",
+              "reason": "Could not map confidently without interpretation."
+            }
+          ],
+          "uncaptured": [
+            "Pressure maybe around 90 systolic, sat about 91, and he seems kind of sleepy."
+          ]
+        }
+      },
+      "scoring": {
+        "truePositives": [],
+        "falsePositives": [],
+        "falseNegatives": [],
+        "matchedTemporal": [],
+        "unexpectedTemporal": [],
+        "findings": []
+      },
+      "latencyMs": 0.01549999999999585
+    },
+    {
+      "id": "RC064",
+      "domain": "multi-domain",
+      "narrative": "BP went from 120/72 to 94/58. No chest pain. Norepi is not running. Urine output was 20 mL over one hour.",
+      "expected": {
+        "claims": [
+          "values.bpEarlier=120/72",
+          "values.bpNow=94/58",
+          "values.chestPain=None reported",
+          "values.urineAmount=20",
+          "values.urineIntervalValue=1",
+          "values.urineIntervalUnit=hour"
+        ],
+        "needsReview": false,
+        "temporalClaims": [
+          "values.bpEarlier=120/72",
+          "values.bpNow=94/58",
+          "values.urineIntervalValue=1",
+          "values.urineIntervalUnit=hour"
+        ],
+        "risk": "mixed-negation"
+      },
+      "actual": {
+        "claims": [
+          "optional.drips.items[0].medication=Norepinephrine",
+          "values.bpEarlier=120/72",
+          "values.bpNow=94/58",
+          "values.urineAmount=20",
+          "values.urineIntervalUnit=hour",
+          "values.urineIntervalValue=1"
+        ],
+        "needsReview": true,
+        "rawExtraction": {
+          "status": "needs_review",
+          "snapshot": {
+            "signals": [
+              "off",
+              "perfusion",
+              "urine"
+            ],
+            "setting": "",
+            "contexts": [],
+            "values": {
+              "bpEarlier": "120/72",
+              "bpNow": "94/58",
+              "urineAmount": "20",
+              "urineIntervalValue": "1",
+              "urineIntervalUnit": "hour"
+            },
+            "optional": {
+              "drips": {
+                "items": [
+                  {
+                    "medication": "Norepinephrine"
+                  }
+                ]
+              }
+            },
+            "units": {
+              "bp": "mmHg"
+            },
+            "notes": ""
+          },
+          "items": [
+            {
+              "id": "bp",
+              "label": "Blood pressure",
+              "fields": [
+                {
+                  "path": "values.bpEarlier",
+                  "label": "Earlier"
+                },
+                {
+                  "path": "values.bpNow",
+                  "label": "Now"
+                }
+              ],
+              "clearPaths": [
+                "values.bpEarlier",
+                "values.bpNow"
+              ]
+            },
+            {
+              "id": "norepinephrine",
+              "label": "Support",
+              "fields": [
+                {
+                  "path": "optional.drips.items.0.medication",
+                  "label": "Medication"
+                },
+                {
+                  "path": "optional.drips.items.0.currentDose",
+                  "label": "Dose"
+                }
+              ],
+              "clearPaths": [
+                "optional.drips.items.0.medication",
+                "optional.drips.items.0.currentDose"
+              ]
+            },
+            {
+              "id": "urine",
+              "label": "Urine output",
+              "fields": [
+                {
+                  "path": "values.urineAmount",
+                  "label": "Amount"
+                },
+                {
+                  "path": "values.urineIntervalValue",
+                  "label": "Period"
+                }
+              ],
+              "clearPaths": [
+                "values.urineAmount",
+                "values.urineIntervalValue",
+                "values.urineIntervalUnit"
+              ]
+            }
+          ],
+          "needsReview": [
+            {
+              "id": "review-1",
+              "text": "No chest pain.",
+              "reason": "Could not map confidently without interpretation."
+            }
+          ],
+          "uncaptured": [
+            "No chest pain."
+          ]
+        }
+      },
+      "scoring": {
+        "truePositives": [
+          "values.bpEarlier=120/72",
+          "values.bpNow=94/58",
+          "values.urineAmount=20",
+          "values.urineIntervalUnit=hour",
+          "values.urineIntervalValue=1"
+        ],
+        "falsePositives": [
+          "optional.drips.items[0].medication=Norepinephrine"
+        ],
+        "falseNegatives": [
+          "values.chestPain=None reported"
+        ],
+        "matchedTemporal": [
+          "values.bpEarlier=120/72",
+          "values.bpNow=94/58",
+          "values.urineIntervalUnit=hour",
+          "values.urineIntervalValue=1"
+        ],
+        "unexpectedTemporal": [],
+        "findings": [
+          {
+            "severity": "P0",
+            "type": "unsupported_structured_claim",
+            "claim": "optional.drips.items[0].medication=Norepinephrine"
+          },
+          {
+            "severity": "P1",
+            "type": "supported_claim_missed",
+            "claim": "values.chestPain=None reported"
+          },
+          {
+            "severity": "P2",
+            "type": "unnecessary_needs_review"
+          }
+        ]
+      },
+      "latencyMs": 0.058875000000000455
+    }
+  ]
+}

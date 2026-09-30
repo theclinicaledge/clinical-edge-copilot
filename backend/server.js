@@ -49,11 +49,13 @@ const client = anthropicApiKey
   ? new Anthropic({ apiKey: anthropicApiKey, timeout: 45000, maxRetries: 0 })
   : null;
 
-const COPILOT_TOTAL_BUDGET_MS = 58000;
-const COPILOT_ORIGINAL_BUDGET_MS = 40000;
-const COPILOT_REPAIR_BUDGET_MS = 12000;
-const COPILOT_RETURN_RESERVE_MS = 3000;
-const COPILOT_MIN_REPAIR_BUDGET_MS = 3000;
+const COPILOT_TOTAL_BUDGET_MS = 18000;
+const COPILOT_ORIGINAL_BUDGET_MS = 12000;
+const COPILOT_REPAIR_BUDGET_MS = 4000;
+const COPILOT_RETURN_RESERVE_MS = 1500;
+const COPILOT_MIN_REPAIR_BUDGET_MS = 2000;
+const TEACH_ME_PROVIDER_BUDGET_MS = 8000;
+const SBAR_PROVIDER_BUDGET_MS = 8000;
 
 function stageTimeoutError(layer) {
   const error = new Error(`${layer} timeout`);
@@ -306,6 +308,20 @@ function buildTeachMeFallback(priorityMapResponse = "", snapshot = "", fallbackR
       tags: ["Focal neurologic assessment", "Observation versus diagnosis", "Temporal fidelity"],
     };
   }
+  const perfusion = assessPerfusionPattern(snapshot);
+  if (perfusion.convergingBedsidePerfusionConcern) {
+    return {
+      active: false,
+      fallbackReason,
+      domain: "hemodynamics-perfusion",
+      conceptId: "bedside-perfusion-convergence",
+      conceptLabel: "Reading converging bedside perfusion findings",
+      keyIdea: "Mental status, symptoms, and peripheral perfusion reflect different parts of physiologic tolerance. When concerning findings occur together, the combination can matter more than any single current measurement.",
+      whyItMatters: "Increased drowsiness can reflect reduced physiologic reserve but is not specific to one cause. Chest symptoms and cool or clammy peripheral findings add separate bedside evidence of possible circulatory stress, while medication or sedation effects, respiratory, neurologic, metabolic, volume-related, bleeding, cardiac, infectious, and other contributors remain unresolved.",
+      scenarioConnection: "The Snapshot reports increased drowsiness, chest discomfort, and cool or clammy peripheral findings. These observations support focused reassessment and prompt communication without establishing a diagnosis, causal mechanism, or trend for the single current measurements.",
+      tags: ["Perfusion assessment", "Physiologic tolerance", "Observation versus diagnosis"],
+    };
+  }
   const rhythmHemodynamics = assessRhythmHemodynamicPattern(snapshot);
   if (rhythmHemodynamics.convergingHemodynamicIntolerance) {
     return {
@@ -356,13 +372,28 @@ function buildTeachMeFallback(priorityMapResponse = "", snapshot = "", fallbackR
   };
 }
 
-const TREND_LANGUAGE = /\b(rise|rising|rose|fall|falling|fell|increase|increasing|increased|decrease|decreasing|decreased|decline|declining|declined|drop|dropping|dropped|improving|worsening|trending|trended)\b/i;
+const TREND_LANGUAGE = /\b(rise|rising|rose|fall|falling|fell|increase|increasing|increased|decrease|decreasing|decreased|decline|declining|declined|drop|dropping|dropped|improving|worsening|trending|trended|up\s+to|down\s+to)\b/i;
 const CERTAINTY_LANGUAGE = /\b(classic for|classic .* trajectory|diagnostic of|confirms?|strongly indicates?)\b/i;
 const QUALIFIER_LANGUAGE = /\b(may|might|could|possible|possibility|consideration|raises concern for|cannot exclude|uncertain)\b/i;
 const TREATMENT_DIRECTIVE = /\b(start|give|administer|bolus|titrate|increase|decrease|stop|discontinue)\b.{0,45}\b(medication|dose|infusion|drip|fluid|oxygen|device|ventilator|pacing)\b/i;
 const UNSUPPORTED_RENAL_COMPENSATION = /\b(?:early|new(?:ly)?(?: developed)?|developing|acute)\s+renal\s+(?:compensation|buffering)\b|\brenal\s+(?:compensation|buffering)\s+(?:has\s+)?(?:begun|started|developed|occurred)\b/i;
 const UNSUPPORTED_CHRONICITY = /\b(?:chronic respiratory acidosis|chronic(?:ally)? compensated|chronic compensation)\b/i;
 const CAUSAL_ATTRIBUTION = /\b(?:cause|caused|causes|causing|due to|explains?|responsible for|is from|result(?:s|ed)? from|directly impairs?|impairs? mentation|acts? as (?:a )?direct|produces?|drives?|leads? to)\b/i;
+
+const MEASUREMENT_FIELD_ALIASES = [
+  ["BP", /\b(?:BP|blood pressure|pressure)\b/i],
+  ["MAP", /\bMAP\b/i],
+  ["Heart rate", /\b(?:heart rate|HR)\b/i],
+  ["Respiratory rate", /\b(?:respiratory rate|RR)\b/i],
+  ["SpO2", /\b(?:SpO2|SpO₂|oxygen saturation|saturation)\b/i],
+  ["Oxygen support", /\b(?:oxygen support|oxygen|nasal cannula|room air)\b/i],
+  ["Urine output", /\b(?:urine output|UOP|urine)\b/i],
+  ["Lactate", /\blactate\b/i],
+  ["Creatinine", /\bcreatinine\b/i],
+  ["CVP", /\bCVP\b/i],
+  ["CI", /\b(?:cardiac index|CI)\b/i],
+  ["Drains / bleeding", /\b(?:chest tube|drain|drainage|bleeding|drain output|chest-tube output)\b/i],
+];
 
 const COMPARISON_UNIT_SUFFIX = /\s*(?:mmHg|bpm|%|°?[CF]|mg\/dL|mEq\/L|mmol\/L|mL\/hr|mL|L\/min(?:\/m2)?|dynes-sec\/cm5|\/min)\s*$/i;
 
@@ -435,7 +466,7 @@ function assessNeurologicPattern(source) {
 
 function temporalGroundingSummary(source) {
   const text = String(source);
-  const recognition = text.match(/\b(?:change|finding|symptoms?|deficits?)\s+(?:was|were\s+)?recognized\s+(within|over)\s+([^.;\n]+)/i);
+  const recognition = text.match(/\b(?:change|finding|symptoms?|deficits?)\s+(?:(?:was|were)\s+)?recognized\s+(within|over)\s+([^.;\n]+)/i);
   const rhythmOnsetUnknown = /\b(?:exact\s+)?rhythm\s+onset[^.;\n]*(?:unknown|unavailable|not known)/i.test(text);
   const symptomOnsetUnknown = /\b(?:exact\s+)?(?:symptom\s+)?onset[^.;\n]*(?:unknown|unavailable|not known)/i.test(text)
     && !rhythmOnsetUnknown;
@@ -452,7 +483,7 @@ function temporalGroundingSummary(source) {
 function hasTemporalGroundingViolation(source, output) {
   const sourceText = String(source);
   const outputText = String(output);
-  const recognitionOnly = /\b(?:change|finding|symptoms?|deficits?)\s+(?:was|were\s+)?recognized\s+(?:within|over)\b/i.test(sourceText)
+  const recognitionOnly = /\b(?:change|finding|symptoms?|deficits?)\s+(?:(?:was|were)\s+)?recognized\s+(?:within|over)\b/i.test(sourceText)
     && /\b(?:exact\s+)?(?:(?:symptom|rhythm)\s+)?onset[^.;\n]*(?:unknown|unavailable|not known)/i.test(sourceText);
   if (!recognitionOnly) return false;
   return /\b(?:symptoms?|deficits?|changes?|rhythm|arrhythmia)\s+(?:began|started|developed|occurred)\b[^.;\n]*(?:ago|within|last|past)\b/i.test(outputText)
@@ -507,6 +538,28 @@ function unsupportedTrendClaims(source, output, terms) {
     const termPattern = term instanceof RegExp ? term : new RegExp(String(term).replace(/[.*+?^${}()|[\]\\]/g, "\\$&"), "i");
     return String(output).split(/(?<=[.!?])\s+|\n/).some((statement) => termPattern.test(statement) && TREND_LANGUAGE.test(statement));
   });
+}
+
+function unsupportedMeasurementTrendClaims(source, output) {
+  return MEASUREMENT_FIELD_ALIASES.flatMap(([label, alias]) => {
+    if (sourceSupportsTrend(source, alias)) return [];
+    const unsupported = String(output).split(/(?<=[.!?])\s+|\n/).some((statement) =>
+      hasDirectionalClaimForAlias(statement, alias)
+        && !/\b(?:if|whether|watch for|monitor for|compare|subsequent|future|would|could|may|might)\b/i.test(statement)
+    );
+    return unsupported ? [label] : [];
+  });
+}
+
+function hasDirectionalClaimForAlias(statement, alias) {
+  const text = String(statement);
+  const field = new RegExp(alias.source, alias.flags.replace("g", ""));
+  const match = field.exec(text);
+  if (!match) return false;
+  const before = text.slice(Math.max(0, match.index - 70), match.index);
+  const after = text.slice(match.index + match[0].length, match.index + match[0].length + 70);
+  return (TREND_LANGUAGE.test(before) && !/[,;:]\s*[^,;:]*$/.test(before))
+    || (TREND_LANGUAGE.test(after) && !/^[^,;:]*[,;:]/.test(after));
 }
 
 function hasUnsupportedEstablishedTrendClaim(source, output, terms) {
@@ -596,7 +649,8 @@ function excludesUnresolvedAlternative(source, output) {
 const URGENCY_RANK = { LOW: 0, MODERATE: 1, HIGH: 2 };
 
 function numericTrend(lines, labelPattern, direction) {
-  const line = lines.find((candidate) => labelPattern.test(candidate));
+  const line = lines.find((candidate) => labelPattern.test(candidate)
+    && /previous\s+-?\d+(?:\.\d+)?[^\n]*?current\s+-?\d+(?:\.\d+)?/i.test(candidate));
   if (!line) return false;
   const match = line.match(/previous\s+(-?\d+(?:\.\d+)?)[^\n]*?current\s+(-?\d+(?:\.\d+)?)/i);
   if (!match) return false;
@@ -625,12 +679,15 @@ function assessPerfusionPattern(source) {
     fallingCardiacIndex: numericTrend(lines, /cardiac index|\bCI\b/i, "down"),
     risingHeartRate: numericTrend(lines, /heart rate/i, "up"),
     risingSvr: numericTrend(lines, /\bSVR\b/i, "up"),
-    peripheralPerfusionChange: /\b(?:cool|clammy)\s+extremit|\bextremit[^.;\n]{0,20}\b(?:cool|clammy)\b|\bdelayed capillary refill\b|capillary refill[^.;\n]*(?:approximately\s+)?\d/i.test(text),
+    peripheralPerfusionChange: /\b(?:cool|clammy)\s+extremit|\bextremit[^.;\n]{0,20}\b(?:cool|clammy)\b|\bperfusion:\s*cool\s*\/\s*clammy\b|\bdelayed capillary refill\b|capillary refill[^.;\n]*(?:approximately\s+)?\d/i.test(text),
     fallingUrineOutput: numericTrend(lines, /urine output/i, "down"),
     risingCreatinine: numericTrend(lines, /creatinine/i, "up"),
     risingLactate: numericTrend(lines, /lactate/i, "up"),
     mentalStatusDeterioration: /mental status[^\n]*(?:changed|declin|drows|confus|letharg)|(?:new|more|increasingly)\s+(?:drows|confus|letharg)|answers slowly/i.test(text),
     risingRespiratoryRate: numericTrend(lines, /respiratory rate/i, "up"),
+    concerningSymptoms: /\bchest (?:discomfort|pain):\s*present\b/i.test(text)
+      || /\b(?:lightheaded\w*|presyncope|palpitations?)\b/i.test(text)
+      || (/\bsyncope\b/i.test(text) && !/\bno syncope\b/i.test(text)),
   };
   const domains = {
     hemodynamic: findings.fallingBloodPressure || findings.fallingMap || findings.fallingCardiacIndex,
@@ -645,8 +702,11 @@ function assessPerfusionPattern(source) {
   const convergingSystemicPerfusion = domainCount >= 3
     && endOrganConcern
     && (domains.hemodynamic || domains.peripheral);
+  const convergingBedsidePerfusionConcern = domains.peripheral
+    && domains.neurologic
+    && findings.concerningSymptoms;
 
-  return { findings, domains, domainCount, endOrganConcern, convergingSystemicPerfusion };
+  return { findings, domains, domainCount, endOrganConcern, convergingSystemicPerfusion, convergingBedsidePerfusionConcern };
 }
 
 function assessRhythmHemodynamicPattern(source) {
@@ -711,7 +771,7 @@ function assessDeterministicUrgency(source) {
   const acidBaseDeterioration = fallingPh && risingPaco2;
 
   const perfusion = assessPerfusionPattern(text);
-  const perfusionConvergence = perfusion.convergingSystemicPerfusion;
+  const perfusionConvergence = perfusion.convergingSystemicPerfusion || perfusion.convergingBedsidePerfusionConcern;
   const rhythmHemodynamics = assessRhythmHemodynamicPattern(text);
   const neurologic = assessNeurologicPattern(text);
 
@@ -719,7 +779,7 @@ function assessDeterministicUrgency(source) {
   addSignal("increased_work_of_breathing", increasedWorkOfBreathing);
   addSignal("increased_oxygen_support", oxygenSupportChange);
   addSignal("worsening_respiratory_acidemia", acidBaseDeterioration);
-  addSignal("converging_perfusion_trends", perfusionConvergence);
+  addSignal(perfusion.convergingSystemicPerfusion ? "converging_perfusion_trends" : "converging_bedside_perfusion_findings", perfusionConvergence);
   addSignal("rhythm_hemodynamic_intolerance", rhythmHemodynamics.convergingHemodynamicIntolerance);
   addSignal("converging_focal_neurologic_deterioration", neurologic.convergingFocalDeterioration);
 
@@ -779,6 +839,7 @@ function validatePriorityMapReliability(source, output) {
   if (unsupportedClinicalNumericClaims(source, output).length) issues.push("unsupported_numeric_claim");
   if (hasTemporalGroundingViolation(source, output)) issues.push("temporal_grounding");
   if (hasUnchangedValueTrendViolation(source, output)) issues.push("unchanged_value_as_trend");
+  if (unsupportedMeasurementTrendClaims(source, output).length) issues.push("unsupported_measurement_trend");
   issues.push(...validateUrgencyConsistency(source, output));
   return [...new Set(issues)];
 }
@@ -889,6 +950,47 @@ Tachypnea does not guarantee effective ventilation. Rising PaCO2 with falling pH
 
 For educational support only. Use your clinical judgment and follow local protocol.`;
 
+  if (perfusion.convergingBedsidePerfusionConcern) return `Urgency Level: ${urgency}
+
+**Priorities**
+### 1 · Converging circulation and bedside warning signs
+Relevance: High priority
+Observed:
+${observations.map((line) => `- ${line}`).join("\n")}
+Interpretation: The combination of increased drowsiness, concerning symptoms, and impaired peripheral-perfusion findings supports a clinically important deterioration pattern. The available observations do not establish the cause, diagnosis, or direction of any single current measurement.
+Assess now:
+- Current circulation, peripheral perfusion, mental status, reported symptoms, breathing, and change from the patient's known baseline
+- Whether the current findings persist, progress, fluctuate, or are accompanied by additional hemodynamic, respiratory, neurologic, bleeding, or medication-related context
+
+**Assess first**
+- Repeat focused assessment of responsiveness, chest symptoms, skin temperature and appearance, pulses, capillary refill, blood pressure, heart rate, and respiratory status
+- Clarify baseline mentation, symptom timing, medication or sedation exposure, recent interventions, bleeding findings, and the clinical meaning of the reported urine-output amount and interval
+
+**Possible patterns**
+- The converging findings may be consistent with impaired circulation or another systemic deterioration pattern, but the mechanism remains uncertain
+- Cardiac, volume-related, bleeding, medication-related, infectious, respiratory, neurologic, metabolic, and other contributors remain possible and require clinical differentiation
+- Single current measurements and one urine-output amount provide context but do not establish a trend or diagnosis
+
+**Missing information**
+- Earlier comparable vital signs and perfusion findings, baseline mental status, symptom timing, and subsequent reassessment
+- Medication and sedation exposure, bleeding assessment, recent interventions, relevant cardiac and respiratory context, and other findings needed to distinguish contributors
+
+**Monitor and trend**
+- Subsequent mental status, chest symptoms, blood pressure, heart rate, breathing, oxygen support, peripheral perfusion, and urine output compared with the supplied observations
+- Document single measurements as single measurements unless a comparable earlier or later value establishes direction
+
+**Escalation triggers**
+- The existing combination of increased drowsiness, chest symptoms, and cool or clammy peripheral-perfusion findings supports prompt team awareness and bedside evaluation now under local protocol
+- Additional decline in responsiveness, breathing, circulation, symptoms, or organ-function indicators would further increase concern but is not required before escalation
+
+**SBAR-ready summary**
+The patient has increased drowsiness with chest symptoms and cool or clammy peripheral findings alongside the reported current measurements and urine-output information. This combination supports a clinically important deterioration pattern, but the cause is not established and single current measurements do not establish trends. The current presentation supports prompt bedside evaluation and communication under local protocol.
+
+**Teach me why**
+Mental status, symptoms, and peripheral perfusion describe different effects of physiologic stress. When they change together, the combination can carry more concern than any single current value while still requiring focused assessment to distinguish circulatory, respiratory, medication-related, neurologic, metabolic, and other contributors.
+
+For educational support only. Use your clinical judgment and follow local protocol.`;
+
   if (rhythmHemodynamics.convergingHemodynamicIntolerance) {
     const lines = String(source).split("\n");
     const observedLabels = /^(?:Rhythm change|BP|MAP|Heart rate|Respiratory rate|SpO2|Oxygen support|Temperature|Potassium|Labs|Pain or other change|Mental status)$/i;
@@ -953,7 +1055,7 @@ For educational support only. Use your clinical judgment and follow local protoc
 
   if (perfusion.convergingSystemicPerfusion) {
     const lines = String(source).split("\n");
-    const observedLabels = /^(?:BP|MAP|Heart rate|Respiratory rate|SpO2|Oxygen support|Temperature|Urine output|Lactate|Creatinine)$/i;
+    const observedLabels = /^(?:BP|MAP|Heart rate|Respiratory rate|SpO2|Oxygen support|Temperature|Urine output|Lactate|Creatinine|Drips|Drains \/ bleeding)$/i;
     const structuredObservations = lines
       .map((line) => line.match(/^-\s*([^:]+):\s*(.+)$/))
       .filter((match) => match && observedLabels.test(match[1].trim()))
@@ -984,6 +1086,13 @@ For educational support only. Use your clinical judgment and follow local protoc
     const infectionSummary = infectionPossible
       ? "; an infectious process is one possible contributor, but no source or diagnosis is established"
       : "";
+    const renalPattern = perfusion.findings.risingCreatinine && perfusion.findings.fallingUrineOutput
+      ? "- The rising creatinine and falling urine output may be consistent with renal or end-organ deterioration in the overall pattern, but the Snapshot does not establish a specific etiology"
+      : perfusion.findings.risingCreatinine
+        ? "- The rising creatinine may be consistent with renal or end-organ deterioration in the overall pattern. The reported urine amount is a single interval measurement and does not establish direction"
+        : perfusion.findings.fallingUrineOutput
+          ? "- The falling urine output may be consistent with renal or end-organ deterioration in the overall pattern, but the Snapshot does not establish a specific etiology"
+          : "- The reported renal and urine-output information provides context, but single measurements do not establish direction or etiology";
 
     return [
       "Urgency Level: " + urgency,
@@ -1007,7 +1116,7 @@ For educational support only. Use your clinical judgment and follow local protoc
       "**Possible patterns**",
       "- The converging findings may reflect impaired systemic perfusion affecting organ function, but the mechanism remains uncertain",
       infectionPattern,
-      "- The worsening creatinine and falling urine output may be consistent with renal or end-organ deterioration in the overall pattern, but the Snapshot does not establish a specific etiology",
+      renalPattern,
       "",
       "**Missing information**",
       "- Focused reassessment findings and any subsequent direction of the reported hemodynamic, perfusion, renal, metabolic, respiratory, and neurologic changes",
@@ -1020,7 +1129,7 @@ For educational support only. Use your clinical judgment and follow local protoc
       "- Single measurements should remain single measurements, and unchanged comparisons should remain documented as unchanged",
       "",
       "**Escalation triggers**",
-      "- The existing combination of worsening hemodynamics, peripheral perfusion, urine output, lactate, renal markers, and mental status supports prompt team awareness and bedside evaluation now under local protocol",
+      "- The existing combination of supported hemodynamic changes, peripheral-perfusion findings, the reported urine-output interval, rising lactate and creatinine, and mental-status change supports prompt team awareness and bedside evaluation now under local protocol",
       "- Additional decline in responsiveness, breathing, circulation, or organ-function indicators would further increase concern but is not required before escalation",
       "",
       "**SBAR-ready summary**",
@@ -1229,6 +1338,162 @@ function groundSbarTemporalFidelity(source, sbar) {
     grounded.background = [grounded.background, summary].filter(Boolean).join(" ");
   }
   return grounded;
+}
+
+const RAPIDITY_LANGUAGE = /\b(?:rapidly|quickly|suddenly|acute(?:ly)?|abruptly)\b/i;
+const ONSET_LANGUAGE = /\b(?:began|started|developed|onset|since|for the (?:last|past))\b/i;
+const SBAR_TREATMENT_DIRECTIVE = /\b(?:start|give|administer|bolus|titrate|increase|decrease|stop|discontinue|initiate)\b.{0,60}\b(?:medication|dose|infusion|drip|fluid|oxygen|device|ventilator|pacing|norepinephrine|epinephrine|vasopressin|dopamine|dobutamine|insulin|heparin)\b/i;
+
+function sourceSupportsGlobalRapidity(source) {
+  return RAPIDITY_LANGUAGE.test(String(source));
+}
+
+function validateSbarReliability(source, sbar) {
+  const issues = [];
+  const sections = ["situation", "background", "assessment", "recommendation"];
+  const text = sections.map((section) => String(sbar?.[section] || "")).join("\n");
+  if (sections.some((section) => !String(sbar?.[section] || "").trim())) issues.push("invalid_sbar_contract");
+
+  for (const [label, alias] of MEASUREMENT_FIELD_ALIASES) {
+    if (sourceSupportsTrend(source, alias)) continue;
+    const unsupported = text.split(/(?<=[.!?])\s+|\n/).some((statement) =>
+      hasDirectionalClaimForAlias(statement, alias)
+        && !/\b(?:if|whether|watch for|monitor for|compare|subsequent|future)\b/i.test(statement)
+    );
+    if (unsupported) issues.push(`unsupported_trend:${label.toLowerCase().replace(/\s+|\//g, "_")}`);
+  }
+
+  if (RAPIDITY_LANGUAGE.test(text) && !sourceSupportsGlobalRapidity(source)) issues.push("unsupported_global_rapidity");
+  if (hasTemporalGroundingViolation(source, text)) issues.push("recognition_as_onset");
+  if (ONSET_LANGUAGE.test(text) && unsupportedClinicalNumericClaims(source, text).some((issue) => issue.startsWith("timeline:"))) {
+    issues.push("unsupported_onset_timeline");
+  }
+  if (TREATMENT_DIRECTIVE.test(text) || SBAR_TREATMENT_DIRECTIVE.test(text)) issues.push("treatment_prescription");
+  if (hasUnsupportedDiagnosticCertainty(text) || hasCertaintyOverstatement(text)) issues.push("unsupported_diagnostic_certainty");
+  return [...new Set(issues)];
+}
+
+function parseSbarSections(raw) {
+  const parseSection = (label, nextLabel) => {
+    const pattern = nextLabel
+      ? new RegExp(`${label}:\\s*([\\s\\S]*?)(?=${nextLabel}:)`, "i")
+      : new RegExp(`${label}:\\s*([\\s\\S]*)$`, "i");
+    return raw.match(pattern)?.[1]?.trim() || "";
+  };
+  return {
+    situation: sanitizeSbarText(parseSection("SITUATION", "BACKGROUND")),
+    background: sanitizeSbarText(parseSection("BACKGROUND", "ASSESSMENT")),
+    assessment: sanitizeSbarText(parseSection("ASSESSMENT", "RECOMMENDATION")),
+    recommendation: sanitizeSbarText(parseSection("RECOMMENDATION", null)),
+  };
+}
+
+function compactSnapshotFacts(source, limit = 6) {
+  return String(source).split("\n")
+    .filter((line) => /^-\s+/.test(line))
+    .map((line) => line.replace(/^-\s+/, "").trim())
+    .filter((line) => !/^(?:What changed|Treat omitted fields)/i.test(line))
+    .slice(0, limit);
+}
+
+function spokenSnapshotFact(fact) {
+  const consciousness = fact.match(/^Level of consciousness:\s*(.+)$/i);
+  if (consciousness) return `level of consciousness was reported as ${consciousness[1]}`;
+  const perfusion = fact.match(/^Perfusion:\s*(.+)$/i);
+  if (perfusion) return `peripheral-perfusion findings were ${perfusion[1]}`;
+  const urine = fact.match(/^Urine output:\s*amount\s+(.+)$/i);
+  if (urine) return `urine output was ${urine[1]}`;
+  const drip = fact.match(/^Drips:\s*items=\d+\)\s*medication=([^,]+)(.*)$/i);
+  if (drip) {
+    const details = drip[2] || "";
+    const dose = details.match(/(?:dose|rate)=([^,]+)/i)?.[1]?.trim();
+    return dose
+      ? `${drip[1].trim()} was running at the reported ${dose}`
+      : `${drip[1].trim()} was running; the dose was not supplied`;
+  }
+  const drain = fact.match(/^Drains \/ bleeding:\s*items=\d+\)\s*type=([^,]+),\s*currentOutput=([^,]+),\s*outputTimeframe=(.+)$/i);
+  if (drain) return `${drain[1].trim()} output was ${drain[2].trim()} during the ${drain[3].trim()}`;
+  const comparison = fact.match(/^([^:]+):\s*(?:previous|earlier)\s+(.+?)\s*(?:->|→)\s*(?:current|now)\s+(.+)$/i);
+  if (comparison) {
+    if (/^(?:unknown|not assessed|unavailable|missing|not supplied)$/i.test(normalizeComparisonValue(comparison[2]))) {
+      return `${comparison[1]} was ${comparison[3]}`;
+    }
+    if (normalizeComparisonValue(comparison[2]) === normalizeComparisonValue(comparison[3])) {
+      return `${comparison[1]} remained ${comparison[3]}`;
+    }
+    return `${comparison[1]} changed from ${comparison[2]} to ${comparison[3]}`;
+  }
+  const current = fact.match(/^([^:]+):\s*(?:current\s+)?(.+)$/i);
+  if (current) return `${current[1]} was ${current[2]}`;
+  return fact;
+}
+
+function selectSbarEvidence(source) {
+  const facts = compactSnapshotFacts(source, Number.MAX_SAFE_INTEGER);
+  const categorized = facts.map((fact) => {
+    const label = fact.split(":", 1)[0].trim();
+    return { label, spoken: spokenSnapshotFact(fact) };
+  });
+  const pick = (labels, limit) => labels.flatMap((candidate) =>
+    categorized.filter(({ label }) => candidate.test(label)).map(({ spoken }) => spoken)
+  ).slice(0, limit);
+  return {
+    background: pick([/^Drips$/i, /^Drains \/ bleeding$/i], 3),
+    assessment: pick([
+      /^Level of consciousness$/i, /^Perfusion$/i, /^BP$/i, /^MAP$/i, /^Heart rate$/i,
+      /^Oxygen support$/i, /^CI$/i, /^Lactate$/i, /^Creatinine$/i, /^Urine output$/i,
+      /^Respiratory rate$/i, /^SpO2$/i, /^CVP$/i,
+    ], 10),
+  };
+}
+
+function buildSbarFallback(source, urgency = "UNKNOWN") {
+  const evidence = selectSbarEvidence(source);
+  const background = evidence.background.join(", ");
+  const assessment = evidence.assessment.join(", ");
+  const prompt = urgency === "HIGH" ? "promptly evaluate the patient now" : urgency === "MODERATE" ? "review the patient soon" : "review the current findings";
+  return {
+    situation: urgency === "HIGH"
+      ? "I'm calling because the current findings together are concerning and need prompt bedside evaluation."
+      : "I'm calling to update you about the patient's current findings.",
+    background: background ? `The Snapshot reports ${background}.` : "The available background is limited, and omitted information remains unknown.",
+    assessment: assessment
+      ? `At the bedside, the Snapshot also reports ${assessment}. The cause is not established.`
+      : "The available observations need focused reassessment, and the cause is not established.",
+    recommendation: `I'd like you to ${prompt}.`,
+  };
+}
+
+async function runSbarWithBudget({ source, urgency, generateOriginal, now = Date.now, providerBudgetMs = SBAR_PROVIDER_BUDGET_MS, signal }) {
+  const startedAt = now();
+  const timing = {
+    provider_status: "started", provider_duration_ms: 0,
+    validation_status: "not_started", validation_duration_ms: 0,
+    repair_attempted: false, repair_status: "not_available", repair_duration_ms: 0,
+    timeout_layer: null,
+  };
+  let raw = "";
+  try {
+    raw = await runWithStageTimeout(generateOriginal, providerBudgetMs, "provider_timeout", signal);
+    timing.provider_status = "success";
+  } catch (error) {
+    if (error?.code !== "provider_timeout" && error?.code !== "client_disconnect") throw error;
+    timing.provider_status = error.code === "provider_timeout" ? "timeout" : "error";
+    timing.provider_duration_ms = now() - startedAt;
+    timing.timeout_layer = error.code === "provider_timeout" ? "provider" : error.code;
+    return { sbar: buildSbarFallback(source, urgency, timing.provider_status), status: "fallback", issues: [timing.provider_status], timing };
+  }
+  timing.provider_duration_ms = now() - startedAt;
+  const validationStartedAt = now();
+  const candidate = groundSbarTemporalFidelity(source, parseSbarSections(raw));
+  if (urgency === "HIGH" && !highUrgencyRecommendationIsAligned(candidate.recommendation)) {
+    candidate.recommendation = "I'm concerned about the current clinical picture and would like you to evaluate the patient now.";
+  }
+  const issues = validateSbarReliability(source, candidate);
+  timing.validation_duration_ms = now() - validationStartedAt;
+  timing.validation_status = issues.length ? "rejected" : "accepted";
+  if (issues.length) return { sbar: buildSbarFallback(source, urgency, issues[0]), status: "fallback", issues, timing };
+  return { sbar: candidate, status: "original", issues: [], timing };
 }
 
 function evaluateReliabilityFixture({ source = "", priorityMap = "", lessonText = "", sbar = null, trendTerms = [], inferredTerms = [] }) {
@@ -2540,6 +2805,7 @@ function buildOperationalLogEntry(fields) {
     "request_id", "request_started_at", "request_ended_at", "total_duration_ms",
     "provider_duration_ms", "provider_status", "validation_duration_ms", "validation_status",
     "repair_attempted", "repair_status", "repair_duration_ms", "timeout_layer", "client_disconnected",
+    "endpoint", "display_resolution", "rejection_reason_codes",
   ];
   return Object.fromEntries(
     allowed
@@ -2619,17 +2885,21 @@ app.post("/api/copilot", apiLimiter, async (req, res) => {
       return res.status(400).json({ error: "A completed Priority Map is required for Teach Me." });
     }
     const learningStartedAt = Date.now();
+    const learningRequestId = requestId;
     try {
-      const message = await client.messages.create({
-        model: "claude-sonnet-4-6",
-        max_tokens: 1200,
-        system: TEACH_ME_RELIABILITY_PROMPT,
-        messages: [{
-          role: "user",
-          content: `Patient Snapshot (user-reported observations):\n${question.trim()}\n\nCompleted Priority Map:\n${priorityMapResponse.trim()}`,
-        }],
-      });
+      const providerStartedAt = Date.now();
+      const message = await runWithStageTimeout((signal) => client.messages.create({
+          model: "claude-sonnet-4-6",
+          max_tokens: 900,
+          system: TEACH_ME_RELIABILITY_PROMPT,
+          messages: [{
+            role: "user",
+            content: `Patient Snapshot (user-reported observations):\n${question.trim()}\n\nCompleted Priority Map:\n${priorityMapResponse.trim()}`,
+          }],
+        }, { signal }), TEACH_ME_PROVIDER_BUDGET_MS, "provider_timeout", disconnectController.signal);
+      const providerDurationMs = Date.now() - providerStartedAt;
       const raw = message.content.find((block) => block.type === "text")?.text || "";
+      const validationStartedAt = Date.now();
       let parsed = null;
       try {
         parsed = JSON.parse(raw.replace(/^```json\s*/i, "").replace(/```\s*$/, "").trim());
@@ -2645,6 +2915,7 @@ app.post("/api/copilot", apiLimiter, async (req, res) => {
       const acidBaseGrounded = schemaValid && !hasAcidBaseReliabilityViolation(question, lessonText);
       const causalityGrounded = schemaValid && !hasUnsupportedCausalAttribution(question, lessonText);
       const grounded = schemaValid && trendGrounded && certaintyGrounded && thresholdGrounded && acidBaseGrounded && causalityGrounded;
+      const validationDurationMs = Date.now() - validationStartedAt;
       const lesson = grounded ? validatedLesson : null;
       const fallbackReason = !schemaValid ? "invalid_schema" : !trendGrounded ? "unsupported_trend" : !certaintyGrounded ? "unsupported_certainty" : !thresholdGrounded ? "unsupported_numeric_threshold" : !acidBaseGrounded ? "acid_base_reliability" : "unsupported_causality";
       const response = lesson ? { active: true, ...lesson } : buildTeachMeFallback(priorityMapResponse, question, fallbackReason);
@@ -2658,6 +2929,21 @@ app.post("/api/copilot", apiLimiter, async (req, res) => {
         status: lesson ? "success" : "fallback",
         response_length: raw.length,
         duration_ms: Date.now() - learningStartedAt,
+        request_id: learningRequestId,
+        request_started_at: new Date(learningStartedAt).toISOString(),
+        request_ended_at: new Date().toISOString(),
+        total_duration_ms: Date.now() - learningStartedAt,
+        provider_duration_ms: providerDurationMs,
+        provider_status: "success",
+        validation_duration_ms: validationDurationMs,
+        validation_status: lesson ? "accepted" : "rejected",
+        repair_attempted: false,
+        repair_status: "not_available",
+        repair_duration_ms: 0,
+        display_resolution: lesson ? "original" : "fallback",
+        rejection_reason_codes: lesson ? [] : [fallbackReason],
+        timeout_layer: null,
+        client_disconnected: clientDisconnected,
         possible_failure: !lesson,
         ...(lesson ? {} : { fallback_used: true, failure_reason: fallbackReason }),
       });
@@ -2668,9 +2954,26 @@ app.post("/api/copilot", apiLimiter, async (req, res) => {
         timestamp: new Date().toISOString(), route: "TEACH_ME", mode: "learning",
         category: "fallback", word_count: 0, input_length: question.trim().length,
         status: "fallback", response_length: 0, duration_ms: Date.now() - learningStartedAt,
+        request_id: learningRequestId,
+        request_started_at: new Date(learningStartedAt).toISOString(),
+        request_ended_at: new Date().toISOString(),
+        total_duration_ms: Date.now() - learningStartedAt,
+        provider_duration_ms: Date.now() - learningStartedAt,
+        provider_status: error?.code === "provider_timeout" ? "timeout" : "error",
+        validation_duration_ms: 0,
+        validation_status: "not_started",
+        repair_attempted: false,
+        repair_status: "not_available",
+        repair_duration_ms: 0,
+        display_resolution: "fallback",
+        rejection_reason_codes: [error?.code || "generation_error"],
+        timeout_layer: error?.code === "provider_timeout" ? "provider" : error?.code === "client_disconnect" ? "client_disconnect" : null,
+        client_disconnected: clientDisconnected,
         possible_failure: true, fallback_used: true, failure_reason: "generation_error",
       });
-      return res.json({ lesson: buildTeachMeFallback(priorityMapResponse, question, "generation_error") });
+      if (clientDisconnected) return;
+      const reason = error?.code === "provider_timeout" ? "provider_timeout" : "generation_error";
+      return res.json({ lesson: buildTeachMeFallback(priorityMapResponse, question, reason) });
     }
   }
 
@@ -2734,7 +3037,7 @@ app.post("/api/copilot", apiLimiter, async (req, res) => {
   const callStream = async (signal) => {
     const stream = await client.messages.stream({
       model: "claude-sonnet-4-6",
-      max_tokens: 3000,
+      max_tokens: 2200,
       system: selectedPrompt,
       messages: [{ role: "user", content: question.trim() }],
     }, { signal });
@@ -2774,7 +3077,7 @@ app.post("/api/copilot", apiLimiter, async (req, res) => {
         repair: async (issues, signal) => {
           const repairMessage = await client.messages.create({
             model: "claude-sonnet-4-6",
-            max_tokens: 3000,
+            max_tokens: 2200,
             system: `${selectedPrompt}\n\nPRIORITY MAP REPAIR: Rewrite the draft so it satisfies the full response and clinical reliability contracts. Correct only the validator issues supplied by the application. Preserve the user's exact reported facts, urgency, and section structure. Do not add new numbers, thresholds, timelines, diagnoses, or causal claims. Return only the complete repaired Priority Map.`,
             messages: [{ role: "user", content: `Patient Snapshot:\n${question.trim()}\n\nValidator issue codes: ${issues.join(", ")}\n\nDraft to repair:\n${fullResponse}` }],
           }, { signal });
@@ -2829,7 +3132,7 @@ app.post("/api/copilot", apiLimiter, async (req, res) => {
         repair: async (issues) => {
           const repairMessage = await client.messages.create({
             model: "claude-sonnet-4-6",
-            max_tokens: 3000,
+            max_tokens: 2200,
             system: `${selectedPrompt}\n\nPRIORITY MAP REPAIR: Rewrite the draft so it satisfies the full response and clinical reliability contracts. Correct only the validator issues supplied by the application. Preserve the user's exact reported facts, urgency, and section structure. Do not add new numbers, thresholds, timelines, diagnoses, or causal claims. Return only the complete repaired Priority Map.`,
             messages: [{
               role: "user",
@@ -2997,6 +3300,19 @@ RECOMMENDATION:`;
 
 app.post("/api/sbar", apiLimiter, async (req, res) => {
   const { question, copilotResponse } = req.body;
+  const requestStartedAt = Date.now();
+  const requestTimestamp = new Date().toISOString();
+  const requestId = randomUUID();
+  let responseFinished = false;
+  let clientDisconnected = false;
+  const disconnectController = new AbortController();
+  res.on("finish", () => { responseFinished = true; });
+  res.on("close", () => {
+    if (!responseFinished) {
+      clientDisconnected = true;
+      disconnectController.abort();
+    }
+  });
 
   if (!question || !copilotResponse) {
     return res.status(400).json({ error: "Missing required fields." });
@@ -3013,47 +3329,86 @@ app.post("/api/sbar", apiLimiter, async (req, res) => {
     });
   }
 
+  const establishedUrgency = parseUrgency(copilotResponse) || "UNKNOWN";
+  if (!client) {
+    const fallback = buildSbarFallback(question, establishedUrgency, "provider_not_configured");
+    appendOperationalLog({
+      timestamp: requestTimestamp, route: "SBAR", endpoint: "/api/sbar", mode: "communication",
+      category: "fallback", word_count: 0, input_length: question.trim().length,
+      urgency: establishedUrgency, status: "fallback", response_length: 0,
+      duration_ms: Date.now() - requestStartedAt, request_id: requestId,
+      request_started_at: requestTimestamp, request_ended_at: new Date().toISOString(),
+      total_duration_ms: Date.now() - requestStartedAt, provider_duration_ms: 0,
+      provider_status: "not_configured", validation_duration_ms: 0, validation_status: "not_started",
+      repair_attempted: false, repair_status: "not_available", repair_duration_ms: 0,
+      display_resolution: "fallback", rejection_reason_codes: ["provider_not_configured"],
+      timeout_layer: null, client_disconnected: false, fallback_used: true, possible_failure: true,
+      failure_reason: "provider_not_configured",
+    });
+    return res.json({ sbar: fallback });
+  }
+
   try {
-    const establishedUrgency = parseUrgency(copilotResponse) || "UNKNOWN";
-    const message = await client.messages.create({
-      model: "claude-sonnet-4-6",
-      max_tokens: 500,
-      system: SBAR_SYSTEM_PROMPT,
-      messages: [{
-        role: "user",
-        content: `Established Priority Map urgency: ${establishedUrgency}\n\nClinical scenario:\n${question.trim()}\n\nCopilot analysis:\n${copilotResponse.trim()}`,
-      }],
+    const resolved = await runSbarWithBudget({
+      source: question,
+      urgency: establishedUrgency,
+      signal: disconnectController.signal,
+      generateOriginal: async (signal) => {
+        const message = await client.messages.create({
+          model: "claude-sonnet-4-6",
+          max_tokens: 450,
+          system: SBAR_SYSTEM_PROMPT,
+          messages: [{
+            role: "user",
+            content: `Established Priority Map urgency: ${establishedUrgency}\n\nClinical scenario:\n${question.trim()}\n\nCopilot analysis:\n${copilotResponse.trim()}`,
+          }],
+        }, { signal });
+        return message.content.find((block) => block.type === "text")?.text || "";
+      },
     });
-
-    const raw = message.content[0]?.text || "";
-
-    // Parse each labeled section out of the raw text
-    const parseSection = (label, nextLabel) => {
-      const pattern = nextLabel
-        ? new RegExp(`${label}:\\s*([\\s\\S]*?)(?=${nextLabel}:)`, "i")
-        : new RegExp(`${label}:\\s*([\\s\\S]*)$`, "i");
-      const m = raw.match(pattern);
-      return m ? m[1].trim() : "";
-    };
-
-    // ── SBAR safety post-processing ───────────────────────────────────────────
-    // Catch residual risky phrasing that may slip through the model instruction.
-    // Scoped strictly to SBAR output — does not touch any other response path.
-    const sbar = groundSbarTemporalFidelity(question, {
-      situation:      sanitizeSbarText(parseSection("SITUATION",      "BACKGROUND")),
-      background:     sanitizeSbarText(parseSection("BACKGROUND",     "ASSESSMENT")),
-      assessment:     sanitizeSbarText(parseSection("ASSESSMENT",     "RECOMMENDATION")),
-      recommendation: sanitizeSbarText(parseSection("RECOMMENDATION", null)),
+    const totalDuration = Date.now() - requestStartedAt;
+    appendOperationalLog({
+      timestamp: requestTimestamp, route: "SBAR", endpoint: "/api/sbar", mode: "communication",
+      category: resolved.status, word_count: 0, input_length: question.trim().length,
+      urgency: establishedUrgency, status: resolved.status === "original" ? "success" : "fallback",
+      response_length: 0, duration_ms: totalDuration, request_id: requestId,
+      request_started_at: requestTimestamp, request_ended_at: new Date().toISOString(),
+      total_duration_ms: totalDuration, provider_duration_ms: resolved.timing.provider_duration_ms,
+      provider_status: resolved.timing.provider_status,
+      validation_duration_ms: resolved.timing.validation_duration_ms,
+      validation_status: resolved.timing.validation_status,
+      repair_attempted: resolved.timing.repair_attempted,
+      repair_status: resolved.timing.repair_status,
+      repair_duration_ms: resolved.timing.repair_duration_ms,
+      display_resolution: resolved.status,
+      rejection_reason_codes: resolved.issues,
+      timeout_layer: resolved.timing.timeout_layer,
+      client_disconnected: clientDisconnected,
+      fallback_used: resolved.status === "fallback",
+      possible_failure: resolved.status === "fallback",
+      failure_reason: resolved.issues[0],
     });
-
-    if (establishedUrgency === "HIGH" && !highUrgencyRecommendationIsAligned(sbar.recommendation)) {
-      sbar.recommendation = "I'm concerned about the worsening clinical picture and would like you to evaluate the patient now.";
-    }
-
-    res.json({ sbar });
+    if (clientDisconnected) return;
+    res.json({ sbar: resolved.sbar });
   } catch (error) {
-    console.error("[SBAR] API error:", error.message);
-    res.status(500).json({ error: "Failed to generate SBAR. Please try again." });
+    const failure = classifyProviderError(error);
+    const totalDuration = Date.now() - requestStartedAt;
+    appendOperationalLog({
+      timestamp: requestTimestamp, route: "SBAR", endpoint: "/api/sbar", mode: "communication",
+      category: "fallback", word_count: 0, input_length: question.trim().length,
+      urgency: establishedUrgency, status: "fallback", response_length: 0,
+      duration_ms: totalDuration, request_id: requestId, request_started_at: requestTimestamp,
+      request_ended_at: new Date().toISOString(), total_duration_ms: totalDuration,
+      provider_duration_ms: totalDuration, provider_status: "error",
+      validation_duration_ms: 0, validation_status: "not_started",
+      repair_attempted: false, repair_status: "not_available", repair_duration_ms: 0,
+      display_resolution: "fallback", rejection_reason_codes: [failure.code],
+      timeout_layer: failure.code === "provider_timeout" ? "provider" : null,
+      client_disconnected: clientDisconnected, fallback_used: true, possible_failure: true,
+      failure_reason: failure.code,
+    });
+    if (clientDisconnected) return;
+    res.json({ sbar: buildSbarFallback(question, establishedUrgency, failure.code) });
   }
 });
 
@@ -3079,6 +3434,7 @@ module.exports = {
   comparisonSemantics,
   sourceSupportsTrend,
   unsupportedTrendClaims,
+  unsupportedMeasurementTrendClaims,
   hasUnsupportedEstablishedTrendClaim,
   unsupportedNumericThresholds,
   hasAcidBaseReliabilityViolation,
@@ -3101,6 +3457,11 @@ module.exports = {
   runPriorityMapWithBudget,
   sanitizeSbarText,
   groundSbarTemporalFidelity,
+  validateSbarReliability,
+  parseSbarSections,
+  buildSbarFallback,
+  selectSbarEvidence,
+  runSbarWithBudget,
   SHIFT_BRAIN_RESPONSE_CONTRACT,
   SBAR_SYSTEM_PROMPT,
   TEACH_ME_RELIABILITY_PROMPT,

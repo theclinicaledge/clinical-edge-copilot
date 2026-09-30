@@ -29,6 +29,9 @@ const {
   runPriorityMapWithBudget,
   sanitizeSbarText,
   groundSbarTemporalFidelity,
+  validateSbarReliability,
+  buildSbarFallback,
+  runSbarWithBudget,
   highUrgencyRecommendationIsAligned,
   lessonGroundingText,
   sourceSupportsTrend,
@@ -37,6 +40,7 @@ const {
   TEACH_ME_RELIABILITY_PROMPT,
   unsupportedNumericThresholds,
   unsupportedTrendClaims,
+  unsupportedMeasurementTrendClaims,
   hasUnsupportedEstablishedTrendClaim,
 } = require("../server");
 
@@ -430,6 +434,52 @@ test("perfusion convergence is not a count of abnormal or infection-related fiel
   assert.match(buildPriorityMapFallback(noninfectiousConvergence), /Worsening systemic perfusion with end-organ warning signs/);
 });
 
+test("converging current bedside perfusion findings are recognized without inventing trends", () => {
+  const bedsideConvergence = [
+    "PATIENT SNAPSHOT — USER-REPORTED / OBSERVED INFORMATION",
+    "What changed: Something feels off, BP / perfusion, Heart / rhythm, Breathing, Neuro, Urine output, Pain / other",
+    "Reported clinical data:",
+    "- Level of consciousness: More drowsy",
+    "- Chest discomfort: Present",
+    "- Perfusion: Cool / clammy",
+    "- Urine output: amount 20 mL over 1 hour",
+    "- BP: previous unknown -> current 88/50 mmHg",
+    "- Heart rate: previous unknown -> current 112 bpm",
+    "- SpO₂: previous unknown -> current 94 %",
+    "- Oxygen support: previous unknown -> current 2 L",
+    "- Temperature: previous unknown -> current 38.2 °C",
+    "Treat omitted fields as unknown. Do not infer normal findings.",
+  ].join("\n");
+  const incompletePattern = bedsideConvergence.replace("- Chest discomfort: Present\n", "");
+  const reassuringPattern = bedsideConvergence
+    .replace("- Level of consciousness: More drowsy", "- Level of consciousness: At baseline")
+    .replace("- Chest discomfort: Present", "- Chest discomfort: None reported")
+    .replace("- Perfusion: Cool / clammy", "- Perfusion: No obvious change");
+
+  const pattern = assessPerfusionPattern(bedsideConvergence);
+  const assessment = assessDeterministicUrgency(bedsideConvergence);
+  const fallback = buildPriorityMapFallback(bedsideConvergence);
+  const lesson = buildTeachMeFallback(fallback, bedsideConvergence, "provider_timeout");
+
+  assert.equal(pattern.convergingBedsidePerfusionConcern, true);
+  assert.equal(pattern.convergingSystemicPerfusion, false);
+  assert.equal(assessment.urgency, "HIGH");
+  assert.ok(assessment.signals.includes("converging_bedside_perfusion_findings"));
+  assert.match(fallback, /Converging circulation and bedside warning signs/);
+  assert.match(fallback, /Urine output: amount 20 mL over 1 hour/);
+  assert.match(fallback, /supports prompt team awareness and bedside evaluation now/i);
+  assert.match(fallback, /not required before escalation/i);
+  assert.doesNotMatch(fallback, /blood pressure (?:fell|dropped)|heart rate (?:rose|increased)|urine output (?:fell|decreased)/i);
+  assert.deepEqual(validatePriorityMapReliability(bedsideConvergence, fallback), []);
+  assert.equal(lesson.conceptId, "bedside-perfusion-convergence");
+  assert.match(lesson.scenarioConnection, /increased drowsiness, chest discomfort, and cool or clammy peripheral findings/i);
+
+  assert.equal(assessPerfusionPattern(incompletePattern).convergingBedsidePerfusionConcern, false);
+  assert.notEqual(assessDeterministicUrgency(incompletePattern).urgency, "HIGH");
+  assert.equal(assessPerfusionPattern(reassuringPattern).convergingBedsidePerfusionConcern, false);
+  assert.notEqual(assessDeterministicUrgency(reassuringPattern).urgency, "HIGH");
+});
+
 test("HIGH urgency requires present-tense escalation when deterioration already exists", () => {
   const futureOnly = "Urgency Level: HIGH\nRelevance: High priority\nFurther deterioration should prompt urgent evaluation.";
   const currentAndFuture = "Urgency Level: HIGH\nThe existing pattern supports prompt bedside evaluation now. Further deterioration would increase concern.";
@@ -776,4 +826,214 @@ test("SBAR sanitizer preserves a natural urgent assessment request", () => {
     "I'm concerned and I'd like you to come assess the patient now.",
   );
   assert.doesNotMatch(sanitizeSbarText("and I need you to come assess"), /and Wanted/i);
+});
+
+const FIRST_RUN_SNAPSHOT = `PATIENT SNAPSHOT — USER-REPORTED / OBSERVED INFORMATION
+Reported clinical data:
+- BP: previous 108/64 -> current 86/48 mmHg
+- MAP: previous unknown -> current 61 mmHg
+- Heart rate: previous 92 -> current 118 bpm
+- Urine output: amount 20 mL over 1 hour
+- Lactate: previous 2.0 -> current 4.1 (unit not supplied)
+- Drips: items=1) medication=Norepinephrine
+- Drains / bleeding: items=1) type=Chest tube, currentOutput=35 mL, outputTimeframe=most recent hour
+Treat omitted fields as unknown. Do not infer normal findings.`;
+
+const CONTROLLED_RERUN_SNAPSHOT = `PATIENT SNAPSHOT — USER-REPORTED / OBSERVED INFORMATION
+What changed: Something feels off, BP / perfusion, Heart / rhythm, Breathing, Neuro, Urine output, Labs / glucose, Bleeding
+Reported clinical data:
+- Level of consciousness: More drowsy
+- Perfusion: Cool / clammy, Delayed capillary refill
+- Urine output: amount 20 mL over 1 hour
+- BP: previous 108/64 -> current 86/48 mmHg
+- MAP: previous unknown -> current 61 mmHg
+- Heart rate: previous 92 -> current 118 bpm
+- Respiratory rate: previous unknown -> current 27 /min
+- SpO2: previous 95 -> current 92 %
+- Oxygen support: previous 2 L nasal cannula -> current 4 L nasal cannula (unit not supplied)
+- CVP: previous 8 -> current 5 (unit not supplied)
+- CI: previous 2.3 -> current 1.8 (unit not supplied)
+- Lactate: previous 2.0 -> current 4.1 (unit not supplied)
+- Creatinine: previous 1.1 -> current 1.6 (unit not supplied)
+- Drips: items=1) medication=Norepinephrine
+- Drains / bleeding: items=1) type=Chest tube, currentOutput=35 mL, outputTimeframe=most recent hour
+Treat omitted fields as unknown. Do not infer normal findings.`;
+
+test("Priority Map validator rejects a directional urine claim from one interval", () => {
+  const output = GROUNDED_PRIORITY_MAP.replace(
+    "The reported hemodynamics show worsening perfusion with uncertain cause.",
+    "The reported hemodynamics show worsening perfusion with falling urine output.",
+  );
+  assert.ok(unsupportedMeasurementTrendClaims(CONTROLLED_RERUN_SNAPSHOT, output).includes("Urine output"));
+  assert.ok(validatePriorityMapReliability(CONTROLLED_RERUN_SNAPSHOT, output).includes("unsupported_measurement_trend"));
+});
+
+test("Priority Map fallback preserves one urine interval without inventing direction", () => {
+  const fallback = buildPriorityMapFallback(CONTROLLED_RERUN_SNAPSHOT);
+  assert.match(fallback, /Urine output: amount 20 mL over 1 hour/i);
+  assert.match(fallback, /rising creatinine/i);
+  assert.match(fallback, /single interval measurement and does not establish direction/i);
+  assert.doesNotMatch(fallback, /(?:falling|decreasing|declining|worsening) urine output/i);
+  assert.deepEqual(validatePriorityMapReliability(CONTROLLED_RERUN_SNAPSHOT, fallback), []);
+});
+
+test("Priority Map semantics retain a supplied urine trend", () => {
+  const source = CONTROLLED_RERUN_SNAPSHOT.replace(
+    "Urine output: amount 20 mL over 1 hour",
+    "Urine output: previous 55 -> current 20 mL/hr",
+  );
+  const fallback = buildPriorityMapFallback(source);
+  assert.match(fallback, /falling urine output/i);
+  assert.equal(unsupportedMeasurementTrendClaims(source, fallback).includes("Urine output"), false);
+});
+
+test("Priority Map semantics allow an explicitly supplied qualitative urine direction", () => {
+  const source = `${CONTROLLED_RERUN_SNAPSHOT}\n- Urine output: decreasing over the observed interval`;
+  const candidate = GROUNDED_PRIORITY_MAP.replace(
+    "The reported hemodynamics show worsening perfusion with uncertain cause.",
+    "The reported hemodynamics include decreasing urine output with uncertain cause.",
+  );
+  assert.equal(sourceSupportsTrend(source, /\b(?:urine output|UOP|urine)\b/i), true);
+  assert.equal(unsupportedMeasurementTrendClaims(source, candidate).includes("Urine output"), false);
+});
+
+function sbarRaw({ background = "Urine output was 20 mL over the last hour.", assessment = "BP fell from 108/64 to 86/48 and lactate rose from 2.0 to 4.1." } = {}) {
+  return `SITUATION: I'm calling about concerning current findings.
+BACKGROUND: ${background}
+ASSESSMENT: ${assessment}
+RECOMMENDATION: I'd like you to evaluate the patient now.`;
+}
+
+test("SBAR rejects directional claims for current and interval-only measurements", () => {
+  const urineIssues = validateSbarReliability(FIRST_RUN_SNAPSHOT, {
+    situation: "I'm calling about concerning findings.",
+    background: "Urine output is down to 20 mL over the last hour.",
+    assessment: "Chest tube output decreased to 35 mL during the most recent hour.",
+    recommendation: "I'd like you to evaluate the patient now.",
+  });
+  assert.ok(urineIssues.includes("unsupported_trend:urine_output"));
+  assert.ok(urineIssues.includes("unsupported_trend:drains___bleeding"));
+});
+
+test("SBAR permits directional language for supported BP and lactate comparisons", () => {
+  assert.deepEqual(validateSbarReliability(FIRST_RUN_SNAPSHOT, {
+    situation: "I'm calling about concerning current findings.",
+    background: "Urine output was 20 mL over the last hour.",
+    assessment: "BP fell from 108/64 to 86/48 and lactate increased from 2.0 to 4.1.",
+    recommendation: "I'd like you to evaluate the patient now.",
+  }), []);
+});
+
+test("SBAR rejects recognition-as-onset and unsupported global rapidity", () => {
+  const source = `${FIRST_RUN_SNAPSHOT}\n- Change was recognized within 30 minutes\n- Exact symptom onset is unknown`;
+  const issues = validateSbarReliability(source, {
+    situation: "The patient is rapidly deteriorating.",
+    background: "Symptoms started 30 minutes ago.",
+    assessment: "The current findings are concerning.",
+    recommendation: "I'd like you to evaluate the patient now.",
+  });
+  assert.ok(issues.includes("unsupported_global_rapidity"));
+  assert.ok(issues.includes("recognition_as_onset"));
+});
+
+test("SBAR allows explicitly supplied rapidity", () => {
+  const source = `${FIRST_RUN_SNAPSHOT}\n- Overall change: rapidly worsening`;
+  assert.deepEqual(validateSbarReliability(source, {
+    situation: "The patient is rapidly worsening.",
+    background: "Urine output was 20 mL over the last hour.",
+    assessment: "BP fell from 108/64 to 86/48.",
+    recommendation: "I'd like you to evaluate the patient now.",
+  }), []);
+});
+
+test("invalid provider SBAR resolves to a safe deterministic S/B/A/R fallback", async () => {
+  const result = await runSbarWithBudget({
+    source: FIRST_RUN_SNAPSHOT,
+    urgency: "HIGH",
+    generateOriginal: async () => sbarRaw({ background: "Urine output is down to 20 mL.", assessment: "The patient is quickly deteriorating." }),
+  });
+  assert.equal(result.status, "fallback");
+  assert.ok(result.issues.includes("unsupported_trend:urine_output"));
+  assert.ok(result.issues.includes("unsupported_global_rapidity"));
+  assert.deepEqual(Object.keys(result.sbar), ["situation", "background", "assessment", "recommendation"]);
+  const text = Object.values(result.sbar).join(" ");
+  assert.doesNotMatch(text, /\b(?:start|give|administer|bolus|titrate)\b/i);
+  assert.match(result.sbar.recommendation, /evaluate the patient now/i);
+});
+
+test("valid provider SBAR is accepted within its stage budget", async () => {
+  const result = await runSbarWithBudget({
+    source: FIRST_RUN_SNAPSHOT,
+    urgency: "HIGH",
+    generateOriginal: async () => sbarRaw(),
+  });
+  assert.equal(result.status, "original");
+  assert.equal(result.timing.provider_status, "success");
+  assert.equal(result.timing.validation_status, "accepted");
+});
+
+test("slow SBAR provider returns deterministic fallback within the product budget", async () => {
+  const startedAt = Date.now();
+  const result = await runSbarWithBudget({
+    source: FIRST_RUN_SNAPSHOT,
+    urgency: "HIGH",
+    providerBudgetMs: 10,
+    generateOriginal: async () => new Promise(() => {}),
+  });
+  assert.equal(result.status, "fallback");
+  assert.equal(result.timing.provider_status, "timeout");
+  assert.equal(result.timing.timeout_layer, "provider");
+  assert.ok(Date.now() - startedAt < 500);
+});
+
+test("SBAR client disconnect aborts one operation without duplicate work", async () => {
+  const controller = new AbortController();
+  let providerCalls = 0;
+  const pending = runSbarWithBudget({
+    source: FIRST_RUN_SNAPSHOT,
+    urgency: "HIGH",
+    signal: controller.signal,
+    generateOriginal: async () => {
+      providerCalls += 1;
+      return new Promise(() => {});
+    },
+  });
+  controller.abort();
+  const result = await pending;
+  assert.equal(result.status, "fallback");
+  assert.equal(result.timing.timeout_layer, "client_disconnect");
+  assert.equal(providerCalls, 1);
+});
+
+test("SBAR rejects treatment prescriptions", () => {
+  const issues = validateSbarReliability(FIRST_RUN_SNAPSHOT, {
+    situation: "I'm calling about concerning findings.",
+    background: "Norepinephrine is running, but the dose was not supplied.",
+    assessment: "BP fell from 108/64 to 86/48.",
+    recommendation: "Increase the norepinephrine infusion now.",
+  });
+  assert.ok(issues.includes("treatment_prescription"));
+});
+
+test("deterministic SBAR fallback preserves interval and comparison semantics", () => {
+  const fallback = buildSbarFallback(FIRST_RUN_SNAPSHOT, "HIGH");
+  const text = Object.values(fallback).join(" ");
+  assert.match(text, /BP changed from 108\/64 to 86\/48 mmHg/i);
+  assert.match(text, /urine output was 20 mL over 1 hour/i);
+  assert.doesNotMatch(text, /urine output (?:fell|dropped|decreased|is down)/i);
+  assert.deepEqual(validateSbarReliability(FIRST_RUN_SNAPSHOT, fallback), []);
+});
+
+test("deterministic SBAR fallback preserves controlled-rerun drips, drains, and intervals", () => {
+  const fallback = buildSbarFallback(CONTROLLED_RERUN_SNAPSHOT, "HIGH");
+  const text = Object.values(fallback).join(" ");
+  assert.match(fallback.background, /Norepinephrine was running; the dose was not supplied/i);
+  assert.match(fallback.background, /Chest tube output was 35 mL during the most recent hour/i);
+  assert.match(fallback.assessment, /urine output was 20 mL over 1 hour/i);
+  assert.match(fallback.assessment, /CI changed from 2\.3 to 1\.8/i);
+  assert.match(fallback.assessment, /Lactate changed from 2\.0 to 4\.1/i);
+  assert.match(fallback.assessment, /Creatinine changed from 1\.1 to 1\.6/i);
+  assert.doesNotMatch(text, /(?:falling|decreasing|declining|down to) (?:urine|chest tube)/i);
+  assert.ok(text.split(/\s+/).length < 180);
+  assert.deepEqual(validateSbarReliability(CONTROLLED_RERUN_SNAPSHOT, fallback), []);
 });

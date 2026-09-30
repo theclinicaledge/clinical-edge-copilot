@@ -458,6 +458,8 @@ export default function App({ onGoHome, navigate, isOnline = true }) {
   const [followUpActive, setFollowUpActive] = useState(false);
   const [processingStage, setProcessingStage] = useState("organizing");
   const [submittedSnapshot, setSubmittedSnapshot] = useState(null);
+  const [editableSnapshot, setEditableSnapshot] = useState(null);
+  const [captureKey, setCaptureKey] = useState(0);
 
   const outputRef             = useRef(null);
   const workspaceTopRef       = useRef(null);
@@ -677,8 +679,46 @@ export default function App({ onGoHome, navigate, isOnline = true }) {
 
   const handleSnapshotBuild = (serializedSnapshot, snapshot) => {
     setSubmittedSnapshot({ serializedSnapshot, snapshot });
+    setEditableSnapshot(null);
     runQuery(serializedSnapshot);
   };
+
+  const resetResultState = useCallback(() => {
+    setQuestion("");
+    setResult(null);
+    setFollowUpResult(null);
+    setRawText("");
+    setStreamBuffer("");
+    setError(null);
+    setFollowUp("");
+    setFollowUpOpen(false);
+    setSbar(null);
+    setSbarLoading(false);
+    setJustSaved(false);
+    setSourcesOpen(false);
+    accumulatedRef.current = "";
+    lastSubmittedRef.current = "";
+  }, []);
+
+  const handleEditSnapshot = useCallback(() => {
+    if (!submittedSnapshot?.snapshot || isActiveRef.current) return;
+    setEditableSnapshot(submittedSnapshot.snapshot);
+    setSubmittedSnapshot(null);
+    resetResultState();
+    setCaptureKey((value) => value + 1);
+    trackEvent("shift_brain_snapshot_edit_started");
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  }, [resetResultState, submittedSnapshot]);
+
+  const handleNewSnapshot = useCallback(() => {
+    if (isActiveRef.current) return;
+    setEditableSnapshot(null);
+    setSubmittedSnapshot(null);
+    resetResultState();
+    setCaptureKey((value) => value + 1);
+    trackEvent("shift_brain_new_snapshot_started");
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  }, [resetResultState]);
 
   const handleFollowUp = () => {
     if (!followUp.trim()) return;
@@ -1024,6 +1064,29 @@ export default function App({ onGoHome, navigate, isOnline = true }) {
         .copilot-result-shell {
           margin-top: 8px;
           scroll-margin-top: calc(92px + env(safe-area-inset-top));
+        }
+        .copilot-result-nav {
+          min-height: 44px;
+          display: flex;
+          align-items: center;
+          justify-content: flex-end;
+          gap: 4px;
+          margin-bottom: 8px;
+        }
+        .copilot-result-nav button {
+          min-height: 42px;
+          border: 1px solid transparent;
+          border-radius: 7px;
+          background: transparent;
+          color: var(--ce-teal-deep);
+          padding: 0 12px;
+          font-size: 12px;
+          font-weight: 750;
+        }
+        .copilot-result-nav button:hover,
+        .copilot-result-nav button:focus-visible {
+          border-color: rgba(10,143,141,0.2);
+          background: rgba(10,191,188,0.06);
         }
         .copilot-result-topper {
           display: grid;
@@ -1465,6 +1528,7 @@ export default function App({ onGoHome, navigate, isOnline = true }) {
           .copilot-context-strip { grid-template-columns: 1fr; }
           .copilot-result-topper { grid-template-columns: 1fr; }
           .copilot-result-topper__meta { min-width: 0; flex-direction: row; flex-wrap: wrap; }
+          .copilot-result-nav { position: sticky; top: calc(56px + env(safe-area-inset-top)); z-index: 5; margin: -2px -2px 8px; padding: 4px 2px; background: rgba(248,245,238,.96); }
           .copilot-action-bar { align-items: stretch; flex-direction: column; padding-top: 12px; }
           .sbar-trigger-btn { width: 100%; }
           .copilot-action-utilities { justify-content: center; }
@@ -1498,7 +1562,9 @@ export default function App({ onGoHome, navigate, isOnline = true }) {
           <div className="copilot-command-main">
 
         <PatientSnapshot
+          key={captureKey}
           initialNotes={prefillNotes}
+          initialSnapshot={editableSnapshot}
           disabled={isActive}
           isOnline={isOnline}
           onBuild={handleSnapshotBuild}
@@ -1561,7 +1627,7 @@ export default function App({ onGoHome, navigate, isOnline = true }) {
           <aside className="copilot-command-rail" aria-label="Copilot guidance">
             <div className="copilot-rail-card copilot-rail-card--dark">
               <span className="copilot-rail-label">First pass</span>
-              <p>Select what changed, then add only the trends and bedside findings you know. Missing information can stay missing.</p>
+              <p>Enter what you know now, then add earlier values or focused findings only when they help. Missing information can stay missing.</p>
             </div>
 
             <div className="copilot-context-strip" aria-label="Copilot workflow checkpoints">
@@ -1656,6 +1722,10 @@ export default function App({ onGoHome, navigate, isOnline = true }) {
         {/* Final structured result */}
         {result && (!streaming || followUpActive) && (
           <div ref={outputRef} className="copilot-result-shell copilot-workspace-stage ce-section-enter">
+            <nav className="copilot-result-nav" aria-label="Snapshot actions">
+              {submittedSnapshot?.snapshot && <button type="button" onClick={handleEditSnapshot}>Edit Snapshot</button>}
+              <button type="button" onClick={handleNewSnapshot}>New Snapshot</button>
+            </nav>
             <PriorityMap result={result} onRequestTeachMe={handleTeachMe} />
 
             {/* Action bar */}

@@ -91,6 +91,35 @@ test("operational logs retain non-content Priority Map resolution metadata", () 
   assert.equal(JSON.stringify(entry).includes("clinical text"), false);
 });
 
+test("operational logs retain privacy-safe SBAR provenance without clinical content", () => {
+  const entry = buildOperationalLogEntry({
+    timestamp: "2026-09-29T12:00:00.000Z",
+    route: "SBAR",
+    endpoint: "/api/sbar",
+    status: "fallback",
+    request_id: "sbar-request-1",
+    total_duration_ms: 8001,
+    provider_duration_ms: 8000,
+    provider_status: "timeout",
+    validation_duration_ms: 0,
+    validation_status: "not_started",
+    repair_attempted: false,
+    repair_status: "not_available",
+    repair_duration_ms: 0,
+    display_resolution: "fallback",
+    rejection_reason_codes: ["provider_timeout"],
+    timeout_layer: "provider",
+    client_disconnected: false,
+    question: "BP 86/48 and urine output 20 mL",
+    response: "SITUATION: clinical content",
+  });
+  assert.equal(entry.endpoint, "/api/sbar");
+  assert.equal(entry.display_resolution, "fallback");
+  assert.deepEqual(entry.rejection_reason_codes, ["provider_timeout"]);
+  assert.equal(JSON.stringify(entry).includes("86/48"), false);
+  assert.equal(JSON.stringify(entry).includes("clinical content"), false);
+});
+
 test("Shift Brain contract has the exact ordered reasoning sections", () => {
   const headers = [...SHIFT_BRAIN_RESPONSE_CONTRACT.matchAll(/^\*\*(.+)\*\*$/gm)]
     .map((match) => match[1]);

@@ -11,7 +11,8 @@
     "generate:brain-sheets": "node scripts/generate-brain-sheets-pdf.mjs",
     "lint": "eslint .",
     "preview": "vite preview",
-    "test:e2e": "playwright test"
+    "test:e2e": "playwright test",
+    "validate:rapid-capture": "node validation/rapid-capture-v1/run-validation.mjs --check validation/rapid-capture-v1/answer-key-v1.0.2.json && node validation/rapid-capture-v1/run-validation.mjs --check validation/rapid-capture-v1/previous-holdout-answer-key-v1.0.1.json validation/rapid-capture-v1/holdout-inputs.json && node validation/rapid-capture-v1/run-validation.mjs --check validation/rapid-capture-v1/holdout-v2-answer-key.json validation/rapid-capture-v1/holdout-v2-inputs.json"
   },
   "dependencies": {
     "@vercel/analytics": "^2.0.1",

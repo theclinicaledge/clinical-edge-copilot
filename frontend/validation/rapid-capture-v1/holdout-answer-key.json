@@ -1,0 +1,22 @@
+{
+  "answerKeyVersion": "1.0.0-holdout",
+  "corpusVersion": "1.0.0-holdout",
+  "cases": [
+    { "id": "RH001", "expectedClaims": ["values.bpEarlier=104/66", "values.bpNow=90/52"], "temporalClaims": ["values.bpEarlier=104/66", "values.bpNow=90/52"], "expectedNeedsReview": false },
+    { "id": "RH002", "expectedClaims": ["values.rrNow=24", "values.spo2Now=93", "values.oxygenNow=3 L nasal cannula"], "temporalClaims": ["values.rrNow=24", "values.spo2Now=93", "values.oxygenNow=3 L nasal cannula"], "expectedNeedsReview": false },
+    { "id": "RH003", "expectedClaims": ["values.mental=Changed", "values.mentalDetail=Difficult to arouse"], "temporalClaims": ["values.mentalDetail=Difficult to arouse"], "expectedNeedsReview": false },
+    { "id": "RH004", "expectedClaims": ["values.skinTemperature=Cool", "values.capillaryRefill=4"], "temporalClaims": [], "expectedNeedsReview": false },
+    { "id": "RH005", "expectedClaims": ["values.urineAmount=22", "values.urineIntervalValue=60", "values.urineIntervalUnit=minute"], "temporalClaims": ["values.urineIntervalValue=60", "values.urineIntervalUnit=minute"], "expectedNeedsReview": false },
+    { "id": "RH006", "expectedClaims": ["values.lactateEarlier=2.1", "values.lactateNow=3.8", "units.lactate=mmol/L"], "temporalClaims": ["values.lactateEarlier=2.1", "values.lactateNow=3.8"], "expectedNeedsReview": false },
+    { "id": "RH007", "expectedClaims": ["optional.drips.items[0].medication=Norepinephrine"], "temporalClaims": [], "expectedNeedsReview": true, "risk": "unknown-dose" },
+    { "id": "RH008", "expectedClaims": ["optional.drains.items[0].type=Chest tube", "optional.drains.items[0].currentOutput=28 mL", "optional.drains.items[0].outputTimeframe=past hour"], "temporalClaims": ["optional.drains.items[0].outputTimeframe=past hour"], "expectedNeedsReview": false },
+    { "id": "RH009", "expectedClaims": ["values.ciEarlier=2.4", "values.ciNow=1.9", "units.ci=unspecified"], "temporalClaims": ["values.ciEarlier=2.4", "values.ciNow=1.9"], "expectedNeedsReview": false },
+    { "id": "RH010", "expectedClaims": ["values.hrNow=124", "values.rhythm=Irregular"], "temporalClaims": ["values.hrNow=124"], "expectedNeedsReview": false },
+    { "id": "RH011", "expectedClaims": [], "temporalClaims": [], "expectedNeedsReview": true, "risk": "negation-and-uncertainty" },
+    { "id": "RH012", "expectedClaims": [], "temporalClaims": [], "expectedNeedsReview": true, "risk": "self-correction" },
+    { "id": "RH013", "expectedClaims": ["values.bpNow=98/60", "values.rrNow=25", "values.urineAmount=18", "values.urineIntervalValue=2", "values.urineIntervalUnit=hour"], "temporalClaims": ["values.bpNow=98/60", "values.rrNow=25", "values.urineIntervalValue=2", "values.urineIntervalUnit=hour"], "expectedNeedsReview": false },
+    { "id": "RH014", "expectedClaims": [], "temporalClaims": [], "expectedNeedsReview": false, "risk": "irrelevant-numbers" },
+    { "id": "RH015", "expectedClaims": ["values.oxygenEarlier=room air", "values.oxygenNow=2 L NC", "values.spo2Now=95"], "temporalClaims": ["values.oxygenEarlier=room air", "values.oxygenNow=2 L NC", "values.spo2Now=95"], "expectedNeedsReview": false },
+    { "id": "RH016", "expectedClaims": ["optional.drains.items[0].type=Chest tube", "optional.drains.items[0].currentOutput=25 mL"], "temporalClaims": [], "expectedNeedsReview": true, "risk": "unknown-interval" }
+  ]
+}

@@ -247,15 +247,15 @@ test('manual capture preserves simultaneous perfusion findings and first-class M
   await expect(page.locator('.snapshot-review')).toContainText('Cool / clammy,Delayed capillary refill');
 });
 
-test('home hub loads and shows module navigation', async ({ page }) => {
+test('command home prioritizes patient change and preserves focused tools', async ({ page }) => {
   await page.goto('/');
-  await expect(page.getByRole('heading', { name: 'Clinical Edge' })).toBeVisible();
-  await expect(page.getByRole('button', { name: 'Start with Copilot' })).toBeVisible();
-  await expect(page.getByText('Copilot', { exact: true })).toBeVisible();
+  await expect(page.getByRole('heading', { name: 'What do you need right now?' })).toBeVisible();
+  await expect(page.getByRole('link', { name: "Describe what's happening" })).toBeVisible();
+  await expect(page.getByRole('heading', { name: 'Check something' })).toBeVisible();
   await expect(page.getByText('Rhythm Lab', { exact: true })).toBeVisible();
   await expect(page.getByText('ICU Drips', { exact: true })).toBeVisible();
   await expect(page.getByText('Reference Hub', { exact: true })).toBeVisible();
-  await expect(page.getByText('ABG & Oxygenation Lab', { exact: true })).toBeVisible();
+  await expect(page.getByText('Acid-base & oxygenation', { exact: true })).toBeVisible();
   await expect(page.getByText('Brain Sheets', { exact: true })).toBeVisible();
 });
 

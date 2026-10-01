@@ -5,6 +5,7 @@
 // uses, so there is one source of truth for both.
 import { renderToString } from "react-dom/server";
 import ClinicalEdgeHome from "./ClinicalEdgeHome.jsx";
+import WorkspaceNavigation from "./components/WorkspaceNavigation.jsx";
 import Download from "./Download.jsx";
 import Privacy from "./Privacy.jsx";
 import Support from "./Support.jsx";
@@ -28,7 +29,7 @@ const BLOG_INDEX_SEO = {
  */
 export function renderRoute(routePath) {
   if (routePath === "/") {
-    return { html: renderToString(<ClinicalEdgeHome onNavigate={() => {}} />), seo: STATIC_ROUTE_SEO["/"] };
+    return { html: renderToString(<><ClinicalEdgeHome onNavigate={() => {}} /><WorkspaceNavigation page="home" navigate={() => {}} /></>), seo: STATIC_ROUTE_SEO["/"] };
   }
   if (routePath === "/download") {
     return { html: renderToString(<Download />), seo: STATIC_ROUTE_SEO["/download"] };

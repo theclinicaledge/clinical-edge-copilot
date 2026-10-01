@@ -727,6 +727,44 @@ function HubView({ onSelect, onGoHome, onSelectPathway, onSelectConcept }) {
           </div>
         </div>
 
+
+        {/* Search */}
+        <div className="rh-search-wrap" style={{ marginBottom: 14 }}>
+          <span className="rh-search-icon">⌕</span>
+          <input
+            className="rh-search"
+            type="text"
+            value={query}
+            onChange={handleSearch}
+            placeholder="Search references…"
+            aria-label="Search references"
+            autoComplete="off"
+            autoCorrect="off"
+            spellCheck={false}
+          />
+        </div>
+
+        {/* Category filters */}
+        <div className="rh-filters" style={{ marginBottom: 28 }}>
+          <button
+            className={'rh-filter-btn' + (cat === 'all' ? ' active' : '')}
+            onClick={() => handleCategorySelect('all')}
+          >
+            All
+          </button>
+          {CATEGORIES.map(c => (
+            <button
+              key={c.id}
+              className={'rh-filter-btn' + (cat === c.id ? ' active' : '')}
+              onClick={() => handleCategorySelect(c.id)}
+            >
+              {c.label}
+            </button>
+          ))}
+        </div>
+
+        <details className="ce-lookup-extras">
+          <summary>Pathways &amp; clinical concepts</summary>
         {/* Bedside Pathways */}
         <div className="rh-pathways" style={{ marginBottom: 24 }}>
           <div className="rh-eyebrow" style={{ marginBottom: 4 }}>Bedside Pathways</div>
@@ -753,39 +791,7 @@ function HubView({ onSelect, onGoHome, onSelectPathway, onSelectConcept }) {
           </div>
         </div>
 
-        {/* Search */}
-        <div className="rh-search-wrap" style={{ marginBottom: 14 }}>
-          <span className="rh-search-icon">⌕</span>
-          <input
-            className="rh-search"
-            type="text"
-            value={query}
-            onChange={handleSearch}
-            placeholder="Search references…"
-            autoComplete="off"
-            autoCorrect="off"
-            spellCheck={false}
-          />
-        </div>
-
-        {/* Category filters */}
-        <div className="rh-filters" style={{ marginBottom: 28 }}>
-          <button
-            className={'rh-filter-btn' + (cat === 'all' ? ' active' : '')}
-            onClick={() => handleCategorySelect('all')}
-          >
-            All
-          </button>
-          {CATEGORIES.map(c => (
-            <button
-              key={c.id}
-              className={'rh-filter-btn' + (cat === c.id ? ' active' : '')}
-              onClick={() => handleCategorySelect(c.id)}
-            >
-              {c.label}
-            </button>
-          ))}
-        </div>
+        </details>
 
         {/* Recently viewed */}
         {recentRefs.length > 0 && !query && (

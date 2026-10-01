@@ -1185,6 +1185,47 @@ Trends across multiple observations can identify deterioration without establish
 For educational support only. Use your clinical judgment and follow local protocol.`;
 }
 
+function buildReassessmentPriorityMap(source) {
+  const existing = buildPriorityMapFallback(source);
+  if (!existing.includes("### 1 · Reported clinical deterioration")) return existing;
+  const { urgency } = assessDeterministicUrgency(source);
+  return `Urgency Level: ${urgency}
+
+**Priorities**
+### 1 · Latest verified bedside findings
+Relevance: ${urgency === "HIGH" ? "High priority" : "Important"}
+Observed:
+${compactSnapshotFacts(source, Number.MAX_SAFE_INTEGER).map((fact) => `- ${fact}`).join("\n")}
+Interpretation: These are the newly verified observations. Their direction alone does not establish global improvement, deterioration, a diagnosis, or an intervention effect. Findings not reassessed remain unknown for the current assessment.
+Assess now:
+- Recheck current circulation, responsiveness, breathing and other relevant findings; clarify what has not been reassessed
+
+**Assess first**
+- Verify the new observations and their timing compared with the previous verified assessment
+- Reassess clinically relevant omitted findings rather than assuming they remain unchanged
+
+**Possible patterns**
+- The underlying contributors remain unresolved; these observations alone do not establish a diagnosis or treatment response
+
+**Missing information**
+- Current medication or sedation exposure, other context, and findings awaiting reassessment
+
+**Monitor and trend**
+- Compare only supported previous-to-current observations
+- Keep urine and drain output as single interval measurements unless comparable intervals are explicitly established
+
+**Escalation triggers**
+${urgency === "HIGH" ? '- Prompt bedside evaluation and team awareness now under local protocol are supported by the current evidence' : '- New or worsening concerns in responsiveness, breathing, circulation or other findings should prompt bedside assessment and team communication under local protocol'}
+
+**SBAR-ready summary**
+Communicate the newly verified findings, supported comparisons, interval measurements, and what remains unknown. Previous findings not reassessed are context only, not current observations.
+
+**Teach me why**
+An observed change is not automatically a change in overall clinical trajectory. Verified timing and focused reassessment help distinguish what is known from what remains unresolved.
+
+For educational support only. Use your clinical judgment and follow local protocol.`;
+}
+
 async function resolvePriorityMap({ source, initialOutput, repair }) {
   const initialIssues = validatePriorityMapReliability(source, initialOutput);
   if (!initialIssues.length) return { output: initialOutput, status: "validated", issues: [], repairIssues: null };
@@ -2831,7 +2872,7 @@ function isOverloadError(err) {
 
 // ── Streaming endpoint ────────────────────────────────────────────────────────
 app.post("/api/copilot", apiLimiter, async (req, res) => {
-  const { question, mode, isFollowUp, learningRequest, priorityMapResponse } = req.body;
+  const { question, mode, isFollowUp, learningRequest, priorityMapResponse, reassessmentRequest } = req.body;
   const requestStartedAt = Date.now();
   const requestId = randomUUID();
   let responseFinished = false;
@@ -2863,6 +2904,18 @@ app.post("/api/copilot", apiLimiter, async (req, res) => {
       error: true,
       message: "Remove patient identifiers and try again. Do not include names, MRNs, dates of birth, SSNs, phone numbers, or email addresses.",
     });
+  }
+
+  if (reassessmentRequest === true) {
+    if (typeof question !== "string" || !question.startsWith("PATIENT SNAPSHOT — USER-REPORTED / OBSERVED INFORMATION")) return res.status(400).json({ error: "A verified Snapshot is required." });
+    const output = buildReassessmentPriorityMap(question);
+    const issues = validatePriorityMapReliability(question, output);
+    appendOperationalLog({ timestamp: new Date().toISOString(), request_id: requestId, route: learningRequest ? "TEACH_ME" : "COPILOT", mode: "reassessment", status: issues.length ? "invalid" : "success", display_resolution: "deterministic", provider_status: "not_called", validation_status: issues.length ? "invalid" : "valid", rejection_reason_codes: issues, total_duration_ms: Date.now() - requestStartedAt });
+    if (learningRequest === true) return res.json({ lesson: buildTeachMeFallback(output, question, "deterministic_reassessment") });
+    if (issues.length) return res.status(422).json({ error: true, message: "The reassessment was preserved, but current reasoning could not be safely refreshed." });
+    res.setHeader("Content-Type", "text/event-stream");
+    res.setHeader("Cache-Control", "no-cache");
+    return res.end(`data: ${JSON.stringify({ text: output })}\n\ndata: ${JSON.stringify({ done: true, resolution: "deterministic" })}\n\n`);
   }
 
   if (!client) {
@@ -3299,7 +3352,7 @@ ASSESSMENT:
 RECOMMENDATION:`;
 
 app.post("/api/sbar", apiLimiter, async (req, res) => {
-  const { question, copilotResponse } = req.body;
+  const { question, copilotResponse, reassessmentRequest, previousAssessment } = req.body;
   const requestStartedAt = Date.now();
   const requestTimestamp = new Date().toISOString();
   const requestId = randomUUID();
@@ -3330,6 +3383,16 @@ app.post("/api/sbar", apiLimiter, async (req, res) => {
   }
 
   const establishedUrgency = parseUrgency(copilotResponse) || "UNKNOWN";
+  if (reassessmentRequest === true) {
+    if (typeof previousAssessment !== "string" || previousAssessment.length > 5000 || containsPHI(previousAssessment)) return res.status(400).json({ error: "Previous evidence must not include patient identifiers." });
+    const sbar = buildSbarFallback(question, assessDeterministicUrgency(question).urgency);
+    // Prior facts are background only, never fed to current urgency or interpretation.
+    const priorFacts = compactSnapshotFacts(previousAssessment, Number.MAX_SAFE_INTEGER).join("; ");
+    sbar.background = priorFacts ? `Previous verified assessment, not reassessed or assumed current: ${priorFacts}.` : "Previous context is limited. Unreported findings remain unknown.";
+    sbar.assessment = `Verified reassessment: ${compactSnapshotFacts(question, Number.MAX_SAFE_INTEGER).join("; ")}. The cause is not established. Other findings were not reassessed.`;
+    appendOperationalLog({ timestamp: requestTimestamp, request_id: requestId, route: "SBAR", mode: "reassessment", status: "success", display_resolution: "deterministic", provider_status: "not_called", total_duration_ms: Date.now() - requestStartedAt });
+    return res.json({ sbar });
+  }
   if (!client) {
     const fallback = buildSbarFallback(question, establishedUrgency, "provider_not_configured");
     appendOperationalLog({
@@ -3453,6 +3516,7 @@ module.exports = {
   validateUrgencyConsistency,
   validatePriorityMapReliability,
   buildPriorityMapFallback,
+  buildReassessmentPriorityMap,
   resolvePriorityMap,
   runPriorityMapWithBudget,
   sanitizeSbarText,

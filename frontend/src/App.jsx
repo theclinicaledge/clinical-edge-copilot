@@ -3,6 +3,8 @@ import { trackEvent } from "./analytics";
 import ModuleHeader from "./components/ModuleHeader.jsx";
 import PatientSnapshot, { SubmittedSnapshotSummary } from "./components/PatientSnapshot.jsx";
 import PriorityMap from "./components/PriorityMap.jsx";
+import Reassessment, { ReassessmentEvidence } from "./components/Reassessment.jsx";
+import { serializePatientSnapshot } from "./components/patientSnapshotModel.js";
 import { parsePriorities } from "./components/priorityMapModel";
 
 // ─── API Config ───────────────────────────────────────────────────────────────
@@ -423,7 +425,9 @@ Heart rate can rise when the body is compensating for pain, reduced circulating 
 
 // ─── Main App ──────────────────────────────────────────────────────────────────
 
-export default function App({ onGoHome, navigate, isOnline = true }) {
+export default function App({ onGoHome, navigate, isOnline = true, initialCaptureMode = "manual", isVisible = true, onScenarioActivity }) {
+  const [draftActive, setDraftActive] = useState(false);
+  const [entryCaptureMode] = useState(initialCaptureMode);
   const [prefillNotes] = useState(() => {
     if (_ssParam === "response") return "";
     try {
@@ -460,6 +464,10 @@ export default function App({ onGoHome, navigate, isOnline = true }) {
   const [submittedSnapshot, setSubmittedSnapshot] = useState(null);
   const [editableSnapshot, setEditableSnapshot] = useState(null);
   const [captureKey, setCaptureKey] = useState(0);
+  const [reassessing, setReassessing] = useState(false);
+  const [reassessment, setReassessment] = useState(null);
+  const [originalSnapshot, setOriginalSnapshot] = useState(null);
+  useEffect(() => { onScenarioActivity?.(draftActive || !!submittedSnapshot || !!result); }, [draftActive, submittedSnapshot, result, onScenarioActivity]);
 
   const outputRef             = useRef(null);
   const workspaceTopRef       = useRef(null);
@@ -470,6 +478,7 @@ export default function App({ onGoHome, navigate, isOnline = true }) {
   const accumulatedRef        = useRef("");
   const isActiveRef           = useRef(false);
   const runQueryRef           = useRef(null);
+  const lastRunOptionsRef     = useRef({});
   const teachMeRequestRef     = useRef(null);
 
   // Track module open — fires once on mount
@@ -507,7 +516,7 @@ export default function App({ onGoHome, navigate, isOnline = true }) {
               // Clear the suppression flag before retrying so any genuine error
               // in the new request is shown normally.
               wasRecentlyHiddenRef.current = false;
-              runQueryRef.current(q);
+              runQueryRef.current(q, lastRunOptionsRef.current);
             }
           }, 2500);
         } else {
@@ -524,7 +533,8 @@ export default function App({ onGoHome, navigate, isOnline = true }) {
   // Core query runner — accepts an explicit query string so chips and
   // follow-ups can call it directly without going through question state.
   // AbortController lets the visibility handler cancel and restart cleanly.
-  const runQuery = async (q, { isFollowUp = false } = {}) => {
+  const runQuery = async (q, { isFollowUp = false, reassessmentRequest = false } = {}) => {
+    lastRunOptionsRef.current = { isFollowUp, reassessmentRequest };
     if (!q.trim()) return;
     if (isActiveRef.current) return;
     if (!isOnline) {
@@ -570,7 +580,7 @@ export default function App({ onGoHome, navigate, isOnline = true }) {
       const res = await fetch(`${API_BASE}/api/copilot`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ question: q, mode, ...(isFollowUp ? { isFollowUp: true } : {}) }),
+        body: JSON.stringify({ question: q, mode, ...(isFollowUp ? { isFollowUp: true } : {}), ...(reassessmentRequest ? { reassessmentRequest: true } : {}) }),
         signal: controller.signal,
       });
 
@@ -678,12 +688,18 @@ export default function App({ onGoHome, navigate, isOnline = true }) {
   runQueryRef.current = runQuery;
 
   const handleSnapshotBuild = (serializedSnapshot, snapshot) => {
+    setOriginalSnapshot(snapshot);
+    setReassessment(null);
+    setReassessing(false);
     setSubmittedSnapshot({ serializedSnapshot, snapshot });
     setEditableSnapshot(null);
     runQuery(serializedSnapshot);
   };
 
   const resetResultState = useCallback(() => {
+    setReassessment(null);
+    setReassessing(false);
+    setOriginalSnapshot(null);
     setQuestion("");
     setResult(null);
     setFollowUpResult(null);
@@ -768,7 +784,7 @@ export default function App({ onGoHome, navigate, isOnline = true }) {
       const res = await fetch(`${API_BASE}/api/sbar`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ question, copilotResponse: rawText }),
+        body: JSON.stringify({ question, copilotResponse: rawText, ...(reassessment ? { reassessmentRequest: true, previousAssessment: serializePatientSnapshot(reassessment.previous) } : {}) }),
       });
       const data = await res.json();
       if (!res.ok || data.error) {
@@ -784,7 +800,7 @@ export default function App({ onGoHome, navigate, isOnline = true }) {
     } finally {
       setSbarLoading(false);
     }
-  }, [rawText, question]);
+  }, [rawText, question, reassessment]);
 
   const handleTeachMe = useCallback(async () => {
     if (!rawText || !question) throw new Error("Priority Map context is unavailable.");
@@ -797,6 +813,7 @@ export default function App({ onGoHome, navigate, isOnline = true }) {
           question,
           mode,
           learningRequest: true,
+          ...(reassessment ? { reassessmentRequest: true } : {}),
           priorityMapResponse: rawText,
         }),
       });
@@ -813,7 +830,7 @@ export default function App({ onGoHome, navigate, isOnline = true }) {
     } finally {
       if (teachMeRequestRef.current === request) teachMeRequestRef.current = null;
     }
-  }, [rawText, question, mode]);
+  }, [rawText, question, mode, reassessment]);
 
   const handleCopySbar = useCallback((sbarData) => {
     const text = [
@@ -836,15 +853,19 @@ export default function App({ onGoHome, navigate, isOnline = true }) {
 
   const isActive = loading || streaming;
   const initialProcessing = isActive && !followUpActive;
-  const workspaceState = initialProcessing ? "process" : result ? "priority-map" : "capture";
+  const workspaceState = reassessing ? "reassess" : initialProcessing ? "process" : result ? "priority-map" : reassessment ? "reassessment-error" : "capture";
+  const previousStage = useRef(workspaceState);
 
   useEffect(() => {
-    if (workspaceState === "capture" || !submittedSnapshot) return;
+    const changed = previousStage.current !== workspaceState;
+    previousStage.current = workspaceState;
+    if (!changed) return;
+    if (!isVisible || workspaceState === "capture" || !submittedSnapshot) return;
     const frame = requestAnimationFrame(() => {
       workspaceTopRef.current?.scrollIntoView({ behavior: "smooth", block: "start" });
     });
     return () => cancelAnimationFrame(frame);
-  }, [workspaceState, submittedSnapshot]);
+  }, [workspaceState, submittedSnapshot, isVisible]);
 
   return (
     <div style={{
@@ -1550,7 +1571,7 @@ export default function App({ onGoHome, navigate, isOnline = true }) {
         }
       `}</style>
 
-      <ModuleHeader moduleName="Copilot" onGoHome={onGoHome} maxWidth="800px" />
+      <ModuleHeader moduleName="Shift Brain" onGoHome={onGoHome} maxWidth="800px" />
 
       {/* ── Warm clinical workspace ──────────────────────────────────────── */}
       <div className="ce-page-enter" style={{ background: "var(--ce-warm-bg)", minHeight: "100vh" }}>
@@ -1565,9 +1586,11 @@ export default function App({ onGoHome, navigate, isOnline = true }) {
           key={captureKey}
           initialNotes={prefillNotes}
           initialSnapshot={editableSnapshot}
+          initialCaptureMode={entryCaptureMode}
           disabled={isActive}
           isOnline={isOnline}
           onBuild={handleSnapshotBuild}
+          onDraftActivity={setDraftActive}
         />
 
         {/* Offline notice — shown only when network is unavailable */}
@@ -1677,7 +1700,7 @@ export default function App({ onGoHome, navigate, isOnline = true }) {
           </aside>
         </div>
 
-        {workspaceState !== "capture" && submittedSnapshot && (
+        {workspaceState !== "capture" && submittedSnapshot && !reassessing && !reassessment && (
           <div ref={workspaceTopRef} className="copilot-workspace-stage ce-section-enter">
             <SubmittedSnapshotSummary
               snapshot={submittedSnapshot.snapshot}
@@ -1719,14 +1742,29 @@ export default function App({ onGoHome, navigate, isOnline = true }) {
           </div>
         )}
 
+        {reassessing && submittedSnapshot?.snapshot && <div ref={workspaceTopRef} className="copilot-workspace-stage"><Reassessment previous={submittedSnapshot.snapshot} disabled={isActive || sbarLoading} onCancel={() => setReassessing(false)} onConfirm={(assessment) => {
+          setReassessment(assessment);
+          setReassessing(false);
+          setSubmittedSnapshot({ snapshot: assessment.snapshot, serializedSnapshot: assessment.serializedSnapshot });
+          runQuery(assessment.serializedSnapshot, { reassessmentRequest: true });
+        }} /></div>}
+        {!reassessing && reassessment && <div ref={workspaceTopRef} className="copilot-workspace-stage"><ReassessmentEvidence assessment={reassessment} original={originalSnapshot} /></div>}
+        {reassessment && error && <button type="button" onClick={() => setReassessing(true)}>Edit reassessment</button>}
+
         {/* Final structured result */}
-        {result && (!streaming || followUpActive) && (
+        {!reassessing && result && (!streaming || followUpActive) && (
           <div ref={outputRef} className="copilot-result-shell copilot-workspace-stage ce-section-enter">
             <nav className="copilot-result-nav" aria-label="Snapshot actions">
               {submittedSnapshot?.snapshot && <button type="button" onClick={handleEditSnapshot}>Edit Snapshot</button>}
               <button type="button" onClick={handleNewSnapshot}>New Snapshot</button>
+              {submittedSnapshot?.snapshot && <button type="button" disabled={isActive || sbarLoading} onClick={() => setReassessing(true)}>Reassess</button>}
             </nav>
-            <PriorityMap result={result} onRequestTeachMe={handleTeachMe} />
+            {reassessment && <p className="ce-reassessment-boundary">Current Priority Map · deterministic reassessment support. No new AI generation.</p>}
+            <PriorityMap key={reassessment ? reassessment.serializedSnapshot : 'initial'} result={result} onRequestTeachMe={handleTeachMe} />
+            {submittedSnapshot?.snapshot && navigate && <nav className="ce-related-checks" aria-label="Related checks">
+              {(submittedSnapshot.snapshot.optional?.drips?.items || reassessment?.previous.optional?.drips?.items)?.some((item) => item.medication?.trim()) && <a href="/icu-drips" onClick={(e) => { if (e.metaKey || e.ctrlKey || e.shiftKey || e.altKey) return; e.preventDefault(); navigate('/icu-drips'); }}>Check medication &#8594;</a>}
+              {submittedSnapshot.snapshot.values?.rhythm?.trim() && <a href="/rhythm-lab/library" onClick={(e) => { if (e.metaKey || e.ctrlKey || e.shiftKey || e.altKey) return; e.preventDefault(); navigate('/rhythm-lab/library'); }}>Check rhythm &#8594;</a>}
+            </nav>}
 
             {/* Action bar */}
             <div className="copilot-action-bar">

@@ -405,14 +405,14 @@ function findingsForSnapshot(snapshot) {
   return findings;
 }
 
-export default function PatientSnapshot({ initialNotes = "", initialSnapshot = null, disabled, isOnline, onBuild }) {
+export default function PatientSnapshot({ initialNotes = "", initialSnapshot = null, initialCaptureMode = "manual", disabled, isOnline, onBuild, onDraftActivity }) {
   const restoredFindings = findingsForSnapshot(initialSnapshot);
   const [snapshot, setSnapshot] = useState(() => createInitialSnapshot(initialSnapshot, initialNotes));
   const [openSections, setOpenSections] = useState(restoredFindings);
   const [addedFindings, setAddedFindings] = useState(restoredFindings);
   const [findingSheetOpen, setFindingSheetOpen] = useState(false);
   const [findingSearch, setFindingSearch] = useState("");
-  const [captureMode, setCaptureMode] = useState("manual");
+  const [captureMode, setCaptureMode] = useState(initialSnapshot ? "manual" : initialCaptureMode);
   const [narrative, setNarrative] = useState("");
   const [extraction, setExtraction] = useState(null);
   const [rapidStage, setRapidStage] = useState("entry");
@@ -426,6 +426,7 @@ export default function PatientSnapshot({ initialNotes = "", initialSnapshot = n
     + Object.values(snapshot.optional).reduce((sum, section) => sum + countStructuredDetails(section), 0)
     + (snapshot.notes.trim() ? 1 : 0), [snapshot]);
   const rapidConfirmed = !extraction || rapidStage === "confirmed";
+  useEffect(() => { onDraftActivity?.(populatedCount > 0 || narrative.trim().length > 0); }, [populatedCount, narrative, onDraftActivity]);
   const canBuild = populatedCount > 0 && !disabled && isOnline && rapidConfirmed;
   const highRisk = useMemo(() => {
     const systolic = Number.parseFloat((snapshot.values.bpNow || "").split("/")[0]);

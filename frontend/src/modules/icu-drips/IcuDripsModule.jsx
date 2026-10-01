@@ -1156,6 +1156,34 @@ function DripsHome({ onSelect, onShowCompare, onShowPractice, onShowChallenge, o
         </div>
       )}
 
+
+      {/* Search + filter */}
+      <div className="id-search-bar">
+        <input
+          className="id-search-input"
+          type="search"
+          placeholder="Search drips"
+          value={query}
+          onChange={e => setQuery(e.target.value)}
+          autoComplete="off"
+          spellCheck={false}
+          aria-label="Search drips"
+        />
+        <div className="id-filters">
+          {CATEGORIES.map(cat => (
+            <button
+              key={cat.key}
+              className={`id-filter-btn${category === cat.key ? ' active' : ''}`}
+              onClick={() => { if (cat.key !== 'all') trackEvent('drip_category_filter_used', { category: cat.key }); setCategory(cat.key); }}
+            >
+              {cat.label}
+            </button>
+          ))}
+        </div>
+      </div>
+
+      <details className="ce-lookup-extras">
+        <summary>Practice, compare &amp; clinical pearls</summary>
       {/* Today's Clinical Pearl */}
       {ICU_PEARLS[0] && (
         <button
@@ -1194,30 +1222,7 @@ function DripsHome({ onSelect, onShowCompare, onShowPractice, onShowChallenge, o
         </button>
       </div>
 
-      {/* Search + filter */}
-      <div className="id-search-bar">
-        <input
-          className="id-search-input"
-          type="search"
-          placeholder="Search drips"
-          value={query}
-          onChange={e => setQuery(e.target.value)}
-          autoComplete="off"
-          spellCheck={false}
-          aria-label="Search drips"
-        />
-        <div className="id-filters">
-          {CATEGORIES.map(cat => (
-            <button
-              key={cat.key}
-              className={`id-filter-btn${category === cat.key ? ' active' : ''}`}
-              onClick={() => { if (cat.key !== 'all') trackEvent('drip_category_filter_used', { category: cat.key }); setCategory(cat.key); }}
-            >
-              {cat.label}
-            </button>
-          ))}
-        </div>
-      </div>
+      </details>
 
       {/* Drip list */}
       {isFiltering ? (

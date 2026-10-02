@@ -5,6 +5,8 @@ const helmet = require("helmet");
 const rateLimit = require("express-rate-limit");
 const Anthropic = require("@anthropic-ai/sdk");
 const { randomUUID } = require("node:crypto");
+const { COMPACT_REASONING_PROMPT, buildEvidence, parseReasoning, validateReasoning, composePriorityMap, reasoningRepairDetails } = require("./priority-map-intelligence");
+const { hasAffirmativeCertainty, assertionClauses, assertionIsQualified } = require("./reasoning-grounding");
 const {
   ABBREVIATION_EXPANSIONS,
 } = require("./nurse-language-dataset");
@@ -49,11 +51,11 @@ const client = anthropicApiKey
   ? new Anthropic({ apiKey: anthropicApiKey, timeout: 45000, maxRetries: 0 })
   : null;
 
-const COPILOT_TOTAL_BUDGET_MS = 18000;
-const COPILOT_ORIGINAL_BUDGET_MS = 12000;
-const COPILOT_REPAIR_BUDGET_MS = 4000;
+const COPILOT_TOTAL_BUDGET_MS = 40000;
+const COPILOT_ORIGINAL_BUDGET_MS = 30000;
+const COPILOT_REPAIR_BUDGET_MS = 8000;
 const COPILOT_RETURN_RESERVE_MS = 1500;
-const COPILOT_MIN_REPAIR_BUDGET_MS = 2000;
+const COPILOT_MIN_REPAIR_BUDGET_MS = 4000;
 const TEACH_ME_PROVIDER_BUDGET_MS = 8000;
 const SBAR_PROVIDER_BUDGET_MS = 8000;
 
@@ -199,6 +201,49 @@ ${CLINICAL_RELIABILITY_CONTRACT}
 
 FOOTER (MANDATORY — always include as the final line):
 For educational support only. Use your clinical judgment and follow local protocol.`;
+
+const INITIAL_PRIORITY_MAP_PROMPT = `You are Clinical Edge, a bedside nursing reasoning partner. Work only from the user-reported Patient Snapshot. Support focused nursing assessment and communication, not diagnosis or treatment decisions.
+Begin with exactly Urgency Level: HIGH, MODERATE, or LOW. Calibrate to the combined findings and context, not an isolated measurement. HIGH requires present-tense prompt bedside evaluation and team awareness under local protocol, without prescribing treatment.
+Connect the supplied findings meaningfully. Name the supported physiologic concern, then distinguish plausible contributors by evidence that supports or weakens them and focused assessments that could discriminate them. Missing details limit certainty, not the usefulness of reasoning. Do not substitute generic 'reassess and follow protocol' statements for contextual reasoning. Use specific assessment questions, not invented assessment results.
+For sparse but meaningful input, one focused priority is enough. Uncertain onset, absent baseline, unknown medication exposure, and conflicting measurements remain explicit. A possible diagnosis may be discussed as a possibility, never established by assertion. Do not force every presentation into shock or deterioration language.
+Keep the complete response concise, aiming for 400–600 words. Choose the lower end of the bullet counts below, avoid duplicating facts across sections, and preserve all exact clinically relevant evidence. Do not add a preamble, internal reasoning transcript, or unnecessary filler.
+
+${SHIFT_BRAIN_RESPONSE_CONTRACT}`;
+
+function validatePriorityMapContract(output) {
+  const headers = ["Priorities", "Assess first", "Possible patterns", "Missing information", "Monitor and trend", "Escalation triggers", "SBAR-ready summary", "Teach me why"];
+  const text = String(output || "");
+  if (!/^Urgency Level: (HIGH|MODERATE|LOW)\b/.test(text.trim())) return ["invalid_priority_map_contract"];
+  let previous = -1;
+  for (const header of headers) {
+    const index = text.indexOf(`**${header}**`);
+    if (index <= previous) return ["invalid_priority_map_contract"];
+    const remainder = text.slice(index + header.length + 4);
+    const next = remainder.indexOf("\n**");
+    if (!(next < 0 ? remainder : remainder.slice(0, next)).trim()) return ["invalid_priority_map_contract"];
+    previous = index;
+  }
+  if (!/### 1 [·.-] .+/.test(text) || !/Observed:\s*\n- .+/.test(text) || !/Interpretation: .+/.test(text) || !/Assess now:\s*\n- .+/.test(text)) return ["invalid_priority_map_contract"];
+  return [];
+}
+
+// Consume provider text privately; only a complete validated result reaches SSE.
+async function collectPriorityMapStream(stream, now = Date.now, onMetadata = () => {}) {
+  const startedAt = now();
+  let text = "", firstTokenMs = null, stopReason = null;
+  let inputTokens = null, outputTokens = null;
+  for await (const chunk of stream) {
+    if (chunk.type === "message_start") inputTokens = chunk.message?.usage?.input_tokens ?? null;
+    if (chunk.type === "message_delta") outputTokens = chunk.usage?.output_tokens ?? outputTokens;
+    if (chunk.type === "content_block_delta" && chunk.delta?.type === "text_delta" && chunk.delta.text) {
+      if (firstTokenMs === null) firstTokenMs = now() - startedAt;
+      text += chunk.delta.text;
+    }
+    if (chunk.type === "message_delta") stopReason = chunk.delta?.stop_reason || stopReason;
+    onMetadata({ provider_first_token_ms: firstTokenMs, provider_stream_characters: text.length, provider_stop_reason: stopReason, provider_input_tokens: inputTokens, provider_output_tokens: outputTokens });
+  }
+  return { text, firstTokenMs, stopReason, inputTokens, outputTokens };
+}
 
 const TEACH_ME_DOMAINS = [
   "deterioration-recognition", "hemodynamics-perfusion", "respiratory-oxygenation",
@@ -575,9 +620,7 @@ function hasUnsupportedEstablishedTrendClaim(source, output, terms) {
 }
 
 function hasCertaintyOverstatement(output) {
-  return String(output).split(/(?<=[.!?])\s+|\n/).some((statement) =>
-    CERTAINTY_LANGUAGE.test(statement) && !/\b(not|isn't|is not|atypical|unlike|does not)\b/i.test(statement)
-  );
+  return hasAffirmativeCertainty(output);
 }
 
 function hasAcidBaseReliabilityViolation(source, output) {
@@ -629,11 +672,10 @@ function unsupportedClinicalNumericClaims(source, output) {
 }
 
 function hasUnsupportedDiagnosticCertainty(output) {
-  return String(output).split(/(?<=[.!?])\s+|\n/).some((statement) => {
-    const diagnosis = /\b(?:respiratory|ventilatory|hypercapnic|hypoxemic)\s+failure\b|\b(?:ischemic|hemorrhagic)\s+stroke\b|\bstroke\b|\bintracranial hemorrhage\b|\bpostictal state\b|\batrial fibrillation\b|\batrial flutter\b|\bsupraventricular tachycardia\b|\bventricular tachycardia\b|\b(?:SVT|VT)\b/i.test(statement);
-    if (!diagnosis) return false;
-    if (/\b(?:possible|possibly|may|might|could|concern(?:ing)? for|raises? concern for|risk of|progress(?:ing)? toward|if .* progresses|not established|does not establish|cannot determine|uncertain)\b/i.test(statement)) return false;
-    return true;
+  return assertionClauses(output).some((statement) => {
+    const diagnosis = /\b(?:respiratory|ventilatory|hypercapnic|hypoxemic)\s+failure\b|\b(?:ischemic|hemorrhagic)\s+stroke\b|\bstroke\b|\bintracranial hemorrhage\b|\bpostictal state\b|\batrial fibrillation\b|\batrial flutter\b|\bsupraventricular tachycardia\b|\bventricular tachycardia\b|\b(?:SVT|VT)\b/gi;
+    return [...statement.matchAll(diagnosis)].some(match => !assertionIsQualified(statement, match.index)
+      && !/\b(?:possible|possibly|may|might|could|concern(?:ing)? for|raises? concern for|risk of|progress(?:ing)? toward|if .* progresses|not established|does not establish|cannot determine|uncertain)\b/i.test(statement));
   });
 }
 
@@ -782,6 +824,7 @@ function assessDeterministicUrgency(source) {
   addSignal(perfusion.convergingSystemicPerfusion ? "converging_perfusion_trends" : "converging_bedside_perfusion_findings", perfusionConvergence);
   addSignal("rhythm_hemodynamic_intolerance", rhythmHemodynamics.convergingHemodynamicIntolerance);
   addSignal("converging_focal_neurologic_deterioration", neurologic.convergingFocalDeterioration);
+  addSignal("reported_altered_mentation", neurologic.mentalStatusChange && !mentalStatusDeterioration && !neurologic.convergingFocalDeterioration);
 
   const respiratoryBedsideConvergence = (mentalStatusDeterioration && increasedWorkOfBreathing)
     || (mentalStatusDeterioration && oxygenSupportChange)
@@ -851,20 +894,17 @@ function buildPriorityMapFallback(source, unsafeOutput = "") {
   const rhythmHemodynamics = assessRhythmHemodynamicPattern(source);
   const respiratoryAcidemia = /\bPaCO2\b/i.test(source) && /\bpH\b/i.test(source)
     && /\b(?:breath|respiratory|ventilat|oxygen)\b/i.test(source);
-  const reported = String(source).split("\n")
-    .filter((line) => /^-\s+/.test(line))
-    .map((line) => line.replace(/^[-*]\s*/, ""));
+  const reported = buildEvidence(source, urgency).evidence.map(item => item.text);
   const observations = reported.length ? reported : ["A clinical change was reported; the available details remain limited"];
   if (neurologic.convergingFocalDeterioration) {
     const temporalSummary = temporalGroundingSummary(source);
-    const neurologicObservations = neurologic.observations.map((item) => item[0].toUpperCase() + item.slice(1));
     return `Urgency Level: ${urgency}
 
 **Priorities**
 ### 1 · Acute focal neurologic deterioration
 Relevance: High priority
 Observed:
-${neurologicObservations.map((line) => `- ${line}`).join("\n")}
+${observations.map((line) => `- ${line}`).join("\n")}
 Interpretation: The combination supports an acute focal neurologic deterioration pattern that is time-sensitive, while the underlying etiology is not established.
 Assess now:
 - Current focal motor, facial, speech and language, mental-status, and level-of-consciousness findings compared with the reported baseline
@@ -1143,30 +1183,32 @@ For educational support only. Use your clinical judgment and follow local protoc
     ].join("\n");
   }
 
+  const genericEvidence = buildEvidence(source, urgency);
+  const hasEarlierComparison = genericEvidence.evidence.some(item => item.kind === "comparison");
   return `Urgency Level: ${urgency}
 
 **Priorities**
-### 1 · Reported clinical deterioration
+### 1 · Reported findings requiring assessment
 Relevance: ${urgency === "HIGH" ? "High priority" : "Important"}
 Observed:
-${observations.map((line) => `- ${line}`).join("\n")}
-Interpretation: The reported changes raise concern for clinical deterioration, while the cause and contribution of individual findings remain uncertain.
+${genericEvidence.evidence.map((item) => `- ${item.text}`).join("\n") || observations.map((line) => `- ${line}`).join("\n")}
+Interpretation: ${hasEarlierComparison ? "The supplied comparisons require focused assessment" : "The reported current findings require assessment; no earlier comparison is established"}, while the cause and contribution of individual findings remain uncertain.
 Assess now:
-- Current respiratory effort, mental status, oxygen support, circulation, and change from the reported baseline
+- Current respiratory effort, mental status, oxygen support, circulation, and clarification of baseline status
 
 **Assess first**
-- Focused bedside reassessment of the reported changes and their current trajectory
-- Whether mental status, work of breathing, oxygen needs, or circulation are worsening
+- Focused bedside assessment of the reported findings and missing context
+- Current mental status, work of breathing, oxygen needs, and circulation
 
 **Possible patterns**
-- The combined changes may reflect worsening physiologic function, but the supplied information does not establish a diagnosis or cause
+- The combined findings may have multiple contributors; the supplied information does not establish a diagnosis or cause
 
 **Missing information**
 - Baseline status, relevant medication or sedation exposure, and other clinical context that could clarify contributors
 - Current focused neurologic, respiratory, and metabolic assessment findings
 
 **Monitor and trend**
-- Compare the explicitly reported previous and current measurements with subsequent reassessment
+- ${hasEarlierComparison ? "Compare the explicitly supplied earlier and current measurements with subsequent reassessment" : "Establish subsequent comparisons; current-only and interval findings do not establish a prior direction"}
 - Worsening mental status, respiratory effort, oxygen requirement, or circulation would increase concern
 
 **Escalation triggers**
@@ -1177,17 +1219,17 @@ ${urgency === "HIGH"
       : "- New or worsening changes should prompt reassessment and communication under local protocol"}
 
 **SBAR-ready summary**
-The patient has reported changes from earlier, including the measurements and bedside findings listed above. The overall trajectory requires reassessment, but the cause remains uncertain. ${urgency === "HIGH" ? "Prompt bedside evaluation and communication" : "Bedside reassessment and communication"} should follow the clinical context and institutional protocol.
+The reported ${hasEarlierComparison ? "comparisons and findings" : "current findings"} are listed above. ${hasEarlierComparison ? "Only explicitly supplied comparisons establish direction." : "No earlier comparison is established."} The cause remains uncertain. ${urgency === "HIGH" ? "Prompt bedside evaluation and communication" : "Bedside assessment and communication"} should follow the clinical context and institutional protocol.
 
 **Teach me why**
-Trends across multiple observations can identify deterioration without establishing a diagnosis or proving that one finding caused another.
+Multiple observations provide context without establishing a diagnosis or proving that one finding caused another. Only explicit comparisons establish a trend.
 
 For educational support only. Use your clinical judgment and follow local protocol.`;
 }
 
 function buildReassessmentPriorityMap(source) {
   const existing = buildPriorityMapFallback(source);
-  if (!existing.includes("### 1 · Reported clinical deterioration")) return existing;
+  if (!existing.includes("### 1 · Reported findings requiring assessment")) return existing;
   const { urgency } = assessDeterministicUrgency(source);
   return `Urgency Level: ${urgency}
 
@@ -1253,6 +1295,7 @@ async function runPriorityMapWithBudget({
   repairBudgetMs = COPILOT_REPAIR_BUDGET_MS,
   returnReserveMs = COPILOT_RETURN_RESERVE_MS,
   minRepairBudgetMs = COPILOT_MIN_REPAIR_BUDGET_MS,
+  validateOutput = (source, output) => [...validatePriorityMapContract(output), ...validatePriorityMapReliability(source, output)],
   signal,
 }) {
   const startedAt = now();
@@ -1265,16 +1308,35 @@ async function runPriorityMapWithBudget({
     repair_status: "not_attempted",
     repair_duration_ms: 0,
     timeout_layer: null,
+    provider_first_token_ms: null,
+    provider_stream_characters: 0,
+    provider_stop_reason: null,
   };
 
   let originalOutput = "";
+  let originalComplete = true;
   const providerStartedAt = now();
   timing.provider_status = "started";
   try {
-    originalOutput = await runWithStageTimeout(generateOriginal, originalBudgetMs, "provider_timeout", signal);
+    const remaining = totalBudgetMs - (now() - startedAt) - returnReserveMs;
+    if (remaining <= 0) throw stageTimeoutError("provider_timeout");
+    const original = await runWithStageTimeout(generateOriginal, Math.min(originalBudgetMs, remaining), "provider_timeout", signal);
+    originalOutput = typeof original === "string" ? original : original.text;
+    if (typeof original !== "string") {
+      timing.provider_first_token_ms = original.firstTokenMs;
+      timing.provider_stream_characters = original.text.length;
+      timing.provider_stop_reason = original.stopReason;
+      timing.provider_input_tokens = original.inputTokens ?? null;
+      timing.provider_output_tokens = original.outputTokens ?? null;
+      originalComplete = original.stopReason === "end_turn";
+    }
     timing.provider_status = "success";
   } catch (error) {
-    if (error?.code !== "provider_timeout" && error?.code !== "client_disconnect") throw error;
+    if (error?.code !== "provider_timeout" && error?.code !== "client_disconnect") {
+      timing.provider_status = "error";
+      timing.provider_duration_ms = now() - providerStartedAt;
+      return { output: buildPriorityMapFallback(source), status: "fallback", issues: [classifyProviderError(error).code], repairIssues: null, timing };
+    }
     timing.provider_status = error?.code === "provider_timeout" ? "timeout" : "error";
     timing.timeout_layer = error?.code === "provider_timeout" ? "provider" : error?.code;
     timing.provider_duration_ms = now() - providerStartedAt;
@@ -1283,9 +1345,14 @@ async function runPriorityMapWithBudget({
   timing.provider_duration_ms = now() - providerStartedAt;
 
   const validationStartedAt = now();
-  const issues = validatePriorityMapReliability(source, originalOutput);
+  const issues = validateOutput(source, originalOutput);
+  if (!originalComplete) issues.push("incomplete_provider_response");
   timing.validation_duration_ms = now() - validationStartedAt;
   timing.validation_status = issues.length ? "rejected" : "accepted";
+  if (now() - startedAt >= totalBudgetMs - returnReserveMs) {
+    timing.timeout_layer = "total_budget";
+    return { output: buildPriorityMapFallback(source), status: "fallback", issues: [...issues, "total_budget"], repairIssues: null, timing };
+  }
   if (!issues.length) return { output: originalOutput, status: "validated", issues, repairIssues: null, timing };
 
   const remainingForRepair = totalBudgetMs - (now() - startedAt) - returnReserveMs;
@@ -1306,10 +1373,18 @@ async function runPriorityMapWithBudget({
     );
     timing.repair_duration_ms = now() - repairStartedAt;
     const repairValidationStartedAt = now();
-    const repairIssues = validatePriorityMapReliability(source, repaired);
+    const repairedOutput = typeof repaired === "string" ? repaired : repaired.text;
+    const repairIssues = validateOutput(source, repairedOutput);
+    timing.repair_input_tokens = repaired.inputTokens ?? null;
+    timing.repair_output_tokens = repaired.outputTokens ?? null;
+    if (typeof repaired !== "string" && repaired.stopReason !== "end_turn") repairIssues.push("incomplete_provider_response");
     timing.validation_duration_ms += now() - repairValidationStartedAt;
     timing.repair_status = repairIssues.length ? "rejected" : "accepted";
-    if (!repairIssues.length) return { output: repaired, status: "repaired", issues, repairIssues: [], timing };
+    if (now() - startedAt >= totalBudgetMs - returnReserveMs) {
+      timing.timeout_layer = "total_budget";
+      return { output: buildPriorityMapFallback(source), status: "fallback", issues, repairIssues: [...repairIssues, "total_budget"], timing };
+    }
+    if (!repairIssues.length) return { output: repairedOutput, status: "repaired", issues, repairIssues: [], timing };
     return { output: buildPriorityMapFallback(source, originalOutput), status: "fallback", issues, repairIssues, timing };
   } catch (error) {
     timing.repair_duration_ms = now() - repairStartedAt;
@@ -2847,6 +2922,8 @@ function buildOperationalLogEntry(fields) {
     "provider_duration_ms", "provider_status", "validation_duration_ms", "validation_status",
     "repair_attempted", "repair_status", "repair_duration_ms", "timeout_layer", "client_disconnected",
     "endpoint", "display_resolution", "rejection_reason_codes",
+    "provider_first_token_ms", "provider_stream_characters", "provider_stop_reason",
+    "provider_input_tokens", "provider_output_tokens", "repair_input_tokens", "repair_output_tokens",
   ];
   return Object.fromEntries(
     allowed
@@ -3032,12 +3109,14 @@ app.post("/api/copilot", apiLimiter, async (req, res) => {
 
   const FOLLOW_UP_PREFIX = `CONTINUATION: The nurse is following up on a case they already submitted. Their input contains the original scenario and a new update. Your job is to respond to what changed — not restate or re-analyze the original scenario from scratch. Focus on what the update means in context and what matters most now. Describe concern as rising or falling only when the original scenario plus update supply enough temporal evidence for that specific variable. Never convert a single new measurement into a trend. Preserve all uncertainty and evidence boundaries from the Clinical Reliability contract. Do not repeat what was already covered unless it directly clarifies the new picture. Stay concise.\n\n`;
 
-  let selectedPrompt = detectPrompt(question.trim(), mode);
+  const structuredSnapshot = question.trim().startsWith("PATIENT SNAPSHOT — USER-REPORTED / OBSERVED INFORMATION");
+  let selectedPrompt = structuredSnapshot && !isFollowUp ? INITIAL_PRIORITY_MAP_PROMPT : detectPrompt(question.trim(), mode);
   if (isFollowUp === true) selectedPrompt = FOLLOW_UP_PREFIX + selectedPrompt;
   selectedPrompt += `\n\nFINAL SOURCE-GROUNDING AUDIT BEFORE OUTPUT: Review every numeric comparison used as a trigger, cutoff, target, or escalation criterion. If that number was not explicitly labeled in the user's input as an ordered goal, alarm, target, or protocol criterion, remove the cutoff and describe the supported trajectory, persistence, combined abnormalities, or worsening clinical state instead. Keep all user-supplied measurements and trends.`;
 
   // ── promptName must be derived before any prompt mutation ──────────────────
   const promptName =
+    selectedPrompt.includes(INITIAL_PRIORITY_MAP_PROMPT) ? "INITIAL_PRIORITY_MAP" :
     selectedPrompt.includes(DEEP_SYSTEM_PROMPT)  ? "DEEP_SYSTEM_PROMPT"  :
     selectedPrompt.includes(QUICK_SYSTEM_PROMPT) ? "QUICK_SYSTEM_PROMPT" :
     selectedPrompt.includes(EXAM_SYSTEM_PROMPT)  ? "EXAM_SYSTEM_PROMPT"  :
@@ -3083,17 +3162,25 @@ app.post("/api/copilot", apiLimiter, async (req, res) => {
   let priorityMapOriginalStatus = null;
   let priorityMapRepairStatus = null;
   let priorityMapTiming = null;
-  const structuredSnapshot = question.trim().startsWith("PATIENT SNAPSHOT — USER-REPORTED / OBSERVED INFORMATION");
+  let priorityMapRejectionCodes = [];
+  let providerStreamMetadata = {};
+  const compactInitial = structuredSnapshot && !isFollowUp;
+  const evidence = compactInitial ? buildEvidence(question.trim(), assessDeterministicUrgency(question.trim()).urgency) : null;
 
   // Runs one full Anthropic stream, appending chunks to fullResponse and
   // writing each chunk to the SSE stream as it arrives.
   const callStream = async (signal) => {
     const stream = await client.messages.stream({
       model: "claude-sonnet-4-6",
-      max_tokens: 2200,
-      system: selectedPrompt,
-      messages: [{ role: "user", content: question.trim() }],
+      max_tokens: compactInitial ? 900 : 2200,
+      system: compactInitial ? COMPACT_REASONING_PROMPT : selectedPrompt,
+      messages: [{ role: "user", content: compactInitial ? JSON.stringify(evidence) : question.trim() }],
     }, { signal });
+    if (structuredSnapshot) {
+      const original = await collectPriorityMapStream(stream, Date.now, (metadata) => { providerStreamMetadata = metadata; });
+      fullResponse = original.text;
+      return original;
+    }
     for await (const chunk of stream) {
       if (
         chunk.type === "content_block_delta" &&
@@ -3120,30 +3207,44 @@ app.post("/api/copilot", apiLimiter, async (req, res) => {
       res.write(`data: ${JSON.stringify({ text: CRASH_FALLBACK_TEXT })}\n\n`);
       console.log("[CRASH-FALLBACK] Returned structured response — skipped streaming.");
     } else if (structuredSnapshot) {
-      res.write(`data: ${JSON.stringify({ progress: "checking" })}\n\n`);
       const resolved = await runPriorityMapWithBudget({
         source: question.trim(),
+        totalBudgetMs: Math.max(0, COPILOT_TOTAL_BUDGET_MS - (Date.now() - requestStartedAt)),
+        ...(compactInitial ? {
+          totalBudgetMs: Math.max(0, 23000 - (Date.now() - requestStartedAt)),
+          originalBudgetMs: 15000,
+          repairBudgetMs: 5000,
+          minRepairBudgetMs: 2500,
+          validateOutput: (source, raw) => {
+            const issues = validateReasoning(source, raw, evidence, validatePriorityMapReliability);
+            if (issues.length) return issues;
+            const composed = composePriorityMap(evidence, parseReasoning(raw));
+            return [...validatePriorityMapContract(composed), ...validatePriorityMapReliability(source, composed)];
+          },
+        } : {}),
         generateOriginal: async (signal) => {
-          await callStream(signal);
-          return fullResponse;
+          const original = await callStream(signal);
+          if (!clientDisconnected) res.write(`data: ${JSON.stringify({ progress: "checking" })}\n\n`);
+          return original;
         },
         repair: async (issues, signal) => {
-          const repairMessage = await client.messages.create({
+          const repairStream = client.messages.stream({
             model: "claude-sonnet-4-6",
-            max_tokens: 2200,
-            system: `${selectedPrompt}\n\nPRIORITY MAP REPAIR: Rewrite the draft so it satisfies the full response and clinical reliability contracts. Correct only the validator issues supplied by the application. Preserve the user's exact reported facts, urgency, and section structure. Do not add new numbers, thresholds, timelines, diagnoses, or causal claims. Return only the complete repaired Priority Map.`,
-            messages: [{ role: "user", content: `Patient Snapshot:\n${question.trim()}\n\nValidator issue codes: ${issues.join(", ")}\n\nDraft to repair:\n${fullResponse}` }],
+            max_tokens: compactInitial ? 900 : 2200,
+            system: compactInitial ? `${COMPACT_REASONING_PROMPT}\nCorrect the supplied issue codes. Return only corrected JSON.` : `${selectedPrompt}\n\nPRIORITY MAP REPAIR: Rewrite the draft so it satisfies the full response and clinical reliability contracts. Correct only the validator issues supplied by the application. Preserve the user's exact reported facts, urgency, and section structure. Do not add new numbers, thresholds, timelines, diagnoses, or causal claims. Return only the complete repaired Priority Map.`,
+            messages: [{ role: "user", content: compactInitial ? JSON.stringify({ evidence, ...reasoningRepairDetails(fullResponse, issues, evidence), draft: fullResponse }) : `Patient Snapshot:\n${question.trim()}\n\nValidator issue codes: ${issues.join(", ")}\n\nDraft to repair:\n${fullResponse}` }],
           }, { signal });
-          return repairMessage.content.find((block) => block.type === "text")?.text || "";
+          return collectPriorityMapStream(repairStream);
         },
         signal: disconnectController.signal,
       });
-      fullResponse = resolved.output;
+      fullResponse = compactInitial && resolved.status !== "fallback" ? composePriorityMap(evidence, parseReasoning(resolved.output)) : resolved.output;
       fallbackUsed = resolved.status === "fallback";
       priorityMapResolution = resolved.status;
       priorityMapOriginalStatus = resolved.issues.length ? "rejected" : "accepted";
       priorityMapRepairStatus = resolved.timing.repair_status;
       priorityMapTiming = resolved.timing;
+      priorityMapRejectionCodes = [...resolved.issues, ...(resolved.repairIssues || [])];
       if (!clientDisconnected) res.write(`data: ${JSON.stringify({ progress: "finalizing" })}\n\n`);
     } else {
       // ── First attempt ───────────────────────────────────────────────────
@@ -3241,6 +3342,10 @@ app.post("/api/copilot", apiLimiter, async (req, res) => {
       repair_status: priorityMapTiming?.repair_status,
       repair_duration_ms: priorityMapTiming?.repair_duration_ms,
       timeout_layer: priorityMapTiming?.timeout_layer,
+      repair_input_tokens: priorityMapTiming?.repair_input_tokens,
+      repair_output_tokens: priorityMapTiming?.repair_output_tokens,
+      rejection_reason_codes: priorityMapRejectionCodes,
+      ...providerStreamMetadata,
       client_disconnected: clientDisconnected,
       possible_failure,
       failure_reason,
@@ -3519,6 +3624,13 @@ module.exports = {
   buildReassessmentPriorityMap,
   resolvePriorityMap,
   runPriorityMapWithBudget,
+  collectPriorityMapStream,
+  validatePriorityMapContract,
+  INITIAL_PRIORITY_MAP_PROMPT,
+  COPILOT_TOTAL_BUDGET_MS,
+  COPILOT_ORIGINAL_BUDGET_MS,
+  COPILOT_REPAIR_BUDGET_MS,
+  COPILOT_RETURN_RESERVE_MS,
   sanitizeSbarText,
   groundSbarTemporalFidelity,
   validateSbarReliability,

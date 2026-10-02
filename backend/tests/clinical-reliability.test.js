@@ -606,10 +606,10 @@ test("converging focal neurologic deterioration is HIGH without diagnosing etiol
   const fallback = buildPriorityMapFallback(NEUROLOGIC_SOURCE);
   assert.match(fallback, /^Urgency Level: HIGH/m);
   assert.match(fallback, /Acute focal neurologic deterioration/);
-  assert.match(fallback, /new focal or unilateral motor weakness/i);
-  assert.match(fallback, /new facial asymmetry/i);
-  assert.match(fallback, /new speech or language change/i);
-  assert.match(fallback, /new confusion or mental-status change/i);
+  // Evidence must retain the actual reported text rather than paraphrased labels.
+  for (const line of NEUROLOGIC_SOURCE.split("\n").filter(line => /^-\s/.test(line))) {
+    assert.ok(fallback.includes(line));
+  }
   assert.match(fallback, /etiology is not established/i);
   assert.match(fallback, /supports prompt team awareness and bedside evaluation/i);
   assert.doesNotMatch(fallback, /Urgency Level: MODERATE|diagnostic of|confirmed stroke|give aspirin|administer thrombolytic/i);

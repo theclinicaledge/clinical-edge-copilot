@@ -21,7 +21,7 @@ export function parsePriorities(content) {
       rank: Number(match[1]) || index + 1,
       label: match[2].trim(),
       relevance,
-      observed: cleanLines(observedBlock).filter((line) => /^[-•*›]\s/.test(line)).map((line) => line.replace(/^[-•*›]\s+/, "")).slice(0, 3),
+      observed: cleanLines(observedBlock).filter((line) => /^[-•*›]\s/.test(line)).map((line) => line.replace(/^[-•*›]\s+/, "")),
       interpretation,
       assessNow: cleanLines(assessBlock).filter((line) => /^[-•*›]\s/.test(line)).map((line) => line.replace(/^[-•*›]\s+/, "")).slice(0, 3),
     };

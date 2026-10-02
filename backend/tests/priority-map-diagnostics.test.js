@@ -86,3 +86,26 @@ test('an observability failure cannot change the clinical result', async () => {
   assert.equal(result.output, raw);
   assert.ok(!JSON.stringify(result.timing).includes('private-content'));
 });
+
+for (const [raw, category] of [
+  ['{"synthesis":', 'invalid_json'],
+  ['[]', 'non_object_root'], ['null', 'non_object_root'], ['"private-string"', 'non_object_root'],
+  ['```json\n{}\n```', 'markdown_wrapped_json'],
+  ['Private preamble {}', 'surrounding_text'], ['{} Private suffix', 'surrounding_text'],
+  ['x'.repeat(12001), 'raw_length_ceiling'], [undefined, 'raw_string_required'],
+]) test(`root schema diagnostics / ${category}`, () => {
+  const issues = validate(source, raw);
+  assert.deepEqual(issues, ['invalid_reasoning_schema']);
+  const findings = diagnose(source, raw, issues);
+  assert.equal(findings[0].field_path, '$');
+  assert.equal(findings[0].reason_category, category);
+  const metadata = sanitizeValidationMetadata({ stage: 'original', accepted: false, rejection_codes: issues, findings });
+  assert.equal(metadata.findings[0].reason_category, category);
+  assert.ok(!JSON.stringify(metadata).includes('Private'));
+  assert.ok(!JSON.stringify(metadata).includes('private-string'));
+  if (category === 'raw_length_ceiling') {
+    assert.equal(metadata.findings[0].actual_length, 12001);
+    assert.equal(metadata.findings[0].maximum, 12000);
+  }
+  assert.deepEqual(validate(source, raw), issues);
+});

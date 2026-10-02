@@ -1,5 +1,26 @@
 const { parseReasoning, REASONING_LIMITS, validateReasoning } = require('./priority-map-intelligence');
 
+function rootFailureCategory(raw) {
+  if (typeof raw !== 'string') return 'raw_string_required';
+  if (raw.length > 12000) return 'raw_length_ceiling';
+  try {
+    const parsed = JSON.parse(raw);
+    return !parsed || typeof parsed !== 'object' || Array.isArray(parsed) ? 'non_object_root' : 'bounded_json_object';
+  } catch {
+    if (/^\s*```/.test(raw)) return 'markdown_wrapped_json';
+    // Inspect framing only for diagnostics; never extract a draft for acceptance.
+    const start = raw.search(/[\[{]/);
+    const end = Math.max(raw.lastIndexOf('}'), raw.lastIndexOf(']'));
+    if (start >= 0 && end > start) {
+      try {
+        JSON.parse(raw.slice(start, end + 1));
+        if (raw.slice(0, start).trim() || raw.slice(end + 1).trim()) return 'surrounding_text';
+      } catch { /* Malformed embedded JSON remains a parsing failure. */ }
+    }
+    return 'invalid_json';
+  }
+}
+
 // Paths and rule names come from code, never provider-authored keys or values.
 function reasoningDiagnostics(source, raw, evidence, clinicalValidator, codes) {
   if (!codes.length) return [];
@@ -27,7 +48,7 @@ function reasoningDiagnostics(source, raw, evidence, clinicalValidator, codes) {
   const fields = [];
   if (codes.includes('invalid_reasoning_schema')) {
     if (!value || typeof value !== 'object' || Array.isArray(value)) {
-      add('$', typeof raw === 'string' && raw.length > 12000 ? 'raw_length_ceiling' : 'bounded_json_object',
+      add('$', rootFailureCategory(raw),
         typeof raw === 'string' && raw.length > 12000 ? { actual_length: raw.length, maximum: 12000 } : {});
     } else {
       keys(value, ['synthesis', 'possible_contributors', 'clarify_now', 'reassessment_or_escalation'], '$');
@@ -75,7 +96,7 @@ function reasoningDiagnostics(source, raw, evidence, clinicalValidator, codes) {
 }
 
 const SAFE_CODES = new Set(`invalid_reasoning_schema invalid_priority_map_contract incomplete_provider_response contributor_semantic_assertion contributor_missing_uncertainty reasoning_missing_uncertainty reasoning_numeric_repetition_contract reasoning_unsupported_number reasoning_unsupported_negative_finding reasoning_unsupported_diagnosis_label reasoning_treatment_directive reasoning_patient_assertion reasoning_medication_assertion reasoning_certainty_claim reasoning_unsupplied_medication reasoning_unsupported_finding reasoning_unsupported_temporal_claim acid_base_reliability unsupported_causality excluded_alternative unsupported_diagnostic_certainty certainty_overstatement unsupported_numeric_claim temporal_grounding unchanged_value_as_trend unsupported_measurement_trend urgency_underclassified urgency_overclassified urgency_priority_conflict urgency_escalation_conflict`.split(' '));
-const SAFE_RULES = new Set([...SAFE_CODES, 'object_required', 'exact_keys', 'string_required', 'nonempty_plain_text', 'hard_length_ceiling', 'array_required', 'array_cardinality', 'invalid_evidence_reference', 'raw_length_ceiling', 'bounded_json_object', 'aggregate_or_composed_rule']);
+const SAFE_RULES = new Set([...SAFE_CODES, 'object_required', 'exact_keys', 'string_required', 'nonempty_plain_text', 'hard_length_ceiling', 'array_required', 'array_cardinality', 'invalid_evidence_reference', 'raw_length_ceiling', 'bounded_json_object', 'raw_string_required', 'non_object_root', 'markdown_wrapped_json', 'surrounding_text', 'invalid_json', 'aggregate_or_composed_rule']);
 const SAFE_KEYS = new Set(['synthesis', 'possible_contributors', 'clarify_now', 'reassessment_or_escalation', 'possibility', 'uncertainty', 'evidence_ids', 'assessment', 'why_it_matters']);
 function sanitizeValidationMetadata(value) {
   if (!value || !['original', 'repair'].includes(value.stage) || typeof value.accepted !== 'boolean') return undefined;

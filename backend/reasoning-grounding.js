@@ -13,7 +13,7 @@ function assertionIsQualified(clause, index) {
 
 function hasAffirmativeCertainty(text, includeCausality = false) {
   const pattern = includeCausality
-    ? /\b(?:confirms?|proves?|establish(?:es)? (?:a |the )?(?:diagnosis|cause|causality|shock|sepsis|stroke|pneumonia|infection)|diagnostic of|due to|caused by|causes|explains|rules? out|excludes?|definitely|certainly|classic for|strongly indicates?|(?:this|the pattern|these findings)\s+(?:is|are|represents?)\s+(?!(?:uncertain|unknown|unresolved|not|possibly|potentially|a possible|a potential|consistent with a possible)\b))\b/gi
+    ? /\b(?:confirms?|proves?|establish(?:es)? (?:a |the )?(?:diagnosis|cause|causality|shock|sepsis|stroke|pneumonia|infection)|diagnostic of|due to|caused by|causes|(?:is|are|was|were|be|has been|have been)\s+(?:directly\s+)?(?:causing|driving|producing|leading to|resulting in|responsible for|the cause of)|explains|rules? out|excludes?|definitely|certainly|classic for|strongly indicates?|(?:this|the pattern|these findings)\s+(?:is|are|represents?)\s+(?!(?:uncertain|unknown|unresolved|not|possibly|potentially|a possible|a potential|consistent with a possible)\b))\b/gi
     : /\b(?:confirms?|proves?|establish(?:es)? (?:a |the )?(?:diagnosis|cause|causality|shock|sepsis|stroke|pneumonia|infection)|diagnostic of|classic for|classic [^.;\n]{0,35} trajectory|strongly indicates?)\b/gi;
   return assertionClauses(text).some(clause => [...clause.matchAll(pattern)].some(match => !assertionIsQualified(clause, match.index)));
 }
@@ -65,9 +65,12 @@ const DIAGNOSIS_LABELS = [
 ];
 
 function diagnosisIsEstablished(source, label) {
-  return assertionClauses(source).some(clause => clause.toLowerCase().includes(label)
-    && /\b(?:known|documented|confirmed|diagnosed|established)\b/i.test(clause)
-    && !/\b(?:not|no|cannot|unknown|unconfirmed|possible|possibly|suspected|may|could|might)\b/i.test(clause));
+  const escaped = label.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+  const explicit = new RegExp(`\\b(?:(?:known|documented|confirmed|diagnosed|established)(?:\\s+(?:diagnosis|history)(?:\\s+of)?|\\s+(?:of|with))?\\s*[:=-]?\\s*(?:(?:acute|chronic)\\s+)?${escaped}\\b|history\\s+of\\s+${escaped}\\b|${escaped}\\s+(?:(?:is|was)\\s+)?(?:known|documented|confirmed|diagnosed|established)\\b)`, 'i');
+  // Documentation of suspicion is not documentation of a diagnosis. An explicit
+  // marker must bind to this label, not merely occur somewhere in the clause.
+  const unresolved = /\b(?:not|no|cannot|unknown|unconfirmed|concern\w*|suspic\w*|suspect\w*|evaluat\w*|rule[ -]?out|ruled out|differential|possib\w*|probab\w*|screen\w*|work[ -]?up|provisional|working diagnosis|query|pending|potential|risk|may|could|might|family history)\b/i;
+  return assertionClauses(source).some(clause => explicit.test(clause) && !unresolved.test(clause));
 }
 
 function unsupportedDiagnosisLabels(source, text) {

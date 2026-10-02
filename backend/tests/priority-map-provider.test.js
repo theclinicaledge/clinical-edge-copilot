@@ -172,6 +172,11 @@ test('actual initial route uses one mocked SDK stream, focused prompt, validated
   assert.match(wire, /"priorityMapResolution":"validated"/);
   assert.doesNotMatch(JSON.stringify(logs), /170 mmHg|Infection could|Altered mental status/);
   assert.match(JSON.stringify(logs), /provider_first_token_ms/);
+  const operational = JSON.parse(logs.find(args => args[0] === '[OPERATIONAL]')[1]);
+  assert.equal(operational.original_validation.accepted, true);
+  assert.equal(operational.original_validation.findings, undefined);
+  assert.equal(operational.repair_validation, undefined);
+  assert.equal(operational.rejection_reason_codes, undefined);
 });
 
 test('actual route repairs unsafe complete output once, never displays the rejected draft', async () => {
@@ -183,11 +188,18 @@ test('actual route repairs unsafe complete output once, never displays the rejec
   res.setHeader = () => {};
   res.write = value => { wire += value; };
   res.end = () => res.emit('finish');
-  const oldLog = console.log;
-  console.log = () => {};
+  const oldLog = console.log, logs = [];
+  console.log = (...args) => logs.push(args);
   try { await handler({ body: { question: source, mode: 'deep' } }, res); } finally { console.log = oldLog; }
   assert.equal(sdkCalls, 2);
   assert.equal(capturedPayload.stream, true);
   assert.match(wire, /"priorityMapResolution":"repaired"/);
   assert.doesNotMatch(wire, /55 mmHg/);
+  const operational = JSON.parse(logs.find(args => args[0] === '[OPERATIONAL]')[1]);
+  assert.equal(operational.original_validation.accepted, false);
+  assert.equal(operational.repair_validation.accepted, true);
+  assert.ok(operational.original_validation.findings.some(item => item.field_path === 'synthesis'));
+  assert.deepEqual(operational.repair_trigger_rejection_codes, operational.original_validation.rejection_codes);
+  assert.equal(operational.rejection_reason_codes, undefined);
+  assert.doesNotMatch(JSON.stringify(logs), /55 mmHg|170 mmHg|Escalate if systolic|Altered mental status/);
 });

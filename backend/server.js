@@ -6,6 +6,7 @@ const rateLimit = require("express-rate-limit");
 const Anthropic = require("@anthropic-ai/sdk");
 const { randomUUID } = require("node:crypto");
 const { COMPACT_REASONING_PROMPT, buildEvidence, parseReasoning, validateReasoning, composePriorityMap, reasoningRepairDetails } = require("./priority-map-intelligence");
+const { reasoningDiagnostics, sanitizeValidationMetadata } = require("./priority-map-diagnostics");
 const { hasAffirmativeCertainty, assertionClauses, assertionIsQualified } = require("./reasoning-grounding");
 const {
   ABBREVIATION_EXPANSIONS,
@@ -1296,9 +1297,17 @@ async function runPriorityMapWithBudget({
   returnReserveMs = COPILOT_RETURN_RESERVE_MS,
   minRepairBudgetMs = COPILOT_MIN_REPAIR_BUDGET_MS,
   validateOutput = (source, output) => [...validatePriorityMapContract(output), ...validatePriorityMapReliability(source, output)],
+  diagnoseOutput,
   signal,
 }) {
   const startedAt = now();
+  const validationMetadata = (stage, output, codes, duration) => {
+    if (!diagnoseOutput) return undefined;
+    let findings;
+    try { findings = diagnoseOutput(source, output, codes); }
+    catch { findings = codes.map(code => ({ code, field_path: "$", rule: code, classification: "semantic_safety", reason_category: "aggregate_or_composed_rule" })); }
+    return sanitizeValidationMetadata({ stage, accepted: !codes.length, rejection_codes: codes, validation_duration_ms: duration, findings });
+  };
   const timing = {
     provider_status: "not_started",
     provider_duration_ms: 0,
@@ -1349,6 +1358,7 @@ async function runPriorityMapWithBudget({
   if (!originalComplete) issues.push("incomplete_provider_response");
   timing.validation_duration_ms = now() - validationStartedAt;
   timing.validation_status = issues.length ? "rejected" : "accepted";
+  if (diagnoseOutput) timing.original_validation = validationMetadata("original", originalOutput, issues, timing.validation_duration_ms);
   if (now() - startedAt >= totalBudgetMs - returnReserveMs) {
     timing.timeout_layer = "total_budget";
     return { output: buildPriorityMapFallback(source), status: "fallback", issues: [...issues, "total_budget"], repairIssues: null, timing };
@@ -1363,6 +1373,7 @@ async function runPriorityMapWithBudget({
   }
 
   timing.repair_attempted = true;
+  if (diagnoseOutput) timing.repair_trigger_rejection_codes = timing.original_validation.rejection_codes;
   const repairStartedAt = now();
   try {
     const repaired = await runWithStageTimeout(
@@ -1378,7 +1389,9 @@ async function runPriorityMapWithBudget({
     timing.repair_input_tokens = repaired.inputTokens ?? null;
     timing.repair_output_tokens = repaired.outputTokens ?? null;
     if (typeof repaired !== "string" && repaired.stopReason !== "end_turn") repairIssues.push("incomplete_provider_response");
-    timing.validation_duration_ms += now() - repairValidationStartedAt;
+    const repairValidationDuration = now() - repairValidationStartedAt;
+    timing.validation_duration_ms += repairValidationDuration;
+    if (diagnoseOutput) timing.repair_validation = validationMetadata("repair", repairedOutput, repairIssues, repairValidationDuration);
     timing.repair_status = repairIssues.length ? "rejected" : "accepted";
     if (now() - startedAt >= totalBudgetMs - returnReserveMs) {
       timing.timeout_layer = "total_budget";
@@ -2924,12 +2937,22 @@ function buildOperationalLogEntry(fields) {
     "endpoint", "display_resolution", "rejection_reason_codes",
     "provider_first_token_ms", "provider_stream_characters", "provider_stop_reason",
     "provider_input_tokens", "provider_output_tokens", "repair_input_tokens", "repair_output_tokens",
+    "repair_trigger_rejection_codes",
   ];
-  return Object.fromEntries(
+  const entry = Object.fromEntries(
     allowed
       .filter((key) => fields[key] !== undefined)
       .map((key) => [key, fields[key]])
   );
+  for (const key of ["original_validation", "repair_validation"]) {
+    const safe = sanitizeValidationMetadata(fields[key]);
+    if (safe) entry[key] = safe;
+  }
+  if (entry.original_validation) {
+    delete entry.rejection_reason_codes;
+    if (fields.repair_trigger_rejection_codes) entry.repair_trigger_rejection_codes = entry.original_validation.rejection_codes;
+  } else delete entry.repair_trigger_rejection_codes;
+  return entry;
 }
 
 // Operational logs are metadata-only. Never add prompt text, normalized text,
@@ -3215,6 +3238,7 @@ app.post("/api/copilot", apiLimiter, async (req, res) => {
           originalBudgetMs: 15000,
           repairBudgetMs: 5000,
           minRepairBudgetMs: 2500,
+          diagnoseOutput: (source, raw, codes) => reasoningDiagnostics(source, raw, evidence, validatePriorityMapReliability, codes),
           validateOutput: (source, raw) => {
             const issues = validateReasoning(source, raw, evidence, validatePriorityMapReliability);
             if (issues.length) return issues;
@@ -3338,6 +3362,9 @@ app.post("/api/copilot", apiLimiter, async (req, res) => {
       provider_status: priorityMapTiming?.provider_status,
       validation_duration_ms: priorityMapTiming?.validation_duration_ms,
       validation_status: priorityMapTiming?.validation_status,
+      original_validation: priorityMapTiming?.original_validation,
+      repair_validation: priorityMapTiming?.repair_validation,
+      repair_trigger_rejection_codes: priorityMapTiming?.repair_trigger_rejection_codes,
       repair_attempted: priorityMapTiming?.repair_attempted,
       repair_status: priorityMapTiming?.repair_status,
       repair_duration_ms: priorityMapTiming?.repair_duration_ms,

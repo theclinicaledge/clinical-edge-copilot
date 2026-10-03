@@ -38,6 +38,15 @@ const REASONING_LIMITS = Object.freeze({ synthesis: 600, possibility: 240, uncer
 function normalizeReasoning(raw) {
   if (typeof raw !== 'string' || raw.length > 12000) return { value: null, changed: false };
   try {
+    // Only a complete, single JSON fence is a transport wrapper. Its contents
+    // bypass whitespace normalization so generated clinical strings stay exact.
+    const fenced = raw.match(/^[ \t\r\n]*```json[ \t]*\r?\n([\s\S]*?)\r?\n```[ \t\r\n]*$/);
+    if (fenced) {
+      if (fenced[1].includes('```')) return { value: null, changed: false };
+      const value = JSON.parse(fenced[1]);
+      if (!value || typeof value !== 'object' || Array.isArray(value)) return { value: null, changed: false };
+      return { value, changed: true };
+    }
     let changed = false;
     const visit = value => {
       if (typeof value === 'string') {

@@ -90,7 +90,7 @@ test('an observability failure cannot change the clinical result', async () => {
 for (const [raw, category] of [
   ['{"synthesis":', 'invalid_json'],
   ['[]', 'non_object_root'], ['null', 'non_object_root'], ['"private-string"', 'non_object_root'],
-  ['```json\n{}\n```', 'markdown_wrapped_json'],
+  ['```json\n{"synthesis":\n```', 'markdown_wrapped_json'],
   ['Private preamble {}', 'surrounding_text'], ['{} Private suffix', 'surrounding_text'],
   ['x'.repeat(12001), 'raw_length_ceiling'], [undefined, 'raw_string_required'],
 ]) test(`root schema diagnostics / ${category}`, () => {

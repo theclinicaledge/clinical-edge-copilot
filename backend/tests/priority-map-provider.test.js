@@ -6,10 +6,10 @@ let sdkCalls = 0;
 let capturedPayload;
 let output;
 let sdkOutputs = [];
-const { COMPACT_REASONING_PROMPT } = require('../priority-map-intelligence');
+const { COMPACT_REASONING_PROMPT, REASONING_OUTPUT_FORMAT } = require('../priority-map-intelligence');
 const reasoning = {
   synthesis: 'Altered mentation with fever and elevated reported BP may reflect neurologic or systemic contributors; the cause remains unresolved.',
-  possible_contributors: [{ possibility: 'A systemic or neurologic process could contribute.', evidence_ids: ['e1'], uncertainty: 'Baseline, onset and examination remain unresolved.' }],
+  possible_contributors: [{ possibility: 'Neurologic process', evidence_ids: ['e1'], uncertainty: 'Baseline, onset and examination remain unresolved.' }],
   clarify_now: [{ assessment: 'Mental-status baseline, focal findings, glucose and medication exposure', why_it_matters: 'These distinguish neurologic, metabolic and medication-related possibilities.' }],
   reassessment_or_escalation: ['Focused bedside assessment and communication should follow the reported findings and local protocol.'],
 };
@@ -167,6 +167,7 @@ test('actual initial route uses one mocked SDK stream, focused prompt, validated
   assert.equal(capturedPayload.stream, true);
   assert.ok(capturedPayload.system.startsWith(COMPACT_REASONING_PROMPT));
   assert.equal(capturedPayload.max_tokens, 900);
+  assert.deepEqual(capturedPayload.output_config, { format: REASONING_OUTPUT_FORMAT });
   assert.ok(JSON.parse(capturedPayload.messages[0].content).evidence.length);
   assert.equal(capturedPayload.thinking, undefined);
   assert.match(wire, /"priorityMapResolution":"validated"/);
@@ -192,6 +193,7 @@ test('actual route repairs unsafe complete output once, never displays the rejec
   console.log = (...args) => logs.push(args);
   try { await handler({ body: { question: source, mode: 'deep' } }, res); } finally { console.log = oldLog; }
   assert.equal(sdkCalls, 2);
+  assert.deepEqual(capturedPayload.output_config, { format: REASONING_OUTPUT_FORMAT });
   assert.equal(capturedPayload.stream, true);
   assert.match(wire, /"priorityMapResolution":"repaired"/);
   assert.doesNotMatch(wire, /55 mmHg/);

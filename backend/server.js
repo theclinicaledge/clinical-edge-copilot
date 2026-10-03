@@ -5,7 +5,7 @@ const helmet = require("helmet");
 const rateLimit = require("express-rate-limit");
 const Anthropic = require("@anthropic-ai/sdk");
 const { randomUUID } = require("node:crypto");
-const { COMPACT_REASONING_PROMPT, buildEvidence, parseReasoning, validateReasoning, composePriorityMap, reasoningRepairDetails } = require("./priority-map-intelligence");
+const { COMPACT_REASONING_PROMPT, REASONING_OUTPUT_FORMAT, buildEvidence, parseReasoning, validateReasoning, composePriorityMap, reasoningRepairDetails } = require("./priority-map-intelligence");
 const { reasoningDiagnostics, sanitizeValidationMetadata } = require("./priority-map-diagnostics");
 const { hasAffirmativeCertainty, assertionClauses, assertionIsQualified } = require("./reasoning-grounding");
 const {
@@ -3196,6 +3196,7 @@ app.post("/api/copilot", apiLimiter, async (req, res) => {
     const stream = await client.messages.stream({
       model: "claude-sonnet-4-6",
       max_tokens: compactInitial ? 900 : 2200,
+      ...(compactInitial ? { output_config: { format: REASONING_OUTPUT_FORMAT } } : {}),
       system: compactInitial ? COMPACT_REASONING_PROMPT : selectedPrompt,
       messages: [{ role: "user", content: compactInitial ? JSON.stringify(evidence) : question.trim() }],
     }, { signal });
@@ -3255,6 +3256,7 @@ app.post("/api/copilot", apiLimiter, async (req, res) => {
           const repairStream = client.messages.stream({
             model: "claude-sonnet-4-6",
             max_tokens: compactInitial ? 900 : 2200,
+            ...(compactInitial ? { output_config: { format: REASONING_OUTPUT_FORMAT } } : {}),
             system: compactInitial ? `${COMPACT_REASONING_PROMPT}\nCorrect the supplied issue codes. Return only corrected JSON.` : `${selectedPrompt}\n\nPRIORITY MAP REPAIR: Rewrite the draft so it satisfies the full response and clinical reliability contracts. Correct only the validator issues supplied by the application. Preserve the user's exact reported facts, urgency, and section structure. Do not add new numbers, thresholds, timelines, diagnoses, or causal claims. Return only the complete repaired Priority Map.`,
             messages: [{ role: "user", content: compactInitial ? JSON.stringify({ evidence, ...reasoningRepairDetails(fullResponse, issues, evidence), draft: fullResponse }) : `Patient Snapshot:\n${question.trim()}\n\nValidator issue codes: ${issues.join(", ")}\n\nDraft to repair:\n${fullResponse}` }],
           }, { signal });

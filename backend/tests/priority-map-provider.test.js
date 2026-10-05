@@ -70,6 +70,13 @@ test('contextual reasoning prompt retains every clinical safeguard without legac
   assert.ok(COPILOT_ORIGINAL_BUDGET_MS > 12000);
   assert.ok(COPILOT_ORIGINAL_BUDGET_MS + COPILOT_REPAIR_BUDGET_MS + COPILOT_RETURN_RESERVE_MS <= COPILOT_TOTAL_BUDGET_MS);
   assert.ok(COPILOT_TOTAL_BUDGET_MS < 65000);
+  const route = require('node:fs').readFileSync(require.resolve('../server'), 'utf8');
+  const compactTiming = route.match(/totalBudgetMs: Math\.max\(0, (\d+) - \(Date\.now\(\) - requestStartedAt\)\),\s*originalBudgetMs: (\d+),\s*repairBudgetMs: (\d+),\s*minRepairBudgetMs: (\d+)/);
+  assert.ok(compactTiming);
+  const [total, original, repair, minimumRepair] = compactTiming.slice(1).map(Number);
+  assert.deepEqual([total, original, repair, minimumRepair], [33000, 25000, 5000, 2500]);
+  assert.equal(total - original - repair - COPILOT_RETURN_RESERVE_MS, 1500);
+  assert.ok(total < 65000);
 });
 
 test('original stream can finish beyond the former deadline; first-token metadata has no content', async () => {

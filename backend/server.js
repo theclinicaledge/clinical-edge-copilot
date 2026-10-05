@@ -3235,8 +3235,8 @@ app.post("/api/copilot", apiLimiter, async (req, res) => {
         source: question.trim(),
         totalBudgetMs: Math.max(0, COPILOT_TOTAL_BUDGET_MS - (Date.now() - requestStartedAt)),
         ...(compactInitial ? {
-          totalBudgetMs: Math.max(0, 23000 - (Date.now() - requestStartedAt)),
-          originalBudgetMs: 15000,
+          totalBudgetMs: Math.max(0, 33000 - (Date.now() - requestStartedAt)),
+          originalBudgetMs: 25000,
           repairBudgetMs: 5000,
           minRepairBudgetMs: 2500,
           diagnoseOutput: (source, raw, codes) => reasoningDiagnostics(source, raw, evidence, validatePriorityMapReliability, codes),

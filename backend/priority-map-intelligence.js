@@ -9,6 +9,20 @@ const CONTRIBUTOR_CATEGORIES = Object.freeze([
   'Rhythm-related process', 'Pain or stress response', 'Fatigue-related process',
   'Other unresolved mechanism',
 ]);
+const ASSESSMENT_REQUESTS = Object.freeze([
+  'Clarify baseline status and timing of recognition versus onset.',
+  'Assess current responsiveness and focused neurologic findings.',
+  'Clarify available glucose, electrolyte and metabolic context.',
+  'Clarify recent medication or sedation exposure and timing.',
+  'Assess current respiratory effort, oxygen support and ventilation context.',
+  'Clarify measured temperature, symptoms and potential exposure context.',
+  'Assess current circulation, peripheral perfusion and measurement reliability.',
+  'Clarify fluid intake, losses and urine output measurement intervals.',
+  'Clarify bleeding assessment and drain output measurement intervals.',
+  'Clarify observed rhythm and associated bedside assessment findings.',
+  'Clarify pain, stress, fatigue and relevant baseline context.',
+  'Clarify relevant history, recent interventions and subsequent observations.',
+]);
 const REASONING_OUTPUT_FORMAT = {
   type: 'json_schema',
   schema: {
@@ -27,7 +41,7 @@ const REASONING_OUTPUT_FORMAT = {
       clarify_now: { type: 'array', description: 'One to three focused assessment questions, not observed findings.', items: {
         type: 'object', additionalProperties: false, required: ['assessment', 'why_it_matters'],
         properties: {
-          assessment: { type: 'string', description: 'At most 300 characters: what to assess or clarify, not a claimed assessment result.' },
+          assessment: { type: 'string', enum: [...ASSESSMENT_REQUESTS], description: 'Select only a relevant neutral information request; explain its contextual value in why_it_matters. Never assert an examination result, diagnosis or cause.' },
           why_it_matters: { type: 'string', description: 'At most 300 characters: how the requested information could distinguish generic mechanisms. Unspecified history, symptoms, medication exposure and exam findings remain unknown, not absent.' },
         },
       } },
@@ -241,4 +255,4 @@ ${reasoning.clarify_now.map(item => item.why_it_matters).join(' ')}
 For educational support only. Use your clinical judgment and follow local protocol.`;
 }
 
-module.exports = { COMPACT_REASONING_PROMPT, CONTRIBUTOR_CATEGORIES, REASONING_OUTPUT_FORMAT, REASONING_LIMITS, normalizeReasoning, reasoningRepairDetails, buildEvidence, parseReasoning, contributorIsQualified, contributorIsCandidate, contributorHasUncertainty, validateReasoning, composePriorityMap };
+module.exports = { COMPACT_REASONING_PROMPT, CONTRIBUTOR_CATEGORIES, ASSESSMENT_REQUESTS, REASONING_OUTPUT_FORMAT, REASONING_LIMITS, normalizeReasoning, reasoningRepairDetails, buildEvidence, parseReasoning, contributorIsQualified, contributorIsCandidate, contributorHasUncertainty, validateReasoning, composePriorityMap };

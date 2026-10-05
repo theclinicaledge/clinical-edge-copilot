@@ -10,7 +10,7 @@ const { COMPACT_REASONING_PROMPT, REASONING_OUTPUT_FORMAT } = require('../priori
 const reasoning = {
   synthesis: 'Altered mentation with fever and elevated reported BP may reflect neurologic or systemic contributors; the cause remains unresolved.',
   possible_contributors: [{ possibility: 'Neurologic process', evidence_ids: ['e1'], uncertainty: 'Baseline, onset and examination remain unresolved.' }],
-  clarify_now: [{ assessment: 'Mental-status baseline, focal findings, glucose and medication exposure', why_it_matters: 'These distinguish neurologic, metabolic and medication-related possibilities.' }],
+  clarify_now: [{ assessment: 'Assess current responsiveness and focused neurologic findings.', why_it_matters: 'These distinguish neurologic, metabolic and medication-related possibilities.' }],
   reassessment_or_escalation: ['Focused bedside assessment and communication should follow the reported findings and local protocol.'],
 };
 globalThis.fetch = async (_url, options) => {

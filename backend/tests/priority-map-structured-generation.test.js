@@ -1,6 +1,6 @@
 const test = require('node:test');
 const assert = require('node:assert/strict');
-const { COMPACT_REASONING_PROMPT, CONTRIBUTOR_CATEGORIES, REASONING_OUTPUT_FORMAT, buildEvidence, validateReasoning, parseReasoning, composePriorityMap } = require('../priority-map-intelligence');
+const { COMPACT_REASONING_PROMPT, CONTRIBUTOR_CATEGORIES, ASSESSMENT_REQUESTS, REASONING_OUTPUT_FORMAT, buildEvidence, validateReasoning, parseReasoning, composePriorityMap } = require('../priority-map-intelligence');
 const { validatePriorityMapReliability, validatePriorityMapContract, runPriorityMapWithBudget, buildOperationalLogEntry } = require('../server');
 const source = '- Altered mental status reported\n- Fever reported\nBaseline and onset were not supplied.';
 const evidence = buildEvidence(source, 'MODERATE');
@@ -37,6 +37,20 @@ test('generic mechanisms and conditional assessment rationales pass full compose
   for (const category of ['Neurologic process', 'Infectious or inflammatory process', 'Metabolic process']) {
     const value = { ...base, possible_contributors: [{ ...base.possible_contributors[0], possibility: category }] };
     assert.deepEqual(validate(source, JSON.stringify(value)), []);
+  }
+});
+
+test('assessment generation is constrained to neutral requests without changing certainty rejection', () => {
+  const allowed = REASONING_OUTPUT_FORMAT.schema.properties.clarify_now.items.properties.assessment.enum;
+  assert.deepEqual(allowed, ASSESSMENT_REQUESTS);
+  for (const assessment of allowed) {
+    const value = { ...base, clarify_now: [{ ...base.clarify_now[0], assessment }] };
+    assert.deepEqual(validate(source, JSON.stringify(value)), [], assessment);
+  }
+  for (const assessment of ['This confirms a neurologic cause.', 'Rule out stroke.', 'No focal deficits are present.']) {
+    assert.ok(!allowed.includes(assessment));
+    const value = { ...base, clarify_now: [{ ...base.clarify_now[0], assessment }] };
+    assert.ok(validate(source, JSON.stringify(value)).length > 0);
   }
 });
 

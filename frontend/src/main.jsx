@@ -38,7 +38,14 @@ if ('serviceWorker' in navigator) {
 }
 
 // ── Routing ─────────────────────────────────────────────────────────────────
+function normalizeLegacyPrivacyRoute() {
+  if (window.location.pathname === '/' && window.location.hash === '#/privacy') {
+    history.replaceState(history.state, '', `/privacy${window.location.search}`);
+  }
+}
+
 function getPage() {
+  normalizeLegacyPrivacyRoute();
   const path = window.location.pathname;
   if (path === '/' || path === '/home') return 'home';
   if (path === '/copilot')    return 'app';
@@ -156,6 +163,7 @@ function Root() {
 // matches the current URL — e.g. /copilot has no static file on Vercel, so
 // the SPA rewrite hands it dist/index.html (prerendered for "/"); that markup
 // belongs to Home, not Copilot, and must be replaced rather than hydrated.
+normalizeLegacyPrivacyRoute();
 const rootEl = document.getElementById('root')
 const app = (
   <StrictMode>

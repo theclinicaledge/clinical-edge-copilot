@@ -5,7 +5,8 @@ const helmet = require("helmet");
 const rateLimit = require("express-rate-limit");
 const Anthropic = require("@anthropic-ai/sdk");
 const { randomUUID } = require("node:crypto");
-const { COMPACT_REASONING_PROMPT, REASONING_OUTPUT_FORMAT, buildEvidence, parseReasoning, validateReasoning, composePriorityMap, reasoningRepairDetails } = require("./priority-map-intelligence");
+const { buildEvidence, parseReasoning } = require("./priority-map-intelligence");
+const { COMPACT_REASONING_PROMPT, REASONING_OUTPUT_FORMAT, validateReasoning, composePriorityMap, reasoningRepairDetails, teachingFromMap } = require("./priority-map-p1");
 const { reasoningDiagnostics, sanitizeValidationMetadata } = require("./priority-map-diagnostics");
 const { composeEvidenceFallback } = require("./priority-map-fallback");
 const { hasAffirmativeCertainty, assertionClauses, assertionIsQualified } = require("./reasoning-grounding");
@@ -340,6 +341,14 @@ function validateTeachMeLesson(lesson) {
 }
 
 function buildTeachMeFallback(priorityMapResponse = "", snapshot = "", fallbackReason = "invalid_contract") {
+  const physiology = teachingFromMap(snapshot, priorityMapResponse, validatePriorityMapReliability);
+  if (physiology) return {
+    active: false, fallbackReason, domain: "deterioration-recognition",
+    conceptId: "pattern-physiology", conceptLabel: "Physiology of this pattern",
+    keyIdea: physiology.principle, whyItMatters: physiology.application,
+    scenarioConnection: physiology.limitation,
+    tags: ["Mechanism reasoning", "Observation versus interpretation"],
+  };
   const neurologic = assessNeurologicPattern(snapshot);
   if (neurologic.convergingFocalDeterioration) {
     const timing = temporalGroundingSummary(snapshot);
@@ -2631,7 +2640,7 @@ app.post("/api/copilot", apiLimiter, async (req, res) => {
       const message = await runWithStageTimeout((signal) => client.messages.create({
           model: "claude-sonnet-4-6",
           max_tokens: 900,
-          system: TEACH_ME_RELIABILITY_PROMPT,
+          system: `${TEACH_ME_RELIABILITY_PROMPT}\nTeach the physiological principle relevant to the reported pattern. If the map has a Physiology teaching section, use it only after checking it against the Snapshot. Do not default to trend recognition unless that is the actual learning problem.`,
           messages: [{
             role: "user",
             content: `Patient Snapshot (user-reported observations):\n${question.trim()}\n\nCompleted Priority Map:\n${priorityMapResponse.trim()}`,
@@ -2826,7 +2835,7 @@ app.post("/api/copilot", apiLimiter, async (req, res) => {
           originalBudgetMs: 25000,
           repairBudgetMs: 5000,
           minRepairBudgetMs: 2500,
-          diagnoseOutput: (source, raw, codes) => reasoningDiagnostics(source, raw, evidence, validatePriorityMapReliability, codes),
+          diagnoseOutput: (source, raw, codes) => reasoningDiagnostics(source, raw, evidence, validatePriorityMapReliability, codes, 'p1'),
           validateOutput: (source, raw) => {
             const issues = validateReasoning(source, raw, evidence, validatePriorityMapReliability);
             if (issues.length) return issues;

@@ -22,9 +22,24 @@ function rootFailureCategory(raw) {
 }
 
 // Paths and rule names come from code, never provider-authored keys or values.
-function reasoningDiagnostics(source, raw, evidence, clinicalValidator, codes) {
+function reasoningDiagnostics(source, raw, evidence, clinicalValidator, codes, contract) {
   if (!codes.length) return [];
   const value = parseReasoning(raw);
+  if (contract === 'p1') {
+    const p1 = require('./priority-map-p1');
+    if (!value || typeof value !== 'object' || Array.isArray(value)) return reasoningDiagnostics(source, raw, evidence, clinicalValidator, codes);
+    const projected = JSON.stringify(p1.projectLegacy(value));
+    const findings = [
+      ...(codes.includes('invalid_reasoning_schema') ? p1.schemaFindings(value) : []),
+      ...reasoningDiagnostics(source, projected, evidence, clinicalValidator, codes).filter(f => f.reason_category !== 'aggregate_or_composed_rule'),
+    ];
+    if (!codes.includes('invalid_reasoning_schema')) for (const [path, text, role] of p1.extraFields(value)) {
+      const local = validateReasoning(source, JSON.stringify(p1.isolatedValue(text, role)), evidence, clinicalValidator);
+      for (const code of codes.filter(code => local.includes(code))) findings.push({ code, field_path: path, rule: code, reason_category: code, classification: 'semantic_safety' });
+    }
+    for (const code of codes) if (!findings.some(f => f.code === code)) findings.push({ code, field_path: '$', rule: code, reason_category: 'aggregate_or_composed_rule', classification: code === 'invalid_reasoning_schema' ? 'schema' : 'semantic_safety' });
+    return findings;
+  }
   const findings = [];
   const add = (field_path, reason_category, metadata = {}) => findings.push({
     code: 'invalid_reasoning_schema', field_path, rule: reason_category,
@@ -96,13 +111,13 @@ function reasoningDiagnostics(source, raw, evidence, clinicalValidator, codes) {
 }
 
 const SAFE_CODES = new Set(`invalid_reasoning_schema invalid_priority_map_contract incomplete_provider_response contributor_semantic_assertion contributor_missing_uncertainty reasoning_missing_uncertainty reasoning_numeric_repetition_contract reasoning_unsupported_number reasoning_unsupported_negative_finding reasoning_unsupported_diagnosis_label reasoning_treatment_directive reasoning_patient_assertion reasoning_medication_assertion reasoning_certainty_claim reasoning_unsupplied_medication reasoning_unsupported_finding reasoning_unsupported_temporal_claim acid_base_reliability unsupported_causality excluded_alternative unsupported_diagnostic_certainty certainty_overstatement unsupported_numeric_claim temporal_grounding unchanged_value_as_trend unsupported_measurement_trend urgency_underclassified urgency_overclassified urgency_priority_conflict urgency_escalation_conflict`.split(' '));
-const SAFE_RULES = new Set([...SAFE_CODES, 'object_required', 'exact_keys', 'string_required', 'nonempty_plain_text', 'hard_length_ceiling', 'array_required', 'array_cardinality', 'invalid_evidence_reference', 'raw_length_ceiling', 'bounded_json_object', 'raw_string_required', 'non_object_root', 'markdown_wrapped_json', 'surrounding_text', 'invalid_json', 'aggregate_or_composed_rule']);
-const SAFE_KEYS = new Set(['synthesis', 'possible_contributors', 'clarify_now', 'reassessment_or_escalation', 'possibility', 'uncertainty', 'evidence_ids', 'assessment', 'why_it_matters']);
+const SAFE_RULES = new Set([...SAFE_CODES, 'object_required', 'exact_keys', 'string_required', 'nonempty_plain_text', 'hard_length_ceiling', 'array_required', 'array_cardinality', 'invalid_evidence_reference', 'raw_length_ceiling', 'bounded_json_object', 'raw_string_required', 'non_object_root', 'markdown_wrapped_json', 'surrounding_text', 'invalid_json', 'aggregate_or_composed_rule', 'enum_value', 'conditional_required', 'duplicate_evidence_reference']);
+const SAFE_KEYS = new Set(['synthesis', 'possible_contributors', 'clarify_now', 'reassessment_or_escalation', 'possibility', 'uncertainty', 'evidence_ids', 'assessment', 'why_it_matters', 'physiology', 'principle', 'application', 'limitation', 'why_relevant', 'would_strengthen', 'would_weaken', 'focus', 'competing_mechanisms', 'conditional_interpretation']);
 function sanitizeValidationMetadata(value) {
   if (!value || !['original', 'repair'].includes(value.stage) || typeof value.accepted !== 'boolean') return undefined;
   const findings = (Array.isArray(value.findings) ? value.findings : []).filter(item => item && SAFE_CODES.has(item.code)).map(item => {
     const safe = { code: item.code };
-    safe.field_path = typeof item.field_path === 'string' && /^(?:\$|synthesis|(?:possible_contributors|clarify_now|reassessment_or_escalation)(?:\[\d+\])?(?:\.(?:possibility|uncertainty|evidence_ids|assessment|why_it_matters))?)$/.test(item.field_path) ? item.field_path : '$';
+    safe.field_path = typeof item.field_path === 'string' && /^(?:\$|synthesis|physiology(?:\.(?:principle|application|limitation))?|(?:possible_contributors|clarify_now|reassessment_or_escalation)(?:\[\d+\])?(?:\.(?:possibility|uncertainty|evidence_ids|assessment|why_it_matters|why_relevant|would_strengthen|would_weaken|focus|competing_mechanisms|conditional_interpretation))?)$/.test(item.field_path) ? item.field_path : '$';
     for (const key of ['rule', 'reason_category']) if (SAFE_RULES.has(item[key])) safe[key] = item[key];
     if (['schema', 'semantic_safety'].includes(item.classification)) safe.classification = item.classification;
     for (const key of ['actual_length', 'maximum', 'minimum', 'actual_cardinality', 'unexpected_key_count', 'invalid_reference_count']) if (Number.isFinite(item[key]) && item[key] >= 0) safe[key] = item[key];

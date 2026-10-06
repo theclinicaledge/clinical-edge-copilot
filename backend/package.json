@@ -6,7 +6,8 @@
   "scripts": {
     "test": "node --test tests/*.test.js",
     "validate:clinical": "node validation/cli.js",
-    "validate:clinical:report": "node validation/cli.js --report"
+    "validate:clinical:report": "node validation/cli.js --report",
+    "validate:p1": "node validation/p1/run.js"
   },
   "keywords": [],
   "author": "",

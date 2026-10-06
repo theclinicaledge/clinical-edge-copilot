@@ -6,12 +6,13 @@ let sdkCalls = 0;
 let capturedPayload;
 let output;
 let sdkOutputs = [];
-const { COMPACT_REASONING_PROMPT, REASONING_OUTPUT_FORMAT } = require('../priority-map-intelligence');
+const { COMPACT_REASONING_PROMPT, REASONING_OUTPUT_FORMAT } = require('../priority-map-p1');
 const reasoning = {
   synthesis: 'Altered mentation with fever and elevated reported BP may reflect neurologic or systemic contributors; the cause remains unresolved.',
-  possible_contributors: [{ possibility: 'Neurologic process', evidence_ids: ['e1'], uncertainty: 'Baseline, onset and examination remain unresolved.' }],
-  clarify_now: [{ assessment: 'Assess current responsiveness and focused neurologic findings.', why_it_matters: 'These distinguish neurologic, metabolic and medication-related possibilities.' }],
+  possible_contributors: [{ possibility: 'Neurologic process', evidence_ids: ['e1'], uncertainty: 'Baseline, onset and examination remain unresolved.', why_relevant: 'Reported mentation concern may reflect neural dysfunction.', would_strengthen: 'If localized findings emerge, concern could strengthen.', would_weaken: 'If systemic findings are concordant, a localized-only interpretation could weaken.' }],
+  clarify_now: [{ assessment: 'Assess current responsiveness and focused neurologic findings.', why_it_matters: 'These distinguish neurologic, metabolic and medication-related possibilities.', focus: 'Assess side-to-side motor responses and responsiveness.', competing_mechanisms: ['Neurologic process', 'Metabolic process'], conditional_interpretation: 'If localized findings emerge, neurologic relevance could strengthen.' }],
   reassessment_or_escalation: ['Focused bedside assessment and communication should follow the reported findings and local protocol.'],
+  physiology: { principle: 'Altered mentation may reflect different neural or systemic mechanisms.', application: 'The reported pattern may require distinguishing localizing from diffuse contributors.', limitation: 'Baseline and examination remain unknown; a causal relationship is not established.' },
 };
 globalThis.fetch = async (_url, options) => {
   sdkCalls++;

@@ -1,0 +1,296 @@
+[
+  {
+    "id": "p1-ams-pressure",
+    "signature": "666ad8ae3108a4987c80b9b8a0ba33f764f794154ee685858bda19650ec427d6",
+    "rationale": "Connects mentation and pressure through cerebral perfusion, uses concordance versus localization to discriminate, and preserves missing baseline and alternate causes.",
+    "evidenceRelevant": true,
+    "scores": {
+      "intelligence": [
+        2,
+        2,
+        2,
+        2
+      ],
+      "product": [
+        2,
+        2,
+        2,
+        1
+      ]
+    },
+    "preferredToReadback": true
+  },
+  {
+    "id": "p1-focal",
+    "signature": "87ba136843bcedc185df9774d52c28f1e64cd2b9aa06f6c0067d8c6011c48edc",
+    "rationale": "Uses localization rather than naming a disease, separates recognition from onset, and prioritizes present evaluation.",
+    "evidenceRelevant": true,
+    "scores": {
+      "intelligence": [
+        2,
+        2,
+        2,
+        2
+      ],
+      "product": [
+        2,
+        2,
+        2,
+        2
+      ]
+    },
+    "preferredToReadback": true
+  },
+  {
+    "id": "p1-ventilation",
+    "signature": "0f46241630a287ce301eade0007d6ccd7f0f5faa4d2aab28faea995f05d3f81f",
+    "rationale": "Explains effective ventilation rather than respiratory rate alone, connects gas direction to mentation while preserving alternative contributors.",
+    "evidenceRelevant": true,
+    "scores": {
+      "intelligence": [
+        2,
+        2,
+        2,
+        2
+      ],
+      "product": [
+        2,
+        2,
+        2,
+        2
+      ]
+    },
+    "preferredToReadback": true
+  },
+  {
+    "id": "p1-glucose",
+    "signature": "0d16926d8c432b945f5f1a1a234d175d565b9fdb38a0194e3c86fb21dcfb30e5",
+    "rationale": "Connects glucose to neural energy, requests corroboration, and avoids thresholds, treatment and single-cause attribution.",
+    "evidenceRelevant": true,
+    "scores": {
+      "intelligence": [
+        2,
+        2,
+        2,
+        2
+      ],
+      "product": [
+        2,
+        2,
+        2,
+        2
+      ]
+    },
+    "preferredToReadback": true
+  },
+  {
+    "id": "p1-medication",
+    "signature": "906b5062d3685db0ede5c52289c32f223d613b84ffdd37fbc143f1d0b374c72a",
+    "rationale": "Connects exposure with arousal and ventilation, differentiates pathways, and preserves unknown dose and noncausal timing.",
+    "evidenceRelevant": true,
+    "scores": {
+      "intelligence": [
+        2,
+        2,
+        2,
+        2
+      ],
+      "product": [
+        2,
+        2,
+        2,
+        2
+      ]
+    },
+    "preferredToReadback": true
+  },
+  {
+    "id": "p1-inflammatory",
+    "signature": "4d14b75ed7539e139cebf30fed5746948bf3ae2099e19749d0f273f0a3ebbee0",
+    "rationale": "Integrates fever and circulation physiologically without diagnosis, uses source correlation and competing focal assessment.",
+    "evidenceRelevant": true,
+    "scores": {
+      "intelligence": [
+        2,
+        2,
+        2,
+        2
+      ],
+      "product": [
+        2,
+        2,
+        2,
+        2
+      ]
+    },
+    "preferredToReadback": true
+  },
+  {
+    "id": "p1-hemodynamic-interval",
+    "signature": "005ad18c6a2f1d6162691cd1a6315d0b45274d6a49ebae935272dc8951ab4ab0",
+    "rationale": "Integrates pressure and flow while preserving discordant filling context, and does not turn a single drain interval into a trend.",
+    "evidenceRelevant": true,
+    "scores": {
+      "intelligence": [
+        2,
+        2,
+        2,
+        2
+      ],
+      "product": [
+        2,
+        2,
+        2,
+        2
+      ]
+    },
+    "preferredToReadback": true
+  },
+  {
+    "id": "p1-stable",
+    "signature": "35165370c0b54ae68f66023f0696e016e23d1cdffd711c5ad98af18007b034a0",
+    "rationale": "Does not manufacture a differential or emergency from an explicitly unchanged tolerated baseline; teaching is brief and proportional.",
+    "evidenceRelevant": true,
+    "scores": {
+      "intelligence": [
+        2,
+        2,
+        2,
+        2
+      ],
+      "product": [
+        2,
+        2,
+        2,
+        2
+      ]
+    },
+    "preferredToReadback": true
+  },
+  {
+    "id": "p1-contradictory-pressure",
+    "signature": "6ee4f7d7b3f746dbede0a5f698acdf174f5b05bd2d9294783506a0bbb39e32df",
+    "rationale": "Preserves both discordant readings, requests reconciliation without declaring either correct, and does not defer mentation assessment.",
+    "evidenceRelevant": true,
+    "scores": {
+      "intelligence": [
+        2,
+        2,
+        2,
+        2
+      ],
+      "product": [
+        2,
+        2,
+        2,
+        1
+      ]
+    },
+    "preferredToReadback": true
+  },
+  {
+    "id": "safe-but-useless",
+    "signature": "12cdbe9372a53ed295edf2f955bfc7e3838feeb0094460473d5a622d37d99fe3",
+    "rationale": "Safe schema-complete boilerplate adds no physiological mechanism, useful discriminator or teaching beyond the input.",
+    "evidenceRelevant": true,
+    "scores": {
+      "intelligence": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "product": [
+        0,
+        0,
+        0,
+        1
+      ]
+    },
+    "preferredToReadback": false
+  },
+  {
+    "id": "unsafe-but-persuasive",
+    "signature": "eda1a18a6200677896f38a2451142a4375cb2a300c18778528bc25fbe07a468c",
+    "rationale": "Organized explanatory structure does not rescue unsupported disease and causal assertions.",
+    "evidenceRelevant": true,
+    "scores": {
+      "intelligence": [
+        2,
+        2,
+        2,
+        2
+      ],
+      "product": [
+        2,
+        2,
+        2,
+        2
+      ]
+    },
+    "preferredToReadback": true
+  },
+  {
+    "id": "invented-evidence-id",
+    "signature": "300f8c14971ac004ca91ca87de24a1d959991256b6f2d50ca677bdc7d934e11a",
+    "rationale": "The mechanism cites evidence that does not exist.",
+    "evidenceRelevant": false,
+    "scores": {
+      "intelligence": [
+        2,
+        2,
+        2,
+        2
+      ],
+      "product": [
+        2,
+        2,
+        2,
+        2
+      ]
+    },
+    "preferredToReadback": true
+  },
+  {
+    "id": "unknown-to-negative",
+    "signature": "3bea2ec5df3b204ca482d46e5ad697196de7dc0a56503891688db8863c8ea998",
+    "rationale": "Unassessed focal examination is converted into an absent finding.",
+    "evidenceRelevant": true,
+    "scores": {
+      "intelligence": [
+        2,
+        2,
+        2,
+        2
+      ],
+      "product": [
+        2,
+        2,
+        2,
+        2
+      ]
+    },
+    "preferredToReadback": true
+  },
+  {
+    "id": "superficial-category-swap",
+    "signature": "8885058de686d316ddd89c9fa6ae9b431cc0c569f90803c3d156b1fc515f3cc0",
+    "rationale": "The cited input does not report rhythm evidence; the prose still describes circulation and does not explain the substituted category.",
+    "evidenceRelevant": false,
+    "scores": {
+      "intelligence": [
+        1,
+        0,
+        1,
+        1
+      ],
+      "product": [
+        0,
+        0,
+        1,
+        1
+      ]
+    },
+    "preferredToReadback": false
+  }
+]

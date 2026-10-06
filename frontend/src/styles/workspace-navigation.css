@@ -40,7 +40,7 @@
 .ce-scenario-return a { min-height: 44px; display: flex; align-items: center; gap: 8px; color: var(--ce-teal); text-decoration: none; }
 .ce-scenario-return { pointer-events: auto; }
 #root:has(> .has-active-scenario) { --ce-dock-clearance: calc(118px + max(14px, env(safe-area-inset-bottom))); }
-.ce-workspace-nav .ce-tool-dock__inner { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); overflow: visible; gap: 4px; border-radius: 8px; }
+.ce-workspace-nav .ce-tool-dock__inner { display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); overflow: visible; gap: 4px; border-radius: 8px; }
 .ce-workspace-nav .ce-tool-dock__item { min-height: 48px; font-family: var(--ce-font-sans); font-size: 12px; border-radius: 5px; background: transparent; cursor: pointer; gap: 5px; padding: 0 4px; }
 .ce-workspace-nav .ce-tool-dock__item.is-active { background: var(--ce-teal); }
 .ce-navigation-backdrop { position: fixed; inset: 0; z-index: 200; display: flex; align-items: flex-end; justify-content: center; background: rgba(11,31,42,.55); padding: 20px 16px 0; }

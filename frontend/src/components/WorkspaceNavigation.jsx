@@ -4,7 +4,7 @@ import { trackEvent } from "../analytics";
 import "../styles/workspace-navigation.css";
 
 import { CHECK_ACTIONS, LEARN_ACTIONS } from "./workspaceActions.js";
-const WORKSPACE_PAGES = new Set(["home", "app", "icudrips", "referencehub", "abglab", "brainsheets", "brainsheets-detail"]);
+const WORKSPACE_PAGES = new Set(["home", "app", "ask", "icudrips", "referencehub", "abglab", "brainsheets", "brainsheets-detail"]);
 
 function NavigationSheet({ kind, onClose, navigate }) {
   const panel = useRef(null);
@@ -62,6 +62,7 @@ export default function WorkspaceNavigation({ page, navigate, scenarioActive = f
       <div className="ce-tool-dock__inner">
       <a href="/" aria-current={page === "home" ? "page" : undefined} className={"ce-tool-dock__item" + (page === "home" ? " is-active" : "")} onClick={(e) => go(e, "/")}>Home</a>
       <a href="/copilot?capture=rapid" aria-current={page === "app" ? "page" : undefined} className={"ce-tool-dock__item" + (page === "app" ? " is-active" : "")} onClick={(e) => go(e, "/copilot?capture=rapid")}>Shift Brain</a>
+      <a href="/ask" aria-current={page === "ask" ? "page" : undefined} className={"ce-tool-dock__item" + (page === "ask" ? " is-active" : "")} onClick={(e) => go(e, "/ask")}>Ask</a>
       <button type="button" aria-label="Check something" aria-haspopup="dialog" aria-expanded={sheet === "check"} className={"ce-tool-dock__item" + (checkActive ? " is-active" : "")} onClick={() => setSheet("check")}>Check</button>
       <button type="button" aria-label="More tools" aria-haspopup="dialog" aria-expanded={sheet === "more"} className={"ce-tool-dock__item" + (moreActive ? " is-active" : "")} onClick={() => setSheet("more")}>More <span aria-hidden="true">&#183;&#183;&#183;</span></button>
     </div></nav>

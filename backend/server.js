@@ -5,6 +5,7 @@ const helmet = require("helmet");
 const rateLimit = require("express-rate-limit");
 const Anthropic = require("@anthropic-ai/sdk");
 const { randomUUID } = require("node:crypto");
+const { registerAskRoutes } = require("./ask-clinical-edge");
 const { buildEvidence, parseReasoning } = require("./priority-map-intelligence");
 const { COMPACT_REASONING_PROMPT, REASONING_OUTPUT_FORMAT, validateReasoning, composePriorityMap, reasoningRepairDetails, teachingFromMap } = require("./priority-map-p1");
 const { reasoningDiagnostics, sanitizeValidationMetadata } = require("./priority-map-diagnostics");
@@ -2565,6 +2566,8 @@ function isOverloadError(err) {
     /overload/i.test(err?.message ?? "")
   );
 }
+
+registerAskRoutes(app, { apiLimiter, getClient: () => client, containsPHI, runWithStageTimeout, collectPriorityMapStream, appendOperationalLog, classifyProviderError });
 
 // ── Streaming endpoint ────────────────────────────────────────────────────────
 app.post("/api/copilot", apiLimiter, async (req, res) => {

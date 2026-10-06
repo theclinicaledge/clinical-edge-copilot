@@ -1,0 +1,19 @@
+.ce-ask-workspace[hidden] { display: none; }
+.ce-ask-page { min-height: 100vh; background: var(--ce-warm-bg); color: var(--ce-text-dark); font-family: var(--ce-font-sans); }
+.ce-ask-main { max-width: 760px; margin: auto; padding: 28px 18px var(--ce-dock-clearance, 100px); }
+.ce-ask-main h1 { font-size: 26px; line-height: 1.25; letter-spacing: 0; margin: 10px 0 24px; }
+.ce-ask-scope { color: var(--ce-text-muted); font-size: 12px; }
+.ce-ask-main label { display: block; font-size: 14px; font-weight: 650; }
+.ce-ask-privacy { color: var(--ce-text-muted); font-size: 12px; line-height: 1.6; margin: 8px 0 12px; }
+.ce-ask-main textarea { width: 100%; box-sizing: border-box; padding: 14px; resize: vertical; min-height: 112px; border: 1px solid var(--ce-warm-line); border-radius: 6px; background: var(--ce-warm-card); color: var(--ce-text-dark); font: 16px/1.6 var(--ce-font-sans); }
+.ce-ask-main :focus-visible { outline: 2px solid var(--ce-teal-deep); outline-offset: 3px; }
+.ce-ask-controls { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 12px; }
+.ce-ask-controls button { min-height: 44px; min-width: 44px; border: 1px solid var(--ce-warm-line); border-radius: 6px; padding: 10px 14px; background: var(--ce-warm-card); color: var(--ce-text-dark); font: 600 13px var(--ce-font-sans); cursor: pointer; }
+.ce-ask-controls .ce-ask-submit { background: var(--ce-teal); color: var(--ce-navy-header); border-color: transparent; }
+.ce-ask-controls button:disabled { opacity: .55; cursor: default; }
+.ce-ask-error { color: var(--ce-urgency-high); line-height: 1.6; }
+.ce-ask-answer { margin-top: 28px; padding-top: 24px; border-top: 1px solid var(--ce-warm-line); overflow-wrap: anywhere; }
+.ce-ask-answer h2 { font-size: 19px; line-height: 1.5; margin: 8px 0 20px; letter-spacing: 0; }
+.ce-ask-answer p, .ce-ask-answer li { font-size: 15px; line-height: 1.8; color: var(--ce-text-mid); white-space: pre-wrap; }
+.ce-home-ask { display: flex; align-items: center; justify-content: space-between; min-height: 52px; gap: 12px; margin-bottom: 24px; border-bottom: 1px solid var(--ce-warm-line); text-decoration: none; font-size: 17px; }
+.ce-home-ask > span { color: var(--ce-teal-deep); }

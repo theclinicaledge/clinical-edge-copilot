@@ -5,6 +5,7 @@ import { Analytics } from '@vercel/analytics/react'
 import './styles/tokens.css'
 import './index.css'
 import App from './App.jsx'
+import AskClinicalEdge from './AskClinicalEdge.jsx'
 import Landing from './Landing.jsx'
 import Scenario from './Scenario.jsx'
 import QuickStart from './QuickStart.jsx'
@@ -41,6 +42,7 @@ function getPage() {
   const path = window.location.pathname;
   if (path === '/' || path === '/home') return 'home';
   if (path === '/copilot')    return 'app';
+  if (path === '/ask') return 'ask';
   if (path === '/rhythm-lab') return 'rhythmlab';
   if (path === '/rhythm-lab/library')  return 'rhythmlab-library';
   if (path === '/rhythm-lab/practice') return 'rhythmlab-practice';
@@ -140,6 +142,7 @@ function Root() {
       {page === 'brainsheets-detail' && <BrainSheetsModule navigate={navigate} onGoHome={() => navigate('/')} templateId={window.location.pathname.replace(/^\/brain-sheets\//, '').replace(/\/$/, '')} />}
       {page === 'blog'          && <BlogIndex />}
       {page === 'blogpost'      && <BlogPostPage slug={window.location.pathname.replace(/^\/blog\//, '').replace(/\/$/, '')} />}
+      <div hidden={page !== 'ask'} inert={page !== 'ask'} className="ce-ask-workspace"><AskClinicalEdge navigate={navigate} isVisible={page === 'ask'} /></div>
       {/* Keep the scenario's existing hook tree in memory, never browser storage. */}
       {workspaceEntered && <div hidden={page !== 'app'} inert={page !== 'app'} className="ce-shift-workspace" onFocusCapture={(event) => { workspacePosition.current.focus = event.target; }}><App onGoHome={() => navigate('/')} navigate={navigate} isOnline={isOnline} isVisible={page === 'app'} onScenarioActivity={setScenarioActive} initialCaptureMode={new URLSearchParams(window.location.search).get('capture') === 'rapid' ? 'rapid' : 'manual'} /></div>}
       <WorkspaceNavigation page={page} navigate={navigate} scenarioActive={scenarioActive} />

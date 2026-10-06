@@ -29,6 +29,7 @@ export default function ClinicalEdgeHome({ onNavigate }) {
     <header className="ce-command-home__header"><div><ClinicalEdgeMark /><strong>Clinical Edge</strong><span>For nurses</span></div></header>
     <main className="ce-command-home__main ce-page-enter">
       <div className="ce-command-home__intro"><span>Your workspace</span><h1>What do you need right now?</h1></div>
+      <a className="ce-home-ask" href="/ask" onClick={event => { if (event.metaKey || event.ctrlKey || event.shiftKey || event.altKey) return; event.preventDefault(); onNavigate('/ask'); }}><strong>Ask Clinical Edge</strong><span aria-hidden="true">&#8594;</span></a>
       <div className="ce-command-home__immediate">
         <section className="ce-command-home__work" aria-labelledby="patient-change-title">
           <span className="ce-command-home__eyebrow">Shift Brain</span>

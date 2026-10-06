@@ -23,10 +23,10 @@ export const meta = {
   cta: {
     eyebrow: "Try it yourself",
     headline: "Practice ABG interpretation with Clinical Edge",
-    body: "Work through ABGs, EKGs, ICU concepts, and real clinical scenarios with step-by-step reasoning designed for nurses.",
+    body: "Explore educational references and fictional practice scenarios.",
     primaryLabel: "Explore ABG Lab",
     primaryHref: "/abg-lab",
-    secondaryLabel: "Ask Copilot a question",
+    secondaryLabel: "Open Shift Brain",
     secondaryHref: "/copilot",
   },
 };

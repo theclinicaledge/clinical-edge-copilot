@@ -1694,8 +1694,8 @@ export default function App({ onGoHome, navigate, isOnline = true, initialCaptur
             </div>
 
             <div className="copilot-rail-card">
-              <span className="copilot-rail-label">Private by default</span>
-              <p>Your snapshot is not retained unless you deliberately save the completed case.</p>
+              <span className="copilot-rail-label">Data processing and saving</span>
+              <p>Saving cases is optional. Saved cases remain on this device. Submitted text is processed by our server and AI provider; see Privacy.</p>
             </div>
           </aside>
         </div>

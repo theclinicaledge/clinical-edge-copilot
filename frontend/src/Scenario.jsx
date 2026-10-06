@@ -265,7 +265,7 @@ export default function Scenario({ onBack, onEnterApp, onQuickStart }) {
             textTransform: "uppercase",
             marginBottom: 8,
           }}>
-            Real Shift Scenarios
+            Fictional practice scenarios
           </div>
           <p style={{
             fontSize: 13,
@@ -273,7 +273,7 @@ export default function Scenario({ onBack, onEnterApp, onQuickStart }) {
             margin: 0,
             letterSpacing: "-0.1px",
           }}>
-            Built from common bedside deterioration patterns.
+            Fictional practice scenarios for nursing education. All people and details are fictional; do not copy identifiers into Clinical Edge.
           </p>
         </div>
 
@@ -665,7 +665,7 @@ export default function Scenario({ onBack, onEnterApp, onQuickStart }) {
                   onClick={() => { trackEvent('scenario_completed', { scenario_id: sc.id, destination: 'quickstart' }); onQuickStart(); }}
                   style={btnPrimary}
                 >
-                  Try it on your own patient →
+                  Try a fictional practice scenario →
                 </button>
               )}
             </div>

@@ -319,7 +319,7 @@ export default function Landing({ onEnterApp, onEnterScenario }) {
             className="l-btn-primary"
             style={{ ...btnPrimary, fontSize: 13, padding: "9px 20px", borderRadius: 8 }}
           >
-            Open App
+            Open workspace
           </button>
         </div>
         </div>{/* end inner nav row */}
@@ -360,7 +360,7 @@ export default function Landing({ onEnterApp, onEnterScenario }) {
                 letterSpacing: "var(--ce-track-eyebrow)",
                 textTransform: "uppercase",
               }}>
-                Clinical Reasoning Support for Nurses
+                For nurses transitioning into ICU practice
               </span>
             </div>
           </div>
@@ -374,8 +374,8 @@ export default function Landing({ onEnterApp, onEnterScenario }) {
             letterSpacing: "-0.03em",
             margin: "0 0 24px",
           }}>
-            Less second-guessing.{" "}
-            <span className="l-hero-accent" style={{ color: "var(--ce-teal)" }}>More clinical confidence.</span>
+            Understand the why{" "}
+            <span className="l-hero-accent" style={{ color: "var(--ce-teal)" }}>behind critical-care nursing.</span>
           </h1>
 
           {/* Lead paragraph */}
@@ -387,7 +387,7 @@ export default function Landing({ onEnterApp, onEnterScenario }) {
             margin: "0 0 40px",
             maxWidth: 560,
           }}>
-            Clinical Edge Copilot helps you think through patient situations, medication questions, and clinical reasoning — whether you're new to nursing, building your skills, or practicing at the bedside. Structured clinical reasoning, in the same order a preceptor would walk you through it.
+            Work through fictional practice scenarios in a nursing-focused learning workspace. Explore reported findings, uncertainty, and the reasoning questions you want to understand.
           </p>
 
           {/* CTAs */}
@@ -400,10 +400,10 @@ export default function Landing({ onEnterApp, onEnterScenario }) {
             }}
           >
             <button onClick={() => { trackEvent('landing_primary_cta_clicked', { destination: 'scenario', placement: 'hero' }); onEnterScenario(); }} className="l-btn-primary" style={{ ...btnPrimary, fontSize: 15, padding: "14px 34px" }}>
-              Try a real scenario →
+              Try a fictional practice scenario →
             </button>
             <button onClick={scrollToDemo} className="l-btn-ghost" style={{ ...btnGhost, fontSize: 15, padding: "14px 34px" }}>
-              See How It Thinks
+              View a learning outline
             </button>
           </div>
         </div>
@@ -430,7 +430,7 @@ export default function Landing({ onEnterApp, onEnterScenario }) {
                 letterSpacing: "var(--ce-track-eyebrow)",
                 textTransform: "uppercase",
               }}>
-                Clinical Edge Copilot
+                Learning outline — not generated output
               </span>
             </div>
 
@@ -447,7 +447,7 @@ export default function Landing({ onEnterApp, onEnterScenario }) {
                 borderRadius: "var(--ce-r-md)",
                 lineHeight: 1.6,
               }}>
-                "BP dropped to 88/50, HR 122, was stable 20 min ago..."
+                A fictional scenario includes earlier and current findings.
               </div>
 
               {/* Urgency badge row — real urgency tokens */}
@@ -464,22 +464,22 @@ export default function Landing({ onEnterApp, onEnterScenario }) {
                   textTransform: "uppercase",
                   letterSpacing: "0.5px",
                 }}>
-                  Urgency: HIGH
+                  Fictional practice
                 </span>
                 <span style={{ fontSize: 10, color: "var(--ce-text-dim)", fontFamily: "var(--ce-font-mono)" }}>·</span>
-                <span style={{ fontSize: 10, color: "var(--ce-text-dim)", fontFamily: "var(--ce-font-mono)" }}>Clinical Reasoning</span>
+                <span style={{ fontSize: 10, color: "var(--ce-text-dim)", fontFamily: "var(--ce-font-mono)" }}>Study prompts</span>
               </div>
 
               {/* Section cards — real SECTION_CONFIG colors (teal + gold only) */}
               <div style={{ display: "flex", flexDirection: "column", gap: 9 }}>
-                <MockCard label="What this could be" accent="var(--ce-teal-deep)" bg="transparent">
-                  Acute hemodynamic compromise — the combination of hypotension and tachycardia points toward shock physiology.
+                <MockCard label="Learning focus" accent="var(--ce-teal-deep)" bg="transparent">
+                  Review which findings the fictional scenario explicitly reports.
                 </MockCard>
-                <MockCard label="Possible concerns" accent="var(--ce-gold-deep)" bg="rgba(212,168,75,0.06)">
-                  Hypotension + tachycardia + acute onset suggests circulatory instability. JVD, lung sounds, skin perfusion, and cap refill help clarify the picture.
+                <MockCard label="Questions to explore" accent="var(--ce-gold-deep)" bg="rgba(212,168,75,0.06)">
+                  Separate the information supplied from questions that still need clarification.
                 </MockCard>
-                <MockCard label="What to assess next" accent="var(--ce-teal-deep)" bg="transparent">
-                  Full reassessment, IV access, 12-lead ECG, fluid responsiveness assessment, and provider awareness.
+                <MockCard label="What remains unknown" accent="var(--ce-teal-deep)" bg="transparent">
+                  Missing information can remain unknown. Discuss the reasoning with a preceptor.
                 </MockCard>
               </div>
             </div>
@@ -495,7 +495,7 @@ export default function Landing({ onEnterApp, onEnterScenario }) {
       }}>
         <Fade>
           <div style={{ textAlign: "center", marginBottom: 52 }}>
-            <Label>What You Can Ask Copilot</Label>
+            <Label>Nursing education and practice</Label>
             <h2 style={{
               fontSize: "clamp(26px, 3.8vw, 44px)",
               fontWeight: 800,
@@ -505,7 +505,7 @@ export default function Landing({ onEnterApp, onEnterScenario }) {
               margin: "0 auto 18px",
               maxWidth: 620,
             }}>
-              One tool. Different kinds of nursing questions.
+              Explore a fictional scenario, one question at a time.
             </h2>
             <p style={{
               fontSize: "clamp(14px, 1.6vw, 17px)",
@@ -514,7 +514,7 @@ export default function Landing({ onEnterApp, onEnterScenario }) {
               maxWidth: 560,
               margin: "0 auto",
             }}>
-              From real clinical situations to quick bedside questions to clinical knowledge — Copilot adapts to how nurses and students actually think.
+              Use fictional scenarios and educational references to explore critical-care concepts. The outlines below are study prompts, not generated answers or evidence of clinical performance.
             </p>
           </div>
         </Fade>
@@ -589,7 +589,7 @@ export default function Landing({ onEnterApp, onEnterScenario }) {
                   borderRadius: 8,
                   lineHeight: 1.6,
                 }}>
-                  "Post-op day 2, HR climbing from 82 to 104 over 3 hours, patient says they feel 'off' but VS look okay otherwise..."
+                  A fictional practice case reports a change over time.
                 </div>
 
                 {/* Urgency badge */}
@@ -605,16 +605,16 @@ export default function Landing({ onEnterApp, onEnterScenario }) {
                     borderRadius: "var(--ce-r-sm)",
                     textTransform: "uppercase",
                     letterSpacing: "0.5px",
-                  }}>Urgency: MODERATE</span>
+                  }}>Fictional practice</span>
                 </div>
 
                 {/* Output preview */}
                 <div style={{ display: "flex", flexDirection: "column", gap: 7 }}>
-                  <MockCard label="What this could be" accent="var(--ce-teal-deep)" bg="transparent">
-                    Trending tachycardia in a post-op patient can point toward occult bleeding or early sepsis — the trajectory over time is the key signal.
+                  <MockCard label="Learning focus" accent="var(--ce-teal-deep)" bg="transparent">
+                    Identify the earlier and current findings actually supplied in the fictional case.
                   </MockCard>
-                  <MockCard label="Possible concerns" accent="var(--ce-gold-deep)" bg="rgba(212,168,75,0.06)">
-                    Trending values carry more weight than any single reading. Perfusion, urine output, and pain together build the fuller picture.
+                  <MockCard label="Questions to explore" accent="var(--ce-gold-deep)" bg="rgba(212,168,75,0.06)">
+                    Write down what changed and what you would want explained, without filling in missing facts.
                   </MockCard>
                 </div>
               </div>
@@ -625,12 +625,12 @@ export default function Landing({ onEnterApp, onEnterScenario }) {
                 fontSize: 11,
                 color: "var(--ce-text-dim)",
               }}>
-                Helps you catch subtle deterioration before it escalates
+                Explore reported changes and the questions they raise in a fictional scenario.
               </div>
             </div>
           </Fade>
 
-          {/* ── Card 2: Quick Question ── */}
+          {/* ── Card 2: Reference learning ── */}
           <Fade delay={120}>
             <div style={{
               background: "var(--ce-navy-700)",
@@ -658,7 +658,7 @@ export default function Landing({ onEnterApp, onEnterScenario }) {
                   textTransform: "uppercase",
                   letterSpacing: "0.8px",
                 }}>
-                  Quick Question
+                  Reference learning
                 </span>
               </div>
 
@@ -674,7 +674,7 @@ export default function Landing({ onEnterApp, onEnterScenario }) {
                   borderRadius: 8,
                   lineHeight: 1.6,
                 }}>
-                  "Does furosemide lower potassium?"
+                  Choose an unfamiliar nursing concept to review in an educational reference.
                 </div>
 
                 <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 14 }}>
@@ -689,15 +689,15 @@ export default function Landing({ onEnterApp, onEnterScenario }) {
                     borderRadius: "var(--ce-r-sm)",
                     textTransform: "uppercase",
                     letterSpacing: "0.5px",
-                  }}>Urgency: LOW</span>
+                  }}>Fictional practice</span>
                 </div>
 
                 <div style={{ display: "flex", flexDirection: "column", gap: 7 }}>
-                  <MockCard label="Direct Answer" accent="var(--ce-teal-deep)" bg="transparent">
-                    Yes — furosemide lowers potassium. It's a loop diuretic that increases urinary K⁺ loss.
+                  <MockCard label="Learning question" accent="var(--ce-teal-deep)" bg="transparent">
+                    What is the concept, and which part do you want to understand?
                   </MockCard>
-                  <MockCard label="What to watch" accent="var(--ce-gold-deep)" bg="rgba(212,168,75,0.06)">
-                    Signs of hypokalemia — weakness, cramps, arrhythmias. Lab trends and cardiac status are worth following, with management guided by provider assessment.
+                  <MockCard label="Further learning" accent="var(--ce-gold-deep)" bg="rgba(212,168,75,0.06)">
+                    Use your training, educational references, and preceptor discussions to explore the explanation.
                   </MockCard>
                 </div>
               </div>
@@ -708,7 +708,7 @@ export default function Landing({ onEnterApp, onEnterScenario }) {
                 fontSize: 11,
                 color: "var(--ce-text-dim)",
               }}>
-                Fast, accurate answers for bedside knowledge gaps
+                Browse educational references for nursing concepts.
               </div>
             </div>
           </Fade>
@@ -741,7 +741,7 @@ export default function Landing({ onEnterApp, onEnterScenario }) {
                   textTransform: "uppercase",
                   letterSpacing: "0.8px",
                 }}>
-                  Clinical Knowledge
+                  Reasoning practice
                 </span>
               </div>
 
@@ -757,7 +757,7 @@ export default function Landing({ onEnterApp, onEnterScenario }) {
                   borderRadius: 8,
                   lineHeight: 1.6,
                 }}>
-                  "A patient with potassium 6.2 mEq/L has peaked T waves. Which medication should the nurse expect to give first? A) Furosemide B) Calcium gluconate C) Sodium bicarbonate D) Kayexalate"
+                  Use a fictional practice case to explore a reasoning question.
                 </div>
 
                 <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 14 }}>
@@ -772,15 +772,15 @@ export default function Landing({ onEnterApp, onEnterScenario }) {
                     borderRadius: "var(--ce-r-sm)",
                     textTransform: "uppercase",
                     letterSpacing: "0.5px",
-                  }}>Urgency: LOW</span>
+                  }}>Fictional practice</span>
                 </div>
 
                 <div style={{ display: "flex", flexDirection: "column", gap: 7 }}>
-                  <MockCard label="What this suggests" accent="var(--ce-teal-deep)" bg="transparent">
-                    B — Calcium gluconate stabilizes the myocardium first. Peaked T waves point toward cardiac instability risk — membrane protection typically comes before K⁺ lowering.
+                  <MockCard label="Study prompt" accent="var(--ce-teal-deep)" bg="transparent">
+                    Which observations are given, and which parts are interpretation?
                   </MockCard>
-                  <MockCard label="Clinical context" accent="var(--ce-teal-deep)" bg="transparent">
-                    A/C/D address the potassium level but act more slowly — when EKG changes are present, cardiac membrane stabilization tends to be the earlier priority.
+                  <MockCard label="Discussion prompt" accent="var(--ce-teal-deep)" bg="transparent">
+                    What would you ask a preceptor to explain about this fictional scenario?
                   </MockCard>
                 </div>
               </div>
@@ -791,7 +791,7 @@ export default function Landing({ onEnterApp, onEnterScenario }) {
                 fontSize: 11,
                 color: "var(--ce-text-dim)",
               }}>
-                Builds clinical reasoning and pattern recognition
+                Practice working through clinical patterns and reasoning.
               </div>
             </div>
           </Fade>
@@ -824,7 +824,7 @@ export default function Landing({ onEnterApp, onEnterScenario }) {
                   textTransform: "uppercase",
                   letterSpacing: "0.8px",
                 }}>
-                  What to Consider Next
+                  Uncertainty and learning
                 </span>
               </div>
 
@@ -840,7 +840,7 @@ export default function Landing({ onEnterApp, onEnterScenario }) {
                   borderRadius: 8,
                   lineHeight: 1.6,
                 }}>
-                  "SpO₂ dropped from 98% to 89% on room air over the last 30 min. Patient is awake but breathing faster and looks anxious."
+                  A fictional practice case leaves some information unknown.
                 </div>
 
                 <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 14 }}>
@@ -855,15 +855,15 @@ export default function Landing({ onEnterApp, onEnterScenario }) {
                     borderRadius: "var(--ce-r-sm)",
                     textTransform: "uppercase",
                     letterSpacing: "0.5px",
-                  }}>Urgency: HIGH</span>
+                  }}>Fictional practice</span>
                 </div>
 
                 <div style={{ display: "flex", flexDirection: "column", gap: 7 }}>
-                  <MockCard label="Possible concerns" accent="var(--ce-gold-deep)" bg="rgba(212,168,75,0.06)">
-                    Anxious presentation with tachypnea and dropping O₂ sats together point toward a respiratory picture that tends to move quickly.
+                  <MockCard label="Questions to explore" accent="var(--ce-gold-deep)" bg="rgba(212,168,75,0.06)">
+                    Which details are reported, and which are not available?
                   </MockCard>
-                  <MockCard label="What to consider next" accent="var(--ce-teal-deep)" bg="transparent">
-                    Oxygen support, lung sound assessment, and keeping the provider aware tend to be early priorities in this kind of picture.
+                  <MockCard label="Learning questions" accent="var(--ce-teal-deep)" bg="transparent">
+                    Identify uncertainties and learning questions to discuss with a preceptor.
                   </MockCard>
                 </div>
               </div>
@@ -874,7 +874,7 @@ export default function Landing({ onEnterApp, onEnterScenario }) {
                 fontSize: 11,
                 color: "var(--ce-text-dim)",
               }}>
-                Helps organize thinking when uncertainty is highest
+                Organize a practice scenario and identify what remains uncertain.
               </div>
             </div>
           </Fade>
@@ -897,7 +897,7 @@ export default function Landing({ onEnterApp, onEnterScenario }) {
             padding: "52px clamp(28px, 5vw, 64px)",
           }}>
             <div>
-              <Label>Designed with Clinical Guardrails</Label>
+              <Label>Educational boundaries</Label>
               <h2 style={{
                 fontSize: "clamp(22px, 3vw, 36px)",
                 fontWeight: 800,
@@ -907,15 +907,15 @@ export default function Landing({ onEnterApp, onEnterScenario }) {
                 margin: "0 0 32px",
                 maxWidth: 520,
               }}>
-                Built around clinical guardrails.
+                Educational boundaries and limitations.
               </h2>
 
               <div style={{ display: "flex", flexDirection: "column", gap: 18 }}>
                 {[
-                  "Does NOT diagnose or replace provider judgment",
-                  "Does NOT tell you to blindly give medications",
-                  "Emphasizes assessment, trends, and escalation",
-                  "Reinforces safe clinical decision-making at every step",
+                  "Does not diagnose or replace clinical judgment",
+                  "Not a source of medication orders or dosing instructions",
+                  "Use fictional practice scenarios and general nursing education only",
+                  "AI can be wrong. Verify information and follow your clinical training and local policy.",
                 ].map((point) => (
                   <div key={point} style={{ display: "flex", alignItems: "flex-start", gap: 14 }}>
                     <Check />
@@ -939,7 +939,7 @@ export default function Landing({ onEnterApp, onEnterScenario }) {
         <Fade style={{ textAlign: "center", marginBottom: 52 }}>
           <Label>How It's Built</Label>
           <SectionHeading maxWidth={560} style={{ margin: "0 auto 20px" }}>
-            Built around how nurses actually reason.
+            A workspace for nursing education and reasoning practice.
           </SectionHeading>
           <p style={{
             fontSize: "clamp(15px, 1.8vw, 17px)",
@@ -949,7 +949,7 @@ export default function Landing({ onEnterApp, onEnterScenario }) {
             margin: "20px auto 0",
             maxWidth: 520,
           }}>
-            Clinical Edge Copilot breaks down what's actually happening, step by step, the way an experienced nurse would.
+            Use structured scenario entry and focused references to work through learning questions.
           </p>
         </Fade>
 
@@ -960,16 +960,16 @@ export default function Landing({ onEnterApp, onEnterScenario }) {
         }}>
           {[
             {
-              title: "Thinks like a nurse",
-              body: "Every response follows real clinical reasoning — the same pattern-recognition an experienced nurse uses at the bedside.",
+              title: "Nursing-focused practice",
+              body: "Structured fictional scenarios provide a starting point for learning questions.",
             },
             {
-              title: "Shows what matters",
-              body: "Cuts through noise and highlights the patterns that actually matter.",
+              title: "Review reported findings",
+              body: "Review the information reported in a practice scenario.",
             },
             {
-              title: "Helps you connect the dots",
-              body: "Vitals, symptoms, labs, and context — organized into a clear clinical picture.",
+              title: "Explore relationships",
+              body: "Use educational references to explore physiology and questions raised by a fictional example.",
             },
           ].map((card, i) => (
             <Fade key={card.title} delay={i * 80}>
@@ -1009,9 +1009,9 @@ export default function Landing({ onEnterApp, onEnterScenario }) {
         margin: "0 auto",
       }}>
         <Fade style={{ marginBottom: 52 }}>
-          <Label>How It Thinks</Label>
+          <Label>Practice workflow</Label>
           <SectionHeading maxWidth={480}>
-            How it breaks down a situation
+            How to work through a practice scenario
           </SectionHeading>
           <p style={{
             fontSize: "clamp(15px, 1.8vw, 17px)",
@@ -1021,17 +1021,17 @@ export default function Landing({ onEnterApp, onEnterScenario }) {
             margin: "16px 0 0",
             maxWidth: 460,
           }}>
-            Not more information — better thinking.
+            Use the fictional details to explore observations, uncertainty, and reasoning.
           </p>
         </Fade>
 
         <Fade delay={80}>
           <div className="l-flow">
             {[
-              { step: "01", label: "Recognizes the pattern",  body: "Identifies what's clinically concerning" },
-              { step: "02", label: "Prioritizes risk",       body: "Surfaces urgency and red flags first" },
-              { step: "03", label: "Guides assessment",      body: "Shows what to check and why" },
-              { step: "04", label: "Clarifies what matters next", body: "What to consider, what to watch, and when provider awareness may be helpful" },
+              { step: "01", label: "Review reported findings",  body: "Start with information explicitly supplied" },
+              { step: "02", label: "Explore priorities",       body: "Discuss priorities and their supporting reasoning" },
+              { step: "03", label: "Clarify the unknowns",      body: "Review questions that could clarify a fictional scenario" },
+              { step: "04", label: "Identify learning questions", body: "Identify uncertainties to discuss with a preceptor" },
             ].map((item, i) => (
               <>
                 {i > 0 && (
@@ -1087,9 +1087,9 @@ export default function Landing({ onEnterApp, onEnterScenario }) {
         margin: "0 auto",
       }}>
         <Fade style={{ marginBottom: 44 }}>
-          <Label>Real Shift Moments</Label>
+          <Label>Questions after learning something new</Label>
           <SectionHeading maxWidth={480}>
-            The moment something feels off.
+            A place to work through learning questions.
           </SectionHeading>
           <p style={{
             fontSize: "clamp(15px, 1.8vw, 17px)",
@@ -1099,7 +1099,7 @@ export default function Landing({ onEnterApp, onEnterScenario }) {
             margin: "20px 0 0",
             maxWidth: 480,
           }}>
-            Vitals are changing. The patient looks different. You need to think clearly — fast.
+            Use a fictional example to explore observations, uncertainty, and reasoning.
           </p>
         </Fade>
 
@@ -1107,18 +1107,18 @@ export default function Landing({ onEnterApp, onEnterScenario }) {
           {[
             {
               n: "01",
-              title: "A subtle BP drop becomes a trend.",
-              body: "Not crashing. Not normal. You need to decide what matters now.",
+              title: "What changed in the fictional case?",
+              body: "Compare only the earlier and current information supplied.",
             },
             {
               n: "02",
-              title: "The patient looks worse before the numbers catch up.",
-              body: "Something changed. You feel it. Now you need to connect the dots.",
+              title: "What remains unknown?",
+              body: "Separate reported information from assumptions.",
             },
             {
               n: "03",
-              title: "You're not looking for more noise.",
-              body: "You need help sorting what's urgent, what to assess, and when to escalate.",
+              title: "What would you like to understand?",
+              body: "Write down a physiology or reasoning question to explore with a preceptor.",
             },
           ].map((item, i) => (
             <Fade key={item.n} delay={i * 60}>
@@ -1167,9 +1167,9 @@ export default function Landing({ onEnterApp, onEnterScenario }) {
         margin: "0 auto",
       }}>
         <Fade style={{ textAlign: "center", marginBottom: 52 }}>
-          <Label>Built for real clinical thinking</Label>
+          <Label>Developing critical-care reasoning</Label>
           <SectionHeading maxWidth={540} style={{ margin: "0 auto" }}>
-            Built for wherever you are in your clinical journey.
+            For nurses transitioning into ICU practice.
           </SectionHeading>
           <p style={{
             fontSize: "clamp(15px, 1.8vw, 17px)",
@@ -1179,7 +1179,7 @@ export default function Landing({ onEnterApp, onEnterScenario }) {
             margin: "20px auto 0",
             maxWidth: 520,
           }}>
-            Whether you're building your clinical eye or making fast decisions on a busy shift — structured thinking helps at every stage.
+            For practicing nurses developing critical-care reasoning, especially during their first two years in ICU.
           </p>
         </Fade>
 
@@ -1196,18 +1196,18 @@ export default function Landing({ onEnterApp, onEnterScenario }) {
           {[
             {
               n: "01",
-              title: "For students building clinical judgment",
-              body: "Learn to recognize patterns, connect the dots, and understand the 'why' behind what you're seeing.",
+              title: "Transitioning from Med-Surg or telemetry",
+              body: "Explore unfamiliar critical-care concepts through education and practice.",
             },
             {
               n: "02",
-              title: "For new grads gaining confidence",
-              body: "Stop second-guessing every assessment. Build structured thinking from your first real shifts.",
+              title: "Moving from PCU into ICU",
+              body: "Work through fictional scenarios and discuss the reasoning with a preceptor.",
             },
             {
               n: "03",
-              title: "For nurses thinking through situations in real time",
-              body: "When things are moving fast and you need clarity — not more noise.",
+              title: "Developing critical-care understanding",
+              body: "Use nursing references and practice scenarios to explore the why.",
             },
           ].map((item, i) => (
             <Fade key={item.n} delay={i * 60} style={{ background: "var(--ce-navy-900)", padding: "40px 34px" }}>
@@ -1246,9 +1246,9 @@ export default function Landing({ onEnterApp, onEnterScenario }) {
         margin: "0 auto",
       }}>
         <Fade>
-          <Label>The Reality of Bedside Nursing</Label>
+          <Label>Learning during the transition</Label>
           <SectionHeading maxWidth={520}>
-            Nursing school didn't teach you how to think like this.
+            The transition into critical care brings new questions.
           </SectionHeading>
         </Fade>
 
@@ -1266,23 +1266,23 @@ export default function Landing({ onEnterApp, onEnterScenario }) {
           {[
             {
               n: "01",
-              title: "Early signals get lost in the noise",
-              body: "A subtle HR trend, a mildly worsening lactate, a patient who seems 'off' — these patterns are easy to miss when you're managing five patients at once.",
+              title: "Several questions at once",
+              body: "Complex scenarios can raise several learning questions at once.",
             },
             {
               n: "02",
-              title: "Pattern recognition takes years",
-              body: "Senior nurses recognize deterioration earlier because they've seen it hundreds of times. That clinical intuition isn't easy to teach — or learn quickly.",
+              title: "Practice and support",
+              body: "Developing critical-care reasoning takes practice and support.",
             },
             {
               n: "03",
-              title: "New nurses carry disproportionate uncertainty",
-              body: "Early in your career, you're constantly asking: is this normal? Should I call? Am I missing something? That uncertainty costs cognitive energy and time.",
+              title: "Unfamiliar physiology and workflows",
+              body: "Moving into ICU can mean learning unfamiliar physiology, devices, and workflows.",
             },
             {
               n: "04",
-              title: "Even experienced nurses second-guess",
-              body: "When you're tired, at the end of a shift, or dealing with an unfamiliar presentation — a structured second opinion helps anyone think more clearly.",
+              title: "Questions at any experience level",
+              body: "Unfamiliar concepts can prompt questions at any experience level.",
             },
           ].map((item, i) => (
             <Fade key={item.n} delay={i * 60} style={{ background: "var(--ce-navy-900)", padding: "44px 40px" }}>
@@ -1322,9 +1322,9 @@ export default function Landing({ onEnterApp, onEnterScenario }) {
         scrollMarginTop: 80,
       }}>
         <Fade style={{ textAlign: "center", marginBottom: 48 }}>
-          <Label>See It In Action</Label>
+          <Label>Learning outline</Label>
           <SectionHeading maxWidth={480} style={{ margin: "0 auto 20px" }}>
-            From bedside concern to structured clinical reasoning.
+            A fictional practice workflow.
           </SectionHeading>
           <p style={{
             fontSize: "clamp(14px, 1.6vw, 16px)",
@@ -1335,7 +1335,7 @@ export default function Landing({ onEnterApp, onEnterScenario }) {
             margin: "16px auto 0",
             maxWidth: 480,
           }}>
-            What you get in seconds — not a Google rabbit hole.
+            Illustrative study prompts, not generated output.
           </p>
         </Fade>
 
@@ -1360,7 +1360,7 @@ export default function Landing({ onEnterApp, onEnterScenario }) {
                 letterSpacing: "var(--ce-track-eyebrow)",
                 textTransform: "uppercase",
               }}>
-                Clinical Edge Copilot — Clinical Reasoning Mode
+                Learning outline — not generated output
               </span>
             </div>
 
@@ -1375,7 +1375,7 @@ export default function Landing({ onEnterApp, onEnterScenario }) {
                 letterSpacing: "1.2px",
                 marginBottom: 12,
               }}>
-                Clinical Scenario
+                Fictional practice outline
               </div>
 
               {/* Scenario text */}
@@ -1390,7 +1390,7 @@ export default function Landing({ onEnterApp, onEnterScenario }) {
                 marginBottom: 28,
                 fontStyle: "italic",
               }}>
-                "Patient is a 68-year-old with CHF admitted yesterday. Oxygen went from 2L nasal cannula to 6L over the past 3 hours. HR up to 108, BP 148/92, increasing respiratory rate, bilateral crackles on auscultation."
+                Start with a fictional scenario supplied for learning. Use only the details given; leave unknown information unknown.
               </div>
 
               {/* Urgency badge row */}
@@ -1407,25 +1407,25 @@ export default function Landing({ onEnterApp, onEnterScenario }) {
                   textTransform: "uppercase",
                   letterSpacing: "0.5px",
                 }}>
-                  Urgency: MODERATE
+                  Fictional practice
                 </span>
                 <span style={{ fontSize: 11, color: "var(--ce-text-dim)", fontFamily: "var(--ce-font-mono)" }}>·</span>
-                <span style={{ fontSize: 11, color: "var(--ce-text-dim)", fontFamily: "var(--ce-font-mono)" }}>Clinical Reasoning</span>
+                <span style={{ fontSize: 11, color: "var(--ce-text-dim)", fontFamily: "var(--ce-font-mono)" }}>Study prompts</span>
               </div>
 
               {/* Sections — real SECTION_CONFIG colors (teal + gold only) */}
               <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
-                <MockCard label="What this could be" accent="var(--ce-teal-deep)" bg="transparent">
-                  Acute decompensated heart failure with progressive fluid overload — the escalating oxygen need is the signal here.
+                <MockCard label="Learning focus" accent="var(--ce-teal-deep)" bg="transparent">
+                  Which observations are explicitly reported in the fictional scenario?
                 </MockCard>
-                <MockCard label="Possible concerns" accent="var(--ce-gold-deep)" bg="rgba(212,168,75,0.06)">
-                  Escalating O₂ requirement + bilateral crackles + tachycardia in a CHF patient is a pattern consistent with ADHF. The 3-hour trend matters more than any single value.
+                <MockCard label="Questions to explore" accent="var(--ce-gold-deep)" bg="rgba(212,168,75,0.06)">
+                  Which relationships would you want explained through physiology?
                 </MockCard>
-                <MockCard label="What to assess next" accent="var(--ce-teal-deep)" bg="transparent">
-                  Work of breathing, O₂ sat trend, lung sounds, lower extremity edema, urine output, daily weight delta, and JVP. Upright positioning is typically prioritized in this picture.
+                <MockCard label="What remains unknown" accent="var(--ce-teal-deep)" bg="transparent">
+                  What information is missing, and how does that limit interpretation?
                 </MockCard>
-                <MockCard label="Where this may be heading" accent="var(--ce-gold-deep)" bg="rgba(212,168,75,0.06)">
-                  If O₂ requirement continues rising, SpO₂ falls below 92%, respiratory rate exceeds 28, or mental status changes — these are patterns that tend to warrant provider awareness.
+                <MockCard label="Discussion questions" accent="var(--ce-gold-deep)" bg="rgba(212,168,75,0.06)">
+                  Which reasoning questions would you discuss with a preceptor?
                 </MockCard>
               </div>
             </div>
@@ -1447,7 +1447,7 @@ export default function Landing({ onEnterApp, onEnterScenario }) {
             padding: "64px clamp(28px, 5vw, 72px)",
           }}>
             <div>
-              <Label>Grounded in real clinical frameworks</Label>
+              <Label>Structured for nursing education and reasoning practice</Label>
 
               <h2 style={{
                 fontSize: "clamp(24px, 3.5vw, 40px)",
@@ -1470,14 +1470,14 @@ export default function Landing({ onEnterApp, onEnterScenario }) {
                 margin: "0 0 40px",
                 maxWidth: 540,
               }}>
-                Responses are structured around real nursing assessment patterns and clinical reasoning.
+                Use fictional practice scenarios and educational references alongside your training and preceptor discussions.
               </p>
 
               <div style={{ display: "flex", flexDirection: "column", gap: 18, marginBottom: 44 }}>
                 {[
                   "Not a diagnosis tool",
                   "Not a replacement for your judgment",
-                  "Not a shortcut",
+                  "AI can be wrong",
                 ].map((point) => (
                   <div key={point} style={{ display: "flex", alignItems: "flex-start", gap: 14 }}>
                     <Check />
@@ -1497,7 +1497,7 @@ export default function Landing({ onEnterApp, onEnterScenario }) {
                 lineHeight: 1.65,
                 maxWidth: 560,
               }}>
-                A second set of clinical eyes when you need to think clearly.
+                A nursing-focused learning workspace. Follow institutional policy, provider orders, and your clinical judgment.
               </div>
             </div>
           </div>
@@ -1512,7 +1512,7 @@ export default function Landing({ onEnterApp, onEnterScenario }) {
         textAlign: "center",
       }}>
         <Fade>
-          <Label>Start Thinking Clearly on Shift</Label>
+          <Label>Start with fictional practice</Label>
           <h2 style={{
             fontSize: "clamp(28px, 4vw, 46px)",
             fontWeight: 800,
@@ -1522,7 +1522,7 @@ export default function Landing({ onEnterApp, onEnterScenario }) {
             margin: "0 auto 22px",
             maxWidth: 560,
           }}>
-            Bring clarity to the moment that matters.
+            Start with a fictional practice scenario.
           </h2>
           <p style={{
             fontSize: "clamp(15px, 1.8vw, 17px)",
@@ -1531,7 +1531,7 @@ export default function Landing({ onEnterApp, onEnterScenario }) {
             margin: "0 auto 48px",
             maxWidth: 440,
           }}>
-            Try a real scenario and see how it breaks it down.
+            Use fictional practice scenarios and general nursing education only. Do not enter real patient information.
           </p>
           <div style={{
             display: "flex",
@@ -1544,14 +1544,14 @@ export default function Landing({ onEnterApp, onEnterScenario }) {
               className="l-btn-primary"
               style={{ ...btnPrimary, fontSize: 15, padding: "14px 34px" }}
             >
-              Try Clinical Edge Copilot
+              Try a fictional practice scenario
             </button>
             <button
               onClick={() => { trackEvent('landing_secondary_cta_clicked', { destination: 'copilot', placement: 'closing' }); onEnterApp(); }}
               className="l-btn-ghost"
               style={{ ...btnGhost, fontSize: 15, padding: "14px 34px" }}
             >
-              Open Copilot
+              Open workspace
             </button>
           </div>
         </Fade>
@@ -1587,7 +1587,7 @@ export default function Landing({ onEnterApp, onEnterScenario }) {
           margin: 0,
           fontFamily: "'IBM Plex Mono', monospace",
         }}>
-          Clinical Edge Copilot provides clinical reasoning support and nursing education only. It does not replace institutional protocols, provider orders, or clinical judgment.
+          Clinical Edge is for nursing education and reasoning practice. It does not replace institutional protocols, provider orders, preceptors, or clinical judgment.
         </p>
 
         <p style={{

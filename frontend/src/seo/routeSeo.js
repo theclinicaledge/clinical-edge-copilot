@@ -6,21 +6,21 @@ export const STATIC_ROUTE_SEO = {
   "/": {
     title: `${SITE_NAME} — Clinical tools for real-world nursing`,
     description:
-      "Think through clinical situations, practice rhythm recognition, and build bedside confidence with Copilot, Rhythm Lab, ICU Drips, Reference Hub, and ABG Lab.",
+      "Nursing education, reference tools, and fictional scenario practice for nurses developing critical-care reasoning.",
     path: "/",
     ogType: "website",
   },
   "/download": {
     title: `${SITE_NAME} — Clinical Tools for Nurses`,
     description:
-      "Explore Clinical Edge's tools for nurses: Copilot for bedside clinical reasoning, Rhythm Lab, ICU Drip Lab, ABG Lab, and Reference Hub — plus the Clinical Edge Copilot app on the App Store.",
+      "Access Clinical Edge nursing education and practice tools on the web or iPhone.",
     path: "/download",
     ogType: "website",
   },
   "/privacy": {
     title: `Privacy Policy | ${SITE_NAME}`,
     description:
-      "How Clinical Edge Copilot handles data: no patient information, no PHI, local-only saved cases, and anonymized usage analytics.",
+      "How Clinical Edge processes submitted text, optional device-local saved cases, and aggregate usage analytics. Do not submit patient-identifiable information.",
     path: "/privacy",
     ogType: "website",
   },

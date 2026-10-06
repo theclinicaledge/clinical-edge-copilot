@@ -123,10 +123,10 @@ const PRODUCTS = [
   {
     key: "copilot",
     tag: "Clinical Reasoning",
-    title: "Clinical Edge Copilot",
+    title: "Shift Brain",
     description:
-      "Think through clinical situations, bedside questions, and SBAR communication with structured reasoning support.",
-    cta: "Open Copilot",
+      "Open Shift Brain to organize structured fictional scenario information.",
+    cta: "Open Shift Brain",
     path: "/copilot",
   },
   {
@@ -134,17 +134,17 @@ const PRODUCTS = [
     tag: "ECG Interpretation",
     title: "Rhythm Lab",
     description:
-      "Build ECG interpretation skills through a structured, repeatable rhythm-reading process.",
+      "Practice a structured approach to rhythm recognition.",
     cta: "Open Rhythm Lab",
     path: "/rhythm-lab",
   },
   {
     key: "icudrips",
     tag: "Infusion Reference",
-    title: "ICU Drip Lab",
+    title: "ICU Drips",
     description:
-      "Strengthen understanding of critical-care drips, hemodynamics, and bedside titration concepts.",
-    cta: "Open ICU Drip Lab",
+      "Review critical-care infusion concepts and monitoring context. Educational reference, not a dosing guide.",
+    cta: "Open ICU Drips",
     path: "/icu-drips",
   },
   {
@@ -161,7 +161,7 @@ const PRODUCTS = [
     tag: "Bedside Reference",
     title: "Reference Hub",
     description:
-      "Fast bedside answers for hemodynamics, labs, ventilation, and devices — no dosing, no diagnosis.",
+      "Browse educational references for hemodynamics, labs, ventilation, and devices. No dosing. No diagnosis.",
     cta: "Open Reference Hub",
     path: "/reference-hub",
   },
@@ -349,7 +349,7 @@ export default function Download({ onNavigate }) {
             margin: "0 0 14px",
             maxWidth: 560,
           }}>
-            Clinical tools built for real nursing workflows.
+            Use Clinical Edge on your iPhone.
           </h1>
 
           <p style={{
@@ -359,8 +359,8 @@ export default function Download({ onNavigate }) {
             margin: "0 0 28px",
             maxWidth: 480,
           }}>
-            Learn rhythms, strengthen critical-care knowledge, and work
-            through clinical questions with practical tools built for nurses.
+            Access nursing reference and practice tools, with education
+            and reasoning support.
           </p>
 
           <div className="dl-hero-ctas" style={{
@@ -453,7 +453,7 @@ export default function Download({ onNavigate }) {
               letterSpacing: "-0.02em",
               margin: "0 0 10px",
             }}>
-              Take Clinical Edge Copilot with you.
+              Nursing education and practice on your iPhone.
             </h2>
             <p style={{
               fontSize: 14,
@@ -462,8 +462,8 @@ export default function Download({ onNavigate }) {
               margin: "0 0 22px",
               maxWidth: 420,
             }}>
-              Access structured clinical reasoning support from your iPhone
-              whenever you need a quick educational reference.
+              Use fictional practice scenarios and educational references
+              to explore nursing concepts.
             </p>
 
             <a
@@ -503,8 +503,8 @@ export default function Download({ onNavigate }) {
         }}>
           {[
             "Built by an RN",
-            "No patient data stored",
-            "App Store reviewed",
+            "Optional device-local saved cases",
+            "Do not enter patient identifiers",
             "Educational support only",
           ].map((item) => (
             <span key={item} style={{
@@ -546,7 +546,9 @@ export default function Download({ onNavigate }) {
           }}>
             Clinical Edge is for educational support only and is not a
             substitute for clinical judgment, provider guidance, institutional
-            policy, or emergency care.
+            policy, or emergency care. Use fictional practice scenarios and
+            general nursing education only. See Privacy for data processing
+            and optional device-local saved cases.
           </p>
         </section>
       </main>

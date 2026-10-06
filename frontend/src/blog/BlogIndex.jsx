@@ -13,7 +13,7 @@ function formatDisplayDate(iso) {
 export default function BlogIndex() {
   useSeo({
     title: `Blog | ${SITE_NAME}`,
-    description: "Practical, nurse-written guides on ABGs, EKGs, and bedside clinical reasoning from Clinical Edge.",
+    description: "Practical guides for nursing education from Clinical Edge.",
     path: "/blog",
     ogType: "website",
   });
@@ -32,7 +32,7 @@ export default function BlogIndex() {
           Clinical Edge Blog
         </h1>
         <p style={{ fontSize: "clamp(14px, 2.8vw, 15.5px)", color: "var(--ce-text-muted)", margin: 0, lineHeight: 1.55, maxWidth: 480 }}>
-          Practical, nurse-written guides on ABGs, EKGs, and bedside clinical reasoning.
+          Practical guides for nursing education.
         </p>
       </header>
 

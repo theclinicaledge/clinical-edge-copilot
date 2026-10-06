@@ -1136,11 +1136,11 @@ test('brain sheets library and production detail route load', async ({ page }) =
 
 test('quickstart option can be selected and completed', async ({ page }) => {
   await page.goto('/quickstart');
-  const textarea = page.getByPlaceholder('e.g. BP dropping post-op and patient looks pale, HR climbing...');
+  const textarea = page.getByPlaceholder('Describe a fictional practice scenario using only the supplied details...');
   await page.getByRole('button', { name: 'BP dropping post-op' }).click();
   await expect(textarea).toHaveValue('BP dropping post-op');
 
-  await page.getByRole('button', { name: 'Start thinking it through →' }).click();
+  await page.getByRole('button', { name: 'Review the fictional scenario →' }).click();
   await page.waitForURL('**/copilot');
   await expect(page.getByPlaceholder('Add a brief relevant detail')).toHaveValue('BP dropping post-op');
 });
@@ -1163,6 +1163,6 @@ test('support page loads', async ({ page }) => {
 
 test('download page loads', async ({ page }) => {
   await page.goto('/download');
-  await expect(page.getByRole('heading', { name: 'Clinical tools built for real nursing workflows.' })).toBeVisible();
+  await expect(page.getByRole('heading', { name: 'Use Clinical Edge on your iPhone.' })).toBeVisible();
   await expect(page.getByRole('link', { name: 'Download on the App Store' }).first()).toBeVisible();
 });

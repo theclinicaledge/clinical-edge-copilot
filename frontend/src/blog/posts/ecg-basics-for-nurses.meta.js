@@ -18,10 +18,10 @@ export const meta = {
   cta: {
     eyebrow: "Try it yourself",
     headline: "Practice rhythm recognition with Clinical Edge",
-    body: "Work through ECGs, ABGs, and real clinical scenarios with step-by-step reasoning designed for nurses.",
+    body: "Explore educational references and fictional practice scenarios.",
     primaryLabel: "Explore Rhythm Lab",
     primaryHref: "/rhythm-lab",
-    secondaryLabel: "Ask Copilot a question",
+    secondaryLabel: "Open Shift Brain",
     secondaryHref: "/copilot",
   },
 };

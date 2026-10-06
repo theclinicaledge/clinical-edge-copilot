@@ -73,12 +73,13 @@ for (const width of widths) {
     await expect(page).toHaveURL(/\/brain-sheets$/);
     await expect(nav.getByRole('button', { name: 'More tools' })).toHaveClass(/is-active/);
     await page.evaluate(() => window.scrollTo(0, document.body.scrollHeight));
-    const clearance = await page.evaluate(() => {
+    await expect.poll(() => page.evaluate(() => {
+      // Navigation also schedules a scroll reset; measure the requested bottom after it settles.
+      window.scrollTo(0, document.body.scrollHeight);
       const cards = document.querySelectorAll('.bs-list-item');
       const last = cards[cards.length - 1];
       return !last || last.getBoundingClientRect().bottom <= document.querySelector('.ce-tool-dock')!.getBoundingClientRect().top;
-    });
-    expect(clearance).toBe(true);
+    })).toBe(true);
     expect(providerRequests).toBe(0);
     expect(errors).toEqual([]);
   });

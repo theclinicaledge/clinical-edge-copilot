@@ -705,9 +705,9 @@ function HubView({ onSelect, onGoHome, onSelectPathway, onSelectConcept }) {
         {/* Hero */}
         <div className="rh-hero">
           <div className="rh-hero__eyebrow">Clinical Reference Hub</div>
-          <h2 className="rh-hero__title">Find what matters faster.</h2>
+          <h2 className="rh-hero__title">Browse nursing reference topics.</h2>
           <p className="rh-hero__text">
-            Fast bedside answers. No dosing. No diagnosis.
+            Educational references. No dosing. No diagnosis.
           </p>
           <div className="rh-hero__stats">
             <div className="rh-hero__stat">

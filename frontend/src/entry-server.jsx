@@ -18,7 +18,7 @@ import { SITE_NAME } from "./seo/seoTags.js";
 
 const BLOG_INDEX_SEO = {
   title: `Blog | ${SITE_NAME}`,
-  description: "Practical, nurse-written guides on ABGs, EKGs, and bedside clinical reasoning from Clinical Edge.",
+  description: "Practical guides for nursing education from Clinical Edge.",
   path: "/blog",
   ogType: "website",
 };

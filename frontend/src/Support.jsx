@@ -136,7 +136,7 @@ export default function Support() {
               clinicaledgehq@gmail.com
             </a>
             <p style={{ margin: "10px 0 0", fontSize: 13, color: "var(--ce-text-muted)", lineHeight: 1.65 }}>
-              For questions about the product, feedback, bug reports, or anything else — reach out directly. We read every message.
+              Send questions or product feedback to clinicaledgehq@gmail.com.
             </p>
           </div>
 
@@ -158,19 +158,19 @@ export default function Support() {
             {[
               {
                 q: "What is Clinical Edge Copilot?",
-                a: "Clinical Edge Copilot is a clinical reasoning support tool for bedside nurses, built on a large language model. It helps you think through patient scenarios, interpret findings, and identify escalation needs — not replace clinical judgment.",
+                a: "Clinical Edge supports nursing education and structured reasoning practice. It does not determine care or escalation decisions.",
               },
               {
                 q: "Is this a diagnostic tool?",
-                a: "No. Copilot is a reasoning and escalation awareness aid. It does not diagnose, prescribe, or replace provider judgment or institutional policy.",
+                a: "No. Clinical Edge provides nursing education and reasoning support. It does not diagnose, prescribe, or replace clinical judgment, preceptors, provider orders, or institutional policy.",
               },
               {
                 q: "Should I enter patient names or identifiers?",
-                a: "No. Do not enter any personally identifiable information — names, dates of birth, MRNs, or other patient identifiers. Use clinical context only.",
+                a: "Use fictional scenarios or general education questions only. Do not enter real patient information.",
               },
               {
                 q: "How do I report a problem or wrong answer?",
-                a: "Email us at clinicaledgehq@gmail.com with the question you asked and what the issue was. We review feedback to improve the product.",
+                a: "Email a description of the issue, the page, and approximate time. Do not include patient information or copy real-patient questions or answers. A fictional reproduction is welcome.",
               },
             ].map(({ q, a }) => (
               <div key={q} style={{

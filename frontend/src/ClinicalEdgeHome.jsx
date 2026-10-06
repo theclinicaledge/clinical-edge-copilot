@@ -38,7 +38,7 @@ export default function ClinicalEdgeHome({ onNavigate }) {
             if (event.metaKey || event.ctrlKey || event.shiftKey || event.altKey) return;
             event.preventDefault(); trackEvent("home_quick_action_copilot"); onNavigate("/copilot?capture=rapid");
           }}><span>Describe what&apos;s happening</span><span aria-hidden="true">&#8594;</span></a>
-          <p>No patient identifiers. Save only when you choose.<br />Reasoning support alongside clinical judgment.</p>
+          <p>Do not enter patient identifiers. Completed cases can be saved on this device when you choose. See Privacy for data processing and storage.<br />Reasoning support alongside clinical judgment.</p>
         </section>
         <section className="ce-command-home__check" aria-labelledby="check-title">
           <h2 id="check-title">Check something</h2>

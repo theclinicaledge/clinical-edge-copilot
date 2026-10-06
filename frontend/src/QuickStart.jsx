@@ -113,7 +113,7 @@ export default function QuickStart({ onBack, onEnterApp }) {
           fontSize: 12, fontWeight: 600, padding: "7px 16px",
           borderRadius: "var(--ce-r-md)", cursor: "pointer",
         }}>
-          Skip to App
+          Open workspace
         </button>
       </nav>
 
@@ -134,7 +134,7 @@ export default function QuickStart({ onBack, onEnterApp }) {
           textTransform: "uppercase",
           marginBottom: 16,
         }}>
-          Your Patient
+          Fictional practice
         </div>
 
         {/* Title */}
@@ -146,7 +146,7 @@ export default function QuickStart({ onBack, onEnterApp }) {
           lineHeight: 1.08,
           margin: "0 0 12px",
         }}>
-          What's going on with your patient?
+          What is happening in this fictional scenario?
         </h1>
 
         {/* Subtext */}
@@ -156,7 +156,7 @@ export default function QuickStart({ onBack, onEnterApp }) {
           lineHeight: 1.65,
           margin: "0 0 36px",
         }}>
-          Describe the situation in your own words.
+          Use the supplied fictional details only. Do not enter real patient information.
         </p>
 
         {/* Input card */}
@@ -172,7 +172,7 @@ export default function QuickStart({ onBack, onEnterApp }) {
             value={value}
             onChange={e => setValue(e.target.value)}
             onKeyDown={handleKeyDown}
-            placeholder={"e.g. BP dropping post-op and patient looks pale, HR climbing..."}
+            placeholder={"Describe a fictional practice scenario using only the supplied details..."}
             rows={5}
             style={{
               width: "100%",
@@ -247,7 +247,7 @@ export default function QuickStart({ onBack, onEnterApp }) {
               boxShadow: "none",
             }}
           >
-            Start thinking it through →
+            Review the fictional scenario →
           </button>
 
           <span style={{

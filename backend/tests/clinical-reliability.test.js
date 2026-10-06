@@ -721,7 +721,7 @@ test("Priority Map returns a grounded fallback when its one repair remains inval
   assert.equal(result.output, buildPriorityMapFallback(RESPIRATORY_SOURCE, result.output));
   assert.deepEqual(validatePriorityMapReliability(RESPIRATORY_SOURCE, result.output), []);
   assert.match(result.output, /Worsening ventilation with respiratory acidemia/);
-  assert.match(result.output, /Hypercapnia may be contributing to the new drowsiness/i);
+  assert.match(result.output, /Hypercapnia may be contributing to drowsiness/i);
   assert.match(result.output, /medication or sedation exposure/i);
   assert.match(result.output, /neurologic and metabolic contributors, fatigue/i);
   assert.doesNotMatch(result.output, /hypercapnic respiratory failure|caused the drowsiness/i);

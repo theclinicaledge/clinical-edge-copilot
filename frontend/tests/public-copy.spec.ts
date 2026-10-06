@@ -40,7 +40,6 @@ for (const width of [390, 1280]) {
         window.scrollTo(0, 0);
       });
       await expect.poll(() => page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true);
-      if (path === '/landing') await expect(page.locator('.ask-grid').locator(':scope > div').first()).toHaveCSS('opacity', '1');
       if (process.env.CLAIMS_SCREENSHOTS_DIR) {
         const slug = path === '/' ? 'home' : path.slice(1).replaceAll('/', '-');
         await page.screenshot({ path: `${process.env.CLAIMS_SCREENSHOTS_DIR}/${slug}-${width}.png`, fullPage: true, animations: 'disabled' });
@@ -66,11 +65,14 @@ test('landing has bounded practice copy and no medical output or public Ask prom
   const content = await page.locator('body').innerText();
   expect(content).not.toMatch(/catch subtle deterioration|fast, accurate|safe clinical decision|thinks like a nurse|preceptor would|nursing school didn't|Google rabbit hole|second set of clinical eyes|Urgency:|calcium gluconate|acute decompensated|furosemide|Ask Clinical Edge|P2|beta.ready/i);
   expect(content).toContain('not generated output');
-  expect(content).toContain('Do not enter real patient information.');
+  expect(content).toContain('Use fictional scenarios and general education only; do not enter real patient information.');
   await expect(page.locator('a[href="/ask"]')).toHaveCount(0);
-  await page.getByRole('button', { name: 'Try a fictional practice scenario →', exact: true }).click();
-  await expect(page).toHaveURL(/\/scenario$/);
-  await expect(page.getByText('Fictional practice scenarios for nursing education.', { exact: false })).toBeVisible();
+  const practice = page.getByRole('button', { name: 'Try a fictional practice scenario', exact: true });
+  await expect(practice).toHaveCount(2);
+  await expect(practice.first()).toBeDisabled();
+  await expect(practice.last()).toBeDisabled();
+  await expect(page).toHaveURL(/\/landing$/);
+  await expect(page.getByText('Example awaiting clinical-owner approval', { exact: true })).toBeVisible();
 });
 
 test('download keeps working tool links and replaces absolute trust claims', async ({ page }) => {

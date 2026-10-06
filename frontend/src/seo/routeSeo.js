@@ -3,6 +3,14 @@ import { SITE_NAME } from "./seoTags.js";
 // Static per-route metadata for prerendered marketing pages that aren't the
 // blog (the blog's SEO data lives alongside its post registry instead).
 export const STATIC_ROUTE_SEO = {
+  "/landing": {
+    title: `${SITE_NAME} — Critical-care nursing practice`,
+    description:
+      "Understand the why behind critical-care nursing. A nursing-focused learning workspace designed around fictional practice, reasoning, and physiology.",
+    path: "/landing",
+    ogType: "website",
+    robots: "noindex, follow",
+  },
   "/": {
     title: `${SITE_NAME} — Clinical tools for real-world nursing`,
     description:

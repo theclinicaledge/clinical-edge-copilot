@@ -16,6 +16,7 @@ const distDir = path.join(root, "dist");
 
 const ROUTES = [
   "/",
+  "/landing",
   "/blog",
   "/blog/abg-interpretation-for-nurses",
   "/blog/ecg-basics-for-nurses",

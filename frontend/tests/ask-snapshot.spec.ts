@@ -67,7 +67,7 @@ for (const width of [320, 390, 430, 1280]) test(`confirmed Snapshot → Ask is e
   await page.screenshot({ path: `/private/tmp/clinical-edge-snapshot-ask-${width}-input.png` });
   await page.locator('.ce-ask-answer').scrollIntoViewIfNeeded();
   await page.screenshot({ path: `/private/tmp/clinical-edge-snapshot-ask-${width}-answer.png` });
-  await page.reload(); await expect(page.getByLabel('Use confirmed Patient Snapshot')).toBeDisabled(); await expect(page.locator('.ce-ask-answer')).toHaveCount(0);
+  await page.reload(); await expect(page.getByLabel('Use confirmed Patient Snapshot')).toHaveCount(0); await expect(page.getByText('No Snapshot selected', { exact: true })).toBeVisible(); await expect(page.locator('.ce-ask-answer')).toHaveCount(0);
 });
 test('disabled context and irrelevant questions omit the packet entirely', async ({ page }) => {
   const bodies: any[] = []; await mockAsk(page, bodies); await enterSnapshot(page);
@@ -85,7 +85,7 @@ test('editing confirmed form invalidates old context and hides stale patient ans
   const dock = page.getByRole('navigation', { name: 'Clinical Edge workspace' });
   await dock.getByRole('link', { name: 'Shift Brain', exact: true }).click(); await page.getByLabel('CI current', { exact: true }).fill('3.5');
   await dock.getByRole('link', { name: 'Ask', exact: true }).click();
-  await expect(page.getByLabel('Use confirmed Patient Snapshot')).toBeDisabled(); await expect(page.locator('.ce-ask-answer')).toHaveCount(0); expect(bodies).toHaveLength(1);
+  await expect(page.getByLabel('Use confirmed Patient Snapshot')).toHaveCount(0); await expect(page.locator('.ce-ask-answer')).toHaveCount(0); expect(bodies).toHaveLength(1);
 });
 test('Snapshot gas uses authoritative ABG calculation through the actual form and Ask UI', async ({ page }) => {
   const bodies: any[] = []; await mockAsk(page, bodies);

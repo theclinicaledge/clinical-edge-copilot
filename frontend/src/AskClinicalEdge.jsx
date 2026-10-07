@@ -47,6 +47,10 @@ export default function AskClinicalEdge({ navigate, isVisible, snapshot = null }
   const [busy, setBusy] = useState(false);
   const pending = useRef(null);
   const input = useRef(null);
+  const presentationDetails = abg || answerContext?.snapshotUse ? details : [...details].sort((a, b) => {
+    const rank = heading => ({ 'At the bedside': 0, Safety: 1, 'What changes interpretation': 2 }[heading] ?? 3);
+    return rank(a.heading) - rank(b.heading);
+  });
   useEffect(() => { if (isVisible) trackEvent('ask_opened', { mode: 'general' }); }, [isVisible]);
   useEffect(() => () => pending.current?.abort(), []);
   useEffect(() => () => { if (snapshot && requestSnapshot.current === snapshot) pending.current?.abort(); }, [snapshot]);
@@ -99,8 +103,8 @@ export default function AskClinicalEdge({ navigate, isVisible, snapshot = null }
       <form onSubmit={submit}>
         <div className="ce-ask-context">
           <strong>{contextEnabled ? 'Using Patient Snapshot' : 'General Ask'}</strong>
-          <label><input type="checkbox" checked={contextEnabled} disabled={!snapshot || busy} onChange={e => setContextChoice(e.target.checked ? snapshot : null)} />Use confirmed Patient Snapshot</label>
-          {!snapshot && <p>No confirmed Snapshot available. <button type="button" onClick={() => navigate('/copilot')}>Create or confirm Snapshot</button></p>}
+          {snapshot ? <label><input type="checkbox" checked={contextEnabled} disabled={busy} onChange={e => setContextChoice(e.target.checked ? snapshot : null)} />Use confirmed Patient Snapshot</label>
+            : <div className="ce-ask-empty"><div><span>No Snapshot selected</span><p>Add non-identifying context for a more specific answer.</p></div><button type="button" onClick={() => navigate('/copilot')}>Create Snapshot <span aria-hidden="true">&#8594;</span></button></div>}
           {contextEnabled && !selectedContext && <p>No relevant Snapshot facts selected. This question will use General Ask.</p>}
           {selectedContext && <details><summary>Reported facts selected for this question ({selectedContext.facts.length})</summary><ul>{reportedFacts(selectedContext).map(fact => <li key={fact.id}><strong>{fact.label}: </strong>{fact.text}</li>)}</ul></details>}
         </div>
@@ -108,12 +112,11 @@ export default function AskClinicalEdge({ navigate, isVisible, snapshot = null }
         <p id="ask-privacy" className="ce-ask-privacy">No names, MRNs, dates of birth or other patient identifiers. Identifier checks do not guarantee de-identification.</p>
         <textarea id="ask-question" ref={input} value={question} onChange={e => setQuestion(e.target.value)} aria-describedby="ask-privacy" placeholder="What would you like to understand?" maxLength={4000} rows={4} disabled={busy} />
         <div className="ce-ask-controls">
-          <button className="ce-ask-submit" disabled={busy || question.trim().length < 4} type="submit">Ask Clinical Edge <span aria-hidden="true">&#8594;</span></button>
-          {busy && <button type="button" onClick={() => pending.current?.abort()} aria-label="Cancel question" title="Cancel question">&#215;</button>}
+          <button className="ce-ask-submit" aria-label="Ask Clinical Edge" disabled={busy || question.trim().length < 4} type="submit">{busy ? <span role="status"><span className="ce-ask-spinner" aria-hidden="true" />Preparing your answer...</span> : <>Ask Clinical Edge <span aria-hidden="true">&#8594;</span></>}</button>
+          {busy && <button className="ce-ask-cancel" type="button" onClick={() => pending.current?.abort()} aria-label="Cancel question">Cancel</button>}
           {!busy && (answer || question) && <button type="button" onClick={() => { setQuestion(''); setSubmitted(''); setAnswer(''); setDetails([]); setAnswerContext(null); setAbg(null); setAbgTeaching([]); setAbgCatalog([]); setExplanationNotice(''); setError(''); input.current?.focus(); }}>New question</button>}
         </div>
       </form>
-      {busy && <p role="status">Preparing your answer...</p>}
       {error && <p className="ce-ask-error" role="alert">{error}</p>}
       {answer && !visibleAnswer && <p role="status">The Snapshot changed. Enable the current Snapshot and ask again; the previous patient answer is no longer shown.</p>}
       {visibleAnswer && <section className="ce-ask-answer" aria-labelledby="ask-answer-heading" aria-live="polite">
@@ -131,14 +134,14 @@ export default function AskClinicalEdge({ navigate, isVisible, snapshot = null }
         {abgTeaching.length > 0 && <section className="ce-ask-detail" aria-label="ABG physiology explanation"><h3>Why</h3>{abgTeaching.map(point => <p key={point.id}>{point.text}</p>)}</section>}
         {abg?.status === 'verified' && <div className="ce-ask-controls"><button type="button" disabled={busy} onClick={event => submit(event, true)}>Explain this pattern <span aria-hidden="true">&#8594;</span></button></div>}
         {explanationNotice && <p role="status">{explanationNotice}</p>}
-        {details.map((detail, index) => <section className="ce-ask-detail" key={index}><h3>{detail.heading}</h3><Answer text={detail.text} /></section>)}
+        {presentationDetails.map((detail, index) => <section className={'ce-ask-detail' + (detail.heading === 'At the bedside' ? ' ce-ask-bedside' : '')} key={index}><h3>{detail.heading}</h3><Answer text={detail.text} /></section>)}
         {answerContext?.evidence && (!abg || abg.status === 'verified') && <aside className="ce-ask-evidence" aria-label="Evidence boundary">
           {['curated_evidence', 'scope_limited', 'deterministic_rules', 'snapshot_reference'].includes(answerContext.evidence.status) ? <>
             <h3>{answerContext.evidence.status === 'scope_limited' ? 'Limited evidence coverage' : answerContext.evidence.status === 'deterministic_rules' ? 'Sources for these rules' : 'References supplied for this answer'}</h3>
             <p>{answerContext.evidence.status === 'snapshot_reference' ? 'Reported facts come from the confirmed Snapshot. Curated references support the bounded physiology explanation, not independent verification of the case. ABG calculations remain code-owned.' : answerContext.evidence.status === 'scope_limited' ? 'A bounded reference explanation, not a complete model-generated answer.' : answerContext.evidence.status === 'deterministic_rules' ? 'Code applies these source-backed rules. Calculations and interpretation are not generated or independently verified by the AI.' : 'Curated excerpts were provided before generation. References support general concepts, not additional patient findings or independent verification of every sentence.'}</p>
             {answerContext.evidence.deviceScope && <p>{answerContext.evidence.deviceScope}</p>}
             <ul className="ce-ask-sources">{(Array.isArray(answerContext.evidence.sources) ? answerContext.evidence.sources : []).filter(source => source && typeof source.title === 'string' && typeof source.publisher === 'string' && typeof source.url === 'string' && source.url.startsWith('https://')).map(source => <li key={source.id}><a href={source.url} target="_blank" rel="noopener noreferrer">{source.title}</a><span>{source.publisher}{source.publication && ` · ${source.publication}`}{source.updated && ` · Updated ${source.updated}`}</span></li>)}</ul>
-          </> : <p>{answerContext.evidence.requiresVerification ? 'Reference check required. This generated explanation was not verified against a current source. Confirm medication specifics, numerical criteria and device guidance in approved references and local policy.' : 'Generated education, not a source-verified clinical recommendation.'}</p>}
+          </> : <p>{answerContext.evidence.requiresVerification ? 'Reference check required. This generated explanation was not verified against a current source. Confirm medication specifics, numerical criteria and device guidance in approved references and local policy.' : 'Educational support, not a source-verified clinical recommendation. Use clinical judgment and local protocol/provider guidance.'}</p>}
           {answerContext.evidence.categories?.includes('medication') && <a href={SOURCES['dailymed-fda-labeling'].url} target="_blank" rel="noopener noreferrer">Check official medication labeling</a>}
         </aside>}
         {answerContext?.offerSnapshot && <div className="ce-ask-handoff"><button type="button" onClick={() => navigate('/copilot?capture=rapid')}>Open Shift Brain <span aria-hidden="true">&#8594;</span></button><span>No question or answer is transferred.</span></div>}

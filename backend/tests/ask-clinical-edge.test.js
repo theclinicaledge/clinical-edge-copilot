@@ -20,7 +20,7 @@ function setup(options = {}) {
     collectPriorityMapStream: async () => {
       if (options.disconnect) { res.emit('close'); throw new Error('cancelled'); }
       if (options.error) throw options.error;
-      return { text: options.raw ?? JSON.stringify({ answer: positive[0].answer }), firstTokenMs: 12, stopReason: options.stopReason ?? 'end_turn', inputTokens: 30, outputTokens: 40 };
+      return { text: options.raw ?? JSON.stringify({ answer: positive[0].answer, details: [], ...(params.output_config.format.schema.properties.source_ids ? { source_ids: params.output_config.format.schema.properties.source_ids.items.enum } : {}) }), firstTokenMs: 12, stopReason: options.stopReason ?? 'end_turn', inputTokens: 30, outputTokens: 40 };
     },
     appendOperationalLog: x => logs.push(x),
     classifyProviderError: () => ({ code: 'provider_failure', message: 'Service unavailable.' }),

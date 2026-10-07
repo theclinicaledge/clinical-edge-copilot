@@ -1,0 +1,271 @@
+{
+  "version": "ask-evidence-v2-abg-engine",
+  "scope": [
+    "acid_base",
+    "lvedp",
+    "venous_oxygen",
+    "crrt"
+  ],
+  "accessDate": "2026-10-07",
+  "sources": [
+    {
+      "id": "merck-acid-base",
+      "title": "Acid-Base Disorders",
+      "publisher": "Merck Manual Professional Edition",
+      "url": "https://www.merckmanuals.com/professional/nephrology/acid-base-regulation-and-disorders/acid-base-disorders",
+      "domain": "acid_base",
+      "updated": "Apr 2025",
+      "version": "v987149",
+      "publication": null,
+      "accessed": "2026-10-07",
+      "locator": "Classification; Primary Changes and Compensations table; Diagnosis",
+      "excerpts": [
+        "Acidemia is serum pH < 7.35.",
+        "Alkalemia is serum pH > 7.45.",
+        "In these mixed disorders, values may be deceptively normal."
+      ],
+      "facts": {
+        "acidemiaPHBelow": 7.35,
+        "alkalemiaPHAbove": 7.45,
+        "referencePaCO2mmHg": 40,
+        "referenceHCO3mmolL": 24,
+        "metabolicAcidosisHCO3Below": 24,
+        "metabolicAlkalosisHCO3Above": 28,
+        "respiratoryAlkalosisPaCO2Below": 38,
+        "winter": {
+          "slope": 1.5,
+          "intercept": 8,
+          "tolerance": 2
+        },
+        "metabolicAlkalosis": {
+          "perHCO3Rise": [0.6, 0.75],
+          "compensatoryPaCO2CeilingmmHg": 55
+        },
+        "respiratoryAcidosis": {
+          "perPaCO2mmHg": 10,
+          "acuteHCO3Rise": [
+            1,
+            2
+          ],
+          "chronicHCO3Rise": [
+            3,
+            4
+          ]
+        },
+        "respiratoryAlkalosis": {
+          "perPaCO2mmHg": 10,
+          "acuteHCO3Fall": [
+            1,
+            2
+          ],
+          "chronicHCO3Fall": [
+            4,
+            5
+          ]
+        },
+        "compensationRulesAreApproximate": true,
+        "outsideExpectedCompensationSuggestsAdditionalProcess": true,
+        "respiratoryFrameworkDurationCannotBeInferredFromOneSample": true,
+        "ABGBicarbonateCalculatedChemistryBicarbonateMeasured": true
+      },
+      "factProvenance": "Parameters transcribed from Primary Changes and Compensations table; mixed-process comparison from Diagnosis paragraphs. Metabolic alkalosis slope/ceiling and bicarbonate measurement distinction rechecked 2026-10-07. No duration inferred."
+    },
+    {
+      "id": "merck-acid-base-regulation",
+      "title": "Acid-Base Regulation",
+      "publisher": "Merck Manual Professional Edition",
+      "url": "https://www.merckmanuals.com/professional/nephrology/acid-base-regulation-and-disorders/acid-base-regulation",
+      "domain": "acid_base",
+      "updated": "Mar 2025",
+      "version": "v987102",
+      "publication": null,
+      "accessed": "2026-10-07",
+      "locator": "Acid-Base Physiology; Chemical buffering; Pulmonary pH regulation; Renal pH regulation",
+      "excerpts": ["acid-base balance depends on the ratio"],
+      "facts": {
+        "CO2WaterCarbonicAcidHydrogenBicarbonateBuffer": true,
+        "ventilationRegulatesCO2": true,
+        "renalHandlingRegulatesBicarbonate": true,
+        "pHDependsOnBicarbonateCO2Ratio": true
+      },
+      "factProvenance": "Source-linked buffer mechanism and lung/kidney roles only, used for controlled physiology teaching. No cause, treatment or timing rule added."
+    },
+    {
+      "id": "bja-henderson-hasselbalch",
+      "title": "Metabolic alkalosis and mixed acid-base disturbance in anaesthesia and critical care",
+      "publisher": "BJA Education / British Journal of Anaesthesia / Elsevier",
+      "url": "https://pmc.ncbi.nlm.nih.gov/articles/PMC10028421/",
+      "domain": "acid_base",
+      "updated": null,
+      "version": "PMC10028421",
+      "publication": "2023-02-23",
+      "doi": "10.1016/j.bjae.2023.01.002",
+      "accessed": "2026-10-07",
+      "locator": "Traditional vs physiochemical approaches, Equation 2 and its explanatory sentence",
+      "excerpts": ["Henderson-Hasselbalch equation"],
+      "facts": { "pKa": 6.1, "CO2SolubilityForMmHg": 0.03, "logarithmBase": 10 },
+      "factProvenance": "Only Equation 2/constants transcribed for an internal same-sample consistency check. No treatments, alternate compensation formulas or other article claims included. Discrepancy tolerance is a separate engineering policy, not a sourced clinical cutoff."
+    },
+    {
+      "id": "merck-metabolic-alkalosis",
+      "title": "Metabolic Alkalosis",
+      "publisher": "Merck Manual Professional Edition",
+      "url": "https://www.merckmanuals.com/professional/nephrology/acid-base-regulation-and-disorders/metabolic-alkalosis",
+      "domain": "acid_base",
+      "updated": "Mar 2025",
+      "version": "v987663",
+      "publication": null,
+      "accessed": "2026-10-07",
+      "locator": "Definition; Causes of Metabolic Alkalosis table",
+      "excerpts": [
+        "Common causes include prolonged vomiting, hypovolemia, diuretic use, and hypokalemia."
+      ],
+      "facts": {
+        "primaryBicarbonateDirection": "increase",
+        "gastricAcidLossDirection": "alkalosis"
+      },
+      "factProvenance": "Classification and direction explicitly stated by this professional reference."
+    },
+    {
+      "id": "merck-heart-pressures",
+      "title": "Monitoring and Testing the Critical Care Patient",
+      "publisher": "Merck Manual Professional Edition",
+      "url": "https://www.merckmanuals.com/professional/critical-care-medicine/approach-to-the-critically-ill-patient/monitoring-and-testing-the-critical-care-patient",
+      "domain": "lvedp",
+      "updated": "Jun 2026",
+      "version": "v924325",
+      "publication": null,
+      "accessed": "2026-10-07",
+      "locator": "Normal Pressures in the Heart and Great Vessels; Pulmonary artery occlusion pressure",
+      "excerpts": [
+        "Many factors cause PAOP to reflect LVEDV inaccurately."
+      ],
+      "facts": {
+        "LVEndDiastolicPressure": {
+          "unit": "mmHg",
+          "average": 9,
+          "referenceRange": [
+            5,
+            12
+          ]
+        },
+        "preloadTarget": "LVEDV",
+        "PAOPProxyLimitations": [
+          "mitral_valve_disease",
+          "intrathoracic_pressure",
+          "ventricular_compliance",
+          "measurement_conditions"
+        ]
+      },
+      "factProvenance": "Table values and named proxy limitations transcribed; a reference interval is not a treatment threshold."
+    },
+    {
+      "id": "peverill-filling-pressure",
+      "title": "\"Left ventricular filling pressure(s)\" - Ambiguous and misleading terminology, best abandoned.",
+      "publisher": "International Journal of Cardiology / Elsevier",
+      "url": "https://pubmed.ncbi.nlm.nih.gov/25965616/",
+      "domain": "lvedp",
+      "updated": null,
+      "version": null,
+      "publication": "2015-07-15",
+      "doi": "10.1016/j.ijcard.2015.04.254",
+      "accessed": "2026-10-07",
+      "locator": "Abstract, sentence describing LVEDP and mean LAP",
+      "excerpts": [
+        "cannot be used interchangeably as they will often differ in magnitude"
+      ],
+      "facts": {
+        "notInterchangeable": [
+          "LVEDP",
+          "mean_LAP"
+        ],
+        "differentClinicalSignificance": true
+      },
+      "factProvenance": "Exact abstract relation; not a claim that every patient has discordant pressures."
+    },
+    {
+      "id": "nlm-venous-sites",
+      "title": "Venous Oxygen Saturation",
+      "publisher": "StatPearls / NCBI Bookshelf",
+      "url": "https://www.ncbi.nlm.nih.gov/books/NBK564395/",
+      "domain": "venous_oxygen",
+      "updated": "2024-09-10",
+      "version": "NBK564395",
+      "publication": null,
+      "accessed": "2026-10-07",
+      "locator": "Anatomy and Physiology; Technique",
+      "excerpts": [
+        "The venous blood in the pulmonary artery represents oxygen extraction in the whole body",
+        "superior vena cava"
+      ],
+      "facts": {
+        "SvO2SampleSite": "pulmonary_artery",
+        "ScvO2UsualSampleSite": "superior_vena_cava",
+        "sampleSiteMustBeVerified": true
+      },
+      "factProvenance": "Sampling-site definitions verified in the publisher's indexed content; full page may present an access challenge."
+    },
+    {
+      "id": "chawla-venous-equivalence",
+      "title": "Lack of Equivalence Between Central and Mixed Venous Oxygen Saturation",
+      "publisher": "CHEST / American College of Chest Physicians",
+      "url": "https://journal.chestnet.org/article/S0012-3692%2815%2931438-0/abstract",
+      "domain": "venous_oxygen",
+      "updated": null,
+      "version": null,
+      "publication": "2004-12",
+      "doi": "10.1378/chest.126.6.1891",
+      "accessed": "2026-10-07",
+      "locator": "Abstract, Conclusions",
+      "excerpts": [
+        "were not equivalent in this sample of critically ill patients."
+      ],
+      "facts": {
+        "population": "critically_ill_adults",
+        "measurementsNotEquivalent": true,
+        "substitutionInOxygenConsumptionCalculationCausedErrors": true,
+        "fixedUniversalGapSupported": false
+      },
+      "factProvenance": "Study conclusion; study population is not a universal healthy-state ordering rule."
+    },
+    {
+      "id": "vantive-prismax-concepts",
+      "title": "PrisMax Interactive Product Explorer - Product Specifications",
+      "publisher": "Vantive",
+      "url": "https://vantive-learning-services.kundedigital.dk/ipe/en/product-specifications",
+      "domain": "crrt",
+      "updated": null,
+      "version": null,
+      "publication": null,
+      "accessed": "2026-10-07",
+      "device": "PrisMax",
+      "locator": "Pressure sensors; Pressure bars; T0830 Blood Leak detected",
+      "excerpts": [
+        "pressure difference between the blood and fluid compartments",
+        "blood in the effluent line"
+      ],
+      "facts": {
+        "device": "PrisMax",
+        "pressureLocations": {
+          "access": "patient_access_line",
+          "filter": "blood_entering_filter",
+          "return": "blood_return_line_deaeration_chamber",
+          "effluent": "fluid_side_effluent_line"
+        },
+        "filterPressureDropComponents": [
+          "filter",
+          "return"
+        ],
+        "TMPCompartments": [
+          "blood",
+          "fluid"
+        ],
+        "pressureChangesHaveMultiplePotentialCauses": true,
+        "bloodInEffluentRequiresBloodLeakAssessment": true,
+        "discolorationIsNotProofOfClotting": true,
+        "settingsOrProceduresIncluded": false
+      },
+      "factProvenance": "Named sensor locations and distinctions transcribed from manufacturer education; no alarm limits, settings, overrides or operating steps copied."
+    }
+  ]
+}

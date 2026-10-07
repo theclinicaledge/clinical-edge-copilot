@@ -15,5 +15,29 @@
 .ce-ask-answer { margin-top: 28px; padding-top: 24px; border-top: 1px solid var(--ce-warm-line); overflow-wrap: anywhere; }
 .ce-ask-answer h2 { font-size: 19px; line-height: 1.5; margin: 8px 0 20px; letter-spacing: 0; }
 .ce-ask-answer p, .ce-ask-answer li { font-size: 15px; line-height: 1.8; color: var(--ce-text-mid); white-space: pre-wrap; }
+.ce-ask-direct p { color: var(--ce-text-dark); font-size: 16px; line-height: 1.65; }
+.ce-ask-detail { margin-top: 20px; }
+.ce-ask-detail h3 { font-size: 14px; font-weight: 650; color: var(--ce-text-dark); margin: 0 0 8px; }
+.ce-ask-detail p { margin: 8px 0; }
+.ce-ask-evidence { margin-top: 24px; padding-top: 14px; border-top: 1px solid var(--ce-warm-line); }
+.ce-ask-evidence p, .ce-ask-handoff span { font-size: 12px; line-height: 1.6; color: var(--ce-text-muted); }
+.ce-ask-evidence a { display: inline-block; padding: 10px 0; color: var(--ce-teal-deep); font-size: 13px; }
+.ce-ask-evidence h3 { font-size: 14px; margin: 0 0 8px; }
+.ce-ask-sources { margin: 10px 0; padding: 0; list-style: none; }
+.ce-ask-sources li { margin: 10px 0; }
+.ce-ask-sources a { line-height: 1.5; min-height: 24px; }
+.ce-ask-sources span { display: block; font-size: 12px; color: var(--ce-text-muted); line-height: 1.5; }
+.ce-ask-handoff { display: flex; flex-wrap: wrap; align-items: center; gap: 12px; margin-top: 18px; }
+.ce-ask-handoff button { min-height: 44px; border: 1px solid var(--ce-warm-line); border-radius: 6px; padding: 10px 14px; color: var(--ce-text-dark); background: var(--ce-warm-card); font: 600 13px var(--ce-font-sans); cursor: pointer; }
 .ce-home-ask { display: flex; align-items: center; justify-content: space-between; min-height: 52px; gap: 12px; margin-bottom: 24px; border-bottom: 1px solid var(--ce-warm-line); text-decoration: none; font-size: 17px; }
 .ce-home-ask > span { color: var(--ce-teal-deep); }
+.ce-ask-abg h3 { font-size: 18px; margin: 0 0 12px; }
+.ce-ask-abg h4 { font-size: 14px; margin: 0 0 8px; }
+.ce-ask-abg-reported { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 12px; margin: 18px 0; }
+.ce-ask-abg-reported dt { font-size: 12px; color: var(--ce-text-muted); }
+.ce-ask-abg-reported dd { margin: 6px 0; font-size: 16px; overflow-wrap: anywhere; }
+.ce-ask-abg-comparison { padding: 14px 0; border-top: 1px solid var(--ce-warm-line); }
+.ce-ask-abg-comparison p { margin: 6px 0; }
+.ce-ask-abg-comparison .ce-ask-abg-formula { font-size: 12px; color: var(--ce-text-muted); }
+.ce-ask-abg-limits summary { min-height: 44px; display: flex; align-items: center; font-size: 14px; color: var(--ce-teal-deep); cursor: pointer; }
+@media (max-width: 350px) { .ce-ask-abg-reported { grid-template-columns: 1fr; } }

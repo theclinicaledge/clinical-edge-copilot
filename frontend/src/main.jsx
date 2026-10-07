@@ -1,5 +1,5 @@
 /* eslint-disable react-refresh/only-export-components */
-import { StrictMode, useState, useEffect, useRef } from 'react'
+import { StrictMode, useState, useEffect, useRef, useCallback } from 'react'
 import { createRoot, hydrateRoot } from 'react-dom/client'
 import { Analytics } from '@vercel/analytics/react'
 import './styles/tokens.css'
@@ -76,6 +76,8 @@ function Root() {
   const [page, setPage] = useState(getPage);
   const [workspaceEntered, setWorkspaceEntered] = useState(() => getPage() === 'app');
   const [scenarioActive, setScenarioActive] = useState(false);
+  const [askSnapshot, setAskSnapshot] = useState(null);
+  const shareSnapshot = useCallback(snapshot => setAskSnapshot(snapshot ? structuredClone(snapshot) : null), []);
   const workspacePosition = useRef({ scroll: 0, focus: null });
   const currentPage = useRef(page);
   useEffect(() => { currentPage.current = page; }, [page]);
@@ -149,9 +151,9 @@ function Root() {
       {page === 'brainsheets-detail' && <BrainSheetsModule navigate={navigate} onGoHome={() => navigate('/')} templateId={window.location.pathname.replace(/^\/brain-sheets\//, '').replace(/\/$/, '')} />}
       {page === 'blog'          && <BlogIndex />}
       {page === 'blogpost'      && <BlogPostPage slug={window.location.pathname.replace(/^\/blog\//, '').replace(/\/$/, '')} />}
-      <div hidden={page !== 'ask'} inert={page !== 'ask'} className="ce-ask-workspace"><AskClinicalEdge navigate={navigate} isVisible={page === 'ask'} /></div>
+      <div hidden={page !== 'ask'} inert={page !== 'ask'} className="ce-ask-workspace"><AskClinicalEdge navigate={navigate} isVisible={page === 'ask'} snapshot={askSnapshot} /></div>
       {/* Keep the scenario's existing hook tree in memory, never browser storage. */}
-      {workspaceEntered && <div hidden={page !== 'app'} inert={page !== 'app'} className="ce-shift-workspace" onFocusCapture={(event) => { workspacePosition.current.focus = event.target; }}><App onGoHome={() => navigate('/')} navigate={navigate} isOnline={isOnline} isVisible={page === 'app'} onScenarioActivity={setScenarioActive} initialCaptureMode={new URLSearchParams(window.location.search).get('capture') === 'rapid' ? 'rapid' : 'manual'} /></div>}
+      {workspaceEntered && <div hidden={page !== 'app'} inert={page !== 'app'} className="ce-shift-workspace" onFocusCapture={(event) => { workspacePosition.current.focus = event.target; }}><App onGoHome={() => navigate('/')} navigate={navigate} isOnline={isOnline} isVisible={page === 'app'} onScenarioActivity={setScenarioActive} onSnapshotChange={shareSnapshot} initialCaptureMode={new URLSearchParams(window.location.search).get('capture') === 'rapid' ? 'rapid' : 'manual'} /></div>}
       <WorkspaceNavigation page={page} navigate={navigate} scenarioActive={scenarioActive} />
       <Analytics />
     </>

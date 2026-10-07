@@ -405,7 +405,7 @@ function findingsForSnapshot(snapshot) {
   return findings;
 }
 
-export default function PatientSnapshot({ initialNotes = "", initialSnapshot = null, initialCaptureMode = "manual", disabled, isOnline, onBuild, onDraftActivity }) {
+export default function PatientSnapshot({ initialNotes = "", initialSnapshot = null, initialCaptureMode = "manual", disabled, isOnline, onBuild, onDraftActivity, onUseInAsk, onInvalidateAsk }) {
   const restoredFindings = findingsForSnapshot(initialSnapshot);
   const [snapshot, setSnapshot] = useState(() => createInitialSnapshot(initialSnapshot, initialNotes));
   const [openSections, setOpenSections] = useState(restoredFindings);
@@ -421,6 +421,14 @@ export default function PatientSnapshot({ initialNotes = "", initialSnapshot = n
   const reviewRef = useRef(null);
   const notesRef = useRef(null);
   const extractionActiveRef = useRef(false);
+  const sharedSnapshot = useRef(null);
+  const shareForAsk = () => { sharedSnapshot.current = snapshot; onUseInAsk?.(snapshot); };
+  useEffect(() => {
+    if (sharedSnapshot.current && sharedSnapshot.current !== snapshot) {
+      sharedSnapshot.current = null;
+      onInvalidateAsk?.();
+    }
+  }, [snapshot, onInvalidateAsk]);
 
   const populatedCount = useMemo(() => Object.values(snapshot.values).filter(Boolean).length
     + Object.values(snapshot.optional).reduce((sum, section) => sum + countStructuredDetails(section), 0)
@@ -597,8 +605,10 @@ export default function PatientSnapshot({ initialNotes = "", initialSnapshot = n
       <div className="snapshot-privacy" role="note"><strong>No patient identifiers.</strong><span>Leave out names, initials, room numbers, DOB, MRNs, contact details, addresses, and exact dates. Automated checks are limited and do not establish that text is de-identified or HIPAA-safe.</span></div>
       <details ref={reviewRef} className="snapshot-review"><summary>Review Snapshot before building</summary><div className="snapshot-review-inner"><SemanticSnapshotReview snapshot={snapshot} /><button type="button" className="snapshot-edit" onClick={() => { reviewRef.current.open = false; document.querySelector(".quick-capture-section")?.scrollIntoView({ behavior: "smooth", block: "start" }); }}>Edit Snapshot</button></div></details>
       <div className="snapshot-submit"><div><strong>{populatedCount ? `Enough to start · ${populatedCount} details added` : "Add what you know"}</strong><span>Missing information can stay missing.</span></div><button type="button" disabled={!canBuild} onClick={build}>{disabled ? "Organizing clinical signals…" : "Build my Priority Map →"}</button></div>
+      {onUseInAsk && <button type="button" className="snapshot-ask" disabled={!populatedCount || disabled || !rapidConfirmed} onClick={shareForAsk}>Confirm Snapshot for Ask →</button>}
     </div>}
 
+    {captureMode === "rapid" && rapidStage === "confirmed" && onUseInAsk && <button type="button" className="snapshot-ask" disabled={!populatedCount || disabled} onClick={shareForAsk}>Use confirmed Snapshot in Ask →</button>}
     {captureMode === "manual" && <button type="button" className="snapshot-add-finding" aria-expanded={findingSheetOpen} onClick={() => setFindingSheetOpen(true)}><span aria-hidden="true">+</span> Add finding</button>}
     {captureMode === "manual" && findingSheetOpen && <div className="snapshot-sheet-backdrop" role="presentation" onClick={() => setFindingSheetOpen(false)}><section className="snapshot-finding-sheet" role="dialog" aria-modal="true" aria-labelledby="add-finding-title" onClick={(event) => event.stopPropagation()}><div className="snapshot-sheet-handle" aria-hidden="true" /><header><div><small>Shift Brain</small><h2 id="add-finding-title">Add a finding</h2></div><button type="button" aria-label="Close add finding" onClick={() => setFindingSheetOpen(false)}>×</button></header><p>Search the findings already supported by Shift Brain.</p><label className="snapshot-finding-search">Find a field<input type="search" value={findingSearch} onChange={(event) => setFindingSearch(event.target.value)} placeholder="Labs, drips, respiratory…" /></label><div className="snapshot-finding-options">{filteredFindingOptions.map(([id, label, detail, signal, targetId]) => <button type="button" key={id} onClick={() => addFinding(id, signal, targetId)}><strong>{label}</strong><span>{detail}</span><b aria-hidden="true">+</b></button>)}</div>{filteredFindingOptions.length === 0 && <p className="snapshot-finding-empty">No matching supported finding.</p>}</section></div>}
   </div>;

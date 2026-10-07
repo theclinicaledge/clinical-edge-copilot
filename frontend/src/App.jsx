@@ -425,7 +425,7 @@ Heart rate can rise when the body is compensating for pain, reduced circulating 
 
 // ─── Main App ──────────────────────────────────────────────────────────────────
 
-export default function App({ onGoHome, navigate, isOnline = true, initialCaptureMode = "manual", isVisible = true, onScenarioActivity }) {
+export default function App({ onGoHome, navigate, isOnline = true, initialCaptureMode = "manual", isVisible = true, onScenarioActivity, onSnapshotChange }) {
   const [draftActive, setDraftActive] = useState(false);
   const [entryCaptureMode] = useState(initialCaptureMode);
   const [prefillNotes] = useState(() => {
@@ -688,6 +688,7 @@ export default function App({ onGoHome, navigate, isOnline = true, initialCaptur
   runQueryRef.current = runQuery;
 
   const handleSnapshotBuild = (serializedSnapshot, snapshot) => {
+    onSnapshotChange?.(snapshot);
     setOriginalSnapshot(snapshot);
     setReassessment(null);
     setReassessing(false);
@@ -720,21 +721,23 @@ export default function App({ onGoHome, navigate, isOnline = true, initialCaptur
     if (!submittedSnapshot?.snapshot || isActiveRef.current) return;
     setEditableSnapshot(submittedSnapshot.snapshot);
     setSubmittedSnapshot(null);
+    onSnapshotChange?.(null);
     resetResultState();
     setCaptureKey((value) => value + 1);
     trackEvent("shift_brain_snapshot_edit_started");
     window.scrollTo({ top: 0, behavior: "smooth" });
-  }, [resetResultState, submittedSnapshot]);
+  }, [resetResultState, submittedSnapshot, onSnapshotChange]);
 
   const handleNewSnapshot = useCallback(() => {
     if (isActiveRef.current) return;
     setEditableSnapshot(null);
     setSubmittedSnapshot(null);
+    onSnapshotChange?.(null);
     resetResultState();
     setCaptureKey((value) => value + 1);
     trackEvent("shift_brain_new_snapshot_started");
     window.scrollTo({ top: 0, behavior: "smooth" });
-  }, [resetResultState]);
+  }, [resetResultState, onSnapshotChange]);
 
   const handleFollowUp = () => {
     if (!followUp.trim()) return;
@@ -846,10 +849,11 @@ export default function App({ onGoHome, navigate, isOnline = true, initialCaptur
   }, []);
 
   const handleReopenCase = useCallback((q) => {
+    onSnapshotChange?.(null);
     trackEvent('saved_case_reopened', { source: 'saved_cases' });
     runQueryRef.current?.(q);
     window.scrollTo({ top: 0, behavior: "smooth" });
-  }, []);
+  }, [onSnapshotChange]);
 
   const isActive = loading || streaming;
   const initialProcessing = isActive && !followUpActive;
@@ -1590,6 +1594,8 @@ export default function App({ onGoHome, navigate, isOnline = true, initialCaptur
           disabled={isActive}
           isOnline={isOnline}
           onBuild={handleSnapshotBuild}
+          onUseInAsk={(snapshot) => { onSnapshotChange?.(snapshot); navigate?.('/ask'); }}
+          onInvalidateAsk={() => onSnapshotChange?.(null)}
           onDraftActivity={setDraftActive}
         />
 
@@ -1746,6 +1752,7 @@ export default function App({ onGoHome, navigate, isOnline = true, initialCaptur
           setReassessment(assessment);
           setReassessing(false);
           setSubmittedSnapshot({ snapshot: assessment.snapshot, serializedSnapshot: assessment.serializedSnapshot });
+          onSnapshotChange?.(assessment.snapshot);
           runQuery(assessment.serializedSnapshot, { reassessmentRequest: true });
         }} /></div>}
         {!reassessing && reassessment && <div ref={workspaceTopRef} className="copilot-workspace-stage"><ReassessmentEvidence assessment={reassessment} original={originalSnapshot} /></div>}

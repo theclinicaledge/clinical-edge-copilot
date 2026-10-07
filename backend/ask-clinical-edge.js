@@ -1,6 +1,7 @@
 const { randomUUID } = require('node:crypto');
 const { retrieveEvidence, sourceMetadata, groundingContext, GROUNDING_INSTRUCTIONS, groundedFormat, validateGrounded, boundedEvidenceAnswer } = require('./ask-evidence');
 const { routeABG, teachingCatalog, explanationRequest, selectExplanation } = require('./ask-abg-engine');
+const { prepareSnapshotAnswer, selectionContract, validateSelection, snapshotPresentation } = require('./ask-snapshot-reasoning');
 
 const ASK_PROMPT = `You are Ask Clinical Edge, an educational assistant for bedside nurses. Answer the question directly first, then adapt the explanation to what was asked. A short concept may need only a few sentences; a complex bedside or device question may benefit from physiology, focused assessment, discriminating information and relevant safety considerations. Do not mechanically include every section. Use concise plain-text paragraphs and optional hyphen bullets, not a Priority Map, quiz, urgency label or rigid template. Usually 100-250 words; simpler questions should be shorter.
 GENERAL MODE: You have only this question. No Shift Brain Snapshot, case history, records or previous conversation is available. Never imply access to them. Values explicitly in the question may be interpreted as reported information, not verified findings. Do not invent patient facts, baseline, trends, medications, diagnoses or causes. Distinguish general knowledge, hypothetical possibilities and information actually provided.
@@ -76,11 +77,12 @@ function registerAskRoutes(app, dependencies) {
     const controller = new AbortController();
     res.on('finish', () => { finished = true; });
     res.on('close', () => { if (!finished) { disconnected = true; controller.abort(); } });
-    const log = fields => appendOperationalLog({ timestamp: new Date().toISOString(), request_id: requestId, route: 'ASK_CLINICAL_EDGE', mode: 'general', category: 'general', total_duration_ms: Date.now() - start, client_disconnected: disconnected, ...fields });
+    const log = fields => appendOperationalLog({ timestamp: new Date().toISOString(), request_id: requestId, route: 'ASK_CLINICAL_EDGE', mode: req.body?.contextMode === 'snapshot' ? 'snapshot' : 'general', category: 'general', total_duration_ms: Date.now() - start, client_disconnected: disconnected, ...fields });
     const fail = (status, code, message) => { if (!disconnected) res.status(status).json({ error: { code, message }, requestId }); };
     const body = req.body;
-    if (!body || typeof body !== 'object' || Array.isArray(body) || Object.keys(body).some(k => !['question', 'contextMode', 'abgExplanation'].includes(k)) || body.contextMode !== 'general'
-      || ('abgExplanation' in body && typeof body.abgExplanation !== 'boolean')) {
+    if (!body || typeof body !== 'object' || Array.isArray(body) || Object.keys(body).some(k => !['question', 'contextMode', 'abgExplanation', 'snapshotContext'].includes(k)) || !['general', 'snapshot'].includes(body.contextMode)
+      || ('abgExplanation' in body && typeof body.abgExplanation !== 'boolean')
+      || (body.contextMode === 'general' && 'snapshotContext' in body) || (body.contextMode === 'snapshot' && ('abgExplanation' in body || !body.snapshotContext))) {
       log({ status: 'blocked', provider_status: 'not_called', failure_reason: 'invalid_context_boundary' });
       return fail(400, 'invalid_context_boundary', 'General questions cannot include Snapshot or conversation context.');
     }
@@ -89,7 +91,12 @@ function registerAskRoutes(app, dependencies) {
       return fail(400, 'invalid_question', 'Enter a nursing question of 4 to 4000 characters.');
     }
     const question = body.question.trim();
-    if (containsPHI(question)) {
+    const contextTools = body.contextMode === 'snapshot' ? await import('./ask-snapshot-context.mjs') : null;
+    if (contextTools && !contextTools.validateSnapshotContext(question, body.snapshotContext)) {
+      log({ status: 'blocked', provider_status: 'not_called', failure_reason: 'invalid_context_boundary' });
+      return fail(400, 'invalid_context_boundary', 'Use only the selected relevant Snapshot fields.');
+    }
+    if (containsPHI(question) || (contextTools && containsPHI(contextTools.contextEvidenceText(body.snapshotContext)))) {
       log({ status: 'blocked', provider_status: 'not_called', failure_reason: 'identifier_pattern' });
       return fail(400, 'identifier_pattern', 'Remove patient identifiers before asking. Passing this check does not establish de-identification.');
     }
@@ -105,6 +112,41 @@ function registerAskRoutes(app, dependencies) {
         : 'A pressure or alarm name alone does not establish the cause. Device models use different sensors and safety systems; a generic troubleshooting sequence can be unsafe.' }];
       log({ status: 'boundary', provider_status: 'not_called', question_kind: policy.questionKind, verification_required: true, display_resolution: 'safety_boundary', boundary_category: policy.boundary });
       return res.json({ answer, details, ...presentation, requestId });
+    }
+    if (contextTools) {
+      const prepared = await prepareSnapshotAnswer(question, body.snapshotContext);
+      const bounded = () => snapshotPresentation(prepared, prepared.synthesis?.defaultIds || prepared.eligible.slice(0, 2), 'reference_guided');
+      const contextClient = prepared.eligible.length ? getClient() : null;
+      if (!contextClient) {
+        log({ status: 'success', provider_status: 'not_called', display_resolution: 'snapshot_reference_guided', selected_fact_count: prepared.reported.length });
+        return res.json({ ...bounded(), requestId });
+      }
+      try {
+        const contract = selectionContract(prepared);
+        // Anthropic's wire schema does not support maxItems. Keep the frozen
+        // contract intact; validateSelection still enforces its two-card ceiling.
+        const providerFormat = structuredClone(contract.format);
+        delete providerFormat.schema.properties.card_ids.maxItems;
+        providerStart = Date.now();
+        const result = await runWithStageTimeout(signal => collectPriorityMapStream(contextClient.messages.stream({
+          model: 'claude-sonnet-4-6', max_tokens: 1200, system: contract.system, output_config: { format: providerFormat },
+          messages: [{ role: 'user', content: JSON.stringify({ question, reported: prepared.reported, cards: contract.catalog }) }],
+        }, { signal }), Date.now, metadata => { providerMetadata = metadata; }), ASK_PROVIDER_MS, 'provider_timeout', controller.signal);
+        const validationStart = Date.now();
+        const ids = result.stopReason === 'end_turn' ? validateSelection(result.text, prepared) : null;
+        log({ status: ids ? 'success' : 'rejected', ...providerMetadata, provider_status: 'success', provider_duration_ms: Date.now() - providerStart,
+          provider_first_token_ms: result.firstTokenMs, provider_stop_reason: result.stopReason, provider_input_tokens: result.inputTokens, provider_output_tokens: result.outputTokens,
+          validation_status: ids ? 'accepted' : 'rejected', validation_duration_ms: Date.now() - validationStart,
+          rejection_reason_codes: ids ? [] : ['invalid_snapshot_card_selection'], display_resolution: ids ? 'snapshot_card_selection' : 'snapshot_reference_guided', timeout_layer: null });
+        if (!disconnected) res.json({ ...(ids ? snapshotPresentation(prepared, ids, 'model_selected') : bounded()), requestId });
+      } catch (error) {
+        const timeout = error?.code === 'provider_timeout';
+        log({ status: disconnected ? 'cancelled' : 'error', ...providerMetadata, provider_status: disconnected ? 'cancelled' : timeout ? 'timeout' : 'error',
+          provider_duration_ms: Date.now() - providerStart, timeout_layer: disconnected ? 'client_disconnect' : timeout ? 'provider' : null,
+          failure_reason: disconnected ? 'client_disconnect' : timeout ? 'provider_timeout' : classifyProviderError(error).code, display_resolution: 'snapshot_reference_guided' });
+        if (!disconnected) res.json({ ...bounded(), requestId });
+      }
+      return;
     }
     const abg = routeABG(question);
     if (abg) {

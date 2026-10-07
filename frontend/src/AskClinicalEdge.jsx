@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from 'react';
 import ModuleHeader from './components/ModuleHeader.jsx';
 import AskABGResult from './components/AskABGResult.jsx';
+import { selectSnapshotContext, reportedFacts } from '../../backend/ask-snapshot-context.mjs';
 import { trackEvent } from './analytics';
 import { SOURCES } from './data/clinicalSources.js';
 import './styles/ask-clinical-edge.css';
@@ -25,12 +26,19 @@ function Answer({ text }) {
   });
 }
 
-export default function AskClinicalEdge({ navigate, isVisible }) {
+export default function AskClinicalEdge({ navigate, isVisible, snapshot = null }) {
+  const [contextChoice, setContextChoice] = useState(null);
+  const contextEnabled = Boolean(snapshot && contextChoice === snapshot);
+  const currentSnapshot = useRef(snapshot);
+  currentSnapshot.current = snapshot;
+  const requestSnapshot = useRef(null);
   const [question, setQuestion] = useState('');
   const [submitted, setSubmitted] = useState('');
   const [answer, setAnswer] = useState('');
   const [details, setDetails] = useState([]);
   const [answerContext, setAnswerContext] = useState(null);
+  const selectedContext = selectSnapshotContext(question, snapshot, contextEnabled);
+  const visibleAnswer = answer && (!answerContext?.snapshotUse || answerContext.snapshot === snapshot);
   const [abg, setAbg] = useState(null);
   const [abgTeaching, setAbgTeaching] = useState([]);
   const [abgCatalog, setAbgCatalog] = useState([]);
@@ -41,18 +49,22 @@ export default function AskClinicalEdge({ navigate, isVisible }) {
   const input = useRef(null);
   useEffect(() => { if (isVisible) trackEvent('ask_opened', { mode: 'general' }); }, [isVisible]);
   useEffect(() => () => pending.current?.abort(), []);
+  useEffect(() => () => { if (snapshot && requestSnapshot.current === snapshot) pending.current?.abort(); }, [snapshot]);
   const submit = async (event, explain = false) => {
     event.preventDefault();
     if (pending.current || (explain ? submitted : question).trim().length < 4) return;
     const controller = new AbortController();
+    const context = explain ? null : selectedContext;
+    const submittedSnapshot = context ? snapshot : null;
+    requestSnapshot.current = submittedSnapshot;
     pending.current = controller;
     const timer = setTimeout(() => controller.abort('timeout'), 35000);
     setBusy(true); setError(''); setExplanationNotice('');
     trackEvent('ask_submitted', { mode: 'general' });
     try {
-      // Deliberately no Snapshot, history, route parameters or hidden workspace state.
-      const response = await fetch(`${API_BASE}/api/ask`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ question: explain ? submitted : question.trim(), contextMode: 'general', ...(explain ? { abgExplanation: true } : {}) }), signal: controller.signal });
+      const response = await fetch(`${API_BASE}/api/ask`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ question: explain ? submitted : question.trim(), contextMode: context ? 'snapshot' : 'general', ...(context ? { snapshotContext: context } : {}), ...(explain ? { abgExplanation: true } : {}) }), signal: controller.signal });
       const data = await response.json().catch(() => ({}));
+      if (submittedSnapshot && currentSnapshot.current !== submittedSnapshot) return;
       if (explain) {
         // Explanation responses cannot replace the authoritative result, answer, sources or reported values.
         const ids = data.abgExplanation?.pointIds;
@@ -61,7 +73,7 @@ export default function AskClinicalEdge({ navigate, isVisible }) {
         else setExplanationNotice('Additional explanation unavailable. The rule-based interpretation is unchanged.');
         return;
       }
-      if (!response.ok || data.contextMode !== 'general' || typeof data.answer !== 'string') {
+      if (!response.ok || !['general', 'snapshot'].includes(data.contextMode) || typeof data.answer !== 'string' || (data.contextMode === 'snapshot' && !context)) {
         setError(ERRORS[data.error?.code] || 'The answer service is unavailable. Your question is unchanged.');
         trackEvent('ask_failed', { mode: 'general', status: response.status });
         return;
@@ -70,7 +82,7 @@ export default function AskClinicalEdge({ navigate, isVisible }) {
       setAbg(data.abg || null); setAbgTeaching(Array.isArray(data.abgTeaching) ? data.abgTeaching : []);
       setAbgCatalog(Array.isArray(data.abgExplanationOptions) ? data.abgExplanationOptions : []);
       setDetails(Array.isArray(data.details) ? data.details.filter(d => typeof d.heading === 'string' && typeof d.text === 'string') : []);
-      setAnswerContext({ questionKind: data.questionKind || 'education', offerSnapshot: data.offerSnapshot === true, evidence: data.evidence });
+      setAnswerContext({ questionKind: data.questionKind || 'education', offerSnapshot: data.offerSnapshot === true, evidence: data.evidence, snapshotUse: data.snapshotUse, snapshot: submittedSnapshot });
       trackEvent('ask_answered', { mode: 'general' });
     } catch {
       if (explain) setExplanationNotice('Additional explanation unavailable. The rule-based interpretation is unchanged.');
@@ -83,8 +95,15 @@ export default function AskClinicalEdge({ navigate, isVisible }) {
   return <div className="ce-ask-page">
     <ModuleHeader moduleName="Ask Clinical Edge" onGoHome={() => navigate('/')} />
     <main className="ce-ask-main">
-      <header><span className="ce-ask-scope">Nursing questions · Only the context you provide here</span><h1>Ask Clinical Edge</h1></header>
+      <header><span className="ce-ask-scope">Nursing questions</span><h1>Ask Clinical Edge</h1></header>
       <form onSubmit={submit}>
+        <div className="ce-ask-context">
+          <strong>{contextEnabled ? 'Using Patient Snapshot' : 'General Ask'}</strong>
+          <label><input type="checkbox" checked={contextEnabled} disabled={!snapshot || busy} onChange={e => setContextChoice(e.target.checked ? snapshot : null)} />Use confirmed Patient Snapshot</label>
+          {!snapshot && <p>No confirmed Snapshot available. <button type="button" onClick={() => navigate('/copilot')}>Create or confirm Snapshot</button></p>}
+          {contextEnabled && !selectedContext && <p>No relevant Snapshot facts selected. This question will use General Ask.</p>}
+          {selectedContext && <details><summary>Reported facts selected for this question ({selectedContext.facts.length})</summary><ul>{reportedFacts(selectedContext).map(fact => <li key={fact.id}><strong>{fact.label}: </strong>{fact.text}</li>)}</ul></details>}
+        </div>
         <label htmlFor="ask-question">Nursing question</label>
         <p id="ask-privacy" className="ce-ask-privacy">No names, MRNs, dates of birth or other patient identifiers. Identifier checks do not guarantee de-identification.</p>
         <textarea id="ask-question" ref={input} value={question} onChange={e => setQuestion(e.target.value)} aria-describedby="ask-privacy" placeholder="What would you like to understand?" maxLength={4000} rows={4} disabled={busy} />
@@ -96,17 +115,27 @@ export default function AskClinicalEdge({ navigate, isVisible }) {
       </form>
       {busy && <p role="status">Preparing your answer...</p>}
       {error && <p className="ce-ask-error" role="alert">{error}</p>}
-      {answer && <section className="ce-ask-answer" aria-labelledby="ask-answer-heading" aria-live="polite">
+      {answer && !visibleAnswer && <p role="status">The Snapshot changed. Enable the current Snapshot and ask again; the previous patient answer is no longer shown.</p>}
+      {visibleAnswer && <section className="ce-ask-answer" aria-labelledby="ask-answer-heading" aria-live="polite">
+        <strong className="ce-ask-answer-mode">{answerContext?.snapshotUse ? 'Using Patient Snapshot' : 'General Ask'}</strong>
         <header><div><span className="ce-ask-scope">{answerContext?.questionKind === 'reported_context' ? 'Reported context · Not a diagnosis' : 'Nursing education'}</span><h2 id="ask-answer-heading">{submitted}</h2></div></header>
         {abg ? <AskABGResult result={abg} /> : <div className="ce-ask-direct"><Answer text={answer} /></div>}
+        {answerContext?.snapshotUse && <>
+          <details className="ce-ask-context"><summary>REPORTED · Information used</summary><ul>{answerContext.snapshotUse.reported.map(fact => <li key={fact.id}><strong>{fact.label}: </strong>{fact.text}</li>)}</ul></details>
+          {answerContext.snapshotUse.calculated && (answerContext.snapshotUse.synthesisBindings
+            ? <details className="ce-ask-context"><summary>CALCULATED · ABG rule check</summary><AskABGResult result={answerContext.snapshotUse.calculated} /></details>
+            : <section className="ce-ask-detail"><h3>CALCULATED · ABG rule check</h3><AskABGResult result={answerContext.snapshotUse.calculated} /></section>)}
+          <p className="ce-ask-scope">{answerContext.snapshotUse.interpretationLabel} · {answerContext.snapshotUse.resolution === 'model_selected' ? 'AI-selected reference explanation' : 'Reference-guided explanation; not a model-generated answer'}</p>
+          {answerContext.snapshotUse.unknown.length > 0 && <section className="ce-ask-detail"><h3>UNKNOWN · What would change interpretation</h3><ul>{answerContext.snapshotUse.unknown.map(text => <li key={text}>{text}</li>)}</ul></section>}
+        </>}
         {abgTeaching.length > 0 && <section className="ce-ask-detail" aria-label="ABG physiology explanation"><h3>Why</h3>{abgTeaching.map(point => <p key={point.id}>{point.text}</p>)}</section>}
         {abg?.status === 'verified' && <div className="ce-ask-controls"><button type="button" disabled={busy} onClick={event => submit(event, true)}>Explain this pattern <span aria-hidden="true">&#8594;</span></button></div>}
         {explanationNotice && <p role="status">{explanationNotice}</p>}
         {details.map((detail, index) => <section className="ce-ask-detail" key={index}><h3>{detail.heading}</h3><Answer text={detail.text} /></section>)}
         {answerContext?.evidence && (!abg || abg.status === 'verified') && <aside className="ce-ask-evidence" aria-label="Evidence boundary">
-          {['curated_evidence', 'scope_limited', 'deterministic_rules'].includes(answerContext.evidence.status) ? <>
+          {['curated_evidence', 'scope_limited', 'deterministic_rules', 'snapshot_reference'].includes(answerContext.evidence.status) ? <>
             <h3>{answerContext.evidence.status === 'scope_limited' ? 'Limited evidence coverage' : answerContext.evidence.status === 'deterministic_rules' ? 'Sources for these rules' : 'References supplied for this answer'}</h3>
-            <p>{answerContext.evidence.status === 'scope_limited' ? 'A bounded reference explanation, not a complete model-generated answer.' : answerContext.evidence.status === 'deterministic_rules' ? 'Code applies these source-backed rules. Calculations and interpretation are not generated or independently verified by the AI.' : 'Curated excerpts were provided before generation. References support general concepts, not additional patient findings or independent verification of every sentence.'}</p>
+            <p>{answerContext.evidence.status === 'snapshot_reference' ? 'Reported facts come from the confirmed Snapshot. Curated references support the bounded physiology explanation, not independent verification of the case. ABG calculations remain code-owned.' : answerContext.evidence.status === 'scope_limited' ? 'A bounded reference explanation, not a complete model-generated answer.' : answerContext.evidence.status === 'deterministic_rules' ? 'Code applies these source-backed rules. Calculations and interpretation are not generated or independently verified by the AI.' : 'Curated excerpts were provided before generation. References support general concepts, not additional patient findings or independent verification of every sentence.'}</p>
             {answerContext.evidence.deviceScope && <p>{answerContext.evidence.deviceScope}</p>}
             <ul className="ce-ask-sources">{(Array.isArray(answerContext.evidence.sources) ? answerContext.evidence.sources : []).filter(source => source && typeof source.title === 'string' && typeof source.publisher === 'string' && typeof source.url === 'string' && source.url.startsWith('https://')).map(source => <li key={source.id}><a href={source.url} target="_blank" rel="noopener noreferrer">{source.title}</a><span>{source.publisher}{source.publication && ` · ${source.publication}`}{source.updated && ` · Updated ${source.updated}`}</span></li>)}</ul>
           </> : <p>{answerContext.evidence.requiresVerification ? 'Reference check required. This generated explanation was not verified against a current source. Confirm medication specifics, numerical criteria and device guidance in approved references and local policy.' : 'Generated education, not a source-verified clinical recommendation.'}</p>}

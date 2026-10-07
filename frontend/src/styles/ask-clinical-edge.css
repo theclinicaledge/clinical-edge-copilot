@@ -41,3 +41,11 @@
 .ce-ask-abg-comparison .ce-ask-abg-formula { font-size: 12px; color: var(--ce-text-muted); }
 .ce-ask-abg-limits summary { min-height: 44px; display: flex; align-items: center; font-size: 14px; color: var(--ce-teal-deep); cursor: pointer; }
 @media (max-width: 350px) { .ce-ask-abg-reported { grid-template-columns: 1fr; } }
+.ce-ask-context { margin: 16px 0; padding: 12px 0; border-block: 1px solid #d9e2e2; color: #17303e; }
+.ce-ask-context > strong, .ce-ask-answer-mode { display: block; color: #007b7b; margin-bottom: 8px; }
+.ce-ask-context label { display: flex; align-items: center; gap: 10px; min-height: 44px; cursor: pointer; }
+.ce-ask-context input[type="checkbox"] { width: 20px; height: 20px; accent-color: #007b7b; }
+.ce-ask-context summary { min-height: 44px; display: list-item; align-content: center; cursor: pointer; }
+.ce-ask-context li { overflow-wrap: anywhere; margin-block: 6px; }
+.snapshot-ask { min-height: 44px; padding: 10px 16px; margin-block: 12px; background: #fbfcfc; color: #007b7b; border: 1px solid #a9c5c5; border-radius: 6px; font: inherit; cursor: pointer; }
+.snapshot-ask:disabled { opacity: .5; cursor: default; }

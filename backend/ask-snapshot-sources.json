@@ -1,0 +1,8 @@
+{
+  "scope": "Focused Snapshot hemodynamic physiology; no diagnostic criteria, drug doses or treatment targets",
+  "sources": [
+    { "id": "snapshot-cardiac-index", "title": "Physiology, Cardiac Index", "publisher": "StatPearls / NCBI Bookshelf", "updated": "2024-06-08", "url": "https://www.ncbi.nlm.nih.gov/books/NBK539905/", "facts": ["Cardiac index expresses cardiac output relative to body surface area. An adult resting reference range is 2.5–4 L/min/m²; a value outside it requires clinical and measurement context rather than establishing a diagnosis."] },
+    { "id": "snapshot-flow-mechanisms", "title": "Shock — physiologic mechanisms", "publisher": "Merck Manual Professional", "updated": "2026-07", "url": "https://www.merckmanuals.com/professional/critical-care-medicine/shock-and-fluid-resuscitation/shock", "facts": ["Reduced filling can reduce stroke volume and cardiac output. Pump performance, rate/rhythm and mechanical restrictions can also affect flow. Vascular tone affects pressure and blood-flow distribution. These mechanisms may coexist; a monitor value does not establish their cause."] },
+    { "id": "snapshot-critical-monitoring", "title": "Monitoring and Testing the Critical Care Patient", "publisher": "Merck Manual Professional", "updated": "2026-06", "url": "https://www.merckmanuals.com/professional/critical-care-medicine/approach-to-the-critically-ill-patient/monitoring-and-testing-the-critical-care-patient", "facts": ["Filling pressures are surrogates, not direct circulating-volume measurements. Flow, hemoglobin, oxygenation and demand together affect oxygen delivery. Perfusion observations, timed output and lactate need clinical context; ultrasound can assess ventricular function and mechanical restrictions."] }
+  ]
+}

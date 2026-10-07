@@ -1,0 +1,84 @@
+{
+  "question": "Patient is on epi, vaso, and levo, the CI is 1.5. What’s going on?",
+  "contextMode": "snapshot",
+  "snapshotContext": {
+    "version": 1,
+    "profile": "hemodynamics",
+    "facts": [
+      {
+        "key": "ci",
+        "current": "1.5",
+        "previous": "",
+        "state": "",
+        "unit": "L/min/m2"
+      },
+      {
+        "key": "map",
+        "current": "66",
+        "previous": "",
+        "state": "",
+        "unit": "mmHg"
+      },
+      {
+        "key": "hr",
+        "current": "96",
+        "previous": "",
+        "state": "",
+        "unit": "bpm"
+      },
+      {
+        "key": "drips",
+        "text": "medication=epinephrine; medication=vasopressin; medication=norepinephrine"
+      },
+      {
+        "key": "cvp",
+        "current": "10",
+        "previous": "",
+        "state": "",
+        "unit": "mmHg"
+      },
+      {
+        "key": "svr",
+        "current": "1400",
+        "previous": "",
+        "state": "",
+        "unit": "dynes-sec/cm5"
+      },
+      {
+        "key": "rhythm",
+        "text": "Paced rhythm"
+      },
+      {
+        "key": "procedure",
+        "text": "Post-CABG"
+      },
+      {
+        "key": "lactate",
+        "current": "3.2",
+        "previous": "2.0",
+        "state": "",
+        "unit": "mmol/L"
+      },
+      {
+        "key": "perfusionFindings",
+        "text": "Cool / clammy"
+      },
+      {
+        "key": "urine",
+        "text": "20 mL over 1 hour"
+      },
+      {
+        "key": "drains",
+        "text": "type=Chest tube, currentOutput=35 mL, outputTimeframe=most recent hour"
+      },
+      {
+        "key": "pacing",
+        "text": "Temporary pacing"
+      },
+      {
+        "key": "gas",
+        "text": "Arterial ABG pH 7.29, PaCO2 55 mmHg, HCO3 26 mmol/L."
+      }
+    ]
+  }
+}

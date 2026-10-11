@@ -791,7 +791,7 @@ export default function App({ onGoHome, navigate, isOnline = true, initialCaptur
       });
       const data = await res.json();
       if (!res.ok || data.error) {
-        setSbar({ error: data.error || "Failed to generate SBAR." });
+        setSbar({ error: apiErrorMessage(res.status, data) });
         trackEvent('sbar_generation_failed', { error_type: 'request_failed' });
       } else {
         setSbar(data.sbar);
@@ -823,7 +823,12 @@ export default function App({ onGoHome, navigate, isOnline = true, initialCaptur
       const data = await res.json().catch(() => ({}));
       if (!res.ok || !data.lesson) {
         trackEvent("teach_me_error", { reason: "request_failed", status: res.status });
-        throw new Error("Teach Me is unavailable.");
+        const failure = new Error("Teach Me is unavailable.");
+        if (data.code === 'clinical_generation_restricted') {
+          failure.code = data.code;
+          failure.userMessage = apiErrorMessage(res.status, data);
+        }
+        throw failure;
       }
       return data.lesson;
     })();
@@ -1923,7 +1928,7 @@ export default function App({ onGoHome, navigate, isOnline = true, initialCaptur
               )}
 
               {sbar && sbar.error && (
-                <div style={{ color: "var(--ce-urgency-high-dark)", fontSize: 13 }}>{sbar.error}</div>
+                <div role="alert" style={{ color: "var(--ce-urgency-high-dark)", fontSize: 13 }}>{sbar.error}</div>
               )}
 
               {sbar && !sbar.error && (

@@ -100,6 +100,25 @@ function registerAskRoutes(app, dependencies) {
       log({ status: 'blocked', provider_status: 'not_called', failure_reason: 'identifier_pattern' });
       return fail(400, 'identifier_pattern', 'Remove patient identifiers before asking. Passing this check does not establish de-identification.');
     }
+    // Operator-controlled containment, not a classifier of clinical intent.
+    // All free-form generation and Snapshot interpretation stop here. Only the
+    // existing deterministic ABG route may return its unchanged authored result.
+    if (require('./safety-containment').containmentEnabled()) {
+      const deterministic = body.contextMode === 'general' && !body.abgExplanation ? routeABG(question) : null;
+      if (deterministic) {
+        const pack = retrieveEvidence('Explain acid-base');
+        const points = deterministic.status === 'verified' ? teachingCatalog(deterministic).slice(0, 2) : [];
+        log({ status: 'success', provider_status: 'not_called', containment_active: true,
+          display_resolution: 'abg_deterministic_containment' });
+        return res.json({ contextMode: 'general', questionKind: 'education', offerSnapshot: false,
+          answer: deterministic.summary, details: [], abg: deterministic, abgTeaching: points,
+          evidence: { ...sourceMetadata(pack, [...new Set([...deterministic.sourceIds, ...points.flatMap(p => p.sourceIds)])]), status: 'deterministic_rules' },
+          requestId });
+      }
+      log({ status: 'restricted', provider_status: 'not_called', containment_active: true,
+        failure_reason: 'ask_temporarily_restricted', display_resolution: 'restricted' });
+      return fail(503, 'ask_temporarily_restricted', 'General and Snapshot-aware Ask are temporarily paused for safety review. Deterministic ABG interpretation, Rhythm Lab and reference tools remain available. For patient care, use bedside assessment and your local clinical team; do not wait for Ask.');
+    }
     const policy = questionPolicy(question);
     const presentation = { contextMode: 'general', questionKind: policy.questionKind, offerSnapshot: policy.offerSnapshot,
       evidence: { status: 'not_source_grounded', requiresVerification: policy.needsVerification, categories: policy.categories } };

@@ -52,7 +52,7 @@ export default function TeachMePanel({ onLoad, onClose }) {
       setLoading(false);
       if (nextLesson?.active) trackEvent("teach_me_quick_check_shown", { domain: nextLesson.domain, concept_id: nextLesson.conceptId, question_type: nextLesson.questionType });
       else trackEvent("teach_me_fallback_viewed", { domain: nextLesson?.domain || "unknown", concept_id: nextLesson?.conceptId || "unknown" });
-    }).catch(() => { if (active) { setError(true); setLoading(false); } });
+    }).catch((failure) => { if (active) { setError(failure?.code === 'clinical_generation_restricted' ? failure.userMessage : true); setLoading(false); } });
     return () => {
       active = false;
       abandonTimerRef.current = setTimeout(() => {
@@ -86,7 +86,7 @@ export default function TeachMePanel({ onLoad, onClose }) {
   };
 
   if (loading) return <div className="teach-panel teach-loading" aria-live="polite"><span>Teach Me</span><strong>Preparing a quick teaching check…</strong></div>;
-  if (error || !lesson) return <div className="teach-panel"><span className="teach-eyebrow">Teach Me</span><h3>Learning check unavailable</h3><p className="teach-muted">The Priority Map remains available. Try opening Teach Me again in a moment.</p><button type="button" className="teach-return" onClick={onClose}>Return to Priority Map</button></div>;
+  if (error || !lesson) return <div className="teach-panel"><span className="teach-eyebrow">Teach Me</span><h3>Learning check unavailable</h3><p className="teach-muted" role="alert">{typeof error === 'string' ? error : 'The Priority Map remains available. Try opening Teach Me again in a moment.'}</p><button type="button" className="teach-return" onClick={onClose}>Return to Priority Map</button></div>;
   if (!lesson.active) return <div className="teach-panel teach-fallback">
     <span className="teach-eyebrow">Key idea</span><h3>{lesson.conceptLabel}</h3><p>{lesson.keyIdea}</p>
     <h4>Why it matters</h4><p>{lesson.whyItMatters}</p><h4>In this situation</h4><p>{lesson.scenarioConnection}</p>

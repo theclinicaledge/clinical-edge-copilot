@@ -8,6 +8,7 @@ import './styles/ask-clinical-edge.css';
 
 const API_BASE = import.meta.env.VITE_API_BASE_URL || (import.meta.env.PROD ? 'https://clinical-edge-copilot.onrender.com' : 'http://localhost:3001');
 const ERRORS = {
+  ask_temporarily_restricted: 'General and Snapshot-aware Ask are temporarily paused for safety review. Your question is unchanged. Deterministic ABG interpretation, Rhythm Lab and reference tools remain available. For patient care, use bedside assessment and your local clinical team; do not wait for Ask.',
   identifier_pattern: 'Remove names, MRNs, dates of birth and other patient identifiers. This check cannot guarantee de-identification.',
   invalid_question: 'Enter a nursing question of 4 to 4000 characters.',
   invalid_context_boundary: 'General mode cannot use Snapshot context.',

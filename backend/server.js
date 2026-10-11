@@ -2541,6 +2541,7 @@ function buildOperationalLogEntry(fields) {
       .filter((key) => fields[key] !== undefined)
       .map((key) => [key, fields[key]])
   );
+  if (typeof fields.containment_active === 'boolean') entry.containment_active = fields.containment_active;
   for (const key of ["original_validation", "repair_validation"]) {
     const safe = sanitizeValidationMetadata(fields[key]);
     if (safe) entry[key] = safe;
@@ -2570,7 +2571,7 @@ function isOverloadError(err) {
 registerAskRoutes(app, { apiLimiter, getClient: () => client, containsPHI, runWithStageTimeout, collectPriorityMapStream, appendOperationalLog, classifyProviderError });
 
 // ── Streaming endpoint ────────────────────────────────────────────────────────
-app.post("/api/copilot", apiLimiter, async (req, res) => {
+app.post("/api/copilot", apiLimiter, require('./safety-containment').containmentGate('COPILOT', appendOperationalLog), async (req, res) => {
   const { question, mode, isFollowUp, learningRequest, priorityMapResponse, reassessmentRequest } = req.body;
   const requestStartedAt = Date.now();
   const requestId = randomUUID();
@@ -3084,7 +3085,7 @@ BACKGROUND:
 ASSESSMENT:
 RECOMMENDATION:`;
 
-app.post("/api/sbar", apiLimiter, async (req, res) => {
+app.post("/api/sbar", apiLimiter, require('./safety-containment').containmentGate('SBAR', appendOperationalLog), async (req, res) => {
   const { question, copilotResponse, reassessmentRequest, previousAssessment } = req.body;
   const requestStartedAt = Date.now();
   const requestTimestamp = new Date().toISOString();

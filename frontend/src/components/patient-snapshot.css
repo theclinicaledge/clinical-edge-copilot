@@ -194,6 +194,9 @@
 .snapshot-submit button:disabled { opacity: .48; cursor: not-allowed; }
 .snapshot-signal-grid button:focus-visible, .snapshot-choice-row button:focus-visible, .snapshot-token-grid button:focus-visible, .snapshot-field-state select:focus-visible, .snapshot-disclosure:focus-visible, .snapshot-edit:focus-visible, .snapshot-submit button:focus-visible, .snapshot-field input:focus, .snapshot-notes textarea:focus { outline: 3px solid rgba(10,191,188,.22); outline-offset: 2px; }
 @media (max-width: 768px) {
+  .patient-snapshot button, .patient-snapshot select { min-height: 44px; }
+  .patient-snapshot input, .patient-snapshot select, .patient-snapshot textarea { font-size: 16px; }
+  .snapshot-segmented button, .snapshot-choice-row button, .snapshot-token-grid button { font-size: 12px; }
   .patient-snapshot--quick { padding-bottom: 64px; }
   .snapshot-intro h1 { font-size: 28px; }
   .snapshot-signal-grid { grid-template-columns: repeat(2,minmax(0,1fr)); }
@@ -219,7 +222,10 @@
   .rapid-manual-banner { align-items: stretch; flex-direction: column; }
 }
 @media (max-width: 430px) {
-  .quick-measurement__current { grid-template-columns: minmax(0,1fr) 66px; }
+  .quick-measurement__current { grid-template-columns: repeat(2,minmax(0,1fr)); }
+  .quick-measurement__current input { grid-column: 1 / -1; grid-row: auto; width: 100%; font-size: 17px; }
+  .quick-measurement__current select { min-width: 0; width: 100%; }
+  .quick-measurement__current button, .quick-measurement__current select { min-height: 44px; font-size: 12px; }
   .urine-amount-row { grid-template-columns: minmax(0,.9fr) auto minmax(0,.8fr) 72px; }
   .snapshot-finding-options { grid-template-columns: 1fr; }
   .snapshot-entry-mode button { font-size: 10.5px; }

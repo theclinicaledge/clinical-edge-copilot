@@ -1,7 +1,7 @@
 import { useSeo } from "./seo/useSeo.js";
 import { STATIC_ROUTE_SEO } from "./seo/routeSeo.js";
 
-export default function Privacy() {
+export default function Privacy({ onNavigate }) {
   useSeo(STATIC_ROUTE_SEO["/privacy"]);
   return (
     <div style={{
@@ -54,6 +54,7 @@ export default function Privacy() {
           </span>
           <a
             href="/"
+            onClick={(event) => { if (!onNavigate || event.metaKey || event.ctrlKey || event.shiftKey || event.altKey) return; event.preventDefault(); onNavigate('/'); }}
             className="privacy-back-link"
             style={{
             marginLeft: "auto",
@@ -70,7 +71,7 @@ export default function Privacy() {
             WebkitTapHighlightColor: "transparent",
           }}
           >
-            ← Back
+            ← Home
           </a>
         </div>
       </div>

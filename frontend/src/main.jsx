@@ -69,12 +69,13 @@ function getPage() {
   if (path.startsWith('/brain-sheets/')) return 'brainsheets-detail';
   if (path === '/blog')           return 'blog';
   if (path.startsWith('/blog/'))  return 'blogpost';
-  return 'home'; // fallback to home hub
+  return 'notfound';
 }
 
 function Root() {
   const [page, setPage] = useState(getPage);
   const [workspaceEntered, setWorkspaceEntered] = useState(() => getPage() === 'app');
+  const [askEntered, setAskEntered] = useState(() => getPage() === 'ask');
   const [scenarioActive, setScenarioActive] = useState(false);
   const [askSnapshot, setAskSnapshot] = useState(null);
   const shareSnapshot = useCallback(snapshot => setAskSnapshot(snapshot ? structuredClone(snapshot) : null), []);
@@ -91,6 +92,7 @@ function Root() {
     history.pushState({ ceScroll: 0 }, '', path);
     setPage(getPage());
     if (getPage() === 'app') setWorkspaceEntered(true);
+    if (getPage() === 'ask') setAskEntered(true);
     requestAnimationFrame(() => {
       window.scrollTo(0, getPage() === 'app' ? workspacePosition.current.scroll : 0);
       if (getPage() === 'app' && workspacePosition.current.focus?.isConnected) workspacePosition.current.focus.focus({ preventScroll: true });
@@ -103,6 +105,7 @@ function Root() {
       if (currentPage.current === 'app') workspacePosition.current.scroll = window.scrollY;
       setPage(getPage());
       if (getPage() === 'app') setWorkspaceEntered(true);
+      if (getPage() === 'ask') setAskEntered(true);
       requestAnimationFrame(() => {
         window.scrollTo(0, getPage() === 'app' ? workspacePosition.current.scroll : history.state?.ceScroll || 0);
         if (getPage() === 'app' && workspacePosition.current.focus?.isConnected) workspacePosition.current.focus.focus({ preventScroll: true });
@@ -141,8 +144,9 @@ function Root() {
       {page === 'scenario'   && <Scenario onBack={goBack} onEnterApp={enterApp} onQuickStart={enterQuickStart} />}
       {page === 'quickstart' && <QuickStart onBack={goBackToScenario} onEnterApp={enterApp} />}
       {page === 'landing'    && <Landing onEnterApp={enterApp} onEnterScenario={enterScenario} />}
-      {page === 'privacy'    && <Privacy />}
-      {page === 'support'    && <Support />}
+      {page === 'privacy'    && <Privacy onNavigate={navigate} />}
+      {page === 'support'    && <Support onNavigate={navigate} />}
+      {page === 'notfound' && <main className="ce-not-found"><span>Clinical Edge</span><h1>Page not found</h1><p>This address does not lead to a Clinical Edge page.</p><a href="/" onClick={(event) => { if (event.metaKey || event.ctrlKey || event.shiftKey || event.altKey) return; event.preventDefault(); navigate('/'); }}>Return Home</a></main>}
       {page === 'download'   && <Download onNavigate={navigate} />}
       {page === 'icudrips'      && <IcuDripsModule onGoHome={() => navigate('/')} />}
       {page === 'referencehub'  && <ReferenceHubModule onGoHome={() => navigate('/')} />}
@@ -151,7 +155,7 @@ function Root() {
       {page === 'brainsheets-detail' && <BrainSheetsModule navigate={navigate} onGoHome={() => navigate('/')} templateId={window.location.pathname.replace(/^\/brain-sheets\//, '').replace(/\/$/, '')} />}
       {page === 'blog'          && <BlogIndex />}
       {page === 'blogpost'      && <BlogPostPage slug={window.location.pathname.replace(/^\/blog\//, '').replace(/\/$/, '')} />}
-      <div hidden={page !== 'ask'} inert={page !== 'ask'} className="ce-ask-workspace"><AskClinicalEdge navigate={navigate} isVisible={page === 'ask'} snapshot={askSnapshot} /></div>
+      {askEntered && <div hidden={page !== 'ask'} inert={page !== 'ask'} className="ce-ask-workspace"><AskClinicalEdge navigate={navigate} isVisible={page === 'ask'} snapshot={askSnapshot} /></div>}
       {/* Keep the scenario's existing hook tree in memory, never browser storage. */}
       {workspaceEntered && <div hidden={page !== 'app'} inert={page !== 'app'} className="ce-shift-workspace" onFocusCapture={(event) => { workspacePosition.current.focus = event.target; }}><App onGoHome={() => navigate('/')} navigate={navigate} isOnline={isOnline} isVisible={page === 'app'} onScenarioActivity={setScenarioActive} onSnapshotChange={shareSnapshot} initialCaptureMode={new URLSearchParams(window.location.search).get('capture') === 'rapid' ? 'rapid' : 'manual'} /></div>}
       <WorkspaceNavigation page={page} navigate={navigate} scenarioActive={scenarioActive} />

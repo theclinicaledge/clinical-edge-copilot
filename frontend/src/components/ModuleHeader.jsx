@@ -25,7 +25,7 @@ export default function ModuleHeader({
   maxWidth = 'var(--ce-content)',
 }) {
   const action = onBack || onGoHome;
-  const actionLabel = onBack ? backLabel : 'All tools';
+  const actionLabel = onBack ? backLabel : 'Home';
 
   return (
     <header className="ce-module-header">
@@ -34,7 +34,7 @@ export default function ModuleHeader({
           type="button"
           className="ce-module-header__brand"
           onClick={onGoHome}
-          aria-label="Clinical Edge — all tools"
+          aria-label="Clinical Edge — Home"
           disabled={!onGoHome}
         >
           <ClinicalEdgeMark />

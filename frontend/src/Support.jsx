@@ -1,7 +1,7 @@
 import { useSeo } from "./seo/useSeo.js";
 import { STATIC_ROUTE_SEO } from "./seo/routeSeo.js";
 
-export default function Support() {
+export default function Support({ onNavigate }) {
   useSeo(STATIC_ROUTE_SEO["/support"]);
   return (
     <div style={{
@@ -69,6 +69,7 @@ export default function Support() {
           </span>
           <a
             href="/"
+            onClick={(event) => { if (!onNavigate || event.metaKey || event.ctrlKey || event.shiftKey || event.altKey) return; event.preventDefault(); onNavigate('/'); }}
             className="support-back-link"
             style={{
             marginLeft: "auto",
@@ -85,7 +86,7 @@ export default function Support() {
             WebkitTapHighlightColor: "transparent",
           }}
           >
-            ← Back
+            ← Home
           </a>
         </div>
       </div>
@@ -196,8 +197,8 @@ export default function Support() {
             color: "var(--ce-text-muted)",
             fontFamily: "'IBM Plex Mono', monospace",
           }}>
-            <a href="/privacy" className="support-footer-link" style={{ color: "var(--ce-text-muted)", textDecoration: "none" }}>Privacy Policy</a>
-            <a href="/" className="support-footer-link" style={{ color: "var(--ce-text-muted)", textDecoration: "none" }}>← Home</a>
+            <a href="/privacy" onClick={(event) => { if (!onNavigate || event.metaKey || event.ctrlKey || event.shiftKey || event.altKey) return; event.preventDefault(); onNavigate('/privacy'); }} className="support-footer-link" style={{ color: "var(--ce-text-muted)", textDecoration: "none" }}>Privacy Policy</a>
+            <a href="/" onClick={(event) => { if (!onNavigate || event.metaKey || event.ctrlKey || event.shiftKey || event.altKey) return; event.preventDefault(); onNavigate('/'); }} className="support-footer-link" style={{ color: "var(--ce-text-muted)", textDecoration: "none" }}>← Home</a>
           </footer>
 
         </div>

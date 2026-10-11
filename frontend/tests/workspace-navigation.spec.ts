@@ -24,28 +24,28 @@ for (const width of widths) {
     await page.setViewportSize({ width: width === 390 ? 844 : width, height: width === 390 ? 390 : 780 });
     await expect(narrative).toHaveValue('Fictional practice scenario: RR is 24.');
     await page.setViewportSize({ width, height: width === 1280 ? 900 : 844 });
-    await nav.getByRole('button', { name: 'Check something' }).click();
-    const dialog = page.getByRole('dialog', { name: 'Check something' });
+    await nav.getByRole('button', { name: 'Reference and learning tools' }).click();
+    const dialog = page.getByRole('dialog', { name: 'Reference & learning tools' });
     await expect(dialog).toBeVisible();
     await expect(page.getByRole('button', { name: 'Close tools' })).toBeFocused();
     await page.screenshot({ path: '/private/tmp/clinical-edge-slice1-check-' + width + '.png', animations: 'disabled' });
     await page.keyboard.press('Shift+Tab');
-    await expect(dialog.getByRole('link', { name: 'Clinical reference' })).toBeFocused();
+    await expect(dialog.getByRole('link', { name: 'Rhythm Lab' })).toBeFocused();
     await page.keyboard.press('Escape');
     await expect(dialog).not.toBeVisible();
-    await expect(nav.getByRole('button', { name: 'Check something' })).toBeFocused();
+    await expect(nav.getByRole('button', { name: 'Reference and learning tools' })).toBeFocused();
     await expect(narrative).toHaveValue('Fictional practice scenario: RR is 24.');
 
     for (const [name, path, target] of [
-      ['Rhythm', '/rhythm-lab/library', 'Filter rhythms'],
+      ['Rhythm Lab', '/rhythm-lab', ''],
       ['Medication', '/icu-drips', 'Search drips'],
       ['ABG', '/abg-lab', ''],
       ['Clinical reference', '/reference-hub', 'Search references'],
     ]) {
-      await nav.getByRole('button', { name: 'Check something' }).click();
+      await nav.getByRole('button', { name: 'Reference and learning tools' }).click();
       await page.getByRole('dialog').getByRole('link', { name }).click();
       await expect(page).toHaveURL(new RegExp(path + '$'));
-      await expect(nav.getByRole('button', { name: 'Check something' })).toHaveClass(/is-active/);
+      await expect(nav.getByRole('button', { name: 'Reference and learning tools' })).toHaveClass(/is-active/);
       if (target) {
         const search = page.getByLabel(target);
         await expect(search).toBeInViewport();
@@ -88,7 +88,7 @@ for (const width of widths) {
 test('home lookup actions open the resource in one action and preserve optional learning', async ({ page }) => {
   await page.setViewportSize({ width: 390, height: 844 });
   for (const [name, path] of [
-    ['Rhythm', '/rhythm-lab/library'], ['Medication', '/icu-drips'],
+    ['Medication', '/icu-drips'],
     ['ABG', '/abg-lab'], ['Clinical reference', '/reference-hub'],
   ]) {
     await page.goto('/');

@@ -44,7 +44,7 @@ for (const width of [390, 430, 1280]) {
     await page.getByLabel('Nurse narrative').fill(narrative);
     const nav = page.getByRole('navigation', { name: 'Clinical Edge workspace' });
     const leave = async () => {
-      await nav.getByRole('button', { name: 'Check something' }).click();
+      await nav.getByRole('button', { name: 'Reference and learning tools' }).click();
       await page.getByRole('dialog').getByRole('link', { name: 'Medication' }).click();
       await expect(page.getByText('Shift Brain active', { exact: true })).toBeVisible();
     };

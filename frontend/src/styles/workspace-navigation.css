@@ -15,6 +15,7 @@
 .ce-command-home__capture { min-height: 56px; padding: 14px 16px; display: flex; align-items: center; justify-content: space-between; gap: 12px; background: var(--ce-teal); color: var(--ce-navy-header); border-radius: 6px; text-decoration: none; font-size: 15px; font-weight: 750; }
 .ce-command-home__work p { margin: 18px 0 0; color: var(--ce-text-light-body); font-size: 12px; line-height: 1.6; }
 .ce-command-home__checks { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 16px; }
+.ce-command-home__checks a:last-child { grid-column: 1 / -1; }
 .ce-command-home a { color: inherit; }
 .ce-command-home__work .ce-command-home__capture { color: var(--ce-navy-header); }
 .ce-command-home__checks a { background: var(--ce-warm-card); border: 1px solid var(--ce-warm-line); padding: 15px 14px; min-height: 88px; border-radius: 6px; }
@@ -78,3 +79,8 @@
   .ce-navigation-sheet { padding-left: 20px; padding-right: 20px; }
 }
 @media (prefers-reduced-motion: reduce) { .ce-navigation-sheet { animation: none; } .ce-command-home a, .ce-navigation-sheet a { transition: none; } }
+/* Keep standalone recovery pages and legal navigation comfortably tappable. */
+.ce-not-found { min-height: 100svh; padding: 96px 24px; background: var(--ce-warm-bg); color: var(--ce-text-dark); }
+.ce-not-found h1 { font-size: 28px; letter-spacing: 0; }
+.ce-not-found a { display: inline-flex; align-items: center; min-height: 48px; padding: 0 20px; border-radius: 8px; background: var(--ce-teal-deep); color: white; font-weight: 700; text-decoration: none; }
+.support-back-link, .privacy-back-link, .support-footer-link { min-height: 44px; display: inline-flex; align-items: center; }

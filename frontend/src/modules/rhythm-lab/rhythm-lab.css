@@ -4217,3 +4217,13 @@
     transform: none;
   }
 }
+/* Shared feature navigation and controls retain the existing rhythm content. */
+.rhythm-feature-nav { display: flex; flex-wrap: wrap; gap: 6px; margin: 0 16px 24px; border-bottom: 1px solid var(--border); padding-bottom: 12px; }
+.rhythm-feature-nav a { display: inline-flex; align-items: center; min-height: 44px; padding: 0 14px; border-radius: 6px; color: var(--text-primary); border: 1px solid var(--border); text-decoration: none; font-size: 14px; font-weight: 600; }
+.rhythm-feature-nav a[aria-current="page"] { background: var(--ce-teal-deep); color: #fff; border-color: var(--ce-teal-deep); }
+.rhythm-feature-nav a:focus-visible { outline: 2px solid var(--ce-teal); outline-offset: 3px; }
+.rhythm-lab-root .rhythm-index-bar__input { min-height: 44px; font-size: 16px; }
+.rhythm-lab-root .rhythm-index-bar__input::placeholder { color: var(--ce-text-dim); opacity: 1; }
+.rhythm-lab-root select { min-height: 44px; font-size: 16px; max-width: 100%; }
+.compare-selected-name { margin: 7px 0 0; color: var(--text-secondary); font-size: 13px; line-height: 1.5; overflow-wrap: anywhere; }
+.rhythm-lab-root button:not(.rhythm-card) { min-height: 44px; }

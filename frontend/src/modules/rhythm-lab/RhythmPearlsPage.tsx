@@ -15,7 +15,7 @@ export default function RhythmPearlsPage({ navigate }: RhythmPearlsPageProps) {
     >
       <div className="home-layout">
         <div className="home-left">
-          <PearlsSection />
+          <PearlsSection initiallyExpanded />
         </div>
       </div>
     </RhythmLabPageShell>

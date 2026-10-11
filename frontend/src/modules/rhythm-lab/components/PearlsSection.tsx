@@ -3,8 +3,8 @@ import { PEARLS } from '../data/phase1';
 
 const PREVIEW_COUNT = 5;
 
-export function PearlsSection() {
-  const [expanded, setExpanded] = useState(false);
+export function PearlsSection({ initiallyExpanded = false }: { initiallyExpanded?: boolean }) {
+  const [expanded, setExpanded] = useState(initiallyExpanded);
   const visible = expanded ? PEARLS : PEARLS.slice(0, PREVIEW_COUNT);
 
   return (

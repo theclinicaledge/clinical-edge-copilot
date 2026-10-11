@@ -26,8 +26,8 @@ function IndexView({ templates, onSelect, onGoHome }) {
         <div className="bs-eyebrow">Brain Sheet Library</div>
         <h1 className="bs-h1">Blank, printable shift-organization sheets.</h1>
         <p className="bs-lead">
-          Seven templates for common bedside assignments — med-surg, ICU,
-          telemetry, ED, night shift, and student clinicals. Print one and
+          Printable templates for common bedside assignments — med-surg, ICU,
+          and telemetry. Print one and
           fill it in on paper the way you always have.
         </p>
         <div className="bs-info-banner">
@@ -364,7 +364,7 @@ export default function BrainSheetsModule({ templateId, navigate, onGoHome }) {
   // Unknown or missing template id falls back to the library index rather
   // than rendering a broken detail page.
   if (!template) {
-    return <IndexView templates={TEMPLATES} onSelect={openTemplate} onGoHome={onGoHome} />;
+    return <IndexView templates={TEMPLATES.filter((template) => template.Sheet && template.pdfPath)} onSelect={openTemplate} onGoHome={onGoHome} />;
   }
 
   return <DetailPlaceholder template={template} onBack={goToIndex} onGoHome={onGoHome} />;

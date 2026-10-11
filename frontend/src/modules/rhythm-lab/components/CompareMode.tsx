@@ -59,12 +59,14 @@ export function CompareMode({ onBack }: CompareModeProps) {
                 id="cmp-rhythm-a"
                 className="compare-select"
                 value={idA}
+                aria-describedby="cmp-rhythm-a-name"
                 onChange={e => setIdA(e.target.value)}
               >
                 {RHYTHMS.map(r => (
-                  <option key={r.id} value={r.id}>{r.shortName} — {r.name}</option>
+                  <option key={r.id} value={r.id}>{r.shortName}</option>
                 ))}
               </select>
+              <p id="cmp-rhythm-a-name" className="compare-selected-name">{rhythmA.name}</p>
             </div>
             <span className="compare-vs" aria-hidden="true">vs</span>
             <div className="compare-selector-group">
@@ -73,12 +75,14 @@ export function CompareMode({ onBack }: CompareModeProps) {
                 id="cmp-rhythm-b"
                 className="compare-select"
                 value={idB}
+                aria-describedby="cmp-rhythm-b-name"
                 onChange={e => setIdB(e.target.value)}
               >
                 {RHYTHMS.map(r => (
-                  <option key={r.id} value={r.id}>{r.shortName} — {r.name}</option>
+                  <option key={r.id} value={r.id}>{r.shortName}</option>
                 ))}
               </select>
+              <p id="cmp-rhythm-b-name" className="compare-selected-name">{rhythmB.name}</p>
             </div>
           </div>
         </div>

@@ -41,7 +41,7 @@ export default function ClinicalEdgeHome({ onNavigate }) {
           <p>Do not enter patient identifiers. Completed cases can be saved on this device when you choose. See Privacy for data processing and storage.<br />Reasoning support alongside clinical judgment.</p>
         </section>
         <section className="ce-command-home__check" aria-labelledby="check-title">
-          <h2 id="check-title">Check something</h2>
+          <h2 id="check-title">Reference tools</h2>
           <div className="ce-command-home__checks">{CHECK_ACTIONS.map((action) => <IntentLink key={action.path} action={action} onNavigate={onNavigate} />)}</div>
         </section>
       </div>

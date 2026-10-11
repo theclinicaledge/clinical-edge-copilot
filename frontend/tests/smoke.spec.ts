@@ -251,7 +251,7 @@ test('command home prioritizes patient change and preserves focused tools', asyn
   await page.goto('/');
   await expect(page.getByRole('heading', { name: 'What do you need right now?' })).toBeVisible();
   await expect(page.getByRole('link', { name: "Describe what's happening" })).toBeVisible();
-  await expect(page.getByRole('heading', { name: 'Check something' })).toBeVisible();
+  await expect(page.getByRole('heading', { name: 'Reference tools' })).toBeVisible();
   await expect(page.getByText('Rhythm Lab', { exact: true })).toBeVisible();
   await expect(page.getByText('ICU Drips', { exact: true })).toBeVisible();
   await expect(page.getByText('Reference Hub', { exact: true })).toBeVisible();

@@ -56,6 +56,10 @@ export function RhythmLabPageShell({
             {subtitle && <p className="page-identity__subtitle">{subtitle}</p>}
           </div>
 
+          <nav className="rhythm-feature-nav" aria-label="Rhythm Lab sections">
+            {[['Library', '/rhythm-lab/library'], ['Practice', '/rhythm-lab/practice'], ['Compare', '/rhythm-lab/compare'], ['Pearls', '/rhythm-lab/pearls'], ['Sprint', '/rhythm-lab/sprint']].map(([label, path]) => <a key={path} href={path} aria-current={window.location.pathname === path ? 'page' : undefined} onClick={(event) => { if (event.metaKey || event.ctrlKey || event.shiftKey || event.altKey) return; event.preventDefault(); navigate(path); }}>{label}</a>)}
+          </nav>
+
           {children}
         </div>
 

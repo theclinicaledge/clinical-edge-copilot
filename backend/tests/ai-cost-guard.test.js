@@ -452,6 +452,36 @@ test('repeated safety refusals (422) from one IP never use up the device but hit
   } finally { providerReply = null; }
 });
 
+test('a new Priority Map that fails the safety check refunds the device but keeps the IP count; provider failure refunds both', async () => {
+  const snapshotMap = { question: 'PATIENT SNAPSHOT — USER-REPORTED / OBSERVED INFORMATION\nBP: 84/50 (earlier 118/72)\nHR: 122\nRR: 26', mode: 'quick' };
+  const device = '9f0a1b2c-3d4e-4f5a-8b6c-7d8e9f0a1b2c';
+  const env = { ASK_SAFETY_CONTAINMENT: undefined, FREE_DAILY_QUESTIONS: '1', FREE_DAILY_QUESTIONS_PER_IP: '2', AI_DAILY_BUDGET_USD: undefined };
+  try {
+    await captureLogs(() => withEnv(env, async () => {
+      // Anthropic answers, but the output (and its repair) fail validation: deterministic fallback.
+      providerReply = sse('not a valid priority map');
+      for (let attempt = 1; attempt <= 2; attempt++) {
+        providerCalls = 0;
+        const res = await callRoute('/api/copilot', snapshotMap, { device, ip: '192.0.2.95' });
+        assert.equal(res.statusCode, 200, `attempt ${attempt}`);
+        assert.ok(providerCalls >= 1, 'Anthropic was called');
+        assert.match(res.text, /"priorityMapResolution":"fallback"/);
+      }
+      const blocked = await callRoute('/api/copilot', snapshotMap, { device, ip: '192.0.2.95' });
+      assert.equal(blocked.statusCode, 429);
+      assert.match(blocked.body.message, /for this network are used up/);
+
+      // Anthropic never answers: fallback refunds both counters, so retries never hit either limit.
+      providerReply = null;
+      for (let attempt = 1; attempt <= 4; attempt++) {
+        const res = await callRoute('/api/copilot', snapshotMap, { device, ip: '192.0.2.96' });
+        assert.equal(res.statusCode, 200, `provider failure attempt ${attempt}`);
+        assert.match(res.text, /"priorityMapResolution":"fallback"/);
+      }
+    }));
+  } finally { providerReply = null; }
+});
+
 test('a successful new question still counts', async () => {
   providerReply = payload => sse(JSON.stringify({ answer: positive[1].answer, details: [], source_ids: payload.output_config.format.schema.properties.source_ids.items.enum }));
   try {

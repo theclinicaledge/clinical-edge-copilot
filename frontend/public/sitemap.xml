@@ -49,6 +49,12 @@
     <priority>0.3</priority>
   </url>
   <url>
+    <loc>https://theclinicaledge.org/terms</loc>
+    <lastmod>2026-10-11</lastmod>
+    <changefreq>yearly</changefreq>
+    <priority>0.3</priority>
+  </url>
+  <url>
     <loc>https://theclinicaledge.org/support</loc>
     <lastmod>2026-07-15</lastmod>
     <changefreq>yearly</changefreq>

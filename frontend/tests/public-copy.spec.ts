@@ -112,7 +112,7 @@ test('Shift Brain privacy notice is scoped and canonical privacy link remains av
   await expect(page.getByRole('link', { name: 'Privacy', exact: true })).toHaveAttribute('href', '/privacy');
 });
 
-for (const path of ['/', '/download', '/privacy']) {
+for (const path of ['/', '/download', '/privacy', '/terms']) {
   test(`route SEO agrees across description, social tags and canonical at ${path}`, async ({ page }) => {
     await page.goto(path);
     const expected = STATIC_ROUTE_SEO[path].description;

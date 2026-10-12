@@ -41,6 +41,9 @@ export default function Privacy({ onNavigate }) {
         }
         .privacy-back-link:hover { color: var(--ce-teal); text-decoration: underline; text-decoration-color: var(--ce-teal); }
         .privacy-back-link:focus-visible { outline: 2px solid var(--ce-teal); outline-offset: 2px; }
+        .privacy-footer-link { text-underline-offset: 3px; }
+        .privacy-footer-link:hover { color: var(--ce-teal-deep) !important; text-decoration: underline !important; }
+        .privacy-footer-link:focus-visible { outline: 2px solid var(--ce-teal); outline-offset: 2px; }
       `}</style>
 
       {/* ── Header — unified Clinical Edge header recipe (design-system.md §4.1) ── */}
@@ -214,7 +217,11 @@ export default function Privacy({ onNavigate }) {
             textAlign: "center",
           }}>
             Clinical Edge Copilot · theclinicaledge.org<br />
-            Your clinical judgment comes first.
+            Your clinical judgment comes first.<br />
+            <span style={{ display: "inline-flex", gap: 16 }}>
+              <a href="/terms" onClick={(event) => { if (!onNavigate || event.metaKey || event.ctrlKey || event.shiftKey || event.altKey) return; event.preventDefault(); onNavigate('/terms'); }} className="privacy-footer-link" style={{ color: "var(--ce-text-muted)", textDecoration: "none" }}>Terms</a>
+              <a href="/support" onClick={(event) => { if (!onNavigate || event.metaKey || event.ctrlKey || event.shiftKey || event.altKey) return; event.preventDefault(); onNavigate('/support'); }} className="privacy-footer-link" style={{ color: "var(--ce-text-muted)", textDecoration: "none" }}>Support</a>
+            </span>
           </footer>
 
         </div>

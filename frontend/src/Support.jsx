@@ -198,6 +198,7 @@ export default function Support({ onNavigate }) {
             fontFamily: "'IBM Plex Mono', monospace",
           }}>
             <a href="/privacy" onClick={(event) => { if (!onNavigate || event.metaKey || event.ctrlKey || event.shiftKey || event.altKey) return; event.preventDefault(); onNavigate('/privacy'); }} className="support-footer-link" style={{ color: "var(--ce-text-muted)", textDecoration: "none" }}>Privacy Policy</a>
+            <a href="/terms" onClick={(event) => { if (!onNavigate || event.metaKey || event.ctrlKey || event.shiftKey || event.altKey) return; event.preventDefault(); onNavigate('/terms'); }} className="support-footer-link" style={{ color: "var(--ce-text-muted)", textDecoration: "none" }}>Terms of Use</a>
             <a href="/" onClick={(event) => { if (!onNavigate || event.metaKey || event.ctrlKey || event.shiftKey || event.altKey) return; event.preventDefault(); onNavigate('/'); }} className="support-footer-link" style={{ color: "var(--ce-text-muted)", textDecoration: "none" }}>← Home</a>
           </footer>
 

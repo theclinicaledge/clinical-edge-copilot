@@ -98,6 +98,7 @@ export default function BlogChrome({ children, contentMaxWidth = 720 }) {
               {[
                 { label: "Blog", path: "/blog" },
                 { label: "Privacy", path: "/privacy" },
+                { label: "Terms", path: "/terms" },
                 { label: "Support", path: "/support" },
               ].map(({ label, path }) => (
                 <a key={label} href={path} style={{ fontSize: 11, color: "var(--ce-text-dim)", textDecoration: "none", letterSpacing: "0.02em" }}>

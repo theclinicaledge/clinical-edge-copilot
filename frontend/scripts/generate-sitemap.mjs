@@ -23,6 +23,7 @@ const STATIC_ROUTES = [
   { loc: "/abg-lab", lastmod: "2026-07-15", changefreq: "monthly", priority: "0.8" },
   { loc: "/download", lastmod: "2026-07-15", changefreq: "monthly", priority: "0.6" },
   { loc: "/privacy", lastmod: "2026-07-15", changefreq: "yearly", priority: "0.3" },
+  { loc: "/terms", lastmod: "2026-10-11", changefreq: "yearly", priority: "0.3" },
   { loc: "/support", lastmod: "2026-07-15", changefreq: "yearly", priority: "0.3" },
   { loc: "/blog", lastmod: "2026-07-15", changefreq: "weekly", priority: "0.7" },
 ];

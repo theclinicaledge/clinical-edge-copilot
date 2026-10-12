@@ -9,6 +9,7 @@ import WorkspaceNavigation from "./components/WorkspaceNavigation.jsx";
 import Download from "./Download.jsx";
 import Landing from "./Landing.jsx";
 import Privacy from "./Privacy.jsx";
+import Terms from "./Terms.jsx";
 import Support from "./Support.jsx";
 import BlogIndex from "./blog/BlogIndex.jsx";
 import BlogLayout from "./blog/BlogLayout.jsx";
@@ -40,6 +41,9 @@ export function renderRoute(routePath) {
   }
   if (routePath === "/privacy") {
     return { html: renderToString(<Privacy />), seo: STATIC_ROUTE_SEO["/privacy"] };
+  }
+  if (routePath === "/terms") {
+    return { html: renderToString(<Terms />), seo: STATIC_ROUTE_SEO["/terms"] };
   }
   if (routePath === "/support") {
     return { html: renderToString(<Support />), seo: STATIC_ROUTE_SEO["/support"] };

@@ -53,7 +53,7 @@ test('example is explicitly withheld and Ask is visibly upcoming without a CTA',
   await expect(ask.getByText('Upcoming · not publicly available', { exact: true })).toBeVisible();
   await expect(ask.locator('a,button')).toHaveCount(0);
   const hrefs = await page.locator('.ce-acquisition a').evaluateAll(elements => elements.map(el => el.getAttribute('href')));
-  expect(new Set(hrefs)).toEqual(new Set(['/', '/privacy', '/support']));
+  expect(new Set(hrefs)).toEqual(new Set(['/', '/privacy', '/terms', '/support']));
   const copy = await page.locator('.ce-acquisition').innerText();
   expect(copy).not.toMatch(/catch.*deterioration|guaranteed|fast, accurate|safe clinical decision|thinks like a nurse|preceptor would|nursing school didn't|Google rabbit hole|second set of clinical eyes|Urgency:|P2|beta.ready|trusted by|\d+ (users|downloads|ratings)/i);
   await expect(page.locator('.ce-acquisition img')).toHaveCount(0);
@@ -86,7 +86,7 @@ test('founder story uses only the supplied nursing path without employer endorse
   expect(story).not.toMatch(/endorsed|hospital|health system|patient story/i);
 });
 
-for (const [label, path, heading] of [['Privacy', '/privacy', 'Privacy Policy'], ['Support', '/support', 'Support']]) {
+for (const [label, path, heading] of [['Privacy', '/privacy', 'Privacy Policy'], ['Terms', '/terms', 'Terms of Use'], ['Support', '/support', 'Support']]) {
   test(`canonical ${label} links work and Back returns to the front door`, async ({ page }) => {
     await page.goto('/landing');
     const links = page.locator('.ce-acquisition').getByRole('link', { name: label, exact: true });

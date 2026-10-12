@@ -108,7 +108,7 @@ export default function Landing({ onEnterScenario }) {
         <h2 id="boundaries-title">Practice alongside your training.</h2>
         <p>For nursing education and reasoning practice. Use fictional scenarios and general education only; do not enter real patient information.</p>
         <p>AI can be wrong. Clinical Edge does not diagnose or prescribe. Clinical judgment, provider orders, preceptors and local policy remain essential.</p>
-        <div className="ce-acquisition__links"><a href="/privacy">Privacy</a><a href="/support">Support</a></div>
+        <div className="ce-acquisition__links"><a href="/privacy">Privacy</a><a href="/terms">Terms</a><a href="/support">Support</a></div>
       </section>
 
       <section className="ce-acquisition__section ce-acquisition__closing" aria-labelledby="practice-cta-title">
@@ -119,7 +119,7 @@ export default function Landing({ onEnterScenario }) {
 
     <footer className="ce-acquisition__footer">
       <span>Clinical Edge · Nursing education &amp; practice</span>
-      <div className="ce-acquisition__links"><a href="/privacy">Privacy</a><a href="/support">Support</a></div>
+      <div className="ce-acquisition__links"><a href="/privacy">Privacy</a><a href="/terms">Terms</a><a href="/support">Support</a></div>
     </footer>
   </div>;
 }

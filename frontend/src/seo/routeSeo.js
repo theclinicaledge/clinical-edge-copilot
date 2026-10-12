@@ -32,6 +32,13 @@ export const STATIC_ROUTE_SEO = {
     path: "/privacy",
     ogType: "website",
   },
+  "/terms": {
+    title: `Terms of Use | ${SITE_NAME}`,
+    description:
+      "The terms for using Clinical Edge on the web and iOS: educational support only, not medical advice, not for emergencies, and no patient identifiers.",
+    path: "/terms",
+    ogType: "website",
+  },
   "/support": {
     title: `Support | ${SITE_NAME}`,
     description:

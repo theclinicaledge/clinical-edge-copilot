@@ -12,7 +12,7 @@ for (const route of ['/copilot', '/ask']) {
     page.on('request', (request) => { if (request.url().includes('/api/')) apiCalls.push(request.url()); });
     await page.goto(route);
     await expect(page.getByRole('heading', { name: 'How your entries are processed' })).toBeFocused();
-    await expect(page.getByText(/sent to our server and then to Anthropic/)).toBeVisible();
+    await expect(page.getByText(/go through our server to Anthropic/)).toBeVisible();
     await expect(page.getByText(/Confirm decisions with the treating provider/)).toBeVisible();
     await expect(page.getByRole('checkbox', { name: /anonymous usage analytics/ })).not.toBeChecked();
     expect(apiCalls).toEqual([]);

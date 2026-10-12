@@ -6,7 +6,7 @@ export const meta = {
     "Learn ABG interpretation with a clear six-step method, normal values, compensation basics, worked examples, and a bedside checklist for nurses.",
   datePublished: "2026-07-15",
   dateModified: "2026-07-15",
-  author: "Clinical Edge",
+  author: "Mohamed Laayouni, RN",
   articleSection: "Nursing Education",
   readingTimeMinutes: 10,
   image: {

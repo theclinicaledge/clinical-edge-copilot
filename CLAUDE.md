@@ -64,9 +64,9 @@ instead of doing it.
 - Do not market or label any feature for time-critical or emergency decision-making
   ("code", "crashing", "rapid response decision"), and do not claim it detects, diagnoses,
   predicts or monitors a condition.
-- Never claim clinical validation, accuracy, FDA status, HIPAA compliance, clinician review, or
-  outcomes that have not actually happened. "Validated" in this repo means automated tests,
-  not clinical validation; do not use the word in user-facing copy.
+- Never claim accuracy, FDA status, HIPAA compliance, or outcomes that have not actually
+  happened. Never claim Clinical Edge or its content is clinically validated or reviewed unless
+  that happened. Describing an established clinical tool as validated (CAM-ICU, RASS) is fine.
 - Synthetic test cases only. Never use real patient cases, even de-identified, in fixtures,
   prompts, screenshots, marketing, or blog content.
 - `ASK_SAFETY_CONTAINMENT=true` on the backend pauses all generative clinical routes. Keep it
@@ -116,8 +116,7 @@ Backend environment variables: `ANTHROPIC_API_KEY` (backend `.env` only, never i
 or in code), `PORT`, `ASK_SAFETY_CONTAINMENT`, `TRUST_PROXY_HOPS` (default 1, for Render's
 proxy so rate limits are per user). Frontend: `VITE_API_BASE_URL` (defaults to
 `https://clinical-edge-copilot.onrender.com`, the live Render backend, and is set to it in
-Vercel). Exception: `frontend/src/App.jsx` still falls back to the retired
-`https://clinical-edge-backend.onrender.com`, so never unset the Vercel variable.
+Vercel). Ask (`AskClinicalEdge.jsx`) and Shift Brain (`App.jsx`) share this one default.
 
 Token limits and timeouts are set per route in `backend/server.js` and
 `backend/ask-clinical-edge.js`; read the code rather than trusting a number written here.

@@ -137,5 +137,8 @@ test('blog byline names the author and makes no review claim', async ({ page }) 
   await page.goto('/blog/abg-interpretation-for-nurses');
   const byline = page.locator('.ce-byline');
   await expect(byline).toContainText('Written by Mohamed Laayouni, RN.');
-  expect(await byline.innerText()).not.toMatch(/reviewed|—/i);
+  expect(await byline.innerText()).not.toMatch(/reviewed|\u2014/i);
+  const graphs = await page.locator('script[type="application/ld+json"]').allTextContents();
+  const article = graphs.flatMap(text => { const data = JSON.parse(text); return data['@graph'] || [data]; }).find(node => node['@type'] === 'BlogPosting');
+  expect(article.author).toEqual({ '@type': 'Person', name: 'Mohamed Laayouni, RN' });
 });

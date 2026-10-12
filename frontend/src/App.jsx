@@ -12,7 +12,7 @@ import { parsePriorities } from "./components/priorityMapModel";
 const API_BASE =
   import.meta.env.VITE_API_BASE_URL ||
   (import.meta.env.PROD
-    ? "https://clinical-edge-backend.onrender.com"
+    ? "https://clinical-edge-copilot.onrender.com"
     : "http://localhost:3001");
 
 // ─── Constants ────────────────────────────────────────────────────────────────

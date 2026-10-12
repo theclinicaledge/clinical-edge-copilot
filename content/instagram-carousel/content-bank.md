@@ -53,7 +53,7 @@ Ranked on: likelihood of saves, comments, shares, relevance to Clinical Edge, br
 - **Idea** — captured in the bank, not yet selected for a week
 - **Selected** — chosen for an upcoming week's plan
 - **In Progress** — slide copy or design actively being built
-- **Ready to Post** — fully built, exported, and clinically reviewed
+- **Ready to Post**: built and exported
 - **Posted** — published live
 - **Repurpose** — posted before but flagged for a reframe/reformat (new hook, new format, or cross-platform cut)
 - **Retired** — will not be built (duplicate, out of scope, or no longer relevant)

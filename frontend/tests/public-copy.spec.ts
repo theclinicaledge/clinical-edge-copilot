@@ -112,7 +112,7 @@ test('Shift Brain privacy notice is scoped and canonical privacy link remains av
   await expect(page.getByRole('link', { name: 'Privacy', exact: true })).toHaveAttribute('href', '/privacy');
 });
 
-for (const path of ['/', '/download', '/privacy']) {
+for (const path of ['/', '/download', '/privacy', '/terms']) {
   test(`route SEO agrees across description, social tags and canonical at ${path}`, async ({ page }) => {
     await page.goto(path);
     const expected = STATIC_ROUTE_SEO[path].description;
@@ -131,4 +131,11 @@ test('blog metadata and both article CTAs describe current practice routes', asy
     await expect(page.getByText('Explore educational references and fictional practice scenarios.')).toBeVisible();
     expect(await page.locator('body').innerText()).not.toContain('Ask Copilot a question');
   }
+});
+
+test('blog byline names the author and makes no review claim', async ({ page }) => {
+  await page.goto('/blog/abg-interpretation-for-nurses');
+  const byline = page.locator('.ce-byline');
+  await expect(byline).toContainText('Written by Mohamed Laayouni, RN.');
+  expect(await byline.innerText()).not.toMatch(/reviewed|—/i);
 });

@@ -588,6 +588,18 @@ export default function Download({ onNavigate }) {
             Privacy
           </a>
           <a
+            href="/terms"
+            className="dl-footer-link"
+            style={{
+              fontSize: 11,
+              color: "var(--ce-text-muted)",
+              textDecoration: "none",
+              fontFamily: "'IBM Plex Mono', monospace",
+            }}
+          >
+            Terms
+          </a>
+          <a
             href="/support"
             className="dl-footer-link"
             style={{

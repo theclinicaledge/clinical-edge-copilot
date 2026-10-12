@@ -22,6 +22,7 @@ const ROUTES = [
   "/blog/ecg-basics-for-nurses",
   "/download",
   "/privacy",
+  "/terms",
   "/support",
 ];
 

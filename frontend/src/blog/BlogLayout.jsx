@@ -56,9 +56,9 @@ export default function BlogLayout({ meta, children, prev, next }) {
             <span>{meta.readingTimeMinutes} min read</span>
           </div>
           <p className="ce-byline">
-            Written and clinically reviewed by the Clinical Edge nursing team. This article is
-            educational and does not replace clinical judgment, facility protocol, or provider
-            guidance — see our <a href="/privacy">privacy policy</a> for how information is handled.
+            Written by Mohamed Laayouni, RN. This article is educational and does not replace
+            clinical judgment, facility protocol, or provider guidance. See our{" "}
+            <a href="/privacy">privacy policy</a> for how information is handled.
           </p>
         </header>
 

@@ -1976,7 +1976,7 @@ export default function App({ onGoHome, navigate, isOnline = true, initialCaptur
           marginTop: 12,
           paddingBottom: 4,
         }}>
-          {[["Privacy", "/privacy"], ["Support", "/support"]].map(([label, href]) => (
+          {[["Privacy", "/privacy"], ["Terms", "/terms"], ["Support", "/support"]].map(([label, href]) => (
             <a key={label} href={href} style={{
               fontSize: 10,
               color: "var(--ce-text-dim)",

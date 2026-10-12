@@ -8,8 +8,9 @@
 //
 // Bump CONSENT_VERSION whenever the AI data flow or the disclosure text
 // materially changes, so every user is asked again.
+// Version 2: the consent screen now records agreement to the Terms of Use.
 
-export const CONSENT_VERSION = 1;
+export const CONSENT_VERSION = 2;
 export const CONSENT_STORAGE_KEY = 'ce_consent';
 const CHANGE_EVENT = 'ce-consent-change';
 

@@ -10,6 +10,7 @@ import Landing from './Landing.jsx'
 import Scenario from './Scenario.jsx'
 import QuickStart from './QuickStart.jsx'
 import Privacy from './Privacy.jsx'
+import Terms from './Terms.jsx'
 import Support from './Support.jsx'
 import Download from './Download.jsx'
 import ClinicalEdgeHome from './ClinicalEdgeHome.jsx'
@@ -62,6 +63,7 @@ function getPage() {
   if (path === '/scenario')   return 'scenario';
   if (path === '/quickstart') return 'quickstart';
   if (path === '/privacy')    return 'privacy';
+  if (path === '/terms')      return 'terms';
   if (path === '/support')    return 'support';
   if (path === '/download')   return 'download';
   if (path === '/icu-drips')      return 'icudrips';
@@ -147,6 +149,7 @@ function Root() {
       {page === 'quickstart' && <QuickStart onBack={goBackToScenario} onEnterApp={enterApp} />}
       {page === 'landing'    && <Landing onEnterApp={enterApp} onEnterScenario={enterScenario} />}
       {page === 'privacy'    && <Privacy onNavigate={navigate} />}
+      {page === 'terms'      && <Terms onNavigate={navigate} />}
       {page === 'support'    && <Support onNavigate={navigate} />}
       {page === 'notfound' && <main className="ce-not-found"><span>Clinical Edge</span><h1>Page not found</h1><p>This address does not lead to a Clinical Edge page.</p><a href="/" onClick={(event) => { if (event.metaKey || event.ctrlKey || event.shiftKey || event.altKey) return; event.preventDefault(); navigate('/'); }}>Return Home</a></main>}
       {page === 'download'   && <Download onNavigate={navigate} />}

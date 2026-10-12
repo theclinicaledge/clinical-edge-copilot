@@ -20,6 +20,11 @@ function ConsentScreen({ navigate, previous }) {
 
   const agree = () => saveConsent({ ai: true, analytics });
   const notNow = () => navigate('/');
+  const openLink = (event, path) => {
+    if (event.metaKey || event.ctrlKey || event.shiftKey || event.altKey) return;
+    event.preventDefault();
+    navigate(path);
+  };
 
   return (
     <main className="ce-consent" aria-labelledby={titleId}>
@@ -40,9 +45,10 @@ function ConsentScreen({ navigate, previous }) {
           <button type="button" className="ce-consent__decline ce-pressable" onClick={notNow}>Not now</button>
         </div>
         <p className="ce-consent__footnote">
-          Change anytime in{' '}
-          <a href="/privacy" onClick={(event) => { if (event.metaKey || event.ctrlKey || event.shiftKey || event.altKey) return; event.preventDefault(); navigate('/privacy'); }}>Privacy</a>.
-          Other tools work without this.
+          By continuing you agree to the{' '}
+          <a href="/terms" onClick={(event) => openLink(event, '/terms')}>Terms of Use</a>.
+          Change choices anytime in{' '}
+          <a href="/privacy" onClick={(event) => openLink(event, '/privacy')}>Privacy</a>.
         </p>
       </div>
     </main>

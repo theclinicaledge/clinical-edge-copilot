@@ -74,7 +74,7 @@ test('production prerender hydrates without replacing the rendered tree', async 
       await route.fulfill({ response });
     } else await route.fallback();
   });
-  for (const path of ['/', '/landing', '/blog', '/blog/abg-interpretation-for-nurses', '/blog/ecg-basics-for-nurses', '/download', '/privacy', '/support']) {
+  for (const path of ['/', '/landing', '/blog', '/blog/abg-interpretation-for-nurses', '/blog/ecg-basics-for-nurses', '/download', '/privacy', '/terms', '/support']) {
     const errors: string[] = [];
     const handle = (error: Error) => errors.push(error.message);
     const consoleError = (message: { type(): string; text(): string }) => { if (message.type() === 'error') errors.push(message.text()); };

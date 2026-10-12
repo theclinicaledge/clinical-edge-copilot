@@ -36,6 +36,12 @@ app.use(cors({
   },
 }));
 
+// ── Proxy awareness ───────────────────────────────────────────────────────────
+// Render terminates TLS in front of this app. Without trusting that one hop,
+// req.ip is the proxy's address and every user shares a single rate-limit
+// bucket. Trust exactly one hop so X-Forwarded-For cannot be spoofed further.
+app.set("trust proxy", Number(process.env.TRUST_PROXY_HOPS ?? 1));
+
 // ── Security headers ──────────────────────────────────────────────────────────
 app.use(helmet());
 

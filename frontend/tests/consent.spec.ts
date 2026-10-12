@@ -31,7 +31,27 @@ test('agreeing opens the workspace with analytics off by default', async ({ page
   await page.goto('/copilot');
   await page.getByRole('button', { name: 'Agree and continue' }).click();
   await expect(page.getByRole('heading', { name: 'How your entries are processed' })).toHaveCount(0);
-  expect(await storedConsent(page)).toMatchObject({ version: 1, ai: true, analytics: false });
+  expect(await storedConsent(page)).toMatchObject({ version: 2, ai: true, analytics: false });
+  await page.reload();
+  await expect(page.getByRole('heading', { name: 'How your entries are processed' })).toHaveCount(0);
+});
+
+test('a stored version 1 consent shows the consent screen again', async ({ page }) => {
+  await page.addInitScript(() => {
+    if (!sessionStorage.getItem('seeded')) {
+      localStorage.setItem('ce_consent', JSON.stringify({ version: 1, ai: true, analytics: true, decidedAt: '2026-10-01T00:00:00.000Z' }));
+      sessionStorage.setItem('seeded', '1');
+    }
+  });
+  const apiCalls: string[] = [];
+  page.on('request', (request) => { if (request.url().includes('/api/')) apiCalls.push(request.url()); });
+  await page.goto('/copilot');
+  await expect(page.getByRole('heading', { name: 'How your entries are processed' })).toBeVisible();
+  await expect(page.getByRole('link', { name: 'Terms of Use' })).toHaveAttribute('href', '/terms');
+  await expect(page.getByRole('checkbox', { name: /anonymous usage analytics/ })).not.toBeChecked();
+  expect(apiCalls).toEqual([]);
+  await page.getByRole('button', { name: 'Agree and continue' }).click();
+  expect(await storedConsent(page)).toMatchObject({ version: 2, ai: true, analytics: false });
   await page.reload();
   await expect(page.getByRole('heading', { name: 'How your entries are processed' })).toHaveCount(0);
 });

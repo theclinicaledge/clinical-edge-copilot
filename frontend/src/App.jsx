@@ -824,7 +824,7 @@ export default function App({ onGoHome, navigate, isOnline = true, initialCaptur
       if (!res.ok || !data.lesson) {
         trackEvent("teach_me_error", { reason: "request_failed", status: res.status });
         const failure = new Error("Teach Me is unavailable.");
-        if (data.code === 'clinical_generation_restricted') {
+        if (['clinical_generation_restricted', 'free_daily_limit_reached', 'ai_daily_budget_reached'].includes(data.code)) {
           failure.code = data.code;
           failure.userMessage = apiErrorMessage(res.status, data);
         }

@@ -16,7 +16,13 @@ const ERRORS = {
   provider_timeout: 'The answer took too long. Your question is unchanged.',
   provider_rate_limit: 'The service is busy. Please wait before asking again.',
   answer_not_accepted: 'An answer could not be safely completed. Your question is unchanged.',
+  free_daily_limit_reached: "You've used today's free AI questions. They reset at midnight Pacific. Reference tools, Rhythm Lab and ABG interpretation still work.",
+  ai_daily_budget_reached: "Ask is resting until tomorrow. Today's AI capacity is used up and resets at midnight Pacific. Reference tools, Rhythm Lab and ABG interpretation still work.",
 };
+// Daily limits: the server's message carries the exact limit, so prefer it.
+const LIMIT_CODES = ['free_daily_limit_reached', 'ai_daily_budget_reached'];
+const limitMessage = data => LIMIT_CODES.includes(data?.error?.code)
+  ? (typeof data.error.message === 'string' && data.error.message.trim() ? data.error.message : ERRORS[data.error.code]) : null;
 
 function Answer({ text }) {
   return text.split(/\n\s*\n/).filter(Boolean).map((block, i) => {
@@ -75,11 +81,11 @@ export default function AskClinicalEdge({ navigate, isVisible, snapshot = null }
         const ids = data.abgExplanation?.pointIds;
         if (response.ok && data.contextMode === 'general' && data.abgExplanation?.status === 'selected' && Array.isArray(ids) && ids.length >= 1 && ids.length <= 3
           && new Set(ids).size === ids.length && ids.every(id => abgCatalog.some(point => point.id === id))) setAbgTeaching(ids.map(id => abgCatalog.find(point => point.id === id)));
-        else setExplanationNotice('Additional explanation unavailable. The rule-based interpretation is unchanged.');
+        else setExplanationNotice(limitMessage(data) || 'Additional explanation unavailable. The rule-based interpretation is unchanged.');
         return;
       }
       if (!response.ok || !['general', 'snapshot'].includes(data.contextMode) || typeof data.answer !== 'string' || (data.contextMode === 'snapshot' && !context)) {
-        setError(ERRORS[data.error?.code] || 'The answer service is unavailable. Your question is unchanged.');
+        setError(limitMessage(data) || ERRORS[data.error?.code] || 'The answer service is unavailable. Your question is unchanged.');
         trackEvent('ask_failed', { mode: 'general', status: response.status });
         return;
       }

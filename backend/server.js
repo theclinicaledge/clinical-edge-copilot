@@ -6,6 +6,7 @@ const rateLimit = require("express-rate-limit");
 const Anthropic = require("@anthropic-ai/sdk");
 const { randomUUID } = require("node:crypto");
 const { registerAskRoutes } = require("./ask-clinical-edge");
+const { createAiCostGuard } = require("./ai-cost-guard");
 const { buildEvidence, parseReasoning } = require("./priority-map-intelligence");
 const { COMPACT_REASONING_PROMPT, REASONING_OUTPUT_FORMAT, validateReasoning, composePriorityMap, reasoningRepairDetails, teachingFromMap } = require("./priority-map-p1");
 const { reasoningDiagnostics, sanitizeValidationMetadata } = require("./priority-map-diagnostics");
@@ -57,8 +58,11 @@ const apiLimiter = rateLimit({
 app.use(express.json());
 
 const anthropicApiKey = process.env.ANTHROPIC_API_KEY;
+// Daily AI budget and free per-client limit (see ai-cost-guard.js). The metered
+// client adds every call's token usage to today's estimated spend.
+const aiCost = createAiCostGuard({ appendOperationalLog });
 const client = anthropicApiKey
-  ? new Anthropic({ apiKey: anthropicApiKey, timeout: 45000, maxRetries: 0 })
+  ? aiCost.meter(new Anthropic({ apiKey: anthropicApiKey, timeout: 45000, maxRetries: 0 }))
   : null;
 
 const COPILOT_TOTAL_BUDGET_MS = 40000;
@@ -2574,7 +2578,7 @@ function isOverloadError(err) {
   );
 }
 
-registerAskRoutes(app, { apiLimiter, getClient: () => client, containsPHI, runWithStageTimeout, collectPriorityMapStream, appendOperationalLog, classifyProviderError });
+registerAskRoutes(app, { apiLimiter, getClient: () => client, admitAI: (req) => aiCost.admit(req, "ASK"), containsPHI, runWithStageTimeout, collectPriorityMapStream, appendOperationalLog, classifyProviderError });
 
 // ── Streaming endpoint ────────────────────────────────────────────────────────
 app.post("/api/copilot", apiLimiter, require('./safety-containment').containmentGate('COPILOT', appendOperationalLog), async (req, res) => {
@@ -2638,6 +2642,9 @@ app.post("/api/copilot", apiLimiter, require('./safety-containment').containment
       message: "The AI service is not configured for this local environment. Add the required backend API key and restart the server.",
     });
   }
+
+  const aiDenial = aiCost.admit(req, learningRequest === true ? "TEACH_ME" : "COPILOT");
+  if (aiDenial) return res.status(aiDenial.status).json({ error: true, code: aiDenial.code, message: aiDenial.message });
 
   if (learningRequest === true) {
     if (typeof priorityMapResponse !== "string" || priorityMapResponse.length > 12000) {
@@ -3150,6 +3157,9 @@ app.post("/api/sbar", apiLimiter, require('./safety-containment').containmentGat
     });
     return res.json({ sbar: fallback });
   }
+
+  const aiDenial = aiCost.admit(req, "SBAR");
+  if (aiDenial) return res.status(aiDenial.status).json({ error: true, code: aiDenial.code, message: aiDenial.message });
 
   try {
     const resolved = await runSbarWithBudget({

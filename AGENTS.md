@@ -110,7 +110,13 @@ instead of doing it.
 | `GET /health` | Health check |
 
 Do not add or rename routes without explicit instruction. Every AI route needs the rate
-limiter, the identifier check, metadata-only logging and the containment gate.
+limiter, the identifier check, metadata-only logging, the containment gate and the AI cost
+guard (`backend/ai-cost-guard.js`: call `admit` right before a request's first Anthropic call).
+
+AI cost guard variables: `AI_DAILY_BUDGET_USD` (default 5), `FREE_DAILY_QUESTIONS` (default 3
+per client per day), `AI_INPUT_USD_PER_MTOK` and `AI_OUTPUT_USD_PER_MTOK` (defaults 3 and 15,
+the `claude-sonnet-4-6` list prices; update them if the model changes). Both limits reset at
+midnight Pacific and live in memory, so a restart or deploy resets them.
 
 Backend environment variables: `ANTHROPIC_API_KEY` (backend `.env` only, never in the frontend
 or in code), `PORT`, `ASK_SAFETY_CONTAINMENT`, `TRUST_PROXY_HOPS` (default 1, for Render's

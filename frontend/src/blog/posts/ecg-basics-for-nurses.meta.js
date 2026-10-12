@@ -6,7 +6,7 @@ export const meta = {
     "Learn ECG basics for nurses using a simple five-step rhythm interpretation method. Review heart rate, regularity, P waves, PR interval, QRS duration, and common rhythms.",
   datePublished: "2026-07-20",
   dateModified: "2026-07-20",
-  author: "Clinical Edge",
+  author: "Mohamed Laayouni, RN",
   articleSection: "Nursing Education",
   readingTimeMinutes: 12,
   image: {

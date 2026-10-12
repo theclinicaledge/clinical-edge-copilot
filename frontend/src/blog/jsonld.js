@@ -12,7 +12,7 @@ export function buildArticleJsonLd(meta) {
     dateModified: meta.dateModified,
     inLanguage: "en-US",
     articleSection: meta.articleSection || "Nursing Education",
-    author: { "@type": "Organization", name: SITE_NAME, url: SITE_URL },
+    author: { "@type": "Person", name: meta.author },
     publisher: {
       "@type": "Organization",
       name: SITE_NAME,

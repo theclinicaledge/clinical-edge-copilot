@@ -224,7 +224,7 @@ export const REFERENCES = [
     whenAttentionIncreases:
       'CRT > 3 seconds, especially alongside cool or mottled extremities or haemodynamic changes. Prolonged CRT in a critical patient is a perfusion warning sign — not a normal variant.',
     commonMistake:
-      'Skipping cap refill because it feels informal — it is a validated perfusion indicator.',
+      'Skipping cap refill because it feels informal. It is a quick, useful perfusion check, best read alongside other findings.',
     pearl:
       'Warm hands and brisk refill tell one story. Cold, mottled skin with sluggish refill tell another — even when the vital signs still look acceptable.',
     relatedRefs: ['map', 'shock-index', 'urine-output', 'lactate', 'cardiac-output'],

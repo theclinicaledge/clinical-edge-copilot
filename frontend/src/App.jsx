@@ -883,7 +883,7 @@ export default function App({ onGoHome, navigate, isOnline = true, initialCaptur
       background: "var(--ce-navy-900)",
       color: "var(--ce-text-light-body)",
       fontFamily: "'Inter', -apple-system, BlinkMacSystemFont, sans-serif",
-      padding: "0 0 calc(80px + env(safe-area-inset-bottom))",
+      // Dock clearance comes from --ce-dock-clearance on the routed page (index.css).
     }}>
       <style>{`
         *, *::before, *::after { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }

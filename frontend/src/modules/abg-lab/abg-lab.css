@@ -9,7 +9,7 @@
   font-family: var(--ce-font-sans);
   display: flex;
   flex-direction: column;
-  overflow-x: hidden;
+  /* No overflow on the sticky header's ancestors (it stops the header sticking); .abg-main clips. */
 }
 
 /* Header */
@@ -61,6 +61,8 @@
 /* Main scroll area */
 .abg-main {
   flex: 1;
+  min-width: 0;
+  overflow-x: clip;
   overflow-y: auto;
   -webkit-overflow-scrolling: touch;
   padding: 0 max(16px, env(safe-area-inset-left));

@@ -19,7 +19,10 @@ body {
 
 /* Keep the final routed content above the fixed dock. Applying clearance to
    the route root preserves each module's own background through the spacer. */
-#root:has(> .ce-tool-dock) > :first-child {
+#root:has(> .ce-tool-dock) > :first-child,
+#root:has(> .ce-tool-dock) > :is(.ce-shift-workspace, .ce-ask-workspace):not([hidden]) {
+  /* Shift Brain and Ask stay mounted (hidden) once opened, so the visible one may not be
+     the first child; it still gets the single dock clearance. */
   padding-bottom: var(--ce-dock-clearance);
 }
 
@@ -44,7 +47,7 @@ textarea::placeholder {
   position: fixed;
   z-index: 80;
   left: 50%;
-  bottom: max(14px, env(safe-area-inset-bottom));
+  bottom: max(14px, var(--ce-safe-bottom, 0px));
   transform: translateX(-50%);
   width: min(680px, calc(100% - 28px));
   pointer-events: none;
@@ -118,7 +121,8 @@ textarea::placeholder {
     display: none;
   }
 
-  #root:has(> .ce-tool-dock) > :first-child {
+  #root:has(> .ce-tool-dock) > :first-child,
+  #root:has(> .ce-tool-dock) > :is(.ce-shift-workspace, .ce-ask-workspace):not([hidden]) {
     padding-bottom: 0;
   }
 }
@@ -634,7 +638,7 @@ textarea::placeholder {
 @media (max-width: 720px) {
   .ce-tool-dock {
     width: min(100% - 16px, 680px);
-    bottom: max(8px, env(safe-area-inset-bottom));
+    bottom: max(8px, var(--ce-safe-bottom, 0px));
   }
 
   .ce-tool-dock__inner {

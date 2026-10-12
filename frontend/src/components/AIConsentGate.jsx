@@ -31,10 +31,10 @@ function ConsentScreen({ navigate, previous }) {
       <div className="ce-consent__card">
         <h1 id={titleId} ref={heading} tabIndex={-1}>How your entries are processed</h1>
         <ul className="ce-consent__points">
-          <li><strong>Sent to Anthropic.</strong> Shift Brain and Ask entries go through our server to Anthropic, a third-party AI, to generate responses.</li>
-          <li><strong>Not stored by us.</strong> Anthropic keeps them up to 30 days, longer if flagged for safety review or required by law.</li>
+          <li><strong>Sent to Anthropic.</strong> AI entries go through our server to Anthropic. Educational Ask sends your question, relevant conversation history and generated answer for admission, generation and safety review.</li>
+          <li><strong>Temporary conversation memory.</strong> Educational Ask history stays in volatile server memory for up to ten minutes, until withdrawal or expiry, and is lost on server restart. Chat content is not written to operational logs or durable chat storage. Anthropic keeps API content up to 30 days, longer if flagged for safety review or required by law.</li>
           <li><strong>No patient identifiers.</strong> No names, initials, MRNs, dates of birth or room numbers.</li>
-          <li><strong>Education, not orders.</strong> Confirm decisions with the treating provider and follow local protocol.</li>
+          <li><strong>Education, not patient care.</strong> Use general questions or fictional examples only. This is not individualized diagnosis, treatment or emergency guidance; do not delay bedside assessment or local emergency help.</li>
         </ul>
         <label className="ce-consent__toggle">
           <input type="checkbox" checked={analytics} onChange={(event) => setAnalytics(event.target.checked)} />

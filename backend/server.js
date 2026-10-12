@@ -6,6 +6,7 @@ const rateLimit = require("express-rate-limit");
 const Anthropic = require("@anthropic-ai/sdk");
 const { randomUUID } = require("node:crypto");
 const { registerAskRoutes } = require("./ask-clinical-edge");
+const { registerConversation } = require('./ask-conversation');
 const { createAiCostGuard } = require("./ai-cost-guard");
 const { buildEvidence, parseReasoning } = require("./priority-map-intelligence");
 const { COMPACT_REASONING_PROMPT, REASONING_OUTPUT_FORMAT, validateReasoning, composePriorityMap, reasoningRepairDetails, teachingFromMap } = require("./priority-map-p1");
@@ -25,6 +26,7 @@ const ALLOWED_ORIGINS = [
   "http://localhost:5173",
   "http://127.0.0.1:5173",
 ];
+if(process.env.NODE_ENV==='development'&&process.env.LOCAL_CONVERSATIONAL_PREVIEW==='true')ALLOWED_ORIGINS.push('http://127.0.0.1:5192','http://localhost:5192');
 
 app.use(cors({
   origin: (origin, callback) => {
@@ -2578,17 +2580,19 @@ function isOverloadError(err) {
   );
 }
 
-registerAskRoutes(app, { apiLimiter, getClient: () => client, admitAI: (req, options) => {
+const admitAskAI = (req, options) => {
   const denial = aiCost.admit(req, "ASK", options);
   // A counted Ask question that ends in an error (4xx/5xx after admission) is not charged
   // to the device. Safety refusals (422) used Anthropic tokens, so they still count toward
   // the per-IP backstop; server errors and Anthropic 429s are refunded on both counters.
   if (!denial && options?.counts) req.res?.once("finish", () => {
     const status = req.res.statusCode;
-    if (status >= 400) aiCost.release(req, { keepIp: status === 422 });
+    if (status >= 400) aiCost.release(req, { keepIp: status === 422 || status === 403 && req.path.startsWith('/api/ask/v1/conversation/') });
   });
   return denial;
-}, containsPHI, runWithStageTimeout, collectPriorityMapStream, appendOperationalLog, classifyProviderError });
+};
+registerAskRoutes(app, { apiLimiter, getClient: () => client, admitAI: admitAskAI, containsPHI, runWithStageTimeout, collectPriorityMapStream, appendOperationalLog, classifyProviderError });
+registerConversation(app, { apiLimiter, getClient: () => client, admitAI: admitAskAI, containsPHI, runWithStageTimeout, collectPriorityMapStream, appendOperationalLog });
 
 // ── Streaming endpoint ────────────────────────────────────────────────────────
 app.post("/api/copilot", apiLimiter, require('./safety-containment').containmentGate('COPILOT', appendOperationalLog), async (req, res) => {
@@ -3260,6 +3264,7 @@ if (require.main === module) {
 }
 
 module.exports = {
+  admitAskAI,
   app,
   buildOperationalLogEntry,
   CLINICAL_RELIABILITY_CONTRACT,

@@ -132,3 +132,10 @@ test('blog metadata and both article CTAs describe current practice routes', asy
     expect(await page.locator('body').innerText()).not.toContain('Ask Copilot a question');
   }
 });
+
+test('blog byline names the author and makes no review claim', async ({ page }) => {
+  await page.goto('/blog/abg-interpretation-for-nurses');
+  const byline = page.locator('.ce-byline');
+  await expect(byline).toContainText('Written by Mohamed Laayouni, RN.');
+  expect(await byline.innerText()).not.toMatch(/reviewed|—/i);
+});

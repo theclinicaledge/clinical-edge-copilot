@@ -4,6 +4,9 @@ const APP_STORE_URL = 'https://apps.apple.com/app/id6761643064';
 const SAFARI_IPHONE = 'Mozilla/5.0 (iPhone; CPU iPhone OS 18_0 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/18.0 Mobile/15E148 Safari/604.1';
 const IOS_WEBVIEW = 'Mozilla/5.0 (iPhone; CPU iPhone OS 18_0 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Mobile/15E148';
 const TAGGED_APP = `${IOS_WEBVIEW} ClinicalEdgeApp/1.0.3`;
+const INSTAGRAM_IOS = `${IOS_WEBVIEW} Instagram 350.0.0.18.106 (iPhone15,2; iOS 18_0; en_US; en-US; scale=3.00; 1179x2556; 642541213)`;
+const TIKTOK_IOS = `${IOS_WEBVIEW} musical_ly_36.5.0 JsSdk/2.0 NetType/WIFI Channel/App Store ByteLocale/en Region/US BytedanceWebview/d8a21c6`;
+const FACEBOOK_IOS = `${IOS_WEBVIEW} [FBAN/FBIOS;FBAV/480.0.0.48.107;FBBV/654321;FBDV/iPhone15,2;FBMD/iPhone;FBSN/iOS;FBSV/18.0;FBSS/3;FBID/phone;FBLC/en_US;FBOP/5]`;
 
 const PLACEMENTS: [string, string[]][] = [
   ['/landing', ['landing', 'footer']],
@@ -69,6 +72,16 @@ test.describe('inside the iOS app', () => {
     });
   }
 
+  test.describe('ClinicalEdgeApp tag alongside a social token', () => {
+    test.use({ userAgent: `${INSTAGRAM_IOS} ClinicalEdgeApp/1.0.3` });
+    test('the app tag still hides the badge', async ({ page }) => {
+      await page.goto('/landing');
+      await expect(page.locator('h1').first()).toBeVisible();
+      await expect(page.locator('html')).toHaveAttribute('data-ce-native-app', 'true');
+      await expect(page.locator('.ce-app-store-badge')).toHaveCount(0);
+    });
+  });
+
   test.describe('iPhone Safari', () => {
     test.use({ userAgent: SAFARI_IPHONE });
     test('shows the badge and is not flagged as the app', async ({ page }) => {
@@ -130,3 +143,19 @@ test.describe('375px mobile layout', () => {
     });
   }
 });
+
+// Social in-app browsers are iOS web views without "Safari/", but social traffic lands there,
+// so they must keep the badge.
+for (const [label, userAgent] of [['Instagram iOS in-app browser', INSTAGRAM_IOS], ['TikTok iOS in-app browser', TIKTOK_IOS], ['Facebook iOS in-app browser', FACEBOOK_IOS]]) {
+  test.describe(label, () => {
+    test.use({ userAgent });
+    test('shows the badge and is not treated as the Clinical Edge app', async ({ page }) => {
+      for (const [path, expected] of PLACEMENTS) {
+        await page.goto(path);
+        await expect(page.locator('.ce-app-store-badge').first()).toBeVisible();
+        await expect(page.locator('html')).not.toHaveAttribute('data-ce-native-app', 'true');
+        expect((await badges(page)).map(b => b.placement)).toEqual(expected);
+      }
+    });
+  });
+}

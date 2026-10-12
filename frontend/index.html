@@ -10,7 +10,10 @@
         var ua = navigator.userAgent || "";
         var tagged = /ClinicalEdgeApp\//.test(ua);
         var ios = /iPhone|iPad|iPod/.test(ua) || (/Macintosh/.test(ua) && navigator.maxTouchPoints > 1);
-        var iosWebView = ios && /AppleWebKit/.test(ua) && !/Safari\//.test(ua);
+        // Social apps' in-app browsers are web views too, but that is where social traffic
+        // lands, so they keep the badge.
+        var socialBrowser = /Instagram|FBAN|FBAV|FB_IAB|BytedanceWebview|musical_ly/.test(ua);
+        var iosWebView = ios && /AppleWebKit/.test(ua) && !/Safari\//.test(ua) && !socialBrowser;
         if (tagged || iosWebView) document.documentElement.setAttribute("data-ce-native-app", "true");
       })();
     </script>

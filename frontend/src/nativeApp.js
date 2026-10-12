@@ -8,8 +8,10 @@
 //   1. The wrapper tags its user agent with "ClinicalEdgeApp/" (applicationNameForUserAgent,
 //      added in the next app build).
 //   2. Interim, until that build is live: an iOS/iPadOS WKWebView. Safari, Chrome and
-//      Firefox on iOS include "Safari/" in the user agent; app web views do not. This
-//      also matches other apps' built-in browsers, where hiding the badge is harmless.
+//      Firefox on iOS include "Safari/" in the user agent; app web views do not.
+//      Instagram, Facebook and TikTok in-app browsers ("Instagram", "FBAN", "FBAV",
+//      "FB_IAB", "BytedanceWebview", "musical_ly") are excluded so they keep the badge.
+//   "ClinicalEdgeApp/" always wins, even alongside any of those tokens.
 
 export function isNativeApp() {
   return typeof document !== "undefined" && document.documentElement.dataset.ceNativeApp === "true";

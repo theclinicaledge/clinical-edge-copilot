@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from 'react';
 import ModuleHeader from './components/ModuleHeader.jsx';
+import AskIntroduction from './components/AskIntroduction.jsx';
 import AskABGResult from './components/AskABGResult.jsx';
 import { selectSnapshotContext, reportedFacts } from '../../backend/ask-snapshot-context.mjs';
 import { trackEvent } from './analytics';
@@ -160,30 +161,32 @@ export default function AskClinicalEdge({ navigate, isVisible, snapshot = null }
   return <div className="ce-ask-page">
     <ModuleHeader moduleName="Ask Clinical Edge" onGoHome={() => navigate('/')} />
     <main className="ce-ask-main">
-      <header><span className="ce-ask-scope">Nursing questions</span><h1>{PUBLIC_BETA ? 'Ask Clinical Edge — Public Beta' : 'Ask Clinical Edge'}</h1></header>
-      {CONVERSATION_PREVIEW && <p className="ce-ask-privacy" role="status">AI-powered nursing education for nurses and students across specialties. Not individualized patient care or emergency guidance. Clinical review remains pending.</p>}
-      {CONVERSATION_PREVIEW && <p className="ce-ask-privacy">{dailyAllowance!==null?`Daily allowance: ${dailyAllowance} counted AI questions per device, shared with other AI tools. `:''}Each submitted conversational question, including follow-ups, counts toward the daily allowance. Limits reset at midnight Pacific. Safety refusals and service errors refund the device allowance; safety refusals still count toward network limits.</p>}
-      {CONVERSATION_PREVIEW && previewConsent && <div className="ce-ask-controls"><button type="button" onClick={withdrawPreview}>Withdraw educational AI consent</button></div>}
-      {CONVERSATION_PREVIEW && !previewConsent && <section className="ce-ask-context" aria-label="Private conversation consent"><h2>Before educational Ask</h2><p>Your question, reported context, relevant earlier turns and generated answer will be sent to Anthropic for intent checking, explanation and safety review. General education may use model knowledge without independently verified sources; this is labelled on the answer. Nonurgent context may be discussed only as general education, not individual care advice. History stays in server memory for up to ten minutes. Anthropic may retain data under its policies. Use fictional examples only; no patient identifiers.</p><button type="button" disabled={busy} onClick={enablePreview}>Enable educational conversation</button></section>}
-      {answerRequestId && <p><a href={`mailto:clinicaledgehq@gmail.com?subject=${encodeURIComponent('Ask concern: '+answerRequestId)}&body=${encodeURIComponent('Request ID: '+answerRequestId+'\nConcern: inaccurate / confusing / concerning (choose one).\nDo not include patient information or copy clinical chat content.')}`}>Report a concern</a></p>}
-      <form onSubmit={submit}>
+      <AskIntroduction beta={PUBLIC_BETA} />
+      {CONVERSATION_PREVIEW && <div className="ce-ask-session-bar">
+        <details className="ce-ask-allowance"><summary>{dailyAllowance !== null ? `${dailyAllowance} questions per day` : 'Daily question allowance'}</summary><p>{dailyAllowance!==null?`Daily allowance: ${dailyAllowance} counted AI questions per device, shared with other AI tools. `:''}Each submitted conversational question, including follow-ups, counts toward the daily allowance. Limits reset at midnight Pacific. Safety refusals and service errors refund the device allowance; safety refusals still count toward network limits. This is your configured limit, not a live remaining balance.</p></details>
+        {previewConsent && <button className="ce-ask-text-button" type="button" onClick={withdrawPreview}>Withdraw AI consent</button>}
+      </div>}
+      {CONVERSATION_PREVIEW && !previewConsent && <section className="ce-ask-conversation-consent" aria-label="Private conversation consent"><h2>Ready to start learning?</h2><p>Enable a temporary educational conversation. Your questions and earlier turns go to Anthropic for answers and safety review.</p><details><summary>Conversation and evidence details</summary><p>Your question, reported context, relevant earlier turns and generated answer will be sent to Anthropic for intent checking, explanation and safety review. General education may use model knowledge without independently verified sources; this is labelled on the answer. Nonurgent context may be discussed only as general education, not individual care advice. History stays in server memory for up to ten minutes. Anthropic may retain data under its policies. Use fictional examples only; no patient identifiers.</p></details><button className="ce-ask-enable" type="button" disabled={busy} onClick={enablePreview}>Enable educational conversation <span aria-hidden="true">&#8594;</span></button></section>}
+      <form className="ce-ask-composer" onSubmit={submit}>
         <div className="ce-ask-context">
-          <strong>{CONVERSATION_PREVIEW ? 'Nursing education' : contextEnabled ? 'Using Patient Snapshot' : 'General Ask'}</strong>
+          {!CONVERSATION_PREVIEW && <strong>{contextEnabled ? 'Using Patient Snapshot' : 'General Ask'}</strong>}
           {CONVERSATION_PREVIEW ? null : snapshot ? <label><input type="checkbox" checked={contextEnabled} disabled={busy} onChange={e => setContextChoice(e.target.checked ? snapshot : null)} />Use confirmed Patient Snapshot</label>
             : <div className="ce-ask-empty"><div><span>No Snapshot selected</span><p>Add non-identifying context for a more specific answer.</p></div><button type="button" onClick={() => navigate('/copilot')}>Create Snapshot <span aria-hidden="true">&#8594;</span></button></div>}
           {!CONVERSATION_PREVIEW && contextEnabled && !selectedContext && <p>No relevant Snapshot facts selected. This question will use General Ask.</p>}
           {!CONVERSATION_PREVIEW && selectedContext && <details><summary>Reported facts selected for this question ({selectedContext.facts.length})</summary><ul>{reportedFacts(selectedContext).map(fact => <li key={fact.id}><strong>{fact.label}: </strong>{fact.text}</li>)}</ul></details>}
         </div>
-        <label htmlFor="ask-question">Nursing question</label>
+        <label htmlFor="ask-question">{answer ? 'Continue the conversation' : 'What would you like to understand?'}<span className="ce-ask-sr-only"> Nursing question</span></label>
         <p id="ask-privacy" className="ce-ask-privacy">No names, MRNs, dates of birth or other patient identifiers. Identifier checks do not guarantee de-identification.</p>
-        <textarea id="ask-question" ref={input} value={question} onChange={e => setQuestion(e.target.value)} aria-describedby="ask-privacy" placeholder="What would you like to understand?" maxLength={4000} rows={4} disabled={busy} />
+        <textarea id="ask-question" ref={input} value={question} onChange={e => setQuestion(e.target.value)} aria-label="Nursing question" aria-describedby="ask-privacy" placeholder="Ask anything about nursing..." maxLength={4000} rows={4} disabled={busy} />
         <div className="ce-ask-controls">
           <button className="ce-ask-submit" aria-label="Ask Clinical Edge" disabled={busy || question.trim().length < 4 || (CONVERSATION_PREVIEW && !previewConsent)} type="submit">{busy ? <span role="status"><span className="ce-ask-spinner" aria-hidden="true" />Preparing your answer...</span> : <>Ask Clinical Edge <span aria-hidden="true">&#8594;</span></>}</button>
           {busy && <button className="ce-ask-cancel" type="button" onClick={() => pending.current?.abort()} aria-label="Cancel question">Cancel</button>}
           {!busy && (answer || question) && <button type="button" onClick={newQuestion}>New question</button>}
         </div>
       </form>
-      {error && <p className="ce-ask-error" role="alert">{error}</p>}
+      {!answer && <div className="ce-ask-examples" role="group" aria-label="Suggested prompts">{['Explain RAAS simply', 'Help me understand ABGs', 'SSRIs vs. SNRIs'].map(example => <button type="button" key={example} disabled={busy} onClick={()=>{setQuestion(example); input.current?.focus();}}>{example}<span aria-hidden="true">&#8599;</span></button>)}</div>}
+      {CONVERSATION_PREVIEW && <p className="ce-ask-boundary">For education, not individual patient care or emergencies. Clinical review remains pending.</p>}
+      {error && <div className="ce-ask-error" role="alert"><strong>We couldn't complete this answer.</strong><p>{error}</p></div>}
       {CONVERSATION_PREVIEW && earlierExplanations.map((earlier, i) => <section className="ce-ask-answer" key={i} aria-label="Earlier educational explanation"><h2>{earlier.question}</h2><Answer text={earlier.answer} />{earlier.details.map(d => <div key={d.heading}><h3>{d.heading}</h3><Answer text={d.text} /></div>)}<ul className="ce-ask-sources">{earlier.sources.map(source => <li key={source.id}><a href={source.url} target="_blank" rel="noopener noreferrer">{source.title}</a></li>)}</ul></section>)}
       {answer && !visibleAnswer && <p role="status">The Snapshot changed. Enable the current Snapshot and ask again; the previous patient answer is no longer shown.</p>}
       {visibleAnswer && <section className="ce-ask-answer" aria-labelledby="ask-answer-heading" aria-live="polite">
@@ -214,6 +217,7 @@ export default function AskClinicalEdge({ navigate, isVisible, snapshot = null }
           {answerContext.evidence.categories?.includes('medication') && <a href={SOURCES['dailymed-fda-labeling'].url} target="_blank" rel="noopener noreferrer">Check official medication labeling</a>}
         </aside>}
         {answerContext?.offerSnapshot && <div className="ce-ask-handoff"><button type="button" onClick={() => navigate('/copilot?capture=rapid')}>Open Shift Brain <span aria-hidden="true">&#8594;</span></button><span>No question or answer is transferred.</span></div>}
+        {answerRequestId && <p className="ce-ask-feedback"><a href={`mailto:clinicaledgehq@gmail.com?subject=${encodeURIComponent('Ask concern: '+answerRequestId)}&body=${encodeURIComponent('Request ID: '+answerRequestId+'\nConcern: inaccurate / confusing / concerning (choose one).\nDo not include patient information or copy clinical chat content.')}`}>Report a concern</a></p>}
       </section>}
     </main>
   </div>;

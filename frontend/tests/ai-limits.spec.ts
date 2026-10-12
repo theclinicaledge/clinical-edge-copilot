@@ -13,14 +13,14 @@ async function ask(page, question: string) {
 test('Ask shows the free daily limit message from the server', async ({ page }) => {
   await page.route('**/api/ask', route => route.fulfill({ status: 429, contentType: 'application/json', body: JSON.stringify({ error: { code: 'free_daily_limit_reached', message: FREE_LIMIT }, requestId: 'mock' }) }));
   await ask(page, 'How does preload affect stroke volume?');
-  await expect(page.getByRole('alert')).toHaveText(FREE_LIMIT);
+  await expect(page.getByRole('alert')).toContainText(FREE_LIMIT);
   await expect(page.getByLabel('Nursing question')).toHaveValue('How does preload affect stroke volume?');
 });
 
 test('Ask shows the resting message when the daily AI budget is used up', async ({ page }) => {
   await page.route('**/api/ask', route => route.fulfill({ status: 503, contentType: 'application/json', body: JSON.stringify({ error: { code: 'ai_daily_budget_reached', message: ASK_RESTING }, requestId: 'mock' }) }));
   await ask(page, 'How does preload affect stroke volume?');
-  await expect(page.getByRole('alert')).toHaveText(ASK_RESTING);
+  await expect(page.getByRole('alert')).toContainText(ASK_RESTING);
 });
 
 test('Ask falls back to its own limit copy if the server message is missing', async ({ page }) => {

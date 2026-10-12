@@ -32,7 +32,7 @@ test.describe('AI consent screen', () => {
   test('Agree is reachable without scrolling at 375x667', async ({ page }) => {
     await page.setViewportSize({ width: 375, height: 667 });
     await page.goto('/ask');
-    await expect(page.getByRole('heading', { name: 'How your entries are processed' })).toBeVisible();
+    await expect(page.getByRole('heading', { name: 'A quick note before we begin' })).toBeVisible();
     await expect(page.getByRole('button', { name: 'Agree and continue' })).toBeInViewport({ ratio: 1 });
     expect(await page.evaluate(() => window.scrollY)).toBe(0);
   });

@@ -3,6 +3,7 @@ import { trackEvent } from "./analytics";
 import { useSeo } from "./seo/useSeo.js";
 import { STATIC_ROUTE_SEO } from "./seo/routeSeo.js";
 import { ClinicalEdgeMark } from "./components/ModuleHeader.jsx";
+import AppStoreBadge from "./components/AppStoreBadge.jsx";
 import { CHECK_ACTIONS, LEARN_ACTIONS } from "./components/workspaceActions.js";
 import "./styles/workspace-navigation.css";
 
@@ -49,7 +50,7 @@ export default function ClinicalEdgeHome({ onNavigate }) {
         <section aria-labelledby="learn-title"><h2 id="learn-title">Keep learning</h2><div className="ce-command-home__links">{LEARN_ACTIONS.map((action) => <IntentLink key={action.path} action={action} onNavigate={onNavigate} />)}</div></section>
         <section aria-labelledby="organize-title"><h2 id="organize-title">Organize your shift</h2><div className="ce-command-home__links"><IntentLink action={{ label: "Brain Sheets", detail: "Blank printable templates", path: "/brain-sheets", event: "brain_sheets_module_opened" }} onNavigate={onNavigate} />{savedCount > 0 && <IntentLink action={{ label: "Saved cases", detail: `${savedCount} saved on this device`, path: "/copilot" }} onNavigate={onNavigate} />}</div></section>
       </div>
-      <footer className="ce-command-home__footer"><p>Education and reasoning support. Follow local policy and clinical judgment.</p><div><a href="/privacy" onClick={(e) => { e.preventDefault(); onNavigate("/privacy"); }}>Privacy</a><a href="/terms" onClick={(e) => { e.preventDefault(); onNavigate("/terms"); }}>Terms</a><a href="/support" onClick={(e) => { e.preventDefault(); onNavigate("/support"); }}>Support</a></div></footer>
+      <footer className="ce-command-home__footer"><p>Education and reasoning support. Follow local policy and clinical judgment.</p><AppStoreBadge placement="footer" height={40} /><div><a href="/privacy" onClick={(e) => { e.preventDefault(); onNavigate("/privacy"); }}>Privacy</a><a href="/terms" onClick={(e) => { e.preventDefault(); onNavigate("/terms"); }}>Terms</a><a href="/support" onClick={(e) => { e.preventDefault(); onNavigate("/support"); }}>Support</a></div></footer>
     </main>
   </div>;
 }

@@ -3,6 +3,20 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+    <!-- Flags the Clinical Edge iOS app's WebView before first paint so App Store
+         promotion stays hidden there. Reader: src/nativeApp.js (rule documented there). -->
+    <script>
+      (function () {
+        var ua = navigator.userAgent || "";
+        var tagged = /ClinicalEdgeApp\//.test(ua);
+        var ios = /iPhone|iPad|iPod/.test(ua) || (/Macintosh/.test(ua) && navigator.maxTouchPoints > 1);
+        // Social apps' in-app browsers are web views too, but that is where social traffic
+        // lands, so they keep the badge.
+        var socialBrowser = /Instagram|FBAN|FBAV|FB_IAB|BytedanceWebview|musical_ly/.test(ua);
+        var iosWebView = ios && /AppleWebKit/.test(ua) && !/Safari\//.test(ua) && !socialBrowser;
+        if (tagged || iosWebView) document.documentElement.setAttribute("data-ce-native-app", "true");
+      })();
+    </script>
 
     <!-- Fonts — single global load (Inter + IBM Plex Mono), union of all module weights -->
     <link rel="preconnect" href="https://fonts.googleapis.com" />
@@ -38,6 +52,8 @@
     <meta name="apple-mobile-web-app-title" content="Clinical Edge" />
     <!-- Home screen icon for iOS (Safari ignores manifest icons) -->
     <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png" />
+    <!-- Safari's native Smart App Banner for the iOS app (never shown inside app web views) -->
+    <meta name="apple-itunes-app" content="app-id=6761643064" />
 
     <!-- ── Microsoft / misc ─────────────────────────────────────────────── -->
     <meta name="msapplication-TileColor" content="#0B1F2A" />

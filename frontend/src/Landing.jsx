@@ -1,5 +1,6 @@
 import { trackEvent } from "./analytics";
 import { ClinicalEdgeMark } from "./components/ModuleHeader.jsx";
+import AppStoreBadge from "./components/AppStoreBadge.jsx";
 import { useSeo } from "./seo/useSeo.js";
 import { STATIC_ROUTE_SEO } from "./seo/routeSeo.js";
 import "./styles/landing.css";
@@ -49,6 +50,7 @@ export default function Landing({ onEnterScenario }) {
           learning workspace, designed to connect fictional scenarios with reasoning and physiology.
         </p>
         <PracticeCta placement="hero" onEnterScenario={onEnterScenario} />
+        <AppStoreBadge placement="landing" />
         <p className="ce-acquisition__welcome">Designed with ICU transitions in mind. Nurses from other settings are welcome.</p>
       </section>
 
@@ -119,6 +121,7 @@ export default function Landing({ onEnterScenario }) {
 
     <footer className="ce-acquisition__footer">
       <span>Clinical Edge · Nursing education &amp; practice</span>
+      <AppStoreBadge placement="footer" height={40} />
       <div className="ce-acquisition__links"><a href="/privacy">Privacy</a><a href="/terms">Terms</a><a href="/support">Support</a></div>
     </footer>
   </div>;

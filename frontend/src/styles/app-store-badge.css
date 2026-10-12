@@ -1,0 +1,7 @@
+/* Official App Store badge: shown as supplied, never squished, with Apple's clear space (inline padding). */
+.ce-app-store-badge { display: inline-flex; flex: none; line-height: 0; border-radius: 10px; }
+.ce-app-store-badge img { display: block; width: auto; max-width: none; flex: none; }
+.ce-app-store-badge:focus-visible { outline: 2px solid var(--ce-teal); outline-offset: 0; }
+
+/* Never promote the App Store inside the iOS app (flag set in index.html before first paint). */
+html[data-ce-native-app="true"] .ce-app-store-badge { display: none !important; }

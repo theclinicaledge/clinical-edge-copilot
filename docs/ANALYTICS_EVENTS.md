@@ -192,13 +192,15 @@ left uninstrumented.
 
 | Event | When it fires | Payload |
 |-------|---------------|---------|
-| `app_store_click` | User taps the official App Store badge | `{ page: "download", destination: "app_store" }` |
+| `app_store_badge_clicked` | User taps the official App Store badge (`components/AppStoreBadge.jsx`) on any page | `{ placement: "landing" \| "download" \| "footer" }` |
 
-**Note:** this event goes through `trackEvent()` like every other event in this
-document — documented here to close a gap that previously existed in this
-file, not changed. The Android notice on this page is UA-detected passive
-rendering, not a user action, so no `download_android_notice_viewed` event was
-added. There is no separate "web app" link on this page.
+**Note:** `app_store_badge_clicked` replaces the former `app_store_click`
+(`{ page, destination, placement }`), which fired only on the Download page.
+The payload is the fixed `placement` enum only. Badges, and therefore this event,
+never appear inside the iOS app (`src/nativeApp.js`). The Android notice on this
+page is UA-detected passive rendering, not a user action, so no
+`download_android_notice_viewed` event was added. There is no separate "web app"
+link on this page.
 
 ---
 

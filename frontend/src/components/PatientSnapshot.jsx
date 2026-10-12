@@ -536,6 +536,7 @@ export default function PatientSnapshot({ initialNotes = "", initialSnapshot = n
       <span>Shift Brain</span>
       <h1>What do you know right now?</h1>
       <p>Enter what you have in any order. Skip anything you do not know.</p>
+      <p className="snapshot-intro__boundary">Not for emergencies. If your patient needs help now, use your rapid response process.</p>
     </header>
 
     <div className="snapshot-entry-mode" aria-label="Snapshot entry method">
@@ -591,7 +592,7 @@ export default function PatientSnapshot({ initialNotes = "", initialSnapshot = n
         <MultiChoiceField id="perfusionFindings" label="Extremities / circulation" options={["Cool / clammy", "Weak pulses", "Delayed capillary refill", "Mottling", "Other"]} values={snapshot.values.perfusionFindings || (snapshot.values.perfusionState ? [snapshot.values.perfusionState] : [])} onChange={(key, value) => updateValue(key, value, "perfusion")} />
       </section>
 
-      {highRisk && <div className="snapshot-escalation" role="alert"><strong>Do not wait to finish this Snapshot.</strong><span>If the current presentation requires urgent attention, follow local escalation procedures now. You can continue adding context while help is being activated.</span></div>}
+      {highRisk && <div className="snapshot-escalation" role="alert"><strong>Clinical Edge is not for emergencies.</strong><span>If this patient may need help now, use your rapid response process. You can come back to this Snapshot later.</span></div>}
 
       {addedFindings.length > 0 && <section className="snapshot-additional snapshot-added-findings" aria-label="Added findings">
         <div className="snapshot-section-heading snapshot-section-heading--small"><span>Added findings</span><p>Only the details you chose are open.</p></div>

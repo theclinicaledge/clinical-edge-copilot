@@ -1674,8 +1674,8 @@ export default function App({ onGoHome, navigate, isOnline = true, initialCaptur
                 <span>What changed over time?</span>
               </div>
               <div className="copilot-context-tile">
-                <strong>Escalate</strong>
-                <span>What needs attention?</span>
+                <strong>Communicate</strong>
+                <span>Who needs to know?</span>
               </div>
             </div>
 

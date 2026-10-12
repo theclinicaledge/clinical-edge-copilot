@@ -418,6 +418,40 @@ for (const [name, path, body, reply, expectedStatus] of [
   });
 }
 
+test('release with keepIp refunds the device count but not the IP count', () => {
+  const guard = createAiCostGuard({ env: { FREE_DAILY_QUESTIONS: '1', FREE_DAILY_QUESTIONS_PER_IP: '2' }, now: at('2026-10-12T18:00:00Z') });
+  for (let i = 0; i < 2; i++) {
+    const refused = req({ device: DEVICE_A });
+    assert.equal(guard.admit(refused, 'ASK'), null);
+    guard.release(refused, { keepIp: true });
+  }
+  assert.deepEqual([guard.snapshot().devices, guard.snapshot().ips], [0, 1]);
+  const network = guard.admit(req({ device: DEVICE_A }), 'ASK');
+  assert.equal(network.status, 429);
+  assert.match(network.message, /for this network are used up/);
+});
+
+test('repeated safety refusals (422) from one IP never use up the device but hit the 50/day IP backstop', async () => {
+  providerReply = sse('{"answer":"","details":[]}');
+  try {
+    await captureLogs(() => withEnv({ ASK_SAFETY_CONTAINMENT: undefined, FREE_DAILY_QUESTIONS: '1', FREE_DAILY_QUESTIONS_PER_IP: undefined, AI_DAILY_BUDGET_USD: undefined }, async () => {
+      const device = '8e9f0a1b-2c3d-4e5f-8a6b-7c8d9e0f1a2b';
+      const body = { question: positive[1].question, contextMode: 'general' };
+      for (let attempt = 1; attempt <= 50; attempt++) {
+        const res = await callRoute('/api/ask', body, { device, ip: '192.0.2.90' });
+        assert.equal(res.statusCode, 422, `attempt ${attempt}`);
+      }
+      const blocked = await callRoute('/api/ask', body, { device, ip: '192.0.2.90' });
+      assert.equal(blocked.statusCode, 429);
+      assert.equal(blocked.body.error.code, 'free_daily_limit_reached');
+      assert.match(blocked.body.error.message, /for this network are used up/);
+      providerReply = null; // server errors are refunded on both counters, so they never fill the IP backstop
+      for (let attempt = 1; attempt <= 3; attempt++) assert.equal((await callRoute('/api/ask', body, { device, ip: '192.0.2.91' })).statusCode, 502);
+      assert.equal((await callRoute('/api/ask', body, { device, ip: '192.0.2.91' })).statusCode, 502);
+    }));
+  } finally { providerReply = null; }
+});
+
 test('a successful new question still counts', async () => {
   providerReply = payload => sse(JSON.stringify({ answer: positive[1].answer, details: [], source_ids: payload.output_config.format.schema.properties.source_ids.items.enum }));
   try {

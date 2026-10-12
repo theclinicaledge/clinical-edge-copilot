@@ -118,8 +118,9 @@ per device per day), `FREE_DAILY_QUESTIONS_PER_IP` (default 50, backstop and the
 requests without a device ID), `AI_INPUT_USD_PER_MTOK` and `AI_OUTPUT_USD_PER_MTOK` (defaults 3
 and 15, the `claude-sonnet-4-6` list prices; update them if the model changes). Only new Ask
 questions and new Priority Maps count toward the free limits; Teach Me, SBAR, follow-ups and ABG
-explanations only need budget, and a question that ends in a server error, safety refusal or
-deterministic fallback is released (`aiCost.release`). The device ID is a random UUID from `frontend/src/deviceId.js`,
+explanations only need budget. A question that ends in a server error, Anthropic 429 or
+deterministic fallback is released (`aiCost.release`); a safety refusal (422) is refunded on the
+device count only and still counts toward the per-IP backstop. The device ID is a random UUID from `frontend/src/deviceId.js`,
 sent as `X-CE-Device` to AI routes only; never log it or send it to analytics. Limits reset
 at midnight Pacific and live in memory, so a restart or deploy resets them.
 

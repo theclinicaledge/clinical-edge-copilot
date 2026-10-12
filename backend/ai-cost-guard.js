@@ -9,8 +9,10 @@ const { ipKeyGenerator } = require("express-rate-limit");
 //    UUID the app creates once), plus a per-IP backstop of FREE_DAILY_QUESTIONS_PER_IP
 //    keyed like express-rate-limit's apiLimiter. Requests without a valid device ID
 //    are limited by the IP backstop only. Follow-up work (Teach Me, SBAR, follow-ups,
-//    ABG explanations) is checked against the budget but never counted, and a counted
-//    question that ends in a server error or a safety refusal is released (refunded).
+//    ABG explanations) is checked against the budget but never counted. A counted
+//    question that ends in a server error is released (refunded) on both counters; a
+//    safety refusal is refunded on the device counter only, because it still used
+//    Anthropic tokens and must keep counting toward the per-IP backstop.
 // Both reset at midnight Pacific. State is in memory only (it resets on deploy or
 // restart). Device IDs and IPs are never logged; counts are dropped at rollover.
 
@@ -148,9 +150,10 @@ function createAiCostGuard({ env = process.env, now = () => new Date(), appendOp
     return denial;
   }
 
-  // Gives back a counted question that did not deliver an answer: a server or provider
-  // error, or a safety refusal. Safe to call more than once or for uncounted requests.
-  function release(req) {
+  // Gives back a counted question that did not deliver an answer. `keepIp: true` (safety
+  // refusals) refunds the device count only. Safe to call more than once or for
+  // uncounted requests.
+  function release(req, { keepIp = false } = {}) {
     const counted = req?.[COUNTED];
     if (!counted) return;
     req[COUNTED] = null;
@@ -161,7 +164,7 @@ function createAiCostGuard({ env = process.env, now = () => new Date(), appendOp
       if (used <= 1) map.delete(key); else map.set(key, used - 1);
     };
     if (counted.device) decrement(devices, counted.device);
-    decrement(ips, counted.ip);
+    if (!keepIp) decrement(ips, counted.ip);
   }
 
   // Wraps an Anthropic client so every messages.create / messages.stream call adds

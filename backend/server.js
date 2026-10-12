@@ -2580,9 +2580,13 @@ function isOverloadError(err) {
 
 registerAskRoutes(app, { apiLimiter, getClient: () => client, admitAI: (req, options) => {
   const denial = aiCost.admit(req, "ASK", options);
-  // A counted Ask question that ends in an error or safety refusal (any 4xx/5xx after
-  // admission) is not charged against the free limit.
-  if (!denial && options?.counts) req.res?.once("finish", () => { if (req.res.statusCode >= 400) aiCost.release(req); });
+  // A counted Ask question that ends in an error (4xx/5xx after admission) is not charged
+  // to the device. Safety refusals (422) used Anthropic tokens, so they still count toward
+  // the per-IP backstop; server errors and Anthropic 429s are refunded on both counters.
+  if (!denial && options?.counts) req.res?.once("finish", () => {
+    const status = req.res.statusCode;
+    if (status >= 400) aiCost.release(req, { keepIp: status === 422 });
+  });
   return denial;
 }, containsPHI, runWithStageTimeout, collectPriorityMapStream, appendOperationalLog, classifyProviderError });
 

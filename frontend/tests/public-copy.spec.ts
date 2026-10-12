@@ -81,7 +81,9 @@ test('download keeps working tool links and replaces absolute trust claims', asy
   expect(body).not.toMatch(/No patient data stored|App Store reviewed|bedside titration|Fast bedside answers|Ask Clinical Edge/i);
   expect(body).toContain('Optional device-local saved cases');
   expect(body).toContain('See Privacy for data processing');
-  await expect(page.locator('a[href*="apps.apple.com"]')).toHaveCount(2);
+  // Hero, iPhone section and footer: all the official App Store badge.
+  await expect(page.locator('a[href*="apps.apple.com"]')).toHaveCount(3);
+  await expect(page.locator('a[href*="apps.apple.com"]:not(.ce-app-store-badge)')).toHaveCount(0);
   for (const path of ['/copilot', '/rhythm-lab', '/icu-drips', '/abg-lab', '/reference-hub']) await expect(page.locator(`a[href="${path}"]`)).toHaveCount(1);
   await page.locator('a[href="/icu-drips"]').click();
   await expect(page).toHaveURL(/\/icu-drips$/);

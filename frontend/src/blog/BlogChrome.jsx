@@ -3,6 +3,7 @@
 // Download.jsx, and ClinicalEdgeHome.jsx. Kept local to the blog section so
 // BlogIndex and every article page share one implementation.
 import "./blog.css";
+import AppStoreBadge from "../components/AppStoreBadge.jsx";
 
 function CELogo({ size = 26 }) {
   return (
@@ -91,6 +92,7 @@ export default function BlogChrome({ children, contentMaxWidth = 720 }) {
             <p style={{ fontSize: 11, color: "var(--ce-text-dim)", lineHeight: 1.65, margin: "0 0 12px" }}>
               Educational and clinical reasoning support only. Not a diagnostic tool. Follow local protocol, provider guidance, and institutional policy.
             </p>
+            <AppStoreBadge placement="footer" height={40} />
             <div style={{ display: "flex", gap: 18, flexWrap: "wrap", alignItems: "center" }}>
               <span style={{ fontSize: 11, color: "var(--ce-text-muted)", letterSpacing: "0.02em" }}>
                 Clinical Edge · theclinicaledge.org

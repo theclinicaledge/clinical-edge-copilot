@@ -53,10 +53,11 @@ test('example is explicitly withheld and Ask is visibly upcoming without a CTA',
   await expect(ask.getByText('Upcoming · not publicly available', { exact: true })).toBeVisible();
   await expect(ask.locator('a,button')).toHaveCount(0);
   const hrefs = await page.locator('.ce-acquisition a').evaluateAll(elements => elements.map(el => el.getAttribute('href')));
-  expect(new Set(hrefs)).toEqual(new Set(['/', '/privacy', '/terms', '/support']));
+  expect(new Set(hrefs)).toEqual(new Set(['/', '/privacy', '/terms', '/support', 'https://apps.apple.com/app/id6761643064']));
   const copy = await page.locator('.ce-acquisition').innerText();
   expect(copy).not.toMatch(/catch.*deterioration|guaranteed|fast, accurate|safe clinical decision|thinks like a nurse|preceptor would|nursing school didn't|Google rabbit hole|second set of clinical eyes|Urgency:|P2|beta.ready|trusted by|\d+ (users|downloads|ratings)/i);
-  await expect(page.locator('.ce-acquisition img')).toHaveCount(0);
+  // The only image allowed on the front door is Apple's official App Store badge.
+  await expect(page.locator('.ce-acquisition img:not(.ce-app-store-badge img)')).toHaveCount(0);
 });
 
 test('gated practice cannot invoke the legacy scenario or QuickStart funnel', async ({ page }) => {

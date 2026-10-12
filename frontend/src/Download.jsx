@@ -2,90 +2,12 @@ import { useState } from "react";
 import { trackEvent } from "./analytics";
 import { useSeo } from "./seo/useSeo.js";
 import { STATIC_ROUTE_SEO } from "./seo/routeSeo.js";
-
-// ── App Store destination ────────────────────────────────────────────────────
-const APP_STORE_URL =
-  "https://apps.apple.com/us/app/clinical-edge-copilot/id6761643064";
+import AppStoreBadge from "./components/AppStoreBadge.jsx";
 
 // ── Android UA detection (display-only, no redirect) ────────────────────────
 function useIsAndroid() {
   const [isAndroid] = useState(() => /android/i.test(navigator.userAgent));
   return isAndroid;
-}
-
-// ── Official Apple App Store badge (inline SVG) ──────────────────────────────
-// Apple mark paths scaled from Apple's canonical badge SVG (viewBox 0 0 120 40).
-// Displayed at 1.4× for sharpness on high-density screens.
-function AppStoreBadge() {
-  return (
-    <svg
-      xmlns="http://www.w3.org/2000/svg"
-      viewBox="0 0 120 40"
-      role="img"
-      aria-label="Download on the App Store"
-      style={{ height: 48, width: "auto", display: "block" }}
-    >
-      {/* Badge outline (subtle gray edge) */}
-      <rect width="120" height="40" rx="7.5" fill="#a6a6a6" />
-      {/* Badge body */}
-      <rect x=".5" y=".5" width="119" height="39" rx="7" fill="#000" />
-
-      {/* Apple mark — paths from Apple's canonical badge asset,
-          scaled 0.567× and translated to center in the left zone */}
-      <g transform="translate(8, 9) scale(0.567)">
-        {/* Main apple body */}
-        <path
-          fill="#fff"
-          d="M24.769 20.301c-.033-3.63 2.974-5.394 3.108-5.476
-             -1.695-2.476-4.33-2.816-5.268-2.851
-             -2.229-.228-4.37 1.325-5.501 1.325
-             -1.149 0-2.9-1.299-4.775-1.261
-             -2.432.037-4.694 1.433-5.943 3.614
-             -2.55 4.418-.65 10.935 1.816 14.51
-             1.22 1.754 2.659 3.718 4.554 3.647
-             1.837-.074 2.526-1.177 4.743-1.177
-             2.199 0 2.845 1.177 4.773 1.135
-             1.974-.033 3.218-1.77 4.416-3.539
-             1.409-2.023 1.981-4.001 2.008-4.103
-             -.044-.016-3.897-1.489-3.931-5.824z"
-        />
-        {/* Leaf */}
-        <path
-          fill="#fff"
-          d="M21.095 9.594c.988-1.237 1.663-2.934 1.478-4.65
-             -1.431.062-3.228.988-4.258 2.199
-             -.919 1.074-1.738 2.833-1.524 4.494
-             1.613.118 3.26-.83 4.304-2.043z"
-        />
-      </g>
-
-      {/* "Download on the" — small, regular weight */}
-      <text
-        x="31"
-        y="17"
-        fill="#fff"
-        fontFamily="-apple-system, BlinkMacSystemFont, 'SF Pro Text', 'Helvetica Neue', Arial, sans-serif"
-        fontSize="8.5"
-        fontWeight="400"
-        letterSpacing="0.15"
-      >
-        Download on the
-      </text>
-
-      {/* "App Store" — larger, semibold */}
-      <text
-        x="31"
-        y="31"
-        fill="#fff"
-        fontFamily="-apple-system, BlinkMacSystemFont, 'SF Pro Display', 'Helvetica Neue', Arial, sans-serif"
-        fontSize="17"
-        fontWeight="600"
-        letterSpacing="-0.3"
-      >
-        App Store
-      </text>
-    </svg>
-  );
 }
 
 // ── Clinical Edge SVG logo ───────────────────────────────────────────────────
@@ -241,9 +163,6 @@ export default function Download({ onNavigate }) {
     else window.location.href = path;
   };
 
-  const handleAppStoreClick = (placement) =>
-    trackEvent("app_store_click", { page: "download", destination: "app_store", placement });
-
   return (
     <div style={{
       minHeight: "100vh",
@@ -254,10 +173,6 @@ export default function Download({ onNavigate }) {
       <style>{`
         *, *::before, *::after { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
         a { outline: none; -webkit-tap-highlight-color: transparent; }
-        .dl-badge-link { display: inline-block; border-radius: var(--ce-r-md); transition: opacity var(--ce-dur-fast) var(--ce-ease-out); }
-        .dl-badge-link:hover { opacity: 0.88; }
-        .dl-badge-link:active { opacity: 0.72; }
-        .dl-badge-link:focus-visible { outline: 2px solid var(--ce-teal); outline-offset: 2px; }
         .dl-footer-link, .dl-header-link {
           transition: color var(--ce-dur-fast) var(--ce-ease-out);
           text-decoration-color: transparent;
@@ -369,6 +284,8 @@ export default function Download({ onNavigate }) {
             alignItems: "flex-start",
             gap: 14,
           }}>
+            <AppStoreBadge placement="download" height={54} />
+
             <a
               href="#dl-products"
               className="dl-btn-primary"
@@ -395,15 +312,6 @@ export default function Download({ onNavigate }) {
               Explore Clinical Edge
             </a>
 
-            <a
-              href={APP_STORE_URL}
-              target="_blank"
-              rel="noreferrer"
-              className="dl-badge-link"
-              onClick={() => handleAppStoreClick("hero")}
-            >
-              <AppStoreBadge />
-            </a>
           </div>
         </section>
 
@@ -466,15 +374,7 @@ export default function Download({ onNavigate }) {
               to explore nursing concepts.
             </p>
 
-            <a
-              href={APP_STORE_URL}
-              target="_blank"
-              rel="noreferrer"
-              className="dl-badge-link"
-              onClick={() => handleAppStoreClick("mobile_section")}
-            >
-              <AppStoreBadge />
-            </a>
+            <AppStoreBadge placement="download" />
 
             {isAndroid && (
               <p style={{
@@ -574,6 +474,7 @@ export default function Download({ onNavigate }) {
             Clinical Edge · theclinicaledge.org
           </span>
         </div>
+        <AppStoreBadge placement="footer" height={40} />
         <div style={{ display: "flex", gap: 16 }}>
           <a
             href="/privacy"

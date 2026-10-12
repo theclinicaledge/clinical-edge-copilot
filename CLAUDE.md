@@ -1,175 +1,173 @@
-# Clinical Edge Copilot — Claude Code Project Memory
+# Clinical Edge — Agent Project Memory (CLAUDE.md, keep identical to AGENTS.md)
+
+This file is read by Codex (AGENTS.md) and Claude (CLAUDE.md). Keep both files identical
+apart from this heading. If code and this file disagree, stop and ask Mohamed which is right,
+then update this file in the same change.
 
 ## What This App Is
-Clinical Edge is a multi-tool nursing platform centered on Clinical Edge Copilot.
-Copilot is an AI-powered clinical reasoning and escalation-awareness aid for bedside nurses — not a diagnostic tool.
-Built by Mohamed, a master's-prepared RN with critical care experience.
+
+Clinical Edge is a nursing education and clinical-reasoning support platform for bedside
+nurses (med-surg, telemetry, PCU, ICU, ED). It supports nursing assessment, reasoning and
+communication. It does not diagnose, treat, prescribe, or replace provider orders, local
+protocol, or clinical judgment. Built by Mohamed, a master's-prepared RN with critical care
+experience.
+
+Shipped as a website (https://theclinicaledge.org) and as an iOS App Store app (App Store ID
+id6761643064) that loads the website in a native WebView from a separate Expo wrapper repo.
+Every web change therefore ships to the App Store app too.
+
+---
+
+## Compliance Rules — Highest Priority, Non-Negotiable
+
+These protect Mohamed's App Store listing and legal position. They override feature requests,
+design preferences and every other rule in this file. If a task would break one, stop and say so
+instead of doing it.
+
+### Patient privacy
+- Never add a field, prompt, upload, or flow that asks for or encourages patient identifiers
+  (names, initials, MRN, DOB, room numbers, dates, contact details, photos of records).
+- Keep the identifier warnings next to every free-text clinical input and keep the backend
+  `containsPHI` check on every route that reaches the AI provider.
+- Never log, store, or send to analytics any clinical text, Snapshot values, AI responses,
+  saved-case content, notes, SBAR text, or search text. Server logs are metadata only.
+- Never add a server-side database or persistence of clinical content without explicit approval
+  and a privacy review.
+
+### Consent (App Store Review Guidelines 5.1.2(i) and 5.1.1(ii))
+- Nothing a user enters may be sent to a third-party AI service until they grant explicit
+  permission. `frontend/src/components/AIConsentGate.jsx` wraps every AI-backed workspace.
+  Any new feature that calls the backend AI routes must sit behind that gate.
+- Usage analytics are opt-in. All events go through `frontend/src/analytics.ts`, which drops
+  them without consent. Never call `@vercel/analytics` `track` directly.
+- Consent state lives in `frontend/src/consent.js`. Bump `CONSENT_VERSION` whenever what is
+  sent, who receives it, or the disclosure wording materially changes.
+- Users can withdraw both choices on the Privacy page. Do not remove that control.
+- Adding any new third party that receives user data (AI provider, analytics, SDK, crash
+  reporter, ads, Meta Pixel) requires: consent gating, a Privacy page update, an App Store
+  privacy label update, and Mohamed's explicit approval. Never add tracking across apps or
+  websites (that would require Apple's App Tracking Transparency prompt).
+
+### Privacy policy and store disclosures
+- `frontend/src/Privacy.jsx` must always list every third party that receives data, what it
+  receives, retention, and how to withdraw consent. Update its effective date when the policy
+  changes. If code changes data flows, update the policy in the same change and tell Mohamed
+  the App Store Connect privacy label may need updating.
+
+### Clinical safety and medical-app scrutiny (Guideline 1.4.1, FDA CDS boundaries)
+- No dosing, titration, bolus, medication hold/start, device or ventilator settings, or
+  treatment commands anywhere: not in prompts, fallbacks, UI copy, marketing, or examples.
+- Keep the visible reminder that output is educational support and decisions belong with the
+  treating provider and local protocol.
+- Always show the basis for a recommendation (the reported findings it came from) so a nurse can
+  review it independently. Do not hide reasoning behind a single verdict.
+- Do not market or label any feature for time-critical or emergency decision-making
+  ("code", "crashing", "rapid response decision"), and do not claim it detects, diagnoses,
+  predicts or monitors a condition.
+- Never claim clinical validation, accuracy, FDA status, HIPAA compliance, clinician review, or
+  outcomes that have not actually happened. "Validated" in this repo means automated tests,
+  not clinical validation; do not use the word in user-facing copy.
+- Synthetic test cases only. Never use real patient cases, even de-identified, in fixtures,
+  prompts, screenshots, marketing, or blog content.
+- `ASK_SAFETY_CONTAINMENT=true` on the backend pauses all generative clinical routes. Keep it
+  working.
+
+### Apple platform
+- The iOS app must stay more than a repackaged website (Guideline 4.2). Do not remove
+  app-like features without discussing App Store impact.
+- No payments, subscriptions or paid unlocks inside the app without discussing In-App Purchase
+  rules first. No accounts without in-app account deletion.
 
 ---
 
 ## Working Environment
 
-- **Safe local path:** `~/Code/clinical-edge-copilot-fixed` (full path: `/Users/mohamed/Code/clinical-edge-copilot-fixed`)
-- **Do NOT reference or use** the old Desktop or iCloud copy of this project
-- All work in Claude Code sessions must target this repo exclusively
-- Repo structure:
-  - `frontend/` — Vite/React app
-  - `backend/` — Node.js/Express server and prompt routing
-  - `content/` — content assets and workflows
-  - `my-video/` — Remotion video system
-
----
+- Local path: `~/Code/clinical-edge-copilot-fixed` (GitHub `theclinicaledge/clinical-edge-copilot`)
+- Do not use old Desktop or iCloud copies.
+- Mohamed may run Codex and Claude on this repo at the same time. Pull before starting, keep
+  changes small and scoped, and work on a branch when touching shared files.
+- Structure: `frontend/` (Vite + React), `backend/` (Node + Express), `content/`, `docs/`,
+  `my-video/` (Remotion).
 
 ## Tech Stack
 
 | Layer | Technology |
 |---|---|
-| Frontend | React + Vite (runs on localhost:5173) |
-| Backend | Node.js + Express (runs on localhost:3001) |
-| AI | Anthropic Claude API (model: claude-sonnet-4-6) |
-| Web analytics | Vercel Analytics via `frontend/src/analytics.ts` |
-| Persistence | Browser localStorage/sessionStorage only (no database) |
+| Frontend | React 19 + Vite (localhost:5173) |
+| Backend | Node.js + Express 5 (localhost:3001), hosted on Render |
+| AI | Anthropic Claude API only (model `claude-sonnet-4-6`). Never OpenAI. |
+| Web hosting | Vercel |
+| Analytics | Vercel Analytics via `frontend/src/analytics.ts`, opt-in only |
+| Persistence | Browser localStorage/sessionStorage only. No database. |
 
-Primary shipped surfaces:
-- Home hub
-- Copilot
-- SBAR draft generation
-- Rhythm Lab
-- ICU Drips
-- Reference Hub
-- ABG & Oxygenation Lab
-- Brain Sheets
-- Scenario walkthrough
-- QuickStart
-- Blog / SEO pages
-- Download, Privacy, and Support pages
+## Backend Routes
 
----
-
-## Architecture — Non-Negotiable Rules
-
-- **Backend endpoints:** `POST /api/copilot`, `POST /api/sbar`, and `GET /health` — do not add or rename endpoints without explicit instruction
-- **API key lives in backend `.env` only** — NEVER expose it to the frontend, NEVER hardcode it anywhere
-- **Never use OpenAI** — Anthropic Claude API exclusively
-- **Never redesign the UI** — dark navy premium aesthetic with electric blue accents is locked in
-- **Never simplify the product** — maintain full feature complexity
-- **Never remove previously built features** — every iteration must preserve all existing functionality
-- **Backend is considered stable** — do not modify backend logic, routes, or API behavior unless explicitly instructed
-- **This document (`CLAUDE.md`) is the source of truth** for architecture, constraints, and behavior
-
----
-
-## File Hygiene Rules
-
-- **Do not touch generated files** — includes `dist/`, `node_modules/`, and any Remotion render output
-- **Do not commit unless explicitly asked** — always wait for explicit commit instruction
-- **Do not change deployment config unless asked** — this includes `vite.config.js`, hosting config, environment variables, and any CI/CD files
-- **Do not create new files unless explicitly instructed**
-- **Do not restructure folders or move files without approval**
-- **Never make changes without first explaining what will be changed and why**
-- **Wait for explicit approval before modifying any files**
-- Before making any changes, always state which files will be modified
-
----
-
-## Deployment / Release Setup
-
-- The web app targets `https://theclinicaledge.org`.
-- Production Copilot calls default to `https://clinical-edge-backend.onrender.com` unless `VITE_API_BASE_URL` is set.
-- Vercel config exists at repo root and in `frontend/`.
-- The separate Expo/App Store wrapper repo is `/Users/mohamed/Clinical-Edge-Mobile/clinical-edge-copilot-mobile`; it loads the web app in a native WebView and has App Store ID `id6761643064`.
-- Frontend build: `cd frontend && npm run build` (output goes to `frontend/dist/` — do not touch)
-- Do not modify deployment-related config (Render, Railway, Vercel, Netlify, etc.) without explicit instruction
-
----
-
-## Copilot Response Format
-
-Every AI response opens with:
-```
-Urgency Level: HIGH / MODERATE / LOW
-```
-HIGH urgency responses also include a `⚠️` urgent deterioration warning.
-
-The current frontend parser expects these six section headers:
-1. What this could be
-2. Possible concerns
-3. What to assess next
-4. What to consider next
-5. Where this may be heading
-6. Closing
-
-`max_tokens` is set to 1400 — do not change this without explicit instruction.
-
----
-
-## Two Modes
-
-| Mode | Description |
+| Route | Purpose |
 |---|---|
-| **Clinical Reasoning** | Deep mode — thorough clinical analysis |
-| **Quick Guidance** | Quick mode — fast, focused response |
+| `POST /api/copilot` | Copilot modes, Shift Brain Priority Map, Teach Me, follow-up, reassessment |
+| `POST /api/sbar` | SBAR draft |
+| `POST /api/ask` | Ask Clinical Edge (general and Snapshot-aware; deterministic ABG engine) |
+| `GET /health` | Health check |
 
-Each mode has its own distinct system prompt. Keep them separate.
+Do not add or rename routes without explicit instruction. Every AI route needs the rate
+limiter, the identifier check, metadata-only logging and the containment gate.
 
----
+Backend environment variables: `ANTHROPIC_API_KEY` (backend `.env` only, never in the frontend
+or in code), `PORT`, `ASK_SAFETY_CONTAINMENT`, `TRUST_PROXY_HOPS` (default 1, for Render's
+proxy so rate limits are per user). Frontend: `VITE_API_BASE_URL` (defaults to
+`https://clinical-edge-backend.onrender.com`).
 
-## Frontend Parsing
+Token limits and timeouts are set per route in `backend/server.js` and
+`backend/ask-clinical-edge.js`; read the code rather than trusting a number written here.
 
-The frontend parser uses a dynamic `ALIAS_MAP` to handle section header variants.
-When modifying section headers or adding new ones, update the ALIAS_MAP accordingly.
+## Surfaces
 
----
+Home, Shift Brain (Snapshot, Rapid Capture, Priority Map, Teach Me, Reassessment, SBAR),
+Ask Clinical Edge, Rhythm Lab, ICU Drips, Reference Hub, ABG & Oxygenation Lab, Brain Sheets,
+Scenario, QuickStart, Blog, Landing, Download, Privacy, Support.
 
-## Saved Cases (Notebook Feature)
+Never remove a shipped feature without explicit approval.
 
-Built with `localStorage` only — no backend database.
+## Design
 
-Each saved case stores:
-- Question (the nurse's clinical scenario)
-- Mode (Clinical Reasoning or Quick Guidance)
-- Raw AI response
-- Urgency level
-- Timestamp
-- Optional note (user-editable)
+- Ratified specs: `design-system.md` and `motion-system.md` at the repo root. Follow them; if a
+  new surface is not covered, ask before inventing a new visual language.
+- Current look: navy header, warm light workspace surfaces, teal primary actions, gold accents.
+  Fonts: Inter (headings and body), IBM Plex Mono (labels and eyebrows).
+- Purple is retired (replaced by gold). Success states use teal plus a non-color signal.
+- CSS-only motion. Clinical modules render instantly; no decorative animation on clinical data.
 
-Supported actions: expand, edit note, reopen, copy, delete.
+## Content Rules
 
----
+- No dosing language or treatment commands. No em dashes in user-facing copy.
+- Nurse-to-nurse voice. Short bullets over paragraphs. Recognition over memorization.
+- No textbook or generic AI phrasing.
 
-## UI Design — Do Not Change
+## Analytics Rules
 
-- **Color scheme:** Dark navy background, electric blue accents
-- **Fonts:** Inter (headings and body), IBM Plex Mono (labels/eyebrows)
-- **Cards:** Color-coded by section
-- **Aesthetic:** Premium, clinical, professional
+Only fixed enums, booleans, safe counts and predefined IDs. Never free text, clinical content,
+or anything that could identify a patient or user. Document new events in
+`docs/ANALYTICS_EVENTS.md`.
 
----
+## File Hygiene
 
-## Clinical Logic — Critical Rules
+- Do not touch generated files: `dist/`, `node_modules/`, Remotion renders, validation outputs.
+- Do not commit unless explicitly asked. Explicit file staging only, never `git add -A`.
+- Do not change deployment config (Vercel, Render, `vite.config.js`, env vars) unless asked.
+- State which files you will change and why before changing them.
 
-- **Never overcall urgency** on isolated abnormal values
-- Urgency must consider: clinical context, trends, and the overall patient picture together
-- The AI should reason like a skilled clinician — not trigger alarms on single data points
-- Always include a Safety Note reminding nurses this is a support tool, not a replacement for clinical judgment
+## Developer Commands
 
----
+- Frontend: `cd frontend && npm run dev` · `npm run lint` · `npm run build` · `npm run test:e2e`
+  · `npm run validate:rapid-capture`
+- Backend: `cd backend && node server.js` · `npm test` · `npm run validate:clinical`
+  · `npm run validate:p1` · `npm run validate:ask`
+- Run lint, backend tests and the e2e suite before saying work is done.
+- Automated validators and authored fixture reviews are not clinical validation. Real-provider
+  and clinician review results live in `docs/CLINICAL_VALIDATION_REGISTRY.md`; never rewrite
+  a recorded result.
 
-## What's Not Built Yet (Coming Soon)
+## Not Built Yet
 
-- Authentication / user accounts
-- Payment / subscription layer
-- Meta Pixel / Meta SDK / App Events integration
-- 30-scenario clinical regression test library
-- Full Brain Sheets library completion beyond the production sheets already built
-
----
-
-## Developer Notes
-
-- Run frontend: `cd frontend && npm run dev`
-- Run backend: `cd backend && node server.js`
-- Both must be running simultaneously for the app to work
-- Run frontend lint: `cd frontend && npm run lint`
-- Run Playwright smoke tests: `cd frontend && npm run test:e2e`
-- Test with realistic, context-rich nursing scenarios and avoid overfitting to minimal inputs
+Accounts, payments/subscriptions, Meta Pixel or other ad SDKs. Each one changes App Store and
+privacy obligations; see Compliance Rules before starting any of them.

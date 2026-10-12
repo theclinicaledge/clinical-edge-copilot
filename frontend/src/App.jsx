@@ -6,6 +6,7 @@ import PriorityMap from "./components/PriorityMap.jsx";
 import Reassessment, { ReassessmentEvidence } from "./components/Reassessment.jsx";
 import { serializePatientSnapshot } from "./components/patientSnapshotModel.js";
 import { parsePriorities } from "./components/priorityMapModel";
+import { aiRequestHeaders } from "./deviceId.js";
 
 // ─── API Config ───────────────────────────────────────────────────────────────
 
@@ -579,7 +580,7 @@ export default function App({ onGoHome, navigate, isOnline = true, initialCaptur
     try {
       const res = await fetch(`${API_BASE}/api/copilot`, {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
+        headers: aiRequestHeaders(),
         body: JSON.stringify({ question: q, mode, ...(isFollowUp ? { isFollowUp: true } : {}), ...(reassessmentRequest ? { reassessmentRequest: true } : {}) }),
         signal: controller.signal,
       });
@@ -786,7 +787,7 @@ export default function App({ onGoHome, navigate, isOnline = true, initialCaptur
     try {
       const res = await fetch(`${API_BASE}/api/sbar`, {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
+        headers: aiRequestHeaders(),
         body: JSON.stringify({ question, copilotResponse: rawText, ...(reassessment ? { reassessmentRequest: true, previousAssessment: serializePatientSnapshot(reassessment.previous) } : {}) }),
       });
       const data = await res.json();
@@ -811,7 +812,7 @@ export default function App({ onGoHome, navigate, isOnline = true, initialCaptur
     const request = (async () => {
       const res = await fetch(`${API_BASE}/api/copilot`, {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
+        headers: aiRequestHeaders(),
         body: JSON.stringify({
           question,
           mode,
@@ -824,7 +825,7 @@ export default function App({ onGoHome, navigate, isOnline = true, initialCaptur
       if (!res.ok || !data.lesson) {
         trackEvent("teach_me_error", { reason: "request_failed", status: res.status });
         const failure = new Error("Teach Me is unavailable.");
-        if (data.code === 'clinical_generation_restricted') {
+        if (['clinical_generation_restricted', 'free_daily_limit_reached', 'ai_daily_budget_reached'].includes(data.code)) {
           failure.code = data.code;
           failure.userMessage = apiErrorMessage(res.status, data);
         }

@@ -70,6 +70,7 @@ function validateAskAnswer(raw, { requireStructured = false, policy = null } = {
 
 function registerAskRoutes(app, dependencies) {
   const { apiLimiter, getClient, containsPHI, runWithStageTimeout, collectPriorityMapStream, appendOperationalLog, classifyProviderError } = dependencies;
+  const admitAI = dependencies.admitAI || (() => null);
   app.post('/api/ask', apiLimiter, async (req, res) => {
     const start = Date.now(), requestId = randomUUID();
     let finished = false, disconnected = false, providerStart = null;
@@ -140,6 +141,8 @@ function registerAskRoutes(app, dependencies) {
         log({ status: 'success', provider_status: 'not_called', display_resolution: 'snapshot_reference_guided', selected_fact_count: prepared.reported.length });
         return res.json({ ...bounded(), requestId });
       }
+      const snapshotDenial = admitAI(req, { counts: true });
+      if (snapshotDenial) return fail(snapshotDenial.status, snapshotDenial.code, snapshotDenial.message);
       try {
         const contract = selectionContract(prepared);
         // Anthropic's wire schema does not support maxItems. Keep the frozen
@@ -183,6 +186,9 @@ function registerAskRoutes(app, dependencies) {
         log({ status: 'error', provider_status: 'not_configured', display_resolution: 'abg_preserved', failure_reason: 'provider_not_configured' });
         return unavailable();
       }
+      // Explaining an existing ABG answer is not a new question.
+      const abgDenial = admitAI(req, { counts: false });
+      if (abgDenial) return fail(abgDenial.status, abgDenial.code, abgDenial.message);
       try {
         const contract = explanationRequest(abg);
         providerStart = Date.now();
@@ -222,6 +228,8 @@ function registerAskRoutes(app, dependencies) {
       log({ status: 'error', provider_status: 'not_configured', failure_reason: 'provider_not_configured' });
       return fail(503, 'provider_not_configured', 'The clinical education service is unavailable.');
     }
+    const generalDenial = admitAI(req, { counts: true });
+    if (generalDenial) return fail(generalDenial.status, generalDenial.code, generalDenial.message);
     try {
       const reasoningContract = evidencePack ? ASK_REASONING_CONTRACT
         .replace(/EVIDENCE BOUNDARY:[\s\S]*?(?=\nSAFETY:)/, GROUNDING_INSTRUCTIONS)

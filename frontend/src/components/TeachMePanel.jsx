@@ -52,7 +52,7 @@ export default function TeachMePanel({ onLoad, onClose }) {
       setLoading(false);
       if (nextLesson?.active) trackEvent("teach_me_quick_check_shown", { domain: nextLesson.domain, concept_id: nextLesson.conceptId, question_type: nextLesson.questionType });
       else trackEvent("teach_me_fallback_viewed", { domain: nextLesson?.domain || "unknown", concept_id: nextLesson?.conceptId || "unknown" });
-    }).catch((failure) => { if (active) { setError(failure?.code === 'clinical_generation_restricted' ? failure.userMessage : true); setLoading(false); } });
+    }).catch((failure) => { if (active) { setError(failure?.userMessage || true); setLoading(false); } });
     return () => {
       active = false;
       abandonTimerRef.current = setTimeout(() => {

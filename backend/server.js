@@ -6,6 +6,7 @@ const rateLimit = require("express-rate-limit");
 const Anthropic = require("@anthropic-ai/sdk");
 const { randomUUID } = require("node:crypto");
 const { registerAskRoutes } = require("./ask-clinical-edge");
+const { createAiCostGuard } = require("./ai-cost-guard");
 const { buildEvidence, parseReasoning } = require("./priority-map-intelligence");
 const { COMPACT_REASONING_PROMPT, REASONING_OUTPUT_FORMAT, validateReasoning, composePriorityMap, reasoningRepairDetails, teachingFromMap } = require("./priority-map-p1");
 const { reasoningDiagnostics, sanitizeValidationMetadata } = require("./priority-map-diagnostics");
@@ -57,8 +58,11 @@ const apiLimiter = rateLimit({
 app.use(express.json());
 
 const anthropicApiKey = process.env.ANTHROPIC_API_KEY;
+// Daily AI budget and free per-client limit (see ai-cost-guard.js). The metered
+// client adds every call's token usage to today's estimated spend.
+const aiCost = createAiCostGuard({ appendOperationalLog });
 const client = anthropicApiKey
-  ? new Anthropic({ apiKey: anthropicApiKey, timeout: 45000, maxRetries: 0 })
+  ? aiCost.meter(new Anthropic({ apiKey: anthropicApiKey, timeout: 45000, maxRetries: 0 }))
   : null;
 
 const COPILOT_TOTAL_BUDGET_MS = 40000;
@@ -2574,7 +2578,17 @@ function isOverloadError(err) {
   );
 }
 
-registerAskRoutes(app, { apiLimiter, getClient: () => client, containsPHI, runWithStageTimeout, collectPriorityMapStream, appendOperationalLog, classifyProviderError });
+registerAskRoutes(app, { apiLimiter, getClient: () => client, admitAI: (req, options) => {
+  const denial = aiCost.admit(req, "ASK", options);
+  // A counted Ask question that ends in an error (4xx/5xx after admission) is not charged
+  // to the device. Safety refusals (422) used Anthropic tokens, so they still count toward
+  // the per-IP backstop; server errors and Anthropic 429s are refunded on both counters.
+  if (!denial && options?.counts) req.res?.once("finish", () => {
+    const status = req.res.statusCode;
+    if (status >= 400) aiCost.release(req, { keepIp: status === 422 });
+  });
+  return denial;
+}, containsPHI, runWithStageTimeout, collectPriorityMapStream, appendOperationalLog, classifyProviderError });
 
 // ── Streaming endpoint ────────────────────────────────────────────────────────
 app.post("/api/copilot", apiLimiter, require('./safety-containment').containmentGate('COPILOT', appendOperationalLog), async (req, res) => {
@@ -2638,6 +2652,10 @@ app.post("/api/copilot", apiLimiter, require('./safety-containment').containment
       message: "The AI service is not configured for this local environment. Add the required backend API key and restart the server.",
     });
   }
+
+  // Only a new Priority Map counts toward the free limit; Teach Me and follow-ups do not.
+  const aiDenial = aiCost.admit(req, learningRequest === true ? "TEACH_ME" : "COPILOT", { counts: learningRequest !== true && isFollowUp !== true });
+  if (aiDenial) return res.status(aiDenial.status).json({ error: true, code: aiDenial.code, message: aiDenial.message });
 
   if (learningRequest === true) {
     if (typeof priorityMapResponse !== "string" || priorityMapResponse.length > 12000) {
@@ -2796,6 +2814,9 @@ app.post("/api/copilot", apiLimiter, require('./safety-containment').containment
   const compactInitial = structuredSnapshot && !isFollowUp;
   const evidence = compactInitial ? buildEvidence(question.trim(), assessDeterministicUrgency(question.trim()).urgency) : null;
 
+  // True once Anthropic has returned a Priority Map for this request (tokens were used).
+  let providerAnswered = false;
+
   // Runs one full Anthropic stream, appending chunks to fullResponse and
   // writing each chunk to the SSE stream as it arrives.
   const callStream = async (signal) => {
@@ -2872,6 +2893,7 @@ app.post("/api/copilot", apiLimiter, require('./safety-containment').containment
       });
       fullResponse = compactInitial && resolved.status !== "fallback" ? composePriorityMap(evidence, parseReasoning(resolved.output)) : resolved.output;
       fallbackUsed = resolved.status === "fallback";
+      providerAnswered = resolved.timing.provider_status === "success";
       priorityMapResolution = resolved.status;
       priorityMapOriginalStatus = resolved.issues.length ? "rejected" : "accepted";
       priorityMapRepairStatus = resolved.timing.repair_status;
@@ -2882,6 +2904,7 @@ app.post("/api/copilot", apiLimiter, require('./safety-containment').containment
       // ── First attempt ───────────────────────────────────────────────────
       try {
         await callStream();
+        providerAnswered = true;
       } catch (firstErr) {
         // Only retry on overload and only if no content has been sent yet
         // (partial content already on the wire cannot be safely retried).
@@ -2894,6 +2917,7 @@ app.post("/api/copilot", apiLimiter, require('./safety-containment').containment
         // ── Single retry ─────────────────────────────────────────────────
         try {
           await callStream();
+          providerAnswered = true;
         } catch (retryErr) {
           if (!isOverloadError(retryErr)) throw retryErr;
 
@@ -2992,6 +3016,12 @@ app.post("/api/copilot", apiLimiter, require('./safety-containment').containment
       ...(priorityMapResolution && { priority_map_display_resolution: priorityMapResolution }),
     });
 
+    // A new map that ended in the deterministic fallback is not charged to the device.
+    // If Anthropic answered and the output failed the safety check, the tokens were used,
+    // so it still counts toward the per-IP backstop. If Anthropic was never reached,
+    // errored or was overloaded (or the crash shortcut skipped it), both are refunded.
+    if (fallbackUsed) aiCost.release(req, { keepIp: providerAnswered });
+
     // Signal stream completion
     if (clientDisconnected) return;
     res.write(`data: ${JSON.stringify({
@@ -3004,6 +3034,7 @@ app.post("/api/copilot", apiLimiter, require('./safety-containment').containment
     res.end();
   } catch (error) {
     // Non-overload errors, or overload after partial content — existing behavior.
+    aiCost.release(req);
     console.error("[Clinical Edge] Anthropic API error:", error.status ?? "", error.message);
     const providerFailure = classifyProviderError(error);
     const { possible_failure: errFail, failure_reason: errReason } = detectPossibleFailure({
@@ -3150,6 +3181,9 @@ app.post("/api/sbar", apiLimiter, require('./safety-containment').containmentGat
     });
     return res.json({ sbar: fallback });
   }
+
+  const aiDenial = aiCost.admit(req, "SBAR", { counts: false });
+  if (aiDenial) return res.status(aiDenial.status).json({ error: true, code: aiDenial.code, message: aiDenial.message });
 
   try {
     const resolved = await runSbarWithBudget({

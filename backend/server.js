@@ -2578,7 +2578,13 @@ function isOverloadError(err) {
   );
 }
 
-registerAskRoutes(app, { apiLimiter, getClient: () => client, admitAI: (req, options) => aiCost.admit(req, "ASK", options), containsPHI, runWithStageTimeout, collectPriorityMapStream, appendOperationalLog, classifyProviderError });
+registerAskRoutes(app, { apiLimiter, getClient: () => client, admitAI: (req, options) => {
+  const denial = aiCost.admit(req, "ASK", options);
+  // A counted Ask question that ends in an error or safety refusal (any 4xx/5xx after
+  // admission) is not charged against the free limit.
+  if (!denial && options?.counts) req.res?.once("finish", () => { if (req.res.statusCode >= 400) aiCost.release(req); });
+  return denial;
+}, containsPHI, runWithStageTimeout, collectPriorityMapStream, appendOperationalLog, classifyProviderError });
 
 // ── Streaming endpoint ────────────────────────────────────────────────────────
 app.post("/api/copilot", apiLimiter, require('./safety-containment').containmentGate('COPILOT', appendOperationalLog), async (req, res) => {
@@ -3000,6 +3006,10 @@ app.post("/api/copilot", apiLimiter, require('./safety-containment').containment
       ...(priorityMapResolution && { priority_map_display_resolution: priorityMapResolution }),
     });
 
+    // A new map that ended in the deterministic fallback (provider failure or safety
+    // rejection) is not charged against the free limit.
+    if (fallbackUsed) aiCost.release(req);
+
     // Signal stream completion
     if (clientDisconnected) return;
     res.write(`data: ${JSON.stringify({
@@ -3012,6 +3022,7 @@ app.post("/api/copilot", apiLimiter, require('./safety-containment').containment
     res.end();
   } catch (error) {
     // Non-overload errors, or overload after partial content — existing behavior.
+    aiCost.release(req);
     console.error("[Clinical Edge] Anthropic API error:", error.status ?? "", error.message);
     const providerFailure = classifyProviderError(error);
     const { possible_failure: errFail, failure_reason: errReason } = detectPossibleFailure({

@@ -7,14 +7,20 @@ const { positive } = require('../validation/ask/fixtures');
 
 // The SDK's only transport is this mock; no external request is possible.
 let providerCalls = 0;
+let providerReply = null; // null: transport failure; otherwise SSE text of a completed reply
 process.env.ANTHROPIC_API_KEY = 'test-key';
-globalThis.fetch = async () => { providerCalls++; throw new Error('mock transport: provider unavailable'); };
+globalThis.fetch = async (_url, options) => {
+  providerCalls++;
+  if (!providerReply) throw new Error('mock transport: provider unavailable');
+  const text = typeof providerReply === 'function' ? providerReply(JSON.parse(options.body)) : providerReply;
+  return new Response(text, { headers: { 'content-type': 'text/event-stream' } });
+};
 const { app, buildOperationalLogEntry } = require('../server');
 
 const DEVICE_A = '3f1c2b4a-8d6e-4f7a-9b2c-1d3e5f7a9b0c';
 const DEVICE_B = '7a9b0c1d-2e3f-4a5b-8c6d-7e8f9a0b1c2d';
 const at = iso => () => new Date(iso);
-const req = ({ ip = '203.0.113.10', device } = {}) => ({ ip, body: {}, headers: device ? { 'x-ce-device-id': device } : {} });
+const req = ({ ip = '203.0.113.10', device } = {}) => ({ ip, body: {}, headers: device ? { 'x-ce-device': device } : {} });
 
 test('cost estimate uses token usage and configured rates', () => {
   const config = readConfig({});
@@ -44,7 +50,7 @@ test('the day rolls over at midnight Pacific, including across daylight saving',
 test('only a well-formed UUID v4 header is accepted as a device ID', () => {
   assert.equal(deviceIdFrom(req({ device: DEVICE_A.toUpperCase() })), DEVICE_A);
   for (const bad of ['', 'not-a-uuid', '3f1c2b4a-8d6e-1f7a-9b2c-1d3e5f7a9b0c', `${DEVICE_A}x`]) assert.equal(deviceIdFrom(req({ device: bad })), null);
-  assert.equal(deviceIdFrom({ headers: { 'x-ce-device-id': [DEVICE_A] } }), null);
+  assert.equal(deviceIdFrom({ headers: { 'x-ce-device': [DEVICE_A] } }), null);
   assert.equal(deviceIdFrom({}), null);
 });
 
@@ -199,8 +205,8 @@ async function withEnv(values, fn) {
 // Runs a registered route without its rate limiter: containment gate (if any), then the handler.
 async function callRoute(path, body, { device = DEVICE_A, ip = '192.0.2.44' } = {}) {
   const layers = app.router.stack.find(layer => layer.route?.path === path).route.stack.slice(1);
-  const request = { ip, body, socket: {}, headers: device ? { 'x-ce-device-id': device } : {} };
   const res = mockRes();
+  const request = { ip, body, socket: {}, headers: device ? { 'x-ce-device': device } : {}, res };
   for (const layer of layers) {
     let advanced = false;
     await layer.handle(request, res, () => { advanced = true; });
@@ -320,7 +326,7 @@ test('deterministic Ask answers do not use up free questions', async () => {
     collectPriorityMapStream: async stream => { let stopReason = null; for await (const event of stream) stopReason = event.delta?.stop_reason || stopReason; return { text: '{}', stopReason }; },
   });
   await withEnv({ ASK_SAFETY_CONTAINMENT: undefined }, async () => {
-    const ask = async question => { const res = mockRes(); await handler({ ip: '192.0.2.9', headers: { 'x-ce-device-id': DEVICE_B }, body: { question, contextMode: 'general' } }, res); return res; };
+    const ask = async question => { const res = mockRes(); await handler({ ip: '192.0.2.9', headers: { 'x-ce-device': DEVICE_B }, body: { question, contextMode: 'general' } }, res); return res; };
     for (let i = 0; i < 3; i++) assert.equal((await ask(ABG)).statusCode, 200);
     assert.equal(streams, 0);
     assert.notEqual((await ask(positive[1].question)).statusCode, 429);
@@ -338,4 +344,100 @@ test('denial log entries survive the operational log allow-list as metadata only
   assert.equal(entry.status, 'limited');
   assert.equal(entry.failure_reason, 'free_daily_limit_reached');
   assert.equal(entry.provider_status, 'not_called');
+});
+
+// ── Brief additions: IP backstop default, invalid header fallback, refunds ──
+
+test('per-IP backstop defaults to 50 counted requests a day across devices', () => {
+  const guard = createAiCostGuard({ env: {}, now: at('2026-10-12T18:00:00Z') });
+  const device = i => `00000000-0000-4000-8000-${String(i).padStart(12, '0')}`;
+  for (let i = 0; i < 50; i++) assert.equal(guard.admit(req({ device: device(i) }), 'ASK'), null);
+  const denial = guard.admit(req({ device: device(50) }), 'ASK');
+  assert.equal(denial.status, 429);
+  assert.equal(denial.limit, 50);
+  assert.equal(guard.admit(req({ ip: '198.51.100.7', device: device(51) }), 'ASK'), null);
+});
+
+test('a missing or invalid device header falls back to per-IP counting', () => {
+  const guard = createAiCostGuard({ env: { FREE_DAILY_QUESTIONS: '1', FREE_DAILY_QUESTIONS_PER_IP: '2' }, now: at('2026-10-12T18:00:00Z') });
+  assert.equal(guard.admit(req({ device: 'not-a-uuid' }), 'ASK'), null); // device limit (1) not applied
+  assert.equal(guard.admit(req({ device: '12345' }), 'ASK'), null);
+  assert.equal(guard.admit(req({ device: 'not-a-uuid' }), 'ASK').status, 429); // IP count 2 of 2
+  assert.equal(guard.snapshot().devices, 0);
+  assert.equal(guard.admit(req({ ip: '198.51.100.7' }), 'ASK'), null);
+});
+
+test('release gives back a counted question once, and ignores uncounted or stale requests', () => {
+  let now = new Date('2026-10-12T18:00:00Z');
+  const guard = createAiCostGuard({ env: { FREE_DAILY_QUESTIONS: '1' }, now: () => now });
+  const failed = req({ device: DEVICE_A });
+  assert.equal(guard.admit(failed, 'ASK'), null);
+  guard.release(failed);
+  guard.release(failed);
+  assert.deepEqual([guard.snapshot().devices, guard.snapshot().ips], [0, 0]);
+  const ok = req({ device: DEVICE_A });
+  assert.equal(guard.admit(ok, 'ASK'), null);
+  assert.equal(guard.admit(req({ device: DEVICE_A }), 'ASK').status, 429);
+  const uncounted = req({ device: DEVICE_A });
+  guard.admit(uncounted, 'SBAR', { counts: false });
+  guard.release(uncounted);
+  guard.release(req({ device: DEVICE_A }));
+  assert.equal(guard.admit(req({ device: DEVICE_A }), 'ASK').status, 429);
+  now = new Date('2026-10-13T18:00:00Z');
+  guard.release(ok); // counted yesterday: today's counts are untouched
+  assert.equal(guard.admit(req({ device: DEVICE_A }), 'ASK'), null);
+  assert.equal(guard.admit(req({ device: DEVICE_A }), 'ASK').status, 429);
+});
+
+const sse = text => [
+  { type: 'message_start', message: { id: 'mock', type: 'message', role: 'assistant', content: [], model: 'claude-sonnet-4-6', stop_reason: null, stop_sequence: null, usage: { input_tokens: 10, output_tokens: 1 } } },
+  { type: 'content_block_start', index: 0, content_block: { type: 'text', text: '' } },
+  { type: 'content_block_delta', index: 0, delta: { type: 'text_delta', text } },
+  { type: 'content_block_stop', index: 0 },
+  { type: 'message_delta', delta: { stop_reason: 'end_turn', stop_sequence: null }, usage: { output_tokens: 5 } },
+  { type: 'message_stop' },
+].map(e => `event: ${e.type}\ndata: ${JSON.stringify(e)}\n\n`).join('');
+
+for (const [name, path, body, reply, expectedStatus] of [
+  ['Ask server error (retry)', '/api/ask', { question: positive[1].question, contextMode: 'general' }, null, 502],
+  ['Ask safety refusal', '/api/ask', { question: positive[1].question, contextMode: 'general' }, sse('{"answer":"","details":[]}'), 422],
+  ['Priority Map server error (retry)', '/api/copilot', copilotBody, null, 200],
+]) {
+  test(`${name} does not use up a free question`, async () => {
+    providerReply = reply;
+    try {
+      await captureLogs(() => withEnv({ ASK_SAFETY_CONTAINMENT: undefined, FREE_DAILY_QUESTIONS: '1', FREE_DAILY_QUESTIONS_PER_IP: undefined, AI_DAILY_BUDGET_USD: undefined }, async () => {
+        const device = '5b6c7d8e-9f0a-4b1c-8d2e-3f4a5b6c7d8e';
+        for (let attempt = 0; attempt < 3; attempt++) {
+          const res = await callRoute(path, body, { device, ip: '192.0.2.77' });
+          assert.equal(res.statusCode, expectedStatus, `attempt ${attempt + 1}`);
+          assert.notEqual(errorOf(res)?.code, 'free_daily_limit_reached');
+        }
+      }));
+    } finally { providerReply = null; }
+  });
+}
+
+test('a successful new question still counts', async () => {
+  providerReply = payload => sse(JSON.stringify({ answer: positive[1].answer, details: [], source_ids: payload.output_config.format.schema.properties.source_ids.items.enum }));
+  try {
+    await captureLogs(() => withEnv({ ASK_SAFETY_CONTAINMENT: undefined, FREE_DAILY_QUESTIONS: '1', FREE_DAILY_QUESTIONS_PER_IP: undefined, AI_DAILY_BUDGET_USD: undefined }, async () => {
+      const device = '6c7d8e9f-0a1b-4c2d-9e3f-4a5b6c7d8e9f';
+      const body = { question: positive[1].question, contextMode: 'general' };
+      const first = await callRoute('/api/ask', body, { device, ip: '192.0.2.78' });
+      assert.ok(first.statusCode < 400, `first answer delivered (status ${first.statusCode})`);
+      const second = await callRoute('/api/ask', body, { device, ip: '192.0.2.78' });
+      assert.equal(second.statusCode, 429);
+    }));
+  } finally { providerReply = null; }
+});
+
+test('/health never counts and is never limited', async () => {
+  await withEnv({ FREE_DAILY_QUESTIONS: '0', FREE_DAILY_QUESTIONS_PER_IP: '0', AI_DAILY_BUDGET_USD: '0' }, async () => {
+    const layers = app.router.stack.find(layer => layer.route?.path === '/health').route.stack;
+    assert.equal(layers.length, 1);
+    const res = mockRes();
+    for (let i = 0; i < 3; i++) layers[0].handle({ ip: '192.0.2.44', headers: {} }, res, () => {});
+    assert.deepEqual(res.body, { status: 'ok' });
+  });
 });

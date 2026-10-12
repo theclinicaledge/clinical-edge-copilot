@@ -5,11 +5,12 @@ const { ipKeyGenerator } = require("express-rate-limit");
 // 1. A global daily budget (AI_DAILY_BUDGET_USD) estimated from the token usage
 //    Anthropic returns, priced with AI_INPUT_USD_PER_MTOK / AI_OUTPUT_USD_PER_MTOK.
 // 2. A free daily limit on new questions (new Ask questions and new Priority Maps):
-//    FREE_DAILY_QUESTIONS per anonymous device ID (the X-CE-Device-Id header, a random
+//    FREE_DAILY_QUESTIONS per anonymous device ID (the X-CE-Device header, a random
 //    UUID the app creates once), plus a per-IP backstop of FREE_DAILY_QUESTIONS_PER_IP
 //    keyed like express-rate-limit's apiLimiter. Requests without a valid device ID
 //    are limited by the IP backstop only. Follow-up work (Teach Me, SBAR, follow-ups,
-//    ABG explanations) is checked against the budget but never counted.
+//    ABG explanations) is checked against the budget but never counted, and a counted
+//    question that ends in a server error or a safety refusal is released (refunded).
 // Both reset at midnight Pacific. State is in memory only (it resets on deploy or
 // restart). Device IDs and IPs are never logged; counts are dropped at rollover.
 
@@ -24,7 +25,8 @@ const DEFAULTS = Object.freeze({
 const CACHE_WRITE_MULTIPLIER = 1.25;
 const CACHE_READ_MULTIPLIER = 0.1;
 const ADMITTED = Symbol("aiCostAdmitted");
-const DEVICE_HEADER = "x-ce-device-id";
+const COUNTED = Symbol("aiCostCounted");
+const DEVICE_HEADER = "x-ce-device";
 const UUID_V4 = /^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
 
 const pacificDay = new Intl.DateTimeFormat("en-CA", {
@@ -133,6 +135,7 @@ function createAiCostGuard({ env = process.env, now = () => new Date(), appendOp
       } else {
         if (device) devices.set(device, deviceUsed + 1);
         ips.set(ip, ipUsed + 1);
+        req[COUNTED] = { day, device, ip };
       }
     }
     if (!denial) req[ADMITTED] = true;
@@ -143,6 +146,22 @@ function createAiCostGuard({ env = process.env, now = () => new Date(), appendOp
       });
     }
     return denial;
+  }
+
+  // Gives back a counted question that did not deliver an answer: a server or provider
+  // error, or a safety refusal. Safe to call more than once or for uncounted requests.
+  function release(req) {
+    const counted = req?.[COUNTED];
+    if (!counted) return;
+    req[COUNTED] = null;
+    rollover();
+    if (counted.day !== day) return;
+    const decrement = (map, key) => {
+      const used = map.get(key) || 0;
+      if (used <= 1) map.delete(key); else map.set(key, used - 1);
+    };
+    if (counted.device) decrement(devices, counted.device);
+    decrement(ips, counted.ip);
   }
 
   // Wraps an Anthropic client so every messages.create / messages.stream call adds
@@ -185,7 +204,7 @@ function createAiCostGuard({ env = process.env, now = () => new Date(), appendOp
     return { day, spentUsd, devices: devices.size, ips: ips.size };
   }
 
-  return { admit, meter, recordUsage, snapshot };
+  return { admit, release, meter, recordUsage, snapshot };
 }
 
 module.exports = { createAiCostGuard, estimateCostUsd, dayKey, readConfig, deviceIdFrom, DEFAULTS, DEVICE_HEADER };

@@ -141,7 +141,7 @@ function registerAskRoutes(app, dependencies) {
         log({ status: 'success', provider_status: 'not_called', display_resolution: 'snapshot_reference_guided', selected_fact_count: prepared.reported.length });
         return res.json({ ...bounded(), requestId });
       }
-      const snapshotDenial = admitAI(req);
+      const snapshotDenial = admitAI(req, { counts: true });
       if (snapshotDenial) return fail(snapshotDenial.status, snapshotDenial.code, snapshotDenial.message);
       try {
         const contract = selectionContract(prepared);
@@ -186,7 +186,8 @@ function registerAskRoutes(app, dependencies) {
         log({ status: 'error', provider_status: 'not_configured', display_resolution: 'abg_preserved', failure_reason: 'provider_not_configured' });
         return unavailable();
       }
-      const abgDenial = admitAI(req);
+      // Explaining an existing ABG answer is not a new question.
+      const abgDenial = admitAI(req, { counts: false });
       if (abgDenial) return fail(abgDenial.status, abgDenial.code, abgDenial.message);
       try {
         const contract = explanationRequest(abg);
@@ -227,7 +228,7 @@ function registerAskRoutes(app, dependencies) {
       log({ status: 'error', provider_status: 'not_configured', failure_reason: 'provider_not_configured' });
       return fail(503, 'provider_not_configured', 'The clinical education service is unavailable.');
     }
-    const generalDenial = admitAI(req);
+    const generalDenial = admitAI(req, { counts: true });
     if (generalDenial) return fail(generalDenial.status, generalDenial.code, generalDenial.message);
     try {
       const reasoningContract = evidencePack ? ASK_REASONING_CONTRACT

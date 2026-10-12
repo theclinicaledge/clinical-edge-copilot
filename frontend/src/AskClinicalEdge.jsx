@@ -5,6 +5,7 @@ import { selectSnapshotContext, reportedFacts } from '../../backend/ask-snapshot
 import { trackEvent } from './analytics';
 import { SOURCES } from './data/clinicalSources.js';
 import './styles/ask-clinical-edge.css';
+import { aiRequestHeaders } from './deviceId.js';
 
 const API_BASE = import.meta.env.VITE_API_BASE_URL || (import.meta.env.PROD ? 'https://clinical-edge-copilot.onrender.com' : 'http://localhost:3001');
 const ERRORS = {
@@ -73,7 +74,7 @@ export default function AskClinicalEdge({ navigate, isVisible, snapshot = null }
     setBusy(true); setError(''); setExplanationNotice('');
     trackEvent('ask_submitted', { mode: 'general' });
     try {
-      const response = await fetch(`${API_BASE}/api/ask`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ question: explain ? submitted : question.trim(), contextMode: context ? 'snapshot' : 'general', ...(context ? { snapshotContext: context } : {}), ...(explain ? { abgExplanation: true } : {}) }), signal: controller.signal });
+      const response = await fetch(`${API_BASE}/api/ask`, { method: 'POST', headers: aiRequestHeaders(), body: JSON.stringify({ question: explain ? submitted : question.trim(), contextMode: context ? 'snapshot' : 'general', ...(context ? { snapshotContext: context } : {}), ...(explain ? { abgExplanation: true } : {}) }), signal: controller.signal });
       const data = await response.json().catch(() => ({}));
       if (submittedSnapshot && currentSnapshot.current !== submittedSnapshot) return;
       if (explain) {

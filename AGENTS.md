@@ -114,9 +114,13 @@ limiter, the identifier check, metadata-only logging, the containment gate and t
 guard (`backend/ai-cost-guard.js`: call `admit` right before a request's first Anthropic call).
 
 AI cost guard variables: `AI_DAILY_BUDGET_USD` (default 5), `FREE_DAILY_QUESTIONS` (default 3
-per client per day), `AI_INPUT_USD_PER_MTOK` and `AI_OUTPUT_USD_PER_MTOK` (defaults 3 and 15,
-the `claude-sonnet-4-6` list prices; update them if the model changes). Both limits reset at
-midnight Pacific and live in memory, so a restart or deploy resets them.
+per device per day), `FREE_DAILY_QUESTIONS_PER_IP` (default 50, backstop and the only limit for
+requests without a device ID), `AI_INPUT_USD_PER_MTOK` and `AI_OUTPUT_USD_PER_MTOK` (defaults 3
+and 15, the `claude-sonnet-4-6` list prices; update them if the model changes). Only new Ask
+questions and new Priority Maps count toward the free limits; Teach Me, SBAR, follow-ups and ABG
+explanations only need budget. The device ID is a random UUID from `frontend/src/deviceId.js`,
+sent as `X-CE-Device-Id` to AI routes only; never log it or send it to analytics. Limits reset
+at midnight Pacific and live in memory, so a restart or deploy resets them.
 
 Backend environment variables: `ANTHROPIC_API_KEY` (backend `.env` only, never in the frontend
 or in code), `PORT`, `ASK_SAFETY_CONTAINMENT`, `TRUST_PROXY_HOPS` (default 1, for Render's

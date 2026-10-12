@@ -122,7 +122,7 @@ export default function Privacy({ onNavigate }) {
             margin: "0 0 36px",
             letterSpacing: "0.01em",
           }}>
-            Effective date: October 11, 2026
+            Effective date: October 12, 2026
           </p>
 
           <PrivacyChoices />
@@ -139,7 +139,7 @@ export default function Privacy({ onNavigate }) {
             },
             {
               title: "Information you provide in prompts",
-              body: "Before anything is sent, the app asks for your explicit permission. When you submit a query or Snapshot, the information you enter is sent to our backend server and forwarded to Anthropic's Claude API, a third-party AI service, to generate a response. Anthropic automatically deletes API inputs and outputs within 30 days, except where content is flagged under its usage policy or longer retention is required by law. Anthropic's commercial terms apply. We do not store prompt text, normalized prompt text, or response excerpts in backend operational logs. Operational logs contain non-content metadata such as request category, length, completion status, timing, and error type. Automated identifier checks are limited and do not make the service HIPAA compliant or safe for PHI.",
+              body: "Before anything is sent, the app asks for your explicit permission. When you submit a query or Snapshot, the information you enter is sent to our backend server and forwarded to Anthropic's Claude API, a third-party AI service, to generate a response. Anthropic automatically deletes API inputs and outputs within 30 days, except where content is flagged under its usage policy or longer retention is required by law. Anthropic's commercial terms apply. We do not store prompt text, normalized prompt text, or response excerpts in backend operational logs. Operational logs contain non-content metadata such as request category, length, completion status, timing, and error type. Automated identifier checks are limited and do not make the service HIPAA compliant or safe for PHI. These requests also carry a random device identifier, created on your device, which is used only to apply daily usage limits; it is not linked to your identity, and our server does not keep it beyond the day.",
             },
             {
               title: "Local storage",

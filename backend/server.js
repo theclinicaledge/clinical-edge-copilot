@@ -2578,7 +2578,7 @@ function isOverloadError(err) {
   );
 }
 
-registerAskRoutes(app, { apiLimiter, getClient: () => client, admitAI: (req) => aiCost.admit(req, "ASK"), containsPHI, runWithStageTimeout, collectPriorityMapStream, appendOperationalLog, classifyProviderError });
+registerAskRoutes(app, { apiLimiter, getClient: () => client, admitAI: (req, options) => aiCost.admit(req, "ASK", options), containsPHI, runWithStageTimeout, collectPriorityMapStream, appendOperationalLog, classifyProviderError });
 
 // ── Streaming endpoint ────────────────────────────────────────────────────────
 app.post("/api/copilot", apiLimiter, require('./safety-containment').containmentGate('COPILOT', appendOperationalLog), async (req, res) => {
@@ -2643,7 +2643,8 @@ app.post("/api/copilot", apiLimiter, require('./safety-containment').containment
     });
   }
 
-  const aiDenial = aiCost.admit(req, learningRequest === true ? "TEACH_ME" : "COPILOT");
+  // Only a new Priority Map counts toward the free limit; Teach Me and follow-ups do not.
+  const aiDenial = aiCost.admit(req, learningRequest === true ? "TEACH_ME" : "COPILOT", { counts: learningRequest !== true && isFollowUp !== true });
   if (aiDenial) return res.status(aiDenial.status).json({ error: true, code: aiDenial.code, message: aiDenial.message });
 
   if (learningRequest === true) {
@@ -3158,7 +3159,7 @@ app.post("/api/sbar", apiLimiter, require('./safety-containment').containmentGat
     return res.json({ sbar: fallback });
   }
 
-  const aiDenial = aiCost.admit(req, "SBAR");
+  const aiDenial = aiCost.admit(req, "SBAR", { counts: false });
   if (aiDenial) return res.status(aiDenial.status).json({ error: true, code: aiDenial.code, message: aiDenial.message });
 
   try {

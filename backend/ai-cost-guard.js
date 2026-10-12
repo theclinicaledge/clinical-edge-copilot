@@ -4,14 +4,19 @@ const { ipKeyGenerator } = require("express-rate-limit");
 //
 // 1. A global daily budget (AI_DAILY_BUDGET_USD) estimated from the token usage
 //    Anthropic returns, priced with AI_INPUT_USD_PER_MTOK / AI_OUTPUT_USD_PER_MTOK.
-// 2. A free per-client daily limit (FREE_DAILY_QUESTIONS), keyed by client IP the
-//    same way express-rate-limit keys apiLimiter.
+// 2. A free daily limit on new questions (new Ask questions and new Priority Maps):
+//    FREE_DAILY_QUESTIONS per anonymous device ID (the X-CE-Device-Id header, a random
+//    UUID the app creates once), plus a per-IP backstop of FREE_DAILY_QUESTIONS_PER_IP
+//    keyed like express-rate-limit's apiLimiter. Requests without a valid device ID
+//    are limited by the IP backstop only. Follow-up work (Teach Me, SBAR, follow-ups,
+//    ABG explanations) is checked against the budget but never counted.
 // Both reset at midnight Pacific. State is in memory only (it resets on deploy or
-// restart) and holds counts and dollar totals, never request content or IPs in logs.
+// restart). Device IDs and IPs are never logged; counts are dropped at rollover.
 
 const DEFAULTS = Object.freeze({
   AI_DAILY_BUDGET_USD: 5,
   FREE_DAILY_QUESTIONS: 3,
+  FREE_DAILY_QUESTIONS_PER_IP: 50,
   // claude-sonnet-4-6 list prices, USD per million tokens.
   AI_INPUT_USD_PER_MTOK: 3,
   AI_OUTPUT_USD_PER_MTOK: 15,
@@ -19,6 +24,8 @@ const DEFAULTS = Object.freeze({
 const CACHE_WRITE_MULTIPLIER = 1.25;
 const CACHE_READ_MULTIPLIER = 0.1;
 const ADMITTED = Symbol("aiCostAdmitted");
+const DEVICE_HEADER = "x-ce-device-id";
+const UUID_V4 = /^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
 
 const pacificDay = new Intl.DateTimeFormat("en-CA", {
   timeZone: "America/Los_Angeles", year: "numeric", month: "2-digit", day: "2-digit",
@@ -40,6 +47,7 @@ function readConfig(env) {
   return {
     budgetUsd: readNumber(env, "AI_DAILY_BUDGET_USD"),
     freeQuestions: readNumber(env, "FREE_DAILY_QUESTIONS", { integer: true }),
+    freeQuestionsPerIp: readNumber(env, "FREE_DAILY_QUESTIONS_PER_IP", { integer: true }),
     inputUsdPerMTok: readNumber(env, "AI_INPUT_USD_PER_MTOK"),
     outputUsdPerMTok: readNumber(env, "AI_OUTPUT_USD_PER_MTOK"),
   };
@@ -66,21 +74,32 @@ function freeLimitMessage(limit) {
   return `You've used today's ${questions}. They reset at midnight Pacific. ${STILL_AVAILABLE}`;
 }
 
+function networkLimitMessage() {
+  return `Today's free AI questions for this network are used up. They reset at midnight Pacific. ${STILL_AVAILABLE}`;
+}
+
+function deviceIdFrom(req) {
+  const raw = req.headers?.[DEVICE_HEADER];
+  return typeof raw === "string" && UUID_V4.test(raw) ? raw.toLowerCase() : null;
+}
+
 function createAiCostGuard({ env = process.env, now = () => new Date(), appendOperationalLog = () => {} } = {}) {
   let day = null;
   let spentUsd = 0;
-  let clients = new Map();
+  let devices = new Map();
+  let ips = new Map();
 
   const rollover = () => {
     const today = dayKey(now());
     if (today !== day) {
       day = today;
       spentUsd = 0;
-      clients = new Map();
+      devices = new Map();
+      ips = new Map();
     }
   };
 
-  const clientKey = (req) => {
+  const ipKey = (req) => {
     const ip = req.ip || req.socket?.remoteAddress || "unknown";
     try { return ipKeyGenerator(ip); } catch { return ip; }
   };
@@ -91,25 +110,32 @@ function createAiCostGuard({ env = process.env, now = () => new Date(), appendOp
   }
 
   // Call immediately before the first Anthropic call of a request. Returns null
-  // when the call may proceed (and counts the request once against the client's
-  // free limit), or a denial { status, code, message } to send instead.
-  function admit(req, route) {
+  // when the call may proceed, or a denial { status, code, message } to send instead.
+  // `counts: true` marks a new question (new Ask question or new Priority Map): it is
+  // checked against and counted once toward the device and IP free limits. Other AI
+  // work only has to fit within the daily budget.
+  function admit(req, route, { counts = true } = {}) {
     rollover();
     if (req[ADMITTED]) return null;
     const config = readConfig(env);
     let denial = null;
     if (spentUsd >= config.budgetUsd) {
       denial = { status: 503, code: "ai_daily_budget_reached", message: budgetMessage(route) };
-    } else {
-      const key = clientKey(req);
-      const used = clients.get(key) || 0;
-      if (used >= config.freeQuestions) {
+    } else if (counts) {
+      const device = deviceIdFrom(req);
+      const ip = ipKey(req);
+      const deviceUsed = device ? devices.get(device) || 0 : 0;
+      const ipUsed = ips.get(ip) || 0;
+      if (device && deviceUsed >= config.freeQuestions) {
         denial = { status: 429, code: "free_daily_limit_reached", message: freeLimitMessage(config.freeQuestions), limit: config.freeQuestions };
+      } else if (ipUsed >= config.freeQuestionsPerIp) {
+        denial = { status: 429, code: "free_daily_limit_reached", message: networkLimitMessage(), limit: config.freeQuestionsPerIp };
       } else {
-        clients.set(key, used + 1);
-        req[ADMITTED] = true;
+        if (device) devices.set(device, deviceUsed + 1);
+        ips.set(ip, ipUsed + 1);
       }
     }
+    if (!denial) req[ADMITTED] = true;
     if (denial) {
       appendOperationalLog({
         timestamp: new Date().toISOString(), route, status: "limited", provider_status: "not_called",
@@ -156,10 +182,10 @@ function createAiCostGuard({ env = process.env, now = () => new Date(), appendOp
 
   function snapshot() {
     rollover();
-    return { day, spentUsd, clients: clients.size };
+    return { day, spentUsd, devices: devices.size, ips: ips.size };
   }
 
   return { admit, meter, recordUsage, snapshot };
 }
 
-module.exports = { createAiCostGuard, estimateCostUsd, dayKey, readConfig, DEFAULTS };
+module.exports = { createAiCostGuard, estimateCostUsd, dayKey, readConfig, deviceIdFrom, DEFAULTS, DEVICE_HEADER };

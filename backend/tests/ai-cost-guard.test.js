@@ -1,22 +1,24 @@
 const test = require('node:test');
 const assert = require('node:assert/strict');
 const { EventEmitter } = require('node:events');
-const { createAiCostGuard, estimateCostUsd, dayKey, readConfig, DEFAULTS } = require('../ai-cost-guard');
+const { createAiCostGuard, estimateCostUsd, dayKey, readConfig, deviceIdFrom, DEFAULTS } = require('../ai-cost-guard');
 const { registerAskRoutes } = require('../ask-clinical-edge');
 const { positive } = require('../validation/ask/fixtures');
 
 // The SDK's only transport is this mock; no external request is possible.
 let providerCalls = 0;
 process.env.ANTHROPIC_API_KEY = 'test-key';
-globalThis.fetch = async () => { providerCalls++; throw new Error('provider must not be called in this test'); };
+globalThis.fetch = async () => { providerCalls++; throw new Error('mock transport: provider unavailable'); };
 const { app, buildOperationalLogEntry } = require('../server');
 
+const DEVICE_A = '3f1c2b4a-8d6e-4f7a-9b2c-1d3e5f7a9b0c';
+const DEVICE_B = '7a9b0c1d-2e3f-4a5b-8c6d-7e8f9a0b1c2d';
 const at = iso => () => new Date(iso);
-const req = (ip = '203.0.113.10') => ({ ip, body: {} });
+const req = ({ ip = '203.0.113.10', device } = {}) => ({ ip, body: {}, headers: device ? { 'x-ce-device-id': device } : {} });
 
 test('cost estimate uses token usage and configured rates', () => {
   const config = readConfig({});
-  assert.deepEqual(config, { budgetUsd: 5, freeQuestions: 3, inputUsdPerMTok: 3, outputUsdPerMTok: 15 });
+  assert.deepEqual(config, { budgetUsd: 5, freeQuestions: 3, freeQuestionsPerIp: 50, inputUsdPerMTok: 3, outputUsdPerMTok: 15 });
   assert.equal(estimateCostUsd({ input_tokens: 1_000_000, output_tokens: 0 }, config), 3);
   assert.equal(estimateCostUsd({ input_tokens: 0, output_tokens: 1_000_000 }, config), 15);
   assert.equal(estimateCostUsd({ input_tokens: 2000, output_tokens: 1000 }, { ...config, inputUsdPerMTok: 1, outputUsdPerMTok: 10 }), 0.012);
@@ -25,10 +27,11 @@ test('cost estimate uses token usage and configured rates', () => {
 });
 
 test('invalid or negative env values fall back to defaults; zero is honoured', () => {
-  const config = readConfig({ AI_DAILY_BUDGET_USD: '-1', FREE_DAILY_QUESTIONS: '2.5', AI_INPUT_USD_PER_MTOK: 'abc', AI_OUTPUT_USD_PER_MTOK: '' });
-  assert.deepEqual(config, { budgetUsd: DEFAULTS.AI_DAILY_BUDGET_USD, freeQuestions: DEFAULTS.FREE_DAILY_QUESTIONS, inputUsdPerMTok: DEFAULTS.AI_INPUT_USD_PER_MTOK, outputUsdPerMTok: DEFAULTS.AI_OUTPUT_USD_PER_MTOK });
-  assert.equal(readConfig({ AI_DAILY_BUDGET_USD: '0', FREE_DAILY_QUESTIONS: '0' }).budgetUsd, 0);
+  const config = readConfig({ AI_DAILY_BUDGET_USD: '-1', FREE_DAILY_QUESTIONS: '2.5', FREE_DAILY_QUESTIONS_PER_IP: 'x', AI_INPUT_USD_PER_MTOK: 'abc', AI_OUTPUT_USD_PER_MTOK: '' });
+  assert.deepEqual(config, { budgetUsd: DEFAULTS.AI_DAILY_BUDGET_USD, freeQuestions: DEFAULTS.FREE_DAILY_QUESTIONS, freeQuestionsPerIp: DEFAULTS.FREE_DAILY_QUESTIONS_PER_IP, inputUsdPerMTok: DEFAULTS.AI_INPUT_USD_PER_MTOK, outputUsdPerMTok: DEFAULTS.AI_OUTPUT_USD_PER_MTOK });
+  assert.equal(readConfig({ AI_DAILY_BUDGET_USD: '0' }).budgetUsd, 0);
   assert.equal(readConfig({ FREE_DAILY_QUESTIONS: '0' }).freeQuestions, 0);
+  assert.equal(readConfig({ FREE_DAILY_QUESTIONS_PER_IP: '0' }).freeQuestionsPerIp, 0);
 });
 
 test('the day rolls over at midnight Pacific, including across daylight saving', () => {
@@ -38,57 +41,90 @@ test('the day rolls over at midnight Pacific, including across daylight saving',
   assert.equal(dayKey(new Date('2026-12-01T08:00:00Z')), '2026-12-01'); // 00:00 PST
 });
 
-test('free daily limit: three AI questions per client, then a 429; other clients unaffected', () => {
+test('only a well-formed UUID v4 header is accepted as a device ID', () => {
+  assert.equal(deviceIdFrom(req({ device: DEVICE_A.toUpperCase() })), DEVICE_A);
+  for (const bad of ['', 'not-a-uuid', '3f1c2b4a-8d6e-1f7a-9b2c-1d3e5f7a9b0c', `${DEVICE_A}x`]) assert.equal(deviceIdFrom(req({ device: bad })), null);
+  assert.equal(deviceIdFrom({ headers: { 'x-ce-device-id': [DEVICE_A] } }), null);
+  assert.equal(deviceIdFrom({}), null);
+});
+
+test('free limit: three new questions per device, then a 429; other devices on the same IP unaffected', () => {
   const logs = [];
   const guard = createAiCostGuard({ env: {}, now: at('2026-10-12T18:00:00Z'), appendOperationalLog: entry => logs.push(entry) });
-  for (let i = 0; i < 3; i++) assert.equal(guard.admit(req(), 'ASK'), null);
-  const denial = guard.admit(req(), 'ASK');
+  for (let i = 0; i < 3; i++) assert.equal(guard.admit(req({ device: DEVICE_A }), 'ASK'), null);
+  const denial = guard.admit(req({ device: DEVICE_A }), 'ASK');
   assert.equal(denial.status, 429);
   assert.equal(denial.code, 'free_daily_limit_reached');
   assert.equal(denial.limit, 3);
   assert.match(denial.message, /You've used today's 3 free AI questions\. They reset at midnight Pacific\./);
   assert.doesNotMatch(denial.message, /—/);
-  assert.equal(guard.admit(req('198.51.100.7'), 'ASK'), null);
-  assert.deepEqual(logs, [{ timestamp: logs[0].timestamp, route: 'ASK', status: 'limited', provider_status: 'not_called', display_resolution: 'limited', failure_reason: 'free_daily_limit_reached' }]);
-  assert.ok(!JSON.stringify(logs).includes('203.0.113.10'));
+  assert.equal(guard.admit(req({ device: DEVICE_B }), 'ASK'), null);
+  assert.equal(guard.admit(req({ device: DEVICE_A, ip: '198.51.100.7' }), 'ASK').status, 429);
+  assert.deepEqual(logs, [{ timestamp: logs[0].timestamp, route: 'ASK', status: 'limited', provider_status: 'not_called', display_resolution: 'limited', failure_reason: 'free_daily_limit_reached' },
+    { timestamp: logs[1].timestamp, route: 'ASK', status: 'limited', provider_status: 'not_called', display_resolution: 'limited', failure_reason: 'free_daily_limit_reached' }]);
+  for (const secret of [DEVICE_A, DEVICE_B, '203.0.113.10', '198.51.100.7']) assert.ok(!JSON.stringify(logs).includes(secret));
 });
 
-test('a request is counted once even when it makes several provider calls (repairs)', () => {
-  const guard = createAiCostGuard({ env: { FREE_DAILY_QUESTIONS: '1' }, now: at('2026-10-12T18:00:00Z') });
-  const request = req();
-  assert.equal(guard.admit(request, 'COPILOT'), null);
-  assert.equal(guard.admit(request, 'COPILOT'), null);
-  assert.equal(guard.admit(req(), 'COPILOT').status, 429);
+test('per-IP backstop applies across devices, and requests without a device ID use only the IP limit', () => {
+  const guard = createAiCostGuard({ env: { FREE_DAILY_QUESTIONS_PER_IP: '4' }, now: at('2026-10-12T18:00:00Z') });
+  for (let i = 0; i < 3; i++) assert.equal(guard.admit(req({ device: DEVICE_A }), 'ASK'), null);
+  assert.equal(guard.admit(req(), 'ASK'), null); // no device ID: IP count 4 of 4
+  const network = guard.admit(req({ device: DEVICE_B }), 'ASK');
+  assert.equal(network.status, 429);
+  assert.equal(network.limit, 4);
+  assert.match(network.message, /^Today's free AI questions for this network are used up\./);
+  assert.equal(guard.admit(req({ ip: '198.51.100.7' }), 'ASK'), null);
+  assert.equal(guard.admit(req({ ip: '198.51.100.7', device: 'invalid' }), 'ASK'), null); // invalid header = no device ID
 });
 
-test('IPv6 clients are keyed by subnet like the rate limiter', () => {
+test('IPv6 clients without a device ID are keyed by subnet like the rate limiter', () => {
+  const guard = createAiCostGuard({ env: { FREE_DAILY_QUESTIONS_PER_IP: '1' }, now: at('2026-10-12T18:00:00Z') });
+  assert.equal(guard.admit(req({ ip: '2001:db8:1:1::1' }), 'ASK'), null);
+  assert.equal(guard.admit(req({ ip: '2001:db8:1:1::2' }), 'ASK').status, 429);
+});
+
+test('a new question is counted once even when it makes several provider calls (repairs)', () => {
   const guard = createAiCostGuard({ env: { FREE_DAILY_QUESTIONS: '1' }, now: at('2026-10-12T18:00:00Z') });
-  assert.equal(guard.admit(req('2001:db8:1:1::1'), 'ASK'), null);
-  assert.equal(guard.admit(req('2001:db8:1:1::2'), 'ASK').status, 429);
+  const request = req({ device: DEVICE_A });
+  assert.equal(guard.admit(request, 'COPILOT'), null);
+  assert.equal(guard.admit(request, 'COPILOT'), null);
+  assert.equal(guard.admit(req({ device: DEVICE_A }), 'COPILOT').status, 429);
+});
+
+test('non-counting AI work is never limited or counted by the free limit, only by the budget', () => {
+  const guard = createAiCostGuard({ env: { FREE_DAILY_QUESTIONS: '1', FREE_DAILY_QUESTIONS_PER_IP: '1', AI_DAILY_BUDGET_USD: '1' }, now: at('2026-10-12T18:00:00Z') });
+  for (let i = 0; i < 5; i++) assert.equal(guard.admit(req({ device: DEVICE_A }), 'SBAR', { counts: false }), null);
+  assert.deepEqual([guard.snapshot().devices, guard.snapshot().ips], [0, 0]);
+  assert.equal(guard.admit(req({ device: DEVICE_A }), 'COPILOT'), null);
+  assert.equal(guard.admit(req({ device: DEVICE_A }), 'COPILOT').status, 429);
+  assert.equal(guard.admit(req({ device: DEVICE_A }), 'TEACH_ME', { counts: false }), null);
+  guard.recordUsage({ output_tokens: 100_000 }); // $1.50
+  assert.equal(guard.admit(req({ device: DEVICE_A }), 'TEACH_ME', { counts: false }).status, 503);
 });
 
 test('daily budget: once estimated spend reaches the budget every client gets a friendly 503', () => {
   const logs = [];
   const guard = createAiCostGuard({ env: { AI_DAILY_BUDGET_USD: '0.01' }, now: at('2026-10-12T18:00:00Z'), appendOperationalLog: entry => logs.push(entry) });
-  assert.equal(guard.admit(req(), 'ASK'), null);
+  assert.equal(guard.admit(req({ device: DEVICE_A }), 'ASK'), null);
   guard.recordUsage({ input_tokens: 1000, output_tokens: 600 }); // $0.003 + $0.009 = $0.012
-  const ask = guard.admit(req('198.51.100.7'), 'ASK');
+  const ask = guard.admit(req({ device: DEVICE_B }), 'ASK');
   assert.equal(ask.status, 503);
   assert.equal(ask.code, 'ai_daily_budget_reached');
   assert.match(ask.message, /^Ask is resting until tomorrow\./);
-  assert.match(guard.admit(req('198.51.100.8'), 'COPILOT').message, /^Shift Brain is resting until tomorrow\./);
+  assert.match(guard.admit(req({ device: DEVICE_B }), 'COPILOT').message, /^Shift Brain is resting until tomorrow\./);
   assert.ok(logs.every(entry => entry.failure_reason === 'ai_daily_budget_reached' && entry.provider_status === 'not_called'));
 });
 
-test('budget and free counts reset at midnight Pacific', () => {
+test('budget and free counts reset at midnight Pacific and no IDs outlive the day', () => {
   let now = new Date('2026-10-13T06:30:00Z'); // 23:30 PDT on Oct 12
   const guard = createAiCostGuard({ env: { AI_DAILY_BUDGET_USD: '1', FREE_DAILY_QUESTIONS: '1' }, now: () => now });
-  assert.equal(guard.admit(req(), 'ASK'), null);
+  assert.equal(guard.admit(req({ device: DEVICE_A }), 'ASK'), null);
+  assert.equal(guard.admit(req({ device: DEVICE_A }), 'ASK').status, 429);
   guard.recordUsage({ output_tokens: 100_000 }); // $1.50
-  assert.equal(guard.admit(req('198.51.100.7'), 'ASK').status, 503);
+  assert.equal(guard.admit(req({ device: DEVICE_B }), 'ASK').status, 503);
   now = new Date('2026-10-13T07:00:01Z'); // 00:00 PDT on Oct 13
-  assert.deepEqual(guard.snapshot(), { day: '2026-10-13', spentUsd: 0, clients: 0 });
-  assert.equal(guard.admit(req(), 'ASK'), null);
+  assert.deepEqual(guard.snapshot(), { day: '2026-10-13', spentUsd: 0, devices: 0, ips: 0 });
+  assert.equal(guard.admit(req({ device: DEVICE_A }), 'ASK'), null);
 });
 
 test('metered client records usage from create and from streams, including partial and null deltas', async () => {
@@ -116,127 +152,6 @@ test('metered client records usage from create and from streams, including parti
   assert.equal(guard.meter(null), null);
 });
 
-// ── Route wiring ─────────────────────────────────────────────────────────────
-
-function mockRes() {
-  const res = new EventEmitter();
-  res.statusCode = 200;
-  res.status = code => { res.statusCode = code; return res; };
-  res.json = value => { res.body = value; res.emit('finish'); return res; };
-  res.setHeader = () => {};
-  res.write = chunk => { res.text = (res.text || '') + chunk; return true; };
-  res.end = chunk => { if (chunk) res.write(chunk); res.emit('finish'); return res; };
-  return res;
-}
-
-async function withEnv(values, fn) {
-  const previous = Object.fromEntries(Object.keys(values).map(key => [key, process.env[key]]));
-  for (const [key, value] of Object.entries(values)) { if (value === undefined) delete process.env[key]; else process.env[key] = value; }
-  try { return await fn(); }
-  finally { for (const [key, value] of Object.entries(previous)) { if (value === undefined) delete process.env[key]; else process.env[key] = value; } }
-}
-
-// Runs a registered route without its rate limiter: containment gate (if any), then the handler.
-async function callRoute(path, body) {
-  const layers = app.router.stack.find(layer => layer.route?.path === path).route.stack.slice(1);
-  const request = { ip: '192.0.2.44', body, socket: {} };
-  const res = mockRes();
-  for (const layer of layers) {
-    let advanced = false;
-    await layer.handle(request, res, () => { advanced = true; });
-    if (!advanced) break;
-  }
-  return res;
-}
-
-const copilotBody = { question: 'Fictional practice scenario: HR 118, BP 92/58, RR 24. What should I assess?', mode: 'quick' };
-const sbarBody = { question: 'Fictional practice scenario: HR 118, BP 92/58.', copilotResponse: 'Urgency Level: MODERATE\n\nSummary.' };
-
-for (const [path, body, json] of [['/api/copilot', copilotBody, true], ['/api/sbar', sbarBody, true], ['/api/ask', { question: positive[1].question, contextMode: 'general' }, false]]) {
-  test(`${path} returns the free-limit 429 and the budget 503 without calling Anthropic`, async () => {
-    providerCalls = 0;
-    const logs = [], original = console.log;
-    console.log = (...args) => logs.push(args);
-    try {
-      await withEnv({ ASK_SAFETY_CONTAINMENT: undefined, FREE_DAILY_QUESTIONS: '0', AI_DAILY_BUDGET_USD: undefined }, async () => {
-        const res = await callRoute(path, body);
-        assert.equal(res.statusCode, 429);
-        const code = json ? res.body.code : res.body.error.code;
-        const message = json ? res.body.message : res.body.error.message;
-        assert.equal(code, 'free_daily_limit_reached');
-        assert.match(message, /free AI questions\. They reset at midnight Pacific\./);
-      });
-      await withEnv({ ASK_SAFETY_CONTAINMENT: undefined, AI_DAILY_BUDGET_USD: '0' }, async () => {
-        const res = await callRoute(path, body);
-        assert.equal(res.statusCode, 503);
-        assert.equal(json ? res.body.code : res.body.error.code, 'ai_daily_budget_reached');
-        assert.match(json ? res.body.message : res.body.error.message, /is resting until tomorrow\./);
-      });
-    } finally { console.log = original; }
-    assert.equal(providerCalls, 0);
-    const operational = logs.filter(args => args[0] === '[OPERATIONAL]').map(args => JSON.parse(args[1]));
-    assert.ok(operational.some(entry => entry.status === 'limited' && entry.failure_reason === 'free_daily_limit_reached'));
-    assert.ok(operational.some(entry => entry.status === 'limited' && entry.failure_reason === 'ai_daily_budget_reached'));
-    assert.ok(!JSON.stringify(logs).includes(body.question));
-    assert.ok(!JSON.stringify(logs).includes('192.0.2.44'));
-  });
-}
-
-test('containment behaviour is unchanged when limits are exhausted', async () => {
-  await withEnv({ ASK_SAFETY_CONTAINMENT: 'true', FREE_DAILY_QUESTIONS: '0', AI_DAILY_BUDGET_USD: '0' }, async () => {
-    for (const [path, body] of [['/api/copilot', copilotBody], ['/api/sbar', sbarBody]]) {
-      const res = await callRoute(path, body);
-      assert.equal(res.statusCode, 503);
-      assert.equal(res.body.code, 'clinical_generation_restricted');
-    }
-    const ask = await callRoute('/api/ask', { question: 'Explain how insulin works.', contextMode: 'general' });
-    assert.equal(ask.statusCode, 503);
-    assert.equal(ask.body.error.code, 'ask_temporarily_restricted');
-    const abg = await callRoute('/api/ask', { question: 'Arterial ABG: pH 7.22, PaCO2 30 mmHg, HCO3 12 mmol/L. What does it mean?', contextMode: 'general' });
-    assert.equal(abg.statusCode, 200);
-    assert.ok(abg.body.abg);
-    const reassessment = await callRoute('/api/copilot', { question: 'PATIENT SNAPSHOT — USER-REPORTED / OBSERVED INFORMATION\nBP: 85/55', mode: 'quick', reassessmentRequest: true });
-    assert.equal(reassessment.statusCode, 200);
-    assert.match(reassessment.text, /"resolution":"deterministic"/);
-  });
-  assert.equal(providerCalls, 0);
-});
-
-test('deterministic Ask answers do not use up free questions', async () => {
-  const guardLogs = [];
-  const guard = createAiCostGuard({ env: { FREE_DAILY_QUESTIONS: '1' }, now: at('2026-10-12T18:00:00Z'), appendOperationalLog: entry => guardLogs.push(entry) });
-  let handler, streams = 0;
-  const client = { messages: { stream: () => { streams++; return (async function* events() {
-    yield { type: 'message_start', message: { usage: { input_tokens: 10 } } };
-    yield { type: 'message_delta', delta: { stop_reason: 'end_turn' }, usage: { output_tokens: 5 } };
-  })(); } } };
-  registerAskRoutes({ post(path, limiter, fn) { handler = fn; } }, {
-    apiLimiter() {}, containsPHI: () => false, getClient: () => client, admitAI: request => guard.admit(request, 'ASK'),
-    appendOperationalLog: () => {}, classifyProviderError: () => ({ code: 'provider_error' }),
-    runWithStageTimeout: work => work(new AbortController().signal),
-    collectPriorityMapStream: async stream => { let stopReason = null; for await (const event of stream) stopReason = event.delta?.stop_reason || stopReason; return { text: '{}', stopReason }; },
-  });
-  await withEnv({ ASK_SAFETY_CONTAINMENT: undefined }, async () => {
-    const ask = async question => { const res = mockRes(); await handler({ ip: '192.0.2.9', body: { question, contextMode: 'general' } }, res); return res; };
-    for (let i = 0; i < 3; i++) assert.equal((await ask('Arterial ABG: pH 7.22, PaCO2 30 mmHg, HCO3 12 mmol/L. What does it mean?')).statusCode, 200);
-    assert.equal(streams, 0);
-    assert.notEqual((await ask(positive[1].question)).statusCode, 429);
-    assert.equal(streams, 1);
-    const limited = await ask(positive[1].question);
-    assert.equal(limited.statusCode, 429);
-    assert.equal(limited.body.error.code, 'free_daily_limit_reached');
-    assert.equal(streams, 1);
-  });
-  assert.equal(guardLogs.length, 1);
-});
-
-test('denial log entries survive the operational log allow-list as metadata only', () => {
-  const entry = buildOperationalLogEntry({ timestamp: '2026-10-12T18:00:00.000Z', route: 'ASK', status: 'limited', provider_status: 'not_called', display_resolution: 'limited', failure_reason: 'free_daily_limit_reached' });
-  assert.equal(entry.status, 'limited');
-  assert.equal(entry.failure_reason, 'free_daily_limit_reached');
-  assert.equal(entry.provider_status, 'not_called');
-});
-
 test('metering works on the real SDK MessageStream and create (mocked transport)', async () => {
   const Anthropic = require('@anthropic-ai/sdk');
   const message = { id: 'mock', type: 'message', role: 'assistant', content: [{ type: 'text', text: '{}' }], model: 'claude-sonnet-4-6', stop_reason: 'end_turn', stop_sequence: null, usage: { input_tokens: 1000, output_tokens: 100 } };
@@ -259,4 +174,168 @@ test('metering works on the real SDK MessageStream and create (mocked transport)
   for await (const event of client.messages.stream(params)) if (event.type === 'content_block_delta') text += event.delta.text;
   assert.equal(text, '{}');
   assert.equal(Math.round(guard.snapshot().spentUsd * 1e6), (1000 * 3 + 100 * 15) + (2000 * 3 + 200 * 15));
+});
+
+// ── Route wiring ─────────────────────────────────────────────────────────────
+
+function mockRes() {
+  const res = new EventEmitter();
+  res.statusCode = 200;
+  res.status = code => { res.statusCode = code; return res; };
+  res.json = value => { res.body = value; res.emit('finish'); return res; };
+  res.setHeader = () => {};
+  res.write = chunk => { res.text = (res.text || '') + chunk; return true; };
+  res.end = chunk => { if (chunk) res.write(chunk); res.emit('finish'); return res; };
+  return res;
+}
+
+async function withEnv(values, fn) {
+  const previous = Object.fromEntries(Object.keys(values).map(key => [key, process.env[key]]));
+  for (const [key, value] of Object.entries(values)) { if (value === undefined) delete process.env[key]; else process.env[key] = value; }
+  try { return await fn(); }
+  finally { for (const [key, value] of Object.entries(previous)) { if (value === undefined) delete process.env[key]; else process.env[key] = value; } }
+}
+
+// Runs a registered route without its rate limiter: containment gate (if any), then the handler.
+async function callRoute(path, body, { device = DEVICE_A, ip = '192.0.2.44' } = {}) {
+  const layers = app.router.stack.find(layer => layer.route?.path === path).route.stack.slice(1);
+  const request = { ip, body, socket: {}, headers: device ? { 'x-ce-device-id': device } : {} };
+  const res = mockRes();
+  for (const layer of layers) {
+    let advanced = false;
+    await layer.handle(request, res, () => { advanced = true; });
+    if (!advanced) break;
+  }
+  return res;
+}
+
+async function captureLogs(fn) {
+  const logs = [], original = console.log, warn = console.warn, error = console.error;
+  console.log = (...args) => logs.push(args);
+  console.warn = (...args) => logs.push(args);
+  console.error = (...args) => logs.push(args);
+  try { await fn(); } finally { console.log = original; console.warn = warn; console.error = error; }
+  return logs;
+}
+
+const errorOf = res => (typeof res.body?.error === 'object' ? res.body.error : res.body);
+const ABG = 'Arterial ABG: pH 7.22, PaCO2 30 mmHg, HCO3 12 mmol/L. What does it mean?';
+const copilotBody = { question: 'Fictional practice scenario: HR 118, BP 92/58, RR 24. What should I assess?', mode: 'quick' };
+const countingRoutes = [
+  ['new Priority Map', '/api/copilot', copilotBody],
+  ['new Ask question', '/api/ask', { question: positive[1].question, contextMode: 'general' }],
+];
+const nonCountingRoutes = [
+  ['Teach Me', '/api/copilot', { ...copilotBody, learningRequest: true, priorityMapResponse: 'Urgency Level: MODERATE\n\nSynthetic map.' }],
+  ['follow-up', '/api/copilot', { ...copilotBody, isFollowUp: true }],
+  ['SBAR', '/api/sbar', { question: copilotBody.question, copilotResponse: 'Urgency Level: MODERATE\n\nSummary.' }],
+  ['ABG explanation', '/api/ask', { question: ABG, contextMode: 'general', abgExplanation: true }],
+];
+
+for (const [name, path, body] of countingRoutes) {
+  test(`${name} (${path}) returns the device 429, the network 429 and the budget 503 without calling Anthropic`, async () => {
+    providerCalls = 0;
+    const logs = await captureLogs(async () => {
+      await withEnv({ ASK_SAFETY_CONTAINMENT: undefined, FREE_DAILY_QUESTIONS: '0', FREE_DAILY_QUESTIONS_PER_IP: undefined, AI_DAILY_BUDGET_USD: undefined }, async () => {
+        const res = await callRoute(path, body);
+        assert.equal(res.statusCode, 429);
+        assert.equal(errorOf(res).code, 'free_daily_limit_reached');
+        assert.match(errorOf(res).message, /free AI questions\. They reset at midnight Pacific\./);
+      });
+      await withEnv({ ASK_SAFETY_CONTAINMENT: undefined, FREE_DAILY_QUESTIONS: undefined, FREE_DAILY_QUESTIONS_PER_IP: '0' }, async () => {
+        const res = await callRoute(path, body, { device: null });
+        assert.equal(res.statusCode, 429);
+        assert.match(errorOf(res).message, /for this network are used up/);
+      });
+      await withEnv({ ASK_SAFETY_CONTAINMENT: undefined, AI_DAILY_BUDGET_USD: '0' }, async () => {
+        const res = await callRoute(path, body);
+        assert.equal(res.statusCode, 503);
+        assert.equal(errorOf(res).code, 'ai_daily_budget_reached');
+        assert.match(errorOf(res).message, /is resting until tomorrow\./);
+      });
+    });
+    assert.equal(providerCalls, 0);
+    const operational = logs.filter(args => args[0] === '[OPERATIONAL]').map(args => JSON.parse(args[1]));
+    assert.ok(operational.some(entry => entry.status === 'limited' && entry.failure_reason === 'free_daily_limit_reached'));
+    assert.ok(operational.some(entry => entry.status === 'limited' && entry.failure_reason === 'ai_daily_budget_reached'));
+    for (const secret of [body.question, DEVICE_A, '192.0.2.44']) assert.ok(!JSON.stringify(logs).includes(secret));
+  });
+}
+
+for (const [name, path, body] of nonCountingRoutes) {
+  test(`${name} (${path}) is not blocked by exhausted free limits but still respects the budget`, async () => {
+    providerCalls = 0;
+    const logs = await captureLogs(async () => {
+      await withEnv({ ASK_SAFETY_CONTAINMENT: undefined, FREE_DAILY_QUESTIONS: '0', FREE_DAILY_QUESTIONS_PER_IP: '0', AI_DAILY_BUDGET_USD: undefined }, async () => {
+        const res = await callRoute(path, body);
+        assert.notEqual(res.statusCode, 429);
+        assert.notEqual(errorOf(res)?.code, 'free_daily_limit_reached');
+      });
+      assert.ok(providerCalls > 0, 'the provider path was reached');
+      const before = providerCalls;
+      await withEnv({ ASK_SAFETY_CONTAINMENT: undefined, AI_DAILY_BUDGET_USD: '0' }, async () => {
+        const res = await callRoute(path, body);
+        assert.equal(res.statusCode, 503);
+        assert.equal(errorOf(res).code, 'ai_daily_budget_reached');
+      });
+      assert.equal(providerCalls, before);
+    });
+    assert.ok(!JSON.stringify(logs).includes(DEVICE_A));
+  });
+}
+
+test('containment behaviour is unchanged when limits are exhausted', async () => {
+  providerCalls = 0;
+  await withEnv({ ASK_SAFETY_CONTAINMENT: 'true', FREE_DAILY_QUESTIONS: '0', FREE_DAILY_QUESTIONS_PER_IP: '0', AI_DAILY_BUDGET_USD: '0' }, async () => {
+    for (const [path, body] of [['/api/copilot', copilotBody], ['/api/sbar', nonCountingRoutes[2][2]]]) {
+      const res = await callRoute(path, body);
+      assert.equal(res.statusCode, 503);
+      assert.equal(res.body.code, 'clinical_generation_restricted');
+    }
+    const ask = await callRoute('/api/ask', { question: 'Explain how insulin works.', contextMode: 'general' });
+    assert.equal(ask.statusCode, 503);
+    assert.equal(ask.body.error.code, 'ask_temporarily_restricted');
+    const abg = await callRoute('/api/ask', { question: ABG, contextMode: 'general' });
+    assert.equal(abg.statusCode, 200);
+    assert.ok(abg.body.abg);
+    const reassessment = await callRoute('/api/copilot', { question: 'PATIENT SNAPSHOT — USER-REPORTED / OBSERVED INFORMATION\nBP: 85/55', mode: 'quick', reassessmentRequest: true });
+    assert.equal(reassessment.statusCode, 200);
+    assert.match(reassessment.text, /"resolution":"deterministic"/);
+  });
+  assert.equal(providerCalls, 0);
+});
+
+test('deterministic Ask answers do not use up free questions', async () => {
+  const guardLogs = [];
+  const guard = createAiCostGuard({ env: { FREE_DAILY_QUESTIONS: '1' }, now: at('2026-10-12T18:00:00Z'), appendOperationalLog: entry => guardLogs.push(entry) });
+  let handler, streams = 0;
+  const client = { messages: { stream: () => { streams++; return (async function* events() {
+    yield { type: 'message_start', message: { usage: { input_tokens: 10 } } };
+    yield { type: 'message_delta', delta: { stop_reason: 'end_turn' }, usage: { output_tokens: 5 } };
+  })(); } } };
+  registerAskRoutes({ post(path, limiter, fn) { handler = fn; } }, {
+    apiLimiter() {}, containsPHI: () => false, getClient: () => client, admitAI: (request, options) => guard.admit(request, 'ASK', options),
+    appendOperationalLog: () => {}, classifyProviderError: () => ({ code: 'provider_error' }),
+    runWithStageTimeout: work => work(new AbortController().signal),
+    collectPriorityMapStream: async stream => { let stopReason = null; for await (const event of stream) stopReason = event.delta?.stop_reason || stopReason; return { text: '{}', stopReason }; },
+  });
+  await withEnv({ ASK_SAFETY_CONTAINMENT: undefined }, async () => {
+    const ask = async question => { const res = mockRes(); await handler({ ip: '192.0.2.9', headers: { 'x-ce-device-id': DEVICE_B }, body: { question, contextMode: 'general' } }, res); return res; };
+    for (let i = 0; i < 3; i++) assert.equal((await ask(ABG)).statusCode, 200);
+    assert.equal(streams, 0);
+    assert.notEqual((await ask(positive[1].question)).statusCode, 429);
+    assert.equal(streams, 1);
+    const limited = await ask(positive[1].question);
+    assert.equal(limited.statusCode, 429);
+    assert.equal(limited.body.error.code, 'free_daily_limit_reached');
+    assert.equal(streams, 1);
+  });
+  assert.equal(guardLogs.length, 1);
+});
+
+test('denial log entries survive the operational log allow-list as metadata only', () => {
+  const entry = buildOperationalLogEntry({ timestamp: '2026-10-12T18:00:00.000Z', route: 'ASK', status: 'limited', provider_status: 'not_called', display_resolution: 'limited', failure_reason: 'free_daily_limit_reached' });
+  assert.equal(entry.status, 'limited');
+  assert.equal(entry.failure_reason, 'free_daily_limit_reached');
+  assert.equal(entry.provider_status, 'not_called');
 });

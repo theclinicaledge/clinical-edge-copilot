@@ -1,0 +1,11 @@
+{
+  "cookies": [],
+  "origins": [
+    {
+      "origin": "http://localhost:5173",
+      "localStorage": [
+        { "name": "ce_consent", "value": "{\"version\":1,\"ai\":true,\"analytics\":true,\"decidedAt\":\"2026-10-11T00:00:00.000Z\"}" }
+      ]
+    }
+  ]
+}

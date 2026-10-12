@@ -13,6 +13,7 @@
  */
 
 import { track } from '@vercel/analytics';
+import { hasAnalyticsConsent } from './consent.js';
 
 const isDev = import.meta.env.DEV;
 
@@ -27,6 +28,8 @@ export type AnalyticsPayload = Record<string, string | number | boolean>;
  */
 export function trackEvent(eventName: string, payload: AnalyticsPayload = {}): void {
   try {
+    // Nothing is sent unless the user opted in (App Store Review Guideline 5.1.1(ii)).
+    if (!hasAnalyticsConsent()) return;
     if (isDev) {
       // eslint-disable-next-line no-console
       console.debug('[analytics]', eventName, payload);

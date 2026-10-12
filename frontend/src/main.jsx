@@ -14,6 +14,8 @@ import Support from './Support.jsx'
 import Download from './Download.jsx'
 import ClinicalEdgeHome from './ClinicalEdgeHome.jsx'
 import WorkspaceNavigation from './components/WorkspaceNavigation.jsx'
+import AIConsentGate from './components/AIConsentGate.jsx'
+import { hasAnalyticsConsent } from './consent.js'
 import RhythmLabModule from './modules/rhythm-lab/RhythmLabModule.tsx'
 import RhythmLibraryPage from './modules/rhythm-lab/RhythmLibraryPage.tsx'
 import RhythmPracticePage from './modules/rhythm-lab/RhythmPracticePage.tsx'
@@ -155,11 +157,12 @@ function Root() {
       {page === 'brainsheets-detail' && <BrainSheetsModule navigate={navigate} onGoHome={() => navigate('/')} templateId={window.location.pathname.replace(/^\/brain-sheets\//, '').replace(/\/$/, '')} />}
       {page === 'blog'          && <BlogIndex />}
       {page === 'blogpost'      && <BlogPostPage slug={window.location.pathname.replace(/^\/blog\//, '').replace(/\/$/, '')} />}
-      {askEntered && <div hidden={page !== 'ask'} inert={page !== 'ask'} className="ce-ask-workspace"><AskClinicalEdge navigate={navigate} isVisible={page === 'ask'} snapshot={askSnapshot} /></div>}
+      {askEntered && <div hidden={page !== 'ask'} inert={page !== 'ask'} className="ce-ask-workspace"><AIConsentGate navigate={navigate}><AskClinicalEdge navigate={navigate} isVisible={page === 'ask'} snapshot={askSnapshot} /></AIConsentGate></div>}
       {/* Keep the scenario's existing hook tree in memory, never browser storage. */}
-      {workspaceEntered && <div hidden={page !== 'app'} inert={page !== 'app'} className="ce-shift-workspace" onFocusCapture={(event) => { workspacePosition.current.focus = event.target; }}><App onGoHome={() => navigate('/')} navigate={navigate} isOnline={isOnline} isVisible={page === 'app'} onScenarioActivity={setScenarioActive} onSnapshotChange={shareSnapshot} initialCaptureMode={new URLSearchParams(window.location.search).get('capture') === 'rapid' ? 'rapid' : 'manual'} /></div>}
+      {workspaceEntered && <div hidden={page !== 'app'} inert={page !== 'app'} className="ce-shift-workspace" onFocusCapture={(event) => { workspacePosition.current.focus = event.target; }}><AIConsentGate navigate={navigate}><App onGoHome={() => navigate('/')} navigate={navigate} isOnline={isOnline} isVisible={page === 'app'} onScenarioActivity={setScenarioActive} onSnapshotChange={shareSnapshot} initialCaptureMode={new URLSearchParams(window.location.search).get('capture') === 'rapid' ? 'rapid' : 'manual'} /></AIConsentGate></div>}
       <WorkspaceNavigation page={page} navigate={navigate} scenarioActive={scenarioActive} />
-      <Analytics />
+      {/* Usage analytics only with consent (App Store Review Guideline 5.1.1(ii)). */}
+      <Analytics beforeSend={(event) => (hasAnalyticsConsent() ? event : null)} />
     </>
   );
 }

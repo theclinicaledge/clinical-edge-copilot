@@ -6,6 +6,9 @@ URL changes. All custom events go through `trackEvent()` in `src/analytics.ts`.
 
 ## Privacy Rules
 
+- **Opt-in only** — nothing is sent (pageviews or custom events) until the user turns on
+  analytics in the consent screen or on the Privacy page (App Store Review Guideline 5.1.1(ii)).
+  `trackEvent()` and the `<Analytics beforeSend>` filter both enforce this via `src/consent.js`.
 - **No clinical free text** — user-entered prompt content, clinical questions, and
   reasoning notes are never transmitted.
 - **No patient information** — names, MRNs, dates of birth, room numbers, or any

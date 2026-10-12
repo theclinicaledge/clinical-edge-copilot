@@ -13,7 +13,9 @@ for (const route of ['/copilot', '/ask']) {
     await page.goto(route);
     await expect(page.getByRole('heading', { name: 'How your entries are processed' })).toBeFocused();
     await expect(page.getByText(/go through our server to Anthropic/)).toBeVisible();
-    await expect(page.getByText(/Confirm decisions with the treating provider/)).toBeVisible();
+    await expect(page.getByText(/not individualized diagnosis, treatment or emergency guidance/)).toBeVisible();
+    await expect(page.getByText(/volatile server memory for up to ten minutes/)).toBeVisible();
+    await expect(page.getByText(/admission, generation and safety review/)).toBeVisible();
     await expect(page.getByRole('checkbox', { name: /anonymous usage analytics/ })).not.toBeChecked();
     expect(apiCalls).toEqual([]);
     expect(await storedConsent(page)).toBeNull();
@@ -31,15 +33,15 @@ test('agreeing opens the workspace with analytics off by default', async ({ page
   await page.goto('/copilot');
   await page.getByRole('button', { name: 'Agree and continue' }).click();
   await expect(page.getByRole('heading', { name: 'How your entries are processed' })).toHaveCount(0);
-  expect(await storedConsent(page)).toMatchObject({ version: 2, ai: true, analytics: false });
+  expect(await storedConsent(page)).toMatchObject({ version: 3, ai: true, analytics: false });
   await page.reload();
   await expect(page.getByRole('heading', { name: 'How your entries are processed' })).toHaveCount(0);
 });
 
-test('a stored version 1 consent shows the consent screen again', async ({ page }) => {
+test('a stored version 2 consent shows the updated disclosure screen again', async ({ page }) => {
   await page.addInitScript(() => {
     if (!sessionStorage.getItem('seeded')) {
-      localStorage.setItem('ce_consent', JSON.stringify({ version: 1, ai: true, analytics: true, decidedAt: '2026-10-01T00:00:00.000Z' }));
+      localStorage.setItem('ce_consent', JSON.stringify({ version: 2, ai: true, analytics: true, decidedAt: '2026-10-01T00:00:00.000Z' }));
       sessionStorage.setItem('seeded', '1');
     }
   });
@@ -51,7 +53,7 @@ test('a stored version 1 consent shows the consent screen again', async ({ page 
   await expect(page.getByRole('checkbox', { name: /anonymous usage analytics/ })).not.toBeChecked();
   expect(apiCalls).toEqual([]);
   await page.getByRole('button', { name: 'Agree and continue' }).click();
-  expect(await storedConsent(page)).toMatchObject({ version: 2, ai: true, analytics: false });
+  expect(await storedConsent(page)).toMatchObject({ version: 3, ai: true, analytics: false });
   await page.reload();
   await expect(page.getByRole('heading', { name: 'How your entries are processed' })).toHaveCount(0);
 });

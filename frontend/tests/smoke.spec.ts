@@ -40,7 +40,7 @@ test.beforeEach(async ({ page }) => {
     localStorage.clear();
     sessionStorage.clear();
     // These suites exercise a user who already granted AI and analytics consent.
-    localStorage.setItem('ce_consent', JSON.stringify({ version: 2, ai: true, analytics: true, decidedAt: '2026-10-11T00:00:00.000Z' }));
+    localStorage.setItem('ce_consent', JSON.stringify({ version: 3, ai: true, analytics: true, decidedAt: '2026-10-11T00:00:00.000Z' }));
   });
 });
 

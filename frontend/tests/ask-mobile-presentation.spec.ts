@@ -81,7 +81,7 @@ for (const width of [320, 390, 430, 1280]) test(`Ask presentation, text fidelity
   if (!baseline) {
     const readingBoundary = await page.locator('.ce-ask-page').evaluate(el => innerHeight - parseFloat(getComputedStyle(el, '::after').height));
     expect(answer!.y + answer!.height).toBeLessThan(readingBoundary);
-    expect(await page.locator('.ce-ask-direct p').first().evaluate(el => getComputedStyle(el).fontSize)).toBe(width <= 720 ? '14px' : '16px');
+    expect(await page.locator('.ce-ask-direct p').first().evaluate(el => getComputedStyle(el).fontSize)).toBe(width <= 720 ? '15px' : '16px');
   }
   await page.screenshot({ path: `${output}/long-footer-clearance-${width}.png` });
   expect(bodies.every(body => body.contextMode === 'general' && !('snapshotContext' in body))).toBe(true);

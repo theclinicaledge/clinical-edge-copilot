@@ -8,9 +8,12 @@ test('public education consent, device header, feedback and withdrawal preserve 
     return route.fulfill({contentType:'application/json',body:JSON.stringify({requestId:'mock-request-123',contextMode:'general',answer:'Mock educational explanation.',details:[],evidence:{status:'not_independently_source_verified',sources:[]}})});
   });
   await page.goto('/ask');
-  await expect(page.getByRole('heading',{name:'Ask Clinical Edge — Public Beta',exact:true})).toBeVisible();
+  await expect(page.getByRole('heading',{name:'Ask Clinical Edge',exact:true})).toBeVisible();
+  await expect(page.getByText('Beta',{exact:true})).toBeVisible();
+  await page.getByText('Daily question allowance',{exact:true}).click();
   await expect(page.getByText(/Each submitted conversational question, including follow-ups/)).toBeVisible();
   await page.getByRole('button',{name:'Enable educational conversation'}).click();
+  await expect(page.getByText('3 questions per day',{exact:true})).toBeVisible();
   await expect(page.getByText(/Daily allowance: 3 counted AI questions per device/)).toBeVisible();
   await page.getByLabel('Nursing question').fill('Explain ventricular compliance.');
   await page.getByRole('button',{name:'Ask Clinical Edge',exact:true}).click();
@@ -21,7 +24,7 @@ test('public education consent, device header, feedback and withdrawal preserve 
   expect(href).toContain('mock-request-123');expect(decodeURIComponent(href!)).not.toContain('ventricular compliance');
   expect(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth)).toBe(true);
   await page.screenshot({path:`/private/tmp/ce-public-beta-${test.info().project.name}.png`,fullPage:true});
-  await page.getByRole('button',{name:'Withdraw educational AI consent'}).click();
+  await page.getByRole('button',{name:'Withdraw AI consent'}).click();
   await expect(page.getByText('Mock educational explanation.')).toHaveCount(0);
   expect(await page.evaluate(()=>JSON.stringify(localStorage))).not.toContain('Mock educational explanation');
 });

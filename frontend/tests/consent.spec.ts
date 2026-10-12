@@ -11,7 +11,8 @@ for (const route of ['/copilot', '/ask']) {
     const apiCalls: string[] = [];
     page.on('request', (request) => { if (request.url().includes('/api/')) apiCalls.push(request.url()); });
     await page.goto(route);
-    await expect(page.getByRole('heading', { name: 'How your entries are processed' })).toBeFocused();
+    await expect(page.getByRole('heading', { name: route === '/ask' ? 'A quick note before we begin' : 'How your entries are processed' })).toBeFocused();
+    if (route === '/ask') await page.getByText('Full AI and privacy information').click();
     await expect(page.getByText(/go through our server to Anthropic/)).toBeVisible();
     await expect(page.getByText(/not individualized diagnosis, treatment or emergency guidance/)).toBeVisible();
     await expect(page.getByText(/volatile server memory for up to ten minutes/)).toBeVisible();

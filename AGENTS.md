@@ -115,7 +115,9 @@ limiter, the identifier check, metadata-only logging and the containment gate.
 Backend environment variables: `ANTHROPIC_API_KEY` (backend `.env` only, never in the frontend
 or in code), `PORT`, `ASK_SAFETY_CONTAINMENT`, `TRUST_PROXY_HOPS` (default 1, for Render's
 proxy so rate limits are per user). Frontend: `VITE_API_BASE_URL` (defaults to
-`https://clinical-edge-backend.onrender.com`).
+`https://clinical-edge-copilot.onrender.com`, the live Render backend, and is set to it in
+Vercel). Exception: `frontend/src/App.jsx` still falls back to the retired
+`https://clinical-edge-backend.onrender.com`, so never unset the Vercel variable.
 
 Token limits and timeouts are set per route in `backend/server.js` and
 `backend/ask-clinical-edge.js`; read the code rather than trusting a number written here.

@@ -3,6 +3,8 @@ import { trackEvent } from "../analytics";
 import TeachMePanel from "./TeachMePanel.jsx";
 import "./priority-map.css";
 
+const CONCERN_LABELS = { HIGH: "High", MODERATE: "Moderate", LOW: "Low" };
+
 function plain(text = "") {
   return text.replace(/\*\*/g, "").replace(/\*/g, "");
 }
@@ -41,8 +43,8 @@ export default function PriorityMap({ result, onRequestTeachMe, variant = "prima
   const isClarification = variant === "clarification";
   return <div className={`priority-map${isClarification ? " priority-map--clarification" : ""}`}>
     <header className="priority-map__header">
-      <div><span>{isClarification ? "Focused follow-up" : "Priority Map"}</span><h2>{isClarification ? "Clarification" : "What matters first"}</h2></div>
-      <div className={`priority-map__urgency priority-map__urgency--${(result.urgencyLevel || "low").toLowerCase()}`}><span aria-hidden="true" />Urgency: {result.urgencyLevel || "Not classified"}</div>
+      <div><span>{isClarification ? "Focused follow-up" : "Priority Map"}</span><h2>{isClarification ? "Clarification" : "Where to focus your reasoning"}</h2></div>
+      <div className={`priority-map__urgency priority-map__urgency--${(result.urgencyLevel || "low").toLowerCase()}`}><span aria-hidden="true" />Concern level: {CONCERN_LABELS[result.urgencyLevel] || "Not classified"}</div>
     </header>
 
     {result.urgent && <div className="priority-map__urgent">{plain(result.urgent)}</div>}
@@ -51,7 +53,7 @@ export default function PriorityMap({ result, onRequestTeachMe, variant = "prima
       <div className="priority-primary__title"><span>{primary.rank}</span><div><h3>{plain(primary.label)}</h3><Relevance value={primary.relevance} /></div></div>
       {primary.observed.length > 0 && <div className="priority-observed"><span>Reported / observed</span><small>From the Snapshot you entered</small><ul>{primary.observed.map((item, index) => <li key={index}>{plain(item)}</li>)}</ul></div>}
       {primary.interpretation && <div className="priority-interpretation"><span>Clinical Edge interpretation</span><small>Reasoning, not a confirmed diagnosis</small><p>{plain(primary.interpretation)}</p></div>}
-      {primary.assessNow.length > 0 && <div className="priority-assess"><span>Assess now</span><ul>{primary.assessNow.map((item, index) => <li key={index}>{plain(item)}</li>)}</ul></div>}
+      {primary.assessNow.length > 0 && <div className="priority-assess"><span>Consider assessing</span><ul>{primary.assessNow.map((item, index) => <li key={index}>{plain(item)}</li>)}</ul></div>}
     </article>
 
     {priorities.length > 1 && <section className="priority-secondary">
@@ -61,7 +63,7 @@ export default function PriorityMap({ result, onRequestTeachMe, variant = "prima
         <div className="priority-secondary__content">
           {priority.observed.length > 0 && <div><span>Reported / observed</span>{priority.observed.map((item, index) => <small key={index}>{plain(item)}</small>)}</div>}
           {priority.interpretation && <p><strong>Interpretation</strong>{plain(priority.interpretation)}</p>}
-          {priority.assessNow.length > 0 && <div><span>Assess now</span>{priority.assessNow.map((item, index) => <small key={index}>{plain(item)}</small>)}</div>}
+          {priority.assessNow.length > 0 && <div><span>Consider assessing</span>{priority.assessNow.map((item, index) => <small key={index}>{plain(item)}</small>)}</div>}
         </div>
       </details>)}
     </section>}
@@ -69,7 +71,7 @@ export default function PriorityMap({ result, onRequestTeachMe, variant = "prima
     <div className="priority-action-grid">
       <ActionSection eyebrow="Direction" title="Watch & trend" category="watch_trend" content={getSection("Monitor and trend")} />
       <ActionSection eyebrow="Clarify" title="Helpful to clarify" category="missing_information" content={getSection("Missing information")} />
-      <ActionSection eyebrow="Escalate" title="Escalation cues" category="escalation_cues" content={getSection("Escalation triggers")} />
+      <ActionSection eyebrow="Communicate" title="When to involve your team" category="escalation_cues" content={getSection("Escalation triggers")} />
     </div>
 
     <section className="priority-reasoning">

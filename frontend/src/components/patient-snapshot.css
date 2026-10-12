@@ -2,6 +2,7 @@
 .ce-page-enter:has(.patient-snapshot--quick) { animation-fill-mode: none; }
 .snapshot-intro { margin-bottom: 18px; }
 .snapshot-intro > span, .snapshot-section-heading > span { color: var(--ce-teal-deep); font: 700 10px/1.2 var(--ce-font-mono); text-transform: uppercase; }
+.snapshot-intro .snapshot-intro__boundary { margin-top: 6px; color: var(--ce-text-mid); font-weight: 600; }
 .snapshot-intro h1 { margin: 6px 0; font-size: clamp(25px, 5vw, 34px); line-height: 1.08; }
 .snapshot-intro p, .snapshot-section-heading p { margin: 0; color: var(--ce-text-muted); font-size: 13px; line-height: 1.5; }
 .patient-snapshot--quick { position: relative; }

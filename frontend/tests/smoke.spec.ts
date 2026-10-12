@@ -218,7 +218,7 @@ test('confirmed Rapid Capture interoperates with Edit Snapshot and New Snapshot 
   await page.getByRole('button', { name: 'Structure my Snapshot' }).click();
   await page.getByRole('button', { name: 'Confirm Snapshot' }).click();
   await page.getByRole('button', { name: 'Build my Priority Map →' }).click();
-  await expect(page.getByRole('heading', { name: 'What matters first' })).toBeVisible();
+  await expect(page.getByRole('heading', { name: 'Where to focus your reasoning' })).toBeVisible();
   await page.getByRole('button', { name: 'Edit Snapshot' }).click();
   await expect(page.getByLabel('MAP current')).toHaveValue('61');
   await expect(page.getByRole('button', { name: 'Cool / clammy' })).toHaveAttribute('aria-pressed', 'true');
@@ -265,6 +265,7 @@ test('command home prioritizes patient change and preserves focused tools', asyn
 test('copilot starts with immediately usable mobile quick capture', async ({ page }) => {
   await page.goto('/copilot');
   await expect(page.getByRole('heading', { name: 'What do you know right now?' })).toBeVisible();
+  await expect(page.getByText('Not for emergencies. If your patient needs help now, use your rapid response process.')).toBeVisible();
   await expect(page.getByLabel('Blood pressure current')).toBeVisible();
   await expect(page.getByLabel('Heart rate current')).toBeVisible();
   await expect(page.getByLabel('Urine output amount')).toBeVisible();
@@ -295,7 +296,7 @@ test('BP perfusion builder reveals contextual modules and preserves structured t
   await expect(page.getByLabel('Urine output amount')).toBeVisible();
   await page.getByLabel('Blood pressure previous').fill('118/72');
   await page.getByLabel('Blood pressure current').fill('86/48');
-  await expect(page.getByRole('alert')).toContainText('Do not wait to finish this Snapshot');
+  await expect(page.getByRole('alert')).toContainText('use your rapid response process');
   await addFinding(page, /^Hemodynamics/);
   await page.getByLabel('CI previous').fill('2.4');
   await page.getByLabel('CI current').fill('1.8');
@@ -476,7 +477,7 @@ test('bedside workflow preserves amount over time and supports Edit and New Snap
   }
 
   await page.getByRole('button', { name: 'Build my Priority Map →' }).click();
-  await expect(page.getByRole('heading', { name: 'What matters first' })).toBeVisible();
+  await expect(page.getByRole('heading', { name: 'Where to focus your reasoning' })).toBeVisible();
   await expect(page.getByRole('button', { name: 'Edit Snapshot' })).toBeInViewport();
   await expect(page.getByRole('button', { name: 'New Snapshot' })).toBeInViewport();
   expect(requestCount).toBe(1);
@@ -635,7 +636,7 @@ for (const viewport of [{ width: 390, height: 844 }, { width: 1280, height: 900 
 
     releaseResponse();
     await expect(page.locator('.main-container')).toHaveAttribute('data-workspace-state', 'priority-map');
-    await expect(page.getByRole('heading', { name: 'What matters first' })).toBeVisible();
+    await expect(page.getByRole('heading', { name: 'Where to focus your reasoning' })).toBeVisible();
     await expect(page.getByRole('heading', { name: 'Reported perfusion change' })).toBeVisible();
     await expect(page.getByRole('button', { name: 'Prepare SBAR' })).toBeVisible();
     await expect(page.getByRole('button', { name: 'Save case locally' })).toBeVisible();
@@ -669,7 +670,7 @@ test('result actions keep SBAR primary and follow-up deliberate, contextual, and
   });
 
   await page.goto('/copilot?screenshot=response');
-  await expect(page.getByRole('heading', { name: 'What matters first' })).toBeVisible();
+  await expect(page.getByRole('heading', { name: 'Where to focus your reasoning' })).toBeVisible();
   await expect(page.getByRole('heading', { name: 'Evolving postoperative change' })).toBeVisible();
   await expect(page.getByRole('button', { name: 'Prepare SBAR' })).toBeVisible();
   await expect(page.getByLabel('Your focused question or update')).toHaveCount(0);
@@ -842,7 +843,7 @@ Lower circulating volume can reduce preload and cardiac output while sympathetic
   await page.getByLabel('Heart rate current').fill('122');
   await page.getByRole('button', { name: 'Build my Priority Map →' }).click();
 
-  await expect(page.getByRole('heading', { name: 'What matters first' })).toBeVisible();
+  await expect(page.getByRole('heading', { name: 'Where to focus your reasoning' })).toBeVisible();
   await expect(page.getByRole('heading', { name: 'Perfusion concern' })).toBeVisible();
   await expect(page.locator('.priority-primary h3')).toHaveText('Perfusion concern');
   await expect(page.locator('.priority-secondary summary strong')).toHaveText('2 · Possible volume loss');
@@ -852,7 +853,7 @@ Lower circulating volume can reduce preload and cardiac output while sympathetic
   await expect(page.getByText('Blood pressure fell from 118/72 to 88/50')).toBeVisible();
   await expect(page.getByText('Heart rate is 122')).toBeVisible();
   await expect(page.getByText('This pattern may reflect impaired perfusion; the cause is not established.')).toBeVisible();
-  await expect(page.getByText('Assess now', { exact: true }).first()).toBeVisible();
+  await expect(page.getByText('Consider assessing', { exact: true }).first()).toBeVisible();
   await expect(page.getByRole('button', { name: /Possible contributors/ })).toBeVisible();
   await expect(page.getByText('This may fit evolving volume loss or another low-preload pattern')).toHaveCount(0);
   await page.getByRole('button', { name: /Possible contributors/ }).click();
@@ -936,7 +937,7 @@ test('Teach Me locks an incorrect answer and keeps clinical content out of analy
   expect(analytics).not.toContain('The number in isolation');
   expect(analytics).not.toContain('Direction over time adds context');
   await page.getByText('Return to Priority Map', { exact: true }).click();
-  await expect(page.getByRole('heading', { name: 'What matters first' })).toBeVisible();
+  await expect(page.getByRole('heading', { name: 'Where to focus your reasoning' })).toBeVisible();
 });
 
 test('Teach Me gracefully renders the structured explanation fallback', async ({ page }) => {

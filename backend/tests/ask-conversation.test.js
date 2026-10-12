@@ -26,7 +26,7 @@ for(const unverified of [true,false]){
     for(const topic of ['RAAS','preeclampsia','dehydration','bicarbonate'])assert.ok(!generation.system.split('EDUCATIONAL EXPLANATION ACCURACY:')[1].split('Do not invent illustrative')[0].includes(topic));
   },{unverified}));
 }
-async function setup(run,{reject=false,failReview=false,onRequest=null,contextual=false,unverified=false,admitAI=null,admissionVerdict=null}={}){
+async function setup(run,{reject=false,failReview=false,onRequest=null,contextual=false,unverified=false,admitAI=null,admissionVerdict=null,generatedResponse=null}={}){
   const keys=['NODE_ENV','LOCAL_CONVERSATIONAL_PREVIEW','ASK_SAFETY_CONTAINMENT'];const old=keys.map(k=>process.env[k]);
   Object.assign(process.env,{NODE_ENV:'development',LOCAL_CONVERSATIONAL_PREVIEW:'true',ASK_SAFETY_CONTAINMENT:'true'});
   const requests=[],logs=[],app=express();app.use(express.json());
@@ -34,7 +34,7 @@ async function setup(run,{reject=false,failReview=false,onRequest=null,contextua
     getClient:()=>({messages:{stream:async params=>{requests.push(params);
       if(onRequest)await onRequest(params,requests.length);
       if(params.max_tokens===200)return{stopReason:'end_turn',text:JSON.stringify(admissionVerdict||{decision:reject?'reject':'admit',scope_id:reject?'none':COVERAGE.id,reason:reject?'patient_care':'covered_education',intent:reject?'individualized_decision':contextual?'contextual_education':'general_education',source_ids:reject||unverified?[]:['merck-ventricular-filling']})};
-      if(params.max_tokens===1200)return{stopReason:'end_turn',text:JSON.stringify({answer:'Preserved EF does not establish normal diastolic filling. Compliance affects pressure-volume interpretation.',details:[],...(unverified?{}:{source_ids:['merck-ventricular-filling']})})};
+      if(params.max_tokens===1200)return{stopReason:'end_turn',text:JSON.stringify(generatedResponse||{answer:'Preserved EF does not establish normal diastolic filling. Compliance affects pressure-volume interpretation.',details:[],...(unverified?{}:{source_ids:['merck-ventricular-filling']})})};
       const data=JSON.parse(params.messages[0].content);return{stopReason:'end_turn',text:failReview?'{}':JSON.stringify({review_id:data.review_id,decision:'allow',checks:Object.fromEntries(RISKS.map(k=>[k,'safe'])),findings:[]})};
     }}}),runWithStageTimeout:async(work,_time,_code,signal)=>work(signal),collectPriorityMapStream:async value=>value,
     appendOperationalLog:entry=>logs.push(entry)});
@@ -358,3 +358,40 @@ test('admitted contextual education still fails closed if complete-answer review
   assert.equal(r.status,422);assert.equal((await r.json()).answer,undefined);assert.equal(requests.length,3);
   assert.equal([...routes.sessions.values()][0].history.length,0);
 },{contextual:true,unverified:true,failReview:true}));
+
+for(const unverified of [true,false]){
+  test(`contextual generation consolidates conditional and logical consistency with ${unverified?'no':'supplied'} references`,()=>setup(async({post,requests})=>{
+    const c=await post('/consent',{accepted:true,version:CONSENT_VERSION});const receipt=(await c.json()).receipt;
+    assert.equal((await post('/preview',{question:'Why might a specialist be involved in a reported clinical situation?'},receipt)).status,200);
+    const system=requests[1].system;
+    assert.equal(system,conversationSystem(unverified?null:educationalEvidence(['merck-ventricular-filling']),'contextual_education'));
+    assert.equal(system.split('EDUCATIONAL EXPLANATION ACCURACY:').length,2);
+    assert.match(system,/each unreported explanation must remain explicitly conditional in its own sentence or bullet/);
+    assert.match(system,/not depend on an earlier qualifier or hypothetical heading/);
+    assert.match(system,/Consultation, testing or medication involvement alone does not establish an unreported diagnosis/);
+    assert.match(system,/Every example must be consistent with its heading and the direct answer/);
+    assert.match(system,/Distinguish where a mechanism originates, which organs it affects and which specialties may manage it/);
+    assert.match(system,/add sections, examples or lists only when they contribute useful explanation/);
+    const accuracy=system.split('EDUCATIONAL EXPLANATION ACCURACY:')[1].split('Do not invent illustrative')[0];
+    for(const word of ['nephrology','kidney','aldosteronism'])assert.ok(!accuracy.includes(word));
+    assert.equal(requests[0].system,ADMISSION_PROMPT);
+    assert.equal(requests[2].system,require('../ask-output-safety').REVIEW_PROMPT);
+  },{contextual:true,unverified}));
+}
+
+test('original patient-assertion guard still withholds the documented contradictory follow-up fixture',()=>setup(async({post,requests,routes})=>{
+  const c=await post('/consent',{accepted:true,version:CONSENT_VERSION});const receipt=(await c.json()).receipt;
+  const r=await post('/preview',{question:'Does that necessarily mean the person has kidney disease?'},receipt);
+  assert.equal(r.status,422);assert.equal((await r.json()).error.code,'output_safety_withheld');
+  assert.equal(requests.length,2);assert.equal([...routes.sessions.values()][0].history.length,0);
+},{contextual:true,unverified:true,generatedResponse:{answer:'Not necessarily.',details:[{heading:'What changes interpretation',text:"Some common reasons without established kidney disease:\n- The patient has pre-existing kidney disease that isn't the cause of the hypertension but affects which medications are safe"}]}}));
+
+for(const details of [[],[{heading:'What changes interpretation',text:'- If an underlying condition were established, it could change which expertise is relevant.\n- If testing were still underway, the consultation could reflect uncertainty rather than a confirmed diagnosis.'}]]){
+  const answer='Not necessarily. Specialist involvement alone does not establish a diagnosis; the actual reason for consultation remains unknown from the reported information.';
+  test(`conditional education is reviewed and delivered unchanged with ${details.length} optional sections`,()=>setup(async({post,requests})=>{
+    const c=await post('/consent',{accepted:true,version:CONSENT_VERSION});const receipt=(await c.json()).receipt;
+    const r=await post('/preview',{question:'Does specialist involvement necessarily confirm a diagnosis?'},receipt);
+    assert.equal(r.status,200);const body=await r.json();assert.equal(body.answer,answer);assert.deepEqual(body.details,details);
+    assert.equal(requests.length,3);assert.deepEqual(JSON.parse(requests[2].messages[0].content).complete_answer,{answer,details});
+  },{contextual:true,unverified:true,generatedResponse:{answer,details}}));
+}

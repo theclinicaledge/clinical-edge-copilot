@@ -8,6 +8,8 @@ export default defineConfig({
   use: {
     baseURL: 'http://localhost:5173',
     trace: 'on-first-retry',
+    // Existing suites exercise consented users; tests/consent.spec.ts covers the gate itself.
+    storageState: 'tests/fixtures/consented-storage.json',
   },
   projects: [
     { name: 'chromium', use: { ...devices['Desktop Chrome'] } },

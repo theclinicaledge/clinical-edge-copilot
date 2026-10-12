@@ -1,5 +1,27 @@
 import { useSeo } from "./seo/useSeo.js";
 import { STATIC_ROUTE_SEO } from "./seo/routeSeo.js";
+import { useState, useSyncExternalStore } from "react";
+import { consentSnapshot, onConsentChange, parseConsentSnapshot, saveConsent } from "./consent.js";
+import "./styles/consent.css";
+
+// In-app way to grant or withdraw consent (App Store Review Guideline 5.1.1(ii)).
+function PrivacyChoices() {
+  const consent = parseConsentSnapshot(useSyncExternalStore(onConsentChange, consentSnapshot, () => "none"));
+  const [saved, setSaved] = useState("");
+  const update = (key, value) => {
+    saveConsent({ ai: consent?.ai === true, analytics: consent?.analytics === true, [key]: value });
+    setSaved(key === "ai" && !value ? "AI processing turned off. Shift Brain and Ask will ask again before sending anything." : "Choice saved on this device.");
+  };
+  return (
+    <section className="ce-privacy-choices" aria-labelledby="privacy-choices-title">
+      <h2 id="privacy-choices-title">Your choices on this device</h2>
+      <p>Change these anytime. They apply to this browser or app install only.</p>
+      <label><input type="checkbox" checked={consent?.ai === true} onChange={(e) => update("ai", e.target.checked)} /><span>Send my Shift Brain and Ask entries to Anthropic to generate responses</span></label>
+      <label><input type="checkbox" checked={consent?.analytics === true} onChange={(e) => update("analytics", e.target.checked)} /><span>Share anonymous usage analytics with Vercel Analytics</span></label>
+      <p role="status" aria-live="polite">{saved}</p>
+    </section>
+  );
+}
 
 export default function Privacy({ onNavigate }) {
   useSeo(STATIC_ROUTE_SEO["/privacy"]);
@@ -97,8 +119,10 @@ export default function Privacy({ onNavigate }) {
             margin: "0 0 36px",
             letterSpacing: "0.01em",
           }}>
-            Effective date: April 1, 2026
+            Effective date: October 11, 2026
           </p>
+
+          <PrivacyChoices />
 
           {/* ── Policy sections ── */}
           {[
@@ -108,11 +132,11 @@ export default function Privacy({ onNavigate }) {
             },
             {
               title: "Do not enter patient information",
-              body: "Clinical Edge Copilot is not a HIPAA-covered platform and is not designed to handle protected health information (PHI). Do not enter patient names, medical record numbers (MRNs), dates of birth, Social Security numbers, phone numbers, addresses, or any other information that could identify a specific patient. Describe the clinical situation only — vitals, symptoms, labs, and context — without identifying details.",
+              body: "Clinical Edge Copilot is not a HIPAA-covered platform and is not designed to handle protected health information (PHI). Do not enter patient names, medical record numbers (MRNs), dates of birth, Social Security numbers, phone numbers, addresses, or any other information that could identify a specific patient. Describe the clinical situation only (vitals, symptoms, labs and context) without identifying details.",
             },
             {
               title: "Information you provide in prompts",
-              body: "When you submit a query, the text you enter is sent to our backend server and forwarded to Anthropic's Claude API to generate a response. We do not store prompt text, normalized prompt text, or response excerpts in backend operational logs. Operational logs contain non-content metadata such as request category, length, completion status, timing, and error type. Automated identifier checks are limited and do not make the service HIPAA compliant or safe for PHI.",
+              body: "Before anything is sent, the app asks for your explicit permission. When you submit a query or Snapshot, the information you enter is sent to our backend server and forwarded to Anthropic's Claude API, a third-party AI service, to generate a response. Anthropic automatically deletes API inputs and outputs within 30 days, except where content is flagged under its usage policy or longer retention is required by law. Anthropic's commercial terms apply. We do not store prompt text, normalized prompt text, or response excerpts in backend operational logs. Operational logs contain non-content metadata such as request category, length, completion status, timing, and error type. Automated identifier checks are limited and do not make the service HIPAA compliant or safe for PHI.",
             },
             {
               title: "Local storage",
@@ -120,15 +144,19 @@ export default function Privacy({ onNavigate }) {
             },
             {
               title: "Analytics and usage data",
-              body: "We use Vercel Analytics to collect aggregate, anonymized usage data — including page views and interaction events such as query submissions and feature usage. This data does not include the content of your queries and is not linked to any individual user. It is used solely to understand how the product is used and to improve it.",
+              body: "Only if you opt in, we use Vercel Analytics to collect aggregate, anonymized usage data, including page views and interaction events such as which features are used. This data never includes what you type and is not linked to any individual user. It is used only to understand how the product is used and to improve it. Analytics is off unless you turn it on, and you can turn it off at any time above.",
             },
             {
               title: "How information is used",
-              body: "Information processed through the app is used to: (1) generate AI responses to your clinical queries in real time; (2) monitor reliability through aggregate, non-content operational metadata; and (3) understand aggregate product usage through analytics. We do not sell data. We do not share query content with third parties beyond what is necessary to generate responses.",
+              body: "Information processed through the app is used to: (1) generate AI responses to your clinical queries in real time; (2) monitor reliability through aggregate, non-content operational metadata; and (3) if you opt in, understand aggregate product usage through analytics. We do not sell data, use it for advertising, or track you across other apps or websites. We do not share query content with third parties beyond what is necessary to generate responses, and we do not use it for any other purpose without asking you again.",
             },
             {
               title: "Third-party services",
-              body: "Clinical Edge Copilot uses the following third-party services:\n\n• Anthropic Claude API — processes query text to generate AI responses. Anthropic's privacy policy applies to data transmitted through their API.\n• Vercel Analytics — collects anonymized usage events. Vercel's privacy policy applies.\n• Google Fonts — fonts are loaded from Google's CDN. Google's privacy policy applies to font requests.",
+              body: "Clinical Edge Copilot uses the following third-party services:\n\n• Anthropic (Claude API): processes the information you submit to generate AI responses.\n• Render: hosts our backend server, which passes your submission to Anthropic without storing its content.\n• Vercel: hosts the website and, only if you opt in, Vercel Analytics usage events.\n• Google Fonts: fonts are loaded from Google's servers, which receive standard request information such as your IP address.\n\nWe share data with these providers only as needed to run the service, and we rely on them to protect it at a level equal to this policy. Their own privacy policies also apply.",
+            },
+            {
+              title: "Retention, deletion and withdrawing consent",
+              body: "Our server does not retain the content you submit. Operational logs hold only non-content metadata. Saved cases stay on your device until you delete them in the app or clear site data. Anthropic's retention is described above. You can withdraw AI processing or analytics consent at any time using the choices at the top of this page. Withdrawing stops future sending; it cannot recall a request already processed. For any other privacy request, email the contact below.",
             },
             {
               title: "Cookies",

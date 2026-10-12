@@ -39,6 +39,8 @@ test.beforeEach(async ({ page }) => {
   await page.addInitScript(() => {
     localStorage.clear();
     sessionStorage.clear();
+    // These suites exercise a user who already granted AI and analytics consent.
+    localStorage.setItem('ce_consent', JSON.stringify({ version: 1, ai: true, analytics: true, decidedAt: '2026-10-11T00:00:00.000Z' }));
   });
 });
 
@@ -126,7 +128,8 @@ test('Rapid Capture confirms an editable canonical Snapshot at 390px without a r
   await expect(page.getByText('Now 62 mmHg')).toBeVisible();
   await expect(page.getByRole('button', { name: 'Build my Priority Map →' })).toBeEnabled();
   expect(requests).toBe(0);
-  expect(await page.evaluate(() => ({ local: localStorage.length, session: sessionStorage.length }))).toEqual({ local: 0, session: 0 });
+  // The consent record holds only booleans; no clinical content may be stored.
+  expect(await page.evaluate(() => ({ local: Object.keys(localStorage).filter((key) => key !== 'ce_consent').length, session: sessionStorage.length }))).toEqual({ local: 0, session: 0 });
   expect(await page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth)).toBe(true);
 });
 

@@ -98,6 +98,8 @@ async function captureAnalytics(page: Page) {
     if (message.text().startsWith('[analytics]')) events.push(await Promise.all(message.args().map(arg => arg.jsonValue())));
   });
   await page.context().route('https://apps.apple.com/**', route => route.fulfill({ status: 200, contentType: 'text/html', body: 'App Store' }));
+  // The badge opens the App Store in a new tab; close it straight away.
+  page.context().on('page', popup => { popup.close().catch(() => {}); });
   return events;
 }
 
@@ -105,9 +107,9 @@ test('clicking a badge sends only app_store_badge_clicked with its placement, th
   const events = await captureAnalytics(page);
   for (const [path, placement] of [['/landing', 'landing'], ['/download', 'download'], ['/', 'footer']]) {
     await page.goto(path);
-    const badge = page.locator(`.ce-app-store-badge[data-placement="${placement}"]`).first();
-    const [popup] = await Promise.all([page.waitForEvent('popup'), badge.click()]);
-    await popup.close();
+    const before = events.length;
+    await page.locator(`.ce-app-store-badge[data-placement="${placement}"]`).first().click();
+    await expect.poll(() => events.length).toBeGreaterThan(before);
   }
   await expect.poll(() => events.filter(e => e[1] === 'app_store_badge_clicked')).toEqual([
     ['[analytics]', 'app_store_badge_clicked', { placement: 'landing' }],
@@ -122,9 +124,8 @@ test.describe('without analytics consent', () => {
   test('a badge click sends no analytics', async ({ page }) => {
     const events = await captureAnalytics(page);
     await page.goto('/landing');
-    const [popup] = await Promise.all([page.waitForEvent('popup'), page.locator('.ce-app-store-badge[data-placement="landing"]').click()]);
-    await popup.close();
-    await page.waitForTimeout(200);
+    await page.locator('.ce-app-store-badge[data-placement="landing"]').click();
+    await page.waitForTimeout(300);
     expect(events).toEqual([]);
   });
 });
@@ -159,3 +160,64 @@ for (const [label, userAgent] of [['Instagram iOS in-app browser', INSTAGRAM_IOS
     });
   });
 }
+
+// The floating workspace dock (Home, Shift Brain, Ask, Tools, More) must never cover the
+// footer badge or the last content of a page when scrolled to the very bottom.
+async function scrollToBottom(page: Page) {
+  await page.evaluate(() => window.scrollTo(0, document.documentElement.scrollHeight));
+  await page.waitForTimeout(200);
+}
+
+test.describe('375px dock clearance', () => {
+  test.use({ viewport: { width: 375, height: 667 } });
+
+  test('the Home footer badge, with its clear space, sits fully above the dock at the very bottom', async ({ page }) => {
+    await page.goto('/');
+    const badge = page.locator('.ce-app-store-badge[data-placement="footer"]');
+    await expect(badge).toBeVisible();
+    await scrollToBottom(page);
+    const dock = await page.locator('.ce-tool-dock').boundingBox();
+    const link = await badge.boundingBox();
+    const image = await badge.locator('img').boundingBox();
+    expect(dock && link && image).toBeTruthy();
+    expect(image!.height).toBeGreaterThanOrEqual(40);
+    // No overlap between the badge (including Apple's clear space) and the dock.
+    expect(link!.y + link!.height).toBeLessThanOrEqual(dock!.y);
+    expect(image!.y + image!.height + image!.height / 4).toBeLessThanOrEqual(dock!.y);
+    await expect(badge.locator('img')).toBeInViewport({ ratio: 1 });
+  });
+
+  for (const path of ['/', '/landing', '/download', '/blog/abg-interpretation-for-nurses']) {
+    test(`the footer badge is centered on phones on ${path}`, async ({ page }) => {
+      await page.goto(path);
+      const badge = page.locator('.ce-app-store-badge[data-placement="footer"]');
+      await expect(badge).toBeVisible();
+      const [own, parent] = await badge.evaluate(a => [a.getBoundingClientRect(), a.parentElement!.getBoundingClientRect()].map(r => r.left + r.width / 2));
+      expect(Math.abs(own - parent)).toBeLessThanOrEqual(1);
+      expect((await badge.locator('img').boundingBox())!.height).toBeGreaterThanOrEqual(40);
+    });
+  }
+
+  for (const path of ['/', '/copilot', '/ask', '/icu-drips', '/reference-hub', '/abg-lab', '/brain-sheets', '/rhythm-lab', '/rhythm-lab/library', '/rhythm-lab/practice', '/rhythm-lab/compare', '/rhythm-lab/pearls', '/rhythm-lab/sprint']) {
+    test(`the last content on ${path} is not hidden behind the dock`, async ({ page }) => {
+      await page.goto(path);
+      await expect(page.locator('.ce-tool-dock')).toBeVisible();
+      await page.waitForTimeout(300);
+      await scrollToBottom(page);
+      const result = await page.evaluate(() => {
+        const dock = document.querySelector('.ce-tool-dock')!;
+        const dockTop = dock.getBoundingClientRect().top;
+        let lowest = -Infinity;
+        for (const element of document.querySelectorAll('#root *')) {
+          const el = element as HTMLElement;
+          if (dock.contains(el) || el.offsetParent === null || el.children.length || !(el.textContent?.trim() || el.tagName === 'IMG')) continue;
+          if (getComputedStyle(el).visibility === 'hidden') continue;
+          const box = el.getBoundingClientRect();
+          if (box.height > 0) lowest = Math.max(lowest, box.bottom);
+        }
+        return { dockTop, lowest };
+      });
+      expect(result.lowest).toBeLessThanOrEqual(result.dockTop);
+    });
+  }
+});

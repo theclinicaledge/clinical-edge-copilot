@@ -27,6 +27,10 @@
 .ce-command-home__links { margin-top: 12px; }
 .ce-command-home__links a { min-height: 64px; border-bottom: 1px solid var(--ce-warm-line); padding: 10px 0; }
 .ce-command-home__footer { display: flex; gap: 24px; justify-content: space-between; margin-top: 28px; color: var(--ce-text-muted); font-size: 11px; line-height: 1.6; }
+/* With the floating dock, the footer (and its App Store badge) carries the dock clearance itself,
+   so the badge clears the dock when scrolled to the very bottom; the page-level spacer is not doubled. */
+#root:has(> .ce-tool-dock) > .ce-command-home.ce-command-home { padding-bottom: 0; }
+#root:has(> .ce-tool-dock) .ce-command-home__footer { padding-bottom: calc(var(--ce-dock-clearance, 88px) + 16px); }
 .ce-command-home__footer p { max-width: 560px; }
 .ce-command-home__footer div { display: flex; gap: 20px; }
 .ce-command-home a, .ce-navigation-sheet a { transition: background-color var(--ce-dur-fast), transform var(--ce-dur-fast); }

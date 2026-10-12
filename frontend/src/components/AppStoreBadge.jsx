@@ -22,9 +22,8 @@ export default function AppStoreBadge({ placement, height = 48 }) {
       target="_blank"
       rel="noopener noreferrer"
       data-placement={placement}
-      // Clear space as padding; the matching negative side margins keep the artwork
-      // aligned with surrounding text while the space around it stays empty.
-      style={{ padding: size / 4, marginInline: -size / 4 }}
+      // Apple's clear space (a quarter of the badge height), applied as padding in CSS.
+      style={{ "--ce-badge-clear": `${size / 4}px` }}
       onClick={() => trackEvent("app_store_badge_clicked", { placement })}
     >
       <img

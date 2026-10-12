@@ -104,7 +104,11 @@
   /* ── Layout ── */
   --ce-content-narrow: 700px;
   --ce-content:        860px;
-  --ce-dock-clearance: calc(74px + max(14px, env(safe-area-inset-bottom)));
+  /* Space every dock page reserves below its last content: dock height plus a gap, plus the
+     iPhone home-indicator safe area (the dock itself sits above that safe area). Applied once,
+     to the routed page, by index.css; do not add per-page dock padding. */
+  --ce-safe-bottom: env(safe-area-inset-bottom, 0px);
+  --ce-dock-clearance: calc(88px + var(--ce-safe-bottom));
 
   /* ── Motion ── */
   --ce-dur-fast:    120ms;

@@ -49,8 +49,8 @@
   -moz-osx-font-smoothing: grayscale;
   min-height: 100svh;
   position: relative;
-  overflow-x: clip; /* prevent any child from blowing out page width */
-  max-width: 100vw;
+  /* No overflow here or on .app-shell: an overflow on the sticky header's ancestors breaks
+     position: sticky in iOS Safari (content scrolled above the header). Clip in .app-body. */
 }
 
 .rhythm-lab-root::before {
@@ -84,6 +84,8 @@
   flex: 1;
   display: flex;
   flex-direction: column;
+  min-width: 0;
+  overflow-x: clip; /* prevent any child from blowing out page width */
 }
 
 /* ─── Site header ────────────────────────────────────────────────────── */

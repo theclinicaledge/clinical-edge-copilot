@@ -22,7 +22,7 @@ export default function ClinicalEdgeHome({ onNavigate }) {
     <header className="ce-command-home__header"><div><ClinicalEdgeMark /><strong>Clinical Edge</strong><span>For nurses</span></div></header>
     <main className="ce-command-home__main">
       <section className="ce-home-feature" aria-labelledby="home-learning-title">
-        <div className="ce-home-feature__label"><strong>Ask Clinical Edge</strong><span>Beta</span></div>
+        <div className="ce-home-feature__label"><strong>Ask Clinical Edge</strong></div>
         <h1 id="home-learning-title">Understand the why.</h1>
         <p>Explore nursing concepts and clinical reasoning, one conversation at a time.</p>
         <a className="ce-home-ask" href="/ask" onClick={event => { if (event.metaKey || event.ctrlKey || event.shiftKey || event.altKey) return; event.preventDefault(); onNavigate('/ask'); }}>Ask a question <span aria-hidden="true">&#8594;</span></a>

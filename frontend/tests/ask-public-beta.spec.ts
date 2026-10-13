@@ -9,7 +9,7 @@ test('public education consent, device header, feedback and withdrawal preserve 
   });
   await page.goto('/ask');
   await expect(page.getByRole('heading',{name:'Ask Clinical Edge',exact:true})).toBeVisible();
-  await expect(page.getByText('Beta',{exact:true})).toBeVisible();
+  await expect(page.getByText(/\bbeta\b/i)).toHaveCount(0);
   await page.getByText('Daily question allowance',{exact:true}).click();
   await expect(page.getByText(/Each submitted conversational question, including follow-ups/)).toBeVisible();
   await page.getByRole('button',{name:'Enable educational conversation'}).click();
@@ -18,6 +18,8 @@ test('public education consent, device header, feedback and withdrawal preserve 
   await page.getByLabel('Nursing question').fill('Explain ventricular compliance.');
   await page.getByRole('button',{name:'Ask Clinical Edge',exact:true}).click();
   await expect(page.getByText('Mock educational explanation.')).toBeVisible();
+  await expect(page.getByText('Educational explanation',{exact:true})).toBeVisible();
+  await expect(page.getByText(/\bbeta\b/i)).toHaveCount(0);
   expect(sent[0].body).toEqual({question:'Explain ventricular compliance.'});
   expect(sent[0].headers['x-ce-device']).toMatch(/^[a-f0-9-]{36}$/);
   const href=await page.getByRole('link',{name:'Report a concern'}).getAttribute('href');

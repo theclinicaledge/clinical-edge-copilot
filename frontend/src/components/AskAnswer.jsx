@@ -83,7 +83,7 @@ export default function AskAnswer({ turn, beta, conversation, earlier = false, a
   return <div className="ce-ask-turn" ref={root}>
     <div className="ce-ask-user-message"><span>You</span><p>{question}</p></div>
     <section className="ce-ask-answer" ref={answerRef} tabIndex={-1} aria-label={earlier ? 'Earlier educational explanation' : 'Latest educational explanation'}>
-      <header className="ce-ask-answer-header"><strong>Clinical Edge</strong><span className="ce-ask-answer-mode">{beta ? 'Educational beta' : conversation ? 'Bounded educational preview' : context?.snapshotUse ? 'Using Patient Snapshot' : 'General Ask'}</span></header>
+      <header className="ce-ask-answer-header"><strong>Clinical Edge</strong><span className="ce-ask-answer-mode">{beta ? 'Educational explanation' : conversation ? 'Bounded educational preview' : context?.snapshotUse ? 'Using Patient Snapshot' : 'General Ask'}</span></header>
       <p className="ce-ask-evidence-status">{evidenceStatus}</p>
       {conversation && context?.educationalReframing && <p className="ce-ask-reframing">{REFRAMING}</p>}
       {!conversation && <p className="ce-ask-scope">{context?.questionKind === 'reported_context' ? 'Reported context · Not a diagnosis' : 'Nursing education'}</p>}

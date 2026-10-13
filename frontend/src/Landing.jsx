@@ -16,7 +16,7 @@ function AskCta({ placement, onNavigate }) {
         if (onNavigate) { event.preventDefault(); onNavigate('/ask'); }
       }}
     >Ask Clinical Edge <span aria-hidden="true">&#8594;</span></a>
-    <p className="ce-acquisition__practice-status">Public Beta · For nursing education</p>
+    <p className="ce-acquisition__practice-status">For nursing education</p>
   </div>;
 }
 
@@ -55,7 +55,7 @@ export default function Landing({ onNavigate }) {
         </div>
         <div className="ce-acquisition__jobs">
           <article>
-            <span className="ce-acquisition__job-status">Ask Clinical Edge · Public Beta</span>
+            <span className="ce-acquisition__job-status">Ask Clinical Edge</span>
             <h3>Ask a nursing question</h3>
             <p>Explore physiology, compare concepts and ask follow-up questions. Educational explanations, not individualized care decisions.</p>
             <a className="ce-acquisition__tool-link" href="/ask" onClick={navigate}>Open Ask <span aria-hidden="true">&#8594;</span></a>

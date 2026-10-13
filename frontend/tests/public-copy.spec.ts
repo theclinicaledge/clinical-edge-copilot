@@ -31,6 +31,7 @@ for (const width of [390, 1280]) {
       page.on('pageerror', error => errors.push(error.message));
       await page.goto(path);
       await expect(page.getByRole('heading', { name: heading, exact: true })).toBeVisible();
+      if (path === '/' || path === '/landing') await expect(page.getByText(/\bbeta\b/i)).toHaveCount(0);
       // Reveal existing scroll-triggered sections before the review capture.
       await page.evaluate(async () => {
         for (let y = 0; y < document.documentElement.scrollHeight; y += 500) {
@@ -64,7 +65,8 @@ test('landing describes public educational Ask without medical output or accurac
   await page.goto('/landing');
   const content = await page.locator('body').innerText();
   expect(content).not.toMatch(/catch subtle deterioration|fast, accurate|safe clinical decision|thinks like a nurse|preceptor would|nursing school didn't|Google rabbit hole|second set of clinical eyes|Urgency:|calcium gluconate|acute decompensated|furosemide|clinically validated|P2|beta.ready/i);
-  expect(content).toContain('Public Beta');
+  expect(content).not.toMatch(/\bbeta\b/i);
+  expect(content).toContain('For nursing education');
   expect(content).toContain('Use fictional scenarios and general education only; do not enter real patient information.');
   await expect(page.locator('a[href="/ask"]')).toHaveCount(3);
   const practice = page.getByRole('button', { name: 'Try a fictional practice scenario', exact: true });

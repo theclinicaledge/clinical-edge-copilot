@@ -32,6 +32,27 @@ test('cost estimate uses token usage and configured rates', () => {
   assert.equal(estimateCostUsd(null, config), 0);
 });
 
+test('Opus usage cannot be underpriced by the existing Sonnet configuration', async () => {
+  const config = readConfig({});
+  assert.equal(estimateCostUsd({ input_tokens: 1_000_000, output_tokens: 1_000_000 }, config, 'claude-opus-5-5'), 24);
+  assert.equal(estimateCostUsd({ input_tokens: 1_000_000, output_tokens: 1_000_000 }, { ...config, inputUsdPerMTok: 5, outputUsdPerMTok: 25 }, 'claude-opus-5-5'), 30);
+  const guard = createAiCostGuard({ env: { AI_DAILY_BUDGET_USD: '0.02' } });
+  const usage = { input_tokens: 1000, output_tokens: 1000 };
+  const client = guard.meter({ messages: {
+    create: async () => ({ usage }),
+    stream: () => ({ async *[Symbol.asyncIterator]() {
+      yield { type: 'message_start', message: { usage: { input_tokens: 1000 } } };
+      yield { type: 'message_delta', usage: { output_tokens: 1000 } };
+      throw Error('synthetic partial stream');
+    } }),
+  } });
+  await client.messages.create({ model: 'claude-opus-5-5' });
+  assert.equal(guard.snapshot().spentUsd, 0.024);
+  assert.equal(guard.admit(req(), 'ASK').code, 'ai_daily_budget_reached');
+  await assert.rejects(async () => { for await (const _event of client.messages.stream({ model: 'claude-opus-5-5' })) {} }, /synthetic partial stream/);
+  assert.equal(guard.snapshot().spentUsd, 0.048);
+});
+
 test('invalid or negative env values fall back to defaults; zero is honoured', () => {
   const config = readConfig({ AI_DAILY_BUDGET_USD: '-1', FREE_DAILY_QUESTIONS: '2.5', FREE_DAILY_QUESTIONS_PER_IP: 'x', AI_INPUT_USD_PER_MTOK: 'abc', AI_OUTPUT_USD_PER_MTOK: '' });
   assert.deepEqual(config, { budgetUsd: DEFAULTS.AI_DAILY_BUDGET_USD, freeQuestions: DEFAULTS.FREE_DAILY_QUESTIONS, freeQuestionsPerIp: DEFAULTS.FREE_DAILY_QUESTIONS_PER_IP, inputUsdPerMTok: DEFAULTS.AI_INPUT_USD_PER_MTOK, outputUsdPerMTok: DEFAULTS.AI_OUTPUT_USD_PER_MTOK });

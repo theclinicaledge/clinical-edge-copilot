@@ -11,7 +11,9 @@ for(const unverified of [true,false]){
     const c=await post('/consent',{accepted:true,version:CONSENT_VERSION});const receipt=(await c.json()).receipt;
     const question='Explain a physiological mechanism to a nursing learner.';
     const r=await post('/preview',{question},receipt);assert.equal(r.status,200);
-    const generation=requests.find(x=>x.max_tokens===1200);
+    const generation=requests[1];
+    assert.deepEqual(requests.map(x=>x.max_tokens),[2048,4096,2048]);
+    for(const request of requests){assert.equal(request.model,'claude-opus-5-5');assert.equal(request.output_config.effort,'medium');}
     assert.match(generation.system,/EDUCATIONAL EXPLANATION ACCURACY:/);
     assert.match(generation.system,/distinguish an observed state from the process/);
     assert.match(generation.system,/a common mechanism is not universal/);
@@ -33,8 +35,8 @@ async function setup(run,{reject=false,failReview=false,onRequest=null,contextua
   const routes=registerConversation(app,{apiLimiter:(_q,_s,next)=>next(),containsPHI,admitAI,
     getClient:()=>({messages:{stream:async params=>{requests.push(params);
       if(onRequest)await onRequest(params,requests.length);
-      if(params.max_tokens===200)return{stopReason:'end_turn',text:JSON.stringify(admissionVerdict||{decision:reject?'reject':'admit',scope_id:reject?'none':COVERAGE.id,reason:reject?'patient_care':'covered_education',intent:reject?'individualized_decision':contextual?'contextual_education':'general_education',source_ids:reject||unverified?[]:['merck-ventricular-filling']})};
-      if(params.max_tokens===1200)return{stopReason:'end_turn',text:JSON.stringify({answer:'Preserved EF does not establish normal diastolic filling. Compliance affects pressure-volume interpretation.',details:[],...(unverified?{}:{source_ids:['merck-ventricular-filling']})})};
+      if(params.system===ADMISSION_PROMPT)return{stopReason:'end_turn',text:JSON.stringify(admissionVerdict||{decision:reject?'reject':'admit',scope_id:reject?'none':COVERAGE.id,reason:reject?'patient_care':'covered_education',intent:reject?'individualized_decision':contextual?'contextual_education':'general_education',source_ids:reject||unverified?[]:['merck-ventricular-filling']})};
+      if(params.max_tokens===4096)return{stopReason:'end_turn',text:JSON.stringify({answer:'Preserved EF does not establish normal diastolic filling. Compliance affects pressure-volume interpretation.',details:[],...(unverified?{}:{source_ids:['merck-ventricular-filling']})})};
       const data=JSON.parse(params.messages[0].content);return{stopReason:'end_turn',text:failReview?'{}':JSON.stringify({review_id:data.review_id,decision:'allow',checks:Object.fromEntries(RISKS.map(k=>[k,'safe'])),findings:[]})};
     }}}),runWithStageTimeout:async(work,_time,_code,signal)=>work(signal),collectPriorityMapStream:async value=>value,
     appendOperationalLog:entry=>logs.push(entry)});
@@ -120,16 +122,25 @@ test('unseen educational wording is not substituted by aliases',()=>setup(async(
 test('care request rejected by semantic admission cannot reach explanation generation',()=>setup(async({post,requests})=>{
   const c=await post('/consent',{accepted:true,version:CONSENT_VERSION});const cookie=(await c.json()).receipt;
   const r=await post('/preview',{question:'Fictional case: which insulin dose should be given?'},cookie);
-  assert.equal(r.status,403);assert.equal(requests.length,1);assert.equal(requests[0].max_tokens,200);
+  assert.equal(r.status,403);assert.equal(requests.length,1);assert.equal(requests[0].max_tokens,2048);
 },{reject:true}));
 test('admission policy separates requested action from specialty, seriousness and source availability',()=>{
-  assert.match(ADMISSION_PROMPT,/Determine the requested task before judging the medical subject/);
-  assert.match(ADMISSION_PROMPT,/Comparing mechanisms is not selecting a medication/);
-  assert.match(ADMISSION_PROMPT,/Explaining a dangerous condition is not an active emergency/);
-  assert.match(ADMISSION_PROMPT,/self-harm or overdose-risk/);
-  assert.match(ADMISSION_PROMPT,/consequentially unclear, return uncertain, never admit/);
-  assert.match(ADMISSION_PROMPT,/missing topic pack is not a reason to reject ordinary education/);
+  assert.match(ADMISSION_PROMPT,/Decide whether a useful bounded educational response is available/);
+  assert.match(ADMISSION_PROMPT,/General mechanisms, indications and monitoring concepts are not themselves care decisions/);
+  assert.match(ADMISSION_PROMPT,/concerning isolated observation alone is not proof of an active emergency/);
+  assert.match(ADMISSION_PROMPT,/self-harm\/overdose facilitation/);
+  assert.match(ADMISSION_PROMPT,/missing information makes even bounded education unsafe/);
+  assert.match(ADMISSION_PROMPT,/Source selection is not a topic-admission requirement/);
 });
+test('authorized frozen instructions reach the contextual generation pathway unchanged',()=>setup(async({post,requests})=>{
+  const sha=text=>require('node:crypto').createHash('sha256').update(text).digest('hex');
+  const c=await post('/consent',{accepted:true,version:CONSENT_VERSION});
+  const r=await post('/preview',{question:'Explain a reported nursing observation.'},(await c.json()).receipt);
+  assert.equal(r.status,200);
+  assert.equal(sha(requests[0].system),'8a4544614ce0906f0eef68f3f28b2d6dfaba6504744d4bdb7f59ea5a64b4bd93');
+  assert.equal(sha(requests[1].system),'2a18c816c41673fc9b273ad0dae37cf7d27edf0e2076a986f34d04e2bf75fc94');
+  assert.equal(sha(requests[2].system),'240203970c6b53665517e05c4c0fefcf3f7bd4b42eef5baaa4f7b493574c0e6a');
+},{contextual:true,unverified:true}));
 // Fixed provider verdicts test transport/enforcement, not model classification accuracy.
 for(const question of ['Why does postoperative delirium happen?','How do SSRIs and SNRIs differ?','Explain the pathophysiology of preeclampsia.','How do anticoagulant classes differ mechanistically?','Why can a severe asthma attack impair ventilation?']){
   test(`source-free educational admission preserves the actual question: ${question}`,()=>setup(async({post,requests})=>{
@@ -274,14 +285,14 @@ test('nonurgent reported context is preserved exactly and reframing explicitly d
 },{contextual:true}));
 
 test('contextual admission distinguishes understanding from decisions without requiring a stable or fictional label',()=>{
-  assert.match(ADMISSION_PROMPT,/asking ABOUT general physiology, common clinical considerations/);
-  assert.match(ADMISSION_PROMPT,/without asking the assistant to MAKE an individual diagnosis or care decision/);
-  assert.match(ADMISSION_PROMPT,/Do not require textbook wording or an explicit nonurgent\/fictional label/);
-  assert.match(ADMISSION_PROMPT,/without claiming the actual cause, treating team's rationale/);
-  assert.match(ADMISSION_PROMPT,/Missing context remains unknown, not evidence of stability/);
-  assert.match(ADMISSION_PROMPT,/mixed education-and-care-decision request remains restricted/);
-  assert.match(ADMISSION_PROMPT,/takes precedence even when the question asks why/);
-  assert.match(ADMISSION_PROMPT,/do not ignore reported dangerous findings/);
+  assert.match(ADMISSION_PROMPT,/general meaning, physiology, relevant possibilities or assessment concepts/);
+  assert.match(ADMISSION_PROMPT,/without making an individual determination/);
+  assert.match(ADMISSION_PROMPT,/no explicit question or question mark is needed/);
+  assert.match(ADMISSION_PROMPT,/determine an individual's diagnosis\/actual cause/);
+  assert.match(ADMISSION_PROMPT,/Missing findings do not establish stability/);
+  assert.match(ADMISSION_PROMPT,/including mixed education-and-decision requests/);
+  assert.match(ADMISSION_PROMPT,/immediate emergency care takes precedence/);
+  assert.match(ADMISSION_PROMPT,/do not disregard reported danger/);
   assert.match(COVERAGE.allowed,/common care rationales, never an individual determination/);
   assert.match(COVERAGE.excluded,/active time-critical situations/);
 });

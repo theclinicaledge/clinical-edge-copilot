@@ -57,13 +57,17 @@ function readConfig(env) {
   };
 }
 
-function estimateCostUsd(usage, config) {
+function estimateCostUsd(usage, config, model) {
   if (!usage) return 0;
+  // Keep configured conservative rates, but do not price Opus as Sonnet.
+  const opus = model === 'claude-opus-5-5';
+  const inputRate = opus ? Math.max(config.inputUsdPerMTok, 4) : config.inputUsdPerMTok;
+  const outputRate = opus ? Math.max(config.outputUsdPerMTok, 20) : config.outputUsdPerMTok;
   const count = (value) => (Number.isFinite(value) && value > 0 ? value : 0);
   const input = count(usage.input_tokens)
     + count(usage.cache_creation_input_tokens) * CACHE_WRITE_MULTIPLIER
     + count(usage.cache_read_input_tokens) * CACHE_READ_MULTIPLIER;
-  return (input * config.inputUsdPerMTok + count(usage.output_tokens) * config.outputUsdPerMTok) / 1e6;
+  return (input * inputRate + count(usage.output_tokens) * outputRate) / 1e6;
 }
 
 const SURFACE_NAMES = { ASK: "Ask", COPILOT: "Shift Brain", TEACH_ME: "Shift Brain", SBAR: "Shift Brain" };
@@ -108,9 +112,9 @@ function createAiCostGuard({ env = process.env, now = () => new Date(), appendOp
     try { return ipKeyGenerator(ip); } catch { return ip; }
   };
 
-  function recordUsage(usage) {
+  function recordUsage(usage, model) {
     rollover();
-    spentUsd += estimateCostUsd(usage, readConfig(env));
+    spentUsd += estimateCostUsd(usage, readConfig(env), model);
   }
 
   // Call immediately before the first Anthropic call of a request. Returns null
@@ -174,7 +178,7 @@ function createAiCostGuard({ env = process.env, now = () => new Date(), appendOp
     const messages = {
       create: async (...args) => {
         const message = await client.messages.create(...args);
-        recordUsage(message?.usage);
+        recordUsage(message?.usage, args[0]?.model);
         return message;
       },
       stream: (...args) => {
@@ -193,7 +197,7 @@ function createAiCostGuard({ env = process.env, now = () => new Date(), appendOp
               yield event;
             }
           } finally {
-            recordUsage(usage);
+            recordUsage(usage, args[0]?.model);
           }
         };
         return stream;

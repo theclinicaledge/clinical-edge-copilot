@@ -23,19 +23,20 @@ for (const width of [390, 768, 1440]) {
       await page.getByRole('button', { name: 'More tools' }).click();
       await page.getByRole('dialog').getByRole('link', { name: destination, exact: true }).click();
       await page.locator(`.${destination.toLowerCase()}-back-link`).click();
-      await page.getByRole('navigation', { name: 'Clinical Edge workspace' }).getByRole('link', { name: 'Shift Brain', exact: true }).click();
+      await page.getByRole('button', { name: 'More tools' }).click();
+      await page.getByRole('dialog').getByRole('link', { name: /^Shift Brain/ }).click();
       // The dock may select Rapid Capture, but the manual form stays in memory.
       await page.getByRole('button', { name: 'Enter findings manually', exact: true }).click();
       await expect(pressure).toHaveValue('108/64');
       expect(await page.evaluate(() => performance.timeOrigin)).toBe(started);
     }
-    await page.getByRole('button', { name: 'Reference and learning tools' }).click();
+    await page.getByRole('button', { name: 'Learn', exact: true }).click();
     const dialog = page.getByRole('dialog');
     await expect(dialog.getByRole('link', { name: 'Rhythm Lab' })).toHaveCount(1);
     await page.keyboard.press('Shift+Tab');
-    await expect(dialog.getByRole('link', { name: 'Rhythm Lab' })).toBeFocused();
+    await expect(dialog.getByRole('link', { name: 'ABG Lab' })).toBeFocused();
     await page.keyboard.press('Escape');
-    await expect(page.getByRole('button', { name: 'Reference and learning tools' })).toBeFocused();
+    await expect(page.getByRole('button', { name: 'Learn', exact: true })).toBeFocused();
     await page.goto('/rhythm-lab/library');
     const search = page.getByLabel('Filter rhythms');
     expect((await search.boundingBox())!.height).toBeGreaterThanOrEqual(44);

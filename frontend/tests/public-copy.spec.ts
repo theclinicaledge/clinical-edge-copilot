@@ -60,19 +60,17 @@ for (const width of [390, 1280]) {
   }
 }
 
-test('landing has bounded practice copy and no medical output or public Ask promise', async ({ page }) => {
+test('landing describes public educational Ask without medical output or accuracy claims', async ({ page }) => {
   await page.goto('/landing');
   const content = await page.locator('body').innerText();
-  expect(content).not.toMatch(/catch subtle deterioration|fast, accurate|safe clinical decision|thinks like a nurse|preceptor would|nursing school didn't|Google rabbit hole|second set of clinical eyes|Urgency:|calcium gluconate|acute decompensated|furosemide|Ask Clinical Edge|P2|beta.ready/i);
-  expect(content).toContain('not generated output');
+  expect(content).not.toMatch(/catch subtle deterioration|fast, accurate|safe clinical decision|thinks like a nurse|preceptor would|nursing school didn't|Google rabbit hole|second set of clinical eyes|Urgency:|calcium gluconate|acute decompensated|furosemide|clinically validated|P2|beta.ready/i);
+  expect(content).toContain('Public Beta');
   expect(content).toContain('Use fictional scenarios and general education only; do not enter real patient information.');
-  await expect(page.locator('a[href="/ask"]')).toHaveCount(0);
+  await expect(page.locator('a[href="/ask"]')).toHaveCount(3);
   const practice = page.getByRole('button', { name: 'Try a fictional practice scenario', exact: true });
-  await expect(practice).toHaveCount(2);
-  await expect(practice.first()).toBeDisabled();
-  await expect(practice.last()).toBeDisabled();
+  await expect(practice).toHaveCount(0);
   await expect(page).toHaveURL(/\/landing$/);
-  await expect(page.getByText('Example awaiting clinical-owner approval', { exact: true })).toBeVisible();
+  await expect(page.getByText('Example awaiting clinical-owner approval', { exact: true })).toHaveCount(0);
 });
 
 test('download keeps working tool links and replaces absolute trust claims', async ({ page }) => {

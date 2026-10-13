@@ -24,7 +24,7 @@ const long = { contextMode: 'general', answer: respiratory, details: [
   { heading: 'At the bedside', text: '- Assess respiratory effort and mental status alongside available carbon dioxide measurements; no single oxygen saturation establishes adequate ventilation.\n- Clarify baseline and recognition timing; focused neurologic findings, available glucose and medication/ventilation context can separate possibilities. Several contributors may coexist.' },
 ], evidence: { status: 'not_source_grounded', requiresVerification: false } };
 
-for (const width of [320, 390, 430, 1280]) test(`Home Ask CTA is full width, keyboard accessible and preserves Shift Brain at ${width}px`, async ({ page }) => {
+for (const width of [320, 390, 430, 1280]) test(`Home Ask CTA is full width, keyboard accessible and prioritizes learning at ${width}px`, async ({ page }) => {
   await page.setViewportSize({ width, height: 844 });
   await page.route('**/api/**', () => { throw new Error('Home navigation must not submit clinical data'); });
   await page.goto('/');
@@ -35,8 +35,8 @@ for (const width of [320, 390, 430, 1280]) test(`Home Ask CTA is full width, key
   expect(box!.height).toBeGreaterThanOrEqual(44);
   expect(Math.abs(box!.width - (main.width - main.padding))).toBeLessThan(2);
   expect(await cta.evaluate(el => getComputedStyle(el).backgroundColor)).toBe('rgb(10, 191, 188)');
-  const shift = await page.locator('.ce-command-home__work').boundingBox(); expect(shift!.y).toBeGreaterThan(box!.y + box!.height);
-  await expect(page.getByRole('heading', { name: 'Something changed.' })).toBeVisible();
+  await expect(page.locator('.ce-command-home__work')).toHaveCount(0);
+  await expect(page.getByRole('heading', { name: 'Learn', exact: true })).toBeVisible();
   await page.screenshot({ path: `${output}/home-cta-${width}.png` });
   await cta.focus(); await cta.press('Enter');
   await expect(page).toHaveURL(/\/ask$/);

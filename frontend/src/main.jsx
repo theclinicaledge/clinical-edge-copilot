@@ -131,7 +131,6 @@ function Root() {
   }, []);
 
   const enterApp         = () => navigate('/copilot');
-  const enterScenario    = () => navigate('/scenario');
   const enterQuickStart  = () => navigate('/quickstart');
   const goBack           = () => navigate('/copilot');
   const goBackToScenario = () => navigate('/scenario');
@@ -147,7 +146,7 @@ function Root() {
       {page === 'rhythmlab-sprint'   && <RhythmSprintPage navigate={navigate} />}
       {page === 'scenario'   && <Scenario onBack={goBack} onEnterApp={enterApp} onQuickStart={enterQuickStart} />}
       {page === 'quickstart' && <QuickStart onBack={goBackToScenario} onEnterApp={enterApp} />}
-      {page === 'landing'    && <Landing onEnterApp={enterApp} onEnterScenario={enterScenario} />}
+      {page === 'landing'    && <Landing onNavigate={navigate} />}
       {page === 'privacy'    && <Privacy onNavigate={navigate} />}
       {page === 'terms'      && <Terms onNavigate={navigate} />}
       {page === 'support'    && <Support onNavigate={navigate} />}

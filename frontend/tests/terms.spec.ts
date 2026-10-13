@@ -59,7 +59,7 @@ test('workspace navigation sheet lists Terms next to Privacy', async ({ page }) 
   await page.setViewportSize({ width: 390, height: 844 });
   await page.goto('/');
   await page.getByRole('navigation', { name: 'Clinical Edge workspace' }).getByRole('button', { name: 'More tools' }).click();
-  const dialog = page.getByRole('dialog', { name: 'Saved work & support' });
+  const dialog = page.getByRole('dialog', { name: 'Workspace & support' });
   await expect(dialog.getByRole('link', { name: /^Privacy/ })).toHaveAttribute('href', '/privacy');
   await expect(dialog.getByRole('link', { name: /^Terms/ })).toHaveAttribute('href', '/terms');
 });

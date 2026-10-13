@@ -83,7 +83,8 @@ test('editing confirmed form invalidates old context and hides stale patient ans
   await page.getByLabel('Use confirmed Patient Snapshot').check(); await page.getByLabel('Nursing question').fill(target);
   await page.getByRole('button', { name: 'Ask Clinical Edge', exact: false }).click(); await expect(page.locator('.ce-ask-answer')).toBeVisible();
   const dock = page.getByRole('navigation', { name: 'Clinical Edge workspace' });
-  await dock.getByRole('link', { name: 'Shift Brain', exact: true }).click(); await page.getByLabel('CI current', { exact: true }).fill('3.5');
+  await dock.getByRole('button', { name: 'More tools' }).click();
+  await page.getByRole('dialog').getByRole('link', { name: /^Shift Brain/ }).click(); await page.getByLabel('CI current', { exact: true }).fill('3.5');
   await dock.getByRole('link', { name: 'Ask', exact: true }).click();
   await expect(page.getByLabel('Use confirmed Patient Snapshot')).toHaveCount(0); await expect(page.locator('.ce-ask-answer')).toHaveCount(0); expect(bodies).toHaveLength(1);
 });
@@ -101,7 +102,8 @@ test('Snapshot gas uses authoritative ABG calculation through the actual form an
 test('rich synthesis stays focused while exact ABG calculations remain available on disclosure', async ({ page }) => {
   const bodies: any[] = []; await mockAsk(page, bodies); await enterSnapshot(page, true);
   const dock = page.getByRole('navigation', { name: 'Clinical Edge workspace' });
-  await dock.getByRole('link', { name: 'Shift Brain', exact: true }).click();
+  await dock.getByRole('button', { name: 'More tools' }).click();
+  await page.getByRole('dialog').getByRole('link', { name: /^Shift Brain/ }).click();
   await page.getByLabel('Other relevant context', { exact: false }).fill('Post-CABG.\nArterial ABG: pH 7.29, PaCO2 55 mmHg, HCO3 26 mmol/L.');
   await page.getByRole('button', { name: 'Confirm Snapshot for Ask', exact: false }).click();
   await page.getByLabel('Use confirmed Patient Snapshot').check(); await page.getByLabel('Nursing question').fill(target);

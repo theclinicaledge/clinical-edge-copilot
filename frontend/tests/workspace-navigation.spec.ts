@@ -1,6 +1,6 @@
 import { test, expect } from '@playwright/test';
 
-const widths = [390, 430, 1280];
+const widths = [390, 768, 1440];
 for (const width of widths) {
   test('command workspace navigation at ' + width + 'px', async ({ page }) => {
     await page.setViewportSize({ width, height: width === 1280 ? 900 : 844 });
@@ -11,11 +11,16 @@ for (const width of widths) {
     await page.goto('/');
     const nav = page.getByRole('navigation', { name: 'Clinical Edge workspace' });
     await expect(nav.getByRole('link', { name: 'Home', exact: true })).toHaveAttribute('aria-current', 'page');
-    await expect(page.getByRole('link', { name: "Describe what's happening" })).toBeInViewport();
+    await expect(page.locator('.ce-home-ask')).toBeInViewport();
+    await expect(nav.getByRole('link', { name: 'Shift Brain', exact: true })).toHaveCount(0);
     await expect(page.locator('.ce-command-home__checks')).toBeInViewport();
     await page.screenshot({ path: '/private/tmp/clinical-edge-slice1-home-' + width + '.png', animations: 'disabled' });
 
-    await page.getByRole('link', { name: "Describe what's happening" }).click();
+    await nav.getByRole('button', { name: 'More tools' }).click();
+    await expect(page.getByRole('dialog')).toContainText('AI generation temporarily unavailable');
+    await page.getByRole('dialog').getByRole('link', { name: /^Shift Brain/ }).click();
+    await expect(page.locator('.ce-shift-availability')).toBeInViewport();
+    await page.getByRole('button', { name: "Describe what's happening", exact: true }).click();
     await expect(page.getByRole('button', { name: "Describe what's happening", exact: true })).toHaveAttribute('aria-pressed', 'true');
     const narrative = page.getByRole('textbox', { name: 'Nurse narrative' });
     await expect(narrative).toBeVisible();
@@ -24,28 +29,28 @@ for (const width of widths) {
     await page.setViewportSize({ width: width === 390 ? 844 : width, height: width === 390 ? 390 : 780 });
     await expect(narrative).toHaveValue('Fictional practice scenario: RR is 24.');
     await page.setViewportSize({ width, height: width === 1280 ? 900 : 844 });
-    await nav.getByRole('button', { name: 'Reference and learning tools' }).click();
-    const dialog = page.getByRole('dialog', { name: 'Reference & learning tools' });
+    await nav.getByRole('button', { name: 'Learn', exact: true }).click();
+    const dialog = page.getByRole('dialog', { name: 'Learn', exact: true });
     await expect(dialog).toBeVisible();
     await expect(page.getByRole('button', { name: 'Close tools' })).toBeFocused();
     await page.screenshot({ path: '/private/tmp/clinical-edge-slice1-check-' + width + '.png', animations: 'disabled' });
     await page.keyboard.press('Shift+Tab');
-    await expect(dialog.getByRole('link', { name: 'Rhythm Lab' })).toBeFocused();
+    await expect(dialog.getByRole('link', { name: 'ABG Lab' })).toBeFocused();
     await page.keyboard.press('Escape');
     await expect(dialog).not.toBeVisible();
-    await expect(nav.getByRole('button', { name: 'Reference and learning tools' })).toBeFocused();
+    await expect(nav.getByRole('button', { name: 'Learn', exact: true })).toBeFocused();
     await expect(narrative).toHaveValue('Fictional practice scenario: RR is 24.');
 
-    for (const [name, path, target] of [
-      ['Rhythm Lab', '/rhythm-lab', ''],
-      ['Medication', '/icu-drips', 'Search drips'],
-      ['ABG', '/abg-lab', ''],
-      ['Clinical reference', '/reference-hub', 'Search references'],
+    for (const [name, path, target, menu] of [
+      ['Rhythm Lab', '/rhythm-lab', '', 'Learn'],
+      ['Medication', '/icu-drips', 'Search drips', 'References'],
+      ['ABG Lab', '/abg-lab', '', 'Learn'],
+      ['Clinical reference', '/reference-hub', 'Search references', 'References'],
     ]) {
-      await nav.getByRole('button', { name: 'Reference and learning tools' }).click();
+      await nav.getByRole('button', { name: menu, exact: true }).click();
       await page.getByRole('dialog').getByRole('link', { name }).click();
       await expect(page).toHaveURL(new RegExp(path + '$'));
-      await expect(nav.getByRole('button', { name: 'Reference and learning tools' })).toHaveClass(/is-active/);
+      await expect(nav.getByRole('button', { name: menu, exact: true })).toHaveClass(/is-active/);
       if (target) {
         const search = page.getByLabel(target);
         await expect(search).toBeInViewport();
@@ -89,10 +94,10 @@ test('home lookup actions open the resource in one action and preserve optional 
   await page.setViewportSize({ width: 390, height: 844 });
   for (const [name, path] of [
     ['Medication', '/icu-drips'],
-    ['ABG', '/abg-lab'], ['Clinical reference', '/reference-hub'],
+    ['ABG Lab', '/abg-lab'], ['Clinical reference', '/reference-hub'],
   ]) {
     await page.goto('/');
-    await page.locator('.ce-command-home__checks').getByRole('link', { name }).click();
+    await page.locator('.ce-command-home__immediate').getByRole('link', { name }).click();
     await expect(page).toHaveURL(new RegExp(path + '$'));
     if (name === 'Medication') {
       await page.getByText('Practice, compare & clinical pearls', { exact: true }).click();

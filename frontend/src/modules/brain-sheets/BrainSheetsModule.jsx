@@ -38,19 +38,19 @@ function IndexView({ templates, onSelect, onGoHome }) {
         </div>
         <div className="bs-list" role="list">
           {templates.map((t) => (
-            <div
-              key={t.id}
-              role="listitem"
-              tabIndex={0}
+            <div key={t.id} role="listitem"><a
               className="bs-list-item ce-pressable ce-card-lift"
-              onClick={() => onSelect(t.id)}
-              onKeyDown={(e) => (e.key === 'Enter' || e.key === ' ') && onSelect(t.id)}
+              href={`/brain-sheets/${t.id}`}
+              onClick={(event) => {
+                if (event.metaKey || event.ctrlKey || event.shiftKey || event.altKey) return;
+                event.preventDefault(); onSelect(t.id);
+              }}
               aria-label={t.title}
             >
               <div className="bs-list-item-title">{t.title}</div>
               <div className="bs-list-item-audience">{t.audience}</div>
               <div className="bs-list-item-meta">{t.meta}</div>
-            </div>
+            </a></div>
           ))}
         </div>
       </div>
@@ -65,7 +65,7 @@ function IndexView({ templates, onSelect, onGoHome }) {
 // fallback text on failure, no analytics event ever.
 //
 // Download PDF is the primary acquisition action when a template has a
-// pre-generated `pdfPath` (currently medsurg-4pt only — see
+// pre-generated `pdfPath` (see
 // data/templates.jsx and scripts/generate-brain-sheets-pdf.mjs). Templates
 // without one simply don't render the button; Print / Save PDF and Copy
 // Link remain available regardless.
@@ -119,6 +119,7 @@ function TemplateActions({ template }) {
   const isMobileRisk = isStandaloneOrRiskyMobile();
   const mobileShareSupported = isMobileRisk && !!template.pdfPath && supportsFileShare();
   const showFallbackPanel = isMobileRisk && !!template.pdfPath && (!mobileShareSupported || shareFailed);
+  const copyUrl = showFallbackPanel ? `${SITE_URL}${template.pdfPath}` : canonicalUrl;
 
   const handlePrint = useCallback(() => {
     // No analytics here — template_downloaded wiring is a pending decision
@@ -135,6 +136,9 @@ function TemplateActions({ template }) {
   const handleSaveShare = useCallback(async () => {
     try {
       const response = await fetch(template.pdfPath);
+      if (!response.ok || !response.headers.get('content-type')?.includes('application/pdf')) {
+        throw new Error('PDF unavailable');
+      }
       const blob = await response.blob();
       const file = new File([blob], template.pdfFilename, { type: 'application/pdf' });
       if (!navigator.canShare?.({ files: [file] }) || !navigator.share) {
@@ -154,13 +158,13 @@ function TemplateActions({ template }) {
   const handleCopyLink = useCallback(async () => {
     try {
       if (!navigator.clipboard?.writeText) throw new Error('Clipboard API unavailable');
-      await navigator.clipboard.writeText(canonicalUrl);
+      await navigator.clipboard.writeText(copyUrl);
       setCopyState('copied');
       window.setTimeout(() => setCopyState('idle'), 1800);
     } catch {
       setCopyState('fallback');
     }
-  }, [canonicalUrl]);
+  }, [copyUrl]);
 
   return (
     <div className="bs-actions">
@@ -189,7 +193,7 @@ function TemplateActions({ template }) {
         )}
         <button type="button" className="bs-btn bs-btn-secondary" onClick={handleCopyLink}>
           <span key={copyState === 'copied' ? 'copied' : 'copy'} className="ce-swap-fast">
-            {copyState === 'copied' ? '✓ Copied' : 'Copy Link'}
+            {copyState === 'copied' ? '✓ Copied' : showFallbackPanel ? 'Copy PDF Link' : 'Copy Link'}
           </span>
         </button>
       </div>
@@ -207,21 +211,13 @@ function TemplateActions({ template }) {
       )}
       {showFallbackPanel && (
         <div className="bs-pdf-fallback">
-          <p>Your device could not open the PDF safely inside the app.</p>
-          <p>Open Clinical Edge in Safari to download the file, or use Copy Link.</p>
-          <a
-            href={canonicalUrl}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="bs-btn bs-btn-secondary"
-          >
-            Open in Safari
-          </a>
+          <p>{shareFailed ? 'PDF sharing did not complete.' : 'PDF file sharing is not available in this browser.'}</p>
+          <p>Copy the PDF link and open it in Safari or another browser to print or save the blank sheet.</p>
         </div>
       )}
       {copyState === 'fallback' && (
         <div className="bs-copy-fallback">
-          <div className="bs-copy-fallback-url">{canonicalUrl}</div>
+          <div className="bs-copy-fallback-url">{copyUrl}</div>
           <span className="bs-copy-fallback-hint">
             {isTouchDevice() ? 'Press and hold to copy' : 'Select and copy this link'}
           </span>

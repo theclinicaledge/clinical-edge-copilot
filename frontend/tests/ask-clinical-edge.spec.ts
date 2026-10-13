@@ -49,7 +49,8 @@ test('Ask excludes active Shift Brain context and preserves both memory workspac
   await page.getByRole('button', { name: 'Ask Clinical Edge' }).click();
   await expect(page.locator('.ce-ask-answer')).toBeVisible();
   expect(bodies).toEqual([{ question, contextMode: 'general' }]);
-  await dock.getByRole('link', { name: 'Shift Brain', exact: true }).click();
+  await dock.getByRole('button', { name: 'More tools' }).click();
+  await page.getByRole('dialog').getByRole('link', { name: /^Shift Brain/ }).click();
   await expect(page.getByLabel('Nurse narrative')).toHaveValue(narrative);
   await dock.getByRole('link', { name: 'Ask', exact: true }).click();
   await expect(page.locator('.ce-ask-answer')).toBeVisible(); expect(bodies).toHaveLength(1);

@@ -1589,6 +1589,11 @@ export default function App({ onGoHome, navigate, isOnline = true, initialCaptur
       {/* ── Main ─────────────────────────────────────────────────────────── */}
       <div className="main-container" data-workspace-state={workspaceState} style={{ maxWidth: 1120, margin: "0 auto", width: "100%", padding: "40px 20px 0", display: "flex", flexDirection: "column", alignItems: "stretch" }}>
 
+        <aside className="ce-shift-availability" aria-labelledby="shift-availability-title">
+          <strong id="shift-availability-title">Manual workspace available</strong>
+          <p>AI-generated Priority Maps, Teach Me and SBAR are temporarily unavailable. You can still enter findings manually and reopen saved cases. Entering findings will not make these AI features available.</p>
+        </aside>
+
         <div className="copilot-command-layout copilot-capture" hidden={workspaceState !== "capture"}>
           <div className="copilot-command-main">
 

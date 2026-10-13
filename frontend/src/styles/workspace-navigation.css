@@ -14,18 +14,18 @@
 .ce-command-home__work h2 { margin: 12px 0 24px; font-size: 26px; }
 .ce-command-home__capture { min-height: 56px; padding: 14px 16px; display: flex; align-items: center; justify-content: space-between; gap: 12px; background: var(--ce-teal); color: var(--ce-navy-header); border-radius: 6px; text-decoration: none; font-size: 15px; font-weight: 750; }
 .ce-command-home__work p { margin: 18px 0 0; color: var(--ce-text-light-body); font-size: 12px; line-height: 1.6; }
-.ce-command-home__checks { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 16px; }
-.ce-command-home__checks a:last-child { grid-column: 1 / -1; }
+.ce-command-home__checks { display: grid; gap: 0; margin-top: 12px; }
 .ce-command-home a { color: inherit; }
 .ce-command-home__work .ce-command-home__capture { color: var(--ce-navy-header); }
-.ce-command-home__checks a { background: var(--ce-warm-card); border: 1px solid var(--ce-warm-line); padding: 15px 14px; min-height: 88px; border-radius: 6px; }
+.ce-command-home__checks a { padding: 10px 0; min-height: 64px; border-bottom: 1px solid var(--ce-warm-line); }
 .ce-command-home__checks a, .ce-command-home__links a, .ce-navigation-links a, .ce-navigation-support a { display: flex; align-items: center; justify-content: space-between; gap: 12px; text-decoration: none; }
 .ce-command-home a strong, .ce-navigation-sheet a strong { display: block; font-size: 14px; font-weight: 700; }
 .ce-command-home a small, .ce-navigation-sheet a small { display: block; margin-top: 5px; color: var(--ce-text-muted); font-size: 12px; line-height: 1.4; }
 .ce-command-home__checks a > span:last-child, .ce-command-home__links a > span:last-child { color: var(--ce-teal-deep); }
-.ce-command-home__secondary { display: grid; grid-template-columns: 1fr 1fr; gap: 36px; margin-top: 36px; padding-top: 24px; border-top: 1px solid var(--ce-warm-line); }
+.ce-command-home__secondary { margin-top: 28px; padding-top: 16px; border-top: 1px solid var(--ce-warm-line); }
 .ce-command-home__links { margin-top: 12px; }
 .ce-command-home__links a { min-height: 64px; border-bottom: 1px solid var(--ce-warm-line); padding: 10px 0; }
+.ce-command-home__secondary a { border-bottom: 0; }
 .ce-command-home__footer { display: flex; gap: 24px; justify-content: space-between; margin-top: 28px; color: var(--ce-text-muted); font-size: 11px; line-height: 1.6; }
 /* With the floating dock, the footer (and its App Store badge) carries the dock clearance itself,
    so the badge clears the dock when scrolled to the very bottom; the page-level spacer is not doubled. */
@@ -45,8 +45,12 @@
 .ce-scenario-return a { min-height: 44px; display: flex; align-items: center; gap: 8px; color: var(--ce-teal); text-decoration: none; }
 .ce-scenario-return { pointer-events: auto; }
 #root:has(> .has-active-scenario) { --ce-dock-clearance: calc(132px + var(--ce-safe-bottom, 0px)); }
-.ce-workspace-nav .ce-tool-dock__inner { display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); overflow: visible; gap: 4px; border-radius: 8px; }
+.ce-workspace-nav .ce-tool-dock__inner { display: grid; grid-template-columns: 1fr 1fr 1fr 1.4fr 44px; overflow: visible; gap: 4px; border-radius: 8px; }
+.ce-shift-availability { margin-bottom: 24px; padding: 16px 18px; border-left: 3px solid var(--ce-teal-deep); background: var(--ce-warm-card); color: var(--ce-text-mid); font: 14px/1.6 var(--ce-font-sans); }
+.ce-shift-availability strong { color: var(--ce-text-dark); }
+.ce-shift-availability p { margin: 6px 0 0; }
 .ce-workspace-nav .ce-tool-dock__item { min-height: 48px; font-family: var(--ce-font-sans); font-size: 12px; border-radius: 5px; background: transparent; cursor: pointer; gap: 5px; padding: 0 4px; }
+.ce-workspace-nav .ce-workspace-nav__more { font-size: 24px; }
 .ce-workspace-nav .ce-tool-dock__item.is-active { background: var(--ce-teal); }
 .ce-navigation-backdrop { position: fixed; inset: 0; z-index: 200; display: flex; align-items: flex-end; justify-content: center; background: rgba(11,31,42,.55); padding: 20px 16px 0; }
 .ce-navigation-sheet { width: min(100%, 520px); max-height: calc(100dvh - 40px - env(safe-area-inset-top)); overflow-y: auto; overscroll-behavior: contain; padding: 24px 24px calc(24px + env(safe-area-inset-bottom)); border-radius: 8px 8px 0 0; background: var(--ce-warm-card); color: var(--ce-text-dark); font-family: var(--ce-font-sans); box-shadow: var(--ce-shadow-float); animation: ce-sheet-arrive 160ms var(--ce-ease-out); }

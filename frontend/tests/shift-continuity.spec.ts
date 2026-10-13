@@ -45,7 +45,7 @@ for (const width of [390, 430, 1280]) {
     const nav = page.getByRole('navigation', { name: 'Clinical Edge workspace' });
     const leave = async () => {
       await nav.getByRole('button', { name: 'References', exact: true }).click();
-      await page.getByRole('dialog').getByRole('link', { name: 'Medication' }).click();
+      await page.getByRole('dialog').getByRole('link', { name: 'ICU Drips' }).click();
       await expect(page.getByText('Shift Brain active', { exact: true })).toBeVisible();
     };
     const resume = async () => {

@@ -76,7 +76,7 @@ for (const width of [390, 430, 1280]) {
     await page.getByLabel('New bedside findings').fill(update);
     const interrupt = async () => {
       await page.getByRole('navigation', { name: 'Clinical Edge workspace' }).getByRole('button', { name: 'References', exact: true }).click();
-      await page.getByRole('dialog').getByRole('link', { name: 'Medication' }).click();
+      await page.getByRole('dialog').getByRole('link', { name: 'ICU Drips' }).click();
       await page.getByRole('link', { name: /Return/ }).click();
     };
     await interrupt();

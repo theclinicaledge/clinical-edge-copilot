@@ -6,13 +6,13 @@ import AppStoreBadge from "./components/AppStoreBadge.jsx";
 import { CHECK_ACTIONS, LEARN_ACTIONS } from "./components/workspaceActions.js";
 import "./styles/workspace-navigation.css";
 
-function IntentLink({ action, onNavigate }) {
-  return <a href={action.path} onClick={(event) => {
+function IntentLink({ action, onNavigate, learning = false }) {
+  return <a className={learning ? "ce-home-learning-card" : undefined} href={action.path} onClick={(event) => {
     if (event.metaKey || event.ctrlKey || event.shiftKey || event.altKey) return;
     event.preventDefault();
     if (action.event) trackEvent(action.event, { source: "command_home" });
     onNavigate(action.path);
-  }}><span><strong>{action.label}</strong><small>{action.detail}</small></span><span aria-hidden="true">&#8599;</span></a>;
+  }}><span>{learning && <span className="ce-home-learning-card__category">{action.path === "/rhythm-lab" ? "ECG learning" : "Acid-base learning"}</span>}<strong>{action.label}</strong><small>{action.detail}</small></span><span className="ce-home-link-arrow" aria-hidden="true">&#8594;</span></a>;
 }
 
 export default function ClinicalEdgeHome({ onNavigate }) {
@@ -20,18 +20,22 @@ export default function ClinicalEdgeHome({ onNavigate }) {
 
   return <div className="ce-command-home">
     <header className="ce-command-home__header"><div><ClinicalEdgeMark /><strong>Clinical Edge</strong><span>For nurses</span></div></header>
-    <main className="ce-command-home__main ce-page-enter">
-      <div className="ce-command-home__intro"><span>Your workspace</span><h1>What do you need right now?</h1></div>
-      <a className="ce-home-ask" href="/ask" onClick={event => { if (event.metaKey || event.ctrlKey || event.shiftKey || event.altKey) return; event.preventDefault(); onNavigate('/ask'); }}><span><strong>Ask Clinical Edge</strong><small>Get answers to your nursing questions.</small></span><span aria-hidden="true">&#8594;</span></a>
+    <main className="ce-command-home__main">
+      <section className="ce-home-feature" aria-labelledby="home-learning-title">
+        <div className="ce-home-feature__label"><strong>Ask Clinical Edge</strong><span>Beta</span></div>
+        <h1 id="home-learning-title">Understand the why.</h1>
+        <p>Explore nursing concepts and clinical reasoning, one conversation at a time.</p>
+        <a className="ce-home-ask" href="/ask" onClick={event => { if (event.metaKey || event.ctrlKey || event.shiftKey || event.altKey) return; event.preventDefault(); onNavigate('/ask'); }}>Ask a question <span aria-hidden="true">&#8594;</span></a>
+      </section>
       <div className="ce-command-home__immediate">
-        <section aria-labelledby="learn-title"><h2 id="learn-title">Learn</h2><div className="ce-command-home__links">{LEARN_ACTIONS.map((action) => <IntentLink key={action.path} action={action} onNavigate={onNavigate} />)}</div></section>
+        <section aria-labelledby="learn-title"><h2 id="learn-title">Learn</h2><div className="ce-home-learning-grid">{LEARN_ACTIONS.map((action) => <IntentLink key={action.path} action={action} onNavigate={onNavigate} learning />)}</div></section>
         <section className="ce-command-home__check" aria-labelledby="check-title">
           <h2 id="check-title">References</h2>
           <div className="ce-command-home__checks">{CHECK_ACTIONS.map((action) => <IntentLink key={action.path} action={action} onNavigate={onNavigate} />)}</div>
         </section>
       </div>
       <div className="ce-command-home__secondary ce-command-home__links"><IntentLink action={{ label: "Brain Sheets", detail: "Blank printable templates", path: "/brain-sheets", event: "brain_sheets_module_opened" }} onNavigate={onNavigate} /></div>
-      <footer className="ce-command-home__footer"><p>Education and reasoning support. Follow local policy and clinical judgment.</p><AppStoreBadge placement="footer" height={40} /><div><a href="/privacy" onClick={(e) => { e.preventDefault(); onNavigate("/privacy"); }}>Privacy</a><a href="/terms" onClick={(e) => { e.preventDefault(); onNavigate("/terms"); }}>Terms</a><a href="/support" onClick={(e) => { e.preventDefault(); onNavigate("/support"); }}>Support</a></div></footer>
+      <footer className="ce-command-home__footer"><div className="ce-home-footer-copy"><p>Education and reasoning support. Follow local policy and clinical judgment.</p><div className="ce-home-footer-links"><a href="/privacy" onClick={(e) => { e.preventDefault(); onNavigate("/privacy"); }}>Privacy</a><a href="/terms" onClick={(e) => { e.preventDefault(); onNavigate("/terms"); }}>Terms</a><a href="/support" onClick={(e) => { e.preventDefault(); onNavigate("/support"); }}>Support</a></div></div><AppStoreBadge placement="footer" height={40} /></footer>
     </main>
   </div>;
 }

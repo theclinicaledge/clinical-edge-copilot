@@ -108,7 +108,7 @@ test('landing SEO is canonical, bounded and withheld from indexing while incompl
 
 test('workspace and installation routes retain their separate roles', async ({ page }) => {
   await page.goto('/');
-  await expect(page.getByRole('heading', { name: 'What do you need right now?', exact: true })).toBeVisible();
+  await expect(page.getByRole('heading', { name: 'Understand the why.', exact: true })).toBeVisible();
   await page.goto('/download');
   await expect(page.getByRole('heading', { name: 'Use Clinical Edge on your iPhone.', exact: true })).toBeVisible();
   await expect(page.getByRole('link', { name: 'Download on the App Store' }).first()).toBeVisible();

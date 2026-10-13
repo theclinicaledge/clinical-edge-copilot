@@ -32,7 +32,7 @@ test('root legacy Privacy canonicalizes before rendering or hydration', async ({
   await page.goto('/#/privacy');
   await expect(page).toHaveURL(/\/privacy$/);
   await expect(page.getByRole('heading', { name: 'Privacy Policy', exact: true })).toBeVisible();
-  await expect(page.getByRole('heading', { name: 'What do you need right now?', exact: true })).toHaveCount(0);
+  await expect(page.getByRole('heading', { name: 'Understand the why.', exact: true })).toHaveCount(0);
   expect(await page.evaluate(() => history.state)).toEqual({ marker: 'preserve-me' });
   await page.reload();
   await expect(page.getByRole('heading', { name: 'Privacy Policy', exact: true })).toBeVisible();
@@ -49,13 +49,13 @@ test('legacy Privacy preserves the original query string exactly', async ({ page
 for (const suffix of ['', '#section', '#/support', '#privacy', '#/privacy/', '#/privacy?extra=1', '#%2Fprivacy']) {
   test(`root remains Home and preserves unrelated URL ${suffix || '(no hash)'}`, async ({ page }) => {
     await page.goto(`/?utm_source=test${suffix}`);
-    await expect(page.getByRole('heading', { name: 'What do you need right now?', exact: true })).toBeVisible();
+    await expect(page.getByRole('heading', { name: 'Understand the why.', exact: true })).toBeVisible();
     await expect(page).toHaveURL(url => url.pathname === '/' && url.search === '?utm_source=test' && url.hash === suffix);
   });
 }
 
 for (const route of [
-  { path: '/home', heading: 'What do you need right now?' },
+  { path: '/home', heading: 'Understand the why.' },
   { path: '/support', heading: 'Support' },
   { path: '/privacy', heading: 'Privacy Policy' },
 ]) {
@@ -87,7 +87,7 @@ test('canonicalization replaces the entry and Back/Forward has no redirect loop'
 
 test('a legacy history entry reached by SPA Back canonicalizes without adding history', async ({ page }) => {
   await page.goto('/');
-  await expect(page.getByRole('heading', { name: 'What do you need right now?', exact: true })).toBeVisible();
+  await expect(page.getByRole('heading', { name: 'Understand the why.', exact: true })).toBeVisible();
   // Simulate an older entry while the app is already running, then use normal SPA navigation.
   await page.evaluate(() => history.replaceState({ marker: 'legacy-entry' }, '', '/?utm_source=old#/privacy'));
   await page.getByRole('link', { name: 'Support', exact: true }).click();

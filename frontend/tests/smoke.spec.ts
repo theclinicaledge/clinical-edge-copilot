@@ -252,7 +252,7 @@ test('manual capture preserves simultaneous perfusion findings and first-class M
 
 test('command home prioritizes Ask and preserves focused tools', async ({ page }) => {
   await page.goto('/');
-  await expect(page.getByRole('heading', { name: 'What do you need right now?' })).toBeVisible();
+  await expect(page.getByRole('heading', { name: 'Understand the why.' })).toBeVisible();
   await expect(page.locator('.ce-home-ask')).toBeVisible();
   await expect(page.getByRole('heading', { name: 'References', exact: true })).toBeVisible();
   await expect(page.getByText('Rhythm Lab', { exact: true })).toBeVisible();

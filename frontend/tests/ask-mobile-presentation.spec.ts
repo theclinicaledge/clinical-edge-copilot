@@ -24,23 +24,60 @@ const long = { contextMode: 'general', answer: respiratory, details: [
   { heading: 'At the bedside', text: '- Assess respiratory effort and mental status alongside available carbon dioxide measurements; no single oxygen saturation establishes adequate ventilation.\n- Clarify baseline and recognition timing; focused neurologic findings, available glucose and medication/ventilation context can separate possibilities. Several contributors may coexist.' },
 ], evidence: { status: 'not_source_grounded', requiresVerification: false } };
 
-for (const width of [320, 390, 430, 1280]) test(`Home Ask CTA is full width, keyboard accessible and prioritizes learning at ${width}px`, async ({ page }) => {
+for (const width of [320, 390, 430, 1440]) test(`Home Ask feature is keyboard accessible and prioritizes learning at ${width}px`, async ({ page }) => {
   await page.setViewportSize({ width, height: 844 });
   await page.route('**/api/**', () => { throw new Error('Home navigation must not submit clinical data'); });
   await page.goto('/');
   const cta = page.locator('.ce-home-ask');
   await expect(cta).toHaveAttribute('href', '/ask');
-  await expect(cta).toContainText('Get answers to your nursing questions.');
-  const box = await cta.boundingBox(), main = await page.locator('.ce-command-home__main').evaluate(el => ({ width: el.clientWidth, padding: parseFloat(getComputedStyle(el).paddingLeft) + parseFloat(getComputedStyle(el).paddingRight) }));
+  await expect(cta).toHaveAccessibleName('Ask a question');
+  await expect(page.getByRole('heading', { name: 'Understand the why.', exact: true })).toBeVisible();
+  const box = await cta.boundingBox(), panel = page.locator('.ce-home-feature');
   expect(box!.height).toBeGreaterThanOrEqual(44);
-  expect(Math.abs(box!.width - (main.width - main.padding))).toBeLessThan(2);
+  expect(box!.width).toBeLessThan((await panel.boundingBox())!.width);
+  expect(await panel.evaluate(el => getComputedStyle(el).backgroundColor)).toBe('rgb(11, 31, 42)');
   expect(await cta.evaluate(el => getComputedStyle(el).backgroundColor)).toBe('rgb(10, 191, 188)');
   await expect(page.locator('.ce-command-home__work')).toHaveCount(0);
   await expect(page.getByRole('heading', { name: 'Learn', exact: true })).toBeVisible();
+  const dockTop = (await page.locator('.ce-tool-dock').boundingBox())!.y;
+  for (const card of await page.locator('.ce-home-learning-card').all()) {
+    await expect(card).toBeInViewport({ ratio: 1 });
+    const bounds = (await card.boundingBox())!;
+    expect(bounds.y + bounds.height).toBeLessThan(dockTop);
+    expect(await card.evaluate(el => getComputedStyle(el).backgroundColor)).toBe('rgb(255, 253, 248)');
+  }
+  await expect(page.locator('.ce-command-home').getByRole('link', { name: /ICU Drips/ })).toHaveAttribute('href', '/icu-drips');
+  await expect(page.locator('.ce-command-home input, .ce-command-home textarea')).toHaveCount(0);
   await page.screenshot({ path: `${output}/home-cta-${width}.png` });
-  await cta.focus(); await cta.press('Enter');
+  await cta.focus();
+  expect(await cta.evaluate(el => getComputedStyle(el).outlineStyle)).toBe('solid');
+  await cta.press('Enter');
   await expect(page).toHaveURL(/\/ask$/);
   expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true);
+});
+
+test('Home supports reduced motion, larger text and accessible footer clearance', async ({ page }) => {
+  await page.emulateMedia({ reducedMotion: 'reduce' });
+  await page.setViewportSize({ width: 390, height: 844 });
+  await page.route('**/api/**', route => route.abort());
+  await page.goto('/');
+  const card = page.locator('.ce-home-learning-card').first();
+  await card.hover();
+  expect(await card.evaluate(el => getComputedStyle(el).transform)).toBe('none');
+  expect(await card.evaluate(el => getComputedStyle(el).animationName)).toBe('none');
+  await page.locator('.ce-command-home').evaluate(home => {
+    const elements = Array.from(home.querySelectorAll('*'));
+    const sizes = elements.map(el => parseFloat(getComputedStyle(el).fontSize));
+    elements.forEach((el, i) => (el as HTMLElement).style.fontSize = `${sizes[i] * 1.5}px`);
+  });
+  expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true);
+  for (const link of await page.locator('.ce-command-home a').all()) {
+    expect(await link.evaluate(el => el.scrollWidth <= el.clientWidth + 1)).toBe(true);
+  }
+  await page.evaluate(() => scrollTo(0, document.documentElement.scrollHeight));
+  const footer = page.locator('.ce-command-home__footer');
+  const bottom = await footer.locator('a').evaluateAll(links => Math.max(...links.map(link => link.getBoundingClientRect().bottom)));
+  expect(bottom).toBeLessThan((await page.locator('.ce-tool-dock').boundingBox())!.y);
 });
 
 for (const width of [320, 390, 430, 1280]) test(`Ask presentation, text fidelity and dock lane at ${width}px`, async ({ page }) => {

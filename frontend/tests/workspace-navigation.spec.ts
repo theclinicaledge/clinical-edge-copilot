@@ -43,7 +43,7 @@ for (const width of widths) {
 
     for (const [name, path, target, menu] of [
       ['Rhythm Lab', '/rhythm-lab', '', 'Learn'],
-      ['Medication', '/icu-drips', 'Search drips', 'References'],
+      ['ICU Drips', '/icu-drips', 'Search drips', 'References'],
       ['ABG Lab', '/abg-lab', '', 'Learn'],
       ['Clinical reference', '/reference-hub', 'Search references', 'References'],
     ]) {
@@ -55,7 +55,7 @@ for (const width of widths) {
         const search = page.getByLabel(target);
         await expect(search).toBeInViewport();
         await page.screenshot({ path: '/private/tmp/clinical-edge-slice1-' + path.slice(1).replaceAll('/', '-') + '-' + width + '.png', animations: 'disabled' });
-        await search.fill(name === 'Medication' ? 'norepinephrine' : name === 'Clinical reference' ? 'lactate' : 'sinus');
+        await search.fill(name === 'ICU Drips' ? 'norepinephrine' : name === 'Clinical reference' ? 'lactate' : 'sinus');
         await expect(search).toBeFocused();
         await search.press('Tab');
       }
@@ -93,13 +93,13 @@ for (const width of widths) {
 test('home lookup actions open the resource in one action and preserve optional learning', async ({ page }) => {
   await page.setViewportSize({ width: 390, height: 844 });
   for (const [name, path] of [
-    ['Medication', '/icu-drips'],
+    ['ICU Drips', '/icu-drips'],
     ['ABG Lab', '/abg-lab'], ['Clinical reference', '/reference-hub'],
   ]) {
     await page.goto('/');
     await page.locator('.ce-command-home__immediate').getByRole('link', { name }).click();
     await expect(page).toHaveURL(new RegExp(path + '$'));
-    if (name === 'Medication') {
+    if (name === 'ICU Drips') {
       await page.getByText('Practice, compare & clinical pearls', { exact: true }).click();
       await expect(page.getByRole('button', { name: /Shift Challenge/ })).toBeVisible();
     }
@@ -113,7 +113,7 @@ test('home lookup actions open the resource in one action and preserve optional 
 
 test('browser back dismisses the navigation sheet and restores the previous route', async ({ page }) => {
   await page.goto('/');
-  await page.locator('.ce-command-home__checks').getByRole('link', { name: 'Medication' }).click();
+  await page.locator('.ce-command-home__checks').getByRole('link', { name: 'ICU Drips' }).click();
   await page.getByRole('button', { name: 'More tools' }).click();
   await expect(page.getByRole('dialog')).toBeVisible();
   await page.goBack();

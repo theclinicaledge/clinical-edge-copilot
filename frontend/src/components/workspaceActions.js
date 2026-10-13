@@ -1,5 +1,5 @@
 export const CHECK_ACTIONS = [
-  { label: "Medication", detail: "ICU Drips", path: "/icu-drips", event: "icu_drips_module_opened" },
+  { label: "ICU Drips", detail: "Infusion reference", path: "/icu-drips", event: "icu_drips_module_opened" },
   { label: "Clinical reference", detail: "Reference Hub", path: "/reference-hub", event: "reference_hub_opened" },
 ];
 export const LEARN_ACTIONS = [

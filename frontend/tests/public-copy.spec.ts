@@ -11,7 +11,7 @@ test.beforeEach(async ({ page }) => {
 });
 
 const routes = [
-  { path: '/', heading: 'What do you need right now?' },
+  { path: '/', heading: 'Understand the why.' },
   { path: '/landing', heading: 'Understand the why behind critical-care nursing.' },
   { path: '/download', heading: 'Use Clinical Edge on your iPhone.' },
   { path: '/support', heading: 'Support' },

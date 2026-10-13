@@ -19,7 +19,7 @@ const overview = {
 };
 const COVERAGE = Object.freeze({
   id: 'general-nursing-education-v1', reviewStatus: 'pending_qualified_review',
-  allowed: 'Nursing education across specialties and ages for students, new graduates and nurses: physiology, mechanisms, comparisons and natural educational follow-ups. Curated sources are optional; explanations without them must be marked not independently source-verified. Nonurgent reported context may be discussed only as disclosed general education, never an individual determination.',
+  allowed: 'Nursing education across specialties and ages for students, new graduates and nurses: physiology, mechanisms, comparisons and natural educational follow-ups. Curated sources are optional; explanations without them must be marked not independently source-verified. Reported clinical context may support disclosed general education about mechanisms and common care rationales, never an individual determination or a claim to know the treating team\'s rationale. Active time-critical situations remain excluded; absent context is not evidence of stability.',
   excluded: 'Individualized diagnosis/treatment selection, dosing/titration, medication/device choices, active time-critical situations, non-nursing requests, and protocol/regimen-specific treatment thresholds without applicable verified evidence.',
   evidencePolicy: 'Optional reference support is not a topic allowlist. General educational knowledge may proceed without it and must be explicitly marked not independently source-verified.',
 });

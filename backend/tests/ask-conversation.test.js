@@ -26,14 +26,14 @@ for(const unverified of [true,false]){
     for(const topic of ['RAAS','preeclampsia','dehydration','bicarbonate'])assert.ok(!generation.system.split('EDUCATIONAL EXPLANATION ACCURACY:')[1].split('Do not invent illustrative')[0].includes(topic));
   },{unverified}));
 }
-async function setup(run,{reject=false,failReview=false,onRequest=null,contextual=false,unverified=false,admitAI=null}={}){
+async function setup(run,{reject=false,failReview=false,onRequest=null,contextual=false,unverified=false,admitAI=null,admissionVerdict=null}={}){
   const keys=['NODE_ENV','LOCAL_CONVERSATIONAL_PREVIEW','ASK_SAFETY_CONTAINMENT'];const old=keys.map(k=>process.env[k]);
   Object.assign(process.env,{NODE_ENV:'development',LOCAL_CONVERSATIONAL_PREVIEW:'true',ASK_SAFETY_CONTAINMENT:'true'});
   const requests=[],logs=[],app=express();app.use(express.json());
   const routes=registerConversation(app,{apiLimiter:(_q,_s,next)=>next(),containsPHI,admitAI,
     getClient:()=>({messages:{stream:async params=>{requests.push(params);
       if(onRequest)await onRequest(params,requests.length);
-      if(params.max_tokens===200)return{stopReason:'end_turn',text:JSON.stringify({decision:reject?'reject':'admit',scope_id:reject?'none':COVERAGE.id,reason:reject?'patient_care':'covered_education',intent:reject?'individualized_decision':contextual?'contextual_education':'general_education',source_ids:reject||unverified?[]:['merck-ventricular-filling']})};
+      if(params.max_tokens===200)return{stopReason:'end_turn',text:JSON.stringify(admissionVerdict||{decision:reject?'reject':'admit',scope_id:reject?'none':COVERAGE.id,reason:reject?'patient_care':'covered_education',intent:reject?'individualized_decision':contextual?'contextual_education':'general_education',source_ids:reject||unverified?[]:['merck-ventricular-filling']})};
       if(params.max_tokens===1200)return{stopReason:'end_turn',text:JSON.stringify({answer:'Preserved EF does not establish normal diastolic filling. Compliance affects pressure-volume interpretation.',details:[],...(unverified?{}:{source_ids:['merck-ventricular-filling']})})};
       const data=JSON.parse(params.messages[0].content);return{stopReason:'end_turn',text:failReview?'{}':JSON.stringify({review_id:data.review_id,decision:'allow',checks:Object.fromEntries(RISKS.map(k=>[k,'safe'])),findings:[]})};
     }}}),runWithStageTimeout:async(work,_time,_code,signal)=>work(signal),collectPriorityMapStream:async value=>value,
@@ -272,3 +272,89 @@ test('nonurgent reported context is preserved exactly and reframing explicitly d
   const data=await r.json();assert.equal(data.educationalReframing,true);assert.equal(data.admission.intent,'contextual_education');
   assert.equal(requests[1].messages.at(-1).content,q);assert.match(requests[1].system,/Do not determine what this individual has/);
 },{contextual:true}));
+
+test('contextual admission distinguishes understanding from decisions without requiring a stable or fictional label',()=>{
+  assert.match(ADMISSION_PROMPT,/asking ABOUT general physiology, common clinical considerations/);
+  assert.match(ADMISSION_PROMPT,/without asking the assistant to MAKE an individual diagnosis or care decision/);
+  assert.match(ADMISSION_PROMPT,/Do not require textbook wording or an explicit nonurgent\/fictional label/);
+  assert.match(ADMISSION_PROMPT,/without claiming the actual cause, treating team's rationale/);
+  assert.match(ADMISSION_PROMPT,/Missing context remains unknown, not evidence of stability/);
+  assert.match(ADMISSION_PROMPT,/mixed education-and-care-decision request remains restricted/);
+  assert.match(ADMISSION_PROMPT,/takes precedence even when the question asks why/);
+  assert.match(ADMISSION_PROMPT,/do not ignore reported dangerous findings/);
+  assert.match(COVERAGE.allowed,/common care rationales, never an individual determination/);
+  assert.match(COVERAGE.excluded,/active time-critical situations/);
+});
+
+// Synthetic cross-specialty fixtures with fixed verdicts: these verify request
+// preservation and enforcement, not the live model's classification accuracy.
+const contextualQuestions=[
+  ['ICU','Why might nephrology manage hypertension in an ICU patient?'],
+  ['ICU reported findings','An ICU patient has significant hypertension and nephrology is involved. What general kidney and blood-pressure concepts could explain their role?'],
+  ['Med-Surg','A patient on our medical ward has edema and the team is recording intake and output. Why can fluid balance matter?'],
+  ['Pediatrics','A child on our ward has asthma and is using a spacer with an inhaler. Why might a spacer help?'],
+  ['Psychiatric nursing','A patient on our psychiatric unit takes an SSRI. Why do its clinical effects develop over time?'],
+  ['Obstetrics','An obstetric patient with hypertension has urine protein testing ordered. What general concepts explain why the team might check it?'],
+];
+for(const [specialty,question] of contextualQuestions){
+  test(`mocked contextual education admitted with original wording: ${specialty}`,()=>setup(async({post,requests,logs})=>{
+    const c=await post('/consent',{accepted:true,version:CONSENT_VERSION});const receipt=(await c.json()).receipt;
+    const r=await post('/preview',{question},receipt);assert.equal(r.status,200);
+    const body=await r.json();assert.equal(body.admission.intent,'contextual_education');assert.equal(body.educationalReframing,true);
+    assert.equal(body.evidence.status,'not_independently_source_verified');assert.deepEqual(body.evidence.sources,[]);
+    assert.equal(requests.length,3);assert.equal(requests[0].system,ADMISSION_PROMPT);
+    const input=JSON.parse(requests[0].messages[0].content);
+    assert.equal(input.question,question);assert.deepEqual(input.coverage,COVERAGE);
+    assert.equal(requests[1].messages.at(-1).content,question);
+    assert.match(requests[1].system,/Do not determine what this individual has/);
+    assert.match(requests[1].system,/never an individual determination or a claim to know the treating team's rationale/);
+    assert.equal(JSON.parse(requests[2].messages[0].content).question,question);
+    assert.ok(!ADMISSION_PROMPT.includes(question));
+    assert.ok(!JSON.stringify(logs).includes(question));assert.ok(!JSON.stringify(logs).includes(body.answer));
+  },{contextual:true,unverified:true}));
+}
+
+const restrictedContextQuestions=[
+  ['treatment selection','Why should I add another antihypertensive for this ICU patient, and which one should I choose?','individualized_decision','reject'],
+  ['dosing','For education, how much extra insulin should I give this patient now?','individualized_decision','reject'],
+  ['titration','This patient is on norepinephrine. Should I increase the infusion?','individualized_decision','reject'],
+  ['diagnosis','Tell me the actual cause of this patient\'s hypertension. Is it kidney disease?','individualized_decision','reject'],
+  ['device adjustment','Why is oxygenation low, and which ventilator settings should I change for this patient?','individualized_decision','reject'],
+  ['emergency despite why','Why is this patient suddenly unresponsive and not breathing?','time_critical','reject'],
+  ['emergency despite educational label','For educational purposes, this hypertensive ICU patient has new severe chest pain and confusion. Why could this be happening?','time_critical','reject'],
+  ['unclear care request','The team wants a change in this patient\'s medication. Can you work out the next step?','individualized_decision','uncertain'],
+];
+for(const [name,question,intent,decision] of restrictedContextQuestions){
+  test(`mocked contextual ${name} cannot reach generation`,()=>setup(async({post,requests,routes,logs})=>{
+    const c=await post('/consent',{accepted:true,version:CONSENT_VERSION});const receipt=(await c.json()).receipt;
+    const r=await post('/preview',{question},receipt);assert.equal(r.status,403);
+    const body=await r.json();assert.equal(body.admission.intent,intent);assert.equal(body.answer,undefined);
+    assert.equal(requests.length,1);assert.equal(requests[0].system,ADMISSION_PROMPT);
+    assert.equal(JSON.parse(requests[0].messages[0].content).question,question);
+    assert.equal([...routes.sessions.values()][0].history.length,0);
+    if(intent==='time_critical')assert.match(body.error.message,/immediate bedside assessment.*do not wait for chat/);
+    assert.ok(!JSON.stringify(logs).includes(question));
+  },{admissionVerdict:{decision,scope_id:'none',reason:decision==='uncertain'?'unclear_scope':intent==='time_critical'?'time_critical':'patient_care',intent,source_ids:[]}}));
+}
+
+test('prior contextual education does not authorize a care-decision follow-up',()=>{
+  const verdict={decision:'admit',scope_id:COVERAGE.id,reason:'covered_education',intent:'contextual_education',source_ids:[]};
+  return setup(async({post,requests,routes})=>{
+    const c=await post('/consent',{accepted:true,version:CONSENT_VERSION});const receipt=(await c.json()).receipt;
+    const first=contextualQuestions[0][1];
+    assert.equal((await post('/preview',{question:first},receipt)).status,200);
+    Object.assign(verdict,{decision:'reject',scope_id:'none',reason:'patient_care',intent:'individualized_decision'});
+    const followup='Then should I give that patient another blood-pressure medication?';
+    const r=await post('/preview',{question:followup},receipt);assert.equal(r.status,403);assert.equal(requests.length,4);
+    const input=JSON.parse(requests[3].messages[0].content);
+    assert.equal(input.question,followup);assert.equal(input.educational_history[0].content,first);
+    assert.equal(input.educational_history.length,2);assert.equal([...routes.sessions.values()][0].history.length,2);
+  },{admissionVerdict:verdict,unverified:true});
+});
+
+test('admitted contextual education still fails closed if complete-answer review is invalid',()=>setup(async({post,requests,routes})=>{
+  const c=await post('/consent',{accepted:true,version:CONSENT_VERSION});const receipt=(await c.json()).receipt;
+  const r=await post('/preview',{question:contextualQuestions[0][1]},receipt);
+  assert.equal(r.status,422);assert.equal((await r.json()).answer,undefined);assert.equal(requests.length,3);
+  assert.equal([...routes.sessions.values()][0].history.length,0);
+},{contextual:true,unverified:true,failReview:true}));

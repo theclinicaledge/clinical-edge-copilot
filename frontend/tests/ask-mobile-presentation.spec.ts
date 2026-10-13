@@ -95,7 +95,7 @@ for (const width of [320, 390, 430, 1280]) test(`Ask presentation, text fidelity
   await page.getByLabel('Nursing question').fill(foleyQuestion);
   await page.getByRole('button', { name: 'Ask Clinical Edge' }).click();
   await expect(page.locator('.ce-ask-answer')).toBeVisible();
-  if (!baseline) expect(await page.locator('.ce-ask-detail h3').allTextContents()).toEqual(['At the bedside', 'What changes interpretation', 'Why it matters']);
+  if (!baseline) expect(await page.locator('.ce-ask-detail h3').allTextContents()).toEqual(foley.details.map(detail => detail.heading));
   for (const detail of foley.details) await expect(page.locator('.ce-ask-detail').filter({ has: page.getByRole('heading', { name: detail.heading, exact: true }) })).toContainText(detail.text.replace(/^- /, ''));
   await page.locator('.ce-ask-answer').scrollIntoViewIfNeeded();
   await page.screenshot({ path: `${output}/foley-excerpt-${width}.png` });
@@ -118,13 +118,14 @@ for (const width of [320, 390, 430, 1280]) test(`Ask presentation, text fidelity
   if (!baseline) {
     const readingBoundary = await page.locator('.ce-ask-page').evaluate(el => innerHeight - parseFloat(getComputedStyle(el, '::after').height));
     expect(answer!.y + answer!.height).toBeLessThan(readingBoundary);
-    expect(await page.locator('.ce-ask-direct p').first().evaluate(el => getComputedStyle(el).fontSize)).toBe(width <= 720 ? '15px' : '16px');
+    expect(await page.locator('.ce-ask-direct p').first().evaluate(el => getComputedStyle(el).fontSize)).toBe(width <= 720 ? '16px' : '17px');
   }
   await page.screenshot({ path: `${output}/long-footer-clearance-${width}.png` });
   expect(bodies.every(body => body.contextMode === 'general' && !('snapshotContext' in body))).toBe(true);
   response = { contextMode: 'general', answer: 'LVEDP is pressure at the end of ventricular filling, not a direct fluid-volume measurement.', details: [], evidence: sourceMetadata(retrieveEvidence('Explain LVEDP')) };
   await page.getByLabel('Nursing question').fill('Explain LVEDP'); await page.getByRole('button', { name: 'Ask Clinical Edge' }).click();
   await expect(page.getByLabel('Evidence boundary')).toContainText('provided before generation');
+  await page.getByText('References and limitations', { exact: true }).click();
   await expect(page.getByLabel('Evidence boundary').getByRole('link').first()).toBeVisible();
   await page.locator('.ce-ask-answer').scrollIntoViewIfNeeded(); await page.screenshot({ path: `${output}/grounded-${width}.png` });
   const gas = 'Arterial ABG: pH 7.22, PaCO2 30 mmHg, HCO3 12 mmol/L. What does it mean?';

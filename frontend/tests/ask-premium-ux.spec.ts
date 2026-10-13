@@ -4,7 +4,7 @@ import { mkdirSync } from 'node:fs';
 test.skip(process.env.CE_PUBLIC_BETA_UI_TEST !== 'true', 'Run against the explicit mocked public-beta preview.');
 
 const baseline = process.env.CE_ASK_UX_BASELINE === 'true';
-const output = `/private/tmp/ce-ask-premium-ux/${baseline ? 'before' : 'after'}`;
+const output = process.env.CE_ASK_UX_OUTPUT || `/private/tmp/ce-ask-premium-ux/${baseline ? 'before' : 'after'}`;
 mkdirSync(output, { recursive: true });
 const answer = 'Oxygenation and ventilation describe different physiological processes. This is a synthetic presentation fixture, not a clinical evaluation.';
 
@@ -90,7 +90,7 @@ for (const width of [390, 768, 1440]) {
     expect(submissions.map(r => r.body)).toEqual([{ question: 'Explain oxygenation and ventilation.' }, { question: 'Why are these different?' }]);
     expect(submissions.every(r => r.headers.authorization === `Bearer ${'a'.repeat(64)}`)).toBe(true);
     expect(submissions.every(r => /^[a-f0-9-]{36}$/.test(r.headers['x-ce-device']))).toBe(true);
-    const report = await page.getByRole('link', { name: 'Report a concern' }).getAttribute('href');
+    const report = await page.getByRole('link', { name: 'Report a concern' }).last().getAttribute('href');
     expect(report).toContain('synthetic-2');
     expect(decodeURIComponent(report!)).not.toContain('ventilation');
     await page.screenshot({ path: `${output}/followup-${width}.png`, fullPage: true });

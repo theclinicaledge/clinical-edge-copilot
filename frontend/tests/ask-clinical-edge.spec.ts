@@ -117,6 +117,7 @@ test('medication reference link is a trusted directory, not a generated citation
     evidence: { status: 'not_source_grounded', requiresVerification: true, categories: ['medication'] } } }));
   await page.goto('/ask'); await page.getByLabel('Nursing question').fill('Why can potassium change with insulin?');
   await page.getByRole('button', { name: 'Ask Clinical Edge' }).click();
+  await page.getByText('References and limitations', { exact: true }).click();
   await expect(page.getByRole('link', { name: 'Check official medication labeling' })).toHaveAttribute('href', 'https://dailymed.nlm.nih.gov/dailymed/');
   await expect(page.getByRole('button', { name: 'Open Shift Brain' })).toHaveCount(0);
   await expect(page.locator('.ce-ask-detail')).toHaveCount(0);
@@ -137,6 +138,7 @@ for (const width of [390, 1280]) {
     await page.getByLabel('Nursing question').fill(`Explain ${domain} concepts`);
     await page.getByRole('button', { name: 'Ask Clinical Edge' }).click();
     const boundary = page.getByLabel('Evidence boundary');
+    await boundary.getByText('References and limitations', { exact: true }).click();
     await expect(boundary).toContainText('provided before generation');
     await expect(boundary).toContainText('not additional patient findings');
     await expect(boundary).toContainText('Professional source fixture');
@@ -161,8 +163,9 @@ test('limited source coverage is not presented as a complete grounded model answ
       { id: 'unsafe', title: 'Unsafe link', publisher: 'Reference publisher', url: 'javascript:alert(1)' }] } } }));
   await page.goto('/ask'); await page.getByLabel('Nursing question').fill('Explain the acid-base anion gap');
   await page.getByRole('button', { name: 'Ask Clinical Edge' }).click();
-  await expect(page.getByLabel('Evidence boundary')).toContainText('Limited evidence coverage');
+  await expect(page.locator('.ce-ask-evidence-status')).toContainText('Limited evidence coverage');
   await expect(page.getByLabel('Evidence boundary')).toContainText('not a complete model-generated answer');
+  await page.getByText('References and limitations', { exact: true }).click();
   await expect(page.getByRole('link', { name: 'Safe reference' })).toBeVisible();
   await expect(page.getByRole('link', { name: 'Unsafe link' })).toHaveCount(0);
 });

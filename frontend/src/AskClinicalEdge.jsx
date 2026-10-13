@@ -243,7 +243,7 @@ export default function AskClinicalEdge({ navigate, isVisible, snapshot = null }
       {!answer && <div className="ce-ask-examples" role="group" aria-label="Suggested prompts">{['Explain RAAS simply', 'Help me understand ABGs', 'SSRIs vs. SNRIs'].map(example => <button type="button" key={example} disabled={busy} onClick={()=>{editQuestion(example); input.current?.focus();}}>{example}<span aria-hidden="true">&#8599;</span></button>)}</div>}
       {CONVERSATION_PREVIEW && <p className="ce-ask-boundary">For education, not individual patient care or emergencies. Clinical review remains pending.</p>}
       {error && <div className="ce-ask-error" role="alert"><strong>We couldn't complete this answer.</strong><p>{error}</p></div>}
-      <div className="ce-ask-delivery-status ce-ask-sr-only" aria-live="polite">{visibleAnswer && !busy ? 'Answer ready. Your explanation is available in the conversation.' : ''}</div>
+      <div className="ce-ask-delivery-status ce-ask-sr-only" aria-live="polite">{visibleAnswer && <span key={answerRequestId || submitted}>Answer ready. Your explanation is available in the conversation.</span>}</div>
     </main>
   </div>;
 }

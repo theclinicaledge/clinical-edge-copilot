@@ -82,6 +82,7 @@ test('pending edits survive delivery, failure and in-memory navigation', async (
   await page.getByLabel('Nursing question').fill('Explain more simply.');
   await page.getByRole('button', { name: 'Ask Clinical Edge', exact: true }).click();
   await page.getByLabel('Nursing question').fill('This new draft must survive.');
+  await expect(page.locator('.ce-ask-delivery-status')).toContainText('Answer ready.');
   await expect(page.getByText(shortAnswer.answer, { exact: true })).toBeVisible();
   await expect(page.getByLabel('Nursing question')).toHaveValue('This new draft must survive.');
   await expect(page.getByLabel('Nursing question')).toBeFocused();
@@ -92,6 +93,11 @@ test('pending edits survive delivery, failure and in-memory navigation', async (
   await expect(page.getByLabel('Nursing question')).toHaveValue('This new draft must survive.');
   await expect(page.locator('.ce-ask-answer')).toHaveCount(2);
   expect(mock.requests.filter(r => r.url.endsWith('/preview'))).toHaveLength(2);
+  await page.evaluate(() => {
+    (window as any).deliveryAnnouncements = [];
+    new MutationObserver(() => (window as any).deliveryAnnouncements.push(document.querySelector('.ce-ask-delivery-status')?.textContent))
+      .observe(document.querySelector('.ce-ask-delivery-status')!, { childList: true, subtree: true, characterData: true });
+  });
   for (const [code, status] of [['output_safety_withheld', 422], ['provider_timeout', 504], ['free_daily_limit_reached', 429]]) {
     mock.respond({ error: { code } }, status);
     await page.getByRole('button', { name: 'Ask Clinical Edge', exact: true }).click();
@@ -99,6 +105,7 @@ test('pending edits survive delivery, failure and in-memory navigation', async (
     await expect(page.getByLabel('Nursing question')).toHaveValue('This new draft must survive.');
     await expect(page.locator('.ce-ask-answer')).toHaveCount(2);
   }
+  expect(await page.evaluate(() => (window as any).deliveryAnnouncements)).toEqual([]);
   const state = await page.evaluate(() => JSON.stringify({ local: { ...localStorage }, session: { ...sessionStorage }, history: history.state }));
   expect(state).not.toContain(readingQuestion); expect(state).not.toContain('new draft');
 });

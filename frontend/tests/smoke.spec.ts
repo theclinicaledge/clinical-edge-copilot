@@ -250,11 +250,11 @@ test('manual capture preserves simultaneous perfusion findings and first-class M
   await expect(page.locator('.snapshot-review')).toContainText('Cool / clammy,Delayed capillary refill');
 });
 
-test('command home prioritizes patient change and preserves focused tools', async ({ page }) => {
+test('command home prioritizes Ask and preserves focused tools', async ({ page }) => {
   await page.goto('/');
-  await expect(page.getByRole('heading', { name: 'What do you need right now?' })).toBeVisible();
-  await expect(page.getByRole('link', { name: "Describe what's happening" })).toBeVisible();
-  await expect(page.getByRole('heading', { name: 'Reference tools' })).toBeVisible();
+  await expect(page.getByRole('heading', { name: 'Understand the why.' })).toBeVisible();
+  await expect(page.locator('.ce-home-ask')).toBeVisible();
+  await expect(page.getByRole('heading', { name: 'References', exact: true })).toBeVisible();
   await expect(page.getByText('Rhythm Lab', { exact: true })).toBeVisible();
   await expect(page.getByText('ICU Drips', { exact: true })).toBeVisible();
   await expect(page.getByText('Reference Hub', { exact: true })).toBeVisible();

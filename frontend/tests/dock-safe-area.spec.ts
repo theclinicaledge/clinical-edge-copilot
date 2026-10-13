@@ -84,7 +84,8 @@ test.describe('iPhone bottom safe area (34px simulated)', () => {
   test('Shift Brain keeps its dock clearance after Ask was opened first (hidden Ask stays mounted)', async ({ page }) => {
     await page.goto('/ask');
     await expect(page.locator('.ce-ask-workspace')).toBeVisible();
-    await page.getByRole('navigation', { name: 'Clinical Edge workspace' }).getByRole('link', { name: 'Shift Brain', exact: true }).click();
+    await page.getByRole('button', { name: 'More tools' }).click();
+    await page.getByRole('dialog').getByRole('link', { name: /^Shift Brain/ }).click();
     await expect(page.locator('.ce-shift-workspace')).toBeVisible();
     await expect(page.locator('.ce-ask-workspace')).toBeHidden();
     expect(await page.evaluate(() => getComputedStyle(document.querySelector('.ce-shift-workspace')!).paddingBottom)).toBe(`${88 + IPHONE_SAFE_BOTTOM}px`);

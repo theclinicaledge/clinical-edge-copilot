@@ -819,11 +819,42 @@
   letter-spacing: -0.01em;
 }
 
+/* Shared reading scale for Reference Hub only; clinical content is unchanged. */
+:is(.rh-page, .rh-detail-page, .rh-pathway-detail, .rh-concept-detail) {
+  --ce-text-dim: var(--ce-text-muted);
+}
+:is(.rh-ref-cat, .rh-ref-range, .rh-ref-range-null, .rh-pathway-card-summary,
+  .rh-concept-card__meta, .rh-connected-chip__category, .rh-concept-ref-chip__category,
+  .rh-hero__eyebrow, .rh-hero__stat-label, .rh-eyebrow, .rh-concept-map__title) {
+  font-size: 12px;
+  line-height: 1.5;
+  letter-spacing: 0;
+  color: var(--ce-text-muted);
+  opacity: 1;
+}
+.rh-ref-range { font-size: 14px; color: var(--ce-gold-deep); }
+.rh-detail-field-label {
+  font-size: 12px;
+  letter-spacing: 0;
+  line-height: 1.5;
+  /* Older detail sections set low-contrast accent colors inline. */
+  color: var(--ce-text-muted) !important;
+}
+:is(.rh-ref-title, .rh-pathway-card-title, .rh-concept-card__title) { font-size: 16px; letter-spacing: 0; }
+:is(.rh-detail-field-body, .rh-nurses-notice-item, .rh-common-mistake-body) { font-size: 16px; line-height: 1.7; }
+:is(.rh-pathway-card-subtitle, .rh-concept-card__subtitle, .rh-concept-card__summary,
+  .rh-concept-map__note, .rh-concept-pathway-chip__sub) { font-size: 14px; opacity: 1; }
+:is(.rh-connected-chip__title, .rh-concept-ref-chip__title, .rh-concept-pathway-chip__title,
+  .rh-concept-map__node) { font-size: 14px; letter-spacing: 0; }
+.rh-filter-btn.active { color: var(--ce-text-dark); }
+.rh-related-chip-cat { font-size: 11px; opacity: 1; letter-spacing: 0; }
+:is(.rh-filter-btn, .rh-recent-chip, .rh-related-chip) { min-height: 44px; font-size: 14px; }
+
 /* ── Mobile ── */
 @media (max-width: 768px) {
   .rh-search { font-size: 16px; }
   .rh-filters { gap: 6px; }
-  .rh-filter-btn { padding: 6px 12px; font-size: 11.5px; }
+  .rh-filter-btn { padding: 6px 12px; font-size: 14px; }
   .rh-pathways-grid { grid-template-columns: 1fr; }
   .rh-look-chip { white-space: normal; }
   .rh-hero__title { font-size: clamp(20px, 6vw, 26px); }

@@ -64,8 +64,17 @@
   font-size: 14px;
   font-weight: 700;
   line-height: 1.5;
+  gap: 16px;
+  text-decoration: none;
+  transition: background-color var(--ce-dur-fast) var(--ce-ease-out), transform var(--ce-dur-fast) var(--ce-ease-out);
 }
-.ce-acquisition__primary:disabled { opacity: .68; cursor: not-allowed; }
+.ce-acquisition__primary:hover { background: var(--ce-teal-deep); transform: translateY(-1px); }
+.ce-acquisition__primary:active { transform: scale(.98); transition-duration: 60ms; }
+@media (prefers-reduced-motion: reduce) {
+  .ce-acquisition__primary { transition: none; }
+  .ce-acquisition__primary:hover, .ce-acquisition__primary:active { transform: none; }
+}
+.ce-acquisition__tool-link { display: inline-flex; align-items: center; gap: 12px; min-height: 48px; margin-top: 12px; color: var(--ce-teal); text-underline-offset: 4px; }
 .ce-acquisition__practice-status { margin: 10px 0 0; color: var(--ce-text-light-sec); font-size: 12px; line-height: 1.6; }
 .ce-acquisition__welcome { max-width: 660px; margin: 22px 0 0; color: var(--ce-text-light-sec); font-size: 12px; line-height: 1.7; }
 .ce-acquisition__section { padding-block: 50px; border-top: 1px solid var(--ce-line-dark); }

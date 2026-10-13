@@ -10,20 +10,20 @@ test.beforeEach(async ({ page }) => {
   });
 });
 
-for (const width of [390, 430, 1280]) {
-  test(`front door has a clear hero, one gated action and no layout errors at ${width}px`, async ({ page }) => {
+for (const width of [390, 768, 1440]) {
+  test(`front door leads to educational Ask with no layout errors at ${width}px`, async ({ page }) => {
     await page.setViewportSize({ width, height: 844 });
     const errors: string[] = [];
     page.on('pageerror', error => errors.push(error.message));
     await page.goto('/landing?utm_source=linkedin');
     await expect(page.getByRole('heading', { name: 'Understand the why behind critical-care nursing.', exact: true })).toBeVisible();
     await expect(page.getByText('For nurses transitioning into critical-care practice', { exact: true })).toBeInViewport();
-    const primary = page.getByRole('button', { name: 'Try a fictional practice scenario', exact: true });
+    const primary = page.locator('.ce-acquisition__primary');
     await expect(primary).toHaveCount(2);
     await expect(primary.first()).toBeInViewport();
-    await expect(primary.first()).toBeDisabled();
-    await expect(primary.last()).toBeDisabled();
-    await expect(page.locator('.ce-acquisition button')).toHaveCount(2);
+    await expect(primary.first()).toHaveAttribute('href', '/ask');
+    await expect(primary.last()).toHaveAttribute('href', '/ask');
+    await expect(page.locator('.ce-acquisition button[disabled]')).toHaveCount(0);
     await expect(page.getByText('Nurses from other settings are welcome.', { exact: false })).toBeInViewport();
     expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true);
     if (width === 390) expect(await page.locator('.ce-acquisition').evaluate(el => el.scrollHeight)).toBeLessThan(5000);
@@ -35,46 +35,40 @@ for (const width of [390, 430, 1280]) {
   });
 }
 
-test('section order follows the audience-to-practice story', async ({ page }) => {
+test('front door promotes working learning tools rather than an unfinished scenario', async ({ page }) => {
   await page.goto('/landing');
   const sectionIds = await page.locator('.ce-acquisition main > section').evaluateAll(elements => elements.map(el => el.getAttribute('aria-labelledby')));
-  expect(sectionIds).toEqual(['landing-title', 'learning-example-title', 'two-jobs-title', 'founder-title', 'boundaries-title', 'practice-cta-title']);
-  await expect(page.locator('.ce-acquisition__workflow ol > li')).toHaveCount(4);
-  const steps = await page.locator('.ce-acquisition__workflow h3').allTextContents();
-  expect(steps).toEqual(['Reported information', 'Reasoning', 'Distinguish possibilities', 'Physiology / why']);
+  expect(sectionIds).toEqual(['landing-title', 'two-jobs-title', 'founder-title', 'boundaries-title', 'practice-cta-title']);
+  await expect(page.getByRole('link', { name: 'Rhythm Lab', exact: true })).toHaveAttribute('href', '/rhythm-lab');
+  await expect(page.getByRole('link', { name: 'ABG Lab', exact: true })).toHaveAttribute('href', '/abg-lab');
 });
 
-test('example is explicitly withheld and Ask is visibly upcoming without a CTA', async ({ page }) => {
+test('Ask availability is accurate without claims of clinical validation', async ({ page }) => {
   await page.goto('/landing');
-  await expect(page.getByText('Example awaiting clinical-owner approval', { exact: true })).toBeVisible();
-  await expect(page.getByText('The outline below is not generated output.', { exact: false })).toBeVisible();
   const ask = page.locator('.ce-acquisition__jobs article').first();
   await expect(ask.getByRole('heading', { name: 'Ask a nursing question', exact: true })).toBeVisible();
-  await expect(ask.getByText('Upcoming · not publicly available', { exact: true })).toBeVisible();
-  await expect(ask.locator('a,button')).toHaveCount(0);
+  await expect(ask.getByText('Ask Clinical Edge · Public Beta', { exact: true })).toBeVisible();
+  await expect(ask.getByRole('link', { name: /Open Ask/ })).toHaveAttribute('href', '/ask');
   const hrefs = await page.locator('.ce-acquisition a').evaluateAll(elements => elements.map(el => el.getAttribute('href')));
-  expect(new Set(hrefs)).toEqual(new Set(['/', '/privacy', '/terms', '/support', 'https://apps.apple.com/app/id6761643064']));
+  expect(new Set(hrefs)).toEqual(new Set(['/', '/ask', '/rhythm-lab', '/abg-lab', '/privacy', '/terms', '/support', 'https://apps.apple.com/app/id6761643064']));
   const copy = await page.locator('.ce-acquisition').innerText();
-  expect(copy).not.toMatch(/catch.*deterioration|guaranteed|fast, accurate|safe clinical decision|thinks like a nurse|preceptor would|nursing school didn't|Google rabbit hole|second set of clinical eyes|Urgency:|P2|beta.ready|trusted by|\d+ (users|downloads|ratings)/i);
+  expect(copy).not.toMatch(/not publicly available|upcoming|clinically validated|guaranteed|fast, accurate|safe clinical decision|trusted by|\d+ (users|downloads|ratings)/i);
   // The only image allowed on the front door is Apple's official App Store badge.
   await expect(page.locator('.ce-acquisition img:not(.ce-app-store-badge img)')).toHaveCount(0);
 });
 
-test('gated practice cannot invoke the legacy scenario or QuickStart funnel', async ({ page }) => {
+test('Ask action respects first-use consent and never submits a question', async ({ page }) => {
   let apiRequests = 0;
-  const conversions: string[] = [];
   page.on('request', request => { if (new URL(request.url()).pathname.startsWith('/api/')) apiRequests++; });
-  page.on('console', message => { if (message.text().includes('landing_primary_cta_clicked')) conversions.push(message.text()); });
+  await page.addInitScript(() => localStorage.removeItem('ce_consent'));
   await page.goto('/landing?utm_source=colleague&utm_campaign=icu');
-  await page.locator('.ce-acquisition__primary').evaluateAll(buttons => buttons.forEach(button => (button as HTMLButtonElement).click()));
-  await expect(page).toHaveURL(/\/landing\?utm_source=colleague&utm_campaign=icu$/);
-  expect(apiRequests).toBe(0);
-  expect(conversions).toEqual([]);
   await expect(page.locator('.ce-acquisition a[href="/scenario"], .ce-acquisition a[href="/quickstart"]')).toHaveCount(0);
-  for (const button of await page.locator('.ce-acquisition__primary').all()) {
-    const statusId = await button.getAttribute('aria-describedby');
-    await expect(page.locator(`#${statusId}`)).toHaveText('Practice entry pending clinical review.');
-  }
+  const started = await page.evaluate(() => performance.timeOrigin);
+  await page.locator('.ce-acquisition__primary').first().click();
+  await expect(page).toHaveURL(/\/ask$/);
+  await expect(page.getByRole('button', { name: 'Agree and continue' })).toBeVisible();
+  expect(apiRequests).toBe(0);
+  expect(await page.evaluate(() => performance.timeOrigin)).toBe(started);
 });
 
 test('founder story uses only the supplied nursing path without employer endorsement', async ({ page }) => {
@@ -114,7 +108,7 @@ test('landing SEO is canonical, bounded and withheld from indexing while incompl
 
 test('workspace and installation routes retain their separate roles', async ({ page }) => {
   await page.goto('/');
-  await expect(page.getByRole('heading', { name: 'What do you need right now?', exact: true })).toBeVisible();
+  await expect(page.getByRole('heading', { name: 'Understand the why.', exact: true })).toBeVisible();
   await page.goto('/download');
   await expect(page.getByRole('heading', { name: 'Use Clinical Edge on your iPhone.', exact: true })).toBeVisible();
   await expect(page.getByRole('link', { name: 'Download on the App Store' }).first()).toBeVisible();

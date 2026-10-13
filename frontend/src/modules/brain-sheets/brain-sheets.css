@@ -86,6 +86,8 @@
 }
 
 .bs-list-item {
+  display: block;
+  text-decoration: none;
   padding: var(--ce-sp-5);
   background: var(--ce-navy-700);
   border: 1px solid var(--ce-line-navy);

@@ -39,7 +39,8 @@ function NavigationSheet({ kind, onClose, navigate }) {
     onClose(); navigate(action.path);
   };
   const links = (actions) => actions.map((action) => <a key={action.path} href={action.path} onClick={(e) => go(e, action)} aria-current={window.location.pathname === action.path ? "page" : undefined}><span><strong>{action.label}</strong>{action.detail && <small>{action.detail}</small>}</span><span aria-hidden="true">&#8594;</span></a>);
-  return createPortal(<div className="ce-navigation-backdrop" onClick={onClose}><section ref={panel} className="ce-navigation-sheet" role="dialog" aria-modal="true" aria-labelledby="navigation-sheet-title" onClick={(e) => e.stopPropagation()}><header><div><small>Clinical Edge</small><h2 id="navigation-sheet-title">{kind === "check" ? "Reference & learning tools" : "Saved work & support"}</h2></div><button type="button" onClick={onClose} aria-label="Close tools" title="Close tools">&#215;</button></header>{kind === "check" ? <><h3>Reference</h3><div className="ce-navigation-links">{links(CHECK_ACTIONS)}</div><h3>Learn</h3><div className="ce-navigation-links">{links(LEARN_ACTIONS)}</div></> : <><h3>Organize</h3><div className="ce-navigation-links">{links([{ label: "Brain Sheets", detail: "Blank printable templates", path: "/brain-sheets" }, { label: "Saved cases", detail: "Explicitly saved on this device", path: "/copilot" }])}</div><div className="ce-navigation-support">{links([{ label: "Privacy", path: "/privacy" }, { label: "Terms", path: "/terms" }, { label: "Support", path: "/support" }])}</div></>}</section></div>, document.body);
+  const titles = { learn: "Learn", references: "References", more: "Workspace & support" };
+  return createPortal(<div className="ce-navigation-backdrop" onClick={onClose}><section ref={panel} className="ce-navigation-sheet" role="dialog" aria-modal="true" aria-labelledby="navigation-sheet-title" onClick={(e) => e.stopPropagation()}><header><div><small>Clinical Edge</small><h2 id="navigation-sheet-title">{titles[kind]}</h2></div><button type="button" onClick={onClose} aria-label="Close tools" title="Close tools">&#215;</button></header>{kind !== "more" ? <div className="ce-navigation-links">{links(kind === "learn" ? LEARN_ACTIONS : CHECK_ACTIONS)}</div> : <><div className="ce-navigation-links">{links([{ label: "Brain Sheets", detail: "Blank printable templates", path: "/brain-sheets" }, { label: "Shift Brain", detail: "Manual workspace & saved cases. AI generation temporarily unavailable.", path: "/copilot" }])}</div><div className="ce-navigation-support">{links([{ label: "Privacy", path: "/privacy" }, { label: "Terms", path: "/terms" }, { label: "Support", path: "/support" }])}</div></>}</section></div>, document.body);
 }
 
 export default function WorkspaceNavigation({ page, navigate, scenarioActive = false }) {
@@ -50,8 +51,9 @@ export default function WorkspaceNavigation({ page, navigate, scenarioActive = f
     return () => window.removeEventListener("popstate", closeSheet);
   }, [closeSheet]);
   if (!WORKSPACE_PAGES.has(page) && !page.startsWith("rhythmlab")) return null;
-  const checkActive = ["icudrips", "referencehub", "abglab"].includes(page) || page.startsWith("rhythmlab");
-  const moreActive = page.startsWith("brainsheets");
+  const learnActive = page === "abglab" || page.startsWith("rhythmlab");
+  const referencesActive = ["icudrips", "referencehub"].includes(page);
+  const moreActive = page === "app" || page.startsWith("brainsheets");
   const go = (e, path) => {
     if (e.metaKey || e.ctrlKey || e.shiftKey || e.altKey) return;
     e.preventDefault(); navigate(path);
@@ -61,10 +63,10 @@ export default function WorkspaceNavigation({ page, navigate, scenarioActive = f
       {scenarioActive && page !== "app" && <div className="ce-scenario-return"><span>Shift Brain active</span><a href="/copilot" onClick={(e) => go(e, "/copilot")}>Return <span aria-hidden="true">&#8594;</span></a></div>}
       <div className="ce-tool-dock__inner">
       <a href="/" aria-current={page === "home" ? "page" : undefined} className={"ce-tool-dock__item" + (page === "home" ? " is-active" : "")} onClick={(e) => go(e, "/")}>Home</a>
-      <a href="/copilot?capture=rapid" aria-current={page === "app" ? "page" : undefined} className={"ce-tool-dock__item" + (page === "app" ? " is-active" : "")} onClick={(e) => go(e, "/copilot?capture=rapid")}>Shift Brain</a>
       <a href="/ask" aria-current={page === "ask" ? "page" : undefined} className={"ce-tool-dock__item" + (page === "ask" ? " is-active" : "")} onClick={(e) => go(e, "/ask")}>Ask</a>
-      <button type="button" aria-label="Reference and learning tools" aria-haspopup="dialog" aria-expanded={sheet === "check"} className={"ce-tool-dock__item" + (checkActive ? " is-active" : "")} onClick={() => setSheet("check")}>Tools</button>
-      <button type="button" aria-label="More tools" aria-haspopup="dialog" aria-expanded={sheet === "more"} className={"ce-tool-dock__item" + (moreActive ? " is-active" : "")} onClick={() => setSheet("more")}>More <span aria-hidden="true">&#183;&#183;&#183;</span></button>
+      <button type="button" aria-haspopup="dialog" aria-expanded={sheet === "learn"} className={"ce-tool-dock__item" + (learnActive ? " is-active" : "")} onClick={() => setSheet("learn")}>Learn</button>
+      <button type="button" aria-haspopup="dialog" aria-expanded={sheet === "references"} className={"ce-tool-dock__item" + (referencesActive ? " is-active" : "")} onClick={() => setSheet("references")}>References</button>
+      <button type="button" aria-label="More tools" title="Workspace & support" aria-haspopup="dialog" aria-expanded={sheet === "more"} className={"ce-tool-dock__item ce-workspace-nav__more" + (moreActive ? " is-active" : "")} onClick={() => setSheet("more")}><span aria-hidden="true">&#183;&#183;&#183;</span></button>
     </div></nav>
     {sheet && <NavigationSheet kind={sheet} onClose={closeSheet} navigate={navigate} />}
   </>;

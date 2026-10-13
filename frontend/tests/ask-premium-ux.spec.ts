@@ -4,7 +4,7 @@ import { mkdirSync } from 'node:fs';
 test.skip(process.env.CE_PUBLIC_BETA_UI_TEST !== 'true', 'Run against the explicit mocked public-beta preview.');
 
 const baseline = process.env.CE_ASK_UX_BASELINE === 'true';
-const output = `/private/tmp/ce-ask-premium-ux/${baseline ? 'before' : 'after'}`;
+const output = process.env.CE_ASK_UX_OUTPUT || `/private/tmp/ce-ask-premium-ux/${baseline ? 'before' : 'after'}`;
 mkdirSync(output, { recursive: true });
 const answer = 'Oxygenation and ventilation describe different physiological processes. This is a synthetic presentation fixture, not a clinical evaluation.';
 
@@ -53,7 +53,7 @@ for (const width of [390, 768, 1440]) {
       await expect(page.getByLabel('Nursing question')).toHaveValue('Explain RAAS simply');
       await expect(page.getByLabel('Nursing question')).toBeFocused();
       await page.getByLabel('Nursing question').press('Enter');
-      await expect(page.getByRole('button', { name: 'Ask Clinical Edge', exact: true })).toBeDisabled();
+      await expect(page.getByRole('button', { name: /^(Ask Clinical Edge|Send question to Ask Clinical Edge)$/ })).toBeDisabled();
       expect(mock.requests).toHaveLength(0);
     }
     await page.evaluate(() => scrollTo(0, 0));
@@ -76,27 +76,27 @@ for (const width of [390, 768, 1440]) {
     }
     await page.getByLabel('Nursing question').fill('Explain oxygenation and ventilation.');
     mock.setOutcome('delay');
-    await page.getByRole('button', { name: 'Ask Clinical Edge', exact: true }).click();
+    await page.getByRole('button', { name: /^(Ask Clinical Edge|Send question to Ask Clinical Edge)$/ }).click();
     await expect(page.getByRole('button', { name: 'Cancel question' })).toBeVisible();
     await page.screenshot({ path: `${output}/loading-${width}.png`, fullPage: true });
     await expect(page.getByText(answer)).toBeVisible();
     await page.screenshot({ path: `${output}/answer-${width}.png`, fullPage: true });
     mock.setOutcome('answer');
     await page.getByLabel('Nursing question').fill('Why are these different?');
-    await page.getByRole('button', { name: 'Ask Clinical Edge', exact: true }).click();
+    await page.getByRole('button', { name: /^(Ask Clinical Edge|Send question to Ask Clinical Edge)$/ }).click();
     await expect(page.getByText('The follow-up uses the preceding educational explanation.')).toBeVisible();
     await expect(page.getByLabel('Earlier educational explanation')).toContainText(answer);
     const submissions = mock.requests.filter(r => r.url.endsWith('/preview'));
     expect(submissions.map(r => r.body)).toEqual([{ question: 'Explain oxygenation and ventilation.' }, { question: 'Why are these different?' }]);
     expect(submissions.every(r => r.headers.authorization === `Bearer ${'a'.repeat(64)}`)).toBe(true);
     expect(submissions.every(r => /^[a-f0-9-]{36}$/.test(r.headers['x-ce-device']))).toBe(true);
-    const report = await page.getByRole('link', { name: 'Report a concern' }).getAttribute('href');
+    const report = await page.getByRole('link', { name: 'Report a concern' }).last().getAttribute('href');
     expect(report).toContain('synthetic-2');
     expect(decodeURIComponent(report!)).not.toContain('ventilation');
     await page.screenshot({ path: `${output}/followup-${width}.png`, fullPage: true });
     mock.setOutcome('refusal');
     await page.getByLabel('Nursing question').fill('Synthetic refused example.');
-    await page.getByRole('button', { name: 'Ask Clinical Edge', exact: true }).click();
+    await page.getByRole('button', { name: /^(Ask Clinical Edge|Send question to Ask Clinical Edge)$/ }).click();
     await expect(page.getByRole('alert')).toContainText('withheld');
     await expect(page.getByLabel('Nursing question')).toHaveValue('Synthetic refused example.');
     await expect(page.getByText('The follow-up uses the preceding educational explanation.')).toBeVisible();
@@ -106,7 +106,7 @@ for (const width of [390, 768, 1440]) {
     await page.getByRole('button', { name: baseline ? 'Withdraw educational AI consent' : 'Withdraw AI consent' }).click();
     await expect(page.getByText(answer)).toHaveCount(0);
     expect(mock.requests.at(-1).method).toBe('DELETE');
-    await expect(page.getByRole('button', { name: 'Ask Clinical Edge', exact: true })).toBeDisabled();
+    await expect(page.getByRole('button', { name: /^(Ask Clinical Edge|Send question to Ask Clinical Edge)$/ })).toBeDisabled();
   });
 }
 
@@ -117,7 +117,7 @@ test('disabled beta preserves the draft and requires renewed consent', async ({ 
   await page.getByRole('button', { name: 'Enable educational conversation' }).click();
   mock.setOutcome('disabled');
   await page.getByLabel('Nursing question').fill('Explain a nursing concept.');
-  await page.getByRole('button', { name: 'Ask Clinical Edge', exact: true }).click();
+  await page.getByRole('button', { name: /^(Ask Clinical Edge|Send question to Ask Clinical Edge)$/ }).click();
   await expect(page.getByRole('alert')).toContainText('expired or was withdrawn');
   await expect(page.getByLabel('Nursing question')).toHaveValue('Explain a nursing concept.');
   await expect(page.getByRole('button', { name: 'Enable educational conversation' })).toBeVisible();
@@ -132,7 +132,7 @@ test('short mobile viewport retains reachable controls above the navigation dock
   await page.getByRole('button', { name: 'Enable educational conversation' }).click();
   await page.getByLabel('Nursing question').fill('Explain RAAS simply');
   await page.evaluate(() => scrollTo(0, document.body.scrollHeight));
-  const button = await page.getByRole('button', { name: 'Ask Clinical Edge', exact: true }).boundingBox();
+  const button = await page.getByRole('button', { name: /^(Ask Clinical Edge|Send question to Ask Clinical Edge)$/ }).boundingBox();
   const dock = await page.getByRole('navigation', { name: 'Clinical Edge workspace' }).boundingBox();
   expect(button!.height).toBeGreaterThanOrEqual(44);
   expect(button!.y + button!.height).toBeLessThan(dock!.y);

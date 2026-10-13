@@ -22,6 +22,7 @@ for (const width of [320, 390, 430, 1280]) test(`direct rule-based ABG and safe 
   const verified = page.getByLabel('Rule-based ABG interpretation');
   await expect(verified).toContainText('24–28 mmHg'); await expect(verified).toContainText('above the approximate expected interval');
   await expect(verified).toContainText('additional respiratory acidifying');
+  await page.getByText('References and limitations', { exact: true }).click();
   await expect(page.getByRole('link', { name: 'Acid-Base Disorders', exact: true })).toBeVisible();
   await expect(page.getByLabel('Evidence boundary')).toContainText('not generated or independently verified by the AI');
   const before = await verified.innerText();

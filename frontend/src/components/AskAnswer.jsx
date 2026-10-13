@@ -101,6 +101,7 @@ export default function AskAnswer({ turn, beta, conversation, earlier = false, a
       {abg?.status === 'verified' && !conversation && onExplain && <div className="ce-ask-controls" data-copy-omit><button type="button" disabled={busy} onClick={onExplain}>Explain this pattern <span aria-hidden="true">&#8594;</span></button></div>}
       {notice && <p role="status">{notice}</p>}
       {details.map((detail, index) => <section className="ce-ask-detail" key={index}><h3 id={`${id}-${index}`} tabIndex={-1}>{detail.heading}</h3><AnswerText text={detail.text} /></section>)}
+      <div className="ce-ask-answer-utilities">
       <Evidence evidence={context?.evidence} abg={abg} />
       {context?.offerSnapshot && <div className="ce-ask-handoff" data-copy-omit><button type="button" onClick={() => navigate('/copilot?capture=rapid')}>Open Shift Brain <span aria-hidden="true">&#8594;</span></button><span>No question or answer is transferred.</span></div>}
       <footer className="ce-ask-answer-actions" data-copy-omit>
@@ -108,6 +109,7 @@ export default function AskAnswer({ turn, beta, conversation, earlier = false, a
         {requestId && <a href={`mailto:clinicaledgehq@gmail.com?subject=${encodeURIComponent('Ask concern: '+requestId)}&body=${encodeURIComponent('Request ID: '+requestId+'\nConcern: inaccurate / confusing / concerning (choose one).\nDo not include patient information or copy clinical chat content.')}`}>Report a concern</a>}
         {copyStatus && <span role="status" className="ce-ask-copy-status">{copyStatus}</span>}
       </footer>
+      </div>
     </section>
   </div>;
 }

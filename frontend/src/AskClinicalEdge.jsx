@@ -219,10 +219,6 @@ export default function AskClinicalEdge({ navigate, isVisible, snapshot = null }
       {CONVERSATION_PREVIEW && earlierExplanations.map((turn, i) => <AskAnswer key={i} turn={turn} earlier beta={PUBLIC_BETA} conversation navigate={navigate} />)}
       {answer && !visibleAnswer && <p role="status">The Snapshot changed. Enable the current Snapshot and ask again; the previous patient answer is no longer shown.</p>}
       {visibleAnswer && <AskAnswer key={`latest-${earlierExplanations.length}`} turn={currentTurn} beta={PUBLIC_BETA} conversation={CONVERSATION_PREVIEW} answerRef={latestAnswer} navigate={navigate} busy={busy} onExplain={event => submit(event, true)} notice={explanationNotice} />}
-      {visibleAnswer && CONVERSATION_PREVIEW && <div className="ce-ask-followups" role="group" aria-label="Follow-up ideas">
-        {[['Explain more simply', 'Explain the previous answer more simply.'], ['Give an example', 'Give an educational example of the concept in the previous answer.'], ['Go deeper', 'Go deeper into the physiology discussed in the previous answer.']].map(([label, value]) => <button type="button" key={label} disabled={!followUpAvailable || busy} onClick={() => fillFollowUp(value)}>{label}</button>)}
-        {!followUpAvailable && <p>Follow-up ideas need an active conversation with this answer in its history.</p>}
-      </div>}
       <form className={`ce-ask-composer${visibleAnswer ? ' ce-ask-composer--followup' : ''}`} onSubmit={submit}>
         <div className="ce-ask-context">
           {!CONVERSATION_PREVIEW && <strong>{contextEnabled ? 'Using Patient Snapshot' : 'General Ask'}</strong>}
@@ -232,12 +228,18 @@ export default function AskClinicalEdge({ navigate, isVisible, snapshot = null }
           {!CONVERSATION_PREVIEW && selectedContext && <details><summary>Reported facts selected for this question ({selectedContext.facts.length})</summary><ul>{reportedFacts(selectedContext).map(fact => <li key={fact.id}><strong>{fact.label}: </strong>{fact.text}</li>)}</ul></details>}
         </div>
         <label htmlFor="ask-question">{visibleAnswer ? followUpAvailable ? 'Continue the conversation' : 'Ask a new question' : 'What would you like to understand?'}<span className="ce-ask-sr-only"> Nursing question</span></label>
+        {visibleAnswer && CONVERSATION_PREVIEW && <div className="ce-ask-followups" role="group" aria-label="Follow-up ideas">
+          {[['Explain more simply', 'Explain the previous answer more simply.'], ['Give an example', 'Give an educational example of the concept in the previous answer.'], ['Go deeper', 'Go deeper into the physiology discussed in the previous answer.']].map(([label, value]) => <button type="button" key={label} disabled={!followUpAvailable || busy} onClick={() => fillFollowUp(value)}>{label}</button>)}
+          {!followUpAvailable && <p>Follow-up ideas need an active conversation with this answer in its history.</p>}
+        </div>}
         <p id="ask-privacy" className="ce-ask-privacy">No names, MRNs, dates of birth or other patient identifiers. Identifier checks do not guarantee de-identification.</p>
-        <textarea id="ask-question" ref={input} value={question} onChange={e => editQuestion(e.target.value)} aria-label="Nursing question" aria-describedby="ask-privacy" placeholder={followUpAvailable ? 'Ask a follow-up...' : 'Ask anything about nursing...'} maxLength={4000} rows={visibleAnswer ? 2 : 4} />
+        <div className="ce-ask-compose-entry">
+        <textarea id="ask-question" ref={input} value={question} onChange={e => editQuestion(e.target.value)} aria-label="Nursing question" aria-describedby="ask-privacy" placeholder={followUpAvailable ? 'Ask a follow-up...' : 'Ask anything about nursing...'} maxLength={4000} rows={visibleAnswer ? 1 : 4} />
         <div className="ce-ask-controls">
-          <button className="ce-ask-submit" aria-label="Ask Clinical Edge" disabled={busy || question.trim().length < 4 || (CONVERSATION_PREVIEW && !previewConsent)} type="submit">{busy ? <span role="status"><span className="ce-ask-spinner" aria-hidden="true" />Preparing your answer...</span> : <>Ask Clinical Edge <span aria-hidden="true">&#8594;</span></>}</button>
+          <button className="ce-ask-submit" aria-label={visibleAnswer ? 'Send question to Ask Clinical Edge' : 'Ask Clinical Edge'} title={visibleAnswer ? 'Send question' : undefined} disabled={busy || question.trim().length < 4 || (CONVERSATION_PREVIEW && !previewConsent)} type="submit">{busy ? <span role="status"><span className="ce-ask-spinner" aria-hidden="true" />Preparing your answer...</span> : visibleAnswer ? <>Send <span aria-hidden="true">&#8593;</span></> : <>Ask Clinical Edge <span aria-hidden="true">&#8594;</span></>}</button>
           {busy && <button className="ce-ask-cancel" type="button" onClick={() => pending.current?.abort()} aria-label="Cancel question">Cancel</button>}
           {!busy && (question || answer) && !(visibleAnswer && CONVERSATION_PREVIEW) && <button type="button" onClick={newQuestion}>New question</button>}
+        </div>
         </div>
       </form>
       {!answer && <div className="ce-ask-examples" role="group" aria-label="Suggested prompts">{['Explain RAAS simply', 'Help me understand ABGs', 'SSRIs vs. SNRIs'].map(example => <button type="button" key={example} disabled={busy} onClick={()=>{editQuestion(example); input.current?.focus();}}>{example}<span aria-hidden="true">&#8599;</span></button>)}</div>}

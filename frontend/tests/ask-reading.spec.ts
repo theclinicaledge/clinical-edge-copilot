@@ -4,7 +4,7 @@ import { readingAnswer, readingQuestion, shortAnswer } from './fixtures/ask-read
 
 const baseline = process.env.CE_READING_BASELINE === 'true';
 test.skip(process.env.CE_PUBLIC_BETA_UI_TEST !== 'true' && !baseline, 'Run against the explicit mocked public-beta preview.');
-const output = `/private/tmp/ce-ask-reading/${baseline ? 'before' : 'after'}`;
+const output = process.env.CE_READING_OUTPUT || `/private/tmp/ce-ask-reading/${baseline ? 'before' : 'after'}`;
 mkdirSync(output, { recursive: true });
 
 async function mockConversation(page, seconds = 600) {
@@ -25,7 +25,7 @@ async function start(page) {
   await page.goto('/ask');
   await page.getByRole('button', { name: 'Enable educational conversation' }).click();
   await page.getByLabel('Nursing question').fill(readingQuestion);
-  await page.getByRole('button', { name: 'Ask Clinical Edge', exact: true }).click();
+  await page.getByRole('button', { name: /^(Ask Clinical Edge|Send question to Ask Clinical Edge)$/ }).click();
   await expect(page.locator('.ce-ask-direct').first()).toContainText('Oxygen saturation describes');
 }
 
@@ -50,8 +50,16 @@ for (const width of [390, 430, 768, 1440]) test(`reading screenshots and chronol
   }
   mock.respond(shortAnswer);
   await page.getByLabel('Nursing question').fill('Why are these different?');
-  await page.getByRole('button', { name: 'Ask Clinical Edge', exact: true }).click();
+  await page.getByRole('button', { name: /^(Ask Clinical Edge|Send question to Ask Clinical Edge)$/ }).click();
   await expect(page.getByText(shortAnswer.answer, { exact: true })).toBeVisible();
+  if (!baseline) {
+    const compactAnswer = await page.locator('.ce-ask-answer').last().boundingBox();
+    expect(compactAnswer!.height).toBeLessThan(width <= 430 ? 330 : 250);
+    await expect(page.locator('.ce-ask-composer').getByRole('group', { name: 'Follow-up ideas' })).toBeVisible();
+    await expect(page.locator('.ce-ask-submit')).toContainText('Send');
+    await page.locator('.ce-ask-user-message').last().evaluate(el => scrollTo(0, scrollY + el.getBoundingClientRect().top - 88));
+    await page.screenshot({ path: `${output}/short-answer-${width}.png` });
+  }
   if (!baseline) await page.locator('.ce-ask-user-message').last().evaluate(el => scrollTo(0, scrollY + el.getBoundingClientRect().top - 260));
   else await page.locator('.ce-ask-answer').last().scrollIntoViewIfNeeded();
   await page.screenshot({ path: `${output}/two-turn-${width}.png` });
@@ -67,7 +75,7 @@ for (const width of [390, 430, 768, 1440]) test(`reading screenshots and chronol
   await page.evaluate(() => scrollTo(0, document.documentElement.scrollHeight));
   await page.screenshot({ path: `${output}/small-mobile-${width}.png` });
   if (!baseline) {
-    const send = await page.getByRole('button', { name: 'Ask Clinical Edge', exact: true }).boundingBox();
+    const send = await page.getByRole('button', { name: /^(Ask Clinical Edge|Send question to Ask Clinical Edge)$/ }).boundingBox();
     const dock = await page.getByRole('navigation', { name: 'Clinical Edge workspace' }).boundingBox();
     expect(send!.y + send!.height).toBeLessThan(dock!.y);
     expect(send!.height).toBeGreaterThanOrEqual(44);
@@ -80,7 +88,7 @@ test('pending edits survive delivery, failure and in-memory navigation', async (
   await start(page);
   mock.respond(shortAnswer, 200, 700);
   await page.getByLabel('Nursing question').fill('Explain more simply.');
-  await page.getByRole('button', { name: 'Ask Clinical Edge', exact: true }).click();
+  await page.getByRole('button', { name: /^(Ask Clinical Edge|Send question to Ask Clinical Edge)$/ }).click();
   await page.getByLabel('Nursing question').fill('This new draft must survive.');
   await expect(page.locator('.ce-ask-delivery-status')).toContainText('Answer ready.');
   await expect(page.getByText(shortAnswer.answer, { exact: true })).toBeVisible();
@@ -100,7 +108,7 @@ test('pending edits survive delivery, failure and in-memory navigation', async (
   });
   for (const [code, status] of [['output_safety_withheld', 422], ['provider_timeout', 504], ['free_daily_limit_reached', 429]]) {
     mock.respond({ error: { code } }, status);
-    await page.getByRole('button', { name: 'Ask Clinical Edge', exact: true }).click();
+    await page.getByRole('button', { name: /^(Ask Clinical Edge|Send question to Ask Clinical Edge)$/ }).click();
     await expect(page.getByRole('alert')).toBeVisible();
     await expect(page.getByLabel('Nursing question')).toHaveValue('This new draft must survive.');
     await expect(page.locator('.ce-ask-answer')).toHaveCount(2);
@@ -117,7 +125,7 @@ test('expiry disables context shortcuts, preserves draft and does not restore ol
   await page.getByLabel('Nursing question').fill('A draft after expiry.');
   await expect(page.getByText(/This conversation has expired/)).toBeVisible();
   await expect(page.getByRole('button', { name: 'Go deeper', exact: true })).toBeDisabled();
-  await expect(page.getByRole('button', { name: 'Ask Clinical Edge', exact: true })).toBeDisabled();
+  await expect(page.getByRole('button', { name: /^(Ask Clinical Edge|Send question to Ask Clinical Edge)$/ })).toBeDisabled();
   await expect(page.getByLabel('Nursing question')).toHaveValue('A draft after expiry.');
   const calls = mock.requests.length;
   await page.getByRole('button', { name: 'Enable educational conversation' }).click();
@@ -127,7 +135,7 @@ test('expiry disables context shortcuts, preserves draft and does not restore ol
   await page.getByRole('button', { name: 'Withdraw AI consent' }).click();
   await expect(page.locator('.ce-ask-answer')).toHaveCount(0);
   await expect(page.getByLabel('Nursing question')).toHaveValue('A draft after expiry.');
-  await expect(page.getByRole('button', { name: 'Ask Clinical Edge', exact: true })).toBeDisabled();
+  await expect(page.getByRole('button', { name: /^(Ask Clinical Edge|Send question to Ask Clinical Edge)$/ })).toBeDisabled();
 });
 
 test('delivery does not interrupt reading an earlier answer', async ({ page }) => {
@@ -136,7 +144,7 @@ test('delivery does not interrupt reading an earlier answer', async ({ page }) =
   await start(page);
   mock.respond(shortAnswer, 200, 800);
   await page.getByLabel('Nursing question').fill('Why are these different?');
-  await page.getByRole('button', { name: 'Ask Clinical Edge', exact: true }).click();
+  await page.getByRole('button', { name: /^(Ask Clinical Edge|Send question to Ask Clinical Edge)$/ }).click();
   await page.evaluate(() => scrollTo(0, 200));
   const readingPosition = await page.evaluate(() => scrollY);
   await expect(page.locator('.ce-ask-answer')).toHaveCount(2);
@@ -151,12 +159,12 @@ test('server expiry and pending withdrawal cannot deliver a late answer', async 
   await start(page);
   mock.respond({ error: { code: 'consent_required' } }, 403);
   await page.getByLabel('Nursing question').fill('A follow-up question.');
-  await page.getByRole('button', { name: 'Ask Clinical Edge', exact: true }).click();
+  await page.getByRole('button', { name: /^(Ask Clinical Edge|Send question to Ask Clinical Edge)$/ }).click();
   await expect(page.getByRole('alert')).toContainText('expired or was withdrawn');
   await expect(page.getByRole('button', { name: 'Give an example', exact: true })).toBeDisabled();
   await page.getByRole('button', { name: 'Enable educational conversation' }).click();
   mock.respond(shortAnswer, 200, 600);
-  await page.getByRole('button', { name: 'Ask Clinical Edge', exact: true }).click();
+  await page.getByRole('button', { name: /^(Ask Clinical Edge|Send question to Ask Clinical Edge)$/ }).click();
   await page.getByRole('button', { name: 'Withdraw AI consent' }).click();
   await expect(page.getByRole('button', { name: 'Enable educational conversation' })).toBeVisible();
   await page.waitForTimeout(700);
@@ -171,7 +179,7 @@ test('safe semantic text, original order, full copy and request-only feedback', 
   mock.respond({ ...readingAnswer, answer: text });
   await page.addInitScript(() => { Object.defineProperty(navigator, 'clipboard', { value: { writeText: async value => { (window as any).copiedAnswer = value; } } }); });
   await page.goto('/ask'); await page.getByRole('button', { name: 'Enable educational conversation' }).click();
-  await page.getByLabel('Nursing question').fill(readingQuestion); await page.getByRole('button', { name: 'Ask Clinical Edge', exact: true }).click();
+  await page.getByLabel('Nursing question').fill(readingQuestion); await page.getByRole('button', { name: /^(Ask Clinical Edge|Send question to Ask Clinical Edge)$/ }).click();
   await expect(page.locator('.ce-ask-direct strong')).toHaveText('Important:');
   await expect(page.locator('.ce-ask-direct em')).toHaveText('unknown');
   await expect(page.locator('.ce-ask-direct ol li')).toHaveCount(2);
@@ -213,11 +221,18 @@ test('enlarged mobile text, simulated keyboard and reduced motion retain reachab
   await page.addStyleTag({ content: '#root { --ce-dock-clearance: 152px; } .ce-tool-dock { bottom: 34px; }' });
   await page.getByLabel('Nursing question').fill('A longer draft\nwith another line\nand a third line\nand a fourth line.');
   await page.getByLabel('Nursing question').focus();
-  await page.evaluate(() => scrollTo(0, document.documentElement.scrollHeight));
+  await page.evaluate(() => new Promise(resolve => requestAnimationFrame(() => requestAnimationFrame(resolve))));
+  await page.locator('.ce-ask-submit').evaluate(el => el.scrollIntoView({ block: 'center', behavior: 'instant' }));
   expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true);
-  const send = await page.getByRole('button', { name: 'Ask Clinical Edge', exact: true }).boundingBox(), dock = await page.locator('.ce-tool-dock').boundingBox();
+  const send = await page.getByRole('button', { name: /^(Ask Clinical Edge|Send question to Ask Clinical Edge)$/ }).boundingBox(), dock = await page.locator('.ce-tool-dock').boundingBox();
   expect(send!.y + send!.height).toBeLessThan(dock!.y);
+  expect(send!.y).toBeGreaterThanOrEqual(60);
+  await expect(page.getByLabel('Nursing question')).toBeFocused();
+  expect(await page.getByLabel('Nursing question').evaluate(el => getComputedStyle(el).outlineStyle)).toBe('solid');
   await expect(page.getByRole('heading', { name: 'At the bedside', exact: true })).toBeAttached();
   expect(await page.locator('.ce-ask-answer').evaluate(el => el.scrollHeight <= el.clientHeight + 2)).toBe(true);
   await page.screenshot({ path: `${output}/enlarged-mobile.png` });
+  const capturedSend = await page.locator('.ce-ask-submit').boundingBox();
+  expect(capturedSend!.y).toBeGreaterThanOrEqual(60);
+  expect(capturedSend!.y + capturedSend!.height).toBeLessThan(dock!.y);
 });

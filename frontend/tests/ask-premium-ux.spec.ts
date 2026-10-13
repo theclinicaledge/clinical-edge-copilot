@@ -34,6 +34,7 @@ for (const width of [390, 768, 1440]) {
     await page.goto('/ask');
     if (!baseline) {
       await expect(page.getByRole('heading', { name: 'Ask Clinical Edge', exact: true })).toBeVisible();
+      await expect(page.getByText(/\bbeta\b/i)).toHaveCount(0);
       await expect(page.getByRole('heading', { name: 'A quick note before we begin' })).toBeFocused();
       await expect(page.getByText('Your AI nursing learning companion.')).toBeVisible();
       await page.getByText('Full AI and privacy information').click();

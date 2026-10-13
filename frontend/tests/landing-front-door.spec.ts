@@ -47,7 +47,8 @@ test('Ask availability is accurate without claims of clinical validation', async
   await page.goto('/landing');
   const ask = page.locator('.ce-acquisition__jobs article').first();
   await expect(ask.getByRole('heading', { name: 'Ask a nursing question', exact: true })).toBeVisible();
-  await expect(ask.getByText('Ask Clinical Edge · Public Beta', { exact: true })).toBeVisible();
+  await expect(ask.getByText('Ask Clinical Edge', { exact: true })).toBeVisible();
+  await expect(page.getByText(/\bbeta\b/i)).toHaveCount(0);
   await expect(ask.getByRole('link', { name: /Open Ask/ })).toHaveAttribute('href', '/ask');
   const hrefs = await page.locator('.ce-acquisition a').evaluateAll(elements => elements.map(el => el.getAttribute('href')));
   expect(new Set(hrefs)).toEqual(new Set(['/', '/ask', '/rhythm-lab', '/abg-lab', '/privacy', '/terms', '/support', 'https://apps.apple.com/app/id6761643064']));

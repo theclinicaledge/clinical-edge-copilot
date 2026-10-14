@@ -4,6 +4,7 @@ import { LEARN_ACTIONS } from '../../components/workspaceActions.js';
 import Shift from './Shift.jsx';
 import Monitor from './monitor/Monitor.jsx';
 import Discharge from './discharge/Discharge.jsx';
+import LibraryMonitorArtwork from './LibraryMonitorArtwork.jsx';
 import { SHIFTS, getShift, progressLabel, scenarioLink } from './integrated/registry.js';
 import { shiftRoute, shiftPath, learningDestination, returningShift } from './routing.js';
 import './app.css';
@@ -11,7 +12,6 @@ import './app.css';
 const renderers = { 'drowsy-patient': Shift, 'monitor-alarm': Monitor, 'discharge-puzzle': Discharge };
 const images = {
   'drowsy-patient': new URL('./assignment-poster.svg', import.meta.url).href,
-  'monitor-alarm': new URL('./monitor/captures/ecg/390-comparison.png', import.meta.url).href,
   'discharge-puzzle': new URL('./discharge/poster.svg', import.meta.url).href,
 };
 
@@ -48,7 +48,7 @@ function Library({ navigate }) {
       <div className="shift-library-grid">{SHIFTS.map(item => {
         const progress = progressLabel(item);
         return <article className="shift-library-card" key={item.id}>
-          <AppLink to={shiftPath(item.id)} navigate={navigate} className="shift-library-image" tabIndex={-1} aria-hidden="true"><img src={images[item.id]} alt="" /><span>SHIFT {item.number}</span></AppLink>
+          <AppLink to={shiftPath(item.id)} navigate={navigate} className="shift-library-image" tabIndex={-1} aria-hidden="true">{item.id === 'monitor-alarm' ? <LibraryMonitorArtwork /> : <img src={images[item.id]} alt="" />}<span>SHIFT {item.number}</span></AppLink>
           <div className="shift-library-copy"><p className="shift-overline">{item.specialty} / {item.difficulty}</p><h2><AppLink to={shiftPath(item.id)} navigate={navigate}>{item.title}</AppLink></h2><p>{item.description}</p><small>{item.duration} / Students & new grads</small><AppLink to={shiftPath(item.id)} navigate={navigate} className="shift-primary">{progress === 'Not started' ? 'Begin shift' : progress === 'Debrief reached' ? 'Return to debrief' : 'Continue shift'} <span aria-hidden="true">&#8594;</span></AppLink><small>{progress}</small></div>
         </article>;
       })}</div>
@@ -111,7 +111,7 @@ export default function ShiftExperience({ mode = 'page', navigate, active = true
   let content;
   if (route?.kind === 'library') content = <Library navigate={navigate} />;
   else if (route?.kind === 'handoff') content = <Handoff key={`${route.id}-${window.location.search}`} item={getShift(route.id)} navigate={navigate} />;
-  return <div ref={region} className="ce-shift-feature" hidden={!active} inert={!active}>
+  return <div ref={region} className={`ce-shift-feature${active && route?.kind === 'library' ? ' ce-shift-feature--library' : ''}`} hidden={!active} inert={!active}>
     {visited.map(id => {
       const visible = active && route?.kind === 'scenario' && route.id === id;
       return <div key={id} hidden={!visible} inert={!visible} data-active-page={visible}><Scenario item={getShift(id)} navigate={navigate} /></div>;

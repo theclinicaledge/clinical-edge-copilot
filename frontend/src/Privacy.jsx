@@ -122,7 +122,7 @@ export default function Privacy({ onNavigate }) {
             margin: "0 0 36px",
             letterSpacing: "0.01em",
           }}>
-            Effective date: October 12, 2026
+            Effective date: October 14, 2026
           </p>
 
           <PrivacyChoices />
@@ -144,6 +144,10 @@ export default function Privacy({ onNavigate }) {
             {
               title: "Local storage",
               body: "Clinical Edge does not automatically retain submitted clinical snapshots as recent history. If you explicitly select Save Case, the scenario, response, urgency level, timestamp, and any note you add are stored in your browser's localStorage on that device. Saved-case content is not sent through analytics. You can delete saved cases in the app or clear them through your browser settings.",
+            },
+            {
+              title: "The Shift: device-local progress",
+              body: "The Shift uses fictional, prewritten nursing scenarios. It does not ask you to enter patient information or use AI to generate gameplay. Your place, selected choices, revealed findings and optional another-shift response are saved in this browser or app on this device. They are not submitted as scenario responses to Clinical Edge. They remain until you restart that scenario or clear the site or app's local data; clearing data may remove progress. When device storage is unavailable, progress lasts only while this tab remains open. Progress is not synchronized across devices. Existing optional website analytics are unchanged; no new gameplay analytics have been added. Opening Ask is separate: the handoff lets you copy an educational question. It does not automatically submit that question or your scenario choices. Ask's existing consent, AI-processing disclosures, privacy limits and daily allowance apply when you choose to submit a question there.",
             },
             {
               title: "Analytics and usage data",

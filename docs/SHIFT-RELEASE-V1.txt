@@ -1,0 +1,69 @@
+THE SHIFT / FIRST PUBLIC EDUCATIONAL RELEASE
+
+Scope: three prewritten fictional scenarios integrated into Home and Learn.
+SHIFT-001 The Drowsy Patient, corrected content 2.1.
+SHIFT-002 The Monitor Alarm, corrected content 2.1 / original ECG assets 1.0.
+SHIFT-003 The Discharge Puzzle, corrected content 0.3, medication-by-medication
+comparison preserved. No AI generation, accounts or backend calls in gameplay.
+
+REVIEW RECORD
+The founder reports that an independent practicing nurse examined and approved
+the complete corrected clinical-review package, including answer keys and ECG
+assets, and explicitly authorizes this public educational release.
+Reviewer name: __________________ Credentials: _____________________________
+Review date: ____________________ Signature/reference: _____________________
+Documented scope limitations: _____________________________________________
+These fields were not supplied. No institutional endorsement, competency
+certification, general clinical validation or separate specialty review claimed.
+Passage-level source verification remains undocumented; source limitations stay.
+
+The founder elected to skip the separate private iPhone setup and will perform
+physical-device testing in the live app after deployment. Browser engineering
+checks are not a substitute for physical Safari/native-wrapper checks.
+
+RELEASE-ONLY CHANGES TO THE REVIEWED CANDIDATE
+Replace obsolete private/pending labels with educational wording and explicitly
+founder-reported approval. Publish device-local progress disclosure, including
+local choices, retention, restart/clear, storage failure and separate Ask consent.
+Clinical decisions, rationales, ECG paths, comparison logic and progress keys
+are unchanged from the frozen corrected candidate. Existing Ask consent wording,
+provider logic, quotas, rate limits, analytics consent and backend are unchanged.
+
+FROZEN REVIEW PACKAGE SHA-256
+reviewer-packet.html:
+561d48acf385d83800864e0a97e86d90b1effa8bbaf3904bb3ea1b02b84d8055
+complete-answer-keys.json:
+dea9b2ac157e149d31961c0db07961117485ca3851e2a479ce2785f574700348
+runtime-manifest.json:
+23bd0a10825b7d288a30cabffe1aeece9a8ad6d1efa5392490ae6a5ae1ccde7e
+
+CALIBRATION BOUNDARY
+The separate Rhythm Lab calibration/Sprint candidate is not included. Shift's
+two Rhythm Lab recommendations remain withheld. Original Shift ECGs remain
+labeled constructed educational illustrations, not patient recordings.
+
+ACTIVATION
+Vercel production frontend: VITE_SHIFT_ENABLED=true, then build the approved
+main revision through the existing Git integration. The flag is build-time;
+source defaults remain OFF. Preserve all other environment settings. No Render
+or native-wrapper configuration change is required. No AI submission in smoke.
+
+PRE-RELEASE ROLLBACK REFERENCE
+Git main: d94ba1f807a9a14b016d2f5450f609c0c8f287dd
+Vercel deployment: GKMM33RecjKrvSKxz9RFJvtZkewo (Ready / Production)
+URL: clinical-edge-copilot-14zxjl6lt-theclinicaledges-projects.vercel.app
+
+ROLLBACK
+Restore that known-good pre-Shift Vercel artifact via Instant Rollback. Set
+VITE_SHIFT_ENABLED=false for subsequent production builds. Verify Home, Ask,
+ABG and direct Shift routes after restoration. Do not change backend safety,
+Ask availability, privacy/consent or spending settings. Saved progress need not
+be deleted. Already open/offline pages may retain static content until reload.
+
+APP STORE HANDOFF
+Hosted web functionality changes; native wrapper code is unchanged. Founder
+must check real-device safe areas, clipboard, downloads, touch and return flow.
+Store descriptions/screenshots/review notes should accurately describe three
+fictional prewritten learning experiences, device-local progress, no AI during
+gameplay, and separately consent-gated Ask handoffs. No App Store Connect edit
+or native submission is part of this release.

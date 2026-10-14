@@ -4,6 +4,7 @@ import { trackEvent } from "../analytics";
 import "../styles/workspace-navigation.css";
 
 import { CHECK_ACTIONS, LEARN_ACTIONS } from "./workspaceActions.js";
+import { SHIFT_ENABLED } from "../shiftFeature.js";
 const WORKSPACE_PAGES = new Set(["home", "app", "ask", "icudrips", "referencehub", "abglab", "brainsheets", "brainsheets-detail"]);
 
 function NavigationSheet({ kind, onClose, navigate }) {
@@ -50,8 +51,8 @@ export default function WorkspaceNavigation({ page, navigate, scenarioActive = f
     window.addEventListener("popstate", closeSheet);
     return () => window.removeEventListener("popstate", closeSheet);
   }, [closeSheet]);
-  if (!WORKSPACE_PAGES.has(page) && !page.startsWith("rhythmlab")) return null;
-  const learnActive = page === "abglab" || page.startsWith("rhythmlab");
+  if (!WORKSPACE_PAGES.has(page) && !page.startsWith("rhythmlab") && !(SHIFT_ENABLED && page === 'shift-learning')) return null;
+  const learnActive = page === "abglab" || page.startsWith("rhythmlab") || page === 'shift-learning';
   const referencesActive = ["icudrips", "referencehub"].includes(page);
   const moreActive = page === "app" || page.startsWith("brainsheets");
   const go = (e, path) => {
@@ -64,7 +65,7 @@ export default function WorkspaceNavigation({ page, navigate, scenarioActive = f
       <div className="ce-tool-dock__inner">
       <a href="/" aria-current={page === "home" ? "page" : undefined} className={"ce-tool-dock__item" + (page === "home" ? " is-active" : "")} onClick={(e) => go(e, "/")}>Home</a>
       <a href="/ask" aria-current={page === "ask" ? "page" : undefined} className={"ce-tool-dock__item" + (page === "ask" ? " is-active" : "")} onClick={(e) => go(e, "/ask")}>Ask</a>
-      <button type="button" aria-haspopup="dialog" aria-expanded={sheet === "learn"} className={"ce-tool-dock__item" + (learnActive ? " is-active" : "")} onClick={() => setSheet("learn")}>Learn</button>
+      {SHIFT_ENABLED ? <a href="/learn" aria-current={page === 'shift-learning' ? 'page' : undefined} className={"ce-tool-dock__item" + (learnActive ? " is-active" : "")} onClick={e => go(e, '/learn')}>Learn</a> : <button type="button" aria-haspopup="dialog" aria-expanded={sheet === "learn"} className={"ce-tool-dock__item" + (learnActive ? " is-active" : "")} onClick={() => setSheet("learn")}>Learn</button>}
       <button type="button" aria-haspopup="dialog" aria-expanded={sheet === "references"} className={"ce-tool-dock__item" + (referencesActive ? " is-active" : "")} onClick={() => setSheet("references")}>References</button>
       <button type="button" aria-label="More tools" title="Workspace & support" aria-haspopup="dialog" aria-expanded={sheet === "more"} className={"ce-tool-dock__item ce-workspace-nav__more" + (moreActive ? " is-active" : "")} onClick={() => setSheet("more")}><span aria-hidden="true">&#183;&#183;&#183;</span></button>
     </div></nav>

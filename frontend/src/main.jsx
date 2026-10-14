@@ -1,5 +1,5 @@
 /* eslint-disable react-refresh/only-export-components */
-import { StrictMode, useState, useEffect, useRef, useCallback } from 'react'
+import { StrictMode, Suspense, lazy, useState, useEffect, useRef, useCallback } from 'react'
 import { createRoot, hydrateRoot } from 'react-dom/client'
 import { Analytics } from '@vercel/analytics/react'
 import './styles/tokens.css'
@@ -29,6 +29,16 @@ import AbgLabModule from './modules/abg-lab/AbgLabModule.jsx'
 import BrainSheetsModule from './modules/brain-sheets/BrainSheetsModule.jsx'
 import BlogIndex from './blog/BlogIndex.jsx'
 import BlogPostPage from './blog/BlogPostPage.jsx'
+import { SHIFT_ENABLED } from './shiftFeature.js'
+import { shiftRoute, returningShift } from './modules/the-shift/routing.js'
+
+function ShiftUnavailable({ navigate, active = true, mode }) {
+  if (!active || mode === 'return') return null;
+  return <main className="ce-not-found" role="alert"><h1>The Shift could not load.</h1><p>Your device-local progress has not been cleared. Check your connection and reload, or return Home.</p><button type="button" onClick={() => window.location.reload()}>Reload</button><a href="/" onClick={event => { if (event.metaKey || event.ctrlKey || event.shiftKey || event.altKey) return; event.preventDefault(); navigate('/'); }}>Return Home</a></main>;
+}
+
+// Keep this build-time condition inline so disabled builds emit no scenario chunks.
+const ShiftExperience = import.meta.env.VITE_SHIFT_ENABLED === 'true' ? lazy(() => import('./modules/the-shift/ShiftExperience.jsx').catch(() => ({ default: ShiftUnavailable }))) : null;
 
 
 // ── Service Worker Registration ─────────────────────────────────────────────
@@ -53,6 +63,7 @@ function getPage() {
   if (path === '/' || path === '/home') return 'home';
   if (path === '/copilot')    return 'app';
   if (path === '/ask') return 'ask';
+  if (SHIFT_ENABLED && shiftRoute(path)) return 'shift-learning';
   if (path === '/rhythm-lab') return 'rhythmlab';
   if (path === '/rhythm-lab/library')  return 'rhythmlab-library';
   if (path === '/rhythm-lab/practice') return 'rhythmlab-practice';
@@ -78,8 +89,10 @@ function getPage() {
 
 function Root() {
   const [page, setPage] = useState(getPage);
+  const [routeKey, setRouteKey] = useState(() => window.location.pathname + window.location.search);
   const [workspaceEntered, setWorkspaceEntered] = useState(() => getPage() === 'app');
   const [askEntered, setAskEntered] = useState(() => getPage() === 'ask');
+  const [shiftEntered, setShiftEntered] = useState(() => SHIFT_ENABLED && getPage() === 'shift-learning');
   const [scenarioActive, setScenarioActive] = useState(false);
   const [askSnapshot, setAskSnapshot] = useState(null);
   const shareSnapshot = useCallback(snapshot => setAskSnapshot(snapshot ? structuredClone(snapshot) : null), []);
@@ -95,8 +108,10 @@ function Root() {
     history.replaceState({ ...history.state, ceScroll: window.scrollY }, '', window.location.href);
     history.pushState({ ceScroll: 0 }, '', path);
     setPage(getPage());
+    setRouteKey(window.location.pathname + window.location.search);
     if (getPage() === 'app') setWorkspaceEntered(true);
     if (getPage() === 'ask') setAskEntered(true);
+    if (SHIFT_ENABLED && getPage() === 'shift-learning') setShiftEntered(true);
     requestAnimationFrame(() => {
       window.scrollTo(0, getPage() === 'app' ? workspacePosition.current.scroll : 0);
       if (getPage() === 'app' && workspacePosition.current.focus?.isConnected) workspacePosition.current.focus.focus({ preventScroll: true });
@@ -108,8 +123,10 @@ function Root() {
     const onPop = () => {
       if (currentPage.current === 'app') workspacePosition.current.scroll = window.scrollY;
       setPage(getPage());
+      setRouteKey(window.location.pathname + window.location.search);
       if (getPage() === 'app') setWorkspaceEntered(true);
       if (getPage() === 'ask') setAskEntered(true);
+      if (SHIFT_ENABLED && getPage() === 'shift-learning') setShiftEntered(true);
       requestAnimationFrame(() => {
         window.scrollTo(0, getPage() === 'app' ? workspacePosition.current.scroll : history.state?.ceScroll || 0);
         if (getPage() === 'app' && workspacePosition.current.focus?.isConnected) workspacePosition.current.focus.focus({ preventScroll: true });
@@ -137,7 +154,9 @@ function Root() {
 
   return (
     <>
+      {SHIFT_ENABLED && returningShift(window.location.search) && ['ask', 'abglab', 'referencehub', 'shift-learning', 'rhythmlab-practice'].includes(page) && <Suspense fallback={null}><ShiftExperience mode="return" navigate={navigate} routeKey={routeKey} /></Suspense>}
       {page === 'home'       && <ClinicalEdgeHome onNavigate={navigate} />}
+      {SHIFT_ENABLED && shiftEntered && <Suspense fallback={page === 'shift-learning' ? <main className="ce-not-found" role="status">Opening The Shift...</main> : null}><ShiftExperience navigate={navigate} active={page === 'shift-learning'} routeKey={routeKey} /></Suspense>}
       {page === 'rhythmlab'          && <RhythmLabModule onGoHome={() => navigate('/')} navigate={navigate} />}
       {page === 'rhythmlab-library'  && <RhythmLibraryPage navigate={navigate} />}
       {page === 'rhythmlab-practice' && <RhythmPracticePage navigate={navigate} />}
@@ -153,8 +172,8 @@ function Root() {
       {page === 'notfound' && <main className="ce-not-found"><span>Clinical Edge</span><h1>Page not found</h1><p>This address does not lead to a Clinical Edge page.</p><a href="/" onClick={(event) => { if (event.metaKey || event.ctrlKey || event.shiftKey || event.altKey) return; event.preventDefault(); navigate('/'); }}>Return Home</a></main>}
       {page === 'download'   && <Download onNavigate={navigate} />}
       {page === 'icudrips'      && <IcuDripsModule onGoHome={() => navigate('/')} />}
-      {page === 'referencehub'  && <ReferenceHubModule onGoHome={() => navigate('/')} />}
-      {page === 'abglab'        && <AbgLabModule onGoHome={() => navigate('/')} />}
+      {page === 'referencehub'  && <ReferenceHubModule key={routeKey} onGoHome={() => navigate('/')} initialReferenceId={SHIFT_ENABLED && returningShift(window.location.search) ? new URLSearchParams(window.location.search).get('reference') : null} />}
+      {page === 'abglab'        && <><p hidden={!(SHIFT_ENABLED && new URLSearchParams(window.location.search).get('example') === 'resp-acidosis' && returningShift(window.location.search))} className="ce-shift-example-note">ABG Lab's existing respiratory-acidosis example uses different values from the Shift. Select Interpret to work through this example.</p><AbgLabModule key={routeKey} onGoHome={() => navigate('/')} initialExampleId={SHIFT_ENABLED && returningShift(window.location.search) ? new URLSearchParams(window.location.search).get('example') : null} /></>}
       {page === 'brainsheets'        && <BrainSheetsModule navigate={navigate} onGoHome={() => navigate('/')} />}
       {page === 'brainsheets-detail' && <BrainSheetsModule navigate={navigate} onGoHome={() => navigate('/')} templateId={window.location.pathname.replace(/^\/brain-sheets\//, '').replace(/\/$/, '')} />}
       {page === 'blog'          && <BlogIndex />}

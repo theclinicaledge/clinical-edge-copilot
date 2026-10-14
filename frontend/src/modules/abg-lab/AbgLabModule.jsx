@@ -123,8 +123,8 @@ function ResultCard({ result }) {
 }
 
 // ── Main module ───────────────────────────────────────────────────────────────
-export default function AbgLabModule({ onGoHome }) {
-  const [fields, setFields]   = useState(EMPTY);
+export default function AbgLabModule({ onGoHome, initialExampleId = null }) {
+  const [fields, setFields]   = useState(() => EXAMPLES.find(example => example.id === initialExampleId)?.values || EMPTY);
   const [result, setResult]   = useState(null);
   const [error,  setError]    = useState(null);
 

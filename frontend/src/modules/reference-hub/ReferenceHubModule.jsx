@@ -1043,8 +1043,8 @@ function DetailView({ ref_, onBack, onSelect, backLabel }) {
 
 // ── Root module ───────────────────────────────────────────────────────────────
 
-export default function ReferenceHubModule({ onGoHome }) {
-  const [selected, setSelected]               = useState(null);
+export default function ReferenceHubModule({ onGoHome, initialReferenceId = null }) {
+  const [selected, setSelected]               = useState(() => REFERENCES.find(reference => reference.id === initialReferenceId) || null);
   const [selectedPathway, setSelectedPathway] = useState(null);
   const [selectedConcept, setSelectedConcept] = useState(null);
 

@@ -12,7 +12,7 @@ test('public review record preserves exact authored v0.4 clinical content', () =
   expect(conversationEntry.review.reviewDate).toBeNull();
   expect(conversationEntry.review.status).toContain('reported by the founder');
 });
-test('production exposes four scenarios, notice, skip and truthful review without API calls', async ({ page }) => {
+test('production exposes five scenarios, notice, skip and truthful review without API calls', async ({ page }) => {
   await page.route('**/*', route => {
     const url = new URL(route.request().url());
     if (['fonts.googleapis.com', 'fonts.gstatic.com', 'va.vercel-scripts.com'].includes(url.hostname)) return route.fulfill({ body: '' });
@@ -23,8 +23,8 @@ test('production exposes four scenarios, notice, skip and truthful review withou
   });
   page.on('pageerror', error => { throw error; });
   await page.goto('/learn/shifts');
-  await expect(page.locator('.shift-library-card')).toHaveCount(4);
-  await page.locator('.shift-library-card').last().getByRole('link', { name: 'Begin shift' }).click();
+  await expect(page.locator('.shift-library-card')).toHaveCount(5);
+  await page.locator('.shift-library-card').nth(3).getByRole('link', { name: 'Begin shift' }).click();
   await expect(page.locator('.conversation-root')).toBeVisible();
   await expect(page.locator('.conversation-notice')).toBeVisible();
   await page.getByRole('button', { name: 'Sources & review', exact: true }).click();
@@ -34,7 +34,7 @@ test('production exposes four scenarios, notice, skip and truthful review withou
   await page.getByRole('button', { name: 'Skip this Shift' }).click();
   await expect(page.getByRole('heading', { name: 'You can step away.' })).toBeVisible();
   await page.getByRole('link', { name: 'Return to Shift Library' }).click();
-  await expect(page.locator('.shift-library-card')).toHaveCount(4);
+  await expect(page.locator('.shift-library-card')).toHaveCount(5);
   await page.goto('/learn/shifts/conversation/ask');
   await expect(page.locator('.shift-handoff')).toContainText('Ask may decline');
   await expect(page.locator('.shift-handoff')).toContainText('Nothing is submitted automatically');

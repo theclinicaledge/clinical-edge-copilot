@@ -38,7 +38,7 @@ export default function ClinicalEdgeHome({ onNavigate }) {
         </section>
       </div>
       <div className="ce-command-home__secondary ce-command-home__links"><IntentLink action={{ label: "Brain Sheets", detail: "Blank printable templates", path: "/brain-sheets", event: "brain_sheets_module_opened" }} onNavigate={onNavigate} /></div>
-      <footer className="ce-command-home__footer"><div className="ce-home-footer-copy"><p>Education and reasoning support. Follow local policy and clinical judgment.</p><div className="ce-home-footer-links"><a href="/privacy" onClick={(e) => { e.preventDefault(); onNavigate("/privacy"); }}>Privacy</a><a href="/terms" onClick={(e) => { e.preventDefault(); onNavigate("/terms"); }}>Terms</a><a href="/support" onClick={(e) => { e.preventDefault(); onNavigate("/support"); }}>Support</a></div></div><AppStoreBadge placement="footer" height={40} /></footer>
+      <footer className="ce-command-home__footer"><div className="ce-home-footer-copy"><p>Education and reasoning support. Follow local policy and clinical judgment.</p><div className="ce-home-footer-links"><a href="/privacy" onClick={(e) => { e.preventDefault(); onNavigate("/privacy"); }}>Privacy</a><a href="/choices" onClick={(e) => { e.preventDefault(); onNavigate("/choices"); }}>Choices</a><a href="/terms" onClick={(e) => { e.preventDefault(); onNavigate("/terms"); }}>Terms</a><a href="/support" onClick={(e) => { e.preventDefault(); onNavigate("/support"); }}>Support</a></div></div><AppStoreBadge placement="footer" height={40} /></footer>
     </main>
   </div>;
 }

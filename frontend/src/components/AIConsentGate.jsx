@@ -48,7 +48,7 @@ function ConsentScreen({ navigate, previous, ask }) {
         </details>
         <label className="ce-consent__toggle">
           <input type="checkbox" checked={analytics} onChange={(event) => setAnalytics(event.target.checked)} />
-          <span>Also share anonymous usage analytics <small>(never what you type, optional)</small></span>
+          <span>Also share pseudonymous usage analytics with PostHog <small>(never what you type, optional)</small></span>
         </label>
         <div className="ce-consent__actions">
           <button type="button" className="ce-consent__agree ce-pressable" onClick={agree}>Agree and continue</button>

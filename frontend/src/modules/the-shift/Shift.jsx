@@ -4,6 +4,7 @@ import '../../styles/tokens.css';
 import './shift.css';
 import { scenario, stages } from './scenario.js';
 import { STORAGE_KEY, freshProgress, readProgress, cueResult } from './progress.js';
+import { shiftProgress } from '../../productAnalytics.js';
 
 const Arrow = () => <span aria-hidden="true">&#8594;</span>;
 const Check = () => <span aria-hidden="true">&#10003;</span>;
@@ -76,7 +77,7 @@ export default function Shift() {
 
   useEffect(() => {
     let frame;
-    try { localStorage.setItem(STORAGE_KEY, JSON.stringify(progress)); }
+    try { const previous = readProgress(); localStorage.setItem(STORAGE_KEY, JSON.stringify(progress)); shiftProgress('drowsy-patient', '2.1', previous, progress, 6); }
     catch { frame = requestAnimationFrame(() => setStorageFailed(true)); }
     return () => { if (frame) cancelAnimationFrame(frame); };
   }, [progress]);

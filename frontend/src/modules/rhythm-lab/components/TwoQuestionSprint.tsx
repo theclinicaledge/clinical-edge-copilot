@@ -1,4 +1,4 @@
-import { useState, useCallback } from 'react';
+import { useState, useCallback, useEffect, useRef } from 'react';
 import { trackEvent } from '../../../analytics';
 import { RHYTHMS } from '../data/rhythms';
 import { RhythmStrip } from './RhythmStrip';
@@ -38,6 +38,8 @@ export function TwoQuestionSprint({ onBack }: TwoQuestionSprintProps) {
   const [regAns,   setRegAns]   = useState<RegAnswer  | null>(null);
   const [revealed, setRevealed] = useState(false);
   const [done,     setDone]     = useState(false);
+  const countedStart = useRef(false);
+  useEffect(() => { if (!countedStart.current) { countedStart.current = true; trackEvent('rhythm_sprint_opened'); } }, []);
 
   const rhythm = deck[cardIdx];
   const pearl  = getPearlForRhythm(rhythm.id);
@@ -57,6 +59,7 @@ export function TwoQuestionSprint({ onBack }: TwoQuestionSprintProps) {
   function next() {
     if (cardIdx + 1 >= SPRINT_LENGTH) {
       setDone(true);
+      trackEvent('rhythm_sprint_completed');
     } else {
       setCardIdx(i => i + 1);
       setRateAns(null);

@@ -6,6 +6,7 @@ import './monitor.css';
 import Tracing from './ECGStrip.jsx';
 import { rooms, scenes, alarmChoices, alarmExplanations, monitorChoices, rhythmSteps, rhythmChoices, findings, actions, chips, recommendations, script, references, links } from './data.js';
 import { KEY, fresh, read, cueCounts, actionsComplete, missingCall } from './progress.js';
+import { shiftProgress } from '../../../productAnalytics.js';
 
 const Arrow = () => <span aria-hidden="true">&#8594;</span>;
 const choice = (items, id) => items.find(item => item.id === id);
@@ -50,7 +51,7 @@ export default function Monitor() {
   const toggle = (key, id, limit = Infinity) => setState(previous => ({ ...previous, [key]: previous[key].includes(id) ? previous[key].filter(item => item !== id) : previous[key].length < limit ? [...previous[key], id] : previous[key] }));
   useEffect(() => {
     let frame;
-    try { localStorage.setItem(KEY, JSON.stringify(state)); } catch { frame = requestAnimationFrame(() => setStorageFailed(true)); }
+    try { const previous = read(); localStorage.setItem(KEY, JSON.stringify(state)); shiftProgress('monitor-alarm', '2.1', previous, state, 7); } catch { frame = requestAnimationFrame(() => setStorageFailed(true)); }
     return () => { if (frame) cancelAnimationFrame(frame); };
   }, [state]);
   useEffect(() => { if (first.current) { first.current = false; return; } heading.current?.focus({ preventScroll: true }); window.scrollTo({ top: 0, behavior: 'instant' }); }, [state.stage]);

@@ -126,7 +126,8 @@ export default function AskClinicalEdge({ navigate, isVisible, snapshot = null }
     pending.current = controller;
     const timer = setTimeout(() => controller.abort('timeout'), CONVERSATION_PREVIEW ? 60000 : 35000);
     setBusy(true); setError(''); setExplanationNotice('');
-    trackEvent('ask_submitted', { mode: 'general' });
+    const analyticsKind = CONVERSATION_PREVIEW && answer ? 'followup' : 'question';
+    trackEvent('ask_submitted', { kind: analyticsKind });
     try {
       const response = await fetch(`${API_BASE}${CONVERSATION_PREVIEW ? '/api/ask/v1/conversation/preview' : '/api/ask'}`, { method: 'POST', headers: { ...aiRequestHeaders(), ...(CONVERSATION_PREVIEW ? { Authorization: `Bearer ${sentReceipt}` } : {}) }, body: JSON.stringify(CONVERSATION_PREVIEW ? { question: sentQuestion } : { question: sentQuestion.trim(), contextMode: context ? 'snapshot' : 'general', ...(context ? { snapshotContext: context } : {}), ...(explain ? { abgExplanation: true } : {}) }), signal: controller.signal });
       const data = await response.json().catch(() => ({}));
@@ -143,7 +144,7 @@ export default function AskClinicalEdge({ navigate, isVisible, snapshot = null }
       if (!response.ok || !['general', 'snapshot'].includes(data.contextMode) || typeof data.answer !== 'string' || (data.contextMode === 'snapshot' && !context)) {
         if (CONVERSATION_PREVIEW && data.error?.code === 'consent_required') { setPreviewConsent(false); consentReceipt.current = null; }
         setError(limitMessage(data) || (CONVERSATION_PREVIEW && data.error?.code === 'educational_scope_unavailable' && typeof data.error.message === 'string' ? data.error.message : ERRORS[data.error?.code] || 'The answer service is unavailable. Your question is unchanged.'));
-        trackEvent('ask_failed', { mode: 'general', status: response.status });
+        trackEvent('ask_failed', { kind: analyticsKind, status: response.status });
         return;
       }
       if (CONVERSATION_PREVIEW && answer) setEarlierExplanations(previous => [...previous, currentTurn].slice(-5));
@@ -155,11 +156,11 @@ export default function AskClinicalEdge({ navigate, isVisible, snapshot = null }
       setAbgCatalog(Array.isArray(data.abgExplanationOptions) ? data.abgExplanationOptions : []);
       setDetails(Array.isArray(data.details) ? data.details.filter(d => typeof d.heading === 'string' && typeof d.text === 'string') : []);
       setAnswerContext({ questionKind: data.questionKind || 'education', educationalReframing:data.educationalReframing===true, offerSnapshot: data.offerSnapshot === true, evidence: data.evidence, snapshotUse: data.snapshotUse, snapshot: submittedSnapshot });
-      trackEvent('ask_answered', { mode: 'general' });
+      trackEvent('ask_answered', { kind: analyticsKind });
     } catch {
       if (explain) setExplanationNotice('Additional explanation unavailable. The rule-based interpretation is unchanged.');
       else setError(controller.signal.aborted ? controller.signal.reason === 'timeout' ? ERRORS.provider_timeout : 'Request cancelled. Your question is unchanged.' : 'Connection unavailable. Your question is unchanged.');
-      trackEvent('ask_failed', { mode: 'general', status: 0 });
+      if (!controller.signal.aborted || controller.signal.reason === 'timeout') trackEvent('ask_failed', { kind: analyticsKind, status: 0 });
     } finally {
       window.removeEventListener('wheel', markReading); window.removeEventListener('touchmove', markReading); window.removeEventListener('scroll', markReading); window.removeEventListener('keydown', markKeyReading);
       clearTimeout(timer); pending.current = null; setBusy(false);

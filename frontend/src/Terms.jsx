@@ -3,7 +3,7 @@ import { STATIC_ROUTE_SEO } from "./seo/routeSeo.js";
 
 // Text is verbatim from the approved Terms of Use. Change it only with Mohamed's approval
 // and update the effective date when it changes.
-const EFFECTIVE_DATE = "October 11, 2026";
+const EFFECTIVE_DATE = "October 17, 2026";
 
 const TERMS_SECTIONS = [
     {
@@ -106,7 +106,7 @@ const TERMS_SECTIONS = [
       "title": "10. Third-party services",
       "blocks": [
         {
-          "text": "The Service relies on third parties such as Anthropic (AI processing), Render and Vercel (hosting) and, only if you opt in, Vercel Analytics. Their own terms and policies also apply to their services. We are not responsible for third-party services or websites linked from the Service."
+          "text": "The Service relies on third parties such as Anthropic (AI processing), Render and Vercel (hosting) and, only if you opt in, PostHog (product analytics). Their own terms and policies also apply to their services. We are not responsible for third-party services or websites linked from the Service."
         }
       ]
     },

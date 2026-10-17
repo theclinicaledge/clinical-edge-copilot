@@ -17,7 +17,7 @@ for (const route of ['/copilot', '/ask']) {
     await expect(page.getByText(/not individualized diagnosis, treatment or emergency guidance/)).toBeVisible();
     await expect(page.getByText(/volatile server memory for up to ten minutes/)).toBeVisible();
     await expect(page.getByText(/admission, generation and safety review/)).toBeVisible();
-    await expect(page.getByRole('checkbox', { name: /anonymous usage analytics/ })).not.toBeChecked();
+    await expect(page.getByRole('checkbox', { name: /pseudonymous usage analytics/ })).not.toBeChecked();
     expect(apiCalls).toEqual([]);
     expect(await storedConsent(page)).toBeNull();
   });
@@ -34,15 +34,15 @@ test('agreeing opens the workspace with analytics off by default', async ({ page
   await page.goto('/copilot');
   await page.getByRole('button', { name: 'Agree and continue' }).click();
   await expect(page.getByRole('heading', { name: 'How your entries are processed' })).toHaveCount(0);
-  expect(await storedConsent(page)).toMatchObject({ version: 3, ai: true, analytics: false });
+  expect(await storedConsent(page)).toMatchObject({ version: 4, ai: true, analytics: false });
   await page.reload();
   await expect(page.getByRole('heading', { name: 'How your entries are processed' })).toHaveCount(0);
 });
 
-test('a stored version 2 consent shows the updated disclosure screen again', async ({ page }) => {
+test('a stored version 3 consent shows the updated disclosure screen again', async ({ page }) => {
   await page.addInitScript(() => {
     if (!sessionStorage.getItem('seeded')) {
-      localStorage.setItem('ce_consent', JSON.stringify({ version: 2, ai: true, analytics: true, decidedAt: '2026-10-01T00:00:00.000Z' }));
+      localStorage.setItem('ce_consent', JSON.stringify({ version: 3, ai: true, analytics: true, decidedAt: '2026-10-01T00:00:00.000Z' }));
       sessionStorage.setItem('seeded', '1');
     }
   });
@@ -51,17 +51,17 @@ test('a stored version 2 consent shows the updated disclosure screen again', asy
   await page.goto('/copilot');
   await expect(page.getByRole('heading', { name: 'How your entries are processed' })).toBeVisible();
   await expect(page.getByRole('link', { name: 'Terms of Use' })).toHaveAttribute('href', '/terms');
-  await expect(page.getByRole('checkbox', { name: /anonymous usage analytics/ })).not.toBeChecked();
+  await expect(page.getByRole('checkbox', { name: /pseudonymous usage analytics/ })).not.toBeChecked();
   expect(apiCalls).toEqual([]);
   await page.getByRole('button', { name: 'Agree and continue' }).click();
-  expect(await storedConsent(page)).toMatchObject({ version: 3, ai: true, analytics: false });
+  expect(await storedConsent(page)).toMatchObject({ version: 4, ai: true, analytics: false });
   await page.reload();
   await expect(page.getByRole('heading', { name: 'How your entries are processed' })).toHaveCount(0);
 });
 
 test('analytics opt-in is recorded only when checked', async ({ page }) => {
   await page.goto('/ask');
-  await page.getByRole('checkbox', { name: /anonymous usage analytics/ }).check();
+  await page.getByRole('checkbox', { name: /pseudonymous usage analytics/ }).check();
   await page.getByRole('button', { name: 'Agree and continue' }).click();
   expect(await storedConsent(page)).toMatchObject({ ai: true, analytics: true });
 });
@@ -77,11 +77,11 @@ test('no analytics events are emitted without consent', async ({ page }) => {
 
 test('consent can be withdrawn from Privacy and the gate returns', async ({ page }) => {
   await page.goto('/copilot');
-  await page.getByRole('checkbox', { name: /anonymous usage analytics/ }).check();
+  await page.getByRole('checkbox', { name: /pseudonymous usage analytics/ }).check();
   await page.getByRole('button', { name: 'Agree and continue' }).click();
   await page.goto('/privacy');
   const ai = page.getByRole('checkbox', { name: /Send my Shift Brain and Ask entries to Anthropic/ });
-  const analytics = page.getByRole('checkbox', { name: /anonymous usage analytics/ });
+  const analytics = page.getByRole('checkbox', { name: /pseudonymous product usage events/ });
   await expect(ai).toBeChecked();
   await expect(analytics).toBeChecked();
   await ai.uncheck();
@@ -92,9 +92,23 @@ test('consent can be withdrawn from Privacy and the gate returns', async ({ page
   await expect(page.getByRole('heading', { name: 'How your entries are processed' })).toBeVisible();
 });
 
+test('analytics can be withdrawn through the in-WebView choices route', async ({ page }) => {
+  await page.goto('/ask');
+  await page.getByRole('checkbox', { name: /pseudonymous usage analytics/ }).check();
+  await page.getByRole('button', { name: 'Agree and continue' }).click();
+  await page.goto('/');
+  await page.getByRole('link', { name: 'Choices', exact: true }).click();
+  await expect(page).toHaveURL(/\/choices$/);
+  const analytics = page.getByRole('checkbox', { name: /pseudonymous product usage events/ });
+  await expect(analytics).toBeChecked();
+  await analytics.uncheck();
+  await expect(analytics).not.toBeChecked();
+  expect(await storedConsent(page)).toMatchObject({ ai: true, analytics: false });
+});
+
 test('privacy policy discloses the AI provider, retention and withdrawal', async ({ page }) => {
   await page.goto('/privacy');
   await expect(page.getByText(/Anthropic automatically deletes API inputs and outputs within 30 days/)).toBeVisible();
   await expect(page.getByText(/Retention, deletion and withdrawing consent/i)).toBeVisible();
-  await expect(page.getByText(/protect it at a level equal to this policy/)).toBeVisible();
+  await expect(page.getByText(/Their own privacy policies also apply/)).toBeVisible();
 });

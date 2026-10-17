@@ -44,6 +44,7 @@ export function PracticeMode({ onBack }: PracticeModeProps) {
     if (!didRecordDay.current) {
       didRecordDay.current = true;
       recordPracticeDay();
+      trackEvent('rhythm_practice_opened');
     }
   }, []);
 

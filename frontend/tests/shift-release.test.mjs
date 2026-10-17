@@ -49,9 +49,9 @@ test('privacy discloses local progress and preserves separate Ask consent', () =
   assert.doesNotMatch(home, /Private release candidate|Clinical review pending/);
   const privacy = readFileSync(new URL('../src/Privacy.jsx', import.meta.url), 'utf8');
   assert.match(privacy, /The Shift: device-local progress/);
-  assert.match(privacy, /They are not submitted as scenario responses/);
+  assert.match(privacy, /Your choices and findings are not submitted as scenario responses/);
   assert.match(privacy, /restart that scenario or clear/);
-  assert.match(privacy, /no new gameplay analytics/);
+  assert.match(privacy, /We do not send your answers/);
   assert.match(privacy, /does not automatically submit/);
   assert.match(privacy, /<PrivacyChoices \/>/);
 });

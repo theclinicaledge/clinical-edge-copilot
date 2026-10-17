@@ -1,4 +1,5 @@
 import { fresh, STORAGE_KEY, VERSION } from './rules.js';
+import { resetShiftAnalytics, shiftProgress } from '../../../productAnalytics.js';
 
 export function loadProgress() {
   try {
@@ -9,9 +10,9 @@ export function loadProgress() {
 }
 
 export function saveProgress(value) {
-  try { localStorage.setItem(STORAGE_KEY, JSON.stringify(value)); } catch { /* Private browsing may block storage. */ }
+  try { const previous = loadProgress(); localStorage.setItem(STORAGE_KEY, JSON.stringify(value)); shiftProgress('which-patient-first', VERSION, previous, value, 7); } catch { /* Private browsing may block storage. */ }
 }
 
 export function clearProgress() {
-  try { localStorage.removeItem(STORAGE_KEY); } catch { /* Keep the current session usable. */ }
+  try { localStorage.removeItem(STORAGE_KEY); resetShiftAnalytics('which-patient-first'); } catch { /* Keep the current session usable. */ }
 }

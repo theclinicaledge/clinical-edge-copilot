@@ -41,12 +41,12 @@ for (const width of [390, 768, 1440]) {
     }
     await expect(page.getByText(/admission, generation and safety review/)).toBeVisible();
     await expect(page.getByText(/Anthropic keeps API content up to 30 days/)).toBeVisible();
-    await expect(page.getByRole('checkbox', { name: /anonymous usage analytics/ })).not.toBeChecked();
+    await expect(page.getByRole('checkbox', { name: /pseudonymous usage analytics/ })).not.toBeChecked();
     expect(mock.requests).toHaveLength(0);
     if (!baseline) await page.getByText('Full AI and privacy information').click();
     await page.screenshot({ path: `${output}/consent-${width}.png`, fullPage: true });
     await page.getByRole('button', { name: 'Agree and continue' }).click();
-    expect(await page.evaluate(() => JSON.parse(localStorage.getItem('ce_consent')!))).toMatchObject({ version: 3, ai: true, analytics: false });
+    expect(await page.evaluate(() => JSON.parse(localStorage.getItem('ce_consent')!))).toMatchObject({ version: 4, ai: true, analytics: false });
     await expect(page.getByRole('button', { name: 'Enable educational conversation' })).toBeVisible();
     expect(mock.requests).toHaveLength(0);
     if (!baseline) {

@@ -89,6 +89,9 @@ test('public Shift 5 flow keeps observations, coverage and debrief honest on mob
   for (const [title, pattern] of [['412 / Mr. Okafor', /^Check in on him/], ['414 / Your role', /^Stay with his care/], ['Jordan / delegated work', /^Thank Jordan/]]) await cards.filter({ hasText: title }).getByRole('button', { name: pattern }).click();
   await cards.filter({ hasText: 'Coverage / 410' }).getByRole('button', { name: /^Dee, can you continue/ }).click();
   await expect(page.getByRole('button', { name: 'See shift debrief' })).toBeDisabled();
+  await expect(cards.filter({ hasText: 'Coverage / 410' })).toContainText('Coverage is not confirmed until Dee accepts out loud.');
+  await expect(cards.filter({ hasText: '412 / Mr. Okafor' })).toContainText('stays queued until coverage is confirmed');
+  await expect(cards.filter({ hasText: '416 / Ms. Whitfield' })).toContainText('stays queued until coverage is confirmed');
   await page.getByRole('button', { name: "Hear Dee's reply" }).click();
   await expect(cards.filter({ hasText: '416 / Ms. Whitfield' })).toContainText('Story loop closed');
   await page.getByRole('button', { name: 'See shift debrief' }).click();

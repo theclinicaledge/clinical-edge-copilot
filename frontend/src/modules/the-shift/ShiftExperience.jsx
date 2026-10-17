@@ -5,14 +5,18 @@ import Shift from './Shift.jsx';
 import Monitor from './monitor/Monitor.jsx';
 import Discharge from './discharge/Discharge.jsx';
 import LibraryMonitorArtwork from './LibraryMonitorArtwork.jsx';
+import { CONVERSATION_ENABLED } from './conversation/private.js';
+import Conversation from './conversation/Conversation.jsx';
 import { SHIFTS, getShift, progressLabel, scenarioLink } from './integrated/registry.js';
 import { shiftRoute, shiftPath, learningDestination, returningShift } from './routing.js';
 import './app.css';
 
 const renderers = { 'drowsy-patient': Shift, 'monitor-alarm': Monitor, 'discharge-puzzle': Discharge };
+if (CONVERSATION_ENABLED) renderers.conversation = Conversation;
 const images = {
   'drowsy-patient': new URL('./assignment-poster.svg', import.meta.url).href,
   'discharge-puzzle': new URL('./discharge/poster.svg', import.meta.url).href,
+  ...(CONVERSATION_ENABLED ? { conversation: new URL('./conversation/room.svg', import.meta.url).href } : {}),
 };
 
 function AppLink({ to, navigate, children, ...props }) {
@@ -31,7 +35,7 @@ function ReviewDialog({ item, close }) {
   }, []);
   return <dialog className="shift-review-dialog" ref={ref} aria-labelledby="shift-review-title" onCancel={close}>
     <header><div><span className="shift-overline">Sources & review record</span><h2 id="shift-review-title">{item.title}</h2></div><button onClick={close} aria-label="Close source record">&#215;</button></header>
-    <p className="shift-review-status">Independent nurse approval of this scenario package is reported by the founder. Not a competency assessment.</p>
+    <p className="shift-review-status">{item.review.status} Not a competency assessment.</p>
     <dl><div><dt>Scenario / content version</dt><dd>{item.scenarioId} / {item.contentVersion}</dd></div><div><dt>Reviewer / review date</dt><dd>{item.review.reviewer || 'Not supplied'} / {item.review.reviewDate || 'Not supplied'}</dd></div><div><dt>Approval reported for version</dt><dd>{item.review.approvedVersion || 'None'}</dd></div></dl>
     <h3>Learning objectives</h3><ul>{item.objectives.map(text => <li key={text}>{text}</li>)}</ul>
     <h3>Teaching sources & applicability</h3><p>Passage-level source verification is not documented. A reference does not certify the scenario.</p>
@@ -63,7 +67,7 @@ function Handoff({ item, navigate }) {
   const [status, setStatus] = useState('');
   const topic = new URLSearchParams(window.location.search).get('topic');
   const question = item.askQuestions?.[topic] || item.askQuestion;
-  return <main className="shift-handoff"><AppLink to={shiftPath(item.id)} navigate={navigate}>&#8592; Return to {item.title}</AppLink><p className="shift-overline">Connected learning / Ask Clinical Edge</p><h1>Keep the question going.</h1><blockquote>{question}</blockquote><button className="shift-secondary" onClick={async () => { try { await navigator.clipboard.writeText(question); setStatus('Question copied.'); } catch { setStatus('Copy unavailable. Select the question above to copy it manually.'); } }}>Copy question</button><p role="status">{status}</p><p>Open Ask and paste the question when you are ready. Nothing is submitted automatically. Existing AI consent, privacy protections and the daily question allowance apply.</p><AppLink to={`/ask?shift=${item.id}`} navigate={navigate} className="shift-primary">Open Ask <span aria-hidden="true">&#8594;</span></AppLink></main>;
+  return <main className="shift-handoff"><AppLink to={shiftPath(item.id)} navigate={navigate}>&#8592; Return to {item.title}</AppLink><p className="shift-overline">Connected learning / Ask Clinical Edge</p><h1>Keep the question going.</h1><blockquote>{question}</blockquote>{item.id === 'conversation' && <p>This question has not been tested with the live model. Ask may decline it. Ask is not a crisis service.</p>}<button className="shift-secondary" onClick={async () => { try { await navigator.clipboard.writeText(question); setStatus('Question copied.'); } catch { setStatus('Copy unavailable. Select the question above to copy it manually.'); } }}>Copy question</button><p role="status">{status}</p><p>Open Ask and paste the question when you are ready. Nothing is submitted automatically. Existing AI consent, privacy protections and the daily question allowance apply.</p><AppLink to={`/ask?shift=${item.id}`} navigate={navigate} className="shift-primary">Open Ask <span aria-hidden="true">&#8594;</span></AppLink></main>;
 }
 
 function Scenario({ item, navigate }) {
@@ -94,7 +98,7 @@ function Scenario({ item, navigate }) {
   return <div ref={root} className="shift-scenario-scroll" onClickCapture={capture}>
     <div className="shift-scene-bar"><AppLink to="/learn/shifts" navigate={navigate}>&#8592; Shift Library</AppLink><button onClick={() => setReview(true)}>Sources & review</button></div>
     <Scene />
-    <section className="shift-connections"><span className="shift-overline">Connected learning</span><h2>Follow the why.</h2><div>{item.recommendations.map(link => <AppLink key={link.id} to={learningDestination(link.path, item.id)} navigate={navigate}><strong>{link.title}</strong><span>{link.detail}</span><b aria-hidden="true">&#8599;</b></AppLink>)}</div></section>
+    {!item.private && item.id !== 'conversation' && <section className="shift-connections"><span className="shift-overline">Connected learning</span><h2>Follow the why.</h2><div>{item.recommendations.map(link => <AppLink key={link.id} to={learningDestination(link.path, item.id)} navigate={navigate}><strong>{link.title}</strong><span>{link.detail}</span><b aria-hidden="true">&#8599;</b></AppLink>)}</div></section>}
     {review && <ReviewDialog item={item} close={() => setReview(false)} />}
   </div>;
 }

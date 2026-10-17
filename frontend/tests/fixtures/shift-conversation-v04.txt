@@ -1,0 +1,372 @@
+The Shift: Scenario 4, The Conversation That Changes Everything (Draft for Review)
+Oct 14, 2026 · @Mohamed Laayouni
+Part A: Scenario card
+Scenario 4 teaches that warning signs often arrive as quiet, ordinary-sounding sentences, and the nurse who notices them and asks directly can change everything. The whole scenario is a conversation; there are no vital signs, labs or monitors.
+What changed in version 0.4 (targeted revision; story, dialogue, content note, Skip and 988 support unchanged):
+• Decision 4 uses four labeled priority groups, with accepted groups for each card instead of one right answer. The combined card is split into "Keep talking with him" and "Document what he said, in his own words."
+• Each placement gets Accepted, Revisit or Unsafe feedback, so reasonable overlap isn't penalized, but real delays and unsafe choices are named.
+• A safer-path rule: after a choice that isn't the best one, the story continues with a labeled bridge, and Screen 7 never credits the learner with choices they didn't make.
+• Source 4 now cites the Joint Commission's 2026 hospital goal, NPG.08.01.01.
+• One debrief line on screening and assessment processes.
+• Build note: quotation marks must render without escape characters.
+Field
+Value
+Scenario ID
+SHIFT-004
+Version
+0.4 (draft, scoring, feedback and ending revision)
+Title
+The Conversation That Changes Everything
+Specialty
+Psychiatric-mental health nursing, set on a med-surg unit
+Learner level
+Student and new grad
+Estimated time
+5 to 6 minutes
+Decisions
+5
+Core lesson
+Notice the quiet warning signs, ask about suicide directly, never leave the patient alone, and never promise to keep it secret
+Learning objectives
+1. Use an open-ended, therapeutic response instead of reassurance or closing the conversation. 2. Recognize verbal and behavioral warning signs of suicide in a medical patient. 3. Ask directly and non-judgmentally about suicidal thoughts. 4. Take immediate safety actions: stay, call for help, remove means per policy, notify the provider. 5. Respond to a request for secrecy honestly and with care.
+Clinical concepts (tags)
+therapeutic-communication, suicide-warning-signs, asking-directly, patient-safety-observation, means-safety, confidentiality-limits
+Clinical judgment steps
+Generate solutions (D1), recognize cues (D2), analyze cues and take action (D3), take action (D4), evaluate and communicate (D5)
+Interaction types
+Live conversation (new), Tap the words that worry you (new), Priority groups (new), Therapeutic response
+The twist
+The patient seems calm, even grateful, and says he has "everything sorted out." His calm manner makes it easy to miss what his words and actions are saying.
+Specialty reviewer needed?
+Yes, required: a psychiatric-mental health nurse or nurse educator
+Review status
+Draft
+Content review date
+Pending
+Content note shown before play: "This Shift includes a conversation about suicide. If this topic is hard for you right now, you can skip it. Support is available either way." Skip shows the 988 support card, then returns to the Shift Library.
+Why a med-surg setting: most nurses will meet a patient in emotional crisis outside a psych unit, often right after hard medical news. Setting it on med-surg makes it relevant to every learner and shows that mental health assessment is every nurse's job.
+How it differs from Scenarios 1 to 3: no data to interpret and no paperwork. The learner's tools are words: what they say, what they notice in what the patient says, and how they act on it.
+What this is not. No discussion of methods beyond what the safety actions require, no clinical risk scoring by the learner, and no medication names or doses. Formal risk assessment and treatment belong to the provider and the facility's protocol.
+Part C: Screen-by-screen script
+Seven screens and five decisions on a night shift, 2100 to 2230. The conversation appears as message bubbles, one line at a time. All people and details are fictional.
+Safer-path rule (applies to every decision). The story always continues along the safer path, so the learner never watches harm happen and is never credited with a choice they didn't make. When a choice wasn't the best one, the learner sees its feedback, and the next screen opens with a short bridge line in a distinct style:
+• After Decision 1: "Taking the safer approach: you sit down and ask about his day."
+• After Decision 3, before the Reveal: "Taking the safer approach: you ask him directly."
+• After Decision 4, if any card is Unsafe: "Taking the safer approach: you stay with him, help comes to you, and safety actions begin."
+• After Decision 5: "Taking the safer approach: you're honest that you can't keep this secret, and you stay."
+Decision 2 needs no bridge; missed cues are covered by its feedback.
+Screen 1 (2100): Report
+Room
+Age, setting, reason for admission
+Report
+Status
+16
+71-year-old, pneumonia, improving
+"Asleep. Due for vitals at 0000."
+Stable
+18
+62-year-old, admitted 3 days ago with a diabetic foot infection. Today the surgeon told him he needs a below-knee amputation. His wife died last year.
+"Really quiet since the surgeon came by. Didn't touch dinner. I think he's just processing."
+Stable vitals
+20
+48-year-old, cellulitis, on IV antibiotics
+"Pump's been fussy all day."
+Stable
+Screen 2 (2115): Decision 1, The first thing you say
+Interaction type: Therapeutic response.
+On screen: You go in for your first check. He's sitting up with the lights low, holding a framed photo. He smiles politely.
+Patient: "Don't worry about me tonight. I've got everything sorted out."
+Prompt: "What do you say?"
+Choice
+Result
+Feedback
+"Today was a big day. I've got some time. Would you like to tell me about it?"
+Correct
+Open-ended, and it offers your presence. It gives him room to talk.
+"Don't worry, the surgery will go great and you'll feel better soon."
+No
+False reassurance. It shuts the door on whatever he's actually feeling.
+"Okay, great. Call me if you need anything."
+No
+You accepted "everything's sorted out" at face value and left. That phrase deserved a second look.
+"Why didn't you eat your dinner?"
+Not best
+"Why" questions can feel like criticism. Start with how he's doing.
+Screen 3 (2120): Decision 2, Listen for what's underneath
+Interaction type: Tap the words that worry you (new). The conversation continues on its own for 5 lines; the learner taps any line that concerns them. Tapped lines get a soft highlight.
+Patient: "That's my wife, Elena. A year ago this week." Patient: "I called my son today. Told him where the will is, and the passwords." Patient: "Without my leg I'd just be a burden to him. He's got his own kids." Patient: "The food here's terrible, by the way." Patient: (takes off his watch and holds it out) "Here. You've been kind. I won't need this."
+Tier
+Line
+Scoring and feedback
+Essential
+"Without my leg I'd just be a burden"
+Required. Feeling like a burden to others is a recognized warning sign.
+Essential
+Giving away his watch: "I won't need this"
+Required. Giving away possessions is a classic warning sign.
+Supporting
+Telling his son where the will and passwords are
+Credit. Putting affairs in order, especially suddenly, can be a warning sign.
+Supporting
+His wife died a year ago this week
+Credit. A recent major loss and an anniversary both raise concern.
+Not a warning sign
+"The food here's terrible"
+No penalty. An ordinary complaint.
+Teaching line: "Each line alone could sound normal. Together, after hard news, they form a pattern. A calm, polite manner doesn't rule out risk. Listen to what he says and does."
+Screen 4 (2125): Decision 3, Ask the question
+Prompt: "What do you say next?"
+Choice
+Result
+Feedback
+"Sometimes when people go through this much, they think about ending their life. Are you thinking about killing yourself?"
+Correct
+Direct, calm and non-judgmental. Asking directly does not put the idea in someone's head; it often brings relief.
+"You're not thinking about doing anything stupid, are you?"
+No
+Judgmental, and worded to get a "no." He's unlikely to tell you the truth.
+"I'll let the doctor know you're feeling down tonight."
+Not best
+Reporting matters, but you'd be passing along a guess. Ask first, so you know what you're reporting.
+"Let's talk about the surgery plan instead. That might help."
+No
+Changing the subject tells him this topic is off-limits.
+Reveal (2126): A long pause. He looks at the photo.
+Patient: "Yeah. I've thought about it. It'd be easier for everyone. I've been saving some of my pills."
+Screen 5 (2127): Decision 4, What happens now
+Interaction type: Priority groups (new). The learner places eight action cards into four labeled groups. Each group shows its description on screen:
+• Immediate response: "Stay with the patient and summon help."
+• Safety actions and assessment: "Precautions, access to means and further assessment. These can happen at the same time as the immediate response."
+• Ongoing care and documentation: "Keep supporting him, share what you learn and document, without delaying safety."
+• Not now: "Actions to avoid right now."
+Guidance shown before placing cards: "These groups describe priorities, not a strict order. In real care, many of these happen at once. There is no required order within a group."
+On screen: Room 20's IV pump starts beeping down the hall.
+Action card
+Accepted groups and feedback
+Revisit (gentle)
+Unsafe (specific)
+Stay with him. Use the call light or your phone to get help without leaving the room
+Immediate response. "He just disclosed suicidal thoughts and possible access to means. He should not be alone, even for a minute."
+Safety actions or Ongoing care: "Staying and calling for help comes first. Everything else builds on it."
+Not now: "Staying with him and calling for help is the one step that can't wait."
+Notify the provider now and start your facility's suicide precautions (for example, continuous observation)
+Immediate response or Safety actions. "Escalation happens now, not after a full assessment."
+Ongoing care: "This belongs with the first actions, not after support and charting. Escalation happens now."
+Not now: "Notifying the provider and starting precautions can't wait. Escalation happens now, while you stay with him."
+Ask where the saved pills are, and remove them and other hazards per policy
+Immediate response or Safety actions. "Reducing access to means saves lives. Follow your facility's process."
+Ongoing care: "Addressing the saved pills is part of keeping him safe now, not a later task."
+Not now: "Reducing access to means saves lives. Address the saved pills now, following your facility's process."
+Gently ask more: is he thinking of acting on it, how, and when?
+Immediate response or Safety actions. "Further assessment helps the team, but it never delays getting help or keeping him safe."
+Ongoing care or Not now: "Asking more helps the team understand his risk now. It happens alongside getting help, never instead of it."
+None
+Keep talking with him (split from the documentation card)
+Immediate response, Safety actions or Ongoing care. "Stay connected. Supportive conversation continues the whole time."
+Not now: "Stay connected. Talking with him continues throughout, even while help arrives."
+None
+Document what he said, in his own words (split from the conversation card)
+Ongoing care. "Exact quotes help the team assess risk."
+Immediate response or Safety actions: "Document soon, but not while it competes with keeping him safe." Not now: "Don't skip documenting. His exact words help the team assess risk."
+None
+Trap: Step out to find the charge nurse
+Not now. "Leaving him alone is the one thing not to do. Call for help instead."
+None
+Any action group: "Leaving him alone is the one thing not to do. Call for help instead."
+Trap: Go silence Room 20's pump first
+Not now. "A beeping pump can wait or go to a colleague. He can't."
+None
+Any action group: "A beeping pump can wait or go to a colleague. He can't."
+Scoring: every card shows its own feedback after submitting: Accepted, Revisit or Unsafe, using the table above. Reasonable overlap is never marked wrong. Revisit is for a real delay or a skipped step; Unsafe is for leaving him alone or putting off escalation or means safety. No numerical score.
+After submitting, show: "These groups describe priorities, not a strict order. Safety actions and assessment can overlap with the immediate response. There is no required order within a group."
+Decision 4 reflection (the "Keeping him safe" line in the debrief), first matching rule wins:
+1. A trap card is in an action group: "After a disclosure like this, don't leave the patient alone. Stay and get help to come to you."
+2. Stay and call, notify and start precautions, or the saved pills is in Not now: "Getting help, starting precautions and addressing the saved pills can't wait. They happen now, while you stay with him."
+3. Anything else marked Revisit: "You kept him safe and didn't leave him alone. A few placements are worth another look below."
+4. Every card Accepted: "You stayed with him and got help to come to you."
+Screen 6 (2130): Decision 5, The request
+Patient: "Please don't tell anyone. I don't want to be locked up somewhere."
+Prompt: "What do you say?"
+Choice
+Result
+Feedback
+"I can't keep this between us, because your safety matters to me. I'm going to stay right here while we get you more support."
+Correct
+Honest about the limits of confidentiality, warm, and you stay. Trust survives honesty better than a broken promise.
+"Okay. It stays between us."
+No (unsafe)
+You can't keep this promise, and keeping it could cost his life.
+"I'm required to report this."
+Not best
+True, but it sounds like a rule, not care. Lead with why: his safety.
+"Nobody's going to lock you up. Don't worry."
+No
+False reassurance. You don't know the plan yet, and he'll remember the promise.
+Screen 7 (2230): Night challenge complete
+On screen, header (one of two):
+• If Decisions 1, 3 and 5 were the best choice and no Decision 4 card was Unsafe: "Because you asked and stayed:"
+• Otherwise: "The safer path, as reviewed above:" with a line under it: "This outcome follows the safer responses, not every choice you made. Your review below shows where to focus."
+On screen, outcome (same for both): "2140: A sitter is at his bedside, the pills are secured, and the provider is evaluating him, with a psychiatry consult requested. 2150: A colleague fixed Room 20's pump. 2230: Before you leave his room, he says: 'Nobody's asked me that before. Thank you for asking.'"
+No alternate harmful ending is shown.
+Share card: "He said everything was sorted out. Would you have asked? theclinicaledge.org"
+Part D: Debrief and connections
+The debrief follows the standard order, then ends with a support card that is always shown, whatever the score.
+Personalized shift review:
+Decision
+If correct
+If missed
+Concept to strengthen
+D1
+"You opened the door instead of closing it."
+"'Everything's sorted out' deserved a second look."
+therapeutic-communication
+D2
+"You heard the burden statement and the gift of his watch."
+"Feeling like a burden and giving things away are warning signs, even when someone seems calm."
+suicide-warning-signs
+D3
+"You asked directly."
+"Asking directly doesn't plant the idea; it opens the door."
+asking-directly
+D4
+"You stayed with him and got help to come to you."
+"Revisit the placements below. Stay, get help to come to you, and start safety actions now."
+patient-safety-observation, means-safety
+D5
+"You were honest about what you couldn't keep secret, and you stayed."
+"Never promise secrecy about safety."
+confidentiality-limits
+Takeaways (large type):
+1. "Listen for the quiet warning signs: being a burden, giving things away, putting affairs in order, a recent loss."
+2. "If you're worried, ask directly. Then stay."
+Why it matters (3 bullets, each sourced in Part E):
+• People in crisis often don't say "I'm suicidal." They say things that sound ordinary, which is why recognizing patterns matters.
+• Asking directly about suicide does not increase risk, and many people feel relief that someone asked.
+• Reducing access to means and keeping the person safe and observed are among the most effective immediate actions.
+Good to know (one line after the bullets, sourced in Part E, source 4): "After a patient shares suicidal thoughts, hospitals use an evidence-based process to assess risk, often built around a validated tool such as the ASQ or C-SSRS. Follow your facility's process. A tool supports the team's assessment; it never replaces staying with the patient and getting help now."
+Go further:
+Button
+Destination
+Concept tag
+Verified to exist?
+Ask why
+Ask, pre-filled: "Why does asking directly about suicide help instead of harm?"
+asking-directly
+Always available
+Practice responses
+Ask, pre-filled: "What are examples of therapeutic vs. non-therapeutic responses in nursing?"
+therapeutic-communication
+Always available
+Reference
+Reference Hub entry on suicide warning signs or therapeutic communication
+
+Include ONLY if an entry exists today
+Play again
+Restart Scenario 4
+
+Always available
+Support card (always shown, separate from the score):
+"Scenarios like this can bring up hard feelings, especially if you've lived something similar. If you or someone you know is struggling, you can call or text 988 (Suicide and Crisis Lifeline, US) any time. If someone is in immediate danger, call 911."
+The Ask buttons count toward the daily Ask limit and keep Ask's normal consent and safety rules. Ask will respond to these as education questions; it must never be presented as a crisis service.
+Test question: "Want another shift tomorrow?" Yes / Maybe / No.
+Part E: Sources and assets
+Six sources are opened and checked, and every teaching point now traces to one; the unsupported "sudden calm" teaching was removed rather than cited.
+Sources:
+#
+Citation
+Type
+Supports
+Opened and checked by
+1
+NIMH. Warning Signs of Suicide
+Government health agency
+D2: "being a burden to others," giving away important items, making a will, saying goodbye; 988 call or text
+Claude, Oct 14, 2026
+2
+NIMH. 5 Action Steps to Help Someone Having Thoughts of Suicide
+Government health agency
+D3: ask directly; asking does not increase suicidal thoughts or behavior. D4: ask about a plan; reduce access to lethal means. Debrief bullets 2 and 3
+Claude, Oct 14, 2026
+3
+Dazzi T, Gribble R, Wessely S, Fear NT. Does asking about suicide and related behaviours induce suicidal ideation? Psychological Medicine 44(16), 2014
+Peer-reviewed systematic review
+D3 feedback: 13 studies found no significant increase in ideation from asking; asking may reduce it
+Claude, Oct 14, 2026
+4
+The Joint Commission. National Performance Goals, Hospital Program, effective January 2026. NPG.08.01.01: The hospital reduces the risk for suicide
+Accreditation standard
+D4: nonpsychiatric units use procedures such as one-to-one monitoring and removing objects that pose a self-harm risk; EPs 3 to 7 apply to any patient who expresses suicidal ideation during care. Good to know line: EP 2 (validated screening tool) and EP 3 (evidence-based assessment that directly asks about ideation, plan and intent). ASQ and C-SSRS are not named in the source; they are examples for the reviewer to confirm. Replaces the earlier NPSG.15.01.01 citation, which the Joint Commission's Suicide Risk Reduction Resource Center page still shows; ChatGPT reports that number continues for the Behavioral Health Care program (not checked by Claude).
+Claude, Oct 14, 2026
+5
+988 Suicide and Crisis Lifeline overview (NY Office of Mental Health)
+Government
+Support card: 988 is available 24/7 by call, text or chat
+Claude, Oct 14, 2026
+6
+OpenStax. Psychiatric-Mental Health Nursing, 3.1 Therapeutic Communication and Relationships
+Open nursing textbook
+D1, D3: cautions against false reassurance, "why" questions and changing the subject. D5: information about suicidal thoughts is shared with the health-care team for safety, so confidentiality is not promised
+Claude, Oct 14, 2026
+Visual assets:
+Asset
+Used on
+Required characteristics
+Source option
+Rights status
+Clinically checked?
+Conversation bubbles and patient silhouette
+Screens 2 to 6
+Calm, respectful, low-light hospital room; no realistic face; no imagery of self-harm or means
+Designed in-app
+Owned
+Pending
+Framed photo and wristwatch icons
+Screens 2 and 3
+Simple illustrations; the watch is the visual cue for "giving things away"
+Designed in-app
+Owned
+Pending
+Part F: Review, sign-off and build notes
+This scenario must not be published without review by a psychiatric-mental health nurse or educator; the questions below are for that reviewer.
+Open questions for the reviewer:
+[ ] D1: is "Would you like to tell me about it?" the best open-ended opener, or is a more open statement better ("Tell me about today")?
+[ ] D2: confirm the tiers. Should the will and passwords be essential rather than supporting?
+[ ] D2 teaching line: "calm as a warning sign" was removed (unsupported). Confirm the replacement wording: "A calm, polite manner doesn't rule out risk."
+[ ] D3: confirm the exact wording of the direct question for students. Is "killing yourself" preferred over "ending your life" or "suicide"?
+[ ] Reveal: is "I've been saving some of my pills" the right level of detail for means, enough to drive D4 without describing a method?
+[ ] D4: approve the accepted-groups table on Screen 5: which placements are Accepted, which get Revisit feedback and which get Unsafe feedback. Should "Gently ask more" be accepted in Immediate response?
+[ ] D4: is "continuous observation" the right general term, given facility terms vary (1:1 sitter, constant observation)?
+[ ] D5: confirm the confidentiality response against source 6 and your facility's practice.
+[ ] Content note and support card: confirm wording, and that offering a Skip option is appropriate.
+[ ] Ending: approve the safer-path bridge lines and the two Screen 7 headers. Confirm no outcome credits a choice the learner didn't make.
+[ ] Good to know line: confirm the screening and assessment wording, and whether naming the ASQ and C-SSRS as examples is appropriate.
+[ ] Source 4: confirm NPG.08.01.01 is the right standard for this med-surg hospital setting.
+Sign-off:
+Stage
+Name and credentials
+Date
+Version
+Notes
+Founder review
+Mohamed
+
+0.4 (not yet signed)
+
+Independent clinical review (psychiatric-mental health, required)
+
+
+
+
+Notes for Astra:
+• Live conversation is new: patient lines appear as message bubbles with a short typing pause, so it feels like a real exchange. The learner's chosen response appears as their own bubble.
+• Tap the words that worry you is new: the learner taps patient bubbles; tapped ones get a soft highlight. No red alarm colors; this scenario stays calm.
+• Priority groups is new: drag or tap eight cards into four labeled groups (Immediate response, Safety actions and assessment, Ongoing care and documentation, Not now). Score each card against its accepted groups in the Screen 5 table. No numerical score and no fixed order within a group. Must also work with taps for accessibility.
+• The tone is quiet: dim, warm visuals; no sound effects, no countdown, no score animation. The Room 20 pump beep is shown as a small text notification, not a sound.
+• Content note first: a calm card before Screen 1 with "Continue" and "Skip this Shift." Skip shows the same 988 support card, then returns to the Shift Library.
+• Support card always shows at the end, separate from the score, with 988 as tappable call and text links.
+• Share card must never mention suicide directly; use the wording in Screen 7.
+• Same limits as Scenarios 1 to 3: scripted, no AI calls during play, no accounts, progress saved on the device only.
+• Display: all feedback renders plain quotation marks, with no visible backslashes or escape characters. Version 0.3 showed a backslash before the quotes around Not now.
+• Safer path and ending: follow the safer-path rule in Part C and the two Screen 7 headers. Bridge lines use a distinct, quiet style so they read as the story continuing, not as the learner's choice.
+• Saved progress: keep earlier v0.2 and v0.3 answers, labeled with their version. New plays record content version 0.4.
+Pre-submission checklist: all items pass; every teaching point now has an opened source. Psychiatric-mental health review is still required before release.

@@ -7,6 +7,7 @@ import { script as discharge, sources as dischargeSources, scenes as dischargeSc
 import { read as readDischarge, KEY as DISCHARGE_KEY } from '../discharge/progress.js';
 import { CONVERSATION_ENABLED } from '../conversation/private.js';
 import { conversationEntry } from '../conversation/metadata.js';
+import { shift5Entry } from '../shift5/metadata.js';
 
 const reportedReview = version => ({ status: 'Independent nurse approval reported by founder', independentStatus: 'Founder-reported approval', reviewer: null, reviewDate: null, approvedVersion: version });
 const sourceAccess = {
@@ -76,9 +77,11 @@ export const SHIFTS = [
   },
 ];
 if (CONVERSATION_ENABLED) SHIFTS.push(conversationEntry);
+SHIFTS.push(shift5Entry);
 export const getShift = id => SHIFTS.find(item => item.id === id);
 export function progressLabel(item) {
   const state = item.readProgress();
+  if (item.progressLabel) return item.progressLabel(state);
   if (state.stage === item.finalStage) return 'Debrief reached';
   return state.stage > 0 || Object.keys(state.answers).length ? `Continue: ${item.stageTitle(state)}` : 'Not started';
 }

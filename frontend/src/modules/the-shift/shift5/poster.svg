@@ -1,0 +1,17 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 360" role="img" aria-labelledby="title desc">
+  <title id="title">Four-room nursing assignment board</title>
+  <desc id="desc">Original fictional illustration of four room cards and a handoff line.</desc>
+  <rect width="640" height="360" fill="#12313f"/>
+  <rect x="48" y="37" width="544" height="286" rx="10" fill="#1b4050" stroke="#6a9896" stroke-width="2"/>
+  <text x="78" y="80" font-family="Arial,sans-serif" font-size="14" font-weight="700" fill="#bedbd3" letter-spacing="2">MED-SURG / FOUR ROOMS</text>
+  <text x="501" y="80" font-family="Arial,sans-serif" font-size="27" font-weight="700" fill="#f6f1e9">0700</text>
+  <g fill="#f6f1e9" stroke="#a5c8be" stroke-width="2">
+    <rect x="78" y="111" width="224" height="69" rx="5"/><rect x="338" y="111" width="224" height="69" rx="5"/>
+    <rect x="78" y="198" width="224" height="69" rx="5"/><rect x="338" y="198" width="224" height="69" rx="5"/>
+  </g>
+  <g font-family="Arial,sans-serif" font-size="25" font-weight="700" fill="#12313f">
+    <text x="100" y="154">410</text><text x="360" y="154">412</text><text x="100" y="241">414</text><text x="360" y="241">416</text>
+  </g>
+  <g stroke="#087b78" stroke-width="5" stroke-linecap="round"><path d="M217 145h58"/><path d="M477 145h58"/><path d="M217 232h58"/><path d="M477 232h58"/></g>
+  <path d="M290 291h60" stroke="#b58a36" stroke-width="4" stroke-linecap="round"/>
+</svg>

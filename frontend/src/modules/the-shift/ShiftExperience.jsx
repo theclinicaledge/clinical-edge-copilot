@@ -7,15 +7,17 @@ import Discharge from './discharge/Discharge.jsx';
 import LibraryMonitorArtwork from './LibraryMonitorArtwork.jsx';
 import { CONVERSATION_ENABLED } from './conversation/private.js';
 import Conversation from './conversation/Conversation.jsx';
+import Shift5 from './shift5/Shift5.jsx';
 import { SHIFTS, getShift, progressLabel, scenarioLink } from './integrated/registry.js';
 import { shiftRoute, shiftPath, learningDestination, returningShift } from './routing.js';
 import './app.css';
 
-const renderers = { 'drowsy-patient': Shift, 'monitor-alarm': Monitor, 'discharge-puzzle': Discharge };
+const renderers = { 'drowsy-patient': Shift, 'monitor-alarm': Monitor, 'discharge-puzzle': Discharge, 'which-patient-first': Shift5 };
 if (CONVERSATION_ENABLED) renderers.conversation = Conversation;
 const images = {
   'drowsy-patient': new URL('./assignment-poster.svg', import.meta.url).href,
   'discharge-puzzle': new URL('./discharge/poster.svg', import.meta.url).href,
+  'which-patient-first': new URL('./shift5/poster.svg', import.meta.url).href,
   ...(CONVERSATION_ENABLED ? { conversation: new URL('./conversation/room.svg', import.meta.url).href } : {}),
 };
 
@@ -97,7 +99,7 @@ function Scenario({ item, navigate }) {
   }
   return <div ref={root} className="shift-scenario-scroll" onClickCapture={capture}>
     <div className="shift-scene-bar"><AppLink to="/learn/shifts" navigate={navigate}>&#8592; Shift Library</AppLink><button onClick={() => setReview(true)}>Sources & review</button></div>
-    <Scene />
+    <Scene embedded={item.id === 'which-patient-first'} />
     {!item.private && item.id !== 'conversation' && <section className="shift-connections"><span className="shift-overline">Connected learning</span><h2>Follow the why.</h2><div>{item.recommendations.map(link => <AppLink key={link.id} to={learningDestination(link.path, item.id)} navigate={navigate}><strong>{link.title}</strong><span>{link.detail}</span><b aria-hidden="true">&#8599;</b></AppLink>)}</div></section>}
     {review && <ReviewDialog item={item} close={() => setReview(false)} />}
   </div>;

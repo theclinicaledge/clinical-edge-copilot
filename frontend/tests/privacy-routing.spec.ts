@@ -22,6 +22,16 @@ test('canonical Privacy renders and survives direct reload', async ({ page }) =>
   await expect(page).toHaveURL(/\/privacy$/);
 });
 
+test('WebView-safe choices route exposes the complete policy and withdrawal controls', async ({ page }) => {
+  await page.goto('/choices');
+  await expect(page.getByRole('heading', { name: 'Privacy Policy', exact: true })).toBeVisible();
+  await expect(page.getByRole('heading', { name: 'Your choices on this device' })).toBeVisible();
+  await expect(page.getByText(/limited product usage events to PostHog/)).toBeVisible();
+  await expect(page).toHaveURL(/\/choices$/);
+  await page.reload();
+  await expect(page.getByRole('checkbox', { name: /pseudonymous product usage events/ })).toBeVisible();
+});
+
 test('root legacy Privacy canonicalizes before rendering or hydration', async ({ page }) => {
   const errors: string[] = [];
   page.on('pageerror', error => errors.push(error.message));

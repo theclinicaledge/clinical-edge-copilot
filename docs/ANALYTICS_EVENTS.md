@@ -1,380 +1,60 @@
-# Clinical Edge Analytics Events
-
-Analytics are powered by **Vercel Analytics** (frontend-only, no custom backend).
-The `<Analytics />` provider in `main.jsx` handles automatic pageview tracking on
-URL changes. All custom events go through `trackEvent()` in `src/analytics.ts`.
-
-## Privacy Rules
-
-- **Opt-in only** — nothing is sent (pageviews or custom events) until the user turns on
-  analytics in the consent screen or on the Privacy page (App Store Review Guideline 5.1.1(ii)).
-  `trackEvent()` and the `<Analytics beforeSend>` filter both enforce this via `src/consent.js`.
-- **No clinical free text** — user-entered prompt content, clinical questions, and
-  reasoning notes are never transmitted.
-- **No patient information** — names, MRNs, dates of birth, room numbers, or any
-  patient-identifiable data are never included.
-- **No user identifiers** — no IP capture, no fingerprinting, no account IDs.
-- **Prompt length** is stored only as a bucket (`short` / `medium` / `long`) —
-  the actual text is never sent.
-- Analytics failures are silently swallowed; they never affect the UI.
-
----
-
-## Global / Navigation
-
-| Event | When it fires | Payload |
-|-------|---------------|---------|
-| `copilot_module_opened` | User taps **Copilot** on the home hub | `{ route: "/" }` |
-| `rhythm_lab_module_opened` | User taps **Rhythm Lab** on the home hub | `{ route: "/" }` |
-| `icu_drips_module_opened` | User taps **ICU Drips** on the home hub | `{ route: "/" }` |
-| `reference_hub_opened` | User taps **Reference Hub** on the home hub | `{ route: "/" }` |
-| `abg_lab_opened` | User taps **ABG & Oxygenation Lab** on the home hub | `{ route: "/" }` |
-
-> `reference_hub_opened` and `abg_lab_opened` reuse the same event name that
-> each module also fires on its own mount (see the Reference Hub and ABG Lab
-> sections below) — they are distinguishable only by payload: `{ route: "/" }`
-> from the home hub vs. no payload from the module itself. Unlike Copilot and
-> Rhythm Lab, Reference Hub and ABG Lab do not have separate `*_module_opened`
-> event names.
-
-> Automatic pageview events are also emitted by Vercel Analytics whenever the
-> URL changes via `pushState` (handled by the `<Analytics />` component).
-
----
-
-## Copilot
-
-| Event | When it fires | Payload |
-|-------|---------------|---------|
-| `copilot_opened` | Copilot module mounts (once per session open) | `{ route: "/copilot" }` |
-| `copilot_prompt_submitted` | User submits a Snapshot or follow-up | `{ mode, source }` |
-| `copilot_response_completed` | Streaming response finishes successfully | `{ mode }` |
-| `copilot_response_error` | Any API or network error | `{ reason, status? }` |
-| `copilot_offline_blocked` | Submit attempted while offline | _(no payload)_ |
-| `copilot_continue_thinking` | User sends a follow-up update | `{ mode }` |
-| `copilot_response_copied` | User copies a response to the clipboard | `{ copy_scope, source }` |
-| `shift_brain_what_changed_viewed` | Structured Snapshot entry screen mounts | _(no payload)_ |
-| `shift_brain_signal_toggled` | A What Changed signal is selected or removed | `{ signal_category, selected, signal_count }` |
-| `shift_brain_multiple_signals_selected` | More than one signal is selected | `{ signal_count }` |
-| `shift_brain_something_off_selected` | The general-deterioration pathway is selected | _(no payload)_ |
-| `shift_brain_optional_section_opened` | A progressive-disclosure section opens | `{ section }` |
-| `shift_brain_advanced_opened` | Advanced acute-care data opens | `{ section: "advanced" }` |
-| `shift_brain_priority_map_requested` | Snapshot is submitted | `{ care_setting, signal_count, populated_field_count, free_text_used, advanced_used }` |
-| `shift_brain_priority_map_completed` | Streaming Priority Map completes | `{ mode }` |
-| `priority_map_viewed` | Completed Priority Map hierarchy renders | `{ urgency, priority_count }` |
-| `priority_map_secondary_priority_viewed` | A secondary ranked priority is engaged | `{ rank }` |
-| `priority_map_section_engaged` | An action/reasoning section is engaged | `{ section }` |
-| `priority_map_sbar_opened` | User deliberately opens Prepare SBAR | _(no payload)_ |
-| `teach_me_opened` | Contextual Teach Me panel opens | _(no payload)_ |
-| `teach_me_quick_check_shown` | Valid Quick Check renders | `{ domain, concept_id, question_type }` |
-| `teach_me_quick_check_answered` | Committed Quick Check answer | `{ domain, concept_id, question_type, correct }` |
-| `teach_me_explanation_viewed` | Explanation becomes visible after commitment | `{ domain, concept_id }` |
-| `teach_me_apply_shown` | Optional Apply question renders | `{ domain, concept_id }` |
-| `teach_me_apply_answered` | Committed Apply answer | `{ domain, concept_id, correct }` |
-| `teach_me_completed` | Lesson completion and return | `{ domain, concept_id, question_type, completion, duration_bucket }` |
-| `teach_me_abandoned` | Teach Me closes before completion | `{ completion: false, duration_bucket }` |
-| `teach_me_fallback_viewed` | Structured explanation fallback renders | `{ domain, concept_id }` |
-| `teach_me_error` | Teach Me request fails | `{ reason, status }` |
-
-**`prompt_length_bucket` values:** `short` (< 80 chars) · `medium` (< 300 chars) · `long` (≥ 300 chars)
-
-**`reason` values for `copilot_response_error`:** `http_error` · `api_error` · `network_error`
-
-**`copy_scope` values for `copilot_response_copied`:** `full_response` (only shape currently in the UI — there is no per-section or formatted-copy variant)
-
-**`source` values for `copilot_response_copied`:** `copilot` (main response copy button) · `saved_cases` (copy button on a saved case row — same handler, different origin)
-
-Shift Brain Snapshot analytics are categorical and aggregate only. Vital values,
-lab values, assessment text, support/device details, optional free text, serialized
-Snapshot content, generated content, and saved-case content are never included.
-Teach Me analytics contain only the abstract learning domain, stable concept ID,
-question type, correctness, completion, and duration bucket. Question text,
-answer choices, explanations, scenario content, clinical values, and Priority Map
-content are excluded. No longitudinal competency record is created.
-
-Clinical snapshots are not retained as automatic recent history. Full scenario and
-response content is stored only when the user explicitly selects **Save Case**;
-that saved content remains in browser `localStorage` and is never included in an
-analytics payload.
-
-> Fired optimistically alongside the `navigator.clipboard.writeText()` call, matching the
-> existing UI's own optimistic "copied" feedback state — the app does not currently
-> distinguish clipboard success from failure for this action, so no `clipboard_copy_failed`
-> event was added (would require changing existing clipboard-handling behavior).
+# Opt-in product analytics release plan
 
----
+This candidate replaces the Vercel Analytics frontend collector with one manual PostHog capture integration. It has no PostHog SDK, automatic pageviews, click capture, session replay, input capture or backend analytics endpoint. The public project token and regional capture host must both be configured before events can be sent. Never use a personal API key in the frontend.
 
-## Saved Cases
+## Release configuration
 
-Saved Cases live inside the Copilot page (`App.jsx`) — a nurse can save a
-response, reopen it back into the input, edit a personal note, or delete it.
-Storage is `localStorage` only; no case content is ever sent in analytics.
+1. The intended PostHog project is **671008 (US Cloud)**, with capture host `https://us.i.posthog.com`. The public project token is configured only in the ignored local `frontend/.env` for development; it is not committed. Review residency, retention, IP/geolocation settings, access controls and any required contractual terms before activation.
+2. After founder approval, set `VITE_POSTHOG_PROJECT_TOKEN` and `VITE_POSTHOG_HOST` for the production frontend build in Vercel. These are public build-time settings, not secrets. Do not put a private PostHog API key in the client. Redeploy through the approved release process.
+3. Update App Store privacy disclosures and review notes for the new analytics recipient and pseudonymous device identifier before releasing to the iOS wrapper. The app privacy page and versioned consent are updated here. Stored consent v3 is invalidated; users must opt in again.
+4. Designated founder testers can visit with `?ce_analytics=exclude` once to save a device-local exclusion. Remove `ce_product_analytics_exclude` in localStorage when testing ends. Local Vite builds and automated browsers are excluded. This is device-specific and does not retroactively remove earlier events.
+   Approved attribution tokens are source `instagram`, `tiktok`, `youtube`, `reddit`, `facebook`, `email`, `friend`, `community`, `student_group`, `qr`; medium `social`, `email`, `referral`, `community`, `qr`; campaign `fl04`, `student_feedback`, `public_beta`. Other values are discarded, not transmitted.
+5. With no token, analytics stays off. An empty dashboard does not mean zero usage.
 
-| Event | When it fires | Payload |
-|-------|---------------|---------|
-| `saved_case_created` | A case is successfully added to saved cases (not a duplicate re-save) | `{ source: "copilot", has_note: false }` |
-| `saved_case_reopened` | User taps the reopen icon on a saved case, pulling it back into the input | `{ source: "saved_cases" }` |
-| `saved_case_note_edited` | User clicks **Save Note** on a saved case (explicit commit — never fires per keystroke) | `{ has_note }` |
-| `saved_case_deleted` | A saved case is removed | `{ source: "saved_cases" }` |
+## Strict event contract
 
-**Privacy note:** never sent — case question, response text, or note content.
-There is no "clear all saved cases" action in the current UI, so no
-`saved_cases_cleared` event exists.
+All event names and properties are allowlisted in `frontend/src/productAnalytics.js`. PostHog timestamps events on ingestion; the client sends a random event UUID and a device-local random distinct ID only after opt-in. It never sends Ask text, answers, clinical values, Shift choices, names, email, form input, raw error text, clipboard content or query strings. Campaign attribution accepts only enumerated category tokens; arbitrary URL values are discarded. Requests send no browser cookies or referrer. The analytics ID is separate from the Ask quota ID. The recipient still sees network metadata such as IP address when receiving an event.
 
----
+| Event | Properties | Meaning |
+| --- | --- | --- |
+| `page_viewed` | `route`, validated `utm_source`, `utm_medium`, `utm_campaign` | One route view, not every rerender |
+| `feature_opened` | `feature` | Major feature mount; do not add to page views when counting visits |
+| `core_task_failed` | Fixed `feature` and `failure` category | Core screen unavailable, without raw error text |
+| `ask_submitted`, `ask_succeeded`, `ask_failed` | `kind` (`question` or `followup`), fixed failure category where applicable | Submitted turn, delivered answer, or withheld/error result |
+| `tool_started`, `tool_completed`, `tool_failed` | Fixed tool, fixed failure category | Explicit action where defined; not a claim of clinical competence |
+| `shift_started` | `scenario`, `version`, `play_id` | New play leaving the initial screen |
+| `shift_resumed` | `scenario`, `version`, `play_id`, `step` | Returning to unfinished saved play |
+| `shift_step_reached` | `scenario`, `version`, `play_id`, `step` | Reached a scenario step; not an answer or score |
+| `shift_decision_reached` | `scenario`, `version`, `play_id`, `step` | Reached an authored decision screen, without recording the choice |
+| `shift_completed` | `scenario`, `version`, `play_id` | Debrief reached; not evidence of clinical skill |
+| `app_store_badge_clicked` | `placement` (`landing`, `download`, `footer`) | Existing App Store badge interest; not a confirmed installation |
 
-## SBAR
+`play_id` is random per local play and is used to deduplicate the funnel. It is cleared on restart or analytics withdrawal. Saved progress remains separate and device-local. If storage is cleared, a device changes, or consent is declined, identity and retention cannot be reconciled. Native iPhone WebView versus mobile Safari is not labeled because the wrapper does not supply a reliable explicit marker.
 
-SBAR generation and copy, also inside `App.jsx`.
+## Prepared PostHog dashboard
 
-| Event | When it fires | Payload |
-|-------|---------------|---------|
-| `sbar_generated` | An SBAR draft is successfully generated and rendered | `{ source: "copilot" }` |
-| `sbar_generation_failed` | SBAR generation fails (non-OK response, API error, or network error) | `{ error_type: "request_failed" }` |
-| `sbar_copied` | User copies the SBAR draft to the clipboard | `{ source: "copilot", copy_scope: "full_sbar" }` |
+The [Clinical Edge - Opted-in product use dashboard](https://us.posthog.com/project/671008/dashboard/2224007) is saved in project 671008. It is labeled **opted-in tracked devices and plays**, not all users. Do not backfill or fabricate historical data. Every real-app capture sets fixed `analytics_origin=app`; synthetic setup events use `analytics_origin=test` and `is_test=true`. The saved dashboard default and the saved insights positively filter to `analytics_origin=app`. The dedicated `ce_analytics_ingestion_test` event is never a usage metric. The dashboard currently has no real-app data because this candidate has not been released.
 
-**Privacy note:** never sent — SBAR situation/background/assessment/recommendation text, or raw error messages.
-The SBAR copy button copies one concatenated block; there is no per-section
-copy in the current UI, so `copy_scope` is always `full_sbar`.
+PostHog ingestion returned HTTP 200 for clearly labeled setup events, and those events appeared in Activity while the real-use dashboard showed no matching events. The setup events contain no clinical or Ask content. Project settings were inspected in the authenticated US Cloud UI: **Discard client IP data ON**, **web autocapture OFF**, **web-vitals autocapture OFF**, **session replay OFF**, and **person last-seen tracking OFF**. IP discard was enabled after the first setup events, so do not claim it applied retroactively.
 
----
+Saved dashboard views:
 
-## QuickStart
+1. Daily active opted-in devices, unique `page_viewed` distinct IDs.
+2. Shift start-to-completion funnel, aggregated by `properties.play_id` and broken down by scenario.
+3. Feature opens, broken down by the fixed `feature` property; these are opens, not unique people or completed tasks.
+4. Ask turns submitted, delivered, and failed/withheld, as separate event counts. Do not interpret these as clinical accuracy or a matched-turn conversion rate.
+5. Return visits on days 1-7, `page_viewed` to a later `page_viewed` by the same opted-in device ID.
+6. Campaign-tagged pageviews, broken down by allowlisted event `utm_source` or `unknown`.
 
-| Event | When it fires | Payload |
-|-------|---------------|---------|
-| `quickstart_opened` | QuickStart page mounts | `{ source: "direct" }` |
-| `quickstart_option_selected` | User taps one of the 3 predefined example chips | `{ option_id }` |
-| `quickstart_completed` | The typed situation is saved to `copilot_prefill` and the user proceeds into Copilot | `{ destination: "copilot" }` |
+The dashboard does **not yet** show an exact last-decision distribution for incomplete Shift plays or a tool start-to-completion rate. Both event types are captured by the candidate, but those analyses should be configured and checked against actual opted-in data after release; do not infer abandonment from a still-open play or compare unmatched raw tool event totals as a success rate. The saved Ask view likewise shows counts, not a verified per-turn success rate. No historical app usage is represented by the setup events.
 
-**`option_id` values:** `bp_drop` · `confusion` · `chest_pain` (fixed internal ids for the 3 example chips — the visible chip text is never sent)
+## Analysis definitions
 
-**Known limitation:** `source` is always `"direct"` — QuickStart's entry point (direct URL vs. the end of the Scenario walkthrough) is not currently threaded through navigation state, so it cannot be distinguished without adding new routing plumbing. Not added in this phase.
+1. **Active users and feature usage:** unique `distinct_id` on `page_viewed` by day. A route breakdown can be added separately; the saved daily-active chart has no route breakdown. Keep `feature_opened` as a separate chart, never sum both.
+2. **Shift start-to-completion:** funnel `shift_started` to `shift_completed`, holding `scenario` and `play_id` constant; filter or break down by `scenario` and `version`. Count unique plays, not raw events.
+3. **Last step before leaving:** for `play_id`s with `shift_started` but no `shift_completed` in the observation window, show maximum `shift_step_reached.step`. Treat open or recently resumed plays as incomplete, not definitively abandoned.
+4. **Ask and tools:** `ask_succeeded` / `ask_submitted` and `ask_failed` by fixed failure category; tool completion/start by tool. Pending turns are neither success nor failure.
+5. **Seven-day return:** retention of `page_viewed` users on a later calendar day within seven days, using the opt-in distinct ID. This is device-level return, not person-level retention.
+6. **Acquisition:** the saved chart counts all `page_viewed` events by validated UTM source, labeling missing UTM as unknown. It is not a first-touch attribution chart. Do not imply cross-device attribution.
 
----
-
-## Scenario Walkthrough
-
-3 predefined scenarios (stable ids `"01"`, `"02"`, `"03"`), each a 3-step
-walkthrough (`scenario` → `thinking` → `analysis`).
-
-| Event | When it fires | Payload |
-|-------|---------------|---------|
-| `scenario_opened` | The Scenario page mounts, or the user switches to a different scenario | `{ scenario_id }` |
-| `scenario_step_viewed` | The active step changes within a scenario (fires once per transition) | `{ scenario_id, step_id }` |
-| `scenario_completed` | User taps "Try it on your own patient →" at the end of the last scenario (03), handing off to QuickStart | `{ scenario_id, destination: "quickstart" }` |
-
-**`step_id` values:** `scenario` (step 1) · `thinking` (step 2) · `analysis` (step 3)
-
-**Note:** `scenario_completed` only exists for the destination that actually occurs in the
-UI today (QuickStart handoff from the final scenario). The nav bar's persistent
-"Open App" shortcut is not treated as scenario completion — it's available on
-every step and doesn't represent finishing the walkthrough.
-
----
-
-## Landing
-
-| Event | When it fires | Payload |
-|-------|---------------|---------|
-| `landing_primary_cta_clicked` | User taps "Try a real scenario →" (hero) or "Try Clinical Edge Copilot" (closing section) | `{ destination: "scenario", placement }` |
-| `landing_secondary_cta_clicked` | User taps "Open App" (nav) or "Open Copilot" (closing section) | `{ destination: "copilot", placement }` |
-
-**`placement` values:** `nav` (nav bar "Open App") · `hero` (hero "Try a real scenario →") · `closing` (closing section, either button)
-
-**Note:** the hero's "See How It Thinks" button only smooth-scrolls to an
-in-page demo section — it has no navigation destination and was intentionally
-left uninstrumented.
-
----
-
-## Download
-
-| Event | When it fires | Payload |
-|-------|---------------|---------|
-| `app_store_badge_clicked` | User taps the official App Store badge (`components/AppStoreBadge.jsx`) on any page | `{ placement: "landing" \| "download" \| "footer" }` |
-
-**Note:** `app_store_badge_clicked` replaces the former `app_store_click`
-(`{ page, destination, placement }`), which fired only on the Download page.
-The payload is the fixed `placement` enum only. Badges, and therefore this event,
-never appear inside the iOS app (`src/nativeApp.js`). The Android notice on this
-page is UA-detected passive rendering, not a user action, so no
-`download_android_notice_viewed` event was added. There is no separate "web app"
-link on this page.
-
----
-
-## Rhythm Lab
-
-| Event | When it fires | Payload |
-|-------|---------------|---------|
-| `rhythm_lab_opened` | Rhythm Lab module mounts | `{ route: "/rhythm-lab" }` |
-| `rhythm_selected` | User taps a rhythm card | `{ rhythm_id, urgency }` |
-| `rhythm_detail_viewed` | RhythmDetail mounts or rhythm id changes | `{ rhythm_id }` |
-| `rhythm_practice_opened` | User opens Practice Mode | _(no payload)_ |
-| `rhythm_practice_reveal` | User reveals the rhythm in Practice Mode | `{ rhythm_id, clues_shown }` |
-| `rhythm_sprint_opened` | User opens Sprint Mode | _(no payload)_ |
-| `rhythm_sprint_reveal` | User reveals a sprint card | `{ rhythm_id, selected_rate, selected_regular }` |
-| `rhythm_confusables_opened` | User opens Confusables | _(no payload)_ |
-| `rhythm_confusable_pair_selected` | User switches to a different confusable pair | `{ pair_id }` |
-| `rhythm_confusable_breakdown_opened` | User expands full A/B comparison | `{ pair_id }` |
-| `rhythm_compare_opened` | User opens Compare Mode | _(no payload)_ |
-
-**`urgency` values:** `normal` · `monitor` · `urgent` · `critical`
-
-**`selected_rate` values:** `slow` · `normal` · `fast`
-
-**`selected_regular`:** boolean (`true` = regular, `false` = irregular)
-
-**`clues_shown`:** integer 0–2 (how many clues were shown before reveal)
-
----
-
-## ICU Drips
-
-| Event | When it fires | Payload |
-|-------|---------------|---------|
-| `icu_drips_opened` | ICU Drips module mounts | `{ route: "/icu-drips" }` |
-| `drip_selected` | User taps a drip from the home list | `{ drip_id, family, category }` |
-| `drip_detail_viewed` | Drip detail page is displayed (from list or related-drip navigation) | `{ drip_id }` |
-| `drip_compare_opened` | User opens Quick Compare (fires alongside `hemodynamic_compare_opened`, below) | _(no payload)_ |
-| `drip_compare_pair_selected` | User selects a specific comparison pair (fires alongside `hemodynamic_compare_pair_selected`, below) | `{ pair_id }` |
-| `drip_category_filter_used` | User filters by a category (not "All") | `{ category }` |
-| `icu_drips_compare_entry_clicked` | User taps the "Common ICU confusions" home action card | `{ source: "home_action" }` |
-
-The following event groups were implemented but previously undocumented.
-Names and payloads below were verified directly against the current code.
-
-**Hemodynamic Compare**
-
-| Event | When it fires | Payload |
-|-------|---------------|---------|
-| `hemodynamic_compare_opened` | Fires alongside `drip_compare_opened` when Quick Compare is opened | _(no payload)_ |
-| `hemodynamic_compare_pair_selected` | Fires alongside `drip_compare_pair_selected` when a comparison pair is selected | `{ pair_id }` |
-| `drip_hemodynamic_compare_viewed` | The hemodynamic compare matrix renders for a pair where both drips have hemodynamics data | `{ pair_id }` |
-| `hemodynamic_compare_detail_expanded` | User expands the "Detailed comparison" table (fires on open only, not on collapse) | `{ pair_id }` |
-| `clinical_scenario_viewed` | A compare pair's Clinical Scenario card is displayed | `{ pair_id }` |
-
-**Practice Mode**
-
-| Event | When it fires | Payload |
-|-------|---------------|---------|
-| `icu_drips_practice_opened` | Practice Mode is entered (initial open or "Practice again" restart) | _(no payload)_ |
-| `icu_drips_practice_answered` | User answers a practice question | `{ question_id, correct }` |
-| `icu_drips_practice_completed` | All practice questions are answered | `{ score, total }` |
-| `icu_drips_practice_review_drip_clicked` | User taps a "Review [drip]" link (from per-question feedback or the end-of-practice summary) | `{ drip_id }` |
-
-**Shift Challenge**
-
-| Event | When it fires | Payload |
-|-------|---------------|---------|
-| `icu_drips_shift_challenge_opened` | Shift Challenge is entered (initial open or "Start over" restart) | _(no payload)_ |
-| `icu_drips_shift_challenge_answered` | User answers a shift challenge | `{ challenge_id, correct }` |
-| `icu_drips_shift_challenge_completed` | All shift challenges are answered | `{ total }` |
-| `icu_drips_shift_challenge_review_drip_clicked` | User taps a "Review [drip]" link from challenge feedback | `{ drip_id }` |
-
-**Clinical Pearls**
-
-| Event | When it fires | Payload |
-|-------|---------------|---------|
-| `icu_drips_pearl_opened` | User taps a pearl to open it (from the home card or a "More pearls" link) | `{ pearl_id }` |
-| `icu_drips_pearl_viewed` | The Pearl view renders or the active pearl id changes | `{ pearl_id }` |
-| `icu_drips_pearl_related_drip_clicked` | User taps a related-drip link from within a pearl | `{ drip_id }` |
-
-**`correct` values:** boolean — whether the selected answer matched the correct option
-
----
-
-## Clinical Trust Layer
-
-Shared "Sources & review" disclosure used on content-module detail pages. One
-event name is reused across modules (rather than a module-prefixed variant)
-so the trust interaction stays comparable as it's extended beyond ICU Drips.
-
-| Event | When it fires | Payload |
-|-------|---------------|---------|
-| `clinical_sources_opened` | User expands the "View sources and review details" disclosure | `{ module, source_context }` |
-
-**`module` values:** `icu_drips` (currently the only module wired up; `rhythm_lab`,
-`reference_hub`, `abg_lab` planned for later phases)
-
-**`source_context` values currently in use:** `medication_detail` (ICU Drips
-medication detail page)
-
----
-
-## Reference Hub
-
-| Event | When it fires | Payload |
-|-------|---------------|---------|
-| `reference_hub_opened` | The hub (search + browse) view mounts — on initial module entry, and again each time the user navigates back to it from a reference, pathway, or concept detail view | _(no payload)_ |
-| `reference_category_selected` | User selects a category filter | `{ category }` |
-| `reference_search_used` | User types into the reference search field | `{ query_length }` |
-| `reference_viewed` | A reference entry is displayed | `{ reference_id, category }` |
-| `reference_related_clicked` | User taps a related reference from a reference entry | `{ from_ref_id, to_ref_id }` |
-| `reference_pathway_opened` | User opens a clinical pathway | `{ pathway_id }` |
-| `reference_pathway_related_clicked` | User taps a reference linked from a pathway | `{ pathway_id, reference_id }` |
-| `reference_concept_opened` | User opens a concept entry | `{ concept_id }` |
-| `reference_concept_pathway_clicked` | User taps a pathway linked from a concept | `{ concept_id, pathway_id }` |
-| `reference_concept_reference_clicked` | User taps a reference linked from a concept | `{ concept_id, reference_id }` |
-
-**`query_length`:** integer character count of the search query (the query text itself is never sent)
-
----
-
-## Brain Sheets
-
-Brain Sheets renders blank printable sheets only. Analytics never includes
-anything written on paper after printing.
-
-| Event | When it fires | Payload |
-|-------|---------------|---------|
-| `brain_sheets_module_opened` | User taps **Brain Sheets** on the home hub | `{ route: "/" }` |
-| `template_viewed` | A valid template detail page mounts | `{ template_id }` |
-| `template_downloaded` | User taps the explicit **Download PDF** action | `{ template_id }` |
-
-**`template_id` values:** `medsurg-4pt` · `medsurg-6pt` · `icu-systems` ·
-`telemetry` · `ed-rapid` · `night-shift` · `new-grad`
-
-**Important semantics:** `template_downloaded` is a download-intent event only.
-It does not prove the browser completed a download. It does not fire for Print /
-Save PDF, mobile Save / Share PDF, Copy Link, preview open, or PDF generation
-mode.
-
----
-
-## ABG Lab
-
-| Event | When it fires | Payload |
-|-------|---------------|---------|
-| `abg_lab_opened` | ABG Lab module mounts | _(no payload)_ |
-| `abg_interpreted` | An ABG interpretation is generated (manual entry or example) | `{ pattern, has_pao2, has_fio2 }` |
-| `abg_example_used` | User loads a preset example case | `{ example_id }` |
-| `abg_cleared` | User clears the current ABG entry | _(no payload)_ |
-
-**`pattern`:** the interpreted acid-base disorder label (e.g. `"Respiratory acidosis"`, `"Within normal limits"`) — a fixed classification result, not user-entered text
-
-**`has_pao2` / `has_fio2`:** booleans indicating whether those optional fields were filled in (values themselves are never sent)
-
----
-
-## Backend Persistence
-
-**Vercel Analytics only.** No custom backend analytics endpoint is used.
-Events are visible in the Vercel project dashboard under the Analytics tab.
-`trackEvent()` in `src/analytics.ts` routes directly to Vercel's `track()` function.
-No additional infrastructure is required.
-
-The Copilot API emits separate metadata-only operational logs for reliability
-monitoring. Those records are allowlisted to route, mode, coarse category,
-length/count fields, urgency, status, latency, retry/fallback flags, and failure
-classification. Prompt text, normalized prompt text, response excerpts, saved
-cases, and notes are excluded.
-
----
-
-## Development Behaviour
-
-In development (`import.meta.env.DEV === true`), `trackEvent()` logs to
-`console.debug` and makes no network requests. All event names and payloads
-are visible in the browser console for easy verification.
+Use PostHog's dashboard, funnel and retention builders; do not configure automatic capture. Check the actual account's billing and retention controls before activation. The free product-analytics allowance is currently advertised as 1 million events per month; verify the account's current plan at activation. Vercel Hobby analytics remains available for historical pageview context but is no longer emitted by this frontend candidate; its old counts are not directly comparable with opt-in PostHog data.

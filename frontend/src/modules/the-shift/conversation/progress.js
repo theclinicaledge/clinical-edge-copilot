@@ -1,4 +1,5 @@
 import { CONTENT_VERSION, opening, asking, confidentiality, actions, cues, zones, reflections, script } from './data.js';
+import { shiftProgress } from '../../../productAnalytics.js';
 export const KEY = 'ce-private-shift-conversation-v04';
 export const LEGACY_KEY = 'ce-private-shift-conversation-v02';
 export const fresh = () => ({ version: CONTENT_VERSION, notice: false, stage: 0, answers: {}, revealed: 0, selected: [], placements: {}, tomorrow: null });
@@ -29,7 +30,7 @@ export function sanitize(value) {
   return state;
 }
 export function read() { try { return sanitize(JSON.parse(localStorage.getItem(KEY))); } catch { return fresh(); } }
-export function save(value) { try { localStorage.setItem(KEY, JSON.stringify(sanitize(value))); return true; } catch { return false; } }
+export function save(value) { try { const previous = read(); const current = sanitize(value); localStorage.setItem(KEY, JSON.stringify(current)); shiftProgress('conversation', CONTENT_VERSION, previous, current, 6); return true; } catch { return false; } }
 export const actionReview = placements => actions.map(item => {
   const chosen = placements?.[item.id];
   const result = item.placements.find(rule => rule.groups.includes(chosen));

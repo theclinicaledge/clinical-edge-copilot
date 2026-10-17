@@ -10,6 +10,7 @@ import Conversation from './conversation/Conversation.jsx';
 import Shift5 from './shift5/Shift5.jsx';
 import { SHIFTS, getShift, progressLabel, scenarioLink } from './integrated/registry.js';
 import { shiftRoute, shiftPath, learningDestination, returningShift } from './routing.js';
+import { shiftOpened } from '../../productAnalytics.js';
 import './app.css';
 
 const renderers = { 'drowsy-patient': Shift, 'monitor-alarm': Monitor, 'discharge-puzzle': Discharge, 'which-patient-first': Shift5 };
@@ -113,6 +114,12 @@ export default function ShiftExperience({ mode = 'page', navigate, active = true
   const region = useRef(null);
   if (mode === 'page' && route?.kind === 'scenario' && !visited.includes(route.id)) setVisited([...visited, route.id]);
   useEffect(() => { if (region.current) region.current.scrollTop = 0; }, [path]);
+  useEffect(() => {
+    if (active && mode === 'page' && route?.kind === 'scenario') {
+      const item = getShift(route.id);
+      if (item) shiftOpened(item.id, item.contentVersion, item.readProgress().stage);
+    }
+  }, [active, mode, path, route?.id, route?.kind]);
   if (mode === 'return') return from ? <aside className="shift-return"><AppLink to={shiftPath(from.id)} navigate={navigate}>&#8592; Return to {from.title}</AppLink><span>Your place is kept</span></aside> : null;
   let content;
   if (route?.kind === 'library') content = <Library navigate={navigate} />;

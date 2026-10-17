@@ -17,7 +17,7 @@ function PrivacyChoices() {
       <h2 id="privacy-choices-title">Your choices on this device</h2>
       <p>Change these anytime. They apply to this browser or app install only.</p>
       <label><input type="checkbox" checked={consent?.ai === true} onChange={(e) => update("ai", e.target.checked)} /><span>Send my Shift Brain and Ask entries to Anthropic to generate responses</span></label>
-      <label><input type="checkbox" checked={consent?.analytics === true} onChange={(e) => update("analytics", e.target.checked)} /><span>Share anonymous usage analytics with Vercel Analytics</span></label>
+      <label><input type="checkbox" checked={consent?.analytics === true} onChange={(e) => update("analytics", e.target.checked)} /><span>Share pseudonymous product usage events with PostHog (optional)</span></label>
       <p role="status" aria-live="polite">{saved}</p>
     </section>
   );
@@ -122,7 +122,7 @@ export default function Privacy({ onNavigate }) {
             margin: "0 0 36px",
             letterSpacing: "0.01em",
           }}>
-            Effective date: October 14, 2026
+            Effective date: October 17, 2026
           </p>
 
           <PrivacyChoices />
@@ -147,11 +147,11 @@ export default function Privacy({ onNavigate }) {
             },
             {
               title: "The Shift: device-local progress",
-              body: "The Shift uses fictional, prewritten nursing scenarios. It does not ask you to enter patient information or use AI to generate gameplay. Your place, selected choices, revealed findings and optional another-shift response are saved in this browser or app on this device. They are not submitted as scenario responses to Clinical Edge. They remain until you restart that scenario or clear the site or app's local data; clearing data may remove progress. When device storage is unavailable, progress lasts only while this tab remains open. Progress is not synchronized across devices. Existing optional website analytics are unchanged; no new gameplay analytics have been added. Opening Ask is separate: the handoff lets you copy an educational question. It does not automatically submit that question or your scenario choices. Ask's existing consent, AI-processing disclosures, privacy limits and daily allowance apply when you choose to submit a question there.",
+              body: "The Shift uses fictional, prewritten nursing scenarios. It does not ask you to enter patient information or use AI to generate gameplay. Your place, selected choices, revealed findings and optional another-shift response are saved in this browser or app on this device. Your choices and findings are not submitted as scenario responses to Clinical Edge. If you opt in to product analytics, we send only the scenario identifier and version, an anonymous play identifier, and the step reached, resumed or completed. We do not send your answers. Progress remains until you restart that scenario or clear the site or app's local data; clearing data may remove progress. When device storage is unavailable, progress lasts only while this tab remains open. Progress is not synchronized across devices. Opening Ask is separate: the handoff lets you copy an educational question. It does not automatically submit that question or your scenario choices. Ask's existing consent, AI-processing disclosures, privacy limits and daily allowance apply when you choose to submit a question there.",
             },
             {
               title: "Analytics and usage data",
-              body: "Only if you opt in, we use Vercel Analytics to collect aggregate, anonymized usage data, including page views and interaction events such as which features are used. This data never includes what you type and is not linked to any individual user. It is used only to understand how the product is used and to improve it. Analytics is off unless you turn it on, and you can turn it off at any time above.",
+              body: "Only if you opt in, we send limited product usage events to PostHog: page or feature visited, Shift scenario/version and step, and whether an Ask or tool request succeeded or failed. We do not send questions, answers, form inputs, patient information or your Shift choices. A random pseudonymous identifier stored on this device connects visits over time; it is not your Ask usage-limit identifier. Campaign labels from links may be included after validation. PostHog receives standard connection information such as IP address when events are sent. Analytics is off unless you opt in. Turning it off stops future collection and clears our analytics identifier on this device, but cannot erase events already received by PostHog. Clearing local data or using another device creates a different identifier.",
             },
             {
               title: "How information is used",
@@ -159,7 +159,7 @@ export default function Privacy({ onNavigate }) {
             },
             {
               title: "Third-party services",
-              body: "Clinical Edge Copilot uses the following third-party services:\n\n• Anthropic (Claude API): processes the information you submit to generate AI responses.\n• Render: hosts our backend server, which processes requests and temporarily holds educational conversation history in volatile memory for up to ten minutes; no durable chat storage is used.\n• Vercel: hosts the website and, only if you opt in, Vercel Analytics usage events.\n• Google Fonts: fonts are loaded from Google's servers, which receive standard request information such as your IP address.\n\nWe share data with these providers only as needed to run the service, and we rely on them to protect it at a level equal to this policy. Their own privacy policies also apply.",
+              body: "Clinical Edge Copilot uses the following third-party services:\n\n• Anthropic (Claude API): processes the information you submit to generate AI responses.\n• Render: hosts our backend server, which processes requests and temporarily holds educational conversation history in volatile memory for up to ten minutes; no durable chat storage is used.\n• Vercel: hosts the website.\n• PostHog: receives limited product events only after optional analytics consent.\n• Google Fonts: fonts are loaded from Google's servers, which receive standard request information such as your IP address.\n\nWe share data with these providers only as needed to run the service. Their own privacy policies also apply.",
             },
             {
               title: "Retention, deletion and withdrawing consent",
@@ -167,7 +167,7 @@ export default function Privacy({ onNavigate }) {
             },
             {
               title: "Cookies",
-              body: "Clinical Edge Copilot does not use cookies for tracking or advertising. Third-party services (Vercel Analytics, Google Fonts) may set their own cookies or use similar technologies subject to their own policies.",
+              body: "Clinical Edge Copilot does not use cookies for tracking or advertising. With analytics opt-in, we use a device-local random identifier for product measurement; no session replay or input capture is enabled. Google Fonts may use similar technologies subject to its policy.",
             },
             {
               title: "No accounts or payments",

@@ -40,7 +40,7 @@ test.beforeEach(async ({ page }) => {
     localStorage.clear();
     sessionStorage.clear();
     // These suites exercise a user who already granted AI and analytics consent.
-    localStorage.setItem('ce_consent', JSON.stringify({ version: 3, ai: true, analytics: true, decidedAt: '2026-10-11T00:00:00.000Z' }));
+    localStorage.setItem('ce_consent', JSON.stringify({ version: 4, ai: true, analytics: true, decidedAt: '2026-10-11T00:00:00.000Z' }));
   });
 });
 
@@ -161,14 +161,8 @@ test('Rapid Capture preserves narrative after a deterministic extraction failure
 });
 
 test('Rapid Capture supports delete, structured add-missing editing, and blocks duplicate extraction', async ({ page }) => {
-  await page.addInitScript(() => {
-    (window as typeof window & { __analyticsDebug: unknown[] }).__analyticsDebug = [];
-    const original = console.debug;
-    console.debug = (...args) => {
-      (window as typeof window & { __analyticsDebug: unknown[] }).__analyticsDebug.push(args);
-      original(...args);
-    };
-  });
+  const analyticsRequests: string[] = [];
+  page.on('request', request => { if (request.url().includes('posthog.com/i/v0/e/')) analyticsRequests.push(request.postData() || ''); });
   await page.goto('/copilot');
   await page.getByRole('button', { name: "Describe what's happening" }).click();
   await page.getByLabel('Nurse narrative').fill(RAPID_BENCHMARK);
@@ -183,10 +177,7 @@ test('Rapid Capture supports delete, structured add-missing editing, and blocks 
   await page.getByLabel('MAP current').fill('62');
   await page.getByRole('button', { name: 'Return to confirmation' }).click();
   await expect(page.locator('.rapid-confirmation__list article').filter({ hasText: 'MAP' })).toContainText('62 mmHg');
-  const analytics = await page.evaluate(() => JSON.stringify((window as typeof window & { __analyticsDebug: unknown[] }).__analyticsDebug));
-  expect((analytics.match(/shift_brain_rapid_capture_extracted/g) || [])).toHaveLength(1);
-  expect(analytics).not.toContain('108/64');
-  expect(analytics).not.toContain('Norepinephrine');
+  expect(analyticsRequests).toEqual([]); // Development and automated tests never send product analytics.
 });
 
 test('searchable finding picker discovers supported modules and collapsed summaries retain values', async ({ page }) => {
@@ -950,14 +941,8 @@ test('Teach Me gracefully renders the structured explanation fallback', async ({
 });
 
 test('one Teach Me action creates one request and a later completed action can create another', async ({ page }) => {
-  await page.addInitScript(() => {
-    (window as typeof window & { __analyticsDebug: unknown[] }).__analyticsDebug = [];
-    const original = console.debug;
-    console.debug = (...args) => {
-      (window as typeof window & { __analyticsDebug: unknown[] }).__analyticsDebug.push(args);
-      original(...args);
-    };
-  });
+  const analyticsRequests: string[] = [];
+  page.on('request', request => { if (request.url().includes('posthog.com/i/v0/e/')) analyticsRequests.push(request.postData() || ''); });
   let learningRequests = 0;
   const lesson = {
     active: false,
@@ -983,15 +968,13 @@ test('one Teach Me action creates one request and a later completed action can c
   await page.getByRole('button', { name: /Teach me why/ }).click();
   await expect(page.getByText('Rhythm change and hemodynamic tolerance')).toBeVisible();
   expect(learningRequests).toBe(1);
-  let analytics = await page.evaluate(() => (window as typeof window & { __analyticsDebug: unknown[][] }).__analyticsDebug);
-  expect(analytics.filter((entry) => entry[1] === 'teach_me_opened')).toHaveLength(1);
+  expect(analyticsRequests).toEqual([]);
 
   await page.getByRole('button', { name: /Concept reviewed/ }).click();
   await page.getByRole('button', { name: /Teach me why/ }).click();
   await expect(page.getByText('Rhythm change and hemodynamic tolerance')).toBeVisible();
   expect(learningRequests).toBe(2);
-  analytics = await page.evaluate(() => (window as typeof window & { __analyticsDebug: unknown[][] }).__analyticsDebug);
-  expect(analytics.filter((entry) => entry[1] === 'teach_me_opened')).toHaveLength(2);
+  expect(analyticsRequests).toEqual([]);
 });
 
 test('snapshot values stay out of analytics and the structured handoff preserves unknowns', async ({ page }) => {

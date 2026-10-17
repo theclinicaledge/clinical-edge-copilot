@@ -137,6 +137,7 @@ export default function AbgLabModule({ onGoHome, initialExampleId = null }) {
   const handleInterpret = useCallback(() => {
     const err = validateFields(fields);
     if (err) { setError(err); return; }
+    trackEvent('abg_example_used');
 
     const r = interpretABG({
       pH:    parseFloat(fields.pH),

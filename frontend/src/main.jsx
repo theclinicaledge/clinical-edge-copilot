@@ -1,7 +1,7 @@
 /* eslint-disable react-refresh/only-export-components */
 import { StrictMode, Suspense, lazy, useState, useEffect, useRef, useCallback } from 'react'
 import { createRoot, hydrateRoot } from 'react-dom/client'
-import { Analytics } from '@vercel/analytics/react'
+import { configureProductAnalytics, trackEvent, trackPageView, syncConsent } from './analytics.ts'
 import './styles/tokens.css'
 import './index.css'
 import App from './App.jsx'
@@ -16,7 +16,7 @@ import Download from './Download.jsx'
 import ClinicalEdgeHome from './ClinicalEdgeHome.jsx'
 import WorkspaceNavigation from './components/WorkspaceNavigation.jsx'
 import AIConsentGate from './components/AIConsentGate.jsx'
-import { hasAnalyticsConsent } from './consent.js'
+import { onConsentChange } from './consent.js'
 import RhythmLabModule from './modules/rhythm-lab/RhythmLabModule.tsx'
 import RhythmLibraryPage from './modules/rhythm-lab/RhythmLibraryPage.tsx'
 import RhythmPracticePage from './modules/rhythm-lab/RhythmPracticePage.tsx'
@@ -32,7 +32,10 @@ import BlogPostPage from './blog/BlogPostPage.jsx'
 import { SHIFT_ENABLED } from './shiftFeature.js'
 import { shiftRoute, returningShift } from './modules/the-shift/routing.js'
 
+if (typeof window !== 'undefined') configureProductAnalytics();
+
 function ShiftUnavailable({ navigate, active = true, mode }) {
+  useEffect(() => { if (active && mode !== 'return') trackEvent('shift_load_failed'); }, [active, mode]);
   if (!active || mode === 'return') return null;
   return <main className="ce-not-found" role="alert"><h1>The Shift could not load.</h1><p>Your device-local progress has not been cleared. Check your connection and reload, or return Home.</p><button type="button" onClick={() => window.location.reload()}>Reload</button><a href="/" onClick={event => { if (event.metaKey || event.ctrlKey || event.shiftKey || event.altKey) return; event.preventDefault(); navigate('/'); }}>Return Home</a></main>;
 }
@@ -74,6 +77,7 @@ function getPage() {
   if (path === '/scenario')   return 'scenario';
   if (path === '/quickstart') return 'quickstart';
   if (path === '/privacy')    return 'privacy';
+  if (path === '/choices')    return 'privacy';
   if (path === '/terms')      return 'terms';
   if (path === '/support')    return 'support';
   if (path === '/download')   return 'download';
@@ -100,6 +104,12 @@ function Root() {
   const currentPage = useRef(page);
   useEffect(() => { currentPage.current = page; }, [page]);
   const [isOnline, setIsOnline] = useState(() => navigator.onLine);
+  useEffect(() => {
+    const sync = () => { syncConsent(); trackPageView(window.location.pathname); };
+    const unsubscribe = onConsentChange(sync);
+    return unsubscribe;
+  }, []);
+  useEffect(() => { trackPageView(window.location.pathname); }, [routeKey]);
 
   // navigate() — pushes pathname and syncs React state without a reload
   const navigate = (path) => {
@@ -182,8 +192,6 @@ function Root() {
       {/* Keep the scenario's existing hook tree in memory, never browser storage. */}
       {workspaceEntered && <div hidden={page !== 'app'} inert={page !== 'app'} className="ce-shift-workspace" onFocusCapture={(event) => { workspacePosition.current.focus = event.target; }}><AIConsentGate navigate={navigate}><App onGoHome={() => navigate('/')} navigate={navigate} isOnline={isOnline} isVisible={page === 'app'} onScenarioActivity={setScenarioActive} onSnapshotChange={shareSnapshot} initialCaptureMode={new URLSearchParams(window.location.search).get('capture') === 'rapid' ? 'rapid' : 'manual'} /></AIConsentGate></div>}
       <WorkspaceNavigation page={page} navigate={navigate} scenarioActive={scenarioActive} />
-      {/* Usage analytics only with consent (App Store Review Guideline 5.1.1(ii)). */}
-      <Analytics beforeSend={(event) => (hasAnalyticsConsent() ? event : null)} />
     </>
   );
 }

@@ -10,8 +10,9 @@
 // materially changes, so every user is asked again.
 // Version 2: the consent screen now records agreement to the Terms of Use.
 // Version 3: discloses educational Ask review and temporary volatile history.
+// Version 4: discloses opt-in pseudonymous product analytics and its processor.
 
-export const CONSENT_VERSION = 3;
+export const CONSENT_VERSION = 4;
 export const CONSENT_STORAGE_KEY = 'ce_consent';
 const CHANGE_EVENT = 'ce-consent-change';
 

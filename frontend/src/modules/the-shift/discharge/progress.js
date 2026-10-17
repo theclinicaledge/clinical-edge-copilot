@@ -1,4 +1,5 @@
 import { startChoices, teachChoices, fixChoices, documents, actions } from './data.js';
+import { shiftProgress } from '../../../productAnalytics.js';
 export const KEY = 'ce-private-shift-discharge-v02';
 export const fresh = () => ({ version: '0.2', stage: 0, answers: {}, flags: [], actionDraft: [], inspected: [], noteOpened: false, tomorrow: null });
 const lines = documents.flatMap(doc => doc.lines.map(([id]) => id));
@@ -29,7 +30,7 @@ export function sanitize(value) {
   return state;
 }
 export function read() { try { return sanitize(JSON.parse(localStorage.getItem(KEY))); } catch { return fresh(); } }
-export function save(state) { try { localStorage.setItem(KEY, JSON.stringify(sanitize(state))); return true; } catch { return false; } }
+export function save(state) { try { const previous = read(); const current = sanitize(state); localStorage.setItem(KEY, JSON.stringify(current)); shiftProgress('discharge-puzzle', '0.3', previous, current, 6); return true; } catch { return false; } }
 export function reviewResults(answers) {
   return [answers.start === 'compare', conflictFound(answers.flags || []), actionsComplete(answers.actions || []), answers.teach === 'show', answers.fix === 'confirm'];
 }

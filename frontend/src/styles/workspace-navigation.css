@@ -1,5 +1,5 @@
 .ce-command-home { min-height: 100vh; background: var(--ce-warm-bg); color: var(--ce-text-dark); font-family: var(--ce-font-sans); }
-.ce-home-shift { padding: 32px; background: var(--ce-navy-header); color: var(--ce-text-light); border-left: 4px solid var(--ce-teal); }
+.ce-home-shift { padding: 32px; background: var(--ce-navy-header); color: var(--ce-text-light); border-left: 4px solid var(--ce-teal); border-radius: var(--ce-r-md); }
 .ce-home-shift > span { font: 600 13px var(--ce-font-mono); color: var(--ce-teal); }
 .ce-home-shift p { max-width: 45ch; font-size: 16px; line-height: 1.6; color: var(--ce-text-light-body); }
 .ce-home-shift small { display: block; font-size: 12px; margin-top: 16px; color: var(--ce-text-light-body); }
@@ -52,7 +52,7 @@
 #root:has(> .ce-tool-dock) > .ce-command-home.ce-command-home { padding-bottom: 0; }
 #root:has(> .ce-tool-dock) .ce-command-home__footer { padding-bottom: calc(var(--ce-dock-clearance, 88px) + 16px); }
 .ce-command-home__footer p { max-width: 560px; margin: 0; }
-.ce-home-footer-links { display: flex; gap: 24px; }
+.ce-home-footer-links { display: flex; flex-wrap: wrap; gap: 8px 24px; }
 .ce-home-footer-links a { display: inline-flex; align-items: center; min-height: 44px; text-decoration: underline; text-underline-offset: 3px; }
 .ce-command-home a { transition: background-color var(--ce-dur-fast), border-color var(--ce-dur-fast), box-shadow var(--ce-dur-fast); }
 .ce-home-learning-card:hover { border-color: var(--ce-teal-deep); box-shadow: var(--ce-shadow-float); }

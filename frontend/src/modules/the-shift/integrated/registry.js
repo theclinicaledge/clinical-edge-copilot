@@ -5,6 +5,8 @@ import { read, KEY } from '../monitor/progress.js';
 import { AUTHORING } from './authoring.js';
 import { script as discharge, sources as dischargeSources, scenes as dischargeScenes } from '../discharge/data.js';
 import { read as readDischarge, KEY as DISCHARGE_KEY } from '../discharge/progress.js';
+import { CONVERSATION_ENABLED } from '../conversation/private.js';
+import { conversationEntry } from '../conversation/metadata.js';
 
 const reportedReview = version => ({ status: 'Independent nurse approval reported by founder', independentStatus: 'Founder-reported approval', reviewer: null, reviewDate: null, approvedVersion: version });
 const sourceAccess = {
@@ -73,6 +75,7 @@ export const SHIFTS = [
     ],
   },
 ];
+if (CONVERSATION_ENABLED) SHIFTS.push(conversationEntry);
 export const getShift = id => SHIFTS.find(item => item.id === id);
 export function progressLabel(item) {
   const state = item.readProgress();

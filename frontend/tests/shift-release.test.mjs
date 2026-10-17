@@ -8,9 +8,9 @@ import { STRIPS, measurements } from '../src/modules/the-shift/monitor/ecg/wavef
 import { learningDestination } from '../src/modules/the-shift/routing.js';
 
 test('three corrected versions record founder-reported approval without invented details', () => {
-  assert.deepEqual(SHIFTS.map(s => [s.scenarioId, s.contentVersion]), [['SHIFT-001', '2.1'], ['SHIFT-002', '2.1'], ['SHIFT-003', '0.3']]);
+  assert.deepEqual(SHIFTS.slice(0, 3).map(s => [s.scenarioId, s.contentVersion]), [['SHIFT-001', '2.1'], ['SHIFT-002', '2.1'], ['SHIFT-003', '0.3']]);
   assert.equal(SHIFTS[1].assetVersion, '1.0');
-  for (const s of SHIFTS) {
+  for (const s of SHIFTS.slice(0, 3)) {
     assert.equal(s.review.independentStatus, 'Founder-reported approval');
     assert.equal(s.review.approvedVersion, s.contentVersion);
     assert.equal(s.review.reviewer, null);

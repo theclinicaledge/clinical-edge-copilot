@@ -1,0 +1,52 @@
+SHIFT-004 / THE CONVERSATION THAT CHANGES EVERYTHING / PUBLIC v0.4
+
+AUTHORIZATION AND REVIEW RECORD
+October 16, 2026 Pacific: founder Mohamed explicitly requested public release.
+After being asked about the final v0.4 review, he reported that a nurse reviewed
+everything/every step and relevant references and considered it publishable.
+This records founder-reported nurse approval, not independently verified
+psychiatric-mental health credentials, institutional endorsement, clinical
+validation or competency certification. Reviewer name, credentials, actual
+review date and signature were not supplied and remain blank in metadata.
+Specialty qualification and passage-level verification are not inferred.
+
+SCOPE
+Publicly include the existing v0.4 authored scenario in the established Shift
+library and routes. Replace obsolete private/pending banner labels with truthful
+founder-reported nurse approval. Update Home to four fictional shifts. Preserve
+the existing general SHIFT_ENABLED production flag; no new environment setting.
+Keep the Ask-may-decline warning visible after public inclusion.
+
+UNCHANGED REVIEWED CONTENT
+conversation/data.js and progress.js are byte-identical to the reviewed private
+v0.4 implementation. This preserves all eight cards/32 placement outcomes,
+24 accepted combinations, original-choice reflections, safer-path bridges,
+conditional ending, source limitations, content notice and skip/support flow.
+The existing ce-private-shift-conversation-v04 storage-key name is deliberately
+retained to preserve local progress. Legacy v0.2/v0.3 records stay read-only.
+The original authored script is retained as a test fixture for fidelity checks.
+
+TECHNICAL VERIFICATION
+19 deterministic scenario/release checks passed. Frontend lint passed.
+934 backend tests passed; no backend source change.
+17 development browser checks and 14 production browser checks passed.
+Production build with VITE_SHIFT_ENABLED=true passed; 9/9 prerendered routes.
+Browser checks covered 390px/mobile, enlarged text, keyboard/focus, tablet,
+1440px/desktop, exact feedback, complete gameplay, truthful review display,
+Skip/support, Ask handoff, storage failure and historical progress preservation.
+Gameplay tests prohibit API requests and external data transmission.
+No provider calls, new analytics, accounts, payment or persistence service.
+Existing build large-chunk warning remains. Physical iPhone/Safari/VoiceOver,
+native-wrapper safe areas, device clipboard and call/SMS launch are not tested.
+
+ROLLBACK
+Known-good production main before this release:
+335591c2304400755385944eef8a5656eeb81ead
+Vercel production deployment: 62vyYFnVywJN4bgHY8ND4cFQf2mz
+GitHub deployment ID: 7078418148
+Rollback to the previous Vercel artifact using the existing release process.
+Do not change backend, Ask safety/consent/limits or delete saved progress.
+
+data.js SHA-256: 26a468da12de6ab17a08716bd915db3b54e005bded5477a060e9d5854e4f976f
+
+progress.js SHA-256: 092d2a0c1fcb19e54c49693507e61af377eee0e92c94a07bd863c1f5364db906

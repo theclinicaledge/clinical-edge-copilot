@@ -3,6 +3,9 @@
 .s6-app .s6-scene-note { margin: -8px 0 20px; color: var(--ce-text-muted); font-size: 14px; }
 .s6-app .s6-card-vitals { margin-top: -8px; font: 500 13px var(--ce-font-mono); color: var(--ce-text-mid); }
 .s6-app .s6-prompt { margin: 28px 0 16px; font-size: 19px; }
+/* Report card section labels sit apart from the text above and close to the text they introduce. */
+.s6-app .shift-report-copy .shift-overline { margin-top: 20px; }
+.s6-app .shift-report-copy .shift-overline + p { margin-top: 4px; }
 
 .s6-app .shift-feedback.is-partial { border-color: var(--ce-gold-deep); }
 .s6-app .shift-feedback.is-partial .shift-feedback-mark { background: var(--ce-urgency-mod-bg); color: var(--ce-text-dark); }

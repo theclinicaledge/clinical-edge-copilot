@@ -4,7 +4,8 @@ import { INFORMATION } from '../med-surg-track/content.js';
 import { Steps, CallControl } from './Controls.jsx';
 import '../med-surg-track/track.css';
 
-export default function RewindPlayer({ versions, title, rewind, close, onSelect, onSubmit, onContinue, continueLabel, nextTitle, saveNotice, takeaway, review }) {
+// figure: optional (variation) => node, shown after the situation facts. Omitted by default.
+export default function RewindPlayer({ versions, title, rewind, close, onSelect, onSubmit, onContinue, continueLabel, nextTitle, saveNotice, takeaway, review, figure }) {
   const dialog = useRef(null), previousFocus = useRef(null), heading = useRef(null);
   const [phase, setPhase] = useState(() => rewind.attempts.length && new Set(rewind.attempts.map(a => a.variation)).size === versions.length ? 'summary' : 'intro'), [call, setCall] = useState(null), [information, setInformation] = useState(null);
   const [reviewing, setReviewing] = useState(false);
@@ -22,7 +23,7 @@ export default function RewindPlayer({ versions, title, rewind, close, onSelect,
   }, []);
   useEffect(() => { heading.current?.focus({ preventScroll: true }); dialog.current?.scrollTo(0, 0); }, [phase, selected]);
   const begin = value => { setReviewing(false); onSelect(value); setCall(null); setInformation(null); setPhase('read'); };
-  const patient = <><p>{variation.history}</p><ul className="mst-round-facts">{variation.facts.map(fact => <li key={fact}>{fact}</li>)}</ul></>;
+  const patient = <><p>{variation.history}</p><ul className="mst-round-facts">{variation.facts.map(fact => <li key={fact}>{fact}</li>)}</ul>{figure?.(variation)}</>;
   return <dialog ref={dialog} className={`mst-sheet mst-round mst-round--${phase}`} aria-labelledby="mst-rewind-title" onCancel={event => { event.preventDefault(); close(); }}>
     <header><div><p className="mst-eyebrow">Rewind / Optional practice</p><h2 id="mst-rewind-title">{phase === 'intro' && !tried ? 'Same moment. Different situation.' : 'Rewind'}</h2><p className="mst-round-shift">{title}</p></div><button className="mst-close" onClick={close} aria-label="Close Rewind and return to debrief">×</button></header>
     <div className="mst-sheet-body">

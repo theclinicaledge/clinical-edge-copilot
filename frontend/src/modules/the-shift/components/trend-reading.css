@@ -1,0 +1,22 @@
+.trend-reading { margin: 0 0 24px; }
+.trend-sr-only { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); white-space: nowrap; }
+.trend-scroll { overflow-x: auto; border: 1px solid var(--ce-warm-line); border-radius: var(--ce-r-md); background: var(--ce-warm-card); }
+.trend-scroll:focus-visible { outline: 3px solid var(--ce-teal-deep); outline-offset: 2px; }
+.trend-reading table { width: 100%; min-width: 560px; border-collapse: collapse; font-size: 14px; font-variant-numeric: tabular-nums; }
+.trend-reading th, .trend-reading td { padding: 10px 12px; text-align: left; border-bottom: 1px solid var(--ce-warm-line); vertical-align: top; }
+.trend-reading tbody tr:last-child th, .trend-reading tbody tr:last-child td { border-bottom: 0; }
+.trend-reading tbody th { font: 600 12px var(--ce-font-mono); color: var(--ce-text-muted); white-space: nowrap; }
+.trend-reading tbody td { color: var(--ce-text-dark); }
+.trend-reading thead th { padding: 6px; background: var(--ce-navy-header); }
+.trend-corner { font: 600 12px var(--ce-font-mono); color: var(--ce-text-light-body); padding-left: 12px !important; }
+.trend-time { display: block; width: 100%; min-height: 44px; padding: 6px 8px; font: 600 13px var(--ce-font-sans); color: var(--ce-text-light); background: transparent; border: 1px solid var(--ce-line-navy); border-radius: var(--ce-r-sm); text-align: left; cursor: pointer; }
+.trend-time.is-static { border-color: transparent; cursor: default; display: flex; align-items: center; color: var(--ce-text-light-body); }
+.trend-time:hover:not(:disabled) { border-color: var(--ce-teal); }
+.trend-time:focus-visible { outline: 3px solid var(--ce-teal); outline-offset: 1px; }
+.trend-time[aria-pressed="true"] { background: var(--ce-teal); border-color: var(--ce-teal); color: var(--ce-text-dark); }
+.trend-time:disabled { cursor: default; }
+.trend-reading td.is-pickable { cursor: pointer; }
+.trend-reading tr.is-emphasis th, .trend-reading tr.is-emphasis td { background: var(--ce-urgency-low-bg); font-weight: 650; }
+.trend-reading td.is-selected { box-shadow: inset 2px 0 var(--ce-teal-deep), inset -2px 0 var(--ce-teal-deep); }
+.trend-reading td.is-highlighted { background: var(--ce-urgency-mod-bg); }
+@media (forced-colors: active) { .trend-time[aria-pressed="true"] { outline: 2px solid; } }

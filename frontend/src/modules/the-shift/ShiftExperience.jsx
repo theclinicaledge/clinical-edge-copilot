@@ -19,11 +19,16 @@ const rewindAssignments = { 'drowsy-patient': 'a1', 'which-patient-first': 'a2',
 
 const renderers = { 'drowsy-patient': Shift, 'monitor-alarm': Monitor, 'discharge-puzzle': Discharge, 'which-patient-first': Shift5 };
 if (CONVERSATION_ENABLED) renderers.conversation = Conversation;
+// Draft SHIFT-006 is loaded only in preview builds, so production bundles never include it.
+// Resolved before first render (Scenario observes the renderer's h1 on mount); folds to null in production.
+const Shift6 = import.meta.env.VITE_SHIFT_006_PREVIEW === 'true' ? (await import('./shift6/Shift6.jsx')).default : null;
+if (Shift6) renderers['stable-number'] = Shift6;
 const images = {
   'drowsy-patient': new URL('./assignment-poster.svg', import.meta.url).href,
   'discharge-puzzle': new URL('./discharge/poster.svg', import.meta.url).href,
   'which-patient-first': new URL('./shift5/poster.svg', import.meta.url).href,
   ...(CONVERSATION_ENABLED ? { conversation: new URL('./conversation/room.svg', import.meta.url).href } : {}),
+  ...(Shift6 ? { 'stable-number': new URL('./shift6/poster.svg', import.meta.url).href } : {}),
 };
 
 function AppLink({ to, navigate, children, ...props }) {

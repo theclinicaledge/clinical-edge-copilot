@@ -1,0 +1,1350 @@
+<!doctype html><html lang="en"><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>Clinical Edge · Med-Surg Clinical review packet</title><style>
+:root{color-scheme:light}*{box-sizing:border-box}body{margin:0;background:#f4f2ed;color:#243642;font:16px/1.65 system-ui,sans-serif}header{background:#0e2937;color:#fff;padding:48px max(24px,calc((100vw - 1100px)/2))}header p{max-width:760px}h1{font-size:clamp(32px,5vw,48px);line-height:1.15;letter-spacing:-.04em}h2{font-size:28px;line-height:1.3;margin:0 0 24px}h3{font-size:21px;line-height:1.4}h4{margin-bottom:8px}nav,main{max-width:1100px;margin:auto;padding:24px}nav{display:flex;flex-wrap:wrap;gap:8px 24px}a{color:#11676a;text-underline-offset:3px}nav a{min-height:44px;padding:8px 0}section{padding:32px 0;border-top:1px solid #d7dcd9;scroll-margin-top:20px}.pending{border-left:4px solid #ad792c;padding:16px;background:#fff}article{padding:24px 0;border-top:1px solid #d7dcd9}.eyebrow,.hash{font:12px/1.7 ui-monospace,monospace;overflow-wrap:anywhere}.eyebrow{text-transform:uppercase;color:#11676a}.table{overflow-x:auto;margin:24px 0}table{border-collapse:collapse;width:100%;font-size:14px;background:#fff}th,td{text-align:left;vertical-align:top;border:1px solid #d7dcd9;padding:14px;min-width:110px}th{background:#e9efec}li{margin:12px 0}pre{white-space:pre-wrap;overflow-wrap:anywhere;background:#fff;padding:20px;font:12px/1.7 ui-monospace,monospace}summary{padding:14px 0;cursor:pointer;min-height:44px}a:focus-visible,summary:focus-visible{outline:3px solid #11676a;outline-offset:3px}@media print{body{background:#fff}header{background:#fff;color:#243642;padding:0}nav{display:none}main{padding:0}section,article{break-inside:avoid}details{display:none}a{color:inherit}}
+</style><header><p>CLINICAL EDGE / PRIVATE REVIEW / OCTOBER 18, 2026</p><h1>Med-Surg Clinical<br>Clinical content packet</h1><p>Three linked assignments. Exact authored cases, accepted answers, alternatives and evidence limits.</p><p>Draft 0.1.0 · Founder and independent clinical review pending</p></header><nav aria-label="Packet contents"><a href="#status">Status</a><a href="#map">Existing mapping</a><a href="#a3">Afternoon Handoff</a><a href="#rewind">Nine Rewinds</a><a href="#evidence">Feedback rules</a><a href="#sources">Sources / assets</a><a href="#review">Review questions</a><a href="#appendix">Exact-source appendix</a><a href="content-packet.json">Full JSON packet</a><a href="educator-guide.txt">Educator guide</a><a href="validation.txt">Build / test record</a></nav><main><section id="status"><h2>Review status and scope</h2><p>Private reviewer preview. New cases, variations and interpretations await qualified clinical and founder review. Not released to learners.</p><p>Prepared October 18, 2026. Content 0.1.0; mapping draft-1; record schema 1. Built from current remote main aa5368b, not the earlier research snapshot. No reviewer approval has been inferred. Prior source comments report approval for existing A1; that does not approve this new use, mapping, feedback, any Rewind or A3.</p><div class="pending">Founder: pending · Independent qualified med-surg nurse/educator: pending · Learner release: pending</div><p>Scope: fictional adult inpatient med-surg education for nurses. Local assessment, competency, escalation criteria and hospital processes govern real care. The authored response categories distinguish continued follow-up, specific information now, non-urgent provider notification and urgent bedside evaluation. They do not prescribe medication, oxygen, fluid or device changes. No AI grades responses or creates content. No clinical validation or competence claim is made.</p></section>
+<section id="map"><h2>Existing-case mapping: exact IDs and limits</h2><div class="table"><table><thead><tr><th scope="col">Decision</th><th scope="col">Source IDs</th><th scope="col">Interpretation</th><th scope="col">Assistance / limitation</th></tr></thead><tbody><tr><td>A1 / priority</td><td>answers.priority: 12,14,9,charts</td><td>Not mapped</td><td>Its rationale already teaches the alertness cue. Retain the original choice but do not infer later independent cue recognition.</td></tr><tr><td>A1 / cues</td><td>answers.cues: consciousness AND breathing; other source cues allowed</td><td>C1; Accepted if both essentials selected, otherwise Revisit</td><td>All actual cue submissions follow priority feedback. Conservatively assisted, including after a correct priority response.</td></tr><tr><td>A1 / action</td><td>answers.action: escalate; wait,increase,stop,sleep,other</td><td>C2 + C3; escalate Accepted; stop Unsafe; other actions Revisit</td><td>Cue rationale precedes every action in the source sequence. All actual choices are assisted, regardless of label.</td></tr><tr><td>A1 / report</td><td>answers.sbar: a,b,c</td><td>C3; a Accepted, b/c Revisit</td><td>Cue teaching and a scripted response-team path precede SBAR. Assisted. ABG/priority remain in snapshots but are not mapped or default-labelled Accepted.</td></tr><tr><td>A2 / dispatch</td><td>d2.submitted; reasons; bridges; storyPlan V1..V5</td><td>Not a mapped component</td><td>An unacceptable dispatch creates a safer-path bridge; downstream mapped evidence is assisted. The original dispatch stays separate from the story plan.</td></tr><tr><td>A2 / coverage</td><td>d3.submitted.option A..F and v5Step i/ii/iii</td><td>C1 + C2 proxy: A/B/C Accepted; D Revisit; E Unsafe; F Outside role + Unsafe. V5 iii Unsafe.</td><td>Uses the existing primaryReason severity order. D3 heading already instructs coverage and response. Accepted choices support arranged response within a prompt, not independent discovery of a vital trend.</td></tr><tr><td>A2 / help</td><td>d4.help.submitted: provider, rapid, priya, recheck, rounds</td><td>C3: provider or rapid Accepted unless recheck/rounds also selected; either delay Unsafe; Priya alone Revisit</td><td>Independent only without prior D2/D3 bridges or a hint/retry. D4 explicitly prompts a call. Scope is the chosen contact/timing within that prompt.</td></tr><tr><td>A2 / report</td><td>d4.report.submitted: trend,dressing,symptoms,surgery,saturation</td><td>C3: trend required; dressing additionally required only if revealed. Missing required item Revisit.</td><td>Never requires an unseen finding. Prior D2/D3/help bridge excludes independent evidence. Generated report contains selected observations plus the existing fixed concern/request scaffold; it does not measure free SBAR composition.</td></tr><tr><td>A3 / action</td><td>call: reassess,information,notify,escalate; specific information ID</td><td>C3: escalate Accepted; reassess Unsafe; information/notify Revisit</td><td>Committed and saved before the concern/findings options appear. Chart inspection is optional, not a hint. No independent claim is made for retries.</td></tr><tr><td>A3 / findings</td><td>findings: select two or three from confusion,hr,rr,bp,temperature,saturation,pillow,menu</td><td>C1: at least two of confusion,hr,rr,bp,temperature Accepted; otherwise Revisit</td><td>Oxygen saturation changes numerically (96→94) but is excluded from the draft qualifying set, following the supplied rule. The unfinished menu is also not a qualifying core cue. Review both restrictions for fairness.</td></tr><tr><td>A3 / concern</td><td>concern: infection,dehydration,medication,glucose,acute,tired,none</td><td>C2: acute hypothesis must satisfy the linked-finding rules below; tired/none Revisit</td><td>No single diagnosis is required. A tentative medication or glucose concern is not confirmation; missing exposure/glucose information is disclosed in teaching.</td></tr></tbody></table></div><p>Critical mismatch: the unchanged A1 flow offers no unassisted mapped evidence under this conservative rule. It therefore shows no performance card and cannot earn Strong or create a deficit recommendation. Optional Rewind and the next assignment remain available. Changing that would require a separately reviewed teaching-flow revision, not silently reclassifying coached answers.</p><h3>A2 context at the mapped moment</h3><p>At 0730 Jordan reports HR 112, BP 98/60, RR 20, lightheaded; at 0700 HR 88, BP 128/74. The learner must arrange RN coverage and go. At 0733 Mr. Park is pale, anxious and feels faint. Optional inspection can show HR 118/BP 92/58/RR 22/SpO₂ 95% on room air, bright red drainage past the outline, cool/clammy skin and the full earlier vital-sign trend. Arrival is 0735 rather than 0733 on the V5 ii handoff path. Those additional findings are not asserted unless revealed. The full existing scripts and rules are preserved in the exact-source appendix.</p><h3>Existing answer keys</h3><p>scenario.js, shift5/data.js and shift5/rules.js are unchanged from aa5368b. Source rendering receives a track-only persistence/debrief adapter. Source standalone storage keys and progression remain separate. This packet includes inherited source teaching for review, including its clinical claims; copying it is not a new endorsement.</p></section>
+<section id="a3"><h2>A3: exact independent application case</h2><h3>Opening / 1400</h3><p>Helen Ortiz, 81, day 2 for a urinary tract infection and dehydration, on IV antibiotics. Aide’s note at 1330: “A little confused, probably sundowning, she’s tired.” She’s yours for the afternoon.</p><div class="table"><table><thead><tr><th scope="col">Information surface</th><th scope="col">Exact content</th></tr></thead><tbody><tr><td>Admission history</td><td>Lives alone, independent. Her daughter said on admission: “Sharp as a tack.”</td></tr><tr><td>0800 nursing note</td><td>0800 nursing note: Alert and oriented, chatting about her grandkids. Filled out her menu.</td></tr><tr><td>Bedside / 1400</td><td>Unsure where she is, picking at the sheets. The menu slip is half-finished. She asks for a different pillow.</td></tr></tbody></table></div><div class="table"><table><thead><tr><th scope="col">Observation</th><th scope="col">0800</th><th scope="col">1400</th><th scope="col">Unit</th></tr></thead><tbody><tr><td>HR</td><td>84</td><td>106</td><td>/min</td></tr><tr><td>BP</td><td>132/78</td><td>106/62</td><td>mmHg</td></tr><tr><td>RR</td><td>16</td><td>24</td><td>/min</td></tr><tr><td>Temperature</td><td>37.2</td><td>38.4</td><td>°C</td></tr><tr><td>SpO₂</td><td>96</td><td>94</td><td>% on room air</td></tr></tbody></table></div><p>All four information surfaces are optional and open in any order. No finding highlights, target-skill label, diagnosis options, suggested practice or then-and-now teaching appears before the action is committed. The header is simply Afternoon Handoff. Reasoning choices appear after action commitment and before the final response is submitted.</p><h3>Step 1: lock the action</h3><div class="table"><table><thead><tr><th scope="col">ID</th><th scope="col">Label</th><th scope="col">Definition</th></tr></thead><tbody><tr><td>reassess</td><td>Continue and reassess</td><td>Continue the current plan with bedside follow-up.</td></tr><tr><td>information</td><td>Get specific information</td><td>Choose the assessment or information you would obtain now.</td></tr><tr><td>notify</td><td>Notify the provider</td><td>Inform the provider through the non-urgent process for review and decisions.</td></tr><tr><td>escalate</td><td>Escalate now</td><td>Request urgent bedside evaluation through the provider or rapid response, following the hospital process.</td></tr></tbody></table></div><div class="table"><table><thead><tr><th scope="col">Information ID</th><th scope="col">Selectable item</th></tr></thead><tbody><tr><td>assessment</td><td>Full bedside assessment, repeat vitals and level of consciousness</td></tr><tr><td>glucose</td><td>Bedside glucose</td></tr><tr><td>history</td><td>Clarify usual orientation and compare with the chart</td></tr><tr><td>wound</td><td>Inspect the wound and obtain a full set of vitals</td></tr></tbody></table></div><p>Get specific information requires one item. For this complete A3 case: escalate = Accepted; continue = Unsafe; information alone or non-urgent notification = Revisit. Assessment may continue while urgent help is requested. No unique choice between provider and rapid response is graded.</p><h3>Step 2: concern and two or three linked findings</h3><div class="table"><table><thead><tr><th scope="col">Concern ID</th><th scope="col">Exact choice</th></tr></thead><tbody><tr><td>infection</td><td>Possible worsening infection or sepsis</td></tr><tr><td>dehydration</td><td>Dehydration</td></tr><tr><td>medication</td><td>A medication effect</td></tr><tr><td>glucose</td><td>Low blood sugar</td></tr><tr><td>acute</td><td>An acute cause, not sure which yet</td></tr><tr><td>tired</td><td>Tired or sundowning</td></tr><tr><td>none</td><td>No new concern</td></tr></tbody></table></div><div class="table"><table><thead><tr><th scope="col">Finding ID</th><th scope="col">Exact choice</th></tr></thead><tbody><tr><td>confusion</td><td>Orientation and behaviour</td></tr><tr><td>hr</td><td>Heart rate</td></tr><tr><td>rr</td><td>Respiratory rate</td></tr><tr><td>bp</td><td>Blood pressure</td></tr><tr><td>temperature</td><td>Temperature</td></tr><tr><td>saturation</td><td>Oxygen saturation</td></tr><tr><td>pillow</td><td>Pillow request</td></tr><tr><td>menu</td><td>Menu slip</td></tr></tbody></table></div><div class="table"><table><thead><tr><th scope="col">Concern</th><th scope="col">Accepted linked-finding rule</th></tr></thead><tbody><tr><td>acute</td><td>Any two or more qualifying changed findings.</td></tr><tr><td>infection</td><td>At least two qualifying changes AND temperature selected; OR new confusion plus HR, RR or BP.</td></tr><tr><td>dehydration</td><td>HR AND BP selected.</td></tr><tr><td>medication / glucose</td><td>New confusion AND HR, RR or BP selected. Tentative acute hypothesis only; not a demonstrated cause.</td></tr><tr><td>tired / none</td><td>Revisit for this complete A3 case.</td></tr></tbody></table></div><p>C1 requires at least two qualifying changes: confusion, HR, RR, BP or temperature. Selecting only the pillow and menu is Revisit. Oxygen saturation really changes; it is not called unchanged. Its exclusion as a qualifying core cue is an unresolved authoring restriction. C2 and C3 are labelled separately: a plausible concern cannot compensate for a delayed action.</p><h3>After the complete response: teaching only</h3><p>The learner can switch between 0800 and 1400 using buttons, with highlights introduced only here. They can explore up to two checks. These interactions do not alter first responses or improve their labels.</p><div class="table"><table><thead><tr><th scope="col">Check</th><th scope="col">Exact result</th></tr></thead><tbody><tr><td>Bedside glucose</td><td>Glucose 108 mg/dL in this fictional example. This does not explain the confusion as current hypoglycaemia; it does not rule out other acute causes.</td></tr><tr><td>Full vitals and level of consciousness</td><td>Repeat vitals match the 1400 flowsheet. She remains disoriented. Reassessment confirms the reported pattern; bedside evaluation should not be delayed.</td></tr><tr><td>IV site and other possible sources</td><td>IV site clean, no redness or swelling. This local finding does not rule out infection elsewhere or establish its source.</td></tr><tr><td>Pain or urination</td><td>No new pain reported; urine is more concentrated than this morning. This may add context but does not establish a cause or explain away the other findings.</td></tr></tbody></table></div><p>New or worsening confusion warrants assessment for an acute cause. Infection and sepsis are possibilities, but confusion alone does not establish either diagnosis. The absence of fever does not rule out sepsis. Assess the whole clinical picture, including changes from baseline.</p></section>
+<section id="rewind"><h2>All nine authored Rewinds and deterministic labels</h2><p>Every branch replaces the relevant history and dependent facts together. Rewind is guided practice after a debrief; no response is promoted to independent evidence. At least one submitted variation records practice; closing without one records only a visit. The sheet can always be dismissed. All unlisted action/information combinations are Revisit unless explicitly Unsafe. No Accepted with a note label is currently used in Rewind. The complete combination matrix is in content-packet.json.</p><article><p class="eyebrow">A1 / a1-oxygen</p><h3>Another oxygen reading</h3><p>71-year-old with COPD and pneumonia, newly sleepy since 0400. No earlier chronic drowsiness. A pending blood gas has not resulted.</p><ul><li>Still opens his eyes to his name, then drifts off mid-sentence.</li><li>RR 10, shallow. SpO₂ now 99% on the existing prescribed oxygen.</li><li>HR 108, BP 152/90, temperature 38.2°C. No other improvement reported.</li></ul><div class="table"><table><thead><tr><th scope="col">Preferred</th><th scope="col">Also accepted actions</th><th scope="col">Specific information accepted</th><th scope="col">Unsafe</th></tr></thead><tbody><tr><td>escalate</td><td>None</td><td>None</td><td>reassess</td></tr></tbody></table></div><h4>Rationale</h4><p>A higher saturation does not explain persistent reduced alertness and slow, shallow breathing. Urgent bedside help is supported without waiting for a blood gas.</p><h4>Alternatives and scope</h4><p>Assessment continues while help comes. Non-urgent notification or information gathering alone would delay the response to the current findings.</p><p>Source IDs: oximetry, rrt. Practice focus: Breathing and alertness, together.</p></article><article><p class="eyebrow">A1 / a1-nap</p><h3>After lunch</h3><p>Complete alternative history: admitted with improving pneumonia, no new drowsiness overnight and no sedating medicine in this branch. Daughter reports a usual after-lunch nap.</p><ul><li>Sleepy after lunch but wakes easily to voice, answers clearly and remains engaged.</li><li>RR 18 with normal effort; no new breathing difficulty. SpO₂ 97% on unchanged prescribed oxygen.</li><li>HR 88, BP 128/76, temperature 37.0°C, unchanged from the morning assessment.</li></ul><div class="table"><table><thead><tr><th scope="col">Preferred</th><th scope="col">Also accepted actions</th><th scope="col">Specific information accepted</th><th scope="col">Unsafe</th></tr></thead><tbody><tr><td>reassess</td><td>information</td><td>assessment, history</td><td>None</td></tr></tbody></table></div><h4>Rationale</h4><p>The reported explanation fits the current alertness, breathing and unchanged observations. Continue bedside follow-up rather than assuming an acute deterioration.</p><h4>Alternatives and scope</h4><p>Clarifying the usual pattern or repeating the assessment is reasonable. Escalation is not required by the stated findings; escalate if new concern appears.</p><p>Source IDs: rrt. Practice focus: Does the explanation fit?.</p></article><article><p class="eyebrow">A1 / a1-clarify</p><h3>A different bedside check</h3><p>71-year-old with COPD and pneumonia. Earlier this morning he was alert, RR 18; saturation 97% on the current prescribed oxygen.</p><ul><li>Now wakes to voice but drifts off mid-sentence. RR 12; oxygen reading remains 97%.</li><li>HR 96, BP 132/78, temperature 37.2°C. No increased work of breathing reported.</li><li>A full bedside assessment and repeat observations have not yet been obtained.</li></ul><div class="table"><table><thead><tr><th scope="col">Preferred</th><th scope="col">Also accepted actions</th><th scope="col">Specific information accepted</th><th scope="col">Unsafe</th></tr></thead><tbody><tr><td>information</td><td>notify, escalate</td><td>assessment</td><td>None</td></tr></tbody></table></div><h4>Rationale</h4><p>A full assessment and recheck now clarify the new reduction in alertness. The saturation does not explain it. Reassessment must be immediate, not a plan to wait.</p><h4>Alternatives and scope</h4><p>Provider notification or urgent bedside escalation is also reasonable for the new change or local criteria. This is a borderline draft and needs explicit reviewer agreement.</p><p>Source IDs: oximetry, rrt. Practice focus: Clarify a new change now.</p></article><article><p class="eyebrow">A2 / a2-trend</p><h3>Inside the outline</h3><p>Room 414, arriving at 0733 after surgery ended at 0300. At 0700 HR 88 and BP 128/74. No new dressing spread has been observed in this branch.</p><ul><li>HR 112, BP 98/60, RR 20. Pale, lightheaded and anxious.</li><li>Drainage remains inside the 0600 outline.</li><li>The repeated bedside observations confirm the trend reported at 0730.</li></ul><div class="table"><table><thead><tr><th scope="col">Preferred</th><th scope="col">Also accepted actions</th><th scope="col">Specific information accepted</th><th scope="col">Unsafe</th></tr></thead><tbody><tr><td>escalate</td><td>None</td><td>None</td><td>reassess</td></tr></tbody></table></div><h4>Rationale</h4><p>The rising heart rate, falling BP and symptoms support urgent evaluation even without dressing expansion. The trend is enough to call; do not infer a bleeding diagnosis from the outline alone.</p><h4>Alternatives and scope</h4><p>Continue assessment while requesting help. Information gathering alone or non-urgent notification does not match this confirmed symptomatic deterioration.</p><p>Source IDs: shock, rrt. Practice focus: The patient and the trend.</p></article><article><p class="eyebrow">A2 / a2-update</p><h3>A call from the family</h3><p>Complete alternative recovery: at 0700 HR 90, BP 126/74, comfortable. There was no earlier report of a falling BP or lightheadedness.</p><ul><li>At 0733 HR 90, BP 126/74, RR 16, SpO₂ 97%, temperature 36.9°C; comfortable and alert.</li><li>Dressing unchanged and drainage inside its outline. No new symptoms.</li><li>His daughter calls the desk for an update.</li></ul><div class="table"><table><thead><tr><th scope="col">Preferred</th><th scope="col">Also accepted actions</th><th scope="col">Specific information accepted</th><th scope="col">Unsafe</th></tr></thead><tbody><tr><td>reassess</td><td>None</td><td>None</td><td>None</td></tr></tbody></table></div><h4>Rationale</h4><p>A family request does not change the patient’s current condition. Continue routine assessment and provide an update through the appropriate process.</p><h4>Alternatives and scope</h4><p>Escalation for acute deterioration is not supported by these unchanged observations. Concerns not stated here would require a new assessment.</p><p>Source IDs: shock. Practice focus: Match the response to the findings.</p></article><article><p class="eyebrow">A2 / a2-wound</p><h3>At the dressing</h3><p>Complete alternative recovery: at 0700 HR 90 and BP 126/74; comfortable, no prior hypotensive trend. Drainage was at the marked edge.</p><ul><li>At 0733 HR 90, BP 126/74, RR 16, SpO₂ 97%, temperature 36.9°C; alert and comfortable.</li><li>A small area of drainage is just past the outline; amount and wound appearance have not yet been assessed.</li><li>No dizziness, faintness or other deterioration reported.</li></ul><div class="table"><table><thead><tr><th scope="col">Preferred</th><th scope="col">Also accepted actions</th><th scope="col">Specific information accepted</th><th scope="col">Unsafe</th></tr></thead><tbody><tr><td>information</td><td>notify</td><td>wound, assessment</td><td>None</td></tr></tbody></table></div><h4>Rationale</h4><p>Inspect the wound and obtain full observations now to clarify the small new finding. The stable bedside picture does not itself require urgent help.</p><h4>Alternatives and scope</h4><p>Non-urgent provider notification is reasonable. Reassess the urgency if the inspection or trend is concerning. Exact appearance/amount remains an unresolved draft detail.</p><p>Source IDs: shock. Practice focus: Get the information that matters.</p></article><article><p class="eyebrow">A3 / a3-no-fever</p><h3>Temperature check</h3><p>Helen Ortiz, 81, day 2 for UTI and dehydration on IV antibiotics. Independent at baseline; no known chronic confusion. At 0800 alert, HR 84, BP 132/78, RR 16, SpO₂ 96%, temperature 37.2°C.</p><ul><li>At 1400 newly unsure where she is and picking at the sheets.</li><li>HR 106, BP 106/62, RR 24, SpO₂ 94%; temperature 37.0°C.</li><li>The aide’s “probably sundowning” explanation has not been established as her usual pattern.</li></ul><div class="table"><table><thead><tr><th scope="col">Preferred</th><th scope="col">Also accepted actions</th><th scope="col">Specific information accepted</th><th scope="col">Unsafe</th></tr></thead><tbody><tr><td>escalate</td><td>None</td><td>None</td><td>reassess</td></tr></tbody></table></div><h4>Rationale</h4><p>The absence of fever does not rule out sepsis. Assess the whole clinical picture, including changes from baseline. These combined changes support urgent bedside evaluation; the cause is not established.</p><h4>Alternatives and scope</h4><p>Assessment and the hospital’s sepsis or deterioration process can proceed together. Non-urgent notification alone understates the current concern.</p><p>Source IDs: nice, cdc, process. Practice focus: Look at the whole current picture.</p></article><article><p class="eyebrow">A3 / a3-usual</p><h3>A fuller admission history</h3><p>History updated throughout: Helen has had memory problems for months and usually becomes confused in the afternoons. Her daughter described that pattern on admission; there is no “sharp as a tack” history or new decline in this branch. The 0800 note described her usual morning orientation.</p><ul><li>At 1400 her orientation matches the daughter’s usual afternoon description; she engages and reports no new symptoms.</li><li>HR 84, BP 132/78, RR 16, temperature 37.2°C, SpO₂ 96%, matching 0800.</li><li>No new difficulty breathing, perfusion change or distress is reported.</li></ul><div class="table"><table><thead><tr><th scope="col">Preferred</th><th scope="col">Also accepted actions</th><th scope="col">Specific information accepted</th><th scope="col">Unsafe</th></tr></thead><tbody><tr><td>reassess</td><td>information, notify</td><td>history, assessment</td><td>None</td></tr></tbody></table></div><h4>Rationale</h4><p>This description fits a documented baseline pattern with unchanged observations. Continue assessment without treating chronic cognitive difficulty as proof of a new acute cause.</p><h4>Alternatives and scope</h4><p>Compare with usual orientation or inform the provider if uncertainty remains. A known pattern does not prevent acute illness; escalate for a new change or concern.</p><p>Source IDs: nice. Practice focus: Establish what is usual.</p></article><article><p class="eyebrow">A3 / a3-therapy</p><h3>After physical therapy</h3><p>Helen remains independent at cognitive baseline. At 0800 alert and oriented; she has just completed physical therapy at 1400. No earlier afternoon confusion is present in this branch.</p><ul><li>Oriented and answering clearly; says she is tired after physical therapy.</li><li>HR 84, BP 132/78, RR 16, temperature 37.2°C, SpO₂ 96%, matching 0800.</li><li>No new confusion, breathing difficulty or other symptom is reported.</li></ul><div class="table"><table><thead><tr><th scope="col">Preferred</th><th scope="col">Also accepted actions</th><th scope="col">Specific information accepted</th><th scope="col">Unsafe</th></tr></thead><tbody><tr><td>reassess</td><td>None</td><td>None</td><td>None</td></tr></tbody></table></div><h4>Rationale</h4><p>Tiredness after activity fits the stated current findings. Continue follow-up; escalation for a worsening pattern is not supported when that pattern is absent.</p><h4>Alternatives and scope</h4><p>New symptoms or uncertainty would justify reassessment and a different response. No conclusion about infection resolution is established.</p><p>Source IDs: nice. Practice focus: Keep the plan when the picture fits.</p></article><p>The updated build request prioritizes coherent response variation over a forced urgency distribution. A3 has one urgent and two reassessment branches. It has no fabricated intermediate-urgency branch. Reviewer agreement is pending.</p></section>
+<section id="evidence"><h2>Feedback and final-comparison rules</h2><ul><li>Only a first-run choice with no earlier hint, safer-path bridge, relevant cue teaching or retry assistance can contribute independent evidence. A snapshot retains all source responses, with original submitted choices separate from story corrections.</li><li>Strong requires independent Accepted evidence on every expected mapped decision across C1/C2/C3. A2 needs D3, help and report; A3 needs action, concern and findings. Accepted with a note does not earn Strong.</li><li>One practice card: among independent Revisit, Outside role or Unsafe choices, prioritize any Unsafe first, then C3, C1, C2. Assisted wrong responses do not create a weakness claim. Hints alone never create a practice recommendation.</li><li>Partial independent positives produce What we saw with only the observations actually supported. No mapped unaided evidence means no card. Missing evidence implies neither success nor failure.</li><li>Cards are frozen from the original run when first completed. Guided retries and Rewind remain separately identified and never replace originals.</li><li>After A3, choose the most recent earlier assignment with a practice card, otherwise A2. Use original first responses and disclose assistance. No same-component usable independent evidence means no change claim.</li><li>For C3 help/timing, compare the earlier original help/action with A3’s locked action. If the practice focus was the report itself, show that report and explain A3 does not separately test spoken reporting; no improvement claim.</li><li>A2 C1/C2 are coverage/action proxies. Comparing those with A3 linked findings/hypotheses is explicitly different-format and cannot establish improvement in those components.</li><li>Only comparable independent choices can support improvement, consistency, continued difficulty or current-needs-review. Even supported improvement concerns these recorded choices, not clinical competence, validated transfer or an effect caused by CE.</li><li>Completing Rewind is descriptive context, never a causal explanation. Everyone receives A1→A2→A3; the next case is not dynamically generated or selected.</li></ul></section>
+<section id="sources"><h2>Sources, scope assumptions and assets</h2><h3>oximetry / <a href="https://www.fda.gov/medical-devices/products-and-medical-procedures/pulse-oximeters">FDA: Pulse Oximeters</a></h3><p>Pulse oximetry estimates oxygen saturation and should be interpreted with symptoms. It does not validate a reassuring saturation as a reason to dismiss a change in breathing or alertness.</p><h3>cjmm / <a href="https://openstax.org/books/medical-surgical-nursing/pages/4-2-clinical-judgment-measurement-model-overview">OpenStax: Clinical Judgment Measurement Model overview</a></h3><p>Educational framework for recognising and analysing cues and taking action. This mapping is an authored interpretation, not an endorsed or validated assessment.</p><h3>cdc / <a href="https://www.cdc.gov/sepsis/about/index.html">CDC: About Sepsis</a></h3><p>General symptom constellation and need for evaluation. Does not diagnose the fictional patient or validate the response rules.</p><h3>process / <a href="https://www.cdc.gov/sepsis/hcp/clinical-care/index.html">CDC: Caring for Patients with Sepsis</a></h3><p>Prompt evaluation and use of the facility’s policies and procedures. No treatment orders or national bedside response threshold are inferred.</p><h3>nice / <a href="https://www.nice.org.uk/guidance/NG253/chapter/could-this-be-sepsis">NICE NG253: Could this be sepsis?</a></h3><p>Changes from usual behaviour and circulation or respiration, including presentations without high temperature. UK guidance supports teaching principles; it is not a US hospital protocol.</p><h3>shock / <a href="https://openstax.org/books/medical-surgical-nursing/pages/23-2-hypovolemic-shock">OpenStax: Hypovolemic Shock</a></h3><p>Concern about a postoperative vital-sign trend; no diagnosis of bleeding is established by the limited initial observations.</p><h3>rrt / <a href="https://psnet.ahrq.gov/primer/rapid-response-systems">AHRQ PSNet: Rapid Response Systems</a></h3><p>Escalation principles, with local criteria and process. No medication, oxygen or device changes are instructed.</p><p>Verification October 18, 2026: the FDA, CDC, OpenStax and AHRQ pages were opened. NICE official indexed guidance/PDF text was checked for the relevant sections; direct page opening was intermittently unavailable. No source has endorsed these cases or the deterministic answer matrix. Reviewer must check exact applicable guidance and hospital processes. Source principles support the draft; source availability is not clinical review.</p><h3>Asset register</h3><div class="table"><table><thead><tr><th scope="col">Asset</th><th scope="col">Use / limit</th></tr></thead><tbody><tr><td>Existing assignment-poster.svg</td><td>A1 path artwork; decorative alt=&quot;&quot;. Existing CE SVG, no ECG or quantitative clinical meaning.</td></tr><tr><td>Existing shift5/poster.svg</td><td>A2 path artwork; decorative alt=&quot;&quot;. Existing CE SVG, no calibration claim.</td></tr><tr><td>Code-native 1400 line illustration</td><td>A3 path artwork only, hidden from assistive technology.</td></tr><tr><td>ECG / waveform assets</td><td>None introduced or used in the track or Rewind. No rhythm identification, measurement, calibration or diagnostic accuracy claim.</td></tr><tr><td>Fonts and controls</td><td>Existing Inter, IBM Plex Mono, CE color tokens and native form/dialog controls. No external illustration source.</td></tr></tbody></table></div></section>
+<section id="review"><h2>Unresolved clinical review questions</h2><ul><li>A1: priority feedback identifies the alertness cue before cue selection, and cue teaching precedes action/SBAR. All mapped choices in the unmodified sequence are conservatively assisted. No independent card or Strong claim is produced. Review whether a later teaching-flow revision is warranted.</li><li>A2: D3 is a coverage/action proxy, not a separate cue-recognition or false-reassurance test. D4 explicitly prompts a call. Confirm the limited feedback wording and mapping.</li><li>A1 middle branch: new drifting off can justify urgent escalation despite otherwise stable observations. Confirm assessment-now, notification and escalation alternatives.</li><li>A2 middle branch: specify clinically meaningful amount/appearance and local wound reporting expectations before learner release.</li><li>A3: confirm urgency and hospital-process wording, plausible combined change, and fairness as an application case.</li><li>A3: medication effect or hypoglycaemia remains an unconfirmed acute hypothesis; accept only with acute findings and matched escalation, with no diagnosis claim.</li><li>A3 Rewind has two reassessment branches and no artificially constructed middle-urgency branch, following the updated build request’s clinical-coherence priority. Confirm this departure from the draft balance table.</li><li>Confirm that the three cases test the same component sufficiently for a formative comparison. No causal learning-effect claim is made.</li><li>A3 SpO₂ and menu changes: confirm whether their exclusion from qualifying C1 evidence is fair; they are changed, not unchanged.</li><li>Confirm all label language, alternatives and local escalation scope, including the distinction between a non-urgent notification and urgent provider evaluation.</li><li>Inherited A1 oxygen/CO₂/ABG explanatory content is unchanged; reviewer should confirm its continued suitability for this track.</li></ul><h3>Review record to complete</h3><div class="table"><table><thead><tr><th scope="col">Review item</th><th scope="col">Reviewer / qualification</th><th scope="col">Decision / required changes / date</th></tr></thead><tbody><tr><td>A1/A2 new decision interpretation and assistance flags</td><td>Pending</td><td>Pending</td></tr><tr><td>Nine Rewind branches and exact combination labels</td><td>Pending</td><td>Pending</td></tr><tr><td>A3 entire case, acute hypotheses, urgency and teaching</td><td>Pending</td><td>Pending</td></tr><tr><td>Strong/observed/practice feedback and final comparison</td><td>Pending</td><td>Pending</td></tr><tr><td>Founder product review and learner-release decision</td><td>Pending</td><td>Pending</td></tr></tbody></table></div><p>No outreach or reviewer contact has been initiated. This packet is the reviewable content, not an approval record. Do not expose it to learners until content review, implementation verification and release authorization are complete.</p></section>
+<section id="appendix"><h2>Exact-source appendix</h2><p>These snapshots make all inherited cases, answer options, feedback and dynamic source rules reviewable without relying on a prose paraphrase. JSON contains the same text and hashes. Re-run the exporter after any content or rule change.</p><details><summary>A1 exact case data</summary><pre>{
+  &quot;id&quot;: &quot;drowsy-patient-r2&quot;,
+  &quot;title&quot;: &quot;The Drowsy Patient&quot;,
+  &quot;reviewStatus&quot;: &quot;Independent nurse approval reported by the founder&quot;,
+  &quot;report&quot;: &quot;Good morning. Report just ended. You have 3 patients on a med-surg unit.&quot;,
+  &quot;patients&quot;: [
+    {
+      &quot;id&quot;: &quot;12&quot;,
+      &quot;age&quot;: &quot;71-year-old&quot;,
+      &quot;label&quot;: &quot;COPD / pneumonia&quot;,
+      &quot;report&quot;: &quot;71-year-old with COPD, admitted 2 days ago for pneumonia. On oxygen by nasal cannula; the flow was turned up overnight because \&quot;his sats were dipping.\&quot; \&quot;He's been really sleepy since about 0400, but his sats are great, 97%. Probably just tired, he didn't sleep well.\&quot;&quot;,
+      &quot;result&quot;: &quot;Correct&quot;,
+      &quot;feedback&quot;: &quot;A new change in level of consciousness is never \&quot;just tired\&quot; until you prove it. \&quot;Great sats\&quot; in a patient with COPD whose oxygen was just turned up is a cue, not reassurance.&quot;
+    },
+    {
+      &quot;id&quot;: &quot;14&quot;,
+      &quot;age&quot;: &quot;45-year-old&quot;,
+      &quot;label&quot;: &quot;Post-op day 1&quot;,
+      &quot;report&quot;: &quot;45-year-old, post-op day 1 after laparoscopic abdominal surgery. Pain 7/10, asking for pain medication. Vitals stable at 0600.&quot;,
+      &quot;result&quot;: &quot;Not first&quot;,
+      &quot;feedback&quot;: &quot;Pain matters. Let Room 14 know you'll be back soon, or ask a colleague to check in. But pain with stable vitals is expected post-op; new drowsiness is not.&quot;
+    },
+    {
+      &quot;id&quot;: &quot;9&quot;,
+      &quot;age&quot;: &quot;58-year-old&quot;,
+      &quot;label&quot;: &quot;Discharge teaching&quot;,
+      &quot;report&quot;: &quot;58-year-old admitted for cellulitis, going home this morning. Needs discharge teaching. Stable overnight.&quot;,
+      &quot;result&quot;: &quot;Not first&quot;,
+      &quot;feedback&quot;: &quot;Stable and expected. Discharge teaching can wait until your sicker patients are safe.&quot;
+    }
+  ],
+  &quot;charts&quot;: {
+    &quot;id&quot;: &quot;charts&quot;,
+    &quot;text&quot;: &quot;Review all three charts at the station first&quot;,
+    &quot;result&quot;: &quot;Not first&quot;,
+    &quot;feedback&quot;: &quot;Report already flagged a change in consciousness. See the patient.&quot;
+  },
+  &quot;bedside&quot;: &quot;You're at Room 12's bedside. Tap each finding to see it.&quot;,
+  &quot;cuePrompt&quot;: &quot;Which findings worry you most right now? Select all that apply.&quot;,
+  &quot;cues&quot;: [
+    {
+      &quot;id&quot;: &quot;consciousness&quot;,
+      &quot;label&quot;: &quot;Consciousness&quot;,
+      &quot;text&quot;: &quot;Opens his eyes to his name, then drifts off mid-sentence&quot;,
+      &quot;tier&quot;: &quot;essential&quot;
+    },
+    {
+      &quot;id&quot;: &quot;headache&quot;,
+      &quot;label&quot;: &quot;What he tells you&quot;,
+      &quot;text&quot;: &quot;Says he has a headache&quot;,
+      &quot;tier&quot;: &quot;supporting&quot;
+    },
+    {
+      &quot;id&quot;: &quot;breathing&quot;,
+      &quot;label&quot;: &quot;Breathing&quot;,
+      &quot;text&quot;: &quot;Respiratory rate 10, shallow&quot;,
+      &quot;tier&quot;: &quot;essential&quot;
+    },
+    {
+      &quot;id&quot;: &quot;saturation&quot;,
+      &quot;label&quot;: &quot;Oxygen saturation&quot;,
+      &quot;text&quot;: &quot;SpO2 97% on nasal cannula&quot;,
+      &quot;tier&quot;: &quot;supporting&quot;
+    },
+    {
+      &quot;id&quot;: &quot;heart&quot;,
+      &quot;label&quot;: &quot;Heart rate&quot;,
+      &quot;text&quot;: &quot;Heart rate 108, sinus tachycardia on the monitor&quot;,
+      &quot;tier&quot;: &quot;supporting&quot;
+    },
+    {
+      &quot;id&quot;: &quot;pressure&quot;,
+      &quot;label&quot;: &quot;Blood pressure&quot;,
+      &quot;text&quot;: &quot;BP 152/90&quot;,
+      &quot;tier&quot;: &quot;supporting&quot;
+    },
+    {
+      &quot;id&quot;: &quot;temperature&quot;,
+      &quot;label&quot;: &quot;Temperature&quot;,
+      &quot;text&quot;: &quot;Temp 38.2°C (100.8°F)&quot;,
+      &quot;tier&quot;: &quot;supporting&quot;
+    },
+    {
+      &quot;id&quot;: &quot;skin&quot;,
+      &quot;label&quot;: &quot;Skin&quot;,
+      &quot;text&quot;: &quot;Skin warm and flushed&quot;,
+      &quot;tier&quot;: &quot;supporting&quot;
+    },
+    {
+      &quot;id&quot;: &quot;sounds&quot;,
+      &quot;label&quot;: &quot;Breath sounds&quot;,
+      &quot;text&quot;: &quot;Coarse crackles, right lower lobe&quot;,
+      &quot;tier&quot;: &quot;supporting&quot;
+    },
+    {
+      &quot;id&quot;: &quot;glucose&quot;,
+      &quot;label&quot;: &quot;Point-of-care glucose&quot;,
+      &quot;text&quot;: &quot;Point-of-care glucose 132&quot;,
+      &quot;tier&quot;: &quot;neutral&quot;
+    },
+    {
+      &quot;id&quot;: &quot;mar&quot;,
+      &quot;label&quot;: &quot;Medication record&quot;,
+      &quot;text&quot;: &quot;MAR: an as-needed sedating cough medication was given at 0300&quot;,
+      &quot;tier&quot;: &quot;supporting&quot;
+    }
+  ],
+  &quot;essentialFeedback&quot;: &quot;Declining consciousness plus inadequate breathing is the problem that matters most.&quot;,
+  &quot;supportingFeedback&quot;: &quot;They support the picture of inadequate ventilation, and sedation, infection and fever can all make breathing worse.&quot;,
+  &quot;glucoseFeedback&quot;: &quot;A gentle note: it doesn't explain the drowsiness.&quot;,
+  &quot;teaching&quot;: &quot;SpO2 estimates arterial oxygen saturation. It does not measure how effectively a patient eliminates CO2. CO2 retention is a strong concern here, but not yet a confirmed cause.&quot;,
+  &quot;actions&quot;: [
+    {
+      &quot;id&quot;: &quot;escalate&quot;,
+      &quot;text&quot;: &quot;Stay with him. Check his airway and breathing: rouse him, sit him upright, count his respirations, watch his effort. Call for help: activate rapid response per your facility's criteria and notify the provider.&quot;,
+      &quot;result&quot;: &quot;Correct&quot;,
+      &quot;feedback&quot;: &quot;A new change in mental status with slow, shallow breathing meets typical rapid response criteria. Any staff member can call; you don't need permission. Act on the patient; labs come second.&quot;
+    },
+    {
+      &quot;id&quot;: &quot;wait&quot;,
+      &quot;text&quot;: &quot;Wait for the ABG drawn at 0645 to result, then decide&quot;,
+      &quot;result&quot;: &quot;No&quot;,
+      &quot;feedback&quot;: &quot;The patient in front of you is the emergency. A pending lab should never delay escalation.&quot;
+    },
+    {
+      &quot;id&quot;: &quot;increase&quot;,
+      &quot;text&quot;: &quot;Turn the oxygen up because he's drowsy&quot;,
+      &quot;result&quot;: &quot;No&quot;,
+      &quot;feedback&quot;: &quot;More oxygen can worsen CO2 retention in this patient. Oxygen changes follow orders or protocol.&quot;
+    },
+    {
+      &quot;id&quot;: &quot;stop&quot;,
+      &quot;text&quot;: &quot;Turn the oxygen off because it's causing the problem&quot;,
+      &quot;result&quot;: &quot;No, unsafe&quot;,
+      &quot;feedback&quot;: &quot;Stopping oxygen suddenly can drop oxygen levels dangerously. Changes follow orders or protocol.&quot;
+    },
+    {
+      &quot;id&quot;: &quot;sleep&quot;,
+      &quot;text&quot;: &quot;Let him sleep and recheck in an hour, his oxygen is fine&quot;,
+      &quot;result&quot;: &quot;No&quot;,
+      &quot;feedback&quot;: &quot;This is the trap the scenario teaches. His oxygen is fine; his breathing is not.&quot;
+    },
+    {
+      &quot;id&quot;: &quot;other&quot;,
+      &quot;text&quot;: &quot;Medicate Room 14 first, then come back&quot;,
+      &quot;result&quot;: &quot;No&quot;,
+      &quot;feedback&quot;: &quot;Room 14 is stable. Room 12 is getting worse now.&quot;
+    }
+  ],
+  &quot;abgArrival&quot;: &quot;The rapid response team arrives within minutes and starts evaluating him. While they work, the ABG drawn at 0645 under an existing order results.&quot;,
+  &quot;abg&quot;: [
+    {
+      &quot;label&quot;: &quot;pH&quot;,
+      &quot;value&quot;: &quot;7.26&quot;,
+      &quot;unit&quot;: &quot;&quot;,
+      &quot;range&quot;: &quot;7.35 to 7.45&quot;
+    },
+    {
+      &quot;label&quot;: &quot;PaCO2&quot;,
+      &quot;value&quot;: &quot;68&quot;,
+      &quot;unit&quot;: &quot;mmHg&quot;,
+      &quot;range&quot;: &quot;35 to 45&quot;
+    },
+    {
+      &quot;label&quot;: &quot;HCO3&quot;,
+      &quot;value&quot;: &quot;30&quot;,
+      &quot;unit&quot;: &quot;mEq/L&quot;,
+      &quot;range&quot;: &quot;22 to 26&quot;
+    },
+    {
+      &quot;label&quot;: &quot;PaO2&quot;,
+      &quot;value&quot;: &quot;88&quot;,
+      &quot;unit&quot;: &quot;mmHg (on oxygen)&quot;,
+      &quot;range&quot;: &quot;80 to 100&quot;
+    }
+  ],
+  &quot;interpretations&quot;: [
+    {
+      &quot;id&quot;: &quot;partial&quot;,
+      &quot;text&quot;: &quot;Respiratory acidosis with an elevated bicarbonate&quot;,
+      &quot;result&quot;: &quot;Correct&quot;,
+      &quot;feedback&quot;: &quot;pH 7.26 shows acidemia; PaCO2 68 identifies a respiratory acidifying process. HCO3 30 is elevated. Compensation can raise bicarbonate, but this result alone does not establish chronic CO2 retention or exclude a mixed disorder.&quot;
+    },
+    {
+      &quot;id&quot;: &quot;uncompensated&quot;,
+      &quot;text&quot;: &quot;Respiratory acidosis, uncompensated&quot;,
+      &quot;result&quot;: &quot;Close&quot;,
+      &quot;feedback&quot;: &quot;The respiratory process is right, but HCO3 is elevated, not unchanged. Acute buffering can already raise bicarbonate; its value alone does not tell us the duration or adequacy of compensation.&quot;
+    },
+    {
+      &quot;id&quot;: &quot;full&quot;,
+      &quot;text&quot;: &quot;Respiratory acidosis, fully compensated&quot;,
+      &quot;result&quot;: &quot;No&quot;,
+      &quot;feedback&quot;: &quot;The pH is still acidemic at 7.26. Compensation moves pH toward normal; it does not necessarily restore a normal pH. A normal-range pH would not, by itself, establish appropriate compensation or exclude a mixed disorder.&quot;
+    },
+    {
+      &quot;id&quot;: &quot;metabolic&quot;,
+      &quot;text&quot;: &quot;Metabolic alkalosis&quot;,
+      &quot;result&quot;: &quot;No&quot;,
+      &quot;feedback&quot;: &quot;A pH below 7.35 is acidemia, not the name of the underlying process. The high PaCO2 supports respiratory acidosis. Elevated HCO3 does not make metabolic alkalosis the primary explanation; a concurrent metabolic process still needs context.&quot;
+    },
+    {
+      &quot;id&quot;: &quot;normal&quot;,
+      &quot;text&quot;: &quot;Normal ABG, PaO2 is fine&quot;,
+      &quot;result&quot;: &quot;No&quot;,
+      &quot;feedback&quot;: &quot;PaO2 88 on supplemental oxygen does not make this ABG normal. Acidemia and elevated PaCO2 remain important, and PaO2 does not measure ventilation.&quot;
+    }
+  ],
+  &quot;deeper&quot;: &quot;In a simple respiratory acidosis, HCO3 typically rises about 1 to 2 mEq/L for each 10 mmHg rise in PaCO2 acutely, and about 3 to 4 with chronic renal compensation, relative to a usual baseline near PaCO2 40 and HCO3 24. These are approximate checks, not diagnoses. HCO3 30 does not prove chronic retention or acute-on-chronic disease. Prior blood gases, chemistry, timing and other clinical findings are needed; a mixed disorder remains possible.&quot;,
+  &quot;sbarPrompt&quot;: &quot;The provider calls back while the team is at the bedside. Which SBAR is strongest?&quot;,
+  &quot;sbars&quot;: [
+    {
+      &quot;id&quot;: &quot;a&quot;,
+      &quot;parts&quot;: [
+        [
+          &quot;S&quot;,
+          &quot;I'm the nurse for Room 12, a 71-year-old with COPD and pneumonia. He's become hard to keep awake since about 0400, and I've activated a rapid response.&quot;
+        ],
+        [
+          &quot;B&quot;,
+          &quot;His oxygen was turned up overnight, and he got an as-needed sedating cough medication at 0300.&quot;
+        ],
+        [
+          &quot;A&quot;,
+          &quot;RR 10 and shallow, SpO2 97% on oxygen, HR 108, BP 152/90, temp 38.2. New headache, flushed skin. ABG at 0645: pH 7.26, PaCO2 68, HCO3 30, PaO2 88. I'm concerned his ventilation is inadequate.&quot;
+        ],
+        [
+          &quot;R&quot;,
+          &quot;I need you at the bedside now. Please evaluate him and give orders for his oxygen and breathing support.&quot;
+        ]
+      ],
+      &quot;result&quot;: &quot;Correct&quot;,
+      &quot;feedback&quot;: &quot;Clear concern, the data behind it, a specific request with a time frame.&quot;
+    },
+    {
+      &quot;id&quot;: &quot;b&quot;,
+      &quot;text&quot;: &quot;\&quot;Hi, Room 12 is pretty sleepy and his ABG is off, but his sats are fine. Can you look at him when you get a chance?\&quot;&quot;,
+      &quot;result&quot;: &quot;Too vague&quot;,
+      &quot;feedback&quot;: &quot;\&quot;Sats are fine\&quot; downplays the problem, and \&quot;when you get a chance\&quot; sets no urgency.&quot;
+    },
+    {
+      &quot;id&quot;: &quot;c&quot;,
+      &quot;text&quot;: &quot;A full list of every vital sign and lab since admission, with no stated concern or request.&quot;,
+      &quot;result&quot;: &quot;All data, no message&quot;,
+      &quot;feedback&quot;: &quot;The provider has to guess what you're worried about.&quot;
+    }
+  ],
+  &quot;outcome&quot;: [
+    [
+      &quot;0730&quot;,
+      &quot;With the provider now at the bedside, the team moves Room 12 to a higher level of care for breathing support.&quot;
+    ],
+    [
+      &quot;0750&quot;,
+      &quot;You reassess Room 14's pain.&quot;
+    ],
+    [
+      &quot;0815&quot;,
+      &quot;You finish Room 9's discharge teaching.&quot;
+    ]
+  ],
+  &quot;takeaways&quot;: [
+    &quot;SpO2 estimates arterial oxygen saturation. It does not measure how effectively a patient eliminates CO2. When a patient gets sleepy, check their breathing, not just their sats.&quot;,
+    &quot;When breathing and consciousness change, act on the patient. Labs confirm; they don't decide whether you call for help.&quot;
+  ],
+  &quot;why&quot;: [
+    &quot;In some patients with COPD, too much supplemental oxygen can raise CO2. The main reasons: oxygen relaxes blood vessels in poorly ventilated parts of the lung, which worsens ventilation-perfusion mismatch, and oxygen-rich blood holds less CO2 (the Haldane effect). The old \&quot;hypoxic drive\&quot; explanation plays only a small role.&quot;,
+    &quot;Other things can slow breathing too: sedating medications, tired breathing muscles, and worsening pneumonia. In a real patient, several may be happening at once.&quot;,
+    &quot;That's why many providers order a target SpO2 of 88 to 92% for patients at risk of CO2 retention, then adjust it based on blood gases and the individual patient.&quot;
+  ],
+  &quot;remember&quot;: &quot;drowsiness or confusion, slow or shallow breathing, headache, warm flushed skin, and a \&quot;great\&quot; SpO2 on more oxygen than usual.&quot;,
+  &quot;ask&quot;: &quot;Why can SpO2 look normal when CO2 is high?&quot;,
+  &quot;share&quot;: &quot;I caught the hidden breathing problem in Room 12. Can you? theclinicaledge.org&quot;,
+  &quot;references&quot;: [
+    {
+      &quot;id&quot;: &quot;bts&quot;,
+      &quot;title&quot;: &quot;BTS Guideline for oxygen use in adults in healthcare and emergency settings (O'Driscoll et al., Thorax, May 2017), hospital summary&quot;,
+      &quot;scope&quot;: &quot;88 to 92% target for patients at risk of hypercapnic respiratory failure (Screens 4 and debrief)&quot;,
+      &quot;url&quot;: &quot;https://doi.org/10.1136/thoraxjnl-2016-209729&quot;
+    },
+    {
+      &quot;id&quot;: &quot;copd&quot;,
+      &quot;title&quot;: &quot;Abdo WF, Heunks LMA. Oxygen-induced hypercapnia in COPD: myths and facts. Critical Care 16, 323 (2012)&quot;,
+      &quot;scope&quot;: &quot;V/Q mismatch as the main mechanism, Haldane effect as secondary, hypoxic drive as minor (debrief)&quot;
+    },
+    {
+      &quot;id&quot;: &quot;abg&quot;,
+      &quot;title&quot;: &quot;Merck Manual Professional: Primary Changes and Compensations in Simple Acid-Base Disorders&quot;,
+      &quot;scope&quot;: &quot;Approximate acute/chronic bicarbonate responses in simple disorders; does not establish this patient's baseline (Screen 5)&quot;
+    },
+    {
+      &quot;id&quot;: &quot;acidbase&quot;,
+      &quot;title&quot;: &quot;Merck Manual Professional: Acid-Base Disorders&quot;,
+      &quot;scope&quot;: &quot;Acidemia versus acidosis, expected compensation and mixed disorders (Screen 5)&quot;
+    },
+    {
+      &quot;id&quot;: &quot;rrt&quot;,
+      &quot;title&quot;: &quot;AHRQ PSNet. Rapid Response Systems (primer)&quot;,
+      &quot;scope&quot;: &quot;Acute change in mental status as a calling criterion; any staff member may call (Screen 4)&quot;
+    },
+    {
+      &quot;id&quot;: &quot;judgment&quot;,
+      &quot;title&quot;: &quot;NCSBN Clinical Judgment Measurement Model, overview (OpenStax Medical-Surgical Nursing)&quot;,
+      &quot;scope&quot;: &quot;The clinical judgment steps the decisions map to&quot;
+    }
+  ]
+}</pre></details><details><summary>A2 exact case data</summary><pre>{
+  &quot;calls&quot;: {
+    &quot;410&quot;: &quot;I need to use the bathroom. Now, please.&quot;,
+    &quot;412&quot;: &quot;I feel shaky and jittery. Something's off.&quot;,
+    &quot;416&quot;: &quot;My ride got here early. Can I go home?&quot;
+  },
+  &quot;coverageOptions&quot;: [
+    {
+      &quot;id&quot;: &quot;A&quot;,
+      &quot;text&quot;: &quot;Dee, 414's pressure is dropping and I'm going now. Can you take 412: get his 0742 recheck, reassess him and act on it under the protocol? And watch 410 and 416 until 0800.&quot;,
+      &quot;ack&quot;: &quot;Got it. 412 at 0742, and I'm watching 410 and 416 until 0800.&quot;,
+      &quot;feedback&quot;: &quot;A nurse who is free has accepted 412 and your other rooms out loud.&quot;
+    },
+    {
+      &quot;id&quot;: &quot;B&quot;,
+      &quot;text&quot;: &quot;Priya, can you take 412's 0742 recheck and reassessment as your short task? Dee, can you watch 410 and 416 until 0800?&quot;,
+      &quot;ack&quot;: &quot;Priya: Yes, that's my one task. I'll call you with the result. Dee: Watching 410 and 416 until 0800. When Priya finishes at 0745, I can take 412 through 0800 if she hands him over to me.&quot;,
+      &quot;feedback&quot;: &quot;Two nurses, each within what they offered. Priya's task ends at 0745; 412 still needs Dee's explicit handback.&quot;
+    },
+    {
+      &quot;id&quot;: &quot;C&quot;,
+      &quot;text&quot;: &quot;Jordan, get 412's glucose at 0742 and give the number straight to Dee. Dee, can you see him with that number, act under the protocol, and watch 410 and 416?&quot;,
+      &quot;ack&quot;: &quot;Jordan: 0742, number to Dee. Dee: Got it. I'll go see him with Jordan's number, and watch 410 and 416 until 0800.&quot;,
+      &quot;feedback&quot;: &quot;Jordan collects the number. A named nurse who has accepted the job reassesses him and decides what's next.&quot;
+    },
+    {
+      &quot;id&quot;: &quot;D&quot;,
+      &quot;text&quot;: &quot;Jordan, get 412's glucose at 0742 and call me with the number.&quot;,
+      &quot;ack&quot;: &quot;Jordan: Will do.&quot;,
+      &quot;feedback&quot;: &quot;Jordan can collect the number, but he's still shaky and you'll be busy with 414. Name a nurse who can see him and act on it, and ask someone to watch your other rooms.&quot;
+    },
+    {
+      &quot;id&quot;: &quot;E&quot;,
+      &quot;text&quot;: &quot;Finish what you are doing first, then go to 414.&quot;,
+      &quot;feedback&quot;: &quot;A rising heart rate and falling pressure after surgery shouldn't wait. Hand off what you're doing and go.&quot;
+    },
+    {
+      &quot;id&quot;: &quot;F&quot;,
+      &quot;text&quot;: &quot;Jordan, can you check 414's dressing and tell me if it looks bad?&quot;,
+      &quot;feedback&quot;: &quot;Assessing what the dressing and the patient's change mean is a nursing responsibility. A qualified nurse must respond to 414's deterioration without waiting for Jordan's judgment.&quot;
+    }
+  ],
+  &quot;dispatchAcknowledgement&quot;: {
+    &quot;410&quot;: {
+      &quot;priya&quot;: &quot;I'll help her to the bathroom.&quot;
+    },
+    &quot;412&quot;: {
+      &quot;priya&quot;: &quot;On my way to 412. I'll call you with what I find; I have to hand him back at 0730.&quot;
+    },
+    &quot;416&quot;: {
+      &quot;priya&quot;: &quot;I'll start her teaching if her papers are ready and tell you where I got to.&quot;
+    }
+  },
+  &quot;dispatchFeedback&quot;: {
+    &quot;410&quot;: {
+      &quot;you&quot;: &quot;You can help her. Jordan could also assist with clear directions and follow-up.&quot;,
+      &quot;priya&quot;: &quot;Priya can take this call, though Jordan could assist with clear directions and follow-up.&quot;,
+      &quot;jordanA&quot;: &quot;Jordan has specific fall-safety directions and knows what change to report.&quot;,
+      &quot;jordanB&quot;: &quot;Name her fall risk, how to assist her and what to report back.&quot;,
+      &quot;hold&quot;: &quot;The message discourages getting up alone, but a high-fall-risk patient still waits for help.&quot;
+    },
+    &quot;412&quot;: {
+      &quot;you&quot;: &quot;A nurse responds to the new symptoms now.&quot;,
+      &quot;priya&quot;: &quot;Priya offered one call, accepted 412 and will hand him back at 0730.&quot;,
+      &quot;jordan&quot;: &quot;Jordan may collect a glucose value under this unit's policy, but cannot independently assess or decide what to do for a symptomatic patient. No nurse was sent to 412.&quot;,
+      &quot;hold&quot;: &quot;A symptomatic patient is waiting without a nurse. Send a qualified nurse now.&quot;
+    },
+    &quot;416&quot;: {
+      &quot;you&quot;: &quot;A nurse can start her discharge teaching.&quot;,
+      &quot;priya&quot;: &quot;Priya can start teaching within her offered window if the papers are ready and tell you where she stopped.&quot;,
+      &quot;jordan&quot;: &quot;Jordan can reinforce completed teaching, not provide discharge teaching.&quot;,
+      &quot;holdA&quot;: &quot;She has a specific update and a realistic next check-in.&quot;,
+      &quot;holdB&quot;: &quot;A vague promise leaves her unsure when a nurse will return.&quot;
+    }
+  },
+  &quot;helpOptions&quot;: [
+    {
+      &quot;id&quot;: &quot;provider&quot;,
+      &quot;label&quot;: &quot;Call the surgical provider&quot;
+    },
+    {
+      &quot;id&quot;: &quot;rapid&quot;,
+      &quot;label&quot;: &quot;Call rapid response&quot;,
+      &quot;note&quot;: &quot;Any staff member with significant concern can call&quot;
+    },
+    {
+      &quot;id&quot;: &quot;priya&quot;,
+      &quot;label&quot;: &quot;Message Priya&quot;,
+      &quot;note&quot;: &quot;She can't leave her admission&quot;
+    },
+    {
+      &quot;id&quot;: &quot;recheck&quot;,
+      &quot;label&quot;: &quot;Reinforce the dressing and recheck vitals in 15 minutes first&quot;
+    },
+    {
+      &quot;id&quot;: &quot;rounds&quot;,
+      &quot;label&quot;: &quot;Wait for the surgeon's 0800 rounds&quot;
+    }
+  ],
+  &quot;hold416&quot;: {
+    &quot;A&quot;: &quot;Your nurse knows your ride is here. They'll be in for your discharge teaching by about 0750.&quot;,
+    &quot;B&quot;: &quot;Your nurse will be there soon.&quot;
+  },
+  &quot;jordanDirections&quot;: {
+    &quot;A&quot;: &quot;She's a high fall risk. Use her walker, stay with her the whole time, leave her with the call light in reach and the bed low, and tell me right away if she's dizzy or in more pain.&quot;,
+    &quot;B&quot;: &quot;Can you help 410 to the bathroom?&quot;
+  },
+  &quot;looseEnds&quot;: [
+    {
+      &quot;id&quot;: &quot;412&quot;,
+      &quot;title&quot;: &quot;412 / Mr. Okafor&quot;,
+      &quot;accepted&quot;: &quot;Check in on him when you can, and make sure the treating team knows about this morning's low so they can review his plan under your protocol.&quot;,
+      &quot;acceptedFeedback&quot;: &quot;This follow-up keeps the morning low on the treating team’s radar; it stays queued until coverage is confirmed.&quot;,
+      &quot;other&quot;: &quot;He's back up. Nothing more needed.&quot;,
+      &quot;otherFeedback&quot;: &quot;A normal recheck isn't the end. The team should know about the low so they can decide whether his plan needs to change.&quot;
+    },
+    {
+      &quot;id&quot;: &quot;414&quot;,
+      &quot;title&quot;: &quot;414 / Your role&quot;,
+      &quot;accepted&quot;: &quot;Stay with his care: carry out new orders as they come, keep reassessing and report how he responds.&quot;,
+      &quot;acceptedFeedback&quot;: &quot;The team is here, and you remain responsible for reassessment and reporting.&quot;,
+      &quot;other&quot;: &quot;The team has it now. Head back to your other rooms.&quot;,
+      &quot;otherFeedback&quot;: &quot;He's still your patient. Reassessing and reporting stay with you.&quot;
+    },
+    {
+      &quot;id&quot;: &quot;coverage&quot;,
+      &quot;title&quot;: &quot;Coverage / 410, 412, 416&quot;,
+      &quot;accepted&quot;: &quot;Dee, can you continue covering 410, 412 and 416 through 0830 while I stay with 414? Please call if anything changes. I'll let Priya know.&quot;,
+      &quot;acceptedFeedback&quot;: &quot;The request names the rooms and end time. Coverage is not confirmed until Dee accepts out loud.&quot;,
+      &quot;other&quot;: &quot;They're stable. Let coverage end.&quot;,
+      &quot;otherFeedback&quot;: &quot;Coverage ends at 0800. Stable patients still need a nurse watching. Get a named nurse's acceptance before treating the loop as closed.&quot;
+    },
+    {
+      &quot;id&quot;: &quot;416&quot;,
+      &quot;title&quot;: &quot;416 / Ms. Whitfield&quot;,
+      &quot;accepted&quot;: &quot;Ask the confirmed covering nurse to update her with a realistic time, and finish her teaching as soon as a nurse is free.&quot;,
+      &quot;acceptedFeedback&quot;: &quot;This follow-up asks for an updated expectation and nurse-led teaching; it stays queued until coverage is confirmed.&quot;,
+      &quot;other&quot;: &quot;Ask Jordan to go over her discharge papers so she can leave.&quot;,
+      &quot;otherFeedback&quot;: &quot;Teaching needs a nurse. Jordan can reinforce teaching but can't provide it.&quot;
+    },
+    {
+      &quot;id&quot;: &quot;jordan&quot;,
+      &quot;title&quot;: &quot;Jordan / delegated work&quot;,
+      &quot;accepted&quot;: &quot;Thank Jordan for flagging 414 fast. Tell her you'll take 414's vitals yourself while he's changing, and to tell you right away about any change in your other patients.&quot;,
+      &quot;acceptedFeedback&quot;: &quot;Jordan's report is acknowledged; a changing patient's vitals stay with the RN under this unit's policy.&quot;,
+      &quot;other&quot;: &quot;Ask Jordan to keep doing 414's vitals every 15 minutes.&quot;,
+      &quot;otherFeedback&quot;: &quot;Under this unit's policy, vitals on a patient whose condition is changing stay with the RN.&quot;
+    }
+  ],
+  &quot;patients&quot;: [
+    {
+      &quot;room&quot;: &quot;410&quot;,
+      &quot;name&quot;: &quot;Ruth Alvarez&quot;,
+      &quot;age&quot;: 74,
+      &quot;label&quot;: &quot;Post-op knee&quot;,
+      &quot;report&quot;: &quot;Post-op day 1, right total knee replacement. Up with a walker and one assist. High fall risk. Pain 3/10 at 0600.&quot;
+    },
+    {
+      &quot;room&quot;: &quot;412&quot;,
+      &quot;name&quot;: &quot;James Okafor&quot;,
+      &quot;age&quot;: 58,
+      &quot;label&quot;: &quot;Glucose due&quot;,
+      &quot;report&quot;: &quot;Type 2 diabetes, day 2 for left leg cellulitis. 0600 glucose 78 mg/dL. Ate very little at dinner. Breakfast tray around 0745. Next glucose check due before breakfast.&quot;
+    },
+    {
+      &quot;room&quot;: &quot;414&quot;,
+      &quot;name&quot;: &quot;Leon Park&quot;,
+      &quot;age&quot;: 66,
+      &quot;label&quot;: &quot;Recent surgery&quot;,
+      &quot;report&quot;: &quot;Open bowel surgery ended at 0300; arrived from PACU at 0430. 0700: HR 88, BP 128/74, RR 16, SpO2 96% on room air. Small spot on the abdominal dressing, outlined at 0600.&quot;
+    },
+    {
+      &quot;room&quot;: &quot;416&quot;,
+      &quot;name&quot;: &quot;Dana Whitfield&quot;,
+      &quot;age&quot;: 39,
+      &quot;label&quot;: &quot;Discharge&quot;,
+      &quot;report&quot;: &quot;Admitted for a kidney infection, now feeling well. Discharge today; teaching not done yet. Ride expected around 0900.&quot;
+    }
+  ],
+  &quot;policy&quot;: &quot;A nursing assistant who is checked off may get a bedside glucose value and must report it to the RN right away. The RN reassesses the patient, interprets the result and decides next steps under the hypoglycemia protocol. Vital signs on a patient whose condition is changing are taken by the RN. Real rules depend on state law, competence and hospital policy.&quot;,
+  &quot;reasons&quot;: [
+    {
+      &quot;id&quot;: &quot;change&quot;,
+      &quot;label&quot;: &quot;Most potential to change soon&quot;
+    },
+    {
+      &quot;id&quot;: &quot;due&quot;,
+      &quot;label&quot;: &quot;Something time-sensitive is due&quot;
+    },
+    {
+      &quot;id&quot;: &quot;safety&quot;,
+      &quot;label&quot;: &quot;Highest safety risk if left alone&quot;
+    },
+    {
+      &quot;id&quot;: &quot;quick&quot;,
+      &quot;label&quot;: &quot;Quickest to finish&quot;
+    }
+  ],
+  &quot;references&quot;: [
+    [
+      &quot;NCSBN / ANA National Guidelines for Nursing Delegation&quot;,
+      &quot;https://www.ncsbn.org/public-files/NGND-PosPaper_06.pdf&quot;,
+      &quot;Role, competence, acceptance, directions and follow-up; does not authorize specific local tasks.&quot;
+    ],
+    [
+      &quot;NIDDK Low Blood Glucose&quot;,
+      &quot;https://www.niddk.nih.gov/health-information/diabetes/overview/preventing-problems/low-blood-glucose-hypoglycemia&quot;,
+      &quot;General low-glucose information, not a hospital protocol.&quot;
+    ],
+    [
+      &quot;AHRQ Rapid Response Systems&quot;,
+      &quot;https://psnet.ahrq.gov/primer/rapid-response-systems&quot;,
+      &quot;General principles; facility criteria vary.&quot;
+    ],
+    [
+      &quot;AHRQ TeamSTEPPS Check-Back&quot;,
+      &quot;https://www.ahrq.gov/teamstepps-program/curriculum/communication/tools/checkback.html&quot;,
+      &quot;Closed-loop communication principle.&quot;
+    ]
+  ],
+  &quot;staff&quot;: [
+    {
+      &quot;id&quot;: &quot;you&quot;,
+      &quot;name&quot;: &quot;You&quot;,
+      &quot;role&quot;: &quot;RN&quot;,
+      &quot;early&quot;: &quot;Free at 0720&quot;,
+      &quot;late&quot;: &quot;Go to 414 after coverage is arranged&quot;
+    },
+    {
+      &quot;id&quot;: &quot;jordan&quot;,
+      &quot;name&quot;: &quot;Jordan&quot;,
+      &quot;role&quot;: &quot;Nursing assistant&quot;,
+      &quot;early&quot;: &quot;Finishing vitals; checked off for bedside glucose values&quot;,
+      &quot;late&quot;: &quot;Reports 414 change at 0730, then free&quot;
+    },
+    {
+      &quot;id&quot;: &quot;priya&quot;,
+      &quot;name&quot;: &quot;Priya&quot;,
+      &quot;role&quot;: &quot;Charge RN&quot;,
+      &quot;early&quot;: &quot;Admission isn't here until 0730; can take one call&quot;,
+      &quot;late&quot;: &quot;One short task to 0745; can still make staffing calls&quot;
+    },
+    {
+      &quot;id&quot;: &quot;dee&quot;,
+      &quot;name&quot;: &quot;Dee&quot;,
+      &quot;role&quot;: &quot;Buddy RN, rooms 418–422&quot;,
+      &quot;early&quot;: &quot;Busy with her own rooms&quot;,
+      &quot;late&quot;: &quot;Can watch rooms and take one patient task to 0800&quot;
+    },
+    {
+      &quot;id&quot;: &quot;sam&quot;,
+      &quot;name&quot;: &quot;Sam&quot;,
+      &quot;role&quot;: &quot;Unit secretary&quot;,
+      &quot;early&quot;: &quot;Answers call lights by intercom&quot;,
+      &quot;late&quot;: &quot;Relays messages, not nursing coverage&quot;
+    }
+  ],
+  &quot;v5Steps&quot;: [
+    {
+      &quot;id&quot;: &quot;i&quot;,
+      &quot;text&quot;: &quot;Call Jordan to take over with her before you leave.&quot;,
+      &quot;feedback&quot;: &quot;Jordan: Coming now. I'll stay with her.&quot;
+    },
+    {
+      &quot;id&quot;: &quot;ii&quot;,
+      &quot;text&quot;: &quot;Help her back to bed first: walker, call light in reach, bed low. Then go.&quot;,
+      &quot;feedback&quot;: &quot;About two minutes. She is back in bed before you leave.&quot;
+    },
+    {
+      &quot;id&quot;: &quot;iii&quot;,
+      &quot;text&quot;: &quot;Tell her to pull the cord when she's done, and go.&quot;,
+      &quot;feedback&quot;: &quot;A high fall risk patient left alone in the bathroom may try to get up by herself.&quot;
+    }
+  ]
+}</pre></details><details><summary>frontend/src/modules/the-shift/scenario.js</summary><p class="hash">SHA-256 e917f4c3da9b2eb7fa825be9db399acee1fc8b93a5f66afd96c6345b3d737b09</p><pre>// Revision 2.1: targeted release corrections; original revision 2 is preserved in prototypes.
+// Review status refers to independent clinical qualification, not founder prototype approval.
+export const scenario = {
+  id: 'drowsy-patient-r2',
+  title: 'The Drowsy Patient',
+  reviewStatus: 'Independent nurse approval reported by the founder',
+  report: 'Good morning. Report just ended. You have 3 patients on a med-surg unit.',
+  patients: [
+    { id: '12', age: '71-year-old', label: 'COPD / pneumonia', report: '71-year-old with COPD, admitted 2 days ago for pneumonia. On oxygen by nasal cannula; the flow was turned up overnight because &quot;his sats were dipping.&quot; &quot;He\'s been really sleepy since about 0400, but his sats are great, 97%. Probably just tired, he didn\'t sleep well.&quot;', result: 'Correct', feedback: 'A new change in level of consciousness is never &quot;just tired&quot; until you prove it. &quot;Great sats&quot; in a patient with COPD whose oxygen was just turned up is a cue, not reassurance.' },
+    { id: '14', age: '45-year-old', label: 'Post-op day 1', report: '45-year-old, post-op day 1 after laparoscopic abdominal surgery. Pain 7/10, asking for pain medication. Vitals stable at 0600.', result: 'Not first', feedback: &quot;Pain matters. Let Room 14 know you'll be back soon, or ask a colleague to check in. But pain with stable vitals is expected post-op; new drowsiness is not.&quot; },
+    { id: '9', age: '58-year-old', label: 'Discharge teaching', report: '58-year-old admitted for cellulitis, going home this morning. Needs discharge teaching. Stable overnight.', result: 'Not first', feedback: 'Stable and expected. Discharge teaching can wait until your sicker patients are safe.' },
+  ],
+  charts: { id: 'charts', text: 'Review all three charts at the station first', result: 'Not first', feedback: 'Report already flagged a change in consciousness. See the patient.' },
+  bedside: &quot;You're at Room 12's bedside. Tap each finding to see it.&quot;,
+  cuePrompt: 'Which findings worry you most right now? Select all that apply.',
+  cues: [
+    { id: 'consciousness', label: 'Consciousness', text: 'Opens his eyes to his name, then drifts off mid-sentence', tier: 'essential' },
+    { id: 'headache', label: 'What he tells you', text: 'Says he has a headache', tier: 'supporting' },
+    { id: 'breathing', label: 'Breathing', text: 'Respiratory rate 10, shallow', tier: 'essential' },
+    { id: 'saturation', label: 'Oxygen saturation', text: 'SpO2 97% on nasal cannula', tier: 'supporting' },
+    { id: 'heart', label: 'Heart rate', text: 'Heart rate 108, sinus tachycardia on the monitor', tier: 'supporting' },
+    { id: 'pressure', label: 'Blood pressure', text: 'BP 152/90', tier: 'supporting' },
+    { id: 'temperature', label: 'Temperature', text: 'Temp 38.2°C (100.8°F)', tier: 'supporting' },
+    { id: 'skin', label: 'Skin', text: 'Skin warm and flushed', tier: 'supporting' },
+    { id: 'sounds', label: 'Breath sounds', text: 'Coarse crackles, right lower lobe', tier: 'supporting' },
+    { id: 'glucose', label: 'Point-of-care glucose', text: 'Point-of-care glucose 132', tier: 'neutral' },
+    { id: 'mar', label: 'Medication record', text: 'MAR: an as-needed sedating cough medication was given at 0300', tier: 'supporting' },
+  ],
+  essentialFeedback: 'Declining consciousness plus inadequate breathing is the problem that matters most.',
+  supportingFeedback: 'They support the picture of inadequate ventilation, and sedation, infection and fever can all make breathing worse.',
+  glucoseFeedback: &quot;A gentle note: it doesn't explain the drowsiness.&quot;,
+  teaching: 'SpO2 estimates arterial oxygen saturation. It does not measure how effectively a patient eliminates CO2. CO2 retention is a strong concern here, but not yet a confirmed cause.',
+  actions: [
+    { id: 'escalate', text: &quot;Stay with him. Check his airway and breathing: rouse him, sit him upright, count his respirations, watch his effort. Call for help: activate rapid response per your facility's criteria and notify the provider.&quot;, result: 'Correct', feedback: &quot;A new change in mental status with slow, shallow breathing meets typical rapid response criteria. Any staff member can call; you don't need permission. Act on the patient; labs come second.&quot; },
+    { id: 'wait', text: 'Wait for the ABG drawn at 0645 to result, then decide', result: 'No', feedback: 'The patient in front of you is the emergency. A pending lab should never delay escalation.' },
+    { id: 'increase', text: &quot;Turn the oxygen up because he's drowsy&quot;, result: 'No', feedback: 'More oxygen can worsen CO2 retention in this patient. Oxygen changes follow orders or protocol.' },
+    { id: 'stop', text: &quot;Turn the oxygen off because it's causing the problem&quot;, result: 'No, unsafe', feedback: 'Stopping oxygen suddenly can drop oxygen levels dangerously. Changes follow orders or protocol.' },
+    { id: 'sleep', text: 'Let him sleep and recheck in an hour, his oxygen is fine', result: 'No', feedback: 'This is the trap the scenario teaches. His oxygen is fine; his breathing is not.' },
+    { id: 'other', text: 'Medicate Room 14 first, then come back', result: 'No', feedback: 'Room 14 is stable. Room 12 is getting worse now.' },
+  ],
+  abgArrival: 'The rapid response team arrives within minutes and starts evaluating him. While they work, the ABG drawn at 0645 under an existing order results.',
+  abg: [
+    { label: 'pH', value: '7.26', unit: '', range: '7.35 to 7.45' },
+    { label: 'PaCO2', value: '68', unit: 'mmHg', range: '35 to 45' },
+    { label: 'HCO3', value: '30', unit: 'mEq/L', range: '22 to 26' },
+    { label: 'PaO2', value: '88', unit: 'mmHg (on oxygen)', range: '80 to 100' },
+  ],
+  interpretations: [
+    { id: 'partial', text: 'Respiratory acidosis with an elevated bicarbonate', result: 'Correct', feedback: 'pH 7.26 shows acidemia; PaCO2 68 identifies a respiratory acidifying process. HCO3 30 is elevated. Compensation can raise bicarbonate, but this result alone does not establish chronic CO2 retention or exclude a mixed disorder.' },
+    { id: 'uncompensated', text: 'Respiratory acidosis, uncompensated', result: 'Close', feedback: 'The respiratory process is right, but HCO3 is elevated, not unchanged. Acute buffering can already raise bicarbonate; its value alone does not tell us the duration or adequacy of compensation.' },
+    { id: 'full', text: 'Respiratory acidosis, fully compensated', result: 'No', feedback: 'The pH is still acidemic at 7.26. Compensation moves pH toward normal; it does not necessarily restore a normal pH. A normal-range pH would not, by itself, establish appropriate compensation or exclude a mixed disorder.' },
+    { id: 'metabolic', text: 'Metabolic alkalosis', result: 'No', feedback: 'A pH below 7.35 is acidemia, not the name of the underlying process. The high PaCO2 supports respiratory acidosis. Elevated HCO3 does not make metabolic alkalosis the primary explanation; a concurrent metabolic process still needs context.' },
+    { id: 'normal', text: 'Normal ABG, PaO2 is fine', result: 'No', feedback: 'PaO2 88 on supplemental oxygen does not make this ABG normal. Acidemia and elevated PaCO2 remain important, and PaO2 does not measure ventilation.' },
+  ],
+  deeper: 'In a simple respiratory acidosis, HCO3 typically rises about 1 to 2 mEq/L for each 10 mmHg rise in PaCO2 acutely, and about 3 to 4 with chronic renal compensation, relative to a usual baseline near PaCO2 40 and HCO3 24. These are approximate checks, not diagnoses. HCO3 30 does not prove chronic retention or acute-on-chronic disease. Prior blood gases, chemistry, timing and other clinical findings are needed; a mixed disorder remains possible.',
+  sbarPrompt: 'The provider calls back while the team is at the bedside. Which SBAR is strongest?',
+  sbars: [
+    { id: 'a', parts: [
+      ['S', &quot;I'm the nurse for Room 12, a 71-year-old with COPD and pneumonia. He's become hard to keep awake since about 0400, and I've activated a rapid response.&quot;],
+      ['B', 'His oxygen was turned up overnight, and he got an as-needed sedating cough medication at 0300.'],
+      ['A', &quot;RR 10 and shallow, SpO2 97% on oxygen, HR 108, BP 152/90, temp 38.2. New headache, flushed skin. ABG at 0645: pH 7.26, PaCO2 68, HCO3 30, PaO2 88. I'm concerned his ventilation is inadequate.&quot;],
+      ['R', 'I need you at the bedside now. Please evaluate him and give orders for his oxygen and breathing support.'],
+    ], result: 'Correct', feedback: 'Clear concern, the data behind it, a specific request with a time frame.' },
+    { id: 'b', text: '&quot;Hi, Room 12 is pretty sleepy and his ABG is off, but his sats are fine. Can you look at him when you get a chance?&quot;', result: 'Too vague', feedback: '&quot;Sats are fine&quot; downplays the problem, and &quot;when you get a chance&quot; sets no urgency.' },
+    { id: 'c', text: 'A full list of every vital sign and lab since admission, with no stated concern or request.', result: 'All data, no message', feedback: &quot;The provider has to guess what you're worried about.&quot; },
+  ],
+  outcome: [
+    ['0730', 'With the provider now at the bedside, the team moves Room 12 to a higher level of care for breathing support.'],
+    ['0750', &quot;You reassess Room 14's pain.&quot;],
+    ['0815', &quot;You finish Room 9's discharge teaching.&quot;],
+  ],
+  takeaways: [
+    'SpO2 estimates arterial oxygen saturation. It does not measure how effectively a patient eliminates CO2. When a patient gets sleepy, check their breathing, not just their sats.',
+    &quot;When breathing and consciousness change, act on the patient. Labs confirm; they don't decide whether you call for help.&quot;,
+  ],
+  why: [
+    'In some patients with COPD, too much supplemental oxygen can raise CO2. The main reasons: oxygen relaxes blood vessels in poorly ventilated parts of the lung, which worsens ventilation-perfusion mismatch, and oxygen-rich blood holds less CO2 (the Haldane effect). The old &quot;hypoxic drive&quot; explanation plays only a small role.',
+    'Other things can slow breathing too: sedating medications, tired breathing muscles, and worsening pneumonia. In a real patient, several may be happening at once.',
+    &quot;That's why many providers order a target SpO2 of 88 to 92% for patients at risk of CO2 retention, then adjust it based on blood gases and the individual patient.&quot;,
+  ],
+  remember: 'drowsiness or confusion, slow or shallow breathing, headache, warm flushed skin, and a &quot;great&quot; SpO2 on more oxygen than usual.',
+  ask: 'Why can SpO2 look normal when CO2 is high?',
+  share: 'I caught the hidden breathing problem in Room 12. Can you? theclinicaledge.org',
+  references: [
+    { id: 'bts', title: &quot;BTS Guideline for oxygen use in adults in healthcare and emergency settings (O'Driscoll et al., Thorax, May 2017), hospital summary&quot;, scope: '88 to 92% target for patients at risk of hypercapnic respiratory failure (Screens 4 and debrief)', url: 'https://doi.org/10.1136/thoraxjnl-2016-209729' },
+    { id: 'copd', title: 'Abdo WF, Heunks LMA. Oxygen-induced hypercapnia in COPD: myths and facts. Critical Care 16, 323 (2012)', scope: 'V/Q mismatch as the main mechanism, Haldane effect as secondary, hypoxic drive as minor (debrief)' },
+    { id: 'abg', title: 'Merck Manual Professional: Primary Changes and Compensations in Simple Acid-Base Disorders', scope: 'Approximate acute/chronic bicarbonate responses in simple disorders; does not establish this patient\'s baseline (Screen 5)' },
+    { id: 'acidbase', title: 'Merck Manual Professional: Acid-Base Disorders', scope: 'Acidemia versus acidosis, expected compensation and mixed disorders (Screen 5)' },
+    { id: 'rrt', title: 'AHRQ PSNet. Rapid Response Systems (primer)', scope: 'Acute change in mental status as a calling criterion; any staff member may call (Screen 4)' },
+    { id: 'judgment', title: 'NCSBN Clinical Judgment Measurement Model, overview (OpenStax Medical-Surgical Nursing)', scope: 'The clinical judgment steps the decisions map to' },
+  ],
+};
+
+export const stages = [
+  { time: '0700', label: 'Report', title: 'The Drowsy Patient', decision: null },
+  { time: '0705', label: 'Prioritize', title: 'Who do you see first?', decision: 'priority' },
+  { time: '0710', label: 'Assess', title: 'What worries you?', decision: 'cues' },
+  { time: '0712', label: 'Act', title: 'What do you do right now?', decision: 'action' },
+  { time: '0715', label: 'Interpret', title: 'Read the ABG', decision: 'abg' },
+  { time: '0718', label: 'Communicate', title: 'Make the call.', decision: 'sbar' },
+  { time: '0815', label: 'Debrief', title: 'Your shift, in perspective.', decision: null },
+];
+</pre></details><details><summary>frontend/src/modules/the-shift/progress.js</summary><p class="hash">SHA-256 31a2537816a7620bc79556a53a9b8a805e9794054f9fea962876316323f1b71e</p><pre>import { scenario } from './scenario.js';
+
+export const STORAGE_KEY = 'ce-private-shift-drowsy-r2';
+export const freshProgress = () =&gt; ({ version: 1, stage: 0, viewed: [], revealed: [], selected: [], answers: {}, tomorrow: null });
+const choiceIds = {
+  priority: ['12', '14', '9', 'charts'],
+  action: scenario.actions.map(item =&gt; item.id),
+  abg: scenario.interpretations.map(item =&gt; item.id),
+  sbar: scenario.sbars.map(item =&gt; item.id),
+};
+export function sanitizeProgress(value) {
+  if (!value || value.version !== 1) return freshProgress();
+  const ids = scenario.cues.map(cue =&gt; cue.id);
+  const safeList = (list, allowed) =&gt; Array.isArray(list) ? [...new Set(list.filter(id =&gt; allowed.includes(id)))] : [];
+  const answers = {};
+  for (const [key, allowed] of Object.entries(choiceIds)) if (allowed.includes(value.answers?.[key])) answers[key] = value.answers[key];
+  if (Array.isArray(value.answers?.cues)) answers.cues = safeList(value.answers.cues, ids);
+  let stage = Number.isInteger(value.stage) ? Math.max(0, Math.min(6, value.stage)) : 0;
+  for (const [requiredStage, key] of [[2, 'priority'], [3, 'cues'], [4, 'action'], [5, 'abg'], [6, 'sbar']]) {
+    if (stage &gt;= requiredStage &amp;&amp; answers[key] === undefined) { stage = requiredStage - 1; break; }
+  }
+  const revealed = safeList(value.revealed, ids);
+  return { version: 1, stage, viewed: safeList(value.viewed, ['12', '14', '9']), revealed, selected: safeList(value.selected, revealed), answers, tomorrow: ['Yes', 'Maybe', 'No'].includes(value.tomorrow) ? value.tomorrow : null };
+}
+export function readProgress() {
+  try { return sanitizeProgress(JSON.parse(localStorage.getItem(STORAGE_KEY))); } catch { return freshProgress(); }
+}
+export function cueResult(selected) {
+  return {
+    essential: scenario.cues.filter(cue =&gt; cue.tier === 'essential' &amp;&amp; selected.includes(cue.id)).length,
+    supporting: scenario.cues.filter(cue =&gt; cue.tier === 'supporting' &amp;&amp; selected.includes(cue.id)).length,
+  };
+}
+</pre></details><details><summary>frontend/src/modules/the-shift/shift5/data.js</summary><p class="hash">SHA-256 caf14d826f0094ca208b9febb79f44bfb3aebaecd880c1c64582a60972a062ec</p><pre>export const patients = [
+  { room: '410', name: 'Ruth Alvarez', age: 74, label: 'Post-op knee', report: 'Post-op day 1, right total knee replacement. Up with a walker and one assist. High fall risk. Pain 3/10 at 0600.' },
+  { room: '412', name: 'James Okafor', age: 58, label: 'Glucose due', report: 'Type 2 diabetes, day 2 for left leg cellulitis. 0600 glucose 78 mg/dL. Ate very little at dinner. Breakfast tray around 0745. Next glucose check due before breakfast.' },
+  { room: '414', name: 'Leon Park', age: 66, label: 'Recent surgery', report: 'Open bowel surgery ended at 0300; arrived from PACU at 0430. 0700: HR 88, BP 128/74, RR 16, SpO2 96% on room air. Small spot on the abdominal dressing, outlined at 0600.' },
+  { room: '416', name: 'Dana Whitfield', age: 39, label: 'Discharge', report: 'Admitted for a kidney infection, now feeling well. Discharge today; teaching not done yet. Ride expected around 0900.' },
+];
+export const staff = [
+  { id: 'you', name: 'You', role: 'RN', early: 'Free at 0720', late: 'Go to 414 after coverage is arranged' },
+  { id: 'jordan', name: 'Jordan', role: 'Nursing assistant', early: 'Finishing vitals; checked off for bedside glucose values', late: 'Reports 414 change at 0730, then free' },
+  { id: 'priya', name: 'Priya', role: 'Charge RN', early: &quot;Admission isn't here until 0730; can take one call&quot;, late: 'One short task to 0745; can still make staffing calls' },
+  { id: 'dee', name: 'Dee', role: 'Buddy RN, rooms 418–422', early: 'Busy with her own rooms', late: 'Can watch rooms and take one patient task to 0800' },
+  { id: 'sam', name: 'Sam', role: 'Unit secretary', early: 'Answers call lights by intercom', late: 'Relays messages, not nursing coverage' },
+];
+export const policy = 'A nursing assistant who is checked off may get a bedside glucose value and must report it to the RN right away. The RN reassesses the patient, interprets the result and decides next steps under the hypoglycemia protocol. Vital signs on a patient whose condition is changing are taken by the RN. Real rules depend on state law, competence and hospital policy.';
+export const reasons = [
+  { id: 'change', label: 'Most potential to change soon' },
+  { id: 'due', label: 'Something time-sensitive is due' },
+  { id: 'safety', label: 'Highest safety risk if left alone' },
+  { id: 'quick', label: 'Quickest to finish' },
+];
+export function d1Feedback(room, reason) {
+  if (reason === 'change') return room === '414' ? 'Reasonable. His surgery was recent, so a change is a real concern.' : &quot;Good principle. 414's recent surgery is one reason a nurse might see him early; your room may have its own reasons.&quot;;
+  if (reason === 'due') return room === '412' ? 'Reasonable. His glucose was low-normal, he ate little, and a check is due before breakfast.' : room === '416' ? 'Defensible. Starting teaching early avoids a rushed discharge. Make sure rooms that could change are seen early too.' : 'Fair. 412 and 416 are the rooms with something due soon.';
+  if (reason === 'safety') return room === '410' ? 'Defensible. Her fall risk is real, and an early round can prevent her getting up alone.' : &quot;Fair. 410 is the classic fall risk; 414's recent surgery and 412's low-normal glucose are other kinds of risk.&quot;;
+  return 'Quick wins can help flow, but a first stop is usually chosen by who might change, not by speed.';
+}
+export const calls = {
+  '410': 'I need to use the bathroom. Now, please.',
+  '412': &quot;I feel shaky and jittery. Something's off.&quot;,
+  '416': 'My ride got here early. Can I go home?',
+};
+export const jordanDirections = {
+  A: &quot;She's a high fall risk. Use her walker, stay with her the whole time, leave her with the call light in reach and the bed low, and tell me right away if she's dizzy or in more pain.&quot;,
+  B: 'Can you help 410 to the bathroom?',
+};
+export const hold416 = {
+  A: &quot;Your nurse knows your ride is here. They'll be in for your discharge teaching by about 0750.&quot;,
+  B: 'Your nurse will be there soon.',
+};
+export const dispatchFeedback = {
+  '412': {
+    you: 'A nurse responds to the new symptoms now.', priya: 'Priya offered one call, accepted 412 and will hand him back at 0730.',
+    jordan: &quot;Jordan may collect a glucose value under this unit's policy, but cannot independently assess or decide what to do for a symptomatic patient. No nurse was sent to 412.&quot;,
+    hold: 'A symptomatic patient is waiting without a nurse. Send a qualified nurse now.',
+  },
+  '410': {
+    you: 'You can help her. Jordan could also assist with clear directions and follow-up.',
+    priya: 'Priya can take this call, though Jordan could assist with clear directions and follow-up.',
+    jordanA: 'Jordan has specific fall-safety directions and knows what change to report.',
+    jordanB: 'Name her fall risk, how to assist her and what to report back.',
+    hold: 'The message discourages getting up alone, but a high-fall-risk patient still waits for help.',
+  },
+  '416': {
+    you: 'A nurse can start her discharge teaching.', priya: 'Priya can start teaching within her offered window if the papers are ready and tell you where she stopped.',
+    jordan: 'Jordan can reinforce completed teaching, not provide discharge teaching.',
+    holdA: 'She has a specific update and a realistic next check-in.', holdB: 'A vague promise leaves her unsure when a nurse will return.',
+  },
+};
+export function dispatchText(room, draft) {
+  const person = draft.assignments[room];
+  const extra = room === '410' &amp;&amp; person === 'jordan' ? draft.jordanDirection : room === '416' &amp;&amp; person === 'hold' ? draft.hold416 : '';
+  return dispatchFeedback[room][person + (extra || '')] || dispatchFeedback[room][person];
+}
+export const dispatchAcknowledgement = {
+  '412': { priya: &quot;On my way to 412. I'll call you with what I find; I have to hand him back at 0730.&quot; },
+  '410': { priya: &quot;I'll help her to the bathroom.&quot; },
+  '416': { priya: &quot;I'll start her teaching if her papers are ready and tell you where I got to.&quot; },
+};
+export const coverageOptions = [
+  { id: 'A', text: &quot;Dee, 414's pressure is dropping and I'm going now. Can you take 412: get his 0742 recheck, reassess him and act on it under the protocol? And watch 410 and 416 until 0800.&quot;, ack: &quot;Got it. 412 at 0742, and I'm watching 410 and 416 until 0800.&quot;, feedback: 'A nurse who is free has accepted 412 and your other rooms out loud.' },
+  { id: 'B', text: &quot;Priya, can you take 412's 0742 recheck and reassessment as your short task? Dee, can you watch 410 and 416 until 0800?&quot;, ack: &quot;Priya: Yes, that's my one task. I'll call you with the result. Dee: Watching 410 and 416 until 0800. When Priya finishes at 0745, I can take 412 through 0800 if she hands him over to me.&quot;, feedback: &quot;Two nurses, each within what they offered. Priya's task ends at 0745; 412 still needs Dee's explicit handback.&quot; },
+  { id: 'C', text: &quot;Jordan, get 412's glucose at 0742 and give the number straight to Dee. Dee, can you see him with that number, act under the protocol, and watch 410 and 416?&quot;, ack: &quot;Jordan: 0742, number to Dee. Dee: Got it. I'll go see him with Jordan's number, and watch 410 and 416 until 0800.&quot;, feedback: &quot;Jordan collects the number. A named nurse who has accepted the job reassesses him and decides what's next.&quot; },
+  { id: 'D', text: &quot;Jordan, get 412's glucose at 0742 and call me with the number.&quot;, ack: 'Jordan: Will do.', feedback: &quot;Jordan can collect the number, but he's still shaky and you'll be busy with 414. Name a nurse who can see him and act on it, and ask someone to watch your other rooms.&quot; },
+  { id: 'E', text: 'Finish what you are doing first, then go to 414.', feedback: &quot;A rising heart rate and falling pressure after surgery shouldn't wait. Hand off what you're doing and go.&quot; },
+  { id: 'F', text: &quot;Jordan, can you check 414's dressing and tell me if it looks bad?&quot;, feedback: &quot;Assessing what the dressing and the patient's change mean is a nursing responsibility. A qualified nurse must respond to 414's deterioration without waiting for Jordan's judgment.&quot; },
+];
+export const v5Steps = [
+  { id: 'i', text: 'Call Jordan to take over with her before you leave.', feedback: &quot;Jordan: Coming now. I'll stay with her.&quot; },
+  { id: 'ii', text: 'Help her back to bed first: walker, call light in reach, bed low. Then go.', feedback: 'About two minutes. She is back in bed before you leave.' },
+  { id: 'iii', text: &quot;Tell her to pull the cord when she's done, and go.&quot;, feedback: 'A high fall risk patient left alone in the bathroom may try to get up by herself.' },
+];
+export const helpOptions = [
+  { id: 'provider', label: 'Call the surgical provider' }, { id: 'rapid', label: 'Call rapid response', note: 'Any staff member with significant concern can call' },
+  { id: 'priya', label: 'Message Priya', note: &quot;She can't leave her admission&quot; },
+  { id: 'recheck', label: 'Reinforce the dressing and recheck vitals in 15 minutes first' },
+  { id: 'rounds', label: &quot;Wait for the surgeon's 0800 rounds&quot; },
+];
+export function helpFeedback(selected) {
+  if (selected.includes('recheck')) return &quot;You don't need another number. This trend and how he looks are enough to call now.&quot;;
+  if (selected.includes('rounds')) return &quot;That's 27 minutes for this trend. Call now.&quot;;
+  if (selected.includes('provider') &amp;&amp; selected.includes('rapid')) return 'Bedside help and the team who can act.' + (selected.includes('priya') ? ' Keeping the charge nurse informed is good teamwork.' : '');
+  if (selected.includes('provider')) return 'The surgical team needs to know now.' + (selected.includes('priya') ? ' Keeping the charge nurse informed is good teamwork.' : '');
+  if (selected.includes('rapid')) return &quot;Right when you're seriously concerned; it brings help fast. Make sure the surgical team hears too, per your hospital's process.&quot; + (selected.includes('priya') ? ' Keeping the charge nurse informed is good teamwork.' : '');
+  return &quot;Priya should know, but she can't come to the bedside now. Call the provider or rapid response about this deterioration.&quot;;
+}
+export const looseEnds = [
+  { id: '412', title: '412 / Mr. Okafor', accepted: &quot;Check in on him when you can, and make sure the treating team knows about this morning's low so they can review his plan under your protocol.&quot;, acceptedFeedback: 'This follow-up keeps the morning low on the treating team’s radar; it stays queued until coverage is confirmed.', other: &quot;He's back up. Nothing more needed.&quot;, otherFeedback: &quot;A normal recheck isn't the end. The team should know about the low so they can decide whether his plan needs to change.&quot; },
+  { id: '414', title: '414 / Your role', accepted: 'Stay with his care: carry out new orders as they come, keep reassessing and report how he responds.', acceptedFeedback: 'The team is here, and you remain responsible for reassessment and reporting.', other: 'The team has it now. Head back to your other rooms.', otherFeedback: &quot;He's still your patient. Reassessing and reporting stay with you.&quot; },
+  { id: 'coverage', title: 'Coverage / 410, 412, 416', accepted: &quot;Dee, can you continue covering 410, 412 and 416 through 0830 while I stay with 414? Please call if anything changes. I'll let Priya know.&quot;, acceptedFeedback: 'The request names the rooms and end time. Coverage is not confirmed until Dee accepts out loud.', other: &quot;They're stable. Let coverage end.&quot;, otherFeedback: &quot;Coverage ends at 0800. Stable patients still need a nurse watching. Get a named nurse's acceptance before treating the loop as closed.&quot; },
+  { id: '416', title: '416 / Ms. Whitfield', accepted: 'Ask the confirmed covering nurse to update her with a realistic time, and finish her teaching as soon as a nurse is free.', acceptedFeedback: 'This follow-up asks for an updated expectation and nurse-led teaching; it stays queued until coverage is confirmed.', other: 'Ask Jordan to go over her discharge papers so she can leave.', otherFeedback: &quot;Teaching needs a nurse. Jordan can reinforce teaching but can't provide it.&quot; },
+  { id: 'jordan', title: 'Jordan / delegated work', accepted: &quot;Thank Jordan for flagging 414 fast. Tell her you'll take 414's vitals yourself while he's changing, and to tell you right away about any change in your other patients.&quot;, acceptedFeedback: &quot;Jordan's report is acknowledged; a changing patient's vitals stay with the RN under this unit's policy.&quot;, other: &quot;Ask Jordan to keep doing 414's vitals every 15 minutes.&quot;, otherFeedback: &quot;Under this unit's policy, vitals on a patient whose condition is changing stay with the RN.&quot; },
+];
+export const references = [
+  ['NCSBN / ANA National Guidelines for Nursing Delegation', 'https://www.ncsbn.org/public-files/NGND-PosPaper_06.pdf', 'Role, competence, acceptance, directions and follow-up; does not authorize specific local tasks.'],
+  ['NIDDK Low Blood Glucose', 'https://www.niddk.nih.gov/health-information/diabetes/overview/preventing-problems/low-blood-glucose-hypoglycemia', 'General low-glucose information, not a hospital protocol.'],
+  ['AHRQ Rapid Response Systems', 'https://psnet.ahrq.gov/primer/rapid-response-systems', 'General principles; facility criteria vary.'],
+  ['AHRQ TeamSTEPPS Check-Back', 'https://www.ahrq.gov/teamstepps-program/curriculum/communication/tools/checkback.html', 'Closed-loop communication principle.'],
+];
+</pre></details><details><summary>frontend/src/modules/the-shift/shift5/rules.js</summary><p class="hash">SHA-256 7f43a7eecc267e0da7214f97bdcd29f3d22646f4b26229fb82e36d9ac0ca492d</p><pre>export const VERSION = '0.4';
+export const STORAGE_KEY = 'ce_shift_005_v04';
+export const ROOMS = ['410', '412', '414', '416'];
+export const CALLS = ['410', '412', '416'];
+export const DESTINATIONS = ['you', 'jordan', 'priya', 'hold'];
+export const SEVERITY = ['Unsafe', 'Outside role', 'Revisit', 'Accepted with a note', 'Accepted'];
+
+export function primaryReason(reasons) {
+  return SEVERITY.find(reason =&gt; reasons.includes(reason)) || 'Accepted';
+}
+export function needsBridge(reasons) {
+  return reasons.some(reason =&gt; ['Unsafe', 'Outside role', 'Revisit'].includes(reason));
+}
+export function fresh() {
+  return {
+    version: VERSION, stage: 0, selectedRoom: null,
+    d1: null, d2Draft: { assignments: {}, jordanDirection: null, hold416: null }, d2: null,
+    room412Seen: [], d3: null,
+    d4: { phase: 0, revealed: [], helpDraft: [], help: null, reportDraft: [], report: null, checkback: null },
+    d5: {}, coverageAcknowledged: false, tomorrow: null,
+  };
+}
+
+export function canSubmitDispatch(draft) {
+  const assigned = CALLS.every(room =&gt; DESTINATIONS.includes(draft.assignments[room]));
+  if (!assigned) return false;
+  const staff = ['you', 'jordan', 'priya'];
+  if (staff.some(person =&gt; CALLS.filter(room =&gt; draft.assignments[room] === person).length &gt; 1)) return false;
+  if (draft.assignments['410'] === 'jordan' &amp;&amp; !['A', 'B'].includes(draft.jordanDirection)) return false;
+  if (draft.assignments['416'] === 'hold' &amp;&amp; !['A', 'B'].includes(draft.hold416)) return false;
+  return true;
+}
+
+const PLAN_KEYS = {
+  'you:jordan:hold:A:A': 'V1',
+  'you:jordan:priya:A:-': 'V2',
+  'priya:jordan:you:A:-': 'V3',
+  'you:priya:hold:-:A': 'V4',
+  'priya:you:hold:-:A': 'V5',
+};
+export function dispatchPlan(draft) {
+  const a = draft.assignments;
+  return PLAN_KEYS[[a['412'], a['410'], a['416'], a['410'] === 'jordan' ? draft.jordanDirection : '-', a['416'] === 'hold' ? draft.hold416 : '-'].join(':')] || null;
+}
+export function evaluateDispatch(draft) {
+  if (!canSubmitDispatch(draft)) throw new Error('Incomplete dispatch');
+  const a = draft.assignments;
+  const reasons = {
+    '410': a['410'] === 'hold' ? ['Revisit'] : a['410'] === 'jordan' ? [draft.jordanDirection === 'A' ? 'Accepted' : 'Revisit'] : ['Accepted with a note'],
+    '412': a['412'] === 'jordan' ? ['Outside role', 'Unsafe'] : a['412'] === 'hold' ? ['Unsafe'] : ['Accepted'],
+    '416': a['416'] === 'jordan' ? ['Outside role'] : a['416'] === 'hold' ? [draft.hold416 === 'A' ? 'Accepted' : 'Revisit'] : ['Accepted'],
+  };
+  const plan = dispatchPlan(draft);
+  const bridges = plan ? [] : [{ decision: 'D2', original: structuredClone(draft), story: 'V1', text: &quot;Taking the safer approach: you go to 412, Jordan helps Ms. Alvarez, and Sam tells Ms. Whitfield you'll be in by about 0750.&quot; }];
+  return { submitted: structuredClone(draft), reasons, plan, storyPlan: plan || 'V1', bridges };
+}
+
+export function evaluateCoverage(option, v5Step = null) {
+  if (!['A', 'B', 'C', 'D', 'E', 'F'].includes(option)) throw new Error('Unknown coverage option');
+  const reasons = { A: ['Accepted'], B: ['Accepted'], C: ['Accepted'], D: ['Revisit'], E: ['Unsafe'], F: ['Outside role', 'Unsafe'] }[option];
+  const v5Reasons = v5Step ? ['i', 'ii', 'iii'].includes(v5Step) ? [v5Step === 'iii' ? 'Unsafe' : 'Accepted'] : null : null;
+  if (v5Step &amp;&amp; !v5Reasons) throw new Error('Unknown V5 step');
+  const bridge = needsBridge(reasons) || (v5Reasons &amp;&amp; needsBridge(v5Reasons));
+  return { submitted: { option, v5Step }, reasons, v5Reasons, storyOption: bridge ? 'A' : option,
+    bridges: bridge ? [{ decision: 'D3', original: { option, v5Step }, story: 'A', text: `Taking the safer approach: Dee takes 412 and watches 410 and 416 while you go to 414${v5Step === 'iii' ? ', and Jordan stays with Ms. Alvarez' : ''}.` }] : [] };
+}
+
+export function helpReasons(choices) {
+  if (choices.includes('recheck') || choices.includes('rounds')) return ['Unsafe'];
+  if (choices.includes('provider') || choices.includes('rapid')) return ['Accepted'];
+  return ['Revisit'];
+}
+export function reportChips(revealed) {
+  return [
+    { id: 'trend', text: revealed.includes('vitals') ? 'HR 88 to 118 and BP 128/74 to 92/58' : 'HR 88 to 112 and BP 128/74 to 98/60 since 0700', required: true },
+    ...(revealed.includes('dressing') ? [{ id: 'dressing', text: 'Bright red drainage spreading past the 0600 outline', required: true }] : []),
+    { id: 'symptoms', text: revealed.includes('skin') ? 'Pale, anxious, feels faint; cool and clammy' : 'Pale, anxious, feels faint' },
+    { id: 'surgery', text: 'Surgery ended at 0300' },
+    { id: 'saturation', text: 'SpO2 96% at 0700' },
+  ];
+}
+export function buildReport(selected, revealed) {
+  const chips = reportChips(revealed);
+  const selectedChips = chips.filter(chip =&gt; selected.includes(chip.id));
+  return [&quot;I'm concerned about postoperative deterioration.&quot;, ...(selected.includes('dressing') &amp;&amp; revealed.includes('dressing') ? [&quot;I'm also concerned about possible bleeding.&quot;] : []), ...selectedChips.map(chip =&gt; chip.text + '.'), 'I need you to see him now.'].join(' ');
+}
+export function evaluateReport(selected, revealed) {
+  const available = reportChips(revealed);
+  if (selected.length &gt; 3 || selected.some(id =&gt; !available.some(chip =&gt; chip.id === id))) throw new Error('Invalid report chips');
+  const missed = available.filter(chip =&gt; chip.required &amp;&amp; !selected.includes(chip.id)).map(chip =&gt; chip.id);
+  const saferIds = [...new Set([...selected, ...missed])];
+  return { submitted: [...selected], revealed: [...revealed], reasons: missed.length ? ['Revisit'] : ['Accepted'], missed,
+    line: buildReport(selected, revealed), saferLine: missed.length ? buildReport(saferIds, revealed) : null,
+    bridges: missed.length ? [{ decision: 'D4 report', original: [...selected], story: saferIds, text: 'Taking the safer approach: lead with the observed findings you had available.' }] : [] };
+}
+
+export function evaluateD5(card, choice) {
+  if (!['412', '414', 'coverage', '416', 'jordan'].includes(card) || !['accepted', 'other'].includes(choice)) throw new Error('Invalid loose end');
+  const reasons = choice === 'accepted' ? ['Accepted'] : [card === '416' ? 'Outside role' : 'Revisit'];
+  return { submitted: choice, reasons, storyChoice: 'accepted', bridges: choice === 'accepted' ? [] : [{ decision: `D5 ${card}`, original: choice, story: 'accepted', text: `Taking the safer approach: ${card} receives the accepted follow-up action.` }] };
+}
+
+export function allReasons(state) {
+  return [
+    ...Object.values(state.d2?.reasons || {}).flat(),
+    ...(state.d3?.reasons || []), ...(state.d3?.v5Reasons || []),
+    ...(state.d4.help?.reasons || []), ...(state.d4.report?.reasons || []), ...(state.d4.checkback?.reasons || []),
+    ...Object.values(state.d5 || {}).flatMap(item =&gt; item.reasons),
+  ];
+}
+export function ending(state) {
+  const reasons = allReasons(state);
+  if (reasons.some(r =&gt; r === 'Unsafe' || r === 'Outside role')) return 'C';
+  if (reasons.includes('Revisit')) return 'B';
+  return 'A';
+}
+export function canFinish(state) {
+  return ['412', '414', 'coverage', '416', 'jordan'].every(card =&gt; !!state.d5[card]) &amp;&amp; state.coverageAcknowledged;
+}
+export function dismissTeachingClaim(state) {
+  return !['V2', 'V3'].includes(state.d2?.storyPlan);
+}
+</pre></details><details><summary>frontend/src/modules/the-shift/shift5/Shift5.jsx</summary><p class="hash">SHA-256 78ac15b37743674e1a2eaaf63b0ec8a71aa779169580ff7d5fc452d24b5968b1</p><pre>import { useEffect, useState } from 'react';
+import { patients, staff, policy, reasons, d1Feedback, calls, jordanDirections, hold416, dispatchText, dispatchAcknowledgement, coverageOptions, v5Steps, helpOptions, helpFeedback, looseEnds, references } from './data';
+import { CALLS, SEVERITY, fresh, canSubmitDispatch, evaluateDispatch, evaluateCoverage, helpReasons, reportChips, evaluateReport, evaluateD5, ending, canFinish, dismissTeachingClaim } from './rules';
+import { loadProgress, saveProgress, clearProgress } from './progress';
+import './shift5.css';
+
+const times = ['0700', '0715', '0720', '0724', '0730', '0733', '0800', '0830'];
+const names = { you: 'You', jordan: 'Jordan', priya: 'Priya', hold: 'Hold / Sam' };
+const stageNames = ['Report', 'Plan your round', 'Answer the lights', 'Room 412', 'Cover your rooms', 'Room 414', 'Close the loops', 'Debrief'];
+const coverageSummaries = {
+  A: 'Dee takes 412 and watches 410 + 416',
+  B: 'Priya takes 412 briefly; Dee watches 410 + 416',
+  C: 'Jordan gets the value; Dee reassesses 412',
+  D: 'Jordan reports the value to you',
+  E: 'Finish your current task first',
+  F: 'Ask Jordan to assess 414’s dressing',
+};
+const staffResponsibilities = {
+  early: {
+    you: 'RN assessment and decisions',
+    jordan: 'Routine assistance; reports changes to the RN',
+    priya: 'Charge RN; can accept one call',
+    sam: 'Relays messages, not nursing coverage',
+  },
+  late: {
+    you: 'RN assessment of changing Room 414',
+    jordan: 'Checked-off glucose value; reports to RN',
+    priya: 'One short RN task or staffing call',
+    dee: 'Named room coverage and RN reassessment',
+  },
+};
+const coverageActionLabels = { A: 'Send handoff', B: 'Send handoff', C: 'Send handoff', D: 'Ask Jordan for the value', E: 'Finish current task', F: 'Ask Jordan to check 414' };
+const coverageMessage = (option, plan) =&gt; option.id !== 'E' ? option.text : plan === 'V3' ? &quot;Finish Ms. Whitfield's teaching, then go.&quot; : plan === 'V5' ? 'Finish with Ms. Alvarez, then go.' : &quot;Stay with Mr. Okafor until his 0742 recheck, then go.&quot;;
+const copy = async value =&gt; { try { await navigator.clipboard.writeText(value); return true; } catch { return false; } };
+
+function Flags({ reasons: items }) {
+  if (!items?.length) return null;
+  const sorted = [...items].sort((a, b) =&gt; SEVERITY.indexOf(a) - SEVERITY.indexOf(b));
+  return &lt;span className=&quot;s5-flags&quot; aria-label={`Primary result: ${sorted[0]}; all reasons: ${sorted.join(', ')}`}&gt;{sorted.map((reason, i) =&gt; &lt;span className={`s5-flag s5-${reason.toLowerCase().replaceAll(' ', '-')} ${i === 0 ? 'is-primary' : ''}`} key={`${reason}-${i}`}&gt;{reason}&lt;/span&gt;)}&lt;/span&gt;;
+}
+
+function Choice({ selected, children, onClick, disabled = false, className = '', expanded }) {
+  return &lt;button type=&quot;button&quot; className={`s5-choice ${selected ? 'is-selected' : ''} ${className}`} aria-pressed={!!selected} aria-expanded={expanded} onClick={onClick} disabled={disabled}&gt;{children}&lt;/button&gt;;
+}
+
+function UnitBoard({ state, onSelect, d1Draft }) {
+  const stage = state.stage;
+  const status = room =&gt; {
+    if (stage === 0) return 'Report ready';
+    if (stage === 1) {
+      const order = state.d1?.order || d1Draft.order;
+      return order.includes(room) ? `Visit ${order.indexOf(room) + 1}` : 'On assignment';
+    }
+    if (stage === 2) return CALLS.includes(room) ? 'Call light' : 'Quiet';
+    if (room === '414') return stage &gt;= 6 ? 'Team at bedside' : stage &gt;= 4 ? 'Change reported' : 'Quiet';
+    if (room === '412') return stage &gt;= 6 ? state.coverageAcknowledged ? 'Dee to 0830' : 'Coverage expired' : 'Recheck due 0742';
+    if (stage &gt;= 6) return state.coverageAcknowledged ? 'Dee to 0830' : 'Coverage expired';
+    if (stage &gt;= 4) return state.d3 ? 'Coverage to 0800' : 'Coverage needed';
+    return room === '416' ? 'Ride arrived' : 'Needs assistance';
+  };
+  return &lt;section className={`s5-board ${stage === 4 ? 'is-compact' : ''}`} aria-label=&quot;Four-patient unit board&quot;&gt;
+    &lt;div className=&quot;s5-board-head&quot;&gt;&lt;span&gt;MED-SURG / FOUR ROOMS&lt;/span&gt;&lt;strong&gt;{stage === 5 &amp;&amp; state.d3?.submitted?.v5Step === 'ii' ? '0735' : times[stage]}&lt;/strong&gt;&lt;/div&gt;
+    &lt;div className=&quot;s5-board-grid&quot;&gt;{patients.map(patient =&gt; &lt;button type=&quot;button&quot; key={patient.room} className={`s5-room ${state.selectedRoom === patient.room ? 'is-active' : ''} ${stage === 2 &amp;&amp; CALLS.includes(patient.room) ? 'is-calling' : ''} ${patient.room === '414' &amp;&amp; stage &gt;= 4 &amp;&amp; stage &lt; 7 ? 'is-changing' : ''}`} onClick={() =&gt; onSelect(patient.room)} aria-label={`Room ${patient.room}, ${patient.name}, ${status(patient.room)}`}&gt;
+      &lt;span className=&quot;s5-room-number&quot;&gt;{patient.room}&lt;/span&gt;&lt;span className=&quot;s5-room-status&quot;&gt;{status(patient.room)}&lt;/span&gt;&lt;small&gt;{patient.name}&lt;/small&gt;
+    &lt;/button&gt;)}&lt;/div&gt;
+    {stage &gt;= 4 &amp;&amp; stage &lt; 7 &amp;&amp; &lt;p className=&quot;s5-board-note&quot;&gt;{stage === 6 ? state.coverageAcknowledged ? 'Dee accepted 410, 412 and 416 through 0830.' : '0800 coverage has ended. Dee has offered an extension; acceptance is pending.' : !state.d3 ? 'Coverage is not assigned yet. A named nurse must accept before you leave.' : state.d3.storyOption === 'B' ? 'Priya to Dee: 412 handoff accepted at 0745. Coverage ends 0800.' : 'Dee accepted coverage through 0800. A new handoff is needed afterward.'}&lt;/p&gt;}
+  &lt;/section&gt;;
+}
+
+function Feedback({ children, reasons: items, bridge }) {
+  return &lt;div className=&quot;s5-feedback&quot; role=&quot;status&quot;&gt;&lt;Flags reasons={items} /&gt;&lt;p&gt;{children}&lt;/p&gt;{bridge &amp;&amp; &lt;p className=&quot;s5-bridge&quot;&gt;{bridge}&lt;/p&gt;}&lt;/div&gt;;
+}
+
+function StaffAvailability({ phase }) {
+  const ids = phase === 'late' ? ['you', 'jordan', 'priya', 'dee'] : ['you', 'jordan', 'priya', 'sam'];
+  return &lt;ul className=&quot;s5-staff-list&quot; aria-label=&quot;Staff availability&quot;&gt;
+    {ids.map(id =&gt; {
+      const person = staff.find(item =&gt; item.id === id);
+      return &lt;li key={id}&gt;&lt;div className=&quot;s5-staff-name&quot;&gt;&lt;strong&gt;{person.name}&lt;/strong&gt;&lt;span&gt;{person.role}&lt;/span&gt;&lt;/div&gt;&lt;div&gt;&lt;span className=&quot;s5-staff-availability&quot;&gt;{person[phase]}&lt;/span&gt;&lt;small&gt;{staffResponsibilities[phase][id]}&lt;/small&gt;&lt;/div&gt;&lt;/li&gt;;
+    })}
+  &lt;/ul&gt;;
+}
+
+export default function Shift5({ embedded = false, trackSession = null, debrief = null }) {
+  const [state, setState] = useState(() =&gt; trackSession ? trackSession.initial() : loadProgress());
+  const [d1Draft, setD1Draft] = useState(() =&gt; state.uiDraft?.d1Draft || { order: [], reason: null });
+  const [d3Draft, setD3Draft] = useState(() =&gt; state.uiDraft?.d3Draft || { option: null, v5Step: null });
+  const [checkbackDraft, setCheckbackDraft] = useState(() =&gt; state.uiDraft?.checkbackDraft || null);
+  const [copied, setCopied] = useState(false);
+  useEffect(() =&gt; { const snapshot = { ...state, uiDraft: { d1Draft, d3Draft, checkbackDraft } }; if (trackSession) trackSession.persist(snapshot); else saveProgress(snapshot); }, [state, d1Draft, d3Draft, checkbackDraft, trackSession]);
+  useEffect(() =&gt; {
+    const heading = document.querySelector('.s5-scene h1');
+    heading?.setAttribute('tabindex', '-1');
+    heading?.focus({ preventScroll: true });
+    window.scrollTo(0, 0);
+  }, [state.stage]);
+  const patch = update =&gt; {
+    if (trackSession) {
+      for (const key of ['d2', 'd3']) if (update[key] &amp;&amp; !state[key]) trackSession.observe(key, update[key], state);
+      for (const key of ['help', 'report']) if (update.d4?.[key] &amp;&amp; !state.d4[key]) trackSession.observe(key, update.d4[key], state);
+    }
+    setState(current =&gt; ({ ...current, ...update }));
+  };
+  const next = () =&gt; setState(current =&gt; ({ ...current, stage: current.stage + 1, selectedRoom: null }));
+  const restart = () =&gt; { if (!trackSession) clearProgress(); setState(trackSession ? trackSession.restart() : fresh()); setD1Draft({ order: [], reason: null }); setD3Draft({ option: null, v5Step: null }); setCheckbackDraft(null); };
+  const submitD1 = () =&gt; { if (d1Draft.order.length === 4 &amp;&amp; d1Draft.reason) patch({ d1: structuredClone(d1Draft) }); };
+  const setAssignment = (room, person) =&gt; setState(current =&gt; ({ ...current, d2Draft: { ...current.d2Draft, assignments: { ...current.d2Draft.assignments, [room]: person } } }));
+  const submitD2 = () =&gt; { if (canSubmitDispatch(state.d2Draft)) patch({ d2: evaluateDispatch(state.d2Draft) }); };
+  const submitD3 = () =&gt; { if (d3Draft.option &amp;&amp; (state.d2.storyPlan !== 'V5' || d3Draft.v5Step)) patch({ d3: evaluateCoverage(d3Draft.option, state.d2.storyPlan === 'V5' ? d3Draft.v5Step : null) }); };
+  const toggleRevealed = id =&gt; setState(current =&gt; ({ ...current, d4: { ...current.d4, revealed: current.d4.revealed.includes(id) ? current.d4.revealed : [...current.d4.revealed, id] } }));
+  const toggleHelp = id =&gt; setState(current =&gt; { const exclusive = ['recheck', 'rounds']; const prev = current.d4.helpDraft; const values = exclusive.includes(id) ? [id] : [...prev.filter(item =&gt; !exclusive.includes(item)), ...(prev.includes(id) ? [] : [id])].filter(item =&gt; item !== id || !prev.includes(id)); return { ...current, d4: { ...current.d4, helpDraft: values } }; });
+  const submitHelp = () =&gt; { const selected = state.d4.helpDraft; if (!selected.length) return; const reasons = helpReasons(selected); patch({ d4: { ...state.d4, help: { submitted: [...selected], reasons, bridges: reasons[0] === 'Accepted' ? [] : [{ decision: 'D4 help', original: selected, story: ['provider', 'rapid'], text: 'Taking the safer approach: you call the surgical provider and rapid response now.' }] }, phase: 1 } }); };
+  const toggleChip = id =&gt; setState(current =&gt; { const draft = current.d4.reportDraft; return { ...current, d4: { ...current.d4, reportDraft: draft.includes(id) ? draft.filter(item =&gt; item !== id) : draft.length &lt; 3 ? [...draft, id] : draft } }; });
+  const submitReport = () =&gt; patch({ d4: { ...state.d4, report: evaluateReport(state.d4.reportDraft, state.d4.revealed), phase: 2 } });
+  const submitCheckback = () =&gt; { if (!checkbackDraft) return; const good = checkbackDraft === 'repeat'; patch({ d4: { ...state.d4, checkback: { submitted: checkbackDraft, reasons: [good ? 'Accepted' : 'Revisit'], bridges: good ? [] : [{ decision: 'D4 check-back', original: checkbackDraft, story: 'repeat', text: 'Taking the safer approach: you repeat the plan back and the responder confirms it.' }] }, phase: 3 } }); };
+  const submitEnd = (card, choice) =&gt; setState(current =&gt; ({ ...current, d5: { ...current.d5, [card]: evaluateD5(card, choice) } }));
+  const acknowledgeCoverage = () =&gt; patch({ coverageAcknowledged: true });
+  const first = state.d1?.order?.[0];
+  const d2Plan = state.d2?.storyPlan;
+  const room412Owner = ['V3', 'V5'].includes(d2Plan) ? 'Priya' : 'You';
+  const optional = [
+    { id: 'skin', label: 'Skin', finding: 'Cool and clammy.' },
+    { id: 'dressing', label: 'Dressing', finding: 'Bright red drainage, now well past the 0600 pen outline.' },
+    { id: 'vitals', label: 'Current vitals', finding: `${state.d3?.submitted?.v5Step === 'ii' ? '0735' : '0733'}: HR 118, BP 92/58, RR 22, SpO2 95% on room air.` },
+    { id: 'trend', label: 'Full trend', finding: `0430/0600/0700/0730/${state.d3?.submitted?.v5Step === 'ii' ? '0735' : '0733'}: HR 84/86/88/112/118; systolic BP 132/130/128/98/92.` },
+  ];
+  return &lt;div className={`s5-app${embedded ? ' is-embedded' : ''}`}&gt;
+    &lt;header className=&quot;s5-header&quot;&gt;&lt;span className=&quot;s5-mark&quot;&gt;CE&lt;/span&gt;&lt;span&gt;&lt;strong&gt;THE SHIFT&lt;/strong&gt;&lt;small&gt;SHIFT-005 / Which Patient First?&lt;/small&gt;&lt;/span&gt;&lt;button type=&quot;button&quot; className=&quot;s5-reset&quot; onClick={restart}&gt;Start over&lt;/button&gt;&lt;/header&gt;
+    &lt;div className=&quot;s5-layout&quot;&gt;&lt;aside className=&quot;s5-rail&quot;&gt;&lt;UnitBoard state={state} d1Draft={d1Draft} onSelect={room =&gt; patch({ selectedRoom: room })} /&gt;{state.stage === 2 &amp;&amp; !state.d2 &amp;&amp; &lt;div className=&quot;s5-rail-staff&quot;&gt;&lt;h2&gt;Who’s available?&lt;/h2&gt;&lt;StaffAvailability phase=&quot;early&quot; /&gt;&lt;/div&gt;}&lt;details className=&quot;s5-team&quot;&gt;&lt;summary&gt;View delegation rules&lt;/summary&gt;&lt;p&gt;{policy}&lt;/p&gt;&lt;/details&gt;&lt;/aside&gt;
+      &lt;main className=&quot;s5-main&quot; id=&quot;main&quot;&gt;&lt;div className=&quot;s5-progress&quot;&gt;&lt;span&gt;Step {state.stage + 1} of 8&lt;/span&gt;&lt;span&gt;{stageNames[state.stage]}&lt;/span&gt;&lt;/div&gt;
+      {state.stage === 0 &amp;&amp; &lt;section className=&quot;s5-scene&quot;&gt;&lt;p className=&quot;s5-eyebrow&quot;&gt;NIGHT REPORT&lt;/p&gt;&lt;h1&gt;Which patient first?&lt;/h1&gt;&lt;p className=&quot;s5-lede&quot;&gt;Night shift handed off four patients. Read what you need, then plan your first round.&lt;/p&gt;&lt;div className=&quot;s5-report-list&quot;&gt;{patients.map(patient =&gt; &lt;details key={patient.room}&gt;&lt;summary&gt;&lt;span&gt;ROOM {patient.room}&lt;/span&gt;&lt;strong&gt;{patient.name}, {patient.age}&lt;/strong&gt;&lt;em&gt;{patient.label}&lt;/em&gt;&lt;/summary&gt;&lt;p&gt;{patient.report}&lt;/p&gt;&lt;/details&gt;)}&lt;/div&gt;&lt;p className=&quot;s5-small&quot;&gt;Fictional educational scenario. Progress stays on this device. Not patient-specific care.&lt;/p&gt;&lt;button className=&quot;s5-primary&quot; onClick={next}&gt;Plan my round &lt;span aria-hidden=&quot;true&quot;&gt;→&lt;/span&gt;&lt;/button&gt;&lt;/section&gt;}
+      {state.stage === 1 &amp;&amp; &lt;section className=&quot;s5-scene s5-round-scene&quot;&gt;
+        &lt;p className=&quot;s5-eyebrow&quot;&gt;YOUR FIRST ROUND&lt;/p&gt;
+        &lt;h1&gt;Plan your first round&lt;/h1&gt;
+        {!state.d1 ? &lt;&gt;
+          &lt;p className=&quot;s5-lede&quot;&gt;Choose the order you would visit all four rooms. Tap a room to place it next; tap it again to remove it. Its night report stays below for reference.&lt;/p&gt;
+          &lt;div className=&quot;s5-order&quot; aria-label=&quot;Your planned room order&quot;&gt;&lt;span&gt;FIRST&lt;/span&gt;{[0, 1, 2, 3].map(i =&gt; &lt;div key={i}&gt;{d1Draft.order[i] || '—'}&lt;/div&gt;)}&lt;span&gt;FOURTH&lt;/span&gt;&lt;/div&gt;
+          &lt;div className=&quot;s5-round-rooms&quot;&gt;{patients.map(patient =&gt; &lt;Choice key={patient.room} selected={d1Draft.order.includes(patient.room)} onClick={() =&gt; { patch({ selectedRoom: patient.room }); setD1Draft(current =&gt; ({ ...current, order: current.order.includes(patient.room) ? current.order.filter(room =&gt; room !== patient.room) : [...current.order, patient.room] })); }}&gt;
+            &lt;span className=&quot;s5-round-room-head&quot;&gt;&lt;strong&gt;ROOM {patient.room}&lt;/strong&gt;&lt;span&gt;{patient.label}&lt;/span&gt;&lt;/span&gt;
+            &lt;span className=&quot;s5-round-room-name&quot;&gt;{patient.name}&lt;/span&gt;
+            &lt;small&gt;{d1Draft.order.includes(patient.room) ? `Visit ${d1Draft.order.indexOf(patient.room) + 1}` : 'Add to round'}&lt;/small&gt;
+          &lt;/Choice&gt;)}&lt;/div&gt;
+          &lt;div className=&quot;s5-report-reminder&quot; aria-live=&quot;polite&quot;&gt;
+            &lt;strong&gt;Night report / {state.selectedRoom ? `Room ${state.selectedRoom}` : 'select a room'}&lt;/strong&gt;
+            &lt;p&gt;{patients.find(patient =&gt; patient.room === state.selectedRoom)?.report || 'Tap a room above or on the unit board to bring back its full report while you plan.'}&lt;/p&gt;
+          &lt;/div&gt;
+          &lt;h2&gt;Why did you pick your first room?&lt;/h2&gt;
+          &lt;div className=&quot;s5-choice-grid&quot;&gt;{reasons.map(reason =&gt; &lt;Choice key={reason.id} selected={d1Draft.reason === reason.id} onClick={() =&gt; setD1Draft(current =&gt; ({ ...current, reason: reason.id }))}&gt;{reason.label}&lt;/Choice&gt;)}&lt;/div&gt;
+          &lt;button className=&quot;s5-primary&quot; disabled={d1Draft.order.length !== 4 || !d1Draft.reason} onClick={submitD1}&gt;Set my plan&lt;/button&gt;
+        &lt;/&gt; : &lt;&gt;&lt;Feedback&gt;{d1Feedback(first, state.d1.reason)} How the rooms compare: 414 had surgery recently, which is a reasonable concern. 412 has a check due and was low-normal. 410 is stable but a fall risk. 416 is stable, and her teaching takes time. Several orders are reasonable.&lt;/Feedback&gt;&lt;p className=&quot;s5-path&quot;&gt;Your round: {state.d1.order.join(' → ')}&lt;/p&gt;&lt;button className=&quot;s5-primary&quot; onClick={next}&gt;Continue shift&lt;/button&gt;&lt;/&gt;}
+      &lt;/section&gt;}
+      {state.stage === 2 &amp;&amp; &lt;section className=&quot;s5-scene&quot;&gt;&lt;p className=&quot;s5-eyebrow&quot;&gt;DECISION 2 / 0720&lt;/p&gt;&lt;h1&gt;Three call lights&lt;/h1&gt;&lt;p className=&quot;s5-lede&quot;&gt;You've made your plan. Then three call lights go off. Each person takes one call. You take one too. Hold can take any.&lt;/p&gt;{CALLS.map(room =&gt; &lt;div className=&quot;s5-dispatch&quot; key={room}&gt;&lt;div className=&quot;s5-dispatch-head&quot;&gt;&lt;strong&gt;ROOM {room}&lt;/strong&gt;&lt;span&gt;Sam: “{calls[room]}”&lt;/span&gt;&lt;/div&gt;{!state.d2 ? &lt;&gt;&lt;div className=&quot;s5-destinations&quot;&gt;{['you', 'jordan', 'priya', 'hold'].map(person =&gt; { const taken = person !== 'hold' &amp;&amp; CALLS.some(other =&gt; other !== room &amp;&amp; state.d2Draft.assignments[other] === person); return &lt;Choice key={person} selected={state.d2Draft.assignments[room] === person} disabled={taken} onClick={() =&gt; setAssignment(room, person)}&gt;{names[person]}&lt;/Choice&gt;; })}&lt;/div&gt;{room === '410' &amp;&amp; state.d2Draft.assignments[room] === 'jordan' &amp;&amp; &lt;div className=&quot;s5-subchoice&quot;&gt;&lt;strong&gt;Directions for Jordan&lt;/strong&gt;{Object.entries(jordanDirections).map(([id, line]) =&gt; &lt;Choice key={id} selected={state.d2Draft.jordanDirection === id} onClick={() =&gt; setState(current =&gt; ({ ...current, d2Draft: { ...current.d2Draft, jordanDirection: id } }))}&gt;{line}&lt;/Choice&gt;)}&lt;/div&gt;}{room === '416' &amp;&amp; state.d2Draft.assignments[room] === 'hold' &amp;&amp; &lt;div className=&quot;s5-subchoice&quot;&gt;&lt;strong&gt;Sam's message&lt;/strong&gt;{Object.entries(hold416).map(([id, line]) =&gt; &lt;Choice key={id} selected={state.d2Draft.hold416 === id} onClick={() =&gt; setState(current =&gt; ({ ...current, d2Draft: { ...current.d2Draft, hold416: id } }))}&gt;{line}&lt;/Choice&gt;)}&lt;/div&gt;}{room === '410' &amp;&amp; state.d2Draft.assignments[room] === 'hold' &amp;&amp; &lt;p className=&quot;s5-muted&quot;&gt;Sam: “Please don't get up alone. Someone will be there in a few minutes.”&lt;/p&gt;}{room === '412' &amp;&amp; state.d2Draft.assignments[room] === 'hold' &amp;&amp; &lt;p className=&quot;s5-muted&quot;&gt;Sam: “Someone will be in shortly.”&lt;/p&gt;}&lt;/&gt; : &lt;&gt;&lt;p&gt;Sent to &lt;strong&gt;{names[state.d2.submitted.assignments[room]]}&lt;/strong&gt;. {room === '410' &amp;&amp; state.d2.submitted.assignments[room] === 'jordan' ? jordanDirections[state.d2.submitted.jordanDirection] : room === '416' &amp;&amp; state.d2.submitted.assignments[room] === 'hold' ? hold416[state.d2.submitted.hold416] : ''}&lt;/p&gt;&lt;Feedback reasons={state.d2.reasons[room]}&gt;{dispatchText(room, state.d2.submitted)} {dispatchAcknowledgement[room]?.[state.d2.submitted.assignments[room]] &amp;&amp; &lt;span&gt;Priya: “{dispatchAcknowledgement[room][state.d2.submitted.assignments[room]]}”&lt;/span&gt;}&lt;/Feedback&gt;&lt;/&gt;}&lt;/div&gt;)}{!state.d2 ? &lt;button className=&quot;s5-primary&quot; disabled={!canSubmitDispatch(state.d2Draft)} onClick={submitD2}&gt;Send assignments&lt;/button&gt; : &lt;&gt;&lt;p className=&quot;s5-muted&quot;&gt;{state.d2.plan ? `Dispatch ${state.d2.plan}. Your location at 0730: ${state.d2.storyPlan === 'V3' ? '416' : state.d2.storyPlan === 'V5' ? '410' : '412'}.` : 'No accepted dispatch plan matched the submitted assignments.'}&lt;/p&gt;{state.d2.bridges.map((bridge, i) =&gt; &lt;p className=&quot;s5-bridge&quot; key={i}&gt;{bridge.text}&lt;/p&gt;)}&lt;button className=&quot;s5-primary&quot; onClick={next}&gt;Follow the shift&lt;/button&gt;&lt;/&gt;}&lt;/section&gt;}
+      {state.stage === 3 &amp;&amp; &lt;section className=&quot;s5-scene&quot;&gt;&lt;p className=&quot;s5-eyebrow&quot;&gt;0724–0729 / PARALLEL WORK&lt;/p&gt;&lt;h1&gt;{room412Owner === 'You' ? 'You reach Room 412' : 'Priya calls from Room 412'}&lt;/h1&gt;{room412Owner === 'You' ? &lt;&gt;&lt;p className=&quot;s5-lede&quot;&gt;You are with Mr. Okafor. Explore what is at the bedside, then continue.&lt;/p&gt;{[['bedside', 'Hands trembling. Alert, answers clearly, able to swallow. “I just feel off.”'], ['meter', '0724 glucose: 62 mg/dL.'], ['whiteboard', 'Breakfast tray around 0745.']].map(([id, line]) =&gt; &lt;div key={id}&gt;&lt;Choice selected={state.room412Seen.includes(id)} onClick={() =&gt; patch({ room412Seen: state.room412Seen.includes(id) ? state.room412Seen : [...state.room412Seen, id] })}&gt;Examine {id}&lt;/Choice&gt;{state.room412Seen.includes(id) &amp;&amp; &lt;p className=&quot;s5-finding&quot;&gt;{line}&lt;/p&gt;}&lt;/div&gt;)}&lt;/&gt; : &lt;&gt;&lt;p className=&quot;s5-lede&quot;&gt;{d2Plan === 'V3' ? &quot;You start Ms. Whitfield's teaching.&quot; : 'You help Ms. Alvarez to the bathroom.'}&lt;/p&gt;&lt;blockquote&gt;“412's glucose was 62. He's alert, talking normally and able to swallow. I started our hypoglycemia protocol at 0727; recheck is due at 0742. My admission's here at 0730, so I'm handing him back to you.” &lt;cite&gt;Priya / 0728&lt;/cite&gt;&lt;/blockquote&gt;&lt;/&gt;}
+        &lt;div className=&quot;s5-event&quot;&gt;&lt;strong&gt;0729 / HANDOFF&lt;/strong&gt;&lt;p&gt;{room412Owner === 'You' ? &quot;His glucose is 62 mg/dL, and he's alert and able to swallow. You start the unit's hypoglycemia protocol at 0727. Its recheck is due at 0742.&quot; : 'You acknowledge Priya’s handback.'} Symptoms easing, still a little shaky. Alert.&lt;/p&gt;&lt;/div&gt;&lt;button className=&quot;s5-primary&quot; onClick={next}&gt;Continue to 0730&lt;/button&gt;&lt;/section&gt;}
+      {state.stage === 4 &amp;&amp; &lt;section className=&quot;s5-scene s5-cover-scene&quot;&gt;
+        &lt;p className=&quot;s5-eyebrow&quot;&gt;DECISION 3 / 0730&lt;/p&gt;
+        &lt;h1&gt;Cover your rooms and go&lt;/h1&gt;
+        &lt;h2 className=&quot;s5-section-label&quot;&gt;What changed?&lt;/h2&gt;
+        &lt;div className=&quot;s5-change-alert&quot;&gt;&lt;span&gt;NEW FROM JORDAN / ROOM 414&lt;/span&gt;&lt;p&gt;“414's vitals just now: HR 112, BP 98/60, RR 20. He says he feels lightheaded. At 0700 he was HR 88, BP 128/74.”&lt;/p&gt;&lt;/div&gt;
+        &lt;h2 className=&quot;s5-section-label&quot;&gt;What needs covering?&lt;/h2&gt;
+        &lt;div className=&quot;s5-cover-tasks&quot; aria-label=&quot;Coverage needed&quot;&gt;&lt;div&gt;&lt;b&gt;412&lt;/b&gt;&lt;span&gt;0742 glucose recheck and RN reassessment&lt;/span&gt;&lt;/div&gt;&lt;div&gt;&lt;b&gt;410 + 416&lt;/b&gt;&lt;span&gt;A named RN watching your other rooms&lt;/span&gt;&lt;/div&gt;&lt;div&gt;&lt;b&gt;414&lt;/b&gt;&lt;span&gt;You respond to the reported change&lt;/span&gt;&lt;/div&gt;&lt;/div&gt;
+        {!state.d3 &amp;&amp; &lt;&gt;&lt;h2 className=&quot;s5-section-label&quot;&gt;Who’s available?&lt;/h2&gt;&lt;StaffAvailability phase=&quot;late&quot; /&gt;&lt;/&gt;}
+        {!state.d3 ? &lt;&gt;
+          {d2Plan === 'V5' &amp;&amp; &lt;div className=&quot;s5-v5-handoff&quot;&gt;&lt;h2&gt;First, hand off Room 410&lt;/h2&gt;&lt;p&gt;Ms. Alvarez is still in the bathroom with you. What happens before you go?&lt;/p&gt;{v5Steps.map(step =&gt; &lt;Choice key={step.id} selected={d3Draft.v5Step === step.id} onClick={() =&gt; setD3Draft(current =&gt; ({ ...current, v5Step: step.id }))}&gt;{step.text}&lt;/Choice&gt;)}&lt;/div&gt;}
+          &lt;h2 className=&quot;s5-section-label&quot;&gt;What will you do next?&lt;/h2&gt;
+          &lt;div className=&quot;s5-coverage-options&quot;&gt;{coverageOptions.map(option =&gt; {
+            const selected = d3Draft.option === option.id;
+            return &lt;Choice key={option.id} selected={selected} onClick={() =&gt; setD3Draft(current =&gt; ({ ...current, option: option.id }))}&gt;&lt;strong&gt;{option.id}. {coverageSummaries[option.id]}&lt;/strong&gt;&lt;/Choice&gt;;
+          })}&lt;/div&gt;
+          {d3Draft.option &amp;&amp; &lt;div className=&quot;s5-selected-preview&quot; role=&quot;region&quot; aria-label=&quot;Selected option preview&quot; aria-live=&quot;polite&quot;&gt;&lt;strong&gt;{d3Draft.option === 'E' ? 'Selected action' : 'Selected message'}&lt;/strong&gt;&lt;p&gt;{coverageMessage(coverageOptions.find(option =&gt; option.id === d3Draft.option), d2Plan)}&lt;/p&gt;&lt;/div&gt;}
+          &lt;button className=&quot;s5-primary&quot; disabled={!d3Draft.option || (d2Plan === 'V5' &amp;&amp; !d3Draft.v5Step)} onClick={submitD3}&gt;{coverageActionLabels[d3Draft.option] || 'Choose an option'}&lt;/button&gt;
+        &lt;/&gt; : &lt;&gt;
+          &lt;div className=&quot;s5-submitted-label&quot;&gt;YOUR SUBMITTED PLAN / {coverageSummaries[state.d3.submitted.option]}&lt;/div&gt;
+          &lt;Feedback reasons={[...state.d3.reasons, ...(state.d3.v5Reasons || [])]} bridge={state.d3.bridges[0]?.text}&gt;{coverageOptions.find(item =&gt; item.id === state.d3.submitted.option)?.feedback}{state.d3.submitted.v5Step &amp;&amp; &lt;&gt; {v5Steps.find(item =&gt; item.id === state.d3.submitted.v5Step)?.feedback}&lt;/&gt;}&lt;/Feedback&gt;
+          {coverageOptions.find(item =&gt; item.id === state.d3.storyOption)?.ack &amp;&amp; &lt;blockquote&gt;{coverageOptions.find(item =&gt; item.id === state.d3.storyOption).ack}&lt;cite&gt;Staff acknowledgement / through 0800&lt;/cite&gt;&lt;/blockquote&gt;}
+          {state.d3.storyOption === 'B' &amp;&amp; &lt;div className=&quot;s5-event&quot;&gt;&lt;strong&gt;0742–0745 / NAMED HANDBACK&lt;/strong&gt;&lt;p&gt;Priya: “412's recheck is 104. I reassessed him; he's eating breakfast, which came at 0745. My short task is ending. Dee, will you take 412 along with 410 and 416 until 0800?”&lt;/p&gt;&lt;p&gt;Dee: “Yes. I have 410, 412 and 416 until 0800, and I'll call if something changes.”&lt;/p&gt;&lt;/div&gt;}
+          {state.d3.storyOption !== 'B' &amp;&amp; &lt;p className=&quot;s5-muted&quot;&gt;At 0742, Dee reports glucose 104 and reassessment; he is eating breakfast, which came at 0745.&lt;/p&gt;}
+          {state.d3.submitted.option === 'C' &amp;&amp; &lt;p className=&quot;s5-small&quot;&gt;This arrangement depends on local policy and confirmed staff competency.&lt;/p&gt;}
+          &lt;button className=&quot;s5-primary&quot; onClick={next}&gt;Go to Room 414&lt;/button&gt;
+        &lt;/&gt;}
+      &lt;/section&gt;}
+      {state.stage === 5 &amp;&amp; &lt;section className=&quot;s5-scene&quot;&gt;&lt;p className=&quot;s5-eyebrow&quot;&gt;DECISION 4 / {state.d3?.submitted?.v5Step === 'ii' ? '0735' : '0733'}&lt;/p&gt;&lt;h1&gt;Room 414 is changing&lt;/h1&gt;&lt;p className=&quot;s5-lede&quot;&gt;Jordan's 0730 findings: HR 112, BP 98/60, RR 20; at 0700, HR 88 and BP 128/74. Mr. Park is pale and anxious. “I feel like I might pass out.”&lt;/p&gt;&lt;div className=&quot;s5-investigation&quot;&gt;&lt;h2&gt;Look at the bedside &lt;small&gt;Optional before or after calling&lt;/small&gt;&lt;/h2&gt;{optional.map(item =&gt; &lt;div key={item.id}&gt;&lt;Choice selected={state.d4.revealed.includes(item.id)} disabled={state.d4.phase &gt;= 2 &amp;&amp; !state.d4.revealed.includes(item.id)} onClick={() =&gt; toggleRevealed(item.id)}&gt;{item.label}&lt;/Choice&gt;{state.d4.revealed.includes(item.id) &amp;&amp; &lt;p className=&quot;s5-finding&quot;&gt;{item.finding}&lt;/p&gt;}&lt;/div&gt;)}&lt;/div&gt;
+      {state.d4.phase === 0 &amp;&amp; &lt;&gt;&lt;h2&gt;Call for help now&lt;/h2&gt;&lt;p&gt;Choose who you contact, or a different first action.&lt;/p&gt;&lt;div className=&quot;s5-options&quot;&gt;{helpOptions.map(option =&gt; &lt;Choice key={option.id} selected={state.d4.helpDraft.includes(option.id)} onClick={() =&gt; toggleHelp(option.id)}&gt;{option.label}{option.note &amp;&amp; &lt;small&gt;{option.note}&lt;/small&gt;}&lt;/Choice&gt;)}&lt;/div&gt;&lt;button className=&quot;s5-primary&quot; disabled={!state.d4.helpDraft.length} onClick={submitHelp}&gt;Act now&lt;/button&gt;&lt;/&gt;}
+      {state.d4.phase &gt;= 1 &amp;&amp; &lt;Feedback reasons={state.d4.help.reasons} bridge={state.d4.help.bridges[0]?.text}&gt;{helpFeedback(state.d4.help.submitted)} {state.d4.revealed.length === 0 &amp;&amp; 'Calling when you recognize the pattern is right. Keep assessing while help comes.'}&lt;/Feedback&gt;}
+      {state.d4.phase === 1 &amp;&amp; &lt;&gt;&lt;p className=&quot;s5-muted&quot;&gt;While the call connects, you can keep assessing.&lt;/p&gt;&lt;h2&gt;Lead with what you have seen&lt;/h2&gt;&lt;p&gt;Choose up to three findings. The spoken report will use only your selected observations.&lt;/p&gt;&lt;div className=&quot;s5-options&quot;&gt;{reportChips(state.d4.revealed).map(chip =&gt; &lt;Choice key={chip.id} selected={state.d4.reportDraft.includes(chip.id)} onClick={() =&gt; toggleChip(chip.id)}&gt;{chip.text}&lt;/Choice&gt;)}&lt;/div&gt;&lt;button className=&quot;s5-primary&quot; onClick={submitReport}&gt;Give report&lt;/button&gt;&lt;/&gt;}
+      {state.d4.phase &gt;= 2 &amp;&amp; &lt;&gt;&lt;div className=&quot;s5-event&quot;&gt;&lt;strong&gt;YOUR SUBMITTED REPORT&lt;/strong&gt;&lt;p&gt;{state.d4.report.line}&lt;/p&gt;&lt;/div&gt;&lt;Feedback reasons={state.d4.report.reasons} bridge={state.d4.report.saferLine ? `Taking the safer approach, separately: ${state.d4.report.saferLine}` : null}&gt;{state.d4.report.missed.length ? `You saw ${state.d4.report.missed.map(id =&gt; id === 'trend' ? 'the vital-sign trend' : 'the spreading bright red drainage').join(' and ')}. It's worth saying early.` : 'You led with the observed findings.'}&lt;/Feedback&gt;&lt;/&gt;}
+      {state.d4.phase === 2 &amp;&amp; &lt;&gt;&lt;blockquote&gt;“I'm coming now, about five minutes. Stay with him.” &lt;cite&gt;Responder&lt;/cite&gt;&lt;/blockquote&gt;&lt;h2&gt;Confirm the plan&lt;/h2&gt;&lt;Choice selected={checkbackDraft === 'repeat'} onClick={() =&gt; setCheckbackDraft('repeat')}&gt;Got it: you're coming now, about five minutes. I'll stay with him and call you right away if anything changes.&lt;/Choice&gt;&lt;Choice selected={checkbackDraft === 'okay'} onClick={() =&gt; setCheckbackDraft('okay')}&gt;Okay, thanks.&lt;/Choice&gt;&lt;button className=&quot;s5-primary&quot; disabled={!checkbackDraft} onClick={submitCheckback}&gt;Respond&lt;/button&gt;&lt;/&gt;}
+      {state.d4.phase === 3 &amp;&amp; &lt;&gt;&lt;Feedback reasons={state.d4.checkback.reasons} bridge={state.d4.checkback.bridges[0]?.text}&gt;{state.d4.checkback.submitted === 'repeat' ? &quot;Responder: That's right. See you in five. Repeating the plan and hearing it confirmed closes the loop.&quot; : 'Repeat the plan back so the caller can confirm it.'}&lt;/Feedback&gt;&lt;p className=&quot;s5-muted&quot;&gt;The responder arrives at {state.d3?.submitted?.v5Step === 'ii' ? '0740' : '0738'}.&lt;/p&gt;&lt;button className=&quot;s5-primary&quot; onClick={next}&gt;Check the loose ends&lt;/button&gt;&lt;/&gt;}&lt;/section&gt;}
+      {state.stage === 6 &amp;&amp; &lt;section className=&quot;s5-scene&quot;&gt;&lt;p className=&quot;s5-eyebrow&quot;&gt;DECISION 5 / 0800&lt;/p&gt;&lt;h1&gt;Check your loose ends&lt;/h1&gt;&lt;p className=&quot;s5-lede&quot;&gt;The surgical team is with Mr. Park. Dee's first coverage window has ended. Close these loops in any order; a request is not acceptance.&lt;/p&gt;&lt;div className=&quot;s5-loose-grid&quot;&gt;{looseEnds.map(card =&gt; { const result = state.d5[card.id]; const pathStatus = card.id === '412' ? state.d3.storyOption === 'B' ? &quot;Priya reported 0742 glucose 104 and reassessment; Dee accepted the 0745 handback until 0800.&quot; : &quot;Dee reported 0742 glucose 104 and reassessment; he is eating breakfast.&quot; : card.id === '414' ? 'The surgical team is at his bedside. Orders are coming.' : card.id === 'coverage' ? state.coverageAcknowledged ? 'Dee accepted 410, 412 and 416 to 0830.' : 'Dee offered an extension to 0830; it is not yet accepted.' : card.id === '416' ? d2Plan === 'V2' ? 'Priya started teaching before her admission.' : d2Plan === 'V3' ? 'You started teaching before you left at 0730.' : 'She was told about 0750; teaching has not been completed.' : 'Jordan is still doing vitals on your rooms.'; return &lt;article className=&quot;s5-loose&quot; key={card.id}&gt;&lt;div className=&quot;s5-loose-head&quot;&gt;&lt;h2&gt;{card.title}&lt;/h2&gt;&lt;span&gt;{!result ? 'Open' : card.id === 'coverage' &amp;&amp; !state.coverageAcknowledged ? 'Awaiting Dee' : ['412', '416'].includes(card.id) &amp;&amp; !state.coverageAcknowledged ? 'Pending coverage' : 'Story loop closed'}&lt;/span&gt;&lt;/div&gt;&lt;p&gt;{pathStatus}&lt;/p&gt;{!result ? &lt;&gt;&lt;Choice onClick={() =&gt; submitEnd(card.id, 'accepted')}&gt;{card.accepted}{card.id === 'jordan' &amp;&amp; d2Plan === 'V5' ? ' Also ask how Ms. Alvarez did.' : ''}&lt;/Choice&gt;&lt;Choice onClick={() =&gt; submitEnd(card.id, 'other')}&gt;{card.other}&lt;/Choice&gt;&lt;/&gt; : &lt;&gt;&lt;Feedback reasons={result.reasons} bridge={result.bridges[0] ? `Taking the safer approach: ${card.accepted}` : null}&gt;{result.submitted === 'accepted' ? card.acceptedFeedback : card.otherFeedback}&lt;/Feedback&gt;{card.id === 'coverage' &amp;&amp; !state.coverageAcknowledged &amp;&amp; &lt;div className=&quot;s5-event&quot;&gt;&lt;strong&gt;AWAITING NAMED ACCEPTANCE&lt;/strong&gt;&lt;p&gt;{card.accepted}&lt;/p&gt;&lt;button className=&quot;s5-primary&quot; onClick={acknowledgeCoverage}&gt;Hear Dee's reply&lt;/button&gt;&lt;/div&gt;}{card.id === 'coverage' &amp;&amp; state.coverageAcknowledged &amp;&amp; &lt;blockquote&gt;“Yes. I have 410, 412 and 416 through 0830. I'll call if anything changes.” &lt;cite&gt;Dee / Priya informed&lt;/cite&gt;&lt;/blockquote&gt;}{card.id === '416' &amp;&amp; state.coverageAcknowledged &amp;&amp; &lt;blockquote&gt;“I'll update her now and tell you whether another RN can finish teaching.” &lt;cite&gt;Dee&lt;/cite&gt;&lt;/blockquote&gt;}{['412', '416'].includes(card.id) &amp;&amp; !state.coverageAcknowledged &amp;&amp; &lt;p className=&quot;s5-muted&quot;&gt;Follow-up queued. This loop stays pending until Dee explicitly accepts coverage.&lt;/p&gt;}&lt;/&gt;}&lt;/article&gt;; })}&lt;/div&gt;&lt;button className=&quot;s5-primary&quot; disabled={!canFinish(state)} onClick={next}&gt;See shift debrief&lt;/button&gt;&lt;/section&gt;}
+      {state.stage === 7 &amp;&amp; &lt;section className=&quot;s5-scene&quot;&gt;&lt;p className=&quot;s5-eyebrow&quot;&gt;0830 / END OF SHIFT&lt;/p&gt;&lt;h1&gt;{ending(state) === 'A' ? 'You kept every room covered, called for help early and closed your loops.' : ending(state) === 'B' ? 'Everyone ended up safe. Some steps were filled in by the safer path:' : 'The safer path, as reviewed above:'}&lt;/h1&gt;{ending(state) === 'C' &amp;&amp; &lt;p className=&quot;s5-lede&quot;&gt;This outcome follows the safer choices, not the ones you made at {['D2', 'D3', 'D4', 'D5'].filter((decision) =&gt; decision === 'D2' ? Object.values(state.d2.reasons).flat().some(reason =&gt; ['Unsafe', 'Outside role'].includes(reason)) : decision === 'D3' ? [...state.d3.reasons, ...(state.d3.v5Reasons || [])].some(reason =&gt; ['Unsafe', 'Outside role'].includes(reason)) : decision === 'D4' ? [...state.d4.help.reasons, ...state.d4.report.reasons, ...state.d4.checkback.reasons].some(reason =&gt; ['Unsafe', 'Outside role'].includes(reason)) : Object.values(state.d5).flatMap(item =&gt; item.reasons).some(reason =&gt; ['Unsafe', 'Outside role'].includes(reason))).join(', ')}.&lt;/p&gt;}
+        &lt;div className=&quot;s5-event&quot;&gt;&lt;strong&gt;THE STORY'S ENDING / NOT A SCORE&lt;/strong&gt;&lt;p&gt;0830: The surgical team is with Mr. Park and has a plan. Mr. Okafor finished breakfast and feels like himself. Ms. Alvarez is resting. Ms. Whitfield's ride is waiting. {dismissTeachingClaim(state) ? 'Her discharge teaching is still pending; the covering RN has updated her about the delay.' : 'Her discharge teaching was started earlier; completion is not established here.'}&lt;/p&gt;&lt;/div&gt;
+        &lt;h2&gt;Your shift / submitted choices&lt;/h2&gt;&lt;div className=&quot;s5-debrief&quot;&gt;&lt;article&gt;&lt;strong&gt;D1 / Your first stop&lt;/strong&gt;&lt;p&gt;You started with {first} because {reasons.find(item =&gt; item.id === state.d1.reason)?.label.toLowerCase()}.&lt;/p&gt;&lt;span&gt;Exploratory, not scored&lt;/span&gt;&lt;/article&gt;&lt;article&gt;&lt;strong&gt;D2 / Your dispatch&lt;/strong&gt;{CALLS.map(room =&gt; &lt;p key={room}&gt;{room} → {names[state.d2.submitted.assignments[room]]}{room === '410' &amp;&amp; state.d2.submitted.assignments[room] === 'jordan' ? `: ${jordanDirections[state.d2.submitted.jordanDirection]}` : room === '416' &amp;&amp; state.d2.submitted.assignments[room] === 'hold' ? `: ${hold416[state.d2.submitted.hold416]}` : ''} &lt;Flags reasons={state.d2.reasons[room]} /&gt;&lt;/p&gt;)}{state.d2.bridges.map((bridge, i) =&gt; &lt;p className=&quot;s5-bridge&quot; key={i}&gt;{bridge.text}&lt;/p&gt;)}&lt;/article&gt;&lt;article&gt;&lt;strong&gt;D3 / Your coverage plan&lt;/strong&gt;&lt;p&gt;{coverageOptions.find(item =&gt; item.id === state.d3.submitted.option)?.text}&lt;/p&gt;&lt;Flags reasons={state.d3.reasons} /&gt;{state.d3.submitted.option === 'D' &amp;&amp; &lt;p&gt;You asked Jordan for the number, but no nurse was named to see him.&lt;/p&gt;}{state.d3.submitted.option === 'B' &amp;&amp; &lt;p&gt;Priya's short task ended at 0745; Dee then explicitly accepted 412 through 0800.&lt;/p&gt;}{state.d3.submitted.v5Step &amp;&amp; &lt;p&gt;Before leaving 410: {v5Steps.find(item =&gt; item.id === state.d3.submitted.v5Step)?.text} &lt;Flags reasons={state.d3.v5Reasons} /&gt;&lt;/p&gt;}{state.d3.bridges.map((bridge, i) =&gt; &lt;p className=&quot;s5-bridge&quot; key={i}&gt;{bridge.text}&lt;/p&gt;)}&lt;/article&gt;&lt;article&gt;&lt;strong&gt;D4 / Your escalation&lt;/strong&gt;&lt;p&gt;You chose: {state.d4.help.submitted.map(id =&gt; helpOptions.find(option =&gt; option.id === id)?.label).join('; ')}. &lt;Flags reasons={state.d4.help.reasons} /&gt;&lt;/p&gt;&lt;p&gt;You revealed: {state.d4.revealed.length ? state.d4.revealed.map(id =&gt; optional.find(item =&gt; item.id === id)?.label).join(', ') : 'no optional findings'}.&lt;/p&gt;&lt;p&gt;Your reported line: “{state.d4.report.line}” &lt;Flags reasons={state.d4.report.reasons} /&gt;&lt;/p&gt;{!state.d4.revealed.includes('dressing') &amp;&amp; &lt;p&gt;A quick look at the dressing while help comes can add a key finding.&lt;/p&gt;}{state.d4.report.saferLine &amp;&amp; &lt;p className=&quot;s5-bridge&quot;&gt;Separate safer-path report: “{state.d4.report.saferLine}”&lt;/p&gt;}&lt;p&gt;Check-back: {state.d4.checkback.submitted === 'repeat' ? 'You repeated the plan' : 'You said okay'} &lt;Flags reasons={state.d4.checkback.reasons} /&gt;&lt;/p&gt;{[...state.d4.help.bridges, ...state.d4.checkback.bridges].map((bridge, i) =&gt; &lt;p className=&quot;s5-bridge&quot; key={i}&gt;{bridge.text}&lt;/p&gt;)}&lt;/article&gt;{looseEnds.map(card =&gt; &lt;article key={card.id}&gt;&lt;strong&gt;D5 / {card.title}&lt;/strong&gt;&lt;p&gt;You chose: {state.d5[card.id].submitted === 'accepted' ? card.accepted : card.other} &lt;Flags reasons={state.d5[card.id].reasons} /&gt;&lt;/p&gt;{state.d5[card.id].bridges.map((bridge, i) =&gt; &lt;p className=&quot;s5-bridge&quot; key={i}&gt;Story continuation, not learner credit: {bridge.text} {card.accepted}&lt;/p&gt;)}&lt;/article&gt;)}&lt;/div&gt;
+        &lt;div className=&quot;s5-takeaways&quot;&gt;&lt;p&gt;New and unexpected moves to the front of the line.&lt;/p&gt;&lt;p&gt;Delegate tasks, not judgment.&lt;/p&gt;&lt;p&gt;Every handoff and every promise is a loop to close.&lt;/p&gt;&lt;/div&gt;
+        &lt;h2&gt;Go further&lt;/h2&gt;&lt;p&gt;Optional questions for Ask Clinical Edge. Copy a question, then open Ask to decide whether to submit it. Ask's consent, scope and daily limit still apply.&lt;/p&gt;{[['delegation', 'How do patient stability, staff competence, RN assessment and local policy affect what a nurse can delegate?'], ['bleeding', 'What are early signs of bleeding after surgery?']].map(([topic, question]) =&gt; &lt;div className=&quot;s5-ask&quot; key={question}&gt;&lt;p&gt;{question}&lt;/p&gt;&lt;button type=&quot;button&quot; onClick={async () =&gt; { setCopied(await copy(question)); }}&gt;{copied ? 'Copied' : 'Copy question'}&lt;/button&gt;&lt;a href={`/ask?topic=${topic}`}&gt;Open Ask ↗&lt;/a&gt;&lt;/div&gt;)}
+        &lt;details className=&quot;s5-sources&quot;&gt;&lt;summary&gt;Sources and review limits&lt;/summary&gt;&lt;p&gt;These references support general concepts. The founder reports an independent nurse found no material issues with this scenario; reviewer identity, credentials, date and formal validation are not documented.&lt;/p&gt;{references.map(([name, url, limit]) =&gt; &lt;p key={url}&gt;&lt;a href={url} target=&quot;_blank&quot; rel=&quot;noreferrer&quot;&gt;{name}&lt;/a&gt; — {limit}&lt;/p&gt;)}&lt;/details&gt;
+        {debrief}
+        &lt;div className=&quot;s5-tomorrow&quot;&gt;&lt;h2&gt;Want another shift tomorrow?&lt;/h2&gt;{['Yes', 'Maybe', 'No'].map(answer =&gt; &lt;Choice key={answer} selected={state.tomorrow === answer} onClick={() =&gt; patch({ tomorrow: answer })}&gt;{answer}&lt;/Choice&gt;)}&lt;p className=&quot;s5-small&quot;&gt;Your answer stays on this device.&lt;/p&gt;&lt;/div&gt;&lt;button className=&quot;s5-primary&quot; onClick={restart}&gt;Play again&lt;/button&gt;&lt;/section&gt;}
+      &lt;/main&gt;&lt;/div&gt;&lt;footer className=&quot;s5-footer&quot;&gt;Clinical Edge · Fictional nursing education · Not patient-specific care&lt;/footer&gt;
+  &lt;/div&gt;;
+}
+</pre></details><details><summary>frontend/src/modules/med-surg-track/content.js</summary><p class="hash">SHA-256 d965dec7225b2d8ed6595cf3f33c7ed60458fe6f521b6fc081b40d59be7d26f2</p><pre>export const VERSION = '0.1.0';
+export const MAPPING_VERSION = 'draft-1';
+export const PATH = '/learn/med-surg';
+export const DRAFT = 'Private reviewer preview. New cases, variations and interpretations await qualified clinical and founder review. Not released to learners.';
+export const ASSIGNMENTS = [
+  { id: 'a1', title: 'The Drowsy Patient', sourceVersion: '2.1', number: '01', duration: 'About 5 minutes', image: new URL('../the-shift/assignment-poster.svg', import.meta.url).href, description: 'The morning report is ready. Three patients are waiting.' },
+  { id: 'a2', title: 'Which Patient First?', sourceVersion: '0.4', number: '02', duration: 'About 8 minutes', image: new URL('../the-shift/shift5/poster.svg', import.meta.url).href, description: 'Four rooms, a changing morning and a team to work with.' },
+  { id: 'a3', title: 'Afternoon Handoff', sourceVersion: VERSION, number: '03', duration: 'About 5 minutes', image: null, description: 'The afternoon handoff is yours. Take a look, then decide your next step.' },
+];
+export const CALLS = [
+  { id: 'reassess', title: 'Continue and reassess', detail: 'Continue the current plan with bedside follow-up.' },
+  { id: 'information', title: 'Get specific information', detail: 'Choose the assessment or information you would obtain now.' },
+  { id: 'notify', title: 'Notify the provider', detail: 'Inform the provider through the non-urgent process for review and decisions.' },
+  { id: 'escalate', title: 'Escalate now', detail: 'Request urgent bedside evaluation through the provider or rapid response, following the hospital process.' },
+];
+export const INFORMATION = [
+  ['assessment', 'Full bedside assessment, repeat vitals and level of consciousness'],
+  ['glucose', 'Bedside glucose'],
+  ['history', 'Clarify usual orientation and compare with the chart'],
+  ['wound', 'Inspect the wound and obtain a full set of vitals'],
+];
+export const CONCERNS = [
+  ['infection', 'Possible worsening infection or sepsis'], ['dehydration', 'Dehydration'], ['medication', 'A medication effect'], ['glucose', 'Low blood sugar'], ['acute', 'An acute cause, not sure which yet'], ['tired', 'Tired or sundowning'], ['none', 'No new concern'],
+];
+export const HANDOFF = {
+  intro: 'Helen Ortiz, 81, day 2 for a urinary tract infection and dehydration, on IV antibiotics. Aide’s note at 1330: “A little confused, probably sundowning, she’s tired.” She’s yours for the afternoon.',
+  history: 'Lives alone, independent. Her daughter said on admission: “Sharp as a tack.”',
+  note: '0800 nursing note: Alert and oriented, chatting about her grandkids. Filled out her menu.',
+  bedside: 'Unsure where she is, picking at the sheets. The menu slip is half-finished. She asks for a different pillow.',
+  vitals: [ ['HR', '84', '106', '/min'], ['BP', '132/78', '106/62', 'mmHg'], ['RR', '16', '24', '/min'], ['Temperature', '37.2', '38.4', '°C'], ['SpO₂', '96', '94', '% on room air'] ],
+};
+export const FINDINGS = [ ['confusion', 'Orientation and behaviour'], ['hr', 'Heart rate'], ['rr', 'Respiratory rate'], ['bp', 'Blood pressure'], ['temperature', 'Temperature'], ['saturation', 'Oxygen saturation'], ['pillow', 'Pillow request'], ['menu', 'Menu slip'] ];
+export const CHANGED = ['confusion', 'hr', 'rr', 'bp', 'temperature'];
+export const CHECKS = [
+  { id: 'glucose', title: 'Bedside glucose', result: 'Glucose 108 mg/dL in this fictional example. This does not explain the confusion as current hypoglycaemia; it does not rule out other acute causes.' },
+  { id: 'assessment', title: 'Full vitals and level of consciousness', result: 'Repeat vitals match the 1400 flowsheet. She remains disoriented. Reassessment confirms the reported pattern; bedside evaluation should not be delayed.' },
+  { id: 'sources', title: 'IV site and other possible sources', result: 'IV site clean, no redness or swelling. This local finding does not rule out infection elsewhere or establish its source.' },
+  { id: 'comfort', title: 'Pain or urination', result: 'No new pain reported; urine is more concentrated than this morning. This may add context but does not establish a cause or explain away the other findings.' },
+];
+export const SOURCES = [
+  { id: 'oximetry', title: 'FDA: Pulse Oximeters', url: 'https://www.fda.gov/medical-devices/products-and-medical-procedures/pulse-oximeters', scope: 'Pulse oximetry estimates oxygen saturation and should be interpreted with symptoms. It does not validate a reassuring saturation as a reason to dismiss a change in breathing or alertness.' },
+  { id: 'cjmm', title: 'OpenStax: Clinical Judgment Measurement Model overview', url: 'https://openstax.org/books/medical-surgical-nursing/pages/4-2-clinical-judgment-measurement-model-overview', scope: 'Educational framework for recognising and analysing cues and taking action. This mapping is an authored interpretation, not an endorsed or validated assessment.' },
+  { id: 'cdc', title: 'CDC: About Sepsis', url: 'https://www.cdc.gov/sepsis/about/index.html', scope: 'General symptom constellation and need for evaluation. Does not diagnose the fictional patient or validate the response rules.' },
+  { id: 'process', title: 'CDC: Caring for Patients with Sepsis', url: 'https://www.cdc.gov/sepsis/hcp/clinical-care/index.html', scope: 'Prompt evaluation and use of the facility’s policies and procedures. No treatment orders or national bedside response threshold are inferred.' },
+  { id: 'nice', title: 'NICE NG253: Could this be sepsis?', url: 'https://www.nice.org.uk/guidance/NG253/chapter/could-this-be-sepsis', scope: 'Changes from usual behaviour and circulation or respiration, including presentations without high temperature. UK guidance supports teaching principles; it is not a US hospital protocol.' },
+  { id: 'shock', title: 'OpenStax: Hypovolemic Shock', url: 'https://openstax.org/books/medical-surgical-nursing/pages/23-2-hypovolemic-shock', scope: 'Concern about a postoperative vital-sign trend; no diagnosis of bleeding is established by the limited initial observations.' },
+  { id: 'rrt', title: 'AHRQ PSNet: Rapid Response Systems', url: 'https://psnet.ahrq.gov/primer/rapid-response-systems', scope: 'Escalation principles, with local criteria and process. No medication, oxygen or device changes are instructed.' },
+];
+// Complete branches, not isolated toggles. No ECG or other physiological assets are used.
+export const REWINDS = {
+  a1: [
+    { id: 'a1-oxygen', title: 'Another oxygen reading', history: '71-year-old with COPD and pneumonia, newly sleepy since 0400. No earlier chronic drowsiness. A pending blood gas has not resulted.', facts: ['Still opens his eyes to his name, then drifts off mid-sentence.', 'RR 10, shallow. SpO₂ now 99% on the existing prescribed oxygen.', 'HR 108, BP 152/90, temperature 38.2°C. No other improvement reported.'], preferred: 'escalate', accepted: ['escalate'], info: [], unsafe: ['reassess'], rationale: 'A higher saturation does not explain persistent reduced alertness and slow, shallow breathing. Urgent bedside help is supported without waiting for a blood gas.', alternatives: 'Assessment continues while help comes. Non-urgent notification or information gathering alone would delay the response to the current findings.', sources: ['oximetry', 'rrt'], focus: 'Breathing and alertness, together' },
+    { id: 'a1-nap', title: 'After lunch', history: 'Complete alternative history: admitted with improving pneumonia, no new drowsiness overnight and no sedating medicine in this branch. Daughter reports a usual after-lunch nap.', facts: ['Sleepy after lunch but wakes easily to voice, answers clearly and remains engaged.', 'RR 18 with normal effort; no new breathing difficulty. SpO₂ 97% on unchanged prescribed oxygen.', 'HR 88, BP 128/76, temperature 37.0°C, unchanged from the morning assessment.'], preferred: 'reassess', accepted: ['reassess', 'information'], info: ['assessment', 'history'], unsafe: [], rationale: 'The reported explanation fits the current alertness, breathing and unchanged observations. Continue bedside follow-up rather than assuming an acute deterioration.', alternatives: 'Clarifying the usual pattern or repeating the assessment is reasonable. Escalation is not required by the stated findings; escalate if new concern appears.', sources: ['rrt'], focus: 'Does the explanation fit?' },
+    { id: 'a1-clarify', title: 'A different bedside check', history: '71-year-old with COPD and pneumonia. Earlier this morning he was alert, RR 18; saturation 97% on the current prescribed oxygen.', facts: ['Now wakes to voice but drifts off mid-sentence. RR 12; oxygen reading remains 97%.', 'HR 96, BP 132/78, temperature 37.2°C. No increased work of breathing reported.', 'A full bedside assessment and repeat observations have not yet been obtained.'], preferred: 'information', accepted: ['information', 'notify', 'escalate'], info: ['assessment'], unsafe: [], rationale: 'A full assessment and recheck now clarify the new reduction in alertness. The saturation does not explain it. Reassessment must be immediate, not a plan to wait.', alternatives: 'Provider notification or urgent bedside escalation is also reasonable for the new change or local criteria. This is a borderline draft and needs explicit reviewer agreement.', sources: ['oximetry', 'rrt'], focus: 'Clarify a new change now' },
+  ],
+  a2: [
+    { id: 'a2-trend', title: 'Inside the outline', history: 'Room 414, arriving at 0733 after surgery ended at 0300. At 0700 HR 88 and BP 128/74. No new dressing spread has been observed in this branch.', facts: ['HR 112, BP 98/60, RR 20. Pale, lightheaded and anxious.', 'Drainage remains inside the 0600 outline.', 'The repeated bedside observations confirm the trend reported at 0730.'], preferred: 'escalate', accepted: ['escalate'], info: [], unsafe: ['reassess'], rationale: 'The rising heart rate, falling BP and symptoms support urgent evaluation even without dressing expansion. The trend is enough to call; do not infer a bleeding diagnosis from the outline alone.', alternatives: 'Continue assessment while requesting help. Information gathering alone or non-urgent notification does not match this confirmed symptomatic deterioration.', sources: ['shock', 'rrt'], focus: 'The patient and the trend' },
+    { id: 'a2-update', title: 'A call from the family', history: 'Complete alternative recovery: at 0700 HR 90, BP 126/74, comfortable. There was no earlier report of a falling BP or lightheadedness.', facts: ['At 0733 HR 90, BP 126/74, RR 16, SpO₂ 97%, temperature 36.9°C; comfortable and alert.', 'Dressing unchanged and drainage inside its outline. No new symptoms.', 'His daughter calls the desk for an update.'], preferred: 'reassess', accepted: ['reassess'], info: [], unsafe: [], rationale: 'A family request does not change the patient’s current condition. Continue routine assessment and provide an update through the appropriate process.', alternatives: 'Escalation for acute deterioration is not supported by these unchanged observations. Concerns not stated here would require a new assessment.', sources: ['shock'], focus: 'Match the response to the findings' },
+    { id: 'a2-wound', title: 'At the dressing', history: 'Complete alternative recovery: at 0700 HR 90 and BP 126/74; comfortable, no prior hypotensive trend. Drainage was at the marked edge.', facts: ['At 0733 HR 90, BP 126/74, RR 16, SpO₂ 97%, temperature 36.9°C; alert and comfortable.', 'A small area of drainage is just past the outline; amount and wound appearance have not yet been assessed.', 'No dizziness, faintness or other deterioration reported.'], preferred: 'information', accepted: ['information', 'notify'], info: ['wound', 'assessment'], unsafe: [], rationale: 'Inspect the wound and obtain full observations now to clarify the small new finding. The stable bedside picture does not itself require urgent help.', alternatives: 'Non-urgent provider notification is reasonable. Reassess the urgency if the inspection or trend is concerning. Exact appearance/amount remains an unresolved draft detail.', sources: ['shock'], focus: 'Get the information that matters' },
+  ],
+  a3: [
+    { id: 'a3-no-fever', title: 'Temperature check', history: 'Helen Ortiz, 81, day 2 for UTI and dehydration on IV antibiotics. Independent at baseline; no known chronic confusion. At 0800 alert, HR 84, BP 132/78, RR 16, SpO₂ 96%, temperature 37.2°C.', facts: ['At 1400 newly unsure where she is and picking at the sheets.', 'HR 106, BP 106/62, RR 24, SpO₂ 94%; temperature 37.0°C.', 'The aide’s “probably sundowning” explanation has not been established as her usual pattern.'], preferred: 'escalate', accepted: ['escalate'], info: [], unsafe: ['reassess'], rationale: 'The absence of fever does not rule out sepsis. Assess the whole clinical picture, including changes from baseline. These combined changes support urgent bedside evaluation; the cause is not established.', alternatives: 'Assessment and the hospital’s sepsis or deterioration process can proceed together. Non-urgent notification alone understates the current concern.', sources: ['nice', 'cdc', 'process'], focus: 'Look at the whole current picture' },
+    { id: 'a3-usual', title: 'A fuller admission history', history: 'History updated throughout: Helen has had memory problems for months and usually becomes confused in the afternoons. Her daughter described that pattern on admission; there is no “sharp as a tack” history or new decline in this branch. The 0800 note described her usual morning orientation.', facts: ['At 1400 her orientation matches the daughter’s usual afternoon description; she engages and reports no new symptoms.', 'HR 84, BP 132/78, RR 16, temperature 37.2°C, SpO₂ 96%, matching 0800.', 'No new difficulty breathing, perfusion change or distress is reported.'], preferred: 'reassess', accepted: ['reassess', 'information', 'notify'], info: ['history', 'assessment'], unsafe: [], rationale: 'This description fits a documented baseline pattern with unchanged observations. Continue assessment without treating chronic cognitive difficulty as proof of a new acute cause.', alternatives: 'Compare with usual orientation or inform the provider if uncertainty remains. A known pattern does not prevent acute illness; escalate for a new change or concern.', sources: ['nice'], focus: 'Establish what is usual' },
+    { id: 'a3-therapy', title: 'After physical therapy', history: 'Helen remains independent at cognitive baseline. At 0800 alert and oriented; she has just completed physical therapy at 1400. No earlier afternoon confusion is present in this branch.', facts: ['Oriented and answering clearly; says she is tired after physical therapy.', 'HR 84, BP 132/78, RR 16, temperature 37.2°C, SpO₂ 96%, matching 0800.', 'No new confusion, breathing difficulty or other symptom is reported.'], preferred: 'reassess', accepted: ['reassess'], info: [], unsafe: [], rationale: 'Tiredness after activity fits the stated current findings. Continue follow-up; escalation for a worsening pattern is not supported when that pattern is absent.', alternatives: 'New symptoms or uncertainty would justify reassessment and a different response. No conclusion about infection resolution is established.', sources: ['nice'], focus: 'Keep the plan when the picture fits' },
+  ],
+};
+export const OPEN_QUESTIONS = [
+  'A1: priority feedback identifies the alertness cue before cue selection, and cue teaching precedes action/SBAR. All mapped choices in the unmodified sequence are conservatively assisted. No independent card or Strong claim is produced. Review whether a later teaching-flow revision is warranted.',
+  'A2: D3 is a coverage/action proxy, not a separate cue-recognition or false-reassurance test. D4 explicitly prompts a call. Confirm the limited feedback wording and mapping.',
+  'A1 middle branch: new drifting off can justify urgent escalation despite otherwise stable observations. Confirm assessment-now, notification and escalation alternatives.',
+  'A2 middle branch: specify clinically meaningful amount/appearance and local wound reporting expectations before learner release.',
+  'A3: confirm urgency and hospital-process wording, plausible combined change, and fairness as an application case.',
+  'A3: medication effect or hypoglycaemia remains an unconfirmed acute hypothesis; accept only with acute findings and matched escalation, with no diagnosis claim.',
+  'A3 Rewind has two reassessment branches and no artificially constructed middle-urgency branch, following the updated build request’s clinical-coherence priority. Confirm this departure from the draft balance table.',
+  'Confirm that the three cases test the same component sufficiently for a formative comparison. No causal learning-effect claim is made.',
+];
+</pre></details><details><summary>frontend/src/modules/med-surg-track/evidence.js</summary><p class="hash">SHA-256 0ad4033423c7664e67ee0784f2703b422e859c22bcfa673c63f95237dc9dfb9c</p><pre>import { CHANGED, CONCERNS, FINDINGS } from './content.js';
+import { scenario } from '../the-shift/scenario.js';
+import { coverageOptions, helpOptions } from '../the-shift/shift5/data.js';
+import { primaryReason } from '../the-shift/shift5/rules.js';
+export const COMPONENTS = ['C1', 'C2', 'C3'];
+const bad = label =&gt; ['Unsafe', 'Outside role', 'Revisit'].includes(label);
+export const accepted = label =&gt; ['Accepted', 'Accepted with a note'].includes(label);
+const specs = {
+  a1: { C1: ['cues'], C2: ['action'], C3: ['action', 'sbar'] },
+  a2: { C1: ['d3'], C2: ['d3'], C3: ['help', 'report'] },
+  a3: { C1: ['findings'], C2: ['concern'], C3: ['call'] },
+};
+export function mappedRecord(assignment, key, value, before = {}) {
+  let label = 'Accepted', components = [], description = '', why = '', assistance = [];
+  if (assignment === 'a1') {
+    if (before.answers?.priority &amp;&amp; before.answers.priority !== '12') assistance.push('Earlier priority safer path');
+    if (key === 'cues') {
+      if (before.answers?.priority !== undefined) assistance.push('Priority feedback identified the alertness cue before cue selection');
+      components = ['C1']; label = ['consciousness', 'breathing'].every(id =&gt; value.includes(id)) ? 'Accepted' : 'Revisit';
+      description = 'Selected ' + value.map(id =&gt; scenario.cues.find(c =&gt; c.id === id)?.label || id).join(', ');
+      why = 'Reduced alertness and slow, shallow breathing are the two essential cues in the existing case.';
+    }
+    if (key === 'action') {
+      components = ['C2', 'C3']; label = value === 'escalate' ? 'Accepted' : value === 'stop' ? 'Unsafe' : 'Revisit';
+      description = scenario.actions.find(c =&gt; c.id === value)?.text || value;
+      why = scenario.actions.find(c =&gt; c.id === value)?.feedback || '';
+      if (Array.isArray(before.answers?.cues)) assistance.push('Cue teaching shown before this action');
+    }
+    if (key === 'sbar') {
+      components = ['C3']; label = value === 'a' ? 'Accepted' : 'Revisit'; description = `Used SBAR ${value.toUpperCase()}`;
+      why = scenario.sbars.find(c =&gt; c.id === value)?.feedback || '';
+      assistance.push('Cue teaching and scripted response-team continuation before SBAR');
+    }
+  }
+  if (assignment === 'a2') {
+    if (before.d2?.bridges?.length) assistance.push('D2 safer-path bridge');
+    if (key === 'd3') {
+      components = ['C1', 'C2']; label = primaryReason([...value.reasons, ...(value.v5Reasons || [])]);
+      description = coverageOptions.find(c =&gt; c.id === value.submitted.option)?.text || '';
+      why = coverageOptions.find(c =&gt; c.id === value.submitted.option)?.feedback || '';
+    }
+    if (['help', 'report'].includes(key)) {
+      if (before.d3?.bridges?.length) assistance.push('D3 safer-path bridge');
+      components = ['C3']; label = primaryReason(value.reasons);
+      description = key === 'help' ? value.submitted.map(id =&gt; helpOptions.find(c =&gt; c.id === id)?.label || id).join('; ') : value.line;
+      why = key === 'help' ? 'The symptomatic HR and BP trend supports bedside help without waiting for rounds or another delayed check.' : 'The report should include the trend and any required findings the learner actually revealed.';
+      if (key === 'report' &amp;&amp; before.d4?.help?.bridges?.length) assistance.push('D4 help safer-path bridge');
+    }
+  }
+  return { key, value: structuredClone(value), label, components, description, why, assistance };
+}
+export function a3Records(response) {
+  const selected = response.findings || [];
+  const changes = selected.filter(id =&gt; CHANGED.includes(id));
+  const c1 = changes.length &gt;= 2 ? 'Accepted' : 'Revisit';
+  let plausible = false;
+  if (response.concern === 'acute') plausible = changes.length &gt;= 2;
+  if (response.concern === 'infection') plausible = changes.length &gt;= 2 &amp;&amp; (selected.includes('temperature') || (selected.includes('confusion') &amp;&amp; selected.some(id =&gt; ['hr', 'rr', 'bp'].includes(id))));
+  if (response.concern === 'dehydration') plausible = selected.includes('hr') &amp;&amp; selected.includes('bp');
+  if (['medication', 'glucose'].includes(response.concern)) plausible = selected.includes('confusion') &amp;&amp; selected.some(id =&gt; ['hr', 'rr', 'bp'].includes(id));
+  return [
+    { key: 'findings', value: selected, components: ['C1'], label: c1, description: 'Linked ' + selected.map(id =&gt; FINDINGS.find(([f]) =&gt; f === id)?.[1] || id).join(', '), why: 'At least two of new confusion, HR, RR, BP and temperature must be linked to the earlier picture.', assistance: [] },
+    { key: 'concern', value: response.concern, components: ['C2'], label: plausible ? 'Accepted' : 'Revisit', description: CONCERNS.find(([id]) =&gt; id === response.concern)?.[1] || response.concern, why: ['tired', 'none'].includes(response.concern) ? 'New or worsening confusion warrants assessment for an acute cause. Infection and sepsis are possibilities, but confusion alone does not establish either diagnosis.' : 'Keep an acute explanation open and connect it to the selected observations. A tentative cause is not a diagnosis; missing exposure or glucose information still needs checking.', assistance: [] },
+  ];
+}
+export function callRecord(call, information) {
+  return { key: 'call', value: { call, information }, components: ['C3'], label: call === 'escalate' ? 'Accepted' : call === 'reassess' ? 'Unsafe' : 'Revisit', description: ({ reassess: 'Continue and reassess', information: 'Get specific information', notify: 'Notify the provider through the non-urgent process', escalate: 'Request urgent bedside evaluation now' })[call], why: 'The new confusion with HR, BP, RR and temperature changes needs bedside evaluation now. Continue assessment while getting the appropriate help through the hospital process.', assistance: [] };
+}
+export function componentEvidence(assignment, run, component) {
+  return (specs[assignment][component] || []).map(key =&gt; run?.decisions[key]).filter(Boolean);
+}
+export function componentState(assignment, run, component) {
+  const entries = componentEvidence(assignment, run, component);
+  const expected = specs[assignment][component].length;
+  if (entries.some(e =&gt; e.independent &amp;&amp; bad(e.label))) return 'needs-review';
+  if (entries.length === expected &amp;&amp; entries.every(e =&gt; e.independent &amp;&amp; accepted(e.label))) return 'supported';
+  return 'not-observed';
+}
+export function feedbackFor(assignment, run) {
+  const entries = Object.values(run?.decisions || {}).filter(e =&gt; e.components?.length &amp;&amp; e.independent);
+  const candidates = entries.filter(e =&gt; bad(e.label)).flatMap(e =&gt; e.components.map(component =&gt; ({ e, component })));
+  candidates.sort((a, b) =&gt; (a.e.label === 'Unsafe' ? 0 : 1) - (b.e.label === 'Unsafe' ? 0 : 1) || ['C3', 'C1', 'C2'].indexOf(a.component) - ['C3', 'C1', 'C2'].indexOf(b.component));
+  if (candidates.length) {
+    const { e, component } = candidates[0];
+    return { kind: 'practice', heading: 'Worth practicing', component, decision: e.key, text: `One decision to look at: ${e.description}. ${e.why}`, takeaway: ({ C1: 'Compare the current findings with the earlier picture.', C2: 'Check whether a reassuring explanation fits all the findings.', C3: 'Match the response and the timing to the whole picture.' })[component] };
+  }
+  if (!entries.length) return null;
+  if (COMPONENTS.every(c =&gt; componentState(assignment, run, c) === 'supported') &amp;&amp; entries.every(e =&gt; e.label === 'Accepted')) {
+    return { kind: 'strong', heading: 'Strong', text: assignment === 'a2' ? 'You arranged coverage to respond to the reported change, requested help and led the report with the observed trend.' : 'You linked the changes, kept an acute cause in mind and requested urgent bedside evaluation.', takeaway: 'Keep matching your next step to the whole current picture.' };
+  }
+  const positives = entries.filter(e =&gt; accepted(e.label));
+  if (!positives.length) return null;
+  const text = assignment === 'a1' &amp;&amp; positives.some(e =&gt; e.key === 'cues') ? 'You selected reduced alertness and slow, shallow breathing as important cues. Later decisions followed the case’s cue teaching.' : positives.some(e =&gt; e.key === 'help') ? 'You requested provider or rapid-response help. Other parts of this response were not all observed independently.' : positives.some(e =&gt; e.key === 'd3') ? 'You arranged a response to the reported change. This choice does not show how you independently interpreted every finding.' : 'Your recorded response included supported observations. There is not enough independent evidence for all three parts.';
+  return { kind: 'observed', heading: 'What we saw', text, takeaway: 'Use what you noticed to explain your next step.' };
+}
+export function comparison(state) {
+  const current = state.assignments.a3?.runs[0];
+  if (!current?.decisions.concern || !current.decisions.findings) return null;
+  const priorId = ['a2', 'a1'].find(id =&gt; state.assignments[id]?.card?.kind === 'practice') || 'a2';
+  const prior = state.assignments[priorId], component = prior?.card?.component || 'C3';
+  const earlier = componentEvidence(priorId, prior?.runs[0], component);
+  // For C3 compare the help action; A3 does not separately measure a spoken SBAR.
+  const reportFocus = component === 'C3' &amp;&amp; prior?.card?.decision === 'report';
+  const left = reportFocus ? earlier.filter(e =&gt; e.key === 'report') : component === 'C3' ? earlier.filter(e =&gt; ['help', 'action'].includes(e.key)) : earlier;
+  const right = componentEvidence('a3', current, component);
+  const usable = left.length &amp;&amp; right.length &amp;&amp; [...left, ...right].every(e =&gt; e.independent);
+  let text = 'An independent comparison is not available for this component. Earlier assistance or missing evidence prevents a change claim.';
+  let outcome = 'insufficient';
+  if (usable) {
+    const before = left.every(e =&gt; accepted(e.label)), after = right.every(e =&gt; accepted(e.label));
+    if (reportFocus) { outcome = 'different-format'; text = 'The earlier difficulty concerned what was included in the spoken report. This handoff response does not independently test a spoken report, so it cannot establish improvement in that part of communication.'; }
+    else if (priorId === 'a2' &amp;&amp; ['C1', 'C2'].includes(component)) { outcome = 'different-format'; text = 'The earlier coverage choice and the current linked reasoning are different kinds of evidence. Both are shown here; they do not establish improvement in noticing or resisting reassurance.'; }
+    else if (!before &amp;&amp; after) { outcome = 'improvement'; text = 'The earlier first response needed review; this first response is supported for the same component. That is an improvement in these recorded choices, not proof of clinical competence or an effect caused by CE.'; }
+    else if (before &amp;&amp; after) { outcome = 'consistency'; text = 'Both first responses are supported for this component. These choices show consistency here, not clinical competence.'; }
+    else if (!before &amp;&amp; !after) { outcome = 'continued-difficulty'; text = 'This component needs review in both first responses. The current response does not support a claim of improvement.'; }
+    else { outcome = 'current-needs-review'; text = 'The earlier first response was supported; this response needs review. The record does not show consistent accepted choices.'; }
+  }
+  return { priorId, component, outcome, text, left, right, prompted: prior?.card?.kind === 'practice', practiceTried: (prior?.rewind?.attempts.length || 0) &gt; 0 };
+}
+</pre></details></section></main></html>

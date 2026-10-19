@@ -1,0 +1,92 @@
+UI flow revision, 2026-10-18
+
+Changed Track.jsx, track.css, Shift.jsx and shift5/Shift5.jsx.
+- Top-level begin/resume action and explicit current assignment.
+- Handoff stage indicator, selected-finding count and actionable incomplete-selection messages.
+- Focus moves to handoff response when entering reasoning.
+- Rewind starts with a selected variation when none was selected; existing selection retained.
+- Rewind action feedback and direct next-untried-version control.
+- Track debrief actions moved before lengthy source Shift reports.
+- Existing clinical content, scoring, persistence schema and analytics unchanged.
+
+Verification for this revision:
+- Frontend lint and production build passed.
+- 16 med-surg unit tests passed.
+- 14 targeted browser tests could not start: Chromium launch denied by Mac sandbox (bootstrap_check_in permission denied). No browser assertions ran.
+- Backend suite: 875 passed, 59 failed; output reports EPERM binding network listeners. This is not a passing backend gate.
+- Full browser suite not repeated because the same browser launch is blocked.
+- Live app browser inspection: updated track and A1 debrief; Rewind opening, selection enables submission, close restores trigger focus. Checked default and 390px phone viewport.
+- No new response submitted in manual checks; existing original responses retained. Opening Rewind increments its visit counter.
+- A3 transitions, all Rewind submissions, complete end-to-end replay and physical-iPhone checks remain pending.
+- No merge, commit, deployment, outreach or App Store change.
+
+Final interaction pass, 2026-10-18:
+- Detailed A1/A2 reports collapsed in the track only; source content remains available.
+- A3 debrief and comparison appear before optional assessment exploration.
+- Explicit patient-to-decision and back-to-patient controls with focus management.
+- Rewind variants grouped in expandable navigation.
+- Submitted practice form replaced by feedback and explicit retry/next/return actions.
+- Desktop patient reference stays alongside the response.
+- Browser test expectations updated for expandable content.
+- Lint, build, diff whitespace check and 16 unit tests passed.
+- Live browser verified A1 debrief collapse, decision jump, two practice submissions, feedback, next variation, retry and phone-width layout. Two guided Rewind attempts added during QA; original assignment responses untouched.
+- Full automated browser and backend gates remain blocked as described above. A3 and the entire three-assignment journey were not manually replayed in this pass; physical iPhone and clinical review remain pending.
+
+Rewind gameplay revision, 2026-10-18:
+- Replaced free-form navigation with intro/read/decide/feedback phases and numbered situations.
+- Prominent explanatory Explore Rewind invitation in every completed track debrief.
+- Explicit instructions: use this version's facts; response may stay the same or change; optional practice preserves originals.
+- Patient details remain expandable on decision screen; specific-information selection remains required.
+- Full rationale shown after commitment, with alternatives expandable; next situation and finish actions explicit.
+- Browser specs updated to the new sequence. Lint, build and 16 unit tests pass.
+- Manually completed all three A1 Rewind situations, including information selection, feedback, next situation, finish and focus restoration. Checked intro at 390px width.
+- Three additional guided practice submissions recorded by QA; original Shift responses unchanged.
+- Automated browser suite remains unverified under the previously recorded launch restriction. No clinical-answer changes or production deployment.
+
+Rewind payoff and continuity revision, 2026-10-18:
+- Feedback pairs existing case facts with authored focus and response rationale after commitment; answer rules unchanged.
+- Partial and full summary show unique situations tried, attempt counts, revisit actions and a non-mastery takeaway.
+- Summary provides next-assignment action (or track return after A3).
+- Debrief shows Explore/Continue/Review Rewind based on saved attempts; all-tried reopening goes to summary.
+- Added browser regression for partial summary, refresh/resume and continuation. Not executed due to previously documented browser runner restriction.
+- Lint, build, 16 unit tests and whitespace check passed. Manual live browser verified completed-state review, summary, revisit, evidence reveal, partial-session summary control and next-assignment navigation. One guided A2 practice response added in QA; originals unchanged.
+
+Release-readiness pass, 2026-10-18:
+- Fixed stale Rewind rendering when progress changes in another tab: close on storage updates and render only for a completed assignment still in the record. Added a cross-tab regression (execution blocked).
+- Manual playthrough exposed missing current-answer feedback after an A3 guided retry. The latest retry now displays its existing recorded action, findings and concern feedback separately, before the preserved original debrief and comparison. Answer rules and persistence schema unchanged. Extended the full-journey regression accordingly.
+- Final frontend lint, production build, 16 pilot unit tests and git diff whitespace check passed. Playwright test discovery successfully lists 16 cases.
+- Attempted 15 targeted browser tests before the cross-tab test was added. All failed during Chromium launch (Mac sandbox bootstrap_check_in permission denied); no assertions ran. These are blocked tests, not passing tests.
+- Manually completed A1, A2 and A3 in a separate localhost origin, preserving saved original responses on 127.0.0.1.
+- Verified next-assignment transitions and prominent Rewind invitations; A3 committed action retained across refresh; final submission and comparison; and an intentionally different guided retry preserving original comparison while displaying its own feedback.
+- Completed all three A3 Rewind situations: required-information selection, Revisit and Accepted feedback, partial summary, Escape/close and trigger-focus restoration, refresh/resume to first untried situation, full summary and summary reopening.
+- Inspected Rewind at 390px and 320px. At 320px, document width equaled viewport width and dialog scroll width equaled client width. Native modal keyboard navigation returned into the dialog after browser-level focus. This does not replace the blocked automated keyboard regression or physical-device testing.
+- Live preview confirmed new retry feedback after hot reload.
+- Prior backend gate remains 875 passed / 59 failed due EPERM listener restrictions; not a passing backend gate. Automated browser suite, physical iPhone checks and independent clinical review remain outstanding. No claim of perfection or production readiness.
+- No commit, merge, deployment, outreach or App Store change.
+
+Flow continuity pass, October 18, 2026 Pacific:
+- Summary now shows each situation's latest result and opens saved feedback directly. Reviewing does not submit an attempt; retry remains a separate explicit action.
+- Feedback displays the stored answer, including the selected information, rather than transient form state.
+- Next action selects an untried situation even after out-of-order play. Once all situations are tried, it leads to the summary.
+- Situation number and title remain visible in decision and feedback phases. Return buttons consistently name the shift debrief.
+- Summary rows stack on narrow phones to accommodate the descriptive Review feedback action.
+- Manual browser checks: A3 saved feedback and unchanged attempt counts in summary; A2 intro/read/decide/feedback/partial summary, playing 1 then 3 then 2, followed by completion summary action. Verified 320px layout without horizontal overflow.
+- Lint, build and 16 unit tests passed. Added a browser regression for review without a new attempt and out-of-order progression; automated execution remains unverified under the previously documented launch restriction.
+- Prepared first-use-flow-check.txt for an uncoached learner review and explicit release checks. No new clinical rules, scoring changes or release actions.
+
+Chart and Make your call refinement, October 19, 2026 UTC:
+- Replaced label-like chart controls with outlined cards, neutral descriptions,
+  Open / Viewing / Open again cues and aria-pressed selection state.
+- Added explicit patient-review guidance, action/ reasoning instructions and
+  focus-moving routes between patient information and the response.
+- Manual live browser checks: all four information sources, keyboard activation,
+  chart-to-response and response-to-chart focus, 390px card layout, action commit,
+  required reasoning, ready state, submission and prominent Rewind entry.
+- Completed one guided A3 retry on the separate localhost QA origin. Latest retry
+  feedback appeared separately from the preserved original comparison. Reopening
+  completed Rewind displayed saved summary and review actions. User's original
+  uncommitted A3 response on 127.0.0.1 was not submitted.
+- Frontend lint, production build and 16 unit tests passed. Automated browser
+  execution remains blocked by the previously recorded Chromium launch restriction.
+- Added interaction-pattern.txt as the reusable implementation and review reference.
+- Physical-device, uncoached learner and independent clinical review remain pending.

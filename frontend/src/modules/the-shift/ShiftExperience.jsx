@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from 'react';
+import { lazy, Suspense, useEffect, useRef, useState } from 'react';
 import { ClinicalEdgeMark } from '../../components/ModuleHeader.jsx';
 import { LEARN_ACTIONS } from '../../components/workspaceActions.js';
 import Shift from './Shift.jsx';
@@ -12,6 +12,10 @@ import { SHIFTS, getShift, progressLabel, scenarioLink } from './integrated/regi
 import { shiftRoute, shiftPath, learningDestination, returningShift } from './routing.js';
 import { shiftOpened } from '../../productAnalytics.js';
 import './app.css';
+
+// Standalone release authorized October 18, 2026; the track keeps its own pilot gate.
+const StandaloneRewind = import.meta.env.VITE_REWIND_ENABLED !== 'false' ? lazy(() => import('../rewind/StandaloneRewind.jsx')) : null;
+const rewindAssignments = { 'drowsy-patient': 'a1', 'which-patient-first': 'a2', 'monitor-alarm': 'monitor-alarm', 'discharge-puzzle': 'discharge-puzzle', conversation: 'conversation' };
 
 const renderers = { 'drowsy-patient': Shift, 'monitor-alarm': Monitor, 'discharge-puzzle': Discharge, 'which-patient-first': Shift5 };
 if (CONVERSATION_ENABLED) renderers.conversation = Conversation;
@@ -52,6 +56,7 @@ function Library({ navigate }) {
     <header className="shift-library-brand"><AppLink to="/" navigate={navigate}><ClinicalEdgeMark /><strong>Clinical Edge</strong></AppLink><span>Learn</span></header>
     <main className="shift-library-main">
       <header className="shift-library-heading"><p className="shift-overline">Fictional nursing experiences</p><h1>The Shift Library</h1><p>Experience the shift. Understand the why. Master the skills.</p><small>Fictional education / Progress stays on this device</small></header>
+      {import.meta.env.VITE_MED_SURG_TRACK_PREVIEW === 'true' && <section className="shift-track-entry" aria-labelledby="med-surg-entry-title"><div><p className="shift-overline">Connected learning / Private pilot</p><h2 id="med-surg-entry-title">Med-Surg Clinical</h2><p>Three linked assignments. Make your call, explore the feedback, then try optional Rewinds with different patient findings.</p><small>Your original responses stay preserved. Track progress is separate from individual shifts.</small></div><AppLink to="/learn/med-surg" navigate={navigate} className="shift-primary">Open learning track <span aria-hidden="true">→</span></AppLink></section>}
       <div className="shift-library-grid">{SHIFTS.map(item => {
         const progress = progressLabel(item);
         return <article className="shift-library-card" key={item.id}>
@@ -73,7 +78,7 @@ function Handoff({ item, navigate }) {
   return <main className="shift-handoff"><AppLink to={shiftPath(item.id)} navigate={navigate}>&#8592; Return to {item.title}</AppLink><p className="shift-overline">Connected learning / Ask Clinical Edge</p><h1>Keep the question going.</h1><blockquote>{question}</blockquote>{item.id === 'conversation' && <p>This question has not been tested with the live model. Ask may decline it. Ask is not a crisis service.</p>}<button className="shift-secondary" onClick={async () => { try { await navigator.clipboard.writeText(question); setStatus('Question copied.'); } catch { setStatus('Copy unavailable. Select the question above to copy it manually.'); } }}>Copy question</button><p role="status">{status}</p><p>Open Ask and paste the question when you are ready. Nothing is submitted automatically. Existing AI consent, privacy protections and the daily question allowance apply.</p><AppLink to={`/ask?shift=${item.id}`} navigate={navigate} className="shift-primary">Open Ask <span aria-hidden="true">&#8594;</span></AppLink></main>;
 }
 
-function Scenario({ item, navigate }) {
+function Scenario({ item, navigate, active }) {
   const [review, setReview] = useState(false);
   const root = useRef(null);
   const Scene = renderers[item.id];
@@ -100,7 +105,7 @@ function Scenario({ item, navigate }) {
   }
   return <div ref={root} className="shift-scenario-scroll" onClickCapture={capture}>
     <div className="shift-scene-bar"><AppLink to="/learn/shifts" navigate={navigate}>&#8592; Shift Library</AppLink><button onClick={() => setReview(true)}>Sources & review</button></div>
-    <Scene embedded={item.id === 'which-patient-first'} />
+    <Scene embedded={item.id === 'which-patient-first'} debrief={active && StandaloneRewind && rewindAssignments[item.id] ? <Suspense fallback={<p role="status">Opening optional practice...</p>}><StandaloneRewind id={rewindAssignments[item.id]} navigate={navigate} /></Suspense> : null} />
     {!item.private && item.id !== 'conversation' && <section className="shift-connections"><span className="shift-overline">Connected learning</span><h2>Follow the why.</h2><div>{item.recommendations.map(link => <AppLink key={link.id} to={learningDestination(link.path, item.id)} navigate={navigate}><strong>{link.title}</strong><span>{link.detail}</span><b aria-hidden="true">&#8599;</b></AppLink>)}</div></section>}
     {review && <ReviewDialog item={item} close={() => setReview(false)} />}
   </div>;
@@ -127,7 +132,7 @@ export default function ShiftExperience({ mode = 'page', navigate, active = true
   return <div ref={region} className={`ce-shift-feature${active && route?.kind === 'library' ? ' ce-shift-feature--library' : ''}`} hidden={!active} inert={!active}>
     {visited.map(id => {
       const visible = active && route?.kind === 'scenario' && route.id === id;
-      return <div key={id} hidden={!visible} inert={!visible} data-active-page={visible}><Scenario item={getShift(id)} navigate={navigate} /></div>;
+      return <div key={id} hidden={!visible} inert={!visible} data-active-page={visible}><Scenario item={getShift(id)} navigate={navigate} active={visible && active} /></div>;
     })}
     {active && content}
   </div>;

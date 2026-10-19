@@ -1,0 +1,405 @@
+{
+  "monitor-alarm": {
+    "title": "The Monitor Alarm",
+    "version": "1.0.0-draft",
+    "variations": [
+      {
+        "id": "monitor-motion",
+        "title": "During the morning wash",
+        "history": "Return to the first alarm in Room 22. In this version you are already at the bedside while the patient washes his face. Use these observations rather than the original alarm outcome.",
+        "facts": [
+          "The monitor briefly labels a noisy segment “V-tach, 180.”",
+          "He is alert, speaking comfortably and denies new symptoms. Palpated pulse is regular at 82/min; BP 126/74.",
+          "The noisy signal follows arm movement. When his arm rests, a regular narrow-complex tracing at 82 returns. One electrode edge is lifting."
+        ],
+        "question": "What is the best next step with the information you have?",
+        "options": [
+          {
+            "id": "ignore",
+            "title": "Silence the alarm and leave the equipment as it is",
+            "label": "Revisit",
+            "feedback": "The signal problem is still unresolved. A comfortable patient does not make unreliable monitoring acceptable."
+          },
+          {
+            "id": "verify",
+            "title": "Check electrode contact and leads, then confirm the tracing and reassess him",
+            "label": "Accepted",
+            "feedback": "This addresses the observed signal problem while keeping the patient assessment central."
+          },
+          {
+            "id": "diagnose",
+            "title": "Report confirmed ventricular tachycardia from the alarm label alone",
+            "label": "Revisit",
+            "feedback": "The label conflicts with the pulse and the movement-linked tracing. Report observations and uncertainty, not a confirmed rhythm from the label."
+          }
+        ],
+        "focus": "Verify the signal and the patient",
+        "rationale": "The pulse and tracing disagree during movement. These findings support investigating artifact, not declaring every similar alarm harmless. Continue assessment if the discrepancy persists or the patient changes.",
+        "sources": [
+          {
+            "title": "Knight et al.: ECG artifact mimicking ventricular tachycardia",
+            "url": "https://pubmed.ncbi.nlm.nih.gov/10528037/",
+            "scope": "Reported consequences of mistaking artifact for ventricular tachycardia; not a rule for dismissing alarms."
+          }
+        ],
+        "alternatives": "Ask a colleague for help checking the signal when needed. New symptoms or an uncertain persistent rhythm require prompt clinical reassessment and escalation appropriate to the findings."
+      },
+      {
+        "id": "monitor-change",
+        "title": "A different bedside picture",
+        "history": "Return to Room 24 after the irregular-rate alert. This is a complete alternative assessment, not the original assessment.",
+        "facts": [
+          "The irregular narrow-complex rhythm is sustained at about 158/min; palpated pulse is rapid and irregular.",
+          "BP is 82/50 compared with 128/74 earlier. He is newly confused, clammy and says he feels faint.",
+          "He is breathing and has a pulse. You are with him; a colleague can summon help."
+        ],
+        "question": "Which response best fits this change?",
+        "options": [
+          {
+            "id": "ecg-first",
+            "title": "Finish obtaining a 12-lead before contacting anyone",
+            "label": "Unsafe",
+            "feedback": "An ECG can help, but completing it first would delay help for the current deterioration."
+          },
+          {
+            "id": "later",
+            "title": "Document the rate and recheck after the next round",
+            "label": "Unsafe",
+            "feedback": "The new symptoms and low BP need attention now."
+          },
+          {
+            "id": "help",
+            "title": "Stay with him and summon urgent bedside help through the unit’s response process",
+            "label": "Accepted",
+            "feedback": "Escalate while assessing and supporting him within your role and local protocol. Share the BP change, mental status and rhythm observations."
+          }
+        ],
+        "focus": "The assessment changes the urgency",
+        "rationale": "Hypotension and new confusion with sustained tachycardia are concerning signs of instability. Assessment and urgent help proceed together; naming the exact rhythm must not delay that response.",
+        "sources": [
+          {
+            "title": "AHA: Adult tachyarrhythmia with a pulse, 2025",
+            "url": "https://cpr.heart.org/-/media/CPR-Files/CPR-Guidelines-Files/2025-Algorithms/Algorithm-ACLS-Tachycardia-250514.pdf",
+            "scope": "Clinical assessment and signs of instability. This practice does not teach medication or electrical treatment."
+          }
+        ],
+        "alternatives": "The appropriate provider and rapid-response pathway depend on the hospital. This scenario does not select a drug, dose or cardioversion setting."
+      },
+      {
+        "id": "monitor-stable",
+        "title": "The alert stays on",
+        "history": "Return to Room 24 with a different set of findings. The new irregular rhythm persists, but the original symptoms and BP drop are absent.",
+        "facts": [
+          "Repeat tracing remains irregular and narrow-complex at 118–126/min; pulse is irregular.",
+          "He is alert, warm and comfortable, without chest discomfort, dyspnea or dizziness. BP 128/76 is unchanged.",
+          "There is no documented history of this rhythm and no provider assessment of this new change yet."
+        ],
+        "question": "What should you do next?",
+        "options": [
+          {
+            "id": "report",
+            "title": "Continue assessment and monitoring, and promptly report the new rhythm for evaluation",
+            "label": "Accepted",
+            "feedback": "The new sustained change still needs review, even though these observations do not show the instability in the other version."
+          },
+          {
+            "id": "dismiss",
+            "title": "Treat the new rhythm as artifact because he feels well",
+            "label": "Revisit",
+            "feedback": "Feeling well does not establish artifact. The pulse and repeated tracing support a real change that needs evaluation."
+          },
+          {
+            "id": "independent",
+            "title": "Choose a rate-control medicine yourself based on the monitor rate",
+            "label": "Unsafe",
+            "feedback": "A monitor rate does not authorize an independent treatment choice."
+          }
+        ],
+        "focus": "Stable observations still need follow-up",
+        "rationale": "Continue monitoring and obtain further rhythm evaluation through the unit’s process. The absence of the other version’s deterioration changes the immediate response; it does not remove the need to report a new sustained rhythm.",
+        "sources": [
+          {
+            "title": "AHA: Adult tachyarrhythmia with a pulse, 2025",
+            "url": "https://cpr.heart.org/-/media/CPR-Files/CPR-Guidelines-Files/2025-Algorithms/Algorithm-ACLS-Tachycardia-250514.pdf",
+            "scope": "Clinical assessment and signs of instability. This practice does not teach medication or electrical treatment."
+          }
+        ],
+        "alternatives": "A 12-lead and clinical review help clarify the rhythm. Escalate sooner if symptoms or hemodynamic changes develop; local criteria may require an earlier response."
+      }
+    ],
+    "review": "New Rewind content: source-checked draft, awaiting clinical review.",
+    "takeaway": "Check the patient, the signal and the trend together. A monitor label alone does not decide the response."
+  },
+  "discharge-puzzle": {
+    "title": "The Discharge Puzzle",
+    "version": "1.0.0-draft",
+    "variations": [
+      {
+        "id": "discharge-conflict",
+        "title": "The ride is waiting",
+        "history": "Return to the discharge review for the patient recovering from a heart failure flare and a recent GI bleed. In this version the blood-thinner instructions remain unresolved.",
+        "facts": [
+          "The medication list says to stop the blood thinner; the patient instructions say to continue it.",
+          "No prescriber clarification or corrected document is available.",
+          "He feels well and his daughter’s ride is outside. There are no new symptoms in this version."
+        ],
+        "question": "How should you handle the conflicting instructions?",
+        "options": [
+          {
+            "id": "choose-stop",
+            "title": "Tell him to follow the stop instruction because of the recent bleed",
+            "label": "Unsafe",
+            "feedback": "That would choose the treatment plan without resolving the conflict. The earlier bleed alone does not settle the intended discharge order."
+          },
+          {
+            "id": "clarify",
+            "title": "Contact the discharging prescriber and reconcile the instructions before completing discharge",
+            "label": "Accepted",
+            "feedback": "Clarify intent through the authorized process; involve pharmacy and update the patient and team about the delay."
+          },
+          {
+            "id": "later",
+            "title": "Send both documents home and let the outpatient team sort it out",
+            "label": "Unsafe",
+            "feedback": "The patient would still have contradictory instructions to act on."
+          }
+        ],
+        "focus": "A clear plan before teaching",
+        "rationale": "A waiting ride does not resolve a medication discrepancy. The goal is one confirmed plan, not assuming either stopping or continuing is automatically correct.",
+        "sources": [
+          {
+            "title": "AHRQ MATCH: Medication reconciliation process",
+            "url": "https://www.ahrq.gov/patient-safety/settings/hospital/match/chapter-3.html",
+            "scope": "Resolve discrepancies and communicate a consistent medication plan at transitions."
+          }
+        ],
+        "alternatives": "Pharmacy can help investigate and reconcile the documents. Follow local roles for order clarification and correction; do not independently choose the disputed treatment."
+      },
+      {
+        "id": "discharge-repeat",
+        "title": "Two names at home",
+        "history": "Return to teaching after the prescriber has clarified the plan and all discharge documents now agree. There is no remaining order conflict in this version.",
+        "facts": [
+          "The reconciled list explicitly states that the new furosemide prescription replaces the home Lasix bottle.",
+          "During show-me, he places both bottles into his morning plan and calls them different medicines.",
+          "His daughter asks you to explain again. They have time to review the instructions."
+        ],
+        "question": "What is the most useful next step?",
+        "options": [
+          {
+            "id": "note-only",
+            "title": "Write a reminder on the sheet and finish without another check",
+            "label": "Revisit",
+            "feedback": "A written note alone does not show whether the misunderstanding has changed."
+          },
+          {
+            "id": "both",
+            "title": "Accept both bottles because both names appear in the history",
+            "label": "Unsafe",
+            "feedback": "The confirmed plan says the new prescription replaces the home bottle; accepting both would contradict it."
+          },
+          {
+            "id": "reteach",
+            "title": "Explain the two names using the confirmed list, then repeat the show-me",
+            "label": "Accepted",
+            "feedback": "Use a different explanation and ask him to demonstrate his plan again. Include his daughter with his agreement."
+          }
+        ],
+        "focus": "Teach-back reveals what to clarify",
+        "rationale": "The order is already reconciled; the problem is how he plans to use it at home. Re-explain the replacement and verify understanding without blame.",
+        "sources": [
+          {
+            "title": "AHRQ: Teach-back, Tool 5",
+            "url": "https://www.ahrq.gov/health-literacy/improve/precautions/tool5.html",
+            "scope": "Check understanding in the patient’s own words; explain differently and check again when needed."
+          },
+          {
+            "title": "AHRQ MATCH: Medication reconciliation process",
+            "url": "https://www.ahrq.gov/patient-safety/settings/hospital/match/chapter-3.html",
+            "scope": "Resolve discrepancies and communicate a consistent medication plan at transitions."
+          }
+        ],
+        "alternatives": "If the label or replacement instruction is unclear, ask pharmacy or the prescriber. Do not invent a new medication schedule or change the confirmed plan."
+      },
+      {
+        "id": "discharge-understood",
+        "title": "Show me tomorrow",
+        "history": "Return to the same discharge after clarification and teaching. This version includes a successful demonstration.",
+        "facts": [
+          "The prescriber-confirmed list and patient instructions agree.",
+          "Using the bottles and written plan, he correctly shows what he will take, identifies the replaced bottle and explains the changes in his own words.",
+          "He and his daughter know the follow-up arrangements and whom to contact with questions. No other discharge concern is identified."
+        ],
+        "question": "What is the appropriate next step?",
+        "options": [
+          {
+            "id": "complete",
+            "title": "Document what he demonstrated and complete the remaining discharge checks",
+            "label": "Accepted",
+            "feedback": "Understanding has been demonstrated. Confirm the remaining local requirements and provide the agreed written plan."
+          },
+          {
+            "id": "memory",
+            "title": "Repeat the entire lesson until he recites it without looking at the sheet",
+            "label": "Revisit",
+            "feedback": "The aim is understanding and using the plan, not memorizing it without support."
+          },
+          {
+            "id": "replace",
+            "title": "Substitute a generic medication handout for the individualized plan",
+            "label": "Revisit",
+            "feedback": "A general handout does not replace the reconciled instructions he just demonstrated."
+          }
+        ],
+        "focus": "Recognize when the teaching worked",
+        "rationale": "He explained and demonstrated the plan, rather than merely agreeing. Record the check and move forward when the other discharge requirements are met.",
+        "sources": [
+          {
+            "title": "AHRQ: Teach-back, Tool 5",
+            "url": "https://www.ahrq.gov/health-literacy/improve/precautions/tool5.html",
+            "scope": "Check understanding in the patient’s own words; explain differently and check again when needed."
+          }
+        ],
+        "alternatives": "Address any new question or discrepancy before leaving. Written instructions can support teach-back; using them is not a failure."
+      }
+    ],
+    "review": "New Rewind content: source-checked draft, awaiting clinical review.",
+    "takeaway": "First establish one clear plan. Then check how the patient will use it. Re-teach when needed and recognize demonstrated understanding."
+  },
+  "conversation": {
+    "title": "The Conversation That Changes Everything",
+    "version": "1.0.0-draft",
+    "variations": [
+      {
+        "id": "conversation-words",
+        "title": "A different opening",
+        "history": "Return to the evening conversation with the adult patient facing amputation after a foot infection. In this version he has not disclosed suicidal thoughts or a plan.",
+        "facts": [
+          "He says, “I do not know how my son will manage with me like this.”",
+          "He is quiet and looks away. No direct question about suicide has been asked yet.",
+          "You have time to stay and listen. A statement about being a burden needs exploration, not an assumption about his intent."
+        ],
+        "question": "Which response best opens a clear conversation?",
+        "options": [
+          {
+            "id": "reassure",
+            "title": "“Your son will manage. Try not to think about it.”",
+            "label": "Revisit",
+            "feedback": "That reassurance moves away from what he is trying to express."
+          },
+          {
+            "id": "direct",
+            "title": "“You sound worried about being a burden. Are you thinking about killing yourself?”",
+            "label": "Accepted",
+            "feedback": "Acknowledge his concern and ask plainly, calmly and without judgment. Listen to the answer and follow the unit’s assessment process."
+          },
+          {
+            "id": "assume",
+            "title": "Document suicidal intent without asking him what he means",
+            "label": "Revisit",
+            "feedback": "The concerning statement needs assessment; it does not establish intent on its own."
+          }
+        ],
+        "focus": "Ask instead of assuming",
+        "rationale": "Direct questions give the patient room to describe what is happening. They do not replace a fuller assessment or determine risk by themselves.",
+        "sources": [
+          {
+            "title": "NIMH: Five action steps",
+            "url": "https://www.nimh.nih.gov/health/publications/5-action-steps-to-help-someone-having-thoughts-of-suicide",
+            "scope": "Direct questions, listening and connection to support. Not a substitute for hospital assessment."
+          }
+        ],
+        "alternatives": "If he discloses current suicidal thoughts, stay with him and obtain urgent help through the unit process. Do not delay that response to finish a checklist."
+      },
+      {
+        "id": "conversation-stay",
+        "title": "No plan described",
+        "history": "Return to the bedside after asking directly. In this version he describes thoughts of suicide now but has not described a plan.",
+        "facts": [
+          "He says, “Yes, I am thinking about killing myself right now.”",
+          "When asked about a plan, he says, “I have not worked that out.” Access to possible means has not yet been assessed.",
+          "He remains calm and cooperative. Another room’s pump begins beeping; you can call a colleague from here."
+        ],
+        "question": "Which immediate response fits these facts?",
+        "options": [
+          {
+            "id": "leave",
+            "title": "Check the other room first because he has no described plan",
+            "label": "Unsafe",
+            "feedback": "No described plan does not make current suicidal thoughts safe to leave unattended."
+          },
+          {
+            "id": "promise",
+            "title": "Ask for a promise not to act and use that as the safety plan",
+            "label": "Unsafe",
+            "feedback": "A promise is not a substitute for assessment, observation or support."
+          },
+          {
+            "id": "stay",
+            "title": "Stay with him, call for help from the room and initiate the unit’s safety response",
+            "label": "Accepted",
+            "feedback": "Arrange urgent evaluation and safety measures under local policy. Further assessment happens alongside help, not before it."
+          }
+        ],
+        "focus": "Current thoughts need immediate support",
+        "rationale": "Being calm and having no stated plan do not cancel the current disclosure. Keep him accompanied while the team arranges urgent evaluation.",
+        "sources": [
+          {
+            "title": "NIMH: Adult inpatient brief suicide safety assessment",
+            "url": "https://www.nimh.nih.gov/research/research-conducted-at-nimh/asq-toolkit-materials/adult-inpatient/adult-inpatient-brief-suicide-safety-assessment-guide",
+            "scope": "Current suicidal thoughts require urgent evaluation and the patient must not be left alone. Formal assessment and disposition belong to qualified clinicians under local policy."
+          }
+        ],
+        "alternatives": "Ask a colleague to handle the other task. Qualified clinicians determine the observation and assessment plan through hospital policy; this practice does not assign a risk score."
+      },
+      {
+        "id": "conversation-trust",
+        "title": "Keep it between us",
+        "history": "Return to the conversation after he has disclosed current suicidal thoughts. You are staying with him and calling for help. He asks you not to tell the care team.",
+        "facts": [
+          "He says, “Please do not tell anyone. I trusted you.”",
+          "The urgent safety concern has not been resolved.",
+          "You can explain what happens next while remaining with him. You cannot promise a particular evaluation outcome."
+        ],
+        "question": "What would you say?",
+        "options": [
+          {
+            "id": "honest",
+            "title": "“Thank you for trusting me. I need to involve the team to help keep you safe, and I will stay with you.”",
+            "label": "Accepted",
+            "feedback": "This explains the necessary next step without abandoning the relationship or promising secrecy."
+          },
+          {
+            "id": "secret",
+            "title": "“I will keep it between us if you promise you will be okay.”",
+            "label": "Unsafe",
+            "feedback": "That promise would obstruct the help needed for the current disclosure."
+          },
+          {
+            "id": "guarantee",
+            "title": "“I can promise you will not need any additional observation.”",
+            "label": "Revisit",
+            "feedback": "You do not know the team’s assessment or safety plan yet."
+          }
+        ],
+        "focus": "Be clear and stay connected",
+        "rationale": "Explain the involvement of the care team as part of helping him stay safe. Warmth and honesty can accompany urgent action.",
+        "sources": [
+          {
+            "title": "NIMH: Five action steps",
+            "url": "https://www.nimh.nih.gov/health/publications/5-action-steps-to-help-someone-having-thoughts-of-suicide",
+            "scope": "Direct questions, listening and connection to support. Not a substitute for hospital assessment."
+          },
+          {
+            "title": "NIMH: Adult inpatient brief suicide safety assessment",
+            "url": "https://www.nimh.nih.gov/research/research-conducted-at-nimh/asq-toolkit-materials/adult-inpatient/adult-inpatient-brief-suicide-safety-assessment-guide",
+            "scope": "Current suicidal thoughts require urgent evaluation and the patient must not be left alone. Formal assessment and disposition belong to qualified clinicians under local policy."
+          }
+        ],
+        "alternatives": "Share relevant information with the appropriate care team under policy. Continue listening; do not bargain away assessment or make promises about disposition."
+      }
+    ],
+    "review": "New Rewind content: source-checked draft, awaiting mental-health clinical review.",
+    "takeaway": "Ask clearly, listen without judgment and act on what is disclosed. Supportive conversation continues while help is arranged."
+  }
+}

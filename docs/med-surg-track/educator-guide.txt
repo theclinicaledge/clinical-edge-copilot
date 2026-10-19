@@ -1,0 +1,89 @@
+CLINICAL EDGE · MED-SURG CLINICAL · EDUCATOR / REVIEWER GUIDE
+Private draft 0.1.0 · October 18, 2026
+
+STATUS
+This is a reviewer preview. Founder and independent qualified med-surg nurse or
+educator review are pending for the new mappings, feedback, nine Rewinds and all
+of Afternoon Handoff. Earlier scenario approval does not approve this pilot.
+Do not recruit or expose learners to this unreviewed draft. No outreach has been
+initiated. The notes below describe a future formative use after approval.
+
+PURPOSE AND SEQUENCE
+Everyone completes The Drowsy Patient, Which Patient First?, then Afternoon
+Handoff. The cases are fictional adult inpatient med-surg situations. Practice
+suggestions and the last comparison respond to the learner's original choices;
+the assignments themselves are fixed. No certification, clinical competence or
+causal learning-effect inference is supported.
+
+BEFORE A REVIEW SESSION
+Open review.html for the exact cases, response matrix, rationale, source scope
+and unresolved questions. Review the borderline A1 assessment branch, the A2
+wound description, A3 acute hypotheses and urgency, and the assistance mapping.
+Use a fresh test browser/profile when an independent walkthrough is desired.
+The application deliberately does not import standalone Shift or prior Replay
+history as independent track evidence. Do not enter real patient information.
+
+DURING THE EXPERIENCE
+Let the nurse inspect the available information and commit without coaching.
+In Afternoon Handoff, the chart and bedside can be opened in any order or not
+opened. An action locks before the concern and linked-finding options appear.
+Do not preview its target skill, guided comparison or answer key. Teaching and
+up to two bedside-check results follow the complete response.
+
+The debrief offers at most one useful takeaway. Rewind opens over the debrief;
+it is guided practice with three complete authored situations. A submitted
+variation records practice. Closing without submitting records only a visit.
+The learner may always close it and return. Escalation is not always accepted.
+Information gathering requires a specific item. The sheet includes accepted
+alternatives and scope after submission.
+
+HOW TO READ THE RECORD
+Strong: every mapped decision across the three components was independently
+Accepted on the first attempt. This is an observation about a bounded exercise.
+What we saw: only the supported observations with independent evidence.
+Worth practicing: an independent original Revisit, Outside role or Unsafe
+decision, prioritizing Unsafe, then action/help/report, noticing, reassurance.
+No card: no adequate independent mapped evidence. Missing or assisted evidence
+is neither failure nor success. A hint by itself never indicates difficulty.
+
+Important source limitation: A1's existing priority feedback already identifies
+the alertness cue; cue teaching then precedes the action and SBAR. All its mapped
+choices are conservatively assisted. A1 therefore produces no performance card
+in this unchanged sequence. It still offers optional Rewind and the next case.
+A2 has substantial prompt scaffolding: its C1/C2 mapping is a coverage/action
+proxy, and the help step already prompts a call. Read all claims narrowly.
+
+The final comparison uses the most recent earlier original response that
+prompted relevant practice, otherwise the relevant A2 response. It never uses
+a coached retry as a new first response. A2 coverage proxies cannot establish
+improvement in A3 cue interpretation. A report-specific difficulty cannot be
+declared improved by a different help action: A3 does not test a spoken report.
+Rewind's call exercise also does not assess free SBAR composition. A comparison
+may appropriately say that independent change cannot be established.
+
+AFTERWARD
+Ask what led to the action and whether the explanation fits the whole picture.
+Discuss plausible acute alternatives without requiring a single diagnosis.
+Use the source/rationale disclosure and hospital-process assumptions. Do not
+substitute the pilot's labels for clinical judgment or hospital protocols.
+
+The learner can open Local record and privacy to export a JSON record or
+deliberately clear this track. Export is optional and shares nothing by itself.
+No educator dashboard, server record or automatic collection exists. Review a
+learner's export only if they choose to share it through an agreed process.
+
+LOCAL RECORD LIMITS
+All runs, original decisions, assistance history and guided practice remain on
+one browser/device. A repeated assignment is guided; originals and frozen cards
+remain unchanged. Unknown content/mapping/source versions or unreadable saved
+data are preserved for export rather than rescored or silently replaced.
+If storage fails, the page warns that new in-memory progress may be lost on
+refresh. Export before leaving. A single active tab is the supported use;
+concurrent writing tabs have no conflict-resolution guarantee. Browser data
+clearing or private-browsing policies may remove records. There is no sync.
+
+BEFORE ANY LEARNER RELEASE
+Complete the review record in the packet, resolve authoring questions, rerun
+verification after approved content changes, and complete physical iPhone
+checks in validation.txt. Founder release authorization is still required.
+Do not treat source checks, automated tests or screenshots as clinical review.

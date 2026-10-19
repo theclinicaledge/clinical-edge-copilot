@@ -1,0 +1,67 @@
+Rewind expansion — October 19, 2026 UTC
+
+Coverage
+All five currently registered standalone shifts now expose three optional Rewinds.
+Drowsy Patient and Which Patient First retain their previously authored packs.
+This pass adds nine situations:
+Monitor Alarm: signal/patient mismatch; deterioration; stable new sustained rhythm.
+Discharge Puzzle: conflicting instructions; duplicated brand/generic plan;
+  demonstrated understanding after reconciliation and teaching.
+Conversation: direct exploration; current thoughts without a described plan;
+  honest involvement of the care team while staying with the patient.
+
+Architecture
+The shared player accepts scenario-specific options and tailored option feedback,
+with common reasoning, reasonable alternatives and sources after submission.
+Existing track choices and scoring are retained. New standalone storage is isolated
+per scenario and content version. Saved review adds no attempt. No new analytics
+or backend endpoints were added. Existing private preview flag still controls entry.
+The discharge footer no longer contradicts its existing founder-reported review.
+
+Verification actually completed
+- Lint passed. 25 unit tests passed: 16 track, 9 standalone, including all 27 new
+  option results, saved reload/isolation, corrupt-version preservation and urgent
+  unsafe-answer checks. Existing unavailable-storage and stale-view tests retained.
+- Enabled production build passed; existing large-chunk warning remains.
+- Five standalone browser regression cases discovered (two existing, three new).
+- Attempted new Monitor browser regression: browser launch denied by macOS sandbox
+  (bootstrap_check_in Permission denied) before assertions. Not a test pass.
+  Remaining new automated browser cases were not executed after that blocker.
+- Actual connected browser walkthrough, separate localhost QA origin: completed
+  Monitor, Discharge and Conversation originals from start to debrief, then played
+  all nine new Rewinds through read/decision/feedback/summary.
+- Monitor: deliberate Revisit answer in situation 1, Accepted answers in 2 and 3.
+  All three saved and the summary showed the distinct outcomes.
+- Discharge: all three Accepted choices and summary verified.
+- Conversation: all three Accepted choices and summary verified. Refresh retained
+  three attempts; saved review reopened without submitting a new response. Explicit
+  retry returned to blank choices and disabled submit until a choice was made.
+- Phone viewport 390x844: Conversation summary, long answer cards and expanded
+  source details inspected. Document width 390; dialog client/scroll width 385.
+  Closing returned keyboard focus to Review Rewind. No horizontal overflow.
+- Browser console error/warning check returned no entries during this walkthrough.
+- QA affected only localhost test progress. No original responses submitted or
+  cleared on the user's 127.0.0.1 origin.
+
+Clinical/source boundaries
+Checked AHA 2025 adult tachyarrhythmia algorithm, Knight et al. artifact report,
+AHRQ MATCH and Teach-back Tool 5, and NIMH direct-question/inpatient safety guidance.
+The source scopes and exact URLs appear beside each variation in the review packet.
+No doses, electrical treatment settings, formal risk scoring or independent
+prescribing are taught in the new Rewinds. All cases are fictional.
+New text is explicitly a source-checked draft awaiting its own clinical review,
+including mental-health review for Conversation. Existing user-reported nurse,
+clinical-content and physical-iPhone checks remain acknowledged for the earlier
+reviewed work; they are not counted as review of this new material.
+
+Remaining release checks
+Independent review of these nine new situations; physical-iPhone check of the new
+long choices; automated browser regressions on a host that can launch Chromium.
+No merge, commit, deployment or App Store submission change was made.
+
+Final checks
+- Restarted the local preview to clear stale development transforms; verified the
+  corrected Monitor patient references and submitted one explicit retry. Summary
+  showed two attempts for that situation and still three unique situations tried.
+- Summary returned to Shift Library and the temporary phone viewport was restored.
+- Final lint/unit run remained 25/25. git diff --check passed.

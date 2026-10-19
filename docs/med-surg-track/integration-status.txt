@@ -1,0 +1,29 @@
+Integration status — October 18, 2026 Pacific
+
+Completed in the pilot branch
+- Learn library now presents Med-Surg Clinical as a full track card with a clear
+  entry action, explanation of optional Rewinds and separate track progress.
+- Existing routes and original-response persistence remain unchanged.
+- Review copy and first-use checklist now acknowledge founder-reported completed
+  clinical review, iPhone check and nurse usability feedback.
+- Lint, default build, pilot-enabled build and 16 unit tests passed.
+- Live browser verified the library card layout and its navigation to the track.
+- Restarted the local preview with the existing Shift and track feature flags.
+
+Outstanding technical gate
+Targeted Playwright run retried with one worker and max-failures=1. Chromium was
+denied bootstrap_check_in by the Mac sandbox before any assertions ran. One case
+reported failed to launch; 14 cases did not run. Do not count this as product test
+failure or passing regression coverage. Run in an environment permitted to launch
+Chromium. No security restrictions were weakened.
+
+Scope and next implementation
+This is local integration in the existing pilot repository, not a merge or release.
+The preview flag remains in place. Other standalone scenarios retain their existing
+behavior; no new clinical variants were invented or labeled reviewed in this pass.
+The reusable interaction pattern is documented in interaction-pattern.txt. Expanding
+to Monitor Alarm, Discharge Puzzle and Conversation requires their own authored
+variants, response mappings and checks; approval of the Med-Surg cases does not
+automatically cover new content.
+
+No commit, push, production deployment or App Store change.

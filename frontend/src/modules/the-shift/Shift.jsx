@@ -52,8 +52,8 @@ function ReportCards({ progress, update }) {
   })}</div>;
 }
 
-export default function Shift() {
-  const [progress, setProgress] = useState(readProgress);
+export default function Shift({ trackSession = null, debrief = null }) {
+  const [progress, setProgress] = useState(() => trackSession ? trackSession.initial() : readProgress());
   const [storageFailed, setStorageFailed] = useState(false);
   const [room, setRoom] = useState(null);
   const [restartOpen, setRestartOpen] = useState(false);
@@ -64,7 +64,11 @@ export default function Shift() {
   const firstRender = useRef(true);
   const stage = stages[progress.stage];
   const update = patch => setProgress(previous => ({ ...previous, ...patch }));
-  const choose = (key, value) => setProgress(previous => previous.answers[key] === undefined ? { ...previous, answers: { ...previous.answers, [key]: value } } : previous);
+  const choose = (key, value) => {
+    if (progress.answers[key] !== undefined) return;
+    trackSession?.observe(key, value, progress);
+    setProgress(previous => previous.answers[key] === undefined ? { ...previous, answers: { ...previous.answers, [key]: value } } : previous);
+  };
   const next = () => setProgress(previous => ({ ...previous, stage: Math.min(6, previous.stage + 1) }));
   const selectedPatient = scenario.patients.find(patient => patient.id === room);
   const priority = [...scenario.patients, scenario.charts].find(item => item.id === progress.answers.priority);
@@ -76,11 +80,12 @@ export default function Shift() {
   const cues = cueResult(progress.answers.cues ?? []);
 
   useEffect(() => {
+    if (trackSession) { trackSession.persist(progress); return; }
     let frame;
     try { const previous = readProgress(); localStorage.setItem(STORAGE_KEY, JSON.stringify(progress)); shiftProgress('drowsy-patient', '2.1', previous, progress, 6); }
     catch { frame = requestAnimationFrame(() => setStorageFailed(true)); }
     return () => { if (frame) cancelAnimationFrame(frame); };
-  }, [progress]);
+  }, [progress, trackSession]);
   useEffect(() => {
     if (firstRender.current) { firstRender.current = false; return; }
     heading.current?.focus({ preventScroll: true });
@@ -91,7 +96,7 @@ export default function Shift() {
   }, [room, restartOpen]);
 
   function closeDialog() { dialog.current?.close(); setRoom(null); setRestartOpen(false); }
-  function restart() { setProgress(freshProgress()); setSbarTab('a'); setCopied(''); closeDialog(); }
+  function restart() { setProgress(trackSession ? trackSession.restart() : freshProgress()); setSbarTab('a'); setCopied(''); closeDialog(); }
   async function copy(text, kind) {
     try { await navigator.clipboard.writeText(text); setCopied(kind); }
     catch { setCopied('unavailable'); }
@@ -179,7 +184,8 @@ export default function Shift() {
         {progress.stage === 6 && <>
           <div className="shift-complete"><span><Check /></span><p>Shift complete<strong>One morning. A different perspective.</strong></p></div>
           <section className="shift-takeaways" aria-label="Takeaways">{scenario.takeaways.map((text, index) => <div key={text}><span>0{index + 1}</span><p>{text}</p></div>)}</section>
-          <section className="shift-debrief-section"><h2>How the morning unfolded</h2><ol className="shift-timeline">{scenario.outcome.map(([time, text]) => <li key={time}><time>{time}</time><p>{text}</p></li>)}</ol></section>
+          {debrief}
+          <details className="mst-full-report" open={trackSession ? undefined : true}><summary hidden={!trackSession}>Explore your full shift report</summary><section className="shift-debrief-section"><h2>How the morning unfolded</h2><ol className="shift-timeline">{scenario.outcome.map(([time, text]) => <li key={time}><time>{time}</time><p>{text}</p></li>)}</ol></section>
           <section className="shift-debrief-section"><span className="shift-overline">Your first decisions</span><h2>Your shift report</h2><ul className="shift-reflections">{[
             ['Prioritize', progress.answers.priority === '12' ? 'You saw the right patient first.' : `You chose ${progress.answers.priority === 'charts' ? 'chart review' : `Room ${progress.answers.priority}`} first.`, scenario.patients[0].feedback, progress.answers.priority === '12'],
             ['Recognize', cues.essential === 2 ? 'You spotted both essential cues.' : `You spotted ${cues.essential} of 2 essential cues.`, scenario.essentialFeedback, cues.essential === 2],
@@ -189,7 +195,7 @@ export default function Shift() {
           ].map(([label, title, feedback, achieved]) => <li key={label}><span className={`shift-result-mark ${achieved ? 'is-recognized' : ''}`} aria-label={achieved ? 'Recognized' : 'Revisit'}>{achieved ? '\u2713' : '\u21BA'}</span><details><summary><small>{label}</small><strong>{title}</strong></summary><p>{feedback}</p></details></li>)}</ul><p className="shift-small">Learning reflection, not a clinical competency score.</p></section>
           <section className="shift-debrief-section"><h2>Why it can happen</h2><ul className="shift-why">{scenario.why.map(text => <li key={text}>{text}</li>)}</ul><p><strong>Cues to remember:</strong> {scenario.remember}</p><References ids={['bts', 'copd', 'abg', 'acidbase', 'rrt', 'judgment']} /></section>
           <section className="shift-debrief-section"><h2>Keep the learning going</h2><div className="shift-next-tools"><a href="/abg-lab" target="_blank" rel="noreferrer"><span>ABG LAB</span><strong>Practice respiratory acidosis <span aria-hidden="true">&#8599;</span></strong><small>Choose the respiratory acidosis example.</small></a><div><span>ASK CLINICAL EDGE</span><strong>Ask why</strong><p>{scenario.ask}</p><div className="shift-ask-links"><button className="shift-text-button" onClick={() => copy(scenario.ask, 'question')}>{copied === 'question' ? 'Question copied' : 'Copy question'}</button><a href="/ask" target="_blank" rel="noreferrer">Open Ask <span aria-hidden="true">&#8599;</span></a></div><small>Counts toward the daily Ask limit when submitted. Existing consent applies.</small></div></div></section>
-          <section className="shift-tomorrow"><h2>Want another shift tomorrow?</h2><div role="group" aria-label="Want another shift tomorrow?">{['Yes', 'Maybe', 'No'].map(answer => <button key={answer} aria-pressed={progress.tomorrow === answer} onClick={() => update({ tomorrow: answer })}>{answer}{progress.tomorrow === answer && <Check />}</button>)}</div><p className="shift-small">{progress.tomorrow ? 'Saved on this device only. Not submitted.' : 'Your response stays on this device.'}</p></section>
+          </details><section className="shift-tomorrow"><h2>Want another shift tomorrow?</h2><div role="group" aria-label="Want another shift tomorrow?">{['Yes', 'Maybe', 'No'].map(answer => <button key={answer} aria-pressed={progress.tomorrow === answer} onClick={() => update({ tomorrow: answer })}>{answer}{progress.tomorrow === answer && <Check />}</button>)}</div><p className="shift-small">{progress.tomorrow ? 'Saved on this device only. Not submitted.' : 'Your response stays on this device.'}</p></section>
           <div className="shift-end-actions"><button className="shift-secondary" onClick={() => setRestartOpen(true)}>Play again <span aria-hidden="true">&#8634;</span></button><details className="shift-share"><summary>Share card preview</summary><p>{scenario.share}</p><small>Preview only. Nothing is shared automatically.</small></details></div>
           <p className="shift-copy-status" role="status">{copied === 'unavailable' ? 'Clipboard unavailable. The question remains visible above.' : copied === 'question' ? 'Question copied. Nothing has been sent to Ask.' : ''}</p>
         </>}
@@ -199,7 +205,7 @@ export default function Shift() {
     </div>
     <dialog ref={dialog} className="shift-dialog" onCancel={() => { setRoom(null); setRestartOpen(false); }} aria-labelledby="shift-dialog-title">
       <button className="shift-dialog-close" aria-label="Close dialog" onClick={closeDialog}>&times;</button>
-      {restartOpen ? <><span className="shift-overline">New attempt</span><h2 id="shift-dialog-title">Restart this shift?</h2><p>This clears only this scenario's saved progress and choices.</p><div className="shift-dialog-actions"><button className="shift-secondary" onClick={closeDialog}>Keep my place</button><button className="shift-primary" onClick={restart}>Restart <span aria-hidden="true">&#8634;</span></button></div></> : selectedPatient && <><RoomNumber id={selectedPatient.id} /><h2 id="shift-dialog-title">Room {selectedPatient.id} report</h2><p>{selectedPatient.report}</p><button className="shift-secondary" onClick={closeDialog}>Return to the shift <Arrow /></button></>}
+      {restartOpen ? <><span className="shift-overline">New attempt</span><h2 id="shift-dialog-title">Restart this shift?</h2><p>{trackSession ? 'Your first track responses stay preserved. This starts a guided retry.' : "This clears only this scenario's saved progress and choices."}</p><div className="shift-dialog-actions"><button className="shift-secondary" onClick={closeDialog}>Keep my place</button><button className="shift-primary" onClick={restart}>Restart <span aria-hidden="true">&#8634;</span></button></div></> : selectedPatient && <><RoomNumber id={selectedPatient.id} /><h2 id="shift-dialog-title">Room {selectedPatient.id} report</h2><p>{selectedPatient.report}</p><button className="shift-secondary" onClick={closeDialog}>Return to the shift <Arrow /></button></>}
     </dialog>
   </div>;
 }

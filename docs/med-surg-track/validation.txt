@@ -1,0 +1,131 @@
+CLINICAL EDGE · MED-SURG CLINICAL · BUILD AND TEST RECORD
+October 18, 2026 · Reviewer-only draft 0.1.0 / mapping draft-1 / schema 1
+
+DELIVERED
+Fixed A1→A2→A3 path; existing Shift sessions with integrated debrief/next action;
+nine authored Rewind branches in a phone-expanding sheet; neutral Afternoon
+Handoff with action locked before reasoning choices; post-response teaching;
+bounded, assistance-aware practice feedback and original-response comparison.
+Local versioned records preserve original responses separately from guided
+retries, bridges, hints and Rewind. Learners control export/clear. No new server,
+account, payment, dashboard, clinical AI grading or analytics collection.
+
+BASELINE AND PRESERVATION
+Remote main was fetched and checked: aa5368bfe64c907c97773d0a93bc7fa335f71661.
+The primary checkout was on local main d02bd20 with unrelated work and behind
+the remote. Its changes were preserved. The earlier Replay pilot was inspected
+in its separate output checkout, including its newer UI revision and prior QA
+limits. It was not overwritten or used as proof that current tests passed.
+
+This isolated checkout is on feat/med-surg-track-pilot, based on aa5368b. No
+commits, push, merge, production deployment, App Store action or contact occurred.
+Existing A1 scenario.js/progress.js, A2 data.js/rules.js, consent.js, backend,
+dependency manifests/locks and hosting configuration are byte-unchanged from
+that base. The small existing-Shift rendering adapters are opt-in via props.
+
+CURRENT CHECK RESULTS
+PASS: frontend lint.
+PASS: private-feature production build; all nine existing prerender routes.
+PASS: disabled-feature production build; emitted JavaScript contained none of
+      the A3 name, track patient-workspace marker or Rewind content ID tested.
+PASS: 16/16 targeted deterministic track tests.
+PASS: 14/14 targeted Chromium browser tests, final run after atomic-save and
+      focus fixes, including the actual unseeded three-assignment flow.
+PASS: 934/934 backend tests. No backend implementation changed afterward.
+PASS: whitespace/diff checks and unchanged source-key/config checks.
+
+FULL SUITE, WITH LIMITS
+Full Chromium suite: 318 passed, 13 failed, 20 skipped (351 collected).
+This run preceded the last atomic-save refinement; all 14 pilot browser tests
+were then rerun and passed on the final implementation. It is not an entirely
+green repository suite, and skipped tests are not claimed as verified.
+
+All 13 full-suite failures were freshly reproduced on an untouched local
+checkout of aa5368b using the same installed dependencies and browser setup:
+  - Privacy device-identifier wording test (ai-limits): 1.
+  - Old Home Ask presentation expectations: 4 widths.
+  - ABG Lab bottom-dock clearance: 1.
+  - Old premium Learn-button/menu expectations: 3 widths.
+  - Old command Home Ask expectation: 1.
+  - Old workspace Home link selector: 3 widths.
+These are not repaired by this bounded pilot. The baseline subset also had a
+Priority Map timing failure; an earlier pilot run had a Rhythm Lab compare dock
+timing failure. Both tests passed on isolated repeat on both baseline and pilot.
+No persistent new failure was identified by those comparisons.
+
+Frontend Node suite: 48 passed, 1 failed (49 tests). The failure is the existing
+Scenario 4 historical byte-freeze test against commit 335591c; it also fails on
+untouched aa5368b (baseline: 32 passed, 1 failed). The pilot intentionally changes
+integration/privacy files within the user's authorized scope; the historical
+freeze is not a suitable clean-baseline assertion for the current repository.
+The clinical source files listed above were separately verified unchanged from
+the actual aa5368b base.
+
+WHAT THE TARGETED CHECKS COVER
+  - Independent versus assisted choices, prior bridges, hint-only history,
+    missing/partial evidence, all-component Strong and one-card prioritization.
+  - Conservative A1 assistance after priority/cue teaching; no false deficit.
+  - A2 source IDs, observed-only report requirements and coverage proxy limits.
+  - A3 neutral opening, optional chart inspection, no pre-action concern options
+    or teaching/highlights, locked action across refresh and reasonable acute
+    hypotheses linked to case findings.
+  - Original comparison source, no replacement by guided retries/Rewind,
+    no automatic improvement, report-versus-help and proxy-format mismatches.
+  - Mid-A1/A2 refresh, unfinished drafts, original wrong choices and safer-path
+    separation; atomic submitted-choice/evidence writes before screen saving.
+  - A3 action/reason/debrief resume, guided retry disclosure and first responses.
+  - Invalid JSON, unknown content/mapping/source versions, malformed structures,
+    preservation/export instead of silent reset, storage-failure memory fallback.
+  - All nine Rewinds, fitting specific-information items, non-urgent alternatives,
+    original preservation, Escape/close return and focus restoration.
+  - Keyboard skip targets, radio/checkbox operation, modal focus containment,
+    visible close control, 44px sheet buttons, no horizontal overflow at 320px,
+    reduced-motion operation and learner-controlled export/cancel-clear.
+  - No pilot network submissions in browser flows; mocked consented analytics
+    transport remains silent on track paths even with webdriver suppression off,
+    while allowed existing-page events still work. No new SDK, autocapture,
+    session recording, analytics fields or lifecycle allowlist entries.
+  - Existing source Shift/browser suites in the full run.
+
+VISUAL INSPECTION ACTUALLY PERFORMED
+Inspected rendered desktop track/path and review packet in the in-app browser.
+Inspected saved 1440px handoff and 390px teaching/debrief layouts, plus phone
+Rewind feedback at 390px and keyboard/focus view at 320px. Targeted tests also
+captured 768px handoff/debrief and current 1440px/390px path screenshots.
+The fixed dock in a full-page capture remains at its viewport position; the
+capture is not a claim that it floats at that document position while scrolling.
+These are desktop Chromium checks at phone viewport widths, not an iPhone pass.
+
+PHYSICAL IPHONE CHECKS STILL REQUIRE MOHAMED / DEVICE ACCESS
+  [ ] Safari touch walkthrough: all three assignments, chart controls, specific
+      information selector, reasoning limits and all Rewind response categories.
+  [ ] Actual safe areas with browser bars expanding/collapsing, portrait/landscape,
+      bottom dock, sheet close/return and scroll access to the last action.
+  [ ] VoiceOver reading order, named controls, table associations, focus entering
+      and leaving Rewind, new-response feedback announcements and chart updates.
+  [ ] Larger Text / zoom, Increase Contrast and Reduce Motion on device.
+  [ ] Background/resume, browser/app termination and relaunch, refresh mid-choice,
+      private-browsing storage denial/quota behavior and explicit failure notice.
+  [ ] Local JSON download/share behavior, deliberate clear and incompatible-record
+      export on Safari. No actual-device export/share success is claimed.
+  [ ] A separate private WebView test environment if available, including navigation
+      back from existing Ask/tool links. Do not modify the pending App Store build.
+  [ ] Device network inspection with analytics opt-in: no track responses, findings,
+      labels or reports transmitted; consent withdrawal still works elsewhere.
+
+OPEN PRODUCT / CLINICAL LIMITS
+This is a supported single-browser, single-active-tab local record; simultaneous
+writing tabs have no conflict-resolution guarantee. No cross-device sync or
+durable server backup exists. Storage failure can lose new progress on refresh.
+
+All new content, interpretations and response labels remain draft pending
+founder and independent clinician review. A1 has no independent mapped evidence
+under its present teaching sequence. A2 C1/C2 are proxies; A3 does not test spoken
+report composition. These limits prevent broad transfer or competence claims.
+Review.html contains the complete open questions, sources and signoff checklist.
+
+REPRODUCIBILITY
+README.txt contains local startup and check commands. Exact test logs are saved
+beside the repository in ../validation/. Browser screenshots are in
+artifacts/med-surg/ at this checkout's root. The review packet can be regenerated
+from runtime content using frontend/scripts/export-med-surg-review.mjs.

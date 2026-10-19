@@ -69,6 +69,12 @@
 .shift-review-dialog ol li { padding: 16px 0; border-bottom: 1px solid var(--ce-warm-line); }
 .shift-review-dialog li p { margin-top: 10px; }
 .shift-review-dialog a { color: var(--ce-teal-deep); }
+.shift-track-entry { display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 24px; margin: 0 0 32px; padding: 24px; background: var(--ce-warm-card); border: 1px solid var(--ce-warm-line); border-left: 4px solid var(--ce-teal-deep); border-radius: 8px; }
+.shift-track-entry > div { flex: 1 1 300px; min-width: 0; }
+.shift-track-entry h2 { margin: 8px 0; font-size: 24px; }
+.shift-track-entry p:not(.shift-overline) { margin: 0 0 12px; line-height: 1.6; }
+.shift-track-entry small { color: var(--ce-text-muted); line-height: 1.6; }
+.shift-track-entry > a { flex: 0 1 auto; }
 @media(max-width: 900px) { .shift-library-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
 @media(max-width: 560px) {
   .shift-library-main { padding: 24px 16px; }

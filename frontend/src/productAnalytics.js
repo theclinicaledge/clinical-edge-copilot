@@ -36,7 +36,11 @@ function excluded() {
   if (new URLSearchParams(window.location.search).get('ce_analytics') === 'exclude') store()?.setItem(EXCLUDE_KEY, '1');
   return import.meta.env?.DEV || navigator.webdriver || store()?.getItem(EXCLUDE_KEY) === '1';
 }
-function allowed() { return !!config && hasAnalyticsConsent() && !excluded(); }
+function allowed() {
+  // Private track has no analytics, autocapture or session recording. Learning records stay local.
+  if (window.location.pathname === '/learn/med-surg' || window.location.pathname.startsWith('/learn/med-surg/')) return false;
+  return !!config && hasAnalyticsConsent() && !excluded();
+}
 function distinctId() {
   const storage = store();
   if (!storage) return null;

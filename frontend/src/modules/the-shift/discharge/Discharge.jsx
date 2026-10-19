@@ -34,7 +34,7 @@ function RestartDialog({ onClose, onRestart }) {
   useEffect(() => { const el = ref.current, previous = document.activeElement; el.showModal(); return () => { el.close(); previous?.isConnected && previous.focus(); }; }, []);
   return <dialog ref={ref} className="shift-dialog discharge-dialog" aria-labelledby="restart-discharge" onCancel={onClose}><h2 id="restart-discharge">Restart The Discharge Puzzle?</h2><p>This resets only Scenario 3. The other two shifts keep their progress.</p><div className="shift-dialog-actions"><button className="shift-secondary" onClick={onClose}>Keep my place</button><button className="shift-primary" onClick={onRestart}>Restart</button></div></dialog>;
 }
-export default function Discharge() {
+export default function Discharge({ debrief = null }) {
   const [state, setState] = useState(read);
   const [storageFailed, setStorageFailed] = useState(false);
   const [restartOpen, setRestartOpen] = useState(false);
@@ -105,7 +105,7 @@ export default function Discharge() {
         {state.inspected.length === 2 && <><h2 className="discharge-prompt">What do you do?</h2><Choices choices={fixChoices} selected={answers.fix} onSelect={id => answer('fix', id)} label="Fix the misunderstanding" /><Feedback item={find(fixChoices, answers.fix)} /></>}
         {answers.fix && <><SourceLinks ids={['teachback', 'discrepancies', 'furosemide']} /><section className="discharge-dialogue"><span className="shift-overline">{answers.fix === 'confirm' ? 'Re-check / Show me again' : 'Guided re-check / After the misunderstanding is corrected'}</span><p>{script.recheck}</p></section>{proceed('Finish the afternoon')}</>}
       </>}
-      {state.stage === 6 && <>
+      {state.stage === 6 && <>{debrief}
         <section className="discharge-personal-review"><h2>Your shift review</h2><ol>{reflections.map(([title], index) => <li key={title}><span className={`discharge-reflection-mark ${recognized[index] ? 'is-recognized' : ''}`} aria-label={recognized[index] ? 'Recognized' : 'Revisit'}>{recognized[index] ? '✓' : '↻'}</span><div><span className="shift-overline">{title}</span><p>{reflectionText(index, answers, recognized[index])}</p>
           {index !== 1 && <details><summary>Your first choice{index === 2 ? 's' : ''}</summary>{index === 2 ? answers.actions.map(id => <p key={id}>{find(actions, id).text}</p>) : <p>{find(index === 0 ? startChoices : index === 3 ? teachChoices : fixChoices, index === 0 ? answers.start : index === 3 ? answers.teach : answers.fix).text}</p>}</details>}
           {index === 1 && <small>{concernCount(answers.flags)} concerns flagged. {state.noteOpened ? 'You opened the Day 2 note.' : 'The Day 2 note was available for investigation.'}</small>}
@@ -116,7 +116,7 @@ export default function Discharge() {
         <section className="shift-tomorrow"><h2>Want another shift tomorrow?</h2><div role="group" aria-label="Want another shift tomorrow?">{['Yes', 'Maybe', 'No'].map(item => <button key={item} aria-pressed={state.tomorrow === item} onClick={() => update({ tomorrow: item })}>{item}</button>)}</div><p className="discharge-review-note">Saved only on this device. Not submitted.</p></section>
         <div className="discharge-end"><button className="shift-secondary" onClick={() => setRestartOpen(true)}>Play again <span aria-hidden="true">↻</span></button><a className="shift-secondary" href="/prototypes/the-shift/scenarios.html">Choose another shift <span aria-hidden="true">→</span></a><details><summary>Share card preview</summary><p>{script.share}</p><small>Preview only. Nothing is shared automatically.</small></details></div>
       </>}
-      <footer className="discharge-footer"><span>{storageFailed ? 'Device storage unavailable. Progress lasts only in this tab.' : 'Progress saved only on this device.'}</span><p>Fictional education. No clinical approval or competency score. Treatment decisions belong to the provider and facility protocol.</p></footer>
+      <footer className="discharge-footer"><span>{storageFailed ? 'Device storage unavailable. Progress lasts only in this tab.' : 'Progress saved only on this device.'}</span><p>Fictional education. Not a competency assessment. Treatment decisions belong to the provider and facility protocol.</p></footer>
     </main>
     {restartOpen && <RestartDialog onClose={() => setRestartOpen(false)} onRestart={() => { const clean = fresh(); update(clean); setRestartOpen(false); }} />}
   </div>;

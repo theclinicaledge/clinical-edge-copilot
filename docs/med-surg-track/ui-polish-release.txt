@@ -1,0 +1,46 @@
+Rewind UI polish and release preparation — October 18, 2026 Pacific
+
+User authorized commit, push and deployment after checks.
+
+Changes
+- Compact sticky Rewind header during play, while retaining first-use orientation.
+- The specific scenario question is the main heading; duplicate visible question
+  removed, with the fieldset's accessible name retained.
+- Returning learners see progress, Continue Rewind and direct summary access.
+- Saved feedback has a direct Back to Rewind summary action; explicit retry remains.
+- Selected responses have a tinted surface, border and native checked state.
+- Keyboard focus and hover affordances strengthened. Each radio control uses a
+  unique group name, isolating the original call from the practice call.
+- Feedback labels have text plus restrained status styling; summary progress has
+  a labeled progress element. Empty option-detail elements removed.
+- Standalone Rewind is enabled with the public Shift release unless explicitly
+  disabled using VITE_REWIND_ENABLED=false. The Med-Surg track retains its separate
+  VITE_MED_SURG_TRACK_PREVIEW gate. Existing SHIFT_ENABLED gate still applies.
+
+Verification
+- Desktop screenshots of original and revised screens reviewed.
+- Shared-player development fixture checked intro, decision, feedback, partial
+  return, summary review, retry and keyboard Space/ArrowDown selection.
+- 390px long-choice layout inspected. Header reduced from about 210px to about
+  95px in the tested Conversation view.
+- Actual Discharge original completed on a separate localhost:5192 QA origin.
+  Entered Rewind, chose a response, saved, refreshed, reopened partial progress,
+  opened the summary, reviewed feedback and returned to summary. Attempt count
+  remained one after review; original debrief remained available.
+- Actual 320px integrated resume: document width 320; dialog client/scroll width315.
+  No horizontal overflow. Temporary viewport override restored.
+- 25 unit tests passed. Lint passed. Production-shaped build with Shift enabled
+  and private track disabled passed. Existing chunk-size warning remains.
+- Backend: all 934 tests passed in this run.
+- 22 pilot/standalone browser tests attempted with stop-on-first-failure: Chromium
+  was denied launch by the macOS sandbox before assertions; 21 not run. This is
+  an environment blocker, not a passing browser gate. Manual browser checks are
+  recorded separately above and in rewind-expansion-validation.txt.
+
+Release scope
+Only this repository's Shift/Rewind/track integration, related privacy/analytics
+boundaries, documentation and tests. Unrelated Ask/backend/Rhythm Lab work in the
+main local checkout is excluded. No backend code or App Store wrapper edits.
+The website also appears in the existing iOS WebView; this is a web release.
+New clinical content retains its explicit draft review status. Existing founder-
+reported clinical and physical-iPhone reviews are not relabeled as new review.

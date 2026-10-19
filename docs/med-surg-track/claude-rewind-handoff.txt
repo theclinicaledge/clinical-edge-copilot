@@ -1,0 +1,57 @@
+Clinical Edge — scenario scripting handoff for Claude
+October 19, 2026 UTC
+
+Rewind is now connected to all five current standalone shifts in the private preview:
+Drowsy Patient, Monitor Alarm, Discharge Puzzle, Conversation, Which Patient First.
+Each has three situations. The Med-Surg track also uses the shared player and keeps
+its own original-response/evidence records. Standalone practice is saved separately.
+
+When writing the next Shift, include its Rewind pack with the original scenario.
+Use the approved interaction sequence rather than designing new navigation:
+completed shift -> prominent optional Rewind invitation -> short explanation ->
+read changed situation -> choose response -> check response -> tailored explanation
+-> next untried situation or summary -> debrief/library. One or all three is optional.
+
+Author three complete fictional alternatives tied to a recognizable decision in
+the shift. Identify the moment you return to. Restate the context and current facts
+so the learner does not need to infer which original facts still apply. Change the
+important evidence, not just numbers or names. Include a case where a response can
+remain appropriate and a case where changed findings justify a different response.
+Do not teach an 'always escalate' or 'always change your answer' rule.
+
+Deliver for each pack:
+- Stable pack ID, title, content version, review status, one concise takeaway.
+- Three variations with stable IDs and neutral titles.
+- Each variation: history, facts[], question, options[], focus, rationale,
+  alternatives, sources[].
+- Each option: id, title, label (Accepted / Revisit / Unsafe), feedback.
+- Each source: title, canonical URL and scope explaining what it supports.
+Use short, specific response choices suitable for the decision: clinical actions,
+medication reconciliation, teach-back or exact conversational responses. Do not
+force every scenario into the original generic action list. Feedback must explain
+the selected response using facts actually presented. Document reasonable
+alternatives and local-role limits. Do not invent a risk score, treatment order,
+medication dose or unobserved patient outcome.
+
+Keep answer labels and rationale out of the read/decision screens. Fact headings
+and titles should not reveal the answer. Require an explicit Check my response
+before saving an attempt. Retrying adds a guided attempt; reviewing saved feedback
+does not. Never change the original Shift answers or classify Rewind as independent
+competence. Do not count teaching-assisted original responses as independent evidence.
+
+Implementation reference:
+frontend/src/modules/rewind/packs.js — authored registry and option validation
+frontend/src/modules/rewind/RewindPlayer.jsx — shared presentation/flow
+frontend/src/modules/rewind/standaloneStore.js — isolated versioned persistence
+frontend/src/modules/rewind/StandaloneRewind.jsx — debrief invitation and adapter
+frontend/src/modules/the-shift/ShiftExperience.jsx — scenario-to-pack mapping
+
+New content needs its own source check and independent clinical review. Existing
+founder-confirmed reviews are retained; they do not automatically approve new text.
+The nine newest situations are source-checked drafts. Review packet:
+standalone-rewind-review.html; machine-readable content: standalone-rewind-packet.json.
+
+Acceptance: complete the original shift and all variants; test wrong-answer feedback,
+retry, saved review, refresh/resume, original preservation, close/focus return,
+keyboard use, narrow-phone wrapping and storage failures. Use authored regression
+tests plus actual browser walkthroughs. Record actual results, never assumed passes.

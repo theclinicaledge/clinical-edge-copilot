@@ -1,0 +1,32 @@
+Clinical Edge Rewind: first-use flow check
+Updated October 18, 2026 Pacific
+
+Purpose
+Observe whether a new learner can understand and navigate Rewind without coaching. This is a usability check, not clinical validation. Use the private preview and fictional scenarios only.
+
+Starting point
+Use a separate test browser profile with a completed assignment. Do not clear or replace the founder's saved responses. Ask the learner to think aloud. Do not point out buttons or explain Rewind before they encounter its instructions.
+
+Tasks and success criteria
+1. From the completed shift, find optional practice. Learner finds Explore Rewind and recognizes that the next assignment is also available.
+2. Explain what Rewind does in their own words. Learner understands that this version's facts govern the response, the action may stay the same, and practice preserves original answers.
+3. Read a situation and choose a response. Learner finds patient details again when needed and understands what an incomplete selection requires.
+4. Check the response. Learner can distinguish their chosen action from its feedback and identify the findings supporting the explanation.
+5. Stop after one situation. Learner reaches the partial summary or returns to the debrief without believing all three are mandatory.
+6. Reopen and continue. Learner finds saved progress and reaches an untried situation.
+7. Review completed feedback. Learner opens the saved response without submitting a new attempt and can choose an explicit retry if desired.
+8. Move on. Learner reaches the next assignment or the track after A3, without being stranded in the modal.
+
+Record for each task
+Completed unaided / needed a hint / could not complete; exact confusing wording or action; device/browser; observed navigation. Distinguish observed behavior from the learner's opinion. Do not record patient information.
+
+Fix criteria
+Any blocked path, lost response, wrong feedback, or accidental overwrite blocks release. If a learner needs navigation coaching, revise that point and repeat that task with someone unfamiliar with the feature. Do not count a coached repeat as first-use success.
+
+Status update: October 18, 2026 Pacific
+- Founder approved the improved flow and reports that a nurse found it clear and understandable. Task-by-task observations and whether coaching occurred were not supplied.
+- Founder confirms the iPhone check is complete. Exact device/browser and individual check results were not supplied; do not invent them or request the same check again without a specific new regression.
+- Founder confirms clinical-content review is complete and accurate. Reviewer identity and review artifacts were not supplied. This is a founder-reported completed review, not a developer clinical-validation claim.
+- Automated browser regressions remain the outstanding technical gate. The previously recorded Mac sandbox failure happened before assertions.
+
+No outreach, enrollment, deployment or release is performed by this checklist.

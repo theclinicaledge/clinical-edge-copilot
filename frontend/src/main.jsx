@@ -29,6 +29,7 @@ import AbgLabModule from './modules/abg-lab/AbgLabModule.jsx'
 import BrainSheetsModule from './modules/brain-sheets/BrainSheetsModule.jsx'
 import BlogIndex from './blog/BlogIndex.jsx'
 import BlogPostPage from './blog/BlogPostPage.jsx'
+import { TRACK_ENABLED, trackRoute } from './modules/med-surg-track/feature.js'
 import { SHIFT_ENABLED } from './shiftFeature.js'
 import { shiftRoute, returningShift } from './modules/the-shift/routing.js'
 
@@ -43,6 +44,8 @@ function ShiftUnavailable({ navigate, active = true, mode }) {
 // Keep this build-time condition inline so disabled builds emit no scenario chunks.
 const ShiftExperience = import.meta.env.VITE_SHIFT_ENABLED === 'true' ? lazy(() => import('./modules/the-shift/ShiftExperience.jsx').catch(() => ({ default: ShiftUnavailable }))) : null;
 
+
+const MedSurgTrack = import.meta.env.VITE_MED_SURG_TRACK_PREVIEW === 'true' ? lazy(() => import('./modules/med-surg-track/Track.jsx')) : null;
 
 // ── Service Worker Registration ─────────────────────────────────────────────
 if ('serviceWorker' in navigator) {
@@ -66,6 +69,7 @@ function getPage() {
   if (path === '/' || path === '/home') return 'home';
   if (path === '/copilot')    return 'app';
   if (path === '/ask') return 'ask';
+  if (SHIFT_ENABLED && TRACK_ENABLED && trackRoute(path)) return 'med-surg';
   if (SHIFT_ENABLED && shiftRoute(path)) return 'shift-learning';
   if (path === '/rhythm-lab') return 'rhythmlab';
   if (path === '/rhythm-lab/library')  return 'rhythmlab-library';
@@ -165,6 +169,7 @@ function Root() {
   return (
     <>
       {SHIFT_ENABLED && returningShift(window.location.search) && ['ask', 'abglab', 'referencehub', 'shift-learning', 'rhythmlab-practice'].includes(page) && <Suspense fallback={null}><ShiftExperience mode="return" navigate={navigate} routeKey={routeKey} /></Suspense>}
+      {page === 'med-surg' && MedSurgTrack && <Suspense fallback={<main role="status">Opening the track...</main>}><MedSurgTrack navigate={navigate} routeKey={routeKey} /></Suspense>}
       {page === 'home'       && <ClinicalEdgeHome onNavigate={navigate} />}
       {SHIFT_ENABLED && shiftEntered && <Suspense fallback={page === 'shift-learning' ? <main className="ce-not-found" role="status">Opening The Shift...</main> : null}><ShiftExperience navigate={navigate} active={page === 'shift-learning'} routeKey={routeKey} /></Suspense>}
       {page === 'rhythmlab'          && <RhythmLabModule onGoHome={() => navigate('/')} navigate={navigate} />}

@@ -1,0 +1,50 @@
+Standalone Rewind integration — October 18, 2026 Pacific
+
+Implemented
+- Extracted the approved player into modules/rewind/RewindPlayer.jsx, with shared
+  Steps and CallControl. The Med-Surg track now uses this same player through an
+  adapter that retains its original persistence and next-assignment navigation.
+- Drowsy Patient and Which Patient First expose optional Rewind in their completed
+  standalone debriefs, using the existing three authored variations each.
+- Standalone practice uses its own versioned device-local keys. It cannot write
+  original Shift or track records. Reviewing feedback does not add an attempt.
+- Intro/read/decision/feedback/summary, partial resume and retry remain consistent.
+  Standalone summaries return to the library; track summaries retain track navigation.
+- Rewind unmounts when its scenario becomes inactive, preventing a retained hidden
+  scenario from leaving an open modal over another page.
+- Incompatible records block replacement. Storage failures preserve current practice
+  in component memory with a visible notice, including within the modal.
+- Privacy disclosure includes standalone practice retention and separation.
+- Standalone entry remains behind the existing private preview flag. No release,
+  deployment, commit, backend changes or new clinical content in this pass.
+
+Verification
+- Lint, enabled production build and 21 unit tests passed (16 existing + 5 new).
+- New tests cover record isolation, corrupt/incompatible record preservation,
+  storage failure, feedback parity for all six variations and stale-view updates.
+- Two new browser regressions are discoverable. Execution attempted with one worker:
+  Chromium launch denied by the Mac sandbox before assertions; not a passing gate.
+- Live browser on separate localhost QA origin: completed both standalone shifts,
+  opened Rewind, submitted a response and reached saved feedback and summary.
+- Drowsy Patient: reviewed saved feedback, closed, refreshed and resumed at situation 2.
+- Which Patient First: summary returned to Shift Library; reopening retained progress.
+- 390px standalone dialog inspected: document width 390, dialog client/scroll width
+  both 385. Viewport override restored afterward.
+- Original Med-Surg A1 still showed its own separate practice count. Verified shared
+  player intro/read/decision/feedback/summary and retained next-assignment action.
+- QA added one standalone practice response per shift and one track A1 response on
+  localhost. User origin 127.0.0.1 responses were not submitted or cleared.
+
+Next expansion
+Monitor Alarm, Discharge Puzzle and Conversation need their own authored Rewind
+packages. The shared player separates navigation and persistence, but its current
+response control still reflects the existing clinical-action choices. Adapt response
+controls and evaluation to each package instead of forcing communication or discharge
+decisions into those choices. New content needs its own review; do not reopen the
+founder-confirmed review of the existing Med-Surg content merely for this extraction.
+
+Expansion update — October 19, 2026 UTC
+The next-expansion work described above is implemented in the private preview.
+See rewind-expansion-validation.txt for current coverage and actual verification,
+claude-rewind-handoff.txt for authoring requirements, and standalone-rewind-review.html
+for all nine newly authored situations. Earlier test totals above are historical.

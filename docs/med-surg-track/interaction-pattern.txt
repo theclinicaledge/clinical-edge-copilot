@@ -1,0 +1,61 @@
+Clinical Edge: reusable shift and Rewind interaction pattern
+October 19, 2026 UTC — private pilot implementation reference
+
+Purpose
+Make the next action understandable without coaching. Scenario facts and clinical
+review vary; navigation, saved-state meaning and practice boundaries stay consistent.
+
+1. Orient
+Name the assignment, patient, time and immediate task. Show the current step.
+Use fictional cases. Keep reviewer and privacy details secondary.
+
+2. Review the patient
+Present information sources as outlined buttons, not plain labels. Each has a
+specific title, neutral description and Open / Viewing / Open again cue. Expose
+the current selection with aria-pressed, retain visible keyboard focus and support
+keyboard activation. Do not turn descriptions into clinical hints or require every
+source to be opened merely to advance. Adapt source names to each scenario.
+
+3. Make your call
+Explain that one action is required, selection can change before commitment, and
+reasoning comes next. Keep patient information available. Provide explicit routes
+between review and response, moving focus as well as scrolling. Commit only with
+the named action button; opening a source must never commit an answer.
+
+4. Explain your thinking
+Confirm the action is saved. State the exact remaining requirements and show
+selection counts/readiness. Preserve access to the chart. Submission leads to the
+debrief; a guided retry displays its own feedback separately from original evidence.
+
+5. Invite optional Rewind
+Put a prominent invitation in the completed shift debrief before lengthy detail.
+Explain: return to this decision with different findings, choose what to do, then
+see why the response may stay the same or change. One situation or all three is
+optional. Original responses remain preserved. Label Explore / Continue / Review
+according to saved progress.
+
+6. Play a situation
+Intro -> read this version's facts -> choose action and required information ->
+submit -> authored feedback. Keep situation number and title visible. Make current
+facts accessible during the decision. Show rationale after commitment, with
+alternatives available to explore. Use reviewed scenario-specific clinical content.
+
+7. Continue, stop or return
+Next chooses the next untried situation, including after out-of-order play.
+Summaries show unique situations tried, attempt counts and latest results. Review
+feedback opens the saved response without creating another attempt. Retrying is
+explicit. Completed practice saves; leaving and resuming must not replace originals.
+Provide Return to shift debrief and a clear next-assignment/track destination.
+
+Acceptance checks for each future scenario
+- An uncoached learner can identify the task, clickable sources and next action.
+- Keyboard focus follows stage changes and returns from a closed Rewind dialog.
+- Phone widths do not hide controls or create horizontal overflow.
+- Required fields, commit boundaries, refresh/resume and partial completion work.
+- Review does not add an attempt; retries cannot overwrite original evidence.
+- Clinical facts, rationale and assistance labels receive independent review.
+- Run browser regressions in a supported environment and physical iPhone checks.
+
+This is the current reusable pattern, not a claim of validated usability or
+clinical readiness. See first-use-flow-check.txt for the uncoached review protocol
+and ui-flow-revision.txt for actual verification and remaining blockers.

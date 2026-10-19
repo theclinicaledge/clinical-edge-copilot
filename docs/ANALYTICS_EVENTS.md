@@ -58,3 +58,9 @@ The dashboard does **not yet** show an exact last-decision distribution for inco
 6. **Acquisition:** the saved chart counts all `page_viewed` events by validated UTM source, labeling missing UTM as unknown. It is not a first-touch attribution chart. Do not imply cross-device attribution.
 
 Use PostHog's dashboard, funnel and retention builders; do not configure automatic capture. Check the actual account's billing and retention controls before activation. The free product-analytics allowance is currently advertised as 1 million events per month; verify the account's current plan at activation. Vercel Hobby analytics remains available for historical pageview context but is no longer emitted by this frontend candidate; its old counts are not directly comparable with opt-in PostHog data.
+
+Med-Surg Clinical private pilot: `/learn/med-surg` and its assignment paths exclude
+all capture events. No new lifecycle events were added to the existing allowlist.
+Autocapture/session recording SDKs are not introduced. Choices, reasoning, chart
+inspection, findings, outcome labels, feedback and local reports stay on-device.
+Consent and withdrawal are unchanged; no record is submitted to an AI route.

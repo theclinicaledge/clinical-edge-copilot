@@ -74,10 +74,14 @@ test('no em dashes anywhere in Shift 06 content or source', () => {
 });
 
 test('sources are stored by spec number, version 0.3, review status Draft', () => {
-  assert.deepEqual(Object.keys(data.SOURCES), ['1', '2', '3', '4', '5', '6']);
+  // OpenStax sources 1 and 6 were removed; nothing may still cite them.
+  assert.deepEqual(Object.keys(data.SOURCES), ['2', '3', '4', '5']);
+  const cited = [data.d1, data.d2, data.d3, data.d4, data.d5, data.d6, REWIND].flatMap(item => item.sources).concat(data.debrief.why.map(([, number]) => number).filter(Boolean));
+  assert.deepEqual(cited.filter(number => !data.SOURCES[number]), []);
+  assert.ok(!JSON.stringify(data.SOURCES).includes('openstax'));
+  assert.equal(data.debrief.why[1][1], null);
   assert.equal(data.VERSION, '0.3');
   assert.equal(data.SCENARIO_ID, 'SHIFT-006');
   assert.equal(data.card.reviewStatus, 'Draft');
   assert.equal(data.card.contentReviewDate, 'Pending');
-  assert.deepEqual(Object.entries(data.SOURCES).filter(([, s]) => s.licensingOpen).map(([n]) => n), ['1', '6']);
 });

@@ -7,15 +7,13 @@ export const VERSION = '0.3';
 export const title = 'The Stable Number';
 
 // Keyed by spec source number so a citation can be swapped without touching learner-facing text.
+// Spec sources 1 and 6 (OpenStax) were removed; the remaining numbers are unchanged.
 export const SOURCES = {
-  1: { citation: 'Bowen C, Carey B, Palozie J, Reinholdt M. Medical-Surgical Nursing, 35.5 Gastrointestinal Concerns. OpenStax; 2024.', url: 'https://openstax.org/books/medical-surgical-nursing/pages/35-5-gastrointestinal-concerns', supports: 'D3, D4, debrief bullet 2', licensingOpen: true },
-  2: { citation: 'Hooper N, Armstrong TJ. Hemorrhagic Shock. StatPearls; updated 26 Sep 2022.', url: 'https://www.ncbi.nlm.nih.gov/books/NBK470382/', supports: 'D2, D3, Rewind, debrief bullets 1 and 3', licensingOpen: false },
-  3: { citation: 'Upper Gastrointestinal Bleeding (editor Copelin EL). StatPearls Point-of-Care; updated 17 Aug 2024.', url: 'https://www.statpearls.com/point-of-care/30795', supports: 'D3, D4, Rewind', licensingOpen: false },
-  4: { citation: 'UC Davis PSNet Editorial Team. Rapid Response Systems. AHRQ PSNet; last reviewed 2024.', url: 'https://psnet.ahrq.gov/primer/rapid-response-systems', supports: 'D1, D4', licensingOpen: false },
-  5: { citation: 'Institute for Healthcare Improvement. SBAR Tool: Situation-Background-Assessment-Recommendation.', url: 'https://www.ihi.org/library/tools/sbar-tool-situation-background-assessment-recommendation', supports: 'D5', licensingOpen: false },
-  6: { citation: 'Bowen C, Carey B, Palozie J, Reinholdt M. Medical-Surgical Nursing, 4.2 Clinical Judgment Measurement Model Overview. OpenStax; 2024.', url: 'https://openstax.org/books/medical-surgical-nursing/pages/4-2-clinical-judgment-measurement-model-overview', supports: 'Part A, D1, D6', licensingOpen: true },
+  2: { citation: 'Hooper N, Armstrong TJ. Hemorrhagic Shock. StatPearls; updated 26 Sep 2022.', url: 'https://www.ncbi.nlm.nih.gov/books/NBK470382/', supports: 'D2, D3, Rewind, debrief bullets 1 and 3' },
+  3: { citation: 'Upper Gastrointestinal Bleeding (editor Copelin EL). StatPearls Point-of-Care; updated 17 Aug 2024.', url: 'https://www.statpearls.com/point-of-care/30795', supports: 'D3, D4, Rewind' },
+  4: { citation: 'UC Davis PSNet Editorial Team. Rapid Response Systems. AHRQ PSNet; last reviewed 2024.', url: 'https://psnet.ahrq.gov/primer/rapid-response-systems', supports: 'D1, D4' },
+  5: { citation: 'Institute for Healthcare Improvement. SBAR Tool: Situation-Background-Assessment-Recommendation.', url: 'https://www.ihi.org/library/tools/sbar-tool-situation-background-assessment-recommendation', supports: 'D5' },
 };
-export const LICENSING_NOTE = 'Sources 1 and 6 (OpenStax) have an unresolved licensing question and may be replaced before release.';
 
 const reading = (time, label, hr, sys, dia, rr, spo2, temp, note) => ({ time, label, hr, sys, dia, rr, spo2, temp, note });
 
@@ -84,7 +82,7 @@ export const d1 = {
     { id: '12', text: 'Room 12, Ms. Ruiz', result: 'Not first', feedback: 'Comfortable, walking, asking to shower. Nothing new to chase.' },
   ],
   teaching: 'A change over time outranks a stable number that only looks off.',
-  concepts: ['trend-vs-snapshot', 'reassurance-trap'], sources: [6, 4],
+  concepts: ['trend-vs-snapshot', 'reassurance-trap'], sources: [4],
 };
 
 const room14At1910 = at(ROOM14_VITALS, '1910');
@@ -121,7 +119,7 @@ export const d3 = {
     { id: 'iv', label: 'IV site', text: 'clean and dry.', tier: 'Not relevant', feedback: notRelevant },
   ],
   teaching: 'Before a lab reassures you, check when it was drawn.',
-  concepts: ['suspected-upper-gi-bleed', 'reassurance-trap'], sources: [3, 1, 2],
+  concepts: ['suspected-upper-gi-bleed', 'reassurance-trap'], sources: [3, 2],
 };
 
 export const d4 = {
@@ -135,7 +133,7 @@ export const d4 = {
   ],
   teaching: "Even when a patient doesn't meet your hospital's automatic rapid response thresholds, a concerning pattern and your clinical judgment can justify escalation.",
   whileHelp: "Stay with him and keep him in bed. Recheck his vitals, mental status and perfusion. Make sure his IV is working. Get ready for any ordered tests per your hospital's policy. None of this comes before the call.",
-  concepts: ['escalation-level', 'reassurance-trap'], sources: [4, 1, 3],
+  concepts: ['escalation-level', 'reassurance-trap'], sources: [4, 3],
 };
 
 export const d5 = {
@@ -174,7 +172,7 @@ export const d6 = {
     { id: 'escalate', text: 'Escalate now', result: 'Not best', feedback: 'After rest, her findings match her own baseline and goal. Escalation is for sustained change.' },
   ],
   teaching: 'Same rule, other direction. She matches her own normal, so the plan stands.',
-  concepts: ['trend-vs-snapshot', 'escalation-level'], sources: [6],
+  concepts: ['trend-vs-snapshot', 'escalation-level'], sources: [],
 };
 
 export const finalScreen = 'Night challenge complete.';
@@ -242,7 +240,7 @@ export const debrief = {
   ],
   why: [
     ['Early in blood loss, the body speeds up the heart and tightens the vessels. Heart rate rises and pulse pressure narrows while systolic pressure can hold steady.', 2],
-    ['In a GI bleed, hemoglobin and hematocrit can be normal at first and drop later.', 1],
+    ['In a GI bleed, hemoglobin and hematocrit can be normal at first and drop later.', null],
     ['Someone who usually runs high can be functionally hypotensive at a systolic that looks normal.', 2],
   ],
   ask: 'Why can hemoglobin look normal early in a GI bleed?',
@@ -273,7 +271,8 @@ export const card = {
 // Open content-validation items carried with the draft (not learner-facing).
 export const OPEN_ITEMS = [
   'Review status stays Draft until founder review and independent clinical sign-off are recorded.',
-  LICENSING_NOTE,
+  'Debrief "Why it happens" bullet 2 (hemoglobin and hematocrit can be normal at first and drop later) has no source since OpenStax Source 1 was removed. It needs a replacement source before release.',
+  'D6 (Room 16) has no source since OpenStax Source 6 was removed.',
   '"Pulse pressure, explained" is hidden. The Reference Hub pulse-pressure entry exists but needs clinical review for this learner level before it is linked.',
   'Estimated time is 6 minutes. If playtesting runs long, D1 may be cut later.',
 ];

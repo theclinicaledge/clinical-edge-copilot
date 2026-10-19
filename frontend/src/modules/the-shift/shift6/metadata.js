@@ -1,4 +1,4 @@
-import { SCENARIO_ID, VERSION, SOURCES, LICENSING_NOTE, OPEN_ITEMS, title, card, debrief } from './data.js';
+import { SCENARIO_ID, VERSION, SOURCES, OPEN_ITEMS, title, card, debrief } from './data.js';
 import { STORAGE_KEY, FINAL_STAGE, stages, readProgress } from './progress.js';
 import { SHIFT6_ID } from './feature.js';
 
@@ -15,7 +15,7 @@ export const shift6Entry = {
   },
   sources: Object.entries(SOURCES).map(([number, source]) => ({
     id: `shift6-${number}`, title: source.citation, url: source.url, scope: `Source ${number}. Supports ${source.supports}.`,
-    limitation: source.licensingOpen ? LICENSING_NOTE : 'Draft source mapping. Passage-level verification has not been recorded.',
+    limitation: 'Draft source mapping. Passage-level verification has not been recorded.',
   })),
   openItems: OPEN_ITEMS,
   storageKey: STORAGE_KEY, readProgress, finalStage: FINAL_STAGE,

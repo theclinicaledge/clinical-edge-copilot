@@ -43,7 +43,8 @@ test.describe('Shift 06 draft preview', () => {
     const dialog = page.getByRole('dialog');
     await expect(dialog).toContainText('Draft. Founder review and independent clinical sign-off have not been recorded.');
     await expect(dialog).toContainText('SHIFT-006 / 0.3');
-    await expect(dialog.locator('ol li')).toHaveCount(6);
+    await expect(dialog.locator('ol li')).toHaveCount(4);
+    await expect(dialog).not.toContainText('OpenStax');
   });
 
   // The stage number equals the decision number for these single-choice decisions.

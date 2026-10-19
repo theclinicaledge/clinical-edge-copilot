@@ -15,7 +15,7 @@ export const FOUNDATIONS: FoundationCard[] = [
   {
     id: 'rate',
     title: 'Rate',
-    line: 'Count large boxes between two R waves and divide 300 by that number. Or count beats in a 6-second strip × 10.',
+    line: 'For a regular rhythm, divide 300 by large boxes between R waves. For irregular rhythms, estimate with QRS count in a full 6-second strip × 10.',
     label: '< 60 · 60–100 · > 100',
   },
   {
@@ -39,7 +39,7 @@ export const FOUNDATIONS: FoundationCard[] = [
   {
     id: 'qrs',
     title: 'QRS width',
-    line: 'Narrow (< 0.12 s) means ventricular activation via normal pathways. Wide (≥ 0.12 s) means aberrant conduction — or ventricular origin.',
+    line: 'Narrow QRS is < 0.12 s. Wide QRS is ≥ 0.12 s and may reflect conduction delay, ventricular origin, pacing, or metabolic toxicity.',
     label: 'Narrow < 0.12 s · Wide ≥ 0.12 s',
   },
   {
@@ -58,27 +58,27 @@ export interface Pearl {
 export const PEARLS: Pearl[] = [
   { id: 'p1',  text: 'Rate first, regularity second, P waves third.' },
   { id: 'p2',  text: 'Fast and regular narrows the list.' },
-  { id: 'p3',  text: 'Wide does not always mean ventricular — it means be careful.' },
-  { id: 'p4',  text: 'AFib is irregular with no organized P waves. MAT looks identical but has P waves — find them.' },
+  { id: 'p3',  text: 'Wide does not always mean ventricular · it means be careful.' },
+  { id: 'p4',  text: 'AFib lacks organized P waves. MAT has at least three P-wave shapes, variable intervals, and a rate above 100.' },
   { id: 'p5',  text: 'A rate near 150 that never flattens between beats deserves a flutter hunt.' },
   { id: 'p6',  text: 'The monitor sees electricity, not perfusion. Assess the patient, then the strip.' },
   { id: 'p7',  text: 'Artifact can look dramatic while the patient looks fine. Check a second lead.' },
-  { id: 'p8',  text: 'Find the spike before you name a paced rhythm. No spike, no paced label.' },
-  { id: 'p9',  text: 'Wenckebach warns you — the PR stretches before the beat drops. Mobitz II gives no warning.' },
+  { id: 'p8',  text: 'Look for pacing spikes and capture. Invisible spikes do not exclude pacing; confirm device history and ECG settings.' },
+  { id: 'p9',  text: 'Wenckebach warns you · the PR stretches before the beat drops. Mobitz II gives no warning.' },
   { id: 'p10', text: 'Complete block: P waves and QRS complexes march to different drummers, ignoring each other.' },
   { id: 'p11', text: 'When the monitor and the patient disagree, the patient wins.' },
-  { id: 'p12', text: 'Early wide bizarre beat = premature (PVC). Late wide beat after a pause = escape. Timing is everything.' },
-  { id: 'p13', text: 'PAC or PVC? Check QRS width. Narrow early beat = PAC. Wide early beat = PVC.' },
-  { id: 'p14', text: 'Sinus bradycardia has an upright P before every QRS. Junctional rhythm does not — or the P is inverted.' },
-  { id: 'p15', text: 'AIVR looks like VTach but runs slow — under 100 bpm. Count before you classify.' },
+  { id: 'p12', text: 'A premature wide beat suggests PVC or aberrant conduction. A late wide beat after a pause suggests ventricular escape; check P waves and timing.' },
+  { id: 'p13', text: 'PAC or PVC? Check premature P waves, QRS morphology, and timing together. PACs can be wide or blocked.' },
+  { id: 'p14', text: 'Sinus bradycardia has an upright P before every QRS. Junctional rhythm does not · or the P is inverted.' },
+  { id: 'p15', text: 'AIVR often runs about 50–110 bpm; boundaries vary and overlap slow VT. Check AV relationships and context.' },
   { id: 'p16', text: 'NSR is your anchor. Every other rhythm is a variation from this baseline.' },
-  { id: 'p17', text: 'Torsades twists around the isoelectric line. The QRS axis rotates — it is unmistakable.' },
-  { id: 'p18', text: 'Sinus tachycardia always has a cause. Look for the trigger — the rate is the symptom, not the diagnosis.' },
-  { id: 'p19', text: 'First-degree block alone is rarely the problem — it is a sign to look harder for the cause.' },
+  { id: 'p17', text: 'Twisting polymorphic VT suggests torsades when the preceding QT is prolonged. The rhythm strip alone cannot establish the QT context.' },
+  { id: 'p18', text: 'Sinus tachycardia always has a cause. Look for the trigger · the rate is the symptom, not the diagnosis.' },
+  { id: 'p19', text: 'First-degree block alone is rarely the problem · it is a sign to look harder for the cause.' },
   { id: 'p20', text: 'PEA: organized electrical activity, no mechanical pulse. The strip is deceptive.' },
 ];
 
-// Precise rhythm-to-pearl mapping — covers every rhythm ID in rhythms.ts
+// Precise rhythm-to-pearl mapping · covers every rhythm ID in rhythms.ts
 const RHYTHM_PEARL_MAP: Record<string, string> = {
   nsr:                      'p16',
   sinus_bradycardia:        'p14',

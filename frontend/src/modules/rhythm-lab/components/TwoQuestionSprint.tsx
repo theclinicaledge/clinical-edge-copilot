@@ -2,29 +2,17 @@ import { useState, useCallback, useEffect, useRef } from 'react';
 import { trackEvent } from '../../../analytics';
 import { RHYTHMS } from '../data/rhythms';
 import { RhythmStrip } from './RhythmStrip';
+import { STRIP_EXAMPLES, stripAnnotation } from '../utils/waveforms';
 import { getPearlForRhythm } from '../data/phase1';
 
 interface TwoQuestionSprintProps {
   onBack: () => void;
 }
 
-type RateAnswer = 'slow' | 'normal' | 'fast';
-type RegAnswer  = 'regular' | 'irregular';
+type RateAnswer = 'slow' | 'normal' | 'fast' | 'not measurable';
+type RegAnswer = 'regular' | 'irregular' | 'not applicable';
 
 const SPRINT_LENGTH = 5;
-
-function getRhythmRateCategory(rate: string): RateAnswer {
-  const r = rate.toLowerCase();
-  if (r.includes('> 100') || r.includes('>100') || r.includes('150') || r.includes('200') || r.includes('tachycardia') || r.includes('fast')) return 'fast';
-  if (r.includes('< 60') || r.includes('<60') || r.includes('40') || r.includes('bradycardia') || r.includes('slow')) return 'slow';
-  return 'normal';
-}
-
-function getRhythmRegCategory(regularity: string): RegAnswer {
-  const r = regularity.toLowerCase();
-  if (r.includes('irregular')) return 'irregular';
-  return 'regular';
-}
 
 function buildDeck(): typeof RHYTHMS {
   const shuffled = [...RHYTHMS].sort(() => Math.random() - 0.5);
@@ -43,8 +31,8 @@ export function TwoQuestionSprint({ onBack }: TwoQuestionSprintProps) {
 
   const rhythm = deck[cardIdx];
   const pearl  = getPearlForRhythm(rhythm.id);
-  const correctRate = getRhythmRateCategory(rhythm.rate);
-  const correctReg  = getRhythmRegCategory(rhythm.regularity);
+  const correctRate = STRIP_EXAMPLES[rhythm.id].rateCategory;
+  const correctReg  = STRIP_EXAMPLES[rhythm.id].regularityCategory;
   const bothAnswered = rateAns !== null && regAns !== null;
 
   const handleReveal = useCallback(() => {
@@ -128,9 +116,11 @@ export function TwoQuestionSprint({ onBack }: TwoQuestionSprintProps) {
           <span className="detail-strip-label">
             {revealed ? `${rhythm.shortName} — ${rhythm.name}` : '? — Identify the rhythm'}
           </span>
-          <span className="detail-strip-annotation">Lead II simulation · 25 mm/s</span>
+          <span className="detail-strip-annotation">{stripAnnotation(rhythm.id)}</span>
         </div>
       </div>
+
+      {rhythm.id === 'pea' && <p className="caliper-hint">{STRIP_EXAMPLES.pea.context}</p>}
 
       {/* Panel */}
       <div className="sprint-panel">
@@ -140,7 +130,7 @@ export function TwoQuestionSprint({ onBack }: TwoQuestionSprintProps) {
             <div className="sprint-q-block">
               <p className="sprint-q-label">Rate?</p>
               <div className="sprint-options">
-                {(['slow', 'normal', 'fast'] as RateAnswer[]).map(opt => (
+                {(['slow', 'normal', 'fast', 'not measurable'] as RateAnswer[]).map(opt => (
                   <button
                     key={opt}
                     className={`sprint-option${rateAns === opt ? ' sprint-option--selected' : ''}`}
@@ -153,9 +143,9 @@ export function TwoQuestionSprint({ onBack }: TwoQuestionSprintProps) {
             </div>
 
             <div className="sprint-q-block">
-              <p className="sprint-q-label">Regular or irregular?</p>
+              <p className="sprint-q-label">Ventricular rhythm: regular or irregular?</p>
               <div className="sprint-options">
-                {(['regular', 'irregular'] as RegAnswer[]).map(opt => (
+                {(['regular', 'irregular', 'not applicable'] as RegAnswer[]).map(opt => (
                   <button
                     key={opt}
                     className={`sprint-option${regAns === opt ? ' sprint-option--selected' : ''}`}
@@ -182,7 +172,7 @@ export function TwoQuestionSprint({ onBack }: TwoQuestionSprintProps) {
               </div>
               <div className="sprint-reveal__checks">
                 <span className={`sprint-check ce-fade-in${rateAns === correctRate ? ' sprint-check--correct' : ' sprint-check--wrong'}`}>
-                  {rateAns === correctRate ? '✓' : '✗'} Rate: {correctRate}
+                  {rateAns === correctRate ? '✓' : '✗'} Example rate: {correctRate}{STRIP_EXAMPLES[rhythm.id].meanRateBpm !== undefined ? ` (~${Math.round(STRIP_EXAMPLES[rhythm.id].meanRateBpm!)} bpm)` : ''}
                 </span>
                 <span className={`sprint-check ce-fade-in${regAns === correctReg ? ' sprint-check--correct' : ' sprint-check--wrong'}`}>
                   {regAns === correctReg ? '✓' : '✗'} {correctReg.charAt(0).toUpperCase() + correctReg.slice(1)}

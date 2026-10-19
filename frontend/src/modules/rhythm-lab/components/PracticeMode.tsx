@@ -2,6 +2,7 @@ import { useState, useEffect, useRef } from 'react';
 import { trackEvent } from '../../../analytics';
 import { RHYTHMS, PRACTICE_CATEGORIES, URGENCY_COLORS_WARM } from '../data/rhythms';
 import { RhythmStrip } from './RhythmStrip';
+import { STRIP_EXAMPLES, stripAnnotation } from '../utils/waveforms';
 import {
   recordPracticeDay,
   addRecentRhythm,
@@ -102,9 +103,11 @@ export function PracticeMode({ onBack }: PracticeModeProps) {
           <span className="detail-strip-label">
             {revealed ? `${rhythm.shortName} — Recognition strip` : '? — Identity hidden'}
           </span>
-          <span className="detail-strip-annotation">Lead II simulation · 25 mm/s</span>
+          <span className="detail-strip-annotation">{stripAnnotation(rhythm.id)}</span>
         </div>
       </div>
+
+      {rhythm.id === 'pea' && <p className="caliper-hint">{STRIP_EXAMPLES.pea.context}</p>}
 
       {/* Teaching panel */}
       <div className="practice-panel">

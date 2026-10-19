@@ -3,6 +3,7 @@ import { trackEvent } from '../../../analytics';
 import { URGENCY_BADGE, URGENCY_COLORS_WARM, URGENCY_CONTEXT } from '../data/rhythms';
 import type { Rhythm } from '../data/rhythms';
 import { RhythmStrip } from './RhythmStrip';
+import { STRIP_EXAMPLES, stripAnnotation } from '../utils/waveforms';
 import { RecognitionSidebar } from './RecognitionSidebar';
 import { RecognitionBreakdown } from './RecognitionBreakdown';
 import { CaliperOverlay } from './CaliperOverlay';
@@ -70,13 +71,15 @@ export function RhythmDetail({ rhythm, onBack }: RhythmDetailProps) {
 
       <div className="detail-strip-area ce-card-enter">
         <div className="detail-strip-wrap">
-          <RhythmStrip rhythmId={rhythm.id} />
-          {caliperOn && <CaliperOverlay />}
+          <div className="detail-strip-measurement">
+            <RhythmStrip rhythmId={rhythm.id} />
+            {caliperOn && <CaliperOverlay />}
+          </div>
         </div>
         <div className="detail-strip-meta">
           <span className="detail-strip-label">{rhythm.shortName} — Recognition strip</span>
           <div className="detail-strip-meta__right">
-            <span className="detail-strip-annotation">Lead II simulation · 25 mm/s</span>
+            <span className="detail-strip-annotation">{stripAnnotation(rhythm.id)}</span>
             <button
               className={`caliper-btn${caliperOn ? ' caliper-btn--on' : ''}`}
               onClick={() => setCaliperOn(v => !v)}
@@ -91,9 +94,12 @@ export function RhythmDetail({ rhythm, onBack }: RhythmDetailProps) {
             </button>
           </div>
         </div>
+        {STRIP_EXAMPLES[rhythm.id]?.context && (
+          <p className="caliper-hint">{STRIP_EXAMPLES[rhythm.id].context}</p>
+        )}
         {caliperOn && (
           <p className="caliper-hint">
-            At 25 mm/s: 1 small box = 0.04s · 1 large box = 0.20s
+            Full strip = 6 s · 1 small box = 0.04 s / 0.1 mV · 1 large box = 0.20 s. On mobile, swipe to inspect the full strip.
           </p>
         )}
       </div>

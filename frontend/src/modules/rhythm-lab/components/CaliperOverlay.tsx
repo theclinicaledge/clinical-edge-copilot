@@ -1,25 +1,6 @@
 import { useState, useRef, useEffect } from 'react';
 
-// ─── Calibration ─────────────────────────────────────────────────────────────
-// Source of truth: RhythmStrip.tsx grid pattern
-//   <pattern id="…-minor" width="20" height="10" patternUnits="userSpaceOnUse">
-//
-// Therefore: SMALL_BOX_UNITS = 20 SVG user units per small box.
-//
-// At 25 mm/s: 1 small box = 0.04 s (ECG paper standard)
-//
-// Formula: seconds = (delta / SMALL_BOX_UNITS) × 0.04
-//
-// Verification:
-//   1 small box  = 20 SVGu  → (20/20)×0.04 = 0.04 s  ✓
-//   1 large box  = 100 SVGu → (100/20)×0.04 = 0.20 s  ✓
-//   3 small boxes = 60 SVGu → (60/20)×0.04 = 0.12 s  ✓
-//   5 small boxes = 100 SVGu → (100/20)×0.04 = 0.20 s  ✓
-const SMALL_BOX_UNITS = 20; // SVG user units per 1 mm ECG small box
-
-function calcSecs(delta: number): number {
-  return (delta / SMALL_BOX_UNITS) * 0.04;
-}
+import { BASELINE, STRIP_WIDTH, SMALL_BOX_UNITS, unitsToSeconds } from '../utils/calibration';
 
 // drag target: 0 = line A, 1 = line B, 2 = middle handle (slide both)
 type DragTarget = 0 | 1 | 2;
@@ -27,24 +8,11 @@ type DragTarget = 0 | 1 | 2;
 export function CaliperOverlay() {
   const [pos, setPos]   = useState([160, 520]);
   const [drag, setDrag] = useState<DragTarget | null>(null);
+  const dragRef = useRef<DragTarget | null>(null);
   const svgRef          = useRef<SVGSVGElement>(null);
+  const labelRef        = useRef<HTMLDivElement>(null);
+  const [labelBounds, setLabelBounds] = useState<{ min: number; max: number } | null>(null);
   const anchorRef       = useRef<{ svgX: number; p0: number; p1: number } | null>(null);
-
-  // Dev-only calibration log — fires whenever caliper position changes
-  useEffect(() => {
-    const [a, b] = pos;
-    const delta      = Math.abs(b - a);
-    const smallBoxes = delta / SMALL_BOX_UNITS;
-    const seconds    = calcSecs(delta);
-    console.debug('[Caliper]', {
-      x1:          a.toFixed(1),
-      x2:          b.toFixed(1),
-      delta:       delta.toFixed(1),
-      SMALL_BOX_UNITS,
-      smallBoxes:  smallBoxes.toFixed(2),
-      seconds:     seconds.toFixed(3),
-    });
-  }, [pos]);
 
   // Accurate pixel→SVG mapping via getScreenCTM — works at any viewport width
   function toSvgX(clientX: number): number {
@@ -54,7 +22,7 @@ export function CaliperOverlay() {
     const pt = svgRef.current.createSVGPoint();
     pt.x = clientX;
     pt.y = 0;
-    return Math.max(0, Math.min(800, pt.matrixTransform(ctm.inverse()).x));
+    return Math.max(0, Math.min(STRIP_WIDTH, pt.matrixTransform(ctm.inverse()).x));
   }
 
   // Slide both lines, preserving span, clamped to strip bounds [0, 800]
@@ -62,14 +30,14 @@ export function CaliperOverlay() {
     const dx      = currentSvgX - anchorSvgX;
     const left    = Math.min(p0, p1);
     const span    = Math.abs(p1 - p0);
-    const newLeft = Math.max(0, Math.min(800 - span, left + dx));
+    const newLeft = Math.max(0, Math.min(STRIP_WIDTH - span, left + dx));
     return p0 <= p1 ? [newLeft, newLeft + span] : [newLeft + span, newLeft];
   }
 
   useEffect(() => {
-    if (drag === null) return;
-    const target = drag; // narrowed local — avoids stale-closure TS error
     function onMove(e: MouseEvent) {
+      const target = dragRef.current;
+      if (target === null) return;
       const x = toSvgX(e.clientX);
       if (target === 2) {
         if (!anchorRef.current) return;
@@ -79,18 +47,19 @@ export function CaliperOverlay() {
         setPos(p => { const n = [...p]; n[target] = x; return n; });
       }
     }
-    function onUp() { setDrag(null); }
+    function onUp() { dragRef.current = null; setDrag(null); }
     document.addEventListener('mousemove', onMove);
     document.addEventListener('mouseup',   onUp);
     return () => {
       document.removeEventListener('mousemove', onMove);
       document.removeEventListener('mouseup',   onUp);
     };
-  }, [drag]);
+  }, []);
 
   function startLineDrag(i: 0 | 1, e: React.MouseEvent | React.TouchEvent) {
     e.preventDefault();
     e.stopPropagation();
+    dragRef.current = i;
     setDrag(i);
   }
 
@@ -99,25 +68,29 @@ export function CaliperOverlay() {
     e.stopPropagation();
     const clientX = 'touches' in e ? e.touches[0].clientX : e.clientX;
     anchorRef.current = { svgX: toSvgX(clientX), p0: pos[0], p1: pos[1] };
+    dragRef.current = 2;
     setDrag(2);
   }
 
   function onTouchMove(e: React.TouchEvent) {
-    if (drag === null) return;
+    const target = dragRef.current;
+    if (target === null) return;
     e.preventDefault();
     const x = toSvgX(e.touches[0].clientX);
-    if (drag === 2) {
+    if (target === 2) {
       if (!anchorRef.current) return;
       const { svgX, p0, p1 } = anchorRef.current;
       setPos(slidePos(svgX, p0, p1, x));
     } else {
-      setPos(p => { const n = [...p]; n[drag] = x; return n; });
+      setPos(p => { const n = [...p]; n[target] = x; return n; });
     }
   }
 
   const [x1, x2] = [...pos].sort((a, b) => a - b) as [number, number];
   const delta     = x2 - x1;
-  const secs      = calcSecs(delta).toFixed(2);
+  const seconds   = unitsToSeconds(delta);
+  const secs      = seconds.toFixed(2);
+  const smallBoxes = (delta / SMALL_BOX_UNITS).toFixed(1);
   const midX      = (x1 + x2) / 2;
 
   // Middle handle: pill on the baseline connector; hidden when span is tiny
@@ -126,13 +99,38 @@ export function CaliperOverlay() {
   const midCursor  = drag === 2 ? 'grabbing' : 'grab';
 
   // Label: always above the strip, centered on the span
-  const labelPct = `${(midX / 800) * 100}%`;
+  const labelPct = `${(midX / STRIP_WIDTH) * 100}%`;
+  const showMeasurement = delta > 4;
+
+  // The measurement lives on the same scrolling plane as the trace, but its
+  // text must remain readable near either edge of the visible viewport.
+  useEffect(() => {
+    const viewport = svgRef.current?.closest('.detail-strip-wrap') as HTMLElement | null;
+    const label = labelRef.current;
+    if (!viewport || !label) return;
+    function updateBounds() {
+      if (!viewport || !label) return;
+      const half = label.offsetWidth / 2 + 4;
+      const min = viewport.scrollLeft + half;
+      setLabelBounds({ min, max: Math.max(min, viewport.scrollLeft + viewport.clientWidth - half) });
+    }
+    updateBounds();
+    const observer = new ResizeObserver(updateBounds);
+    observer.observe(viewport);
+    observer.observe(label);
+    viewport.addEventListener('scroll', updateBounds, { passive: true });
+    return () => {
+      observer.disconnect();
+      viewport.removeEventListener('scroll', updateBounds);
+    };
+  }, [showMeasurement]);
 
   return (
     <div
       className="caliper-overlay"
       onTouchMove={onTouchMove}
-      onTouchEnd={() => setDrag(null)}
+      onTouchEnd={() => { dragRef.current = null; setDrag(null); }}
+      onTouchCancel={() => { dragRef.current = null; setDrag(null); }}
     >
       <svg
         ref={svgRef}
@@ -145,24 +143,24 @@ export function CaliperOverlay() {
         <rect x={x1} y="0" width={delta} height="100" fill="rgba(10,191,188,0.06)" />
 
         {/* Baseline connector */}
-        <line x1={x1} y1="65" x2={x2} y2="65"
+        <line x1={x1} y1={BASELINE} x2={x2} y2={BASELINE}
           stroke="rgba(10,191,188,0.3)" strokeWidth="0.5" />
 
         {/* Middle handle */}
         {showHandle && (
           <>
             <rect
-              x={midX - handleW / 2} y="61.5"
+              x={midX - handleW / 2} y={BASELINE - 3.5}
               width={handleW} height="7" rx="2"
               fill="rgba(10,191,188,0.14)"
               stroke="rgba(10,191,188,0.38)" strokeWidth="0.5"
               style={{ cursor: midCursor, pointerEvents: 'none' }}
             />
             <rect
-              x={midX - handleW / 2 - 4} y="56"
+              x={midX - handleW / 2 - 4} y={BASELINE - 9}
               width={handleW + 8} height="18"
               fill="transparent"
-              style={{ cursor: midCursor }}
+              style={{ cursor: midCursor, touchAction: 'none' }}
               onMouseDown={startMiddleDrag}
               onTouchStart={startMiddleDrag}
             />
@@ -173,8 +171,9 @@ export function CaliperOverlay() {
         <line x1={pos[0]} y1="0" x2={pos[0]} y2="100"
           stroke="rgba(10,191,188,0.65)" strokeWidth="0.8" />
         <rect
-          x={pos[0] - 12} y="0" width="24" height="100"
-          fill="transparent" style={{ cursor: 'ew-resize' }}
+          data-caliper-handle="a"
+          x={pos[0] - 12} y="0" width="24" height={delta < 24 ? 50 : 100}
+          fill="transparent" style={{ cursor: 'ew-resize', touchAction: 'none' }}
           onMouseDown={e => startLineDrag(0, e)}
           onTouchStart={e => startLineDrag(0, e)}
         />
@@ -183,17 +182,18 @@ export function CaliperOverlay() {
         <line x1={pos[1]} y1="0" x2={pos[1]} y2="100"
           stroke="rgba(10,191,188,0.65)" strokeWidth="0.8" />
         <rect
-          x={pos[1] - 12} y="0" width="24" height="100"
-          fill="transparent" style={{ cursor: 'ew-resize' }}
+          data-caliper-handle="b"
+          x={pos[1] - 12} y={delta < 24 ? 50 : 0} width="24" height={delta < 24 ? 50 : 100}
+          fill="transparent" style={{ cursor: 'ew-resize', touchAction: 'none' }}
           onMouseDown={e => startLineDrag(1, e)}
           onTouchStart={e => startLineDrag(1, e)}
         />
       </svg>
 
       {/* Measurement label — always above the strip, never between the lines */}
-      {delta > 4 && (
-        <div className="caliper-chip" style={{ left: labelPct }}>
-          {secs}s
+      {showMeasurement && (
+        <div ref={labelRef} className="caliper-chip" style={{ left: labelBounds ? `clamp(${labelBounds.min}px, ${labelPct}, ${labelBounds.max}px)` : labelPct }}>
+          {secs}s · {smallBoxes} small boxes
         </div>
       )}
     </div>

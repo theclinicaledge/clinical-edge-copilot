@@ -468,7 +468,8 @@
 
 .explore-hub {
   border-top: 1px solid rgba(214, 208, 196, 0.8);
-  padding: 20px 0 0;
+  /* Keep the final Recognition Pearls card scrollable above the floating dock. */
+  padding: 20px 0 var(--ce-dock-clearance, 88px);
 }
 
 .explore-hub__eyebrow {
@@ -962,7 +963,7 @@
   inset: 0;
   cursor: crosshair;
   user-select: none;
-  touch-action: none;
+  touch-action: pan-x;
 }
 
 .detail-strip-meta__right {
@@ -1020,7 +1021,7 @@
 /* HTML measurement chip — full CSS font control, not SVG text */
 .caliper-chip {
   position: absolute;
-  top: 5px;                          /* always above the strip content */
+  top: 0;
   transform: translateX(-50%);
   background: rgba(8, 16, 28, 0.92);
   color: rgba(10, 191, 188, 0.96);
@@ -1453,27 +1454,24 @@
   .detail-strip-meta  { padding: 8px 24px; }
 }
 
-/* ─── Responsive: mobile detail strip — scrollable ───────────────────── */
-
-@media (max-width: 600px) {
-  .strip-canvas {
-    width: 100%;        /* bound the container so overflow-x: auto clips correctly */
-    overflow-x: auto;
-    -webkit-overflow-scrolling: touch;
-    scrollbar-width: thin;
-  }
-
-  .strip-canvas svg {
-    min-width: 360px;   /* reduced from 480 — still scrollable but less aggressive */
-    height: 80px;
-  }
-}
-
-/* ─── Strip canvas — sweep reveal wrapper ────────────────────────────── */
-
+/* Six seconds of square ECG paper. Keep calipers in the same scrolling plane. */
 .strip-canvas {
-  line-height: 0; /* collapse inline-block gap below the SVG */
+  width: 100%;
+  overflow-x: auto;
+  line-height: 0;
 }
+.strip-canvas .rhythm-strip-svg {
+  width: 100%;
+  min-width: 640px;
+  height: auto;
+  aspect-ratio: 8 / 1;
+}
+.detail-strip-wrap { overflow-x: auto; }
+.detail-strip-measurement {
+  position: relative;
+  min-width: 640px;
+}
+.detail-strip-measurement .strip-canvas { overflow: visible; }
 
 /* ─── Motion animations — all gated on no-preference ────────────────── */
 
@@ -1785,18 +1783,6 @@
 .compare-strip-card__strip {
   padding: 0;
   overflow: hidden;
-}
-
-@media (max-width: 600px) {
-  .compare-strip-card__strip .strip-canvas {
-    width: 100%;
-    overflow-x: auto;
-    -webkit-overflow-scrolling: touch;
-  }
-  .compare-strip-card__strip .strip-canvas svg {
-    min-width: 340px;
-    height: 80px;
-  }
 }
 
 /* ─── Compare Mode: analysis section ────────────────────────────────── */

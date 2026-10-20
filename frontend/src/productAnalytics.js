@@ -14,8 +14,9 @@ const TOOLS = new Set(['abg', 'rhythm_practice', 'rhythm_sprint', 'reference_sea
 const FAILURES = new Set(['limit', 'network', 'server', 'withheld_or_rejected', 'unavailable']);
 const CAMPAIGN_VALUES = {
   utm_source: new Set(['instagram', 'tiktok', 'youtube', 'reddit', 'facebook', 'email', 'friend', 'community', 'student_group', 'qr']),
-  utm_medium: new Set(['social', 'email', 'referral', 'community', 'qr']),
-  utm_campaign: new Set(['fl04', 'student_feedback', 'public_beta']),
+  utm_medium: new Set(['social', 'email', 'referral', 'community', 'qr', 'paid_social']),
+  utm_campaign: new Set(['fl04', 'student_feedback', 'public_beta', 'clinical_edge_learn_test']),
+  utm_content: new Set(['who_first_video']),
 };
 let config = null;
 let lastPage = '';
@@ -52,7 +53,7 @@ function propertiesFor(event, props) {
   const result = {};
   if (event === 'page_viewed') {
     result.route = safeRoute(props.route);
-    for (const key of ['utm_source', 'utm_medium', 'utm_campaign']) if (CAMPAIGN_VALUES[key].has(props[key])) result[key] = props[key];
+    for (const key of Object.keys(CAMPAIGN_VALUES)) if (CAMPAIGN_VALUES[key].has(props[key])) result[key] = props[key];
   }
   else result.route = safeRoute(props.route);
   if (event === 'feature_opened' && FEATURES.has(props.feature)) result.feature = props.feature;
@@ -126,7 +127,7 @@ export function pageViewed(path) {
   if (lastPage === route) return;
   const params = new URLSearchParams(window.location.search);
   const campaign = {};
-  for (const key of ['utm_source', 'utm_medium', 'utm_campaign']) if (CAMPAIGN_VALUES[key].has(params.get(key))) campaign[key] = params.get(key);
+  for (const key of Object.keys(CAMPAIGN_VALUES)) if (CAMPAIGN_VALUES[key].has(params.get(key))) campaign[key] = params.get(key);
   if (capture('page_viewed', { route, ...campaign })) lastPage = route;
 }
 export function trackEvent(name, data = {}) {

@@ -13,11 +13,18 @@ This candidate replaces the Vercel Analytics frontend collector with one manual 
 
 ## Strict event contract
 
+October 20, 2026: founder-approved Instagram traffic test adds only medium
+`paid_social`, campaign `clinical_edge_learn_test`, and content `who_first_video`.
+These are fixed public advertising labels, not free text. Existing labels remain
+accepted; all other values are discarded. Consent, identifiers, recipient and
+event scope remain unchanged. No Meta SDK or cross-site tracking is added.
+Labels apply to the current page-view URL only, not persistent first-touch attribution.
+
 All event names and properties are allowlisted in `frontend/src/productAnalytics.js`. PostHog timestamps events on ingestion; the client sends a random event UUID and a device-local random distinct ID only after opt-in. It never sends Ask text, answers, clinical values, Shift choices, names, email, form input, raw error text, clipboard content or query strings. Campaign attribution accepts only enumerated category tokens; arbitrary URL values are discarded. Requests send no browser cookies or referrer. The analytics ID is separate from the Ask quota ID. The recipient still sees network metadata such as IP address when receiving an event.
 
 | Event | Properties | Meaning |
 | --- | --- | --- |
-| `page_viewed` | `route`, validated `utm_source`, `utm_medium`, `utm_campaign` | One route view, not every rerender |
+| `page_viewed` | `route`, validated `utm_source`, `utm_medium`, `utm_campaign`, `utm_content` | One route view, not every rerender |
 | `feature_opened` | `feature` | Major feature mount; do not add to page views when counting visits |
 | `core_task_failed` | Fixed `feature` and `failure` category | Core screen unavailable, without raw error text |
 | `ask_submitted`, `ask_succeeded`, `ask_failed` | `kind` (`question` or `followup`), fixed failure category where applicable | Submitted turn, delivered answer, or withheld/error result |

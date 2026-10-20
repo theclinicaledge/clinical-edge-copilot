@@ -89,3 +89,30 @@ test('App Store badge interest retains only an approved placement', () => {
   assert.deepEqual(Object.keys(sent[0].properties).sort(), ['$process_person_profile', 'analytics_origin', 'placement', 'route']);
   assert.equal(sent[0].properties.placement, 'footer');
 });
+
+test('approved Instagram ad labels require consent and arrive together', () => {
+  window.location.pathname = '/learn';
+  window.location.search = '?utm_source=instagram&utm_medium=paid_social&utm_campaign=clinical_edge_learn_test&utm_content=who_first_video';
+  pageViewed('/learn');
+  assert.equal(sent.length, 0);
+  saveConsent({ ai: false, analytics: true });
+  pageViewed('/learn');
+  assert.deepEqual(sent[0].properties, {
+    route: '/learn', utm_source: 'instagram', utm_medium: 'paid_social',
+    utm_campaign: 'clinical_edge_learn_test', utm_content: 'who_first_video',
+    analytics_origin: 'app', $process_person_profile: false,
+  });
+  saveConsent({ ai: false, analytics: false });
+  syncConsent();
+  pageViewed('/learn');
+  assert.equal(sent.length, 1);
+});
+
+test('unapproved campaign and creative values never leave the device', () => {
+  saveConsent({ ai: false, analytics: true });
+  window.location.search = '?utm_source=private&utm_medium=secret&utm_campaign=private%20text&utm_content=private%20text&question=private';
+  pageViewed('/learn');
+  assert.deepEqual(sent[0].properties, { route: '/learn', analytics_origin: 'app', $process_person_profile: false });
+  assert.deepEqual(_testing.propertiesFor('page_viewed', { route: '/learn', utm_content: 'unknown', utm_campaign: 'unknown' }), { route: '/learn' });
+  assert.deepEqual(_testing.propertiesFor('feature_opened', { route: '/learn', feature: 'shift_library', utm_content: 'who_first_video' }), { route: '/learn', feature: 'shift_library' });
+});

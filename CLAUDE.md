@@ -38,8 +38,9 @@ instead of doing it.
 - Nothing a user enters may be sent to a third-party AI service until they grant explicit
   permission. `frontend/src/components/AIConsentGate.jsx` wraps every AI-backed workspace.
   Any new feature that calls the backend AI routes must sit behind that gate.
-- Usage analytics are opt-in. All events go through `frontend/src/analytics.ts`, which drops
-  them without consent. Never call `@vercel/analytics` `track` directly.
+- Usage analytics are opt-in. `frontend/src/analytics.ts` delegates to the manual PostHog
+  collector in `frontend/src/productAnalytics.js`, which drops events without consent.
+  Do not add direct collectors, automatic capture, or session replay.
 - Consent state lives in `frontend/src/consent.js`. Bump `CONSENT_VERSION` whenever what is
   sent, who receives it, or the disclosure wording materially changes.
 - Users can withdraw both choices on the Privacy page. Do not remove that control.
@@ -97,7 +98,7 @@ instead of doing it.
 | Backend | Node.js + Express 5 (localhost:3001), hosted on Render |
 | AI | Anthropic Claude API only (model `claude-sonnet-4-6`). Never OpenAI. |
 | Web hosting | Vercel |
-| Analytics | Vercel Analytics via `frontend/src/analytics.ts`, opt-in only |
+| Analytics | Manual PostHog via `frontend/src/productAnalytics.js`, opt-in only |
 | Persistence | Browser localStorage/sessionStorage only. No database. |
 
 ## Backend Routes

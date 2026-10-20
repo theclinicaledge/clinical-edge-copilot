@@ -81,7 +81,7 @@ function StaffAvailability({ phase }) {
   </ul>;
 }
 
-export default function Shift5({ embedded = false, trackSession = null, debrief = null }) {
+export default function Shift5({ embedded = false, trackSession = null, debrief = null, nextStep = null }) {
   const [state, setState] = useState(() => trackSession ? trackSession.initial() : loadProgress());
   const [d1Draft, setD1Draft] = useState(() => state.uiDraft?.d1Draft || { order: [], reason: null });
   const [d3Draft, setD3Draft] = useState(() => state.uiDraft?.d3Draft || { option: null, v5Step: null });
@@ -195,6 +195,7 @@ export default function Shift5({ embedded = false, trackSession = null, debrief 
         <h2>Go further</h2><p>Optional questions for Ask Clinical Edge. Copy a question, then open Ask to decide whether to submit it. Ask's consent, scope and daily limit still apply.</p>{[['delegation', 'How do patient stability, staff competence, RN assessment and local policy affect what a nurse can delegate?'], ['bleeding', 'What are early signs of bleeding after surgery?']].map(([topic, question]) => <div className="s5-ask" key={question}><p>{question}</p><button type="button" onClick={async () => { setCopied(await copy(question)); }}>{copied ? 'Copied' : 'Copy question'}</button><a href={`/ask?topic=${topic}`}>Open Ask ↗</a></div>)}
         <details className="s5-sources"><summary>Sources and review limits</summary><p>These references support general concepts. The founder reports an independent nurse found no material issues with this scenario; reviewer identity, credentials, date and formal validation are not documented.</p>{references.map(([name, url, limit]) => <p key={url}><a href={url} target="_blank" rel="noreferrer">{name}</a> — {limit}</p>)}</details>
         </details><div className="s5-tomorrow"><h2>Want another shift tomorrow?</h2>{['Yes', 'Maybe', 'No'].map(answer => <Choice key={answer} selected={state.tomorrow === answer} onClick={() => patch({ tomorrow: answer })}>{answer}</Choice>)}<p className="s5-small">Your answer stays on this device.</p></div><button className="s5-primary" onClick={restart}>Play again</button></section>}
+      {state.stage === 7 && nextStep}
       </main></div><footer className="s5-footer">Clinical Edge · Fictional nursing education · Not patient-specific care</footer>
   </div>;
 }

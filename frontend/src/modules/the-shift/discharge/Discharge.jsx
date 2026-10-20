@@ -34,7 +34,7 @@ function RestartDialog({ onClose, onRestart }) {
   useEffect(() => { const el = ref.current, previous = document.activeElement; el.showModal(); return () => { el.close(); previous?.isConnected && previous.focus(); }; }, []);
   return <dialog ref={ref} className="shift-dialog discharge-dialog" aria-labelledby="restart-discharge" onCancel={onClose}><h2 id="restart-discharge">Restart The Discharge Puzzle?</h2><p>This resets only Scenario 3. The other two shifts keep their progress.</p><div className="shift-dialog-actions"><button className="shift-secondary" onClick={onClose}>Keep my place</button><button className="shift-primary" onClick={onRestart}>Restart</button></div></dialog>;
 }
-export default function Discharge({ debrief = null }) {
+export default function Discharge({ debrief = null, nextStep = null }) {
   const [state, setState] = useState(read);
   const [storageFailed, setStorageFailed] = useState(false);
   const [restartOpen, setRestartOpen] = useState(false);
@@ -117,6 +117,7 @@ export default function Discharge({ debrief = null }) {
         <div className="discharge-end"><button className="shift-secondary" onClick={() => setRestartOpen(true)}>Play again <span aria-hidden="true">↻</span></button><a className="shift-secondary" href="/prototypes/the-shift/scenarios.html">Choose another shift <span aria-hidden="true">→</span></a><details><summary>Share card preview</summary><p>{script.share}</p><small>Preview only. Nothing is shared automatically.</small></details></div>
       </>}
       <footer className="discharge-footer"><span>{storageFailed ? 'Device storage unavailable. Progress lasts only in this tab.' : 'Progress saved only on this device.'}</span><p>Fictional education. Not a competency assessment. Treatment decisions belong to the provider and facility protocol.</p></footer>
+      {state.stage === 6 && nextStep}
     </main>
     {restartOpen && <RestartDialog onClose={() => setRestartOpen(false)} onRestart={() => { const clean = fresh(); update(clean); setRestartOpen(false); }} />}
   </div>;

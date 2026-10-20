@@ -88,6 +88,20 @@ function Handoff({ item, navigate }) {
   return <main className="shift-handoff"><AppLink to={shiftPath(item.id)} navigate={navigate}>&#8592; Return to {item.title}</AppLink><p className="shift-overline">Connected learning / Ask Clinical Edge</p><h1>Keep the question going.</h1><blockquote>{question}</blockquote>{item.id === 'conversation' && <p>This question has not been tested with the live model. Ask may decline it. Ask is not a crisis service.</p>}<button className="shift-secondary" onClick={async () => { try { await navigator.clipboard.writeText(question); setStatus('Question copied.'); } catch { setStatus('Copy unavailable. Select the question above to copy it manually.'); } }}>Copy question</button><p role="status">{status}</p><p>Open Ask and paste the question when you are ready. Nothing is submitted automatically. Existing AI consent, privacy protections and the daily question allowance apply.</p><AppLink to={`/ask?shift=${item.id}`} navigate={navigate} className="shift-primary">Open Ask <span aria-hidden="true">&#8594;</span></AppLink></main>;
 }
 
+function NextStep({ item, navigate }) {
+  const [primary, ...other] = item.recommendations;
+  return <section className="shift-next-step" aria-label="Your next step">
+    <span className="shift-overline">Keep learning</span>
+    <h2>Your next step</h2>
+    <h3>{primary.title}</h3><p>{primary.detail}</p>
+    <AppLink className="shift-primary" to={learningDestination(primary.path, item.id)} navigate={navigate}>
+      {primary.path.startsWith('/ask') ? 'Prepare a question' : primary.path.startsWith('/abg') ? 'Open ABG example' : 'Open reference'} <span aria-hidden="true">&#8594;</span>
+    </AppLink>
+    {item.recommendations.some(link => link.path.startsWith('/ask')) && <p className="shift-next-step__note">Ask is optional. Nothing is submitted automatically. Existing consent and daily limits apply.</p>}
+    <div className="shift-next-step__alternatives">{other.map(link => <AppLink key={link.id} to={learningDestination(link.path, item.id)} navigate={navigate}>{link.title} <span aria-hidden="true">&#8599;</span></AppLink>)}<AppLink to="/learn/shifts" navigate={navigate}>Choose another shift <span aria-hidden="true">&#8594;</span></AppLink></div>
+  </section>;
+}
+
 function Scenario({ item, navigate, active }) {
   const [review, setReview] = useState(false);
   const root = useRef(null);
@@ -115,8 +129,7 @@ function Scenario({ item, navigate, active }) {
   }
   return <div ref={root} className="shift-scenario-scroll" onClickCapture={capture}>
     <div className="shift-scene-bar"><AppLink to="/learn/shifts" navigate={navigate}>&#8592; Shift Library</AppLink><button onClick={() => setReview(true)}>Sources & review</button></div>
-    <Scene embedded={item.id === 'which-patient-first'} debrief={active && StandaloneRewind && rewindAssignments[item.id] ? <Suspense fallback={<p role="status">Opening optional practice...</p>}><StandaloneRewind id={rewindAssignments[item.id]} navigate={navigate} /></Suspense> : null} />
-    {!item.private && item.id !== 'conversation' && <section className="shift-connections"><span className="shift-overline">Connected learning</span><h2>Follow the why.</h2><div>{item.recommendations.map(link => <AppLink key={link.id} to={learningDestination(link.path, item.id)} navigate={navigate}><strong>{link.title}</strong><span>{link.detail}</span><b aria-hidden="true">&#8599;</b></AppLink>)}</div></section>}
+    <Scene embedded={item.id === 'which-patient-first'} nextStep={['drowsy-patient', 'monitor-alarm', 'discharge-puzzle', 'which-patient-first'].includes(item.id) ? <NextStep item={item} navigate={navigate} /> : null} debrief={active && StandaloneRewind && rewindAssignments[item.id] ? <Suspense fallback={<p role="status">Opening optional practice...</p>}><StandaloneRewind id={rewindAssignments[item.id]} navigate={navigate} /></Suspense> : null} />
     {review && <ReviewDialog item={item} close={() => setReview(false)} />}
   </div>;
 }

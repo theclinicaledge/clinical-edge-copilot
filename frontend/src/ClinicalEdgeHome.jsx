@@ -3,6 +3,7 @@ import { useSeo } from "./seo/useSeo.js";
 import { STATIC_ROUTE_SEO } from "./seo/routeSeo.js";
 import { ClinicalEdgeMark } from "./components/ModuleHeader.jsx";
 import AppStoreBadge from "./components/AppStoreBadge.jsx";
+import ContinueLearning from "./components/ContinueLearning.jsx";
 import { CHECK_ACTIONS, LEARN_ACTIONS } from "./components/workspaceActions.js";
 import "./styles/workspace-navigation.css";
 import { SHIFT_ENABLED } from './shiftFeature.js';
@@ -23,6 +24,7 @@ export default function ClinicalEdgeHome({ onNavigate }) {
   return <div className="ce-command-home">
     <header className="ce-command-home__header"><div><ClinicalEdgeMark /><strong>Clinical Edge</strong><span>For nurses</span></div></header>
     <main className="ce-command-home__main">
+      {SHIFT_ENABLED && <ContinueLearning onNavigate={onNavigate} />}
       {SHIFT_ENABLED && <section className="ce-home-shift" aria-labelledby="home-shift-title"><span>The Shift</span><h1 id="home-shift-title">Experience nursing.<br />Five minutes at a time.</h1><p>Five fictional shifts. Look closer, connect the clues, and understand the why.</p><a className="ce-home-ask" href="/learn" onClick={event => { if (event.metaKey || event.ctrlKey || event.shiftKey || event.altKey) return; event.preventDefault(); onNavigate('/learn'); }}>Choose your shift <span aria-hidden="true">&#8594;</span></a><small>Fictional nursing education</small></section>}
       <section className={`ce-home-feature${SHIFT_ENABLED ? ' ce-home-feature--companion' : ''}`} aria-labelledby="home-learning-title">
         <div className="ce-home-feature__label"><strong>Ask Clinical Edge</strong></div>

@@ -28,7 +28,7 @@ for (const width of [320, 390, 1440]) {
 }
 
 for (const [id, key, saved, button, destination] of [
-  ['monitor-alarm', 'ce-private-shift-monitor-r2', { version: 1, stage: 7, answers: { alarm: alarmChoices[0].id, explanation: alarmExplanations[0].id, monitor: monitorChoices[0].id, rhythm: rhythmChoices[0].id, cues: [], actions: ['notify', 'stay', 'ecg'], chips: [], recommendation: recommendations[0].id } }, 'Open reference', /reference-hub\?reference=potassium&shift=monitor-alarm/],
+  ['monitor-alarm', 'ce-private-shift-monitor-r2', { version: 1, stage: 7, answers: { alarm: alarmChoices[0].id, explanation: alarmExplanations[0].id, monitor: monitorChoices[0].id, rhythm: rhythmChoices[0].id, cues: [], actions: ['notify', 'stay', 'ecg'], chips: [], recommendation: recommendations[0].id } }, 'Potassium reference', /reference-hub\?reference=potassium&shift=monitor-alarm/],
   ['discharge-puzzle', 'ce-private-shift-discharge-v02', { version: '0.2', stage: 6, inspected: ['lasix', 'furosemide'], answers: { start: startChoices[0].id, flags: [], actions: ['provider', 'charge'], teach: teachChoices[0].id, fix: fixChoices[0].id } }, 'Prepare a question', /discharge-puzzle\/ask/],
 ] as const) {
   test(`${id} uses its existing destination`, async ({ page }) => {

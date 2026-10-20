@@ -97,7 +97,7 @@ function NextStep({ item, navigate }) {
     <h2>Your next step</h2>
     <h3>{primary.title}</h3><p>{primary.detail}</p>
     <AppLink className="shift-primary" to={learningDestination(primary.path, item.id)} navigate={navigate}>
-      {primary.path.startsWith('/ask') ? 'Prepare a question' : primary.path.startsWith('/abg') ? 'Open ABG example' : 'Open reference'} <span aria-hidden="true">&#8594;</span>
+      {primary.path.startsWith('/ask') ? 'Prepare a question' : primary.path.startsWith('/abg') ? 'Open ABG example' : primary.path.startsWith('/rhythm-lab') ? 'Open rhythm comparison' : 'Open reference'} <span aria-hidden="true">&#8594;</span>
     </AppLink>
     {item.recommendations.some(link => link.path.startsWith('/ask')) && <p className="shift-next-step__note">Ask is optional. Nothing is submitted automatically. Existing consent and daily limits apply.</p>}
     <div className="shift-next-step__alternatives">{other.map(link => <AppLink key={link.id} to={learningDestination(link.path, item.id)} navigate={navigate}>{link.title} <span aria-hidden="true">&#8599;</span></AppLink>)}<AppLink to="/learn/shifts" navigate={navigate}>Choose another shift <span aria-hidden="true">&#8594;</span></AppLink></div>

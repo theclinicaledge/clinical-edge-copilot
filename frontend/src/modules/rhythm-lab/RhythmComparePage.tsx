@@ -52,7 +52,7 @@ export default function RhythmComparePage({ navigate }: RhythmComparePageProps) 
       {/* Both panels stay mounted — switching tabs preserves each tool's
           selection state instead of resetting it. */}
       <div role="tabpanel" id="rl-panel-compare" aria-labelledby="rl-tab-compare" hidden={tab !== 'compare'}>
-        <CompareMode onBack={onBack} />
+        <CompareMode onBack={onBack} monitorHandoff={new URLSearchParams(window.location.search).get('shift') === 'monitor-alarm' && new URLSearchParams(window.location.search).get('pair') === 'sinus-af'} />
       </div>
       <div role="tabpanel" id="rl-panel-confusables" aria-labelledby="rl-tab-confusables" hidden={tab !== 'confusables'}>
         <CompareRhythmsView onBack={onBack} />

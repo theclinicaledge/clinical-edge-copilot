@@ -52,7 +52,7 @@ function ReportCards({ progress, update }) {
   })}</div>;
 }
 
-export default function Shift({ trackSession = null, debrief = null }) {
+export default function Shift({ trackSession = null, debrief = null, nextStep = null }) {
   const [progress, setProgress] = useState(() => trackSession ? trackSession.initial() : readProgress());
   const [storageFailed, setStorageFailed] = useState(false);
   const [room, setRoom] = useState(null);
@@ -201,6 +201,7 @@ export default function Shift({ trackSession = null, debrief = null }) {
         </>}
 
         <footer className="shift-footer"><span>{storageFailed ? 'Device storage unavailable. Progress lasts only in this tab.' : 'Progress saved on this device'}</span><p>Fictional education only. Treatment decisions belong to the provider and facility protocol.</p><small>{scenario.reviewStatus}.</small></footer>
+        {progress.stage === 6 && nextStep}
       </main>
     </div>
     <dialog ref={dialog} className="shift-dialog" onCancel={() => { setRoom(null); setRestartOpen(false); }} aria-labelledby="shift-dialog-title">

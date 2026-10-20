@@ -52,6 +52,18 @@ html[data-ce-native-app="true"] .shift-library-download { display: none; }
 .shift-scene-bar button { border: 0; background: transparent; text-decoration: underline; }
 .shift-connections { max-width: 1140px; margin: 0 auto; padding: 24px 20px; border-top: 1px solid var(--ce-warm-line); }
 .shift-connections h2 { font-size: 24px; margin-top: 8px; }
+.shift-next-step { margin: 28px 0 16px; padding: 24px 0; border-top: 2px solid var(--ce-gold); color: var(--ce-text-dark); text-align: left; }
+.shift-next-step h2 { font: 700 24px/1.3 var(--ce-font-sans); margin: 8px 0 20px; }
+.shift-next-step h3 { font: 600 19px/1.4 var(--ce-font-sans); margin: 0 0 8px; }
+.shift-next-step p { font: 400 15px/1.6 var(--ce-font-sans); max-width: 55ch; margin: 0 0 18px; }
+.shift-next-step a { text-decoration: none; scroll-margin-block: 24px 140px; }
+.shift-next-step .shift-primary { display: inline-flex; align-items: center; justify-content: space-between; gap: 24px; min-height: 48px; }
+.shift-next-step p.shift-next-step__note { margin-top: 14px; font-size: 13px; color: var(--ce-text-muted); }
+.shift-next-step__alternatives { display: flex; flex-wrap: wrap; gap: 4px 24px; margin-top: 20px; border-top: 1px solid var(--ce-warm-line); padding-top: 8px; }
+.shift-next-step__alternatives a { display: inline-flex; align-items: center; gap: 12px; min-height: 44px; color: var(--ce-teal-deep); font: 600 14px/1.4 var(--ce-font-sans); }
+.shift-next-step a:focus-visible { outline: 2px solid var(--ce-teal-deep); outline-offset: 4px; }
+.shift-next-step a:hover { text-decoration: underline; }
+.shift-next-step a:active { opacity: .8; }
 .shift-return { background: var(--ce-warm-card); border-bottom: 1px solid var(--ce-warm-line); display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 6px max(20px, calc((100% - 1100px) / 2)); font: 13px/1.5 var(--ce-font-sans); color: var(--ce-text-dark); }
 .shift-return a { min-height: 44px; display: flex; align-items: center; color: var(--ce-teal-deep); }
 .shift-return > span { font-size: 12px; color: var(--ce-text-muted); }

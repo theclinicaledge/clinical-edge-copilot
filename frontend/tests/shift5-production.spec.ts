@@ -99,6 +99,11 @@ test('public Shift 5 flow keeps observations, coverage and debrief honest on mob
   await expect(page.locator('.s5-event').first()).toContainText('Her discharge teaching is still pending');
   await expect(page.locator('.s5-debrief')).not.toContainText('Bright red drainage');
   await expect(page.locator('body')).toHaveJSProperty('scrollWidth', await page.evaluate(() => document.body.clientWidth));
+  await page.getByRole('region', { name: 'Your next step' }).getByRole('link', { name: 'Prepare a question' }).click();
+  await expect(page).toHaveURL(/which-patient-first\/ask\?topic=delegation/);
+  await expect(page.locator('.shift-handoff')).toContainText('Nothing is submitted automatically');
+  await page.getByRole('link', { name: /Return to Which Patient First/ }).click();
+  await expect(page.getByRole('heading', { name: /You kept every room covered/ })).toBeVisible();
   expect(apiRequests).toEqual([]);
 });
 

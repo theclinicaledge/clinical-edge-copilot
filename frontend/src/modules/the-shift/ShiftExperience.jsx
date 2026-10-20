@@ -75,7 +75,7 @@ function Library({ navigate }) {
         </article>;
       })}</div>
       <p className="shift-local-note">Progress and fixed-choice reflections stay on this device. No patient information, AI calls or account. Restart a scenario to clear its progress.</p>
-      <section className="shift-library-tools"><h2>Build on what you notice</h2><div>{LEARN_ACTIONS.filter(action => action.path !== '/rhythm-lab').map(action => <AppLink key={action.path} to={action.path} navigate={navigate}><strong>{action.label}</strong><span>{action.detail}</span><b aria-hidden="true">&#8599;</b></AppLink>)}<AppLink to="/reference-hub" navigate={navigate}><strong>References</strong><span>Existing clinical reference hub</span><b aria-hidden="true">&#8599;</b></AppLink><AppLink to="/icu-drips" navigate={navigate}><strong>ICU Drips</strong><span>Infusion reference</span><b aria-hidden="true">&#8599;</b></AppLink></div></section>
+      <section className="shift-library-tools"><h2>Build on what you notice</h2><div>{LEARN_ACTIONS.map(action => <AppLink key={action.path} to={action.path} navigate={navigate}><strong>{action.label}</strong><span>{action.detail}</span><b aria-hidden="true">&#8599;</b></AppLink>)}<AppLink to="/reference-hub" navigate={navigate}><strong>References</strong><span>Existing clinical reference hub</span><b aria-hidden="true">&#8599;</b></AppLink><AppLink to="/icu-drips" navigate={navigate}><strong>ICU Drips</strong><span>Infusion reference</span><b aria-hidden="true">&#8599;</b></AppLink></div></section>
       <footer className="shift-library-footer"><AppLink to="/privacy" navigate={navigate}>Privacy</AppLink><AppLink to="/terms" navigate={navigate}>Terms</AppLink><span>Fictional education. Not patient-specific care.</span></footer>
     </main>
   </div>;

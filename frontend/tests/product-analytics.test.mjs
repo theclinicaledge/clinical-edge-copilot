@@ -88,6 +88,9 @@ test('App Store badge interest retains only an approved placement', () => {
   assert.equal(sent.length, 1);
   assert.deepEqual(Object.keys(sent[0].properties).sort(), ['$process_person_profile', 'analytics_origin', 'placement', 'route']);
   assert.equal(sent[0].properties.placement, 'footer');
+  assert.equal(trackEvent('app_store_badge_clicked', { placement: 'learn', question: 'private' }), true);
+  assert.equal(sent.at(-1).properties.placement, 'learn');
+  assert.equal('question' in sent.at(-1).properties, false);
 });
 
 test('approved Instagram ad labels require consent and arrive together', () => {

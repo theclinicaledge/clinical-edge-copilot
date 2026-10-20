@@ -8,11 +8,12 @@ import type { ComparePair } from '../utils/localProgress';
 
 interface CompareModeProps {
   onBack: () => void;
+  monitorHandoff?: boolean;
 }
 
-export function CompareMode({ onBack }: CompareModeProps) {
-  const [idA, setIdA] = useState('mobitz_i');
-  const [idB, setIdB] = useState('mobitz_ii');
+export function CompareMode({ onBack, monitorHandoff = false }: CompareModeProps) {
+  const [idA, setIdA] = useState(monitorHandoff ? 'nsr' : 'mobitz_i');
+  const [idB, setIdB] = useState(monitorHandoff ? 'afib' : 'mobitz_ii');
   const [recentCompares, setRecentCompares] = useState<ComparePair[]>(() => getRecentCompares());
 
   // Record compare pair on user interaction (skip first render — don't persist defaults)

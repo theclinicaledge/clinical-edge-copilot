@@ -55,6 +55,7 @@ export const SHIFTS = [
     image: '../monitor/captures/ecg/390-comparison.png', imageAlt: 'Monitor Alarm illustration comparing constructed sinus and atrial fibrillation illustrations.',
     askQuestion: script.ask,
     recommendations: [
+      { id: 'rhythm', title: 'Compare sinus rhythm and AF', detail: 'Explore the existing Rhythm Lab illustrations side by side.', path: '/rhythm-lab/compare/sinus-af' },
       { id: 'potassium', title: 'Potassium reference', detail: 'Existing Reference Hub material.', path: '/reference-hub/potassium' },
       { id: 'magnesium', title: 'Magnesium reference', detail: 'Existing Reference Hub material.', path: '/reference-hub/magnesium' },
       { id: 'ask', title: 'Ask why', detail: 'Bring the rhythm-and-blood-pressure question to Ask.', path: '/ask' },

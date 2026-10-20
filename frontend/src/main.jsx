@@ -117,6 +117,11 @@ function Root() {
 
   // navigate() — pushes pathname and syncs React state without a reload
   const navigate = (path) => {
+    if (SHIFT_ENABLED && returningShift(window.location.search) === 'monitor-alarm' && window.location.pathname.startsWith('/rhythm-lab') && /^\/rhythm-lab(?:\/|\?|$)/.test(path)) {
+      const destination = new URL(path, window.location.origin);
+      destination.searchParams.set('shift', 'monitor-alarm');
+      path = destination.pathname + destination.search;
+    }
     if (path === window.location.pathname + window.location.search) return;
     if (page === 'app') workspacePosition.current.scroll = window.scrollY;
     history.replaceState({ ...history.state, ceScroll: window.scrollY }, '', window.location.href);
@@ -168,14 +173,14 @@ function Root() {
 
   return (
     <>
-      {SHIFT_ENABLED && returningShift(window.location.search) && ['ask', 'abglab', 'referencehub', 'shift-learning', 'rhythmlab-practice'].includes(page) && <Suspense fallback={null}><ShiftExperience mode="return" navigate={navigate} routeKey={routeKey} /></Suspense>}
+      {SHIFT_ENABLED && returningShift(window.location.search) && ['ask', 'abglab', 'referencehub', 'shift-learning', 'rhythmlab', 'rhythmlab-library', 'rhythmlab-compare', 'rhythmlab-pearls', 'rhythmlab-sprint', 'rhythmlab-practice'].includes(page) && <Suspense fallback={null}><ShiftExperience mode="return" navigate={navigate} routeKey={routeKey} /></Suspense>}
       {page === 'med-surg' && MedSurgTrack && <Suspense fallback={<main role="status">Opening the track...</main>}><MedSurgTrack navigate={navigate} routeKey={routeKey} /></Suspense>}
       {page === 'home'       && <ClinicalEdgeHome onNavigate={navigate} />}
       {SHIFT_ENABLED && shiftEntered && <Suspense fallback={page === 'shift-learning' ? <main className="ce-not-found" role="status">Opening The Shift...</main> : null}><ShiftExperience navigate={navigate} active={page === 'shift-learning'} routeKey={routeKey} /></Suspense>}
       {page === 'rhythmlab'          && <RhythmLabModule onGoHome={() => navigate('/')} navigate={navigate} />}
       {page === 'rhythmlab-library'  && <RhythmLibraryPage navigate={navigate} />}
       {page === 'rhythmlab-practice' && <RhythmPracticePage navigate={navigate} />}
-      {page === 'rhythmlab-compare'  && <RhythmComparePage navigate={navigate} />}
+      {page === 'rhythmlab-compare'  && <RhythmComparePage key={routeKey} navigate={navigate} />}
       {page === 'rhythmlab-pearls'   && <RhythmPearlsPage navigate={navigate} />}
       {page === 'rhythmlab-sprint'   && <RhythmSprintPage navigate={navigate} />}
       {page === 'scenario'   && <Scenario onBack={goBack} onEnterApp={enterApp} onQuickStart={enterQuickStart} />}

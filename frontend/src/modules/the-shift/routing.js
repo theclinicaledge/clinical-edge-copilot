@@ -14,6 +14,7 @@ export function learningDestination(path, id) {
   const suffix = `shift=${id}`;
   if (path.startsWith('/ask')) return `${shiftPath(id)}/ask${path.includes('?') ? path.slice(path.indexOf('?')) : ''}`;
   const destinations = {
+    '/rhythm-lab/compare/sinus-af': '/rhythm-lab/compare?pair=sinus-af',
     '/abg-lab/resp-acidosis': '/abg-lab?example=resp-acidosis',
     '/reference-hub/potassium': '/reference-hub?reference=potassium',
     '/reference-hub/magnesium': '/reference-hub?reference=magnesium',

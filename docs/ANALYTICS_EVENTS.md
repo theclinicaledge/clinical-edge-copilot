@@ -27,7 +27,7 @@ All event names and properties are allowlisted in `frontend/src/productAnalytics
 | `shift_step_reached` | `scenario`, `version`, `play_id`, `step` | Reached a scenario step; not an answer or score |
 | `shift_decision_reached` | `scenario`, `version`, `play_id`, `step` | Reached an authored decision screen, without recording the choice |
 | `shift_completed` | `scenario`, `version`, `play_id` | Debrief reached; not evidence of clinical skill |
-| `app_store_badge_clicked` | `placement` (`landing`, `download`, `footer`) | Existing App Store badge interest; not a confirmed installation |
+| `app_store_badge_clicked` | `placement` (`landing`, `download`, `footer`, `learn`) | Existing App Store badge interest; not a confirmed installation |
 
 `play_id` is random per local play and is used to deduplicate the funnel. It is cleared on restart or analytics withdrawal. Saved progress remains separate and device-local. If storage is cleared, a device changes, or consent is declined, identity and retention cannot be reconciled. Native iPhone WebView versus mobile Safari is not labeled because the wrapper does not supply a reliable explicit marker.
 

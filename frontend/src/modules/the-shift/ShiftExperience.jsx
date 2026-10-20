@@ -1,5 +1,6 @@
 import { lazy, Suspense, useEffect, useRef, useState } from 'react';
 import { ClinicalEdgeMark } from '../../components/ModuleHeader.jsx';
+import AppStoreBadge from '../../components/AppStoreBadge.jsx';
 import { LEARN_ACTIONS } from '../../components/workspaceActions.js';
 import Shift from './Shift.jsx';
 import Monitor from './monitor/Monitor.jsx';
@@ -61,6 +62,10 @@ function Library({ navigate }) {
     <header className="shift-library-brand"><AppLink to="/" navigate={navigate}><ClinicalEdgeMark /><strong>Clinical Edge</strong></AppLink><span>Learn</span></header>
     <main className="shift-library-main">
       <header className="shift-library-heading"><p className="shift-overline">Fictional nursing experiences</p><h1>The Shift Library</h1><p>Experience the shift. Understand the why. Master the skills.</p><small>Fictional education / Progress stays on this device</small></header>
+      <aside className="shift-library-download" aria-labelledby="shift-download-title">
+        <div><h2 id="shift-download-title">Prefer learning in the app?</h2><p>Get Clinical Edge for iPhone, or explore a shift here.</p></div>
+        <AppStoreBadge placement="learn" height={44} />
+      </aside>
       {import.meta.env.VITE_MED_SURG_TRACK_PREVIEW === 'true' && <section className="shift-track-entry" aria-labelledby="med-surg-entry-title"><div><p className="shift-overline">Connected learning / Private pilot</p><h2 id="med-surg-entry-title">Med-Surg Clinical</h2><p>Three linked assignments. Make your call, explore the feedback, then try optional Rewinds with different patient findings.</p><small>Your original responses stay preserved. Track progress is separate from individual shifts.</small></div><AppLink to="/learn/med-surg" navigate={navigate} className="shift-primary">Open learning track <span aria-hidden="true">→</span></AppLink></section>}
       <div className="shift-library-grid">{SHIFTS.map(item => {
         const progress = progressLabel(item);

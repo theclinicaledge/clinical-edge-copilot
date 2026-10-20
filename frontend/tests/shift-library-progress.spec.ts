@@ -33,7 +33,7 @@ for (const width of [320, 390, 1440]) {
     await expect(page.getByRole('heading', { name: 'Who do you see first?' })).toBeVisible();
     await page.getByRole('link', { name: 'Shift Library', exact: false }).first().click();
     await expect(cards.nth(0).locator('.shift-library-status')).toContainText('In progress');
-    await cards.nth(1).getByRole('link', { name: 'Return to debrief' }).click();
+    await cards.nth(1).getByRole('link', { name: 'Review debrief' }).click();
     await expect(page.getByRole('heading', { name: 'Your shift review' })).toBeVisible();
     await page.reload();
     await expect(page.getByRole('heading', { name: 'Your shift review' })).toBeVisible();

@@ -63,10 +63,8 @@
   flex: 1;
   min-width: 0;
   overflow-x: clip;
-  overflow-y: auto;
-  -webkit-overflow-scrolling: touch;
   padding: 0 max(16px, env(safe-area-inset-left));
-  padding-bottom: max(48px, env(safe-area-inset-bottom));
+  padding-bottom: calc(var(--ce-dock-clearance, 88px) + 32px);
   background: var(--ce-warm-bg);
 }
 
@@ -423,3 +421,37 @@
   border-top: 1px solid var(--ce-warm-line-soft);
   margin: 16px 0;
 }
+
+/* Keep the final controls and result reachable without moving the global dock. */
+.abg-shell :is(input, button, summary) { scroll-margin-block: 96px calc(var(--ce-dock-clearance, 88px) + 24px); }
+#abg-result-anchor { scroll-margin-top: calc(88px + env(safe-area-inset-top, 0px)); outline: none; }
+.abg-result-heading { margin: 0 0 10px; font-size: 11px; font-weight: 700; }
+.abg-walkthrough { margin: 0 0 20px; }
+.abg-walkthrough > summary { cursor: pointer; padding: 16px 20px; min-height: 56px; color: var(--ce-text-dark); font-size: 15px; font-weight: 700; }
+.abg-walkthrough > summary span { display: block; margin-top: 4px; color: var(--ce-text-muted); font-size: 12px; font-weight: 400; }
+.abg-walkthrough[open] > summary { border-bottom: 1px solid var(--ce-warm-line); }
+.abg-walk-body { padding: 18px 20px; }
+.abg-walk-tabs { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 18px; }
+.abg-walk-tabs button, .abg-choice { min-height: 44px; padding: 9px 12px; border: 1px solid var(--ce-warm-line); border-radius: var(--ce-r-sm); background: var(--ce-warm-card); color: var(--ce-text-mid); font: 600 12px/1.4 var(--ce-font-sans); cursor: pointer; }
+.abg-walk-tabs button[aria-pressed="true"], .abg-choice[aria-pressed="true"] { border-color: var(--ce-teal-deep); color: var(--ce-teal-deep); background: var(--ce-warm-bg); }
+.abg-walk-tabs button:hover, .abg-choice:hover { border-color: var(--ce-teal-deep); background: var(--ce-warm-mid); }
+.abg-walk-tabs button:active, .abg-choice:active { transform: scale(0.98); }
+.abg-walkthrough :is(button, summary):focus-visible { outline: 2px solid var(--ce-teal-deep); outline-offset: 3px; }
+.abg-walk-body h3 { margin: 0 0 8px; color: var(--ce-text-dark); font-size: 17px; line-height: 1.4; }
+.abg-walk-body p { margin: 0 0 12px; color: var(--ce-text-mid); font-size: 13px; line-height: 1.65; }
+.abg-choices { display: flex; flex-wrap: wrap; gap: 8px; margin: 14px 0; }
+.abg-feedback { margin: 14px 0; padding: 14px; border-left: 3px solid var(--ce-teal-deep); background: var(--ce-warm-bg); border-radius: var(--ce-r-sm); }
+.abg-feedback strong { display: block; color: var(--ce-teal-deep); font-size: 13px; margin-bottom: 6px; }
+.abg-ph-range { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 4px; margin: 16px 0; }
+.abg-ph-range span { padding: 9px 4px; text-align: center; border-bottom: 3px solid var(--ce-warm-line); font-size: 11px; color: var(--ce-text-muted); line-height: 1.5; }
+.abg-ph-range [data-current="true"] { border-color: var(--ce-teal-deep); color: var(--ce-teal-deep); font-weight: 700; }
+.abg-ph-range small { display: block; font-size: 10px; }
+.abg-math { padding: 14px; background: var(--ce-warm-bg); border: 1px solid var(--ce-warm-line); border-radius: var(--ce-r-sm); margin: 12px 0; }
+.abg-math summary { min-height: 36px; cursor: pointer; color: var(--ce-teal-deep); font-size: 13px; font-weight: 600; }
+.abg-math p { font-family: var(--ce-font-mono); font-size: 12px; overflow-wrap: anywhere; margin: 8px 0 0; }
+.abg-walk-footer { display: flex; gap: 12px; align-items: center; justify-content: space-between; border-top: 1px solid var(--ce-warm-line); margin-top: 18px; padding-top: 16px; }
+.abg-walk-footer .abg-btn-secondary, .abg-walk-footer .abg-btn-primary { padding-inline: 14px; font-size: 12px; }
+.abg-reference-note { color: var(--ce-text-muted); font-size: 12px; line-height: 1.6; margin-top: 12px; }
+.abg-reference-note a { color: var(--ce-teal-deep); text-underline-offset: 3px; }
+.abg-input-note { color: var(--ce-text-muted); font-size: 12px; line-height: 1.6; margin-top: -4px; }
+@media (max-width: 420px) { .abg-walkthrough > summary { padding: 16px; } .abg-walk-body { padding: 16px; } .abg-walk-footer { flex-wrap: wrap; } }

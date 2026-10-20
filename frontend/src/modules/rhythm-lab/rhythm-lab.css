@@ -291,6 +291,25 @@
 }
 
 /* ─── Phase 2: Compare / Confusables tab switcher ────────────────────── */
+/* Comparison-only mobile hierarchy; ECG rendering and desktop sizing are unchanged. */
+@media (max-width: 640px) {
+  .rhythm-lab-root:has(.compare-tabs) .page-identity { padding: 12px 16px 8px; }
+  .rhythm-lab-root:has(.compare-tabs) .page-identity__eyebrow,
+  .rhythm-lab-root:has(.compare-tabs) .page-identity__subtitle { display: none; }
+  .rhythm-lab-root:has(.compare-tabs) .page-identity__title { font-size: 22px; letter-spacing: 0; }
+  .rhythm-lab-root:has(.compare-tabs) .rhythm-feature-nav { margin: 0 16px 0; padding-bottom: 6px; gap: 4px; }
+  .rhythm-lab-root:has(.compare-tabs) .rhythm-feature-nav a { padding-inline: 8px; font-size: 12px; }
+  .rhythm-lab-root:has(.compare-tabs) .compare-tabs { padding: 8px 16px; }
+  .rhythm-lab-root:has(.compare-tabs) .compare-page .compare-nav,
+  .rhythm-lab-root:has(.compare-tabs) .compare-header__text { display: none; }
+  .rhythm-lab-root:has(.compare-tabs) .compare-header { padding: 8px 16px 12px; }
+  .rhythm-lab-root:has(.compare-tabs) .compare-header__top { padding: 0; gap: 0; }
+  .rhythm-lab-root:has(.compare-tabs) .compare-selectors { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 12px; align-items: start; }
+  .rhythm-lab-root:has(.compare-tabs) .compare-vs { display: none; }
+  .rhythm-lab-root:has(.compare-tabs) .compare-selected-name { margin: 4px 0 0; font-size: 12px; line-height: 1.4; }
+  .rhythm-lab-root:has(.compare-tabs) .compare-selector-label { font-size: 11px; letter-spacing: 0; }
+  .rhythm-lab-root:has(.compare-tabs) .compare-strip-card__header { flex-wrap: wrap; padding: 8px 16px; gap: 6px; }
+}
 
 .compare-tabs {
   display: flex;

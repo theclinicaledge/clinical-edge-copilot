@@ -3,6 +3,12 @@
    All classes are scoped with .abg- prefix to avoid collisions.           */
 
 /* Shell */
+.abg-connected-practice { padding: 20px 0; border-top: 2px solid var(--ce-teal); color: var(--ce-text-dark); }
+.abg-connected-practice h2 { font-size: 22px; line-height: 1.25; margin: 8px 0; letter-spacing: 0; }
+.abg-connected-practice p:not(.abg-card-label) { font-size: 15px; line-height: 1.6; margin: 0 0 16px; }
+.abg-content > details.abg-card > summary { cursor: pointer; min-height: 44px; align-content: center; margin: 0; }
+.abg-content > details.abg-card > summary:focus-visible { outline: 2px solid var(--ce-teal); outline-offset: 4px; }
+.abg-content > details.abg-card[open] > summary { margin-bottom: 12px; }
 .abg-shell {
   min-height: 100vh;
   background: var(--ce-warm-bg);

@@ -130,7 +130,9 @@ function ResultCard({ result }) {
   );
 }
 
-export default function AbgLabModule({ onGoHome, initialExampleId = null }) {
+export default function AbgLabModule({ onGoHome, initialExampleId = null, fromDrowsyShift = false }) {
+  const ExamplesContainer = fromDrowsyShift ? 'details' : 'div';
+  const ExamplesLabel = fromDrowsyShift ? 'summary' : 'div';
   const [fields, setFields] = useState(() => EXAMPLES.find(ex => ex.id === initialExampleId)?.values || EMPTY);
   const [result, setResult] = useState(null);
   const [error, setError] = useState(null);
@@ -162,9 +164,15 @@ export default function AbgLabModule({ onGoHome, initialExampleId = null }) {
       <ModuleHeader moduleName="ABG Lab" onGoHome={onGoHome} maxWidth="680px" />
       <div className="abg-main"><div className="abg-content">
         <div className="abg-hero"><div className="abg-hero-eyebrow">Acid-Base · Oxygenation</div><h1>ABG & Oxygenation Lab</h1><p className="abg-hero-sub">Get the pattern, then follow the clues that explain it.</p></div>
-        <div className="abg-card"><div className="abg-card-label">Try an example</div><div className="abg-example-row">
+        {fromDrowsyShift && <section className="abg-connected-practice" aria-label="Practice after The Drowsy Patient">
+          <p className="abg-card-label">From The Drowsy Patient</p>
+          <h2>Practice respiratory acidosis</h2>
+          <p>A separate practice example, not Room 12's results. The existing ABG Lab example uses different values from the Shift.</p>
+          <button type="button" className="abg-btn-primary" onClick={() => handleExample(EXAMPLES.find(ex => ex.id === 'resp-acidosis'))}>Explore this example <span aria-hidden="true">→</span></button>
+        </section>}
+        <ExamplesContainer className="abg-card"><ExamplesLabel className="abg-card-label">{fromDrowsyShift ? 'Try another example' : 'Try an example'}</ExamplesLabel><div className="abg-example-row">
           {EXAMPLES.map(ex => <button type="button" key={ex.id} className="abg-example-chip" onClick={() => handleExample(ex)}>{ex.label}</button>)}
-        </div></div>
+        </div></ExamplesContainer>
         <div className="abg-card"><div className="abg-card-label">Enter ABG Values</div>
           <form className="abg-form" noValidate onSubmit={e => { e.preventDefault(); readValues(fields); }}>
             <div className="abg-fields-grid">{DISPLAY_FIELDS.map(field => <div key={field.key} className="abg-field">

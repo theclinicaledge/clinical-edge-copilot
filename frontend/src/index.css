@@ -19,10 +19,11 @@ body {
 
 /* Keep the final routed content above the fixed dock. Applying clearance to
    the route root preserves each module's own background through the spacer. */
-#root:has(> .ce-tool-dock) > :first-child,
+#root:has(> .ce-tool-dock) > :where(:nth-child(1 of :not([hidden], .shift-return, .ce-shift-example-note))):not(.ce-tool-dock, .abg-shell, .ce-shift-feature),
 #root:has(> .ce-tool-dock) > :is(.ce-shift-workspace, .ce-ask-workspace):not([hidden]) {
-  /* Shift Brain and Ask stay mounted (hidden) once opened, so the visible one may not be
-     the first child; it still gets the single dock clearance. */
+  /* Retained learning/workspace containers and return notes may precede the active page.
+     Apply clearance to visible content, not a hidden first child. ABG carries its own
+     content padding; the Shift scroll container reserves a separate bottom lane. */
   padding-bottom: var(--ce-dock-clearance);
 }
 

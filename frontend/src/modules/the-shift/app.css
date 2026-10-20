@@ -29,6 +29,18 @@ html[data-ce-native-app="true"] .shift-library-download { display: none; }
 .shift-library-monitor text { fill: var(--ce-text-light-body); font: 9px var(--ce-font-mono); letter-spacing: 0; }
 .shift-library-image > span { position: absolute; top: 12px; left: 12px; background: var(--ce-navy-header); color: var(--ce-text-light); padding: 6px 10px; border-radius: 4px; font: 12px var(--ce-font-mono); }
 .shift-library-copy { display: flex; flex-direction: column; flex: 1; padding: 22px; }
+.shift-library-reviews { margin: 24px 0; padding: 20px 0; border-top: 2px solid var(--ce-teal); border-bottom: 1px solid var(--ce-warm-line); }
+.shift-library-reviews h2 { font-size: 22px; margin: 0 0 8px; letter-spacing: 0; }
+.shift-library-reviews p { color: var(--ce-text-muted); font-size: 14px; line-height: 1.5; }
+.shift-library-reviews ul { list-style: none; margin: 0; padding: 0; }
+.shift-library-reviews li + li { border-top: 1px solid var(--ce-warm-line); }
+.shift-library-reviews a { display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; gap: 12px; padding: 16px 0; min-height: 44px; text-decoration: none; }
+.shift-library-reviews a > span:first-child { flex: 1 1 200px; }
+.shift-library-reviews small { display: block; color: var(--ce-text-muted); font-size: 11px; margin-bottom: 4px; }
+.shift-library-reviews strong { font-size: 16px; }
+.shift-library-reviews a > span:last-child { color: var(--ce-teal-deep); font-size: 14px; font-weight: 600; }
+.shift-library-reviews a:hover strong { text-decoration: underline; }
+.shift-library-reviews a:focus-visible { outline: 2px solid var(--ce-teal-deep); outline-offset: 4px; }
 .shift-library-status { display: inline-flex; align-items: center; align-self: flex-start; gap: 8px; margin-bottom: 16px; padding: 5px 9px; border: 1px solid var(--ce-warm-line); border-radius: 4px; color: var(--ce-text-muted); font: 600 13px/1.4 var(--ce-font-sans); }
 .shift-library-status > span { font-size: 16px; line-height: 1; }
 .shift-library-status--active { border-color: var(--ce-gold); color: var(--ce-text-dark); background: var(--ce-warm-bg); }

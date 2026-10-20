@@ -58,10 +58,16 @@ function ReviewDialog({ item, close }) {
 }
 
 function Library({ navigate }) {
+  const reviewable = SHIFTS.filter(item => ['drowsy-patient', 'monitor-alarm', 'discharge-puzzle', 'conversation', 'which-patient-first'].includes(item.id) && progressLabel(item) === 'Debrief reached');
   return <div className="shift-library-page">
     <header className="shift-library-brand"><AppLink to="/" navigate={navigate}><ClinicalEdgeMark /><strong>Clinical Edge</strong></AppLink><span>Learn</span></header>
     <main className="shift-library-main">
       <header className="shift-library-heading"><p className="shift-overline">Fictional nursing experiences</p><h1>The Shift Library</h1><p>Experience the shift. Understand the why. Master the skills.</p><small>Fictional education / Progress stays on this device</small></header>
+      {reviewable.length > 0 && <section className="shift-library-reviews" aria-labelledby="shift-reviews-title">
+        <h2 id="shift-reviews-title">Your debriefs</h2>
+        <p>Revisit your choices and takeaways. Reviewing does not start a new attempt.</p>
+        <ul>{reviewable.map(item => <li key={item.id}><AppLink to={shiftPath(item.id)} navigate={navigate}><span><small>SHIFT {item.number}</small><strong>{item.title}</strong></span><span>Review debrief <span aria-hidden="true">&#8594;</span></span></AppLink></li>)}</ul>
+      </section>}
       <aside className="shift-library-download" aria-labelledby="shift-download-title">
         <div><h2 id="shift-download-title">Prefer learning in the app?</h2><p>Get Clinical Edge for iPhone, or explore a shift here.</p></div>
         <AppStoreBadge placement="learn" height={44} />
@@ -73,7 +79,7 @@ function Library({ navigate }) {
         const showStatus = ['drowsy-patient', 'monitor-alarm', 'discharge-puzzle', 'conversation', 'which-patient-first'].includes(item.id);
         return <article className="shift-library-card" key={item.id}>
           <AppLink to={shiftPath(item.id)} navigate={navigate} className="shift-library-image" tabIndex={-1} aria-hidden="true">{item.id === 'monitor-alarm' ? <LibraryMonitorArtwork /> : <img src={images[item.id]} alt="" />}<span>SHIFT {item.number}</span></AppLink>
-          <div className="shift-library-copy">{showStatus && <span className={`shift-library-status shift-library-status--${status === 'Finished' ? 'finished' : status === 'In progress' ? 'active' : 'new'}`}><span aria-hidden="true">{status === 'Finished' ? '\u2713' : status === 'In progress' ? '\u25D0' : '\u25CB'}</span>{status}</span>}<p className="shift-overline">{item.specialty} / {item.difficulty}</p><h2><AppLink to={shiftPath(item.id)} navigate={navigate}>{item.title}</AppLink></h2><p>{item.description}</p><small>{item.duration} / Students & new grads</small><AppLink to={shiftPath(item.id)} navigate={navigate} className="shift-primary">{progress === 'Not started' ? 'Begin shift' : progress === 'Debrief reached' ? 'Return to debrief' : 'Continue shift'} <span aria-hidden="true">&#8594;</span></AppLink><small>{showStatus && status === 'Not started' ? 'Ready when you are' : progress}</small></div>
+          <div className="shift-library-copy">{showStatus && <span className={`shift-library-status shift-library-status--${status === 'Finished' ? 'finished' : status === 'In progress' ? 'active' : 'new'}`}><span aria-hidden="true">{status === 'Finished' ? '\u2713' : status === 'In progress' ? '\u25D0' : '\u25CB'}</span>{status}</span>}<p className="shift-overline">{item.specialty} / {item.difficulty}</p><h2><AppLink to={shiftPath(item.id)} navigate={navigate}>{item.title}</AppLink></h2><p>{item.description}</p><small>{item.duration} / Students & new grads</small><AppLink to={shiftPath(item.id)} navigate={navigate} className="shift-primary">{progress === 'Not started' ? 'Begin shift' : progress === 'Debrief reached' ? (showStatus ? 'Review debrief' : 'Return to debrief') : 'Continue shift'} <span aria-hidden="true">&#8594;</span></AppLink><small>{showStatus && status === 'Not started' ? 'Ready when you are' : progress}</small></div>
         </article>;
       })}</div>
       <p className="shift-local-note">Progress and fixed-choice reflections stay on this device. No patient information, AI calls or account. Restart a scenario to clear its progress.</p>

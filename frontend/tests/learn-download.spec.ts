@@ -9,6 +9,23 @@ const agents = [
   ['tagged wrapper', `${webview} ClinicalEdgeApp/1.0.4`, true],
 ] as const;
 
+test('Learn includes the existing Rhythm Lab beside the other learning tools', async ({ page }) => {
+  await page.setViewportSize({ width: 390, height: 844 });
+  await page.goto('/learn');
+  const tools = page.locator('.shift-library-tools');
+  const rhythm = tools.getByRole('link', { name: /Rhythm Lab/ });
+  await rhythm.scrollIntoViewIfNeeded();
+  await expect(rhythm).toBeVisible();
+  await expect(rhythm).toHaveAttribute('href', '/rhythm-lab');
+  await expect(tools.getByRole('link')).toHaveCount(4);
+  await rhythm.focus();
+  await expect(rhythm).toBeFocused();
+  await page.screenshot({ path: '/private/tmp/clinical-edge-learn-rhythm-mobile.png' });
+  await rhythm.press('Enter');
+  await expect(page).toHaveURL(/\/rhythm-lab$/);
+  await expect(page.getByRole('heading', { name: 'Rhythm Lab', exact: true })).toBeVisible();
+});
+
 for (const [name, userAgent, native] of agents) {
   test.describe(name, () => {
     test.use({ userAgent, viewport: { width: 390, height: 844 } });

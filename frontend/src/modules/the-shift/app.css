@@ -29,6 +29,10 @@ html[data-ce-native-app="true"] .shift-library-download { display: none; }
 .shift-library-monitor text { fill: var(--ce-text-light-body); font: 9px var(--ce-font-mono); letter-spacing: 0; }
 .shift-library-image > span { position: absolute; top: 12px; left: 12px; background: var(--ce-navy-header); color: var(--ce-text-light); padding: 6px 10px; border-radius: 4px; font: 12px var(--ce-font-mono); }
 .shift-library-copy { display: flex; flex-direction: column; flex: 1; padding: 22px; }
+.shift-library-status { display: inline-flex; align-items: center; align-self: flex-start; gap: 8px; margin-bottom: 16px; padding: 5px 9px; border: 1px solid var(--ce-warm-line); border-radius: 4px; color: var(--ce-text-muted); font: 600 13px/1.4 var(--ce-font-sans); }
+.shift-library-status > span { font-size: 16px; line-height: 1; }
+.shift-library-status--active { border-color: var(--ce-gold); color: var(--ce-text-dark); background: var(--ce-warm-bg); }
+.shift-library-status--finished { border-color: var(--ce-teal-deep); color: var(--ce-teal-deep); }
 .shift-library-copy h2 { font-size: 23px; line-height: 1.25; margin: 10px 0; }
 .shift-library-copy h2 a { text-decoration: none; }
 .shift-library-copy h2 a:hover { text-decoration: underline; }

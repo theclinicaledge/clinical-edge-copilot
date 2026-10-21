@@ -1,4 +1,4 @@
-import { useState, useMemo, useEffect, useCallback } from 'react';
+import { useState, useMemo, useEffect, useCallback, useLayoutEffect, useRef } from 'react';
 import { REFERENCES, CATEGORIES } from './data/references.js';
 import { trackEvent } from '../../analytics';
 import ModuleHeader from '../../components/ModuleHeader.jsx';
@@ -645,7 +645,22 @@ function ConceptDetailView({ concept, onBack, onSelectPathway, onSelectRef }) {
 
 // ── Hub view (search + browse) ────────────────────────────────────────────────
 
-function HubView({ onSelect, onGoHome, onSelectPathway, onSelectConcept }) {
+function HubView({ onSelect, onGoHome, onSelectPathway, onSelectConcept, active }) {
+  const root = useRef(null);
+  const position = useRef(null);
+  function rememberPosition(event) {
+    const target = event.target.closest('[role="button"], button');
+    if (target) position.current = { label: target.getAttribute('aria-label') || target.textContent.trim(), top: target.getBoundingClientRect().top, scroll: window.scrollY };
+  }
+  useLayoutEffect(() => {
+    if (!active || !position.current) return;
+    const { label, top, scroll } = position.current;
+    const target = [...root.current.querySelectorAll('[role="button"], button')].find(el => (el.getAttribute('aria-label') || el.textContent.trim()) === label);
+    if (target) {
+      target.focus({ preventScroll: true });
+      window.scrollTo({ top: window.scrollY + target.getBoundingClientRect().top - top, behavior: 'instant' });
+    } else window.scrollTo({ top: scroll, behavior: 'instant' });
+  }, [active]);
   const [query, setQuery]   = useState('');
   const [cat, setCat]       = useState('all');
   const [recent, setRecent] = useState(() => lsGet(LS_RECENT, []));
@@ -697,7 +712,12 @@ function HubView({ onSelect, onGoHome, onSelectPathway, onSelectConcept }) {
   [recent]);
 
   return (
-    <div className="rh-page ce-workspace">
+    <div ref={root} className="rh-page ce-workspace" onClickCapture={rememberPosition} onKeyDownCapture={event => {
+      if (event.key === 'Enter' || event.key === ' ') {
+        rememberPosition(event);
+        if (event.target.matches('[role="button"]')) event.preventDefault();
+      }
+    }}>
       <Header onGoHome={onGoHome} />
 
       <div style={{ maxWidth: 800, margin: '0 auto', padding: '32px 20px 60px' }}>
@@ -1080,45 +1100,14 @@ export default function ReferenceHubModule({ onGoHome, initialReferenceId = null
   // Pathway back label: if opened from concept, go back to concept
   const pathwayBackLabel = selectedConcept ? 'Back to concept' : 'All pathways';
 
-  if (selected) {
-    return (
-      <DetailView
-        ref_={selected}
-        onBack={handleBackFromDetail}
-        onSelect={handleSelectRef}
-        backLabel={detailBackLabel}
-      />
-    );
-  }
-
-  if (selectedPathway) {
-    return (
-      <PathwayDetailView
-        pathway={selectedPathway}
-        onBack={handleBackFromPathway}
-        onSelectRef={handleSelectRef}
-        backLabel={pathwayBackLabel}
-      />
-    );
-  }
-
-  if (selectedConcept) {
-    return (
-      <ConceptDetailView
-        concept={selectedConcept}
-        onBack={() => setSelectedConcept(null)}
-        onSelectPathway={handleSelectPathwayFromConcept}
-        onSelectRef={handleSelectRef}
-      />
-    );
-  }
-
-  return (
-    <HubView
-      onSelect={handleSelectRef}
-      onGoHome={onGoHome}
-      onSelectPathway={setSelectedPathway}
-      onSelectConcept={setSelectedConcept}
-    />
-  );
+  const hubActive = !selected && !selectedPathway && !selectedConcept;
+  return <>
+    <div hidden={!hubActive} inert={!hubActive}>
+      <HubView active={hubActive} onSelect={handleSelectRef} onGoHome={onGoHome} onSelectPathway={setSelectedPathway} onSelectConcept={setSelectedConcept} />
+    </div>
+    {selected ? <DetailView ref_={selected} onBack={handleBackFromDetail} onSelect={handleSelectRef} backLabel={detailBackLabel} />
+      : selectedPathway ? <PathwayDetailView pathway={selectedPathway} onBack={handleBackFromPathway} onSelectRef={handleSelectRef} backLabel={pathwayBackLabel} />
+      : selectedConcept ? <ConceptDetailView concept={selectedConcept} onBack={() => setSelectedConcept(null)} onSelectPathway={handleSelectPathwayFromConcept} onSelectRef={handleSelectRef} />
+      : null}
+  </>;
 }

@@ -48,7 +48,7 @@ test.describe('Shift 06 preview', () => {
     await expect(dialog).toContainText('Founder review and independent clinical sign-off have not been recorded.');
     await expect(dialog).not.toContainText('Draft');
     await expect(dialog).toContainText('SHIFT-006 / 0.4');
-    await expect(dialog.locator('ol li')).toHaveCount(5);
+    await expect(dialog.locator('ol li')).toHaveCount(7);
     await expect(dialog).not.toContainText('OpenStax');
   });
 
@@ -69,6 +69,7 @@ test.describe('Shift 06 preview', () => {
     if (choice.result === 'Close') await expect(feedback(page)).toContainText('Partially correct');
     if (decision.teaching) await expect(feedback(page)).toContainText(decision.teaching);
     if (decision === d4) await expect(feedback(page)).toContainText(d4.whileHelp);
+    if (decision === d6) for (const name of ['Chronic Obstructive Pulmonary Disease (COPD)', 'Pursed-lip Breathing']) await expect(feedback(page).locator('.shift-sources')).toContainText(name);
   });
 
   async function play(page: Page, correct: boolean) {

@@ -91,8 +91,10 @@ test('no em dashes anywhere in Shift 06 content or source', () => {
 });
 
 test('sources are stored by spec number, version 0.4, sign-off not claimed', () => {
-  // OpenStax sources 1 and 6 were removed; nothing may still cite them. Source 7 backs debrief bullet 2.
-  assert.deepEqual(Object.keys(data.SOURCES), ['2', '3', '4', '5', '7']);
+  // OpenStax sources 1 and 6 were removed; nothing may still cite them. Source 7 backs debrief bullet 2,
+  // and Sources 8 and 9 back D6.
+  assert.deepEqual(Object.keys(data.SOURCES), ['2', '3', '4', '5', '7', '8', '9']);
+  assert.deepEqual(data.d6.sources, [8, 9]);
   const cited = [data.d1, data.d2, data.d3, data.d4, data.d5, data.d6, REWIND].flatMap(item => item.sources).concat(data.debrief.why.map(([, number]) => number).filter(Boolean));
   assert.deepEqual(cited.filter(number => !data.SOURCES[number]), []);
   assert.ok(!JSON.stringify(data.SOURCES).includes('openstax'));

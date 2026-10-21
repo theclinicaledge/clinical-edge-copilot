@@ -9,13 +9,15 @@ export const title = 'The Stable Number';
 
 // Keyed by spec source number so a citation can be swapped without touching learner-facing text.
 // Spec sources 1 and 6 (OpenStax) were removed; the remaining numbers are unchanged. Source 7 replaces
-// Source 1 for debrief bullet 2.
+// Source 1 for debrief bullet 2, and Sources 8 and 9 replace Source 6 for D6.
 export const SOURCES = {
   2: { citation: 'Hooper N, Armstrong TJ. Hemorrhagic Shock. StatPearls; updated 26 Sep 2022.', url: 'https://www.ncbi.nlm.nih.gov/books/NBK470382/', supports: 'D2, D3, Rewind, debrief bullets 1 and 3' },
   3: { citation: 'Upper Gastrointestinal Bleeding (editor Copelin EL). StatPearls Point-of-Care; updated 17 Aug 2024.', url: 'https://www.statpearls.com/point-of-care/30795', supports: 'D3, D4, Rewind' },
   4: { citation: 'UC Davis PSNet Editorial Team. Rapid Response Systems. AHRQ PSNet; last reviewed 2024.', url: 'https://psnet.ahrq.gov/primer/rapid-response-systems', supports: 'D1, D4' },
   5: { citation: 'Institute for Healthcare Improvement. SBAR Tool: Situation-Background-Assessment-Recommendation.', url: 'https://www.ihi.org/library/tools/sbar-tool-situation-background-assessment-recommendation', supports: 'D5' },
   7: { citation: 'Killeen RB, Kaur A, Afzal M. Acute Anemia. StatPearls; updated 26 Feb 2025.', url: 'https://www.ncbi.nlm.nih.gov/books/NBK537232/', supports: 'debrief bullet 2' },
+  8: { citation: 'Kanchustambham V, Brown BD. Chronic Obstructive Pulmonary Disease (COPD). StatPearls; updated 15 Apr 2026.', url: 'https://www.ncbi.nlm.nih.gov/books/NBK559281/', supports: 'D6' },
+  9: { citation: 'Nguyen JD, Duong H. Pursed-lip Breathing. StatPearls; updated 25 Jan 2025.', url: 'https://www.ncbi.nlm.nih.gov/books/NBK545289/', supports: 'D6' },
 };
 
 const reading = (time, label, hr, sys, dia, rr, spo2, temp, note) => ({ time, label, hr, sys, dia, rr, spo2, temp, note });
@@ -174,7 +176,7 @@ export const d6 = {
     { id: 'escalate', text: 'Escalate now', result: 'Not best', feedback: 'After rest, her findings match her own baseline and goal. Escalation is for sustained change.' },
   ],
   teaching: 'Same rule, other direction. She matches her own normal, so the plan stands.',
-  concepts: ['trend-vs-snapshot', 'escalation-level'], sources: [],
+  concepts: ['trend-vs-snapshot', 'escalation-level'], sources: [8, 9],
 };
 
 export const finalScreen = 'Night challenge complete.';
@@ -273,6 +275,5 @@ export const card = {
 // Open content-validation items (not learner-facing).
 export const OPEN_ITEMS = [
   'Founder review and independent clinical sign-off have not been recorded. Shift 06 stays behind the preview flag until they are.',
-  'D6 (Room 16) has no source since OpenStax Source 6 was removed.',
   'Estimated time is 6 minutes. If playtesting runs long, D1 may be cut later.',
 ];

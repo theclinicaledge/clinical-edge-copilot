@@ -880,3 +880,11 @@
   }
   .rh-concept-map__node { white-space: normal; }
 }
+.rh-page [role="button"]:focus-visible { outline: 2px solid var(--ce-teal-deep); outline-offset: 3px; }
+@media (max-width: 640px) {
+  .rh-page .rh-hero { margin-bottom: 16px; padding-bottom: 16px; }
+  .rh-page .rh-hero__title { font-size: 22px; letter-spacing: 0; }
+  .rh-page .rh-hero__stats { display: none; }
+  .rh-page .rh-filters { flex-wrap: nowrap; overflow-x: auto; padding-bottom: 8px; }
+  .rh-page .rh-filter-btn { flex-shrink: 0; min-height: 44px; }
+}

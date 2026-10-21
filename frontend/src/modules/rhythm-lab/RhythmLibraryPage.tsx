@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useLayoutEffect, useRef, useState } from 'react';
 import { trackEvent } from '../../analytics';
 import { RHYTHMS, RHYTHM_ALIASES } from './data/rhythms';
 import type { Rhythm } from './data/rhythms';
@@ -20,6 +20,20 @@ function norm(s: string): string {
 export default function RhythmLibraryPage({ navigate }: RhythmLibraryPageProps) {
   const [query, setQuery] = useState('');
   const [selected, setSelected] = useState<Rhythm | null>(null);
+  const returnPosition = useRef<{ label: string; top: number; scroll: number } | null>(null);
+  useLayoutEffect(() => {
+    if (selected) {
+      window.scrollTo({ top: 0, behavior: 'instant' });
+      document.querySelector<HTMLButtonElement>('.detail-back')?.focus({ preventScroll: true });
+    } else if (returnPosition.current) {
+      const { label, top, scroll } = returnPosition.current;
+      const button = [...document.querySelectorAll<HTMLButtonElement>('.rhythm-library-list button')].find(el => (el.getAttribute('aria-label') || el.textContent?.trim()) === label);
+      if (button) {
+        button.focus({ preventScroll: true });
+        window.scrollTo({ top: window.scrollY + button.getBoundingClientRect().top - top, behavior: 'instant' });
+      } else window.scrollTo({ top: scroll, behavior: 'instant' });
+    }
+  }, [selected]);
 
   const recentIds   = getRecentRhythms();
   const favoriteIds = getFavorites();
@@ -54,7 +68,10 @@ export default function RhythmLibraryPage({ navigate }: RhythmLibraryPageProps) 
       {selected ? (
         <RhythmDetail rhythm={selected} onBack={() => setSelected(null)} />
       ) : (
-        <div className="home-layout">
+        <div className="home-layout rhythm-library-list" onClickCapture={event => {
+          const button = (event.target as HTMLElement).closest('button');
+          if (button) returnPosition.current = { label: button.getAttribute('aria-label') || button.textContent?.trim() || '', top: button.getBoundingClientRect().top, scroll: window.scrollY };
+        }}>
           {favoriteRhythms.length > 0 && (
             <div className="home-left">
               <div className="progress-panel">
@@ -82,7 +99,7 @@ export default function RhythmLibraryPage({ navigate }: RhythmLibraryPageProps) 
               </p>
             </div>
 
-            {recentRhythms.length > 0 && (
+            {!q && recentRhythms.length > 0 && (
               <div className="progress-recent">
                 <p className="progress-recent__label">Recently viewed</p>
                 <div className="progress-recent__list">
@@ -123,7 +140,7 @@ export default function RhythmLibraryPage({ navigate }: RhythmLibraryPageProps) 
                     />
                   ))
                 : (
-                    <p className="rhythm-index-no-results">No matching rhythms.</p>
+                    <p className="rhythm-index-no-results" role="status">No matching rhythms. Try a rhythm name or abbreviation.</p>
                   )
               }
             </div>

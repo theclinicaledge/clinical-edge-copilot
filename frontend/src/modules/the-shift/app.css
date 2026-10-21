@@ -29,6 +29,12 @@ html[data-ce-native-app="true"] .shift-library-download { display: none; }
 .shift-library-monitor text { fill: var(--ce-text-light-body); font: 9px var(--ce-font-mono); letter-spacing: 0; }
 .shift-library-image > span { position: absolute; top: 12px; left: 12px; background: var(--ce-navy-header); color: var(--ce-text-light); padding: 6px 10px; border-radius: 4px; font: 12px var(--ce-font-mono); }
 .shift-library-copy { display: flex; flex-direction: column; flex: 1; padding: 22px; }
+.shift-debrief-nav { display: flex; flex-wrap: wrap; gap: 4px 12px; padding: 12px 0; margin: 12px 0 24px; border-block: 1px solid var(--ce-warm-line); }
+.shift-debrief-nav button { background: transparent; border: 0; border-radius: 4px; color: var(--ce-teal-deep); font: 600 14px var(--ce-font-sans); padding: 10px 6px; min-height: 44px; cursor: pointer; text-decoration: underline; text-underline-offset: 4px; }
+.shift-debrief-nav button:hover { background: var(--ce-warm-card); }
+.shift-debrief-nav button:active { opacity: .75; }
+.shift-debrief-nav button:focus-visible, .shift-debrief-target:focus-visible { outline: 2px solid var(--ce-teal-deep); outline-offset: 4px; }
+.shift-debrief-target { scroll-margin-top: 100px; }
 .shift-library-reviews { margin: 24px 0; padding: 20px 0; border-top: 2px solid var(--ce-teal); border-bottom: 1px solid var(--ce-warm-line); }
 .shift-library-reviews h2 { font-size: 22px; margin: 0 0 8px; letter-spacing: 0; }
 .shift-library-reviews p { color: var(--ce-text-muted); font-size: 14px; line-height: 1.5; }

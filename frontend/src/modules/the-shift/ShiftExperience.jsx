@@ -13,6 +13,7 @@ import { SHIFTS, getShift, progressLabel, scenarioLink } from './integrated/regi
 import { shiftRoute, shiftPath, learningDestination, returningShift } from './routing.js';
 import { shiftOpened } from '../../productAnalytics.js';
 import './app.css';
+import DebriefNavigation from './DebriefNavigation.jsx';
 
 // Standalone release authorized October 18, 2026; the track keeps its own pilot gate.
 const StandaloneRewind = import.meta.env.VITE_REWIND_ENABLED !== 'false' ? lazy(() => import('../rewind/StandaloneRewind.jsx')) : null;
@@ -137,7 +138,7 @@ function Scenario({ item, navigate, active }) {
   }
   return <div ref={root} className="shift-scenario-scroll" onClickCapture={capture}>
     <div className="shift-scene-bar"><AppLink to="/learn/shifts" navigate={navigate}>&#8592; Shift Library</AppLink><button onClick={() => setReview(true)}>Sources & review</button></div>
-    <Scene embedded={item.id === 'which-patient-first'} nextStep={['drowsy-patient', 'monitor-alarm', 'discharge-puzzle', 'which-patient-first'].includes(item.id) ? <NextStep item={item} navigate={navigate} /> : null} debrief={active && StandaloneRewind && rewindAssignments[item.id] ? <Suspense fallback={<p role="status">Opening optional practice...</p>}><StandaloneRewind id={rewindAssignments[item.id]} navigate={navigate} /></Suspense> : null} />
+    <Scene embedded={item.id === 'which-patient-first'} nextStep={['drowsy-patient', 'monitor-alarm', 'discharge-puzzle', 'which-patient-first'].includes(item.id) ? <NextStep item={item} navigate={navigate} /> : null} debrief={active && rewindAssignments[item.id] ? <><DebriefNavigation />{StandaloneRewind && <Suspense fallback={<p role="status">Opening optional practice...</p>}><StandaloneRewind id={rewindAssignments[item.id]} navigate={navigate} /></Suspense>}</> : null} />
     {review && <ReviewDialog item={item} close={() => setReview(false)} />}
   </div>;
 }

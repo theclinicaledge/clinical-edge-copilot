@@ -28,6 +28,13 @@ export function PracticeMode({ onBack }: PracticeModeProps) {
   const [catIdx,     setCatIdx]     = useState(() => Math.floor(Math.random() * RHYTHMS.length));
   const [revealed,   setRevealed]   = useState(false);
   const [cluesShown, setCluesShown] = useState(0); // 0 = none, 1 = first, 2 = both
+  const stripRef = useRef<HTMLDivElement>(null);
+  const answerRef = useRef<HTMLDivElement>(null);
+  useEffect(() => {
+    if (!revealed) return;
+    answerRef.current?.focus({ preventScroll: true });
+    stripRef.current?.scrollIntoView({ block: 'start', behavior: 'instant' });
+  }, [revealed]);
 
   // Derive filtered rhythm list for the active category
   const category   = PRACTICE_CATEGORIES.find(c => c.key === catKey)!;
@@ -97,7 +104,7 @@ export function PracticeMode({ onBack }: PracticeModeProps) {
       </div>
 
       {/* Strip — key remounts on each new rhythm, replaying the reveal animation */}
-      <div className="detail-strip-area">
+      <div ref={stripRef} className="detail-strip-area practice-reading-strip">
         <RhythmStrip key={`${catKey}-${safeIdx}`} rhythmId={rhythm.id} />
         <div className="detail-strip-meta">
           <span className="detail-strip-label">
@@ -173,12 +180,13 @@ export function PracticeMode({ onBack }: PracticeModeProps) {
 
           /* ── Post-reveal ────────────────────────────────────── */
           <div key={`answer-${catKey}-${safeIdx}`} className="practice-answer ce-section-enter">
-            <div className="practice-answer__header">
+            <div ref={answerRef} tabIndex={-1} aria-label="Revealed rhythm" className="practice-answer__header">
               <span className="practice-answer__abbrev">{rhythm.shortName}</span>
               <span className="practice-answer__name">{rhythm.name}</span>
               <span className="practice-answer__urgency" style={{ color: urgencyColor }}>
                 {rhythm.urgencyLabel}
               </span>
+              <button className="practice-next-btn practice-next-top" onClick={next}>Next strip →</button>
             </div>
 
             <div className="practice-answer__body">

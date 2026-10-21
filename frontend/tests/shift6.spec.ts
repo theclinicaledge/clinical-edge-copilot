@@ -37,6 +37,8 @@ test.describe('Shift 06 preview', () => {
     const card = page.locator('.shift-library-card').filter({ hasText: 'The Stable Number' });
     await expect(card).toContainText('Med-Surg / Foundations');
     await expect(card).not.toContainText('Draft');
+    await expect(card.locator('.shift-library-status')).toHaveText(/Not started/);
+    await expect(card).toContainText('Ready when you are');
     await card.getByRole('link', { name: /Begin shift|Continue shift|Return to debrief/ }).click();
     await expect(page).toHaveURL(new RegExp(`${PATH}$`));
     await expect(page.locator('.shift-app')).not.toContainText(/\bDraft\b/);

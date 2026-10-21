@@ -773,6 +773,11 @@
 .id-ref-row__body-inner {
   padding: 2px 14px 13px 36px; /* 14 left + 9 icon + 9 gap ≈ 36 */
 }
+.id-ref-row__body[data-open="false"] > .id-ref-row__body-inner {
+  padding-top: 0;
+  padding-bottom: 0;
+  visibility: hidden;
+}
 
 /* Variant body: subtle colored left rule */
 .id-ref-row--watch .id-ref-row__body-inner {
@@ -1346,11 +1351,11 @@
 .id-hemo-val--down     { color: var(--ce-gold); }
 .id-hemo-val--neutral  { color: var(--ce-text-dim); }
 .id-hemo-val--variable {
-  font-size: 8.5px;
+  font-size: var(--ce-fs-caption);
   font-family: var(--id-font-mono);
   font-style: italic;
   font-weight: 500;
-  color: #8B7EC0;
+  color: var(--ce-text-muted);
   letter-spacing: 0.01em;
 }
 /* Optional note below grid */
@@ -2514,4 +2519,89 @@
   .id-practice,
   .id-challenge,
   .id-pearl-view { animation: none; opacity: 1; transform: none; }
+}
+
+/* Small teaching aids inside the existing detail cards and mechanism row. */
+.id-why-chain {
+  list-style: none;
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: var(--ce-sp-3);
+  padding: 0;
+  margin: 0;
+  color: var(--ce-text-mid);
+  font-size: var(--ce-fs-body-sm);
+  line-height: 1.65;
+}
+.id-why-chain li + li {
+  border-left: 1px solid var(--ce-warm-line);
+  padding-left: var(--ce-sp-3);
+}
+.id-why-chain__label {
+  display: block;
+  color: var(--ce-gold-deep);
+  font-family: var(--ce-font-mono);
+  font-size: var(--ce-fs-eyebrow);
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: var(--ce-track-eyebrow);
+  margin-bottom: var(--ce-sp-1);
+}
+.id-why-chain li:not(:last-child) .id-why-chain__label::after {
+  content: ' →';
+}
+.id-why-check {
+  margin-top: var(--ce-sp-3);
+  padding-top: var(--ce-sp-3);
+  border-top: 1px solid var(--ce-warm-line);
+  font-size: var(--ce-fs-body-sm);
+  line-height: 1.65;
+}
+.id-why-check__label {
+  color: var(--ce-text-muted);
+  font: 700 var(--ce-fs-eyebrow) var(--ce-font-mono);
+  text-transform: uppercase;
+  letter-spacing: var(--ce-track-eyebrow);
+  margin: 0 0 var(--ce-sp-1);
+}
+.id-why-check__prompt { margin: 0 0 var(--ce-sp-2); color: var(--ce-text-mid); }
+.id-why-check__choices { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: var(--ce-sp-2); }
+.id-why-check__choice {
+  min-height: 44px;
+  padding: var(--ce-sp-2) var(--ce-sp-3);
+  border: 1px solid var(--ce-warm-line);
+  border-radius: var(--ce-r-md);
+  background: var(--ce-warm-card);
+  color: var(--ce-text-mid);
+  font: inherit;
+  line-height: 1.5;
+  text-align: left;
+  cursor: pointer;
+}
+.id-why-check__choice:hover,
+.id-why-check__choice[aria-pressed="true"] {
+  border-color: var(--ce-teal-deep);
+  background: rgba(10,191,188,0.06);
+}
+.id-why-check__choice:focus-visible { outline: 2px solid var(--ce-teal-deep); outline-offset: 2px; }
+.id-why-check__feedback { margin: var(--ce-sp-2) 0 0; color: var(--ce-text-mid); }
+.id-hemo-cell__key, .id-hcm abbr { text-decoration: none; }
+.id-hemo-cell__hint {
+  color: var(--ce-text-muted);
+  font-size: var(--ce-fs-eyebrow);
+  line-height: 1.2;
+  text-align: center;
+}
+.id-hemo-card__key {
+  color: var(--ce-text-muted);
+  font-size: var(--ce-fs-caption);
+  line-height: 1.6;
+  margin: var(--ce-sp-2) 0 0;
+}
+.id-hcm > .id-hemo-card__key { padding: 0 var(--ce-sp-3) var(--ce-sp-3); }
+@media (max-width: 540px) {
+  .id-why-chain { grid-template-columns: 1fr; gap: var(--ce-sp-2); }
+  .id-why-chain li { display: grid; grid-template-columns: 64px minmax(0, 1fr); gap: var(--ce-sp-2); }
+  .id-why-chain li + li { padding: 0; border: 0; }
+  .id-why-check__choices { grid-template-columns: 1fr; }
 }

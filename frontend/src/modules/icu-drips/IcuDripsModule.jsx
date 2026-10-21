@@ -1,9 +1,10 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useId } from 'react';
 import { trackEvent } from '../../analytics';
 import ModuleHeader from '../../components/ModuleHeader.jsx';
 import ClinicalTrustPanel from '../../components/clinical-trust/ClinicalTrustPanel.jsx';
-import { ICU_DRIPS_TRUST, getSourcesForDrip } from '../../data/clinicalSources.js';
+import { ICU_DRIPS_TRUST, getSourcesForDrip, SOURCES } from '../../data/clinicalSources.js';
 import './icu-drips.css';
+import { DRIP_LEARNING } from './data/learning.js';
 import {
   DRIPS, CATEGORIES, FAMILIES, FOUNDATIONS,
   SAFETY_DISCLAIMER, COMPARE_PAIRS, CLINICAL_PEARLS,
@@ -75,7 +76,7 @@ const PRACTICE_DECK = [
       'Soft hemodynamics always indicate volume depletion in this setting',
     ],
     correctOption: 2,
-    explanation: 'Milrinone\'s longer half-life means the hemodynamic picture reflects what was running hours earlier, not just the current rate. Expecting immediate resolution after a rate change does not account for the drug\'s pharmacokinetic behavior.',
+    explanation: 'Milrinone clears more slowly than dobutamine, particularly with renal impairment. Earlier exposure can still influence the current response. Persistent hypotension still needs ongoing assessment and team communication.',
     relatedDripId: 'milrinone',
     learningPearl: 'With milrinone, what the numbers show now may reflect what was running hours ago — not just the current rate.',
   },
@@ -90,7 +91,7 @@ const PRACTICE_DECK = [
       'Heart rate stability means the vasopressor is not yet working',
     ],
     correctOption: 1,
-    explanation: 'Vasopressin works through V1 receptors rather than adrenergic pathways. Unlike catecholamine vasopressors, it does not directly stimulate the heart. MAP improvement without a significant heart rate shift is a pattern consistent with non-catecholamine vascular tone support.',
+    explanation: 'Vasopressin works through V1 receptors rather than adrenergic pathways. Unlike catecholamine vasopressors, it does not directly stimulate the heart. This is consistent with V1-mediated vascular tone support, but it is not unique to vasopressin; other drugs and the patient condition can produce a similar trend.',
     relatedDripId: 'vasopressin',
     learningPearl: 'Vasopressin raises MAP through a different receptor system — heart rate often stays stable because there is no direct beta stimulation.',
   },
@@ -105,7 +106,7 @@ const PRACTICE_DECK = [
       'Blood pressure softening on sedation always means the level is too high',
     ],
     correctOption: 1,
-    explanation: 'Propofol commonly causes hypotension through vasodilation. Dexmedetomidine\'s primary hemodynamic concern is bradycardia. Two patients can look equally calm while having distinctly different hemodynamic patterns depending on which agent is running.',
+    explanation: 'Propofol commonly lowers BP through vasodilation. Dexmedetomidine reduces sympathetic activity and can slow HR. Both can cause hypotension or bradycardia, so the pattern explains a possible mechanism rather than uniquely identifying the drug or cause.',
     relatedDripId: 'propofol',
     learningPearl: 'Sedation depth is not the only story — the hemodynamic pattern on the monitor helps identify which agent\'s dominant effect is showing.',
   },
@@ -152,22 +153,22 @@ const PRACTICE_DECK = [
     correctOption: 1,
     explanation: 'Insulin drives glucose into cells and simultaneously shifts potassium intracellularly, which can lower serum potassium levels. Close monitoring of potassium alongside glucose is an essential nursing awareness point during insulin infusions.',
     relatedDripId: 'insulin-infusion',
-    learningPearl: 'Glucose is not the only number that matters on an insulin infusion — potassium moves with it and can drop silently.',
+    learningPearl: 'Potassium can fall independently of the glucose trend and needs its own measurement.',
   },
   {
     id: 'q-amiodarone-tail',
-    prompt: 'The amiodarone infusion has stopped. When do its effects and interactions end?',
+    prompt: 'The amiodarone infusion has ended. What remains relevant to the medication review?',
     context: 'A patient\'s amiodarone infusion was discontinued. The team is planning next steps.',
     options: [
       'Effects resolve within a few hours of stopping the infusion',
-      'Effects and drug interactions can persist for weeks after the infusion ends',
+      'Effects and interactions can persist; duration varies with exposure and patient factors',
       'Amiodarone has a short half-life — monitoring can stop when the infusion does',
       'Thyroid and liver monitoring is only relevant while the infusion is running',
     ],
     correctOption: 1,
-    explanation: 'Amiodarone has an exceptionally long half-life measured in weeks. Its effects on heart rhythm, QTc, thyroid function, and drug interactions can persist long after the infusion is stopped. This is especially important when other medications are being added or adjusted.',
+    explanation: 'Amiodarone has long, variable terminal elimination. Prior and cumulative exposure affect how long effects and interactions remain relevant. The monitoring and follow-up plan depends on the clinical context, rather than one fixed duration after every infusion.',
     relatedDripId: 'amiodarone',
-    learningPearl: 'Amiodarone\'s effects outlast the infusion — monitoring for QTc, thyroid, liver, and drug interactions continues well beyond discontinuation.',
+    learningPearl: 'Prior amiodarone exposure can still matter after the infusion; follow-up depends on exposure, symptoms, and the provider-directed plan.',
   },
 ];
 
@@ -250,7 +251,7 @@ const SHIFT_CHALLENGES = [
     ],
     correctOption: 0,
     explanation: 'Insulin shifts glucose into cells and can shift potassium into cells too. The glucose trend matters, but potassium is part of the bedside watch throughout the infusion.',
-    pearl: 'Insulin infusions are really two labs: glucose and potassium.',
+    pearl: 'Insulin can lower glucose and potassium, but each trend needs its own assessment.',
     relatedDripIds: ['insulin-infusion'],
   },
 ];
@@ -282,7 +283,7 @@ const ICU_PEARLS = [
     id: 'dobutamine-hr',
     title: 'Dobutamine and heart rate',
     pearl: 'Beta-1 stimulation from dobutamine can raise heart rate alongside improving cardiac output.',
-    whyItMatters: 'A climbing heart rate on an inotrope may be the drug working, not a new arrhythmia — but both need trending.',
+    whyItMatters: 'A faster HR can reflect beta stimulation or a new arrhythmia. The rhythm strip and perfusion assessment help distinguish them.',
     relatedDripIds: ['dobutamine'],
   },
   {
@@ -294,9 +295,9 @@ const ICU_PEARLS = [
   },
   {
     id: 'dex-gradual-brady',
-    title: 'Dexmedetomidine and creeping bradycardia',
-    pearl: 'Heart rate slowing on dexmedetomidine is often gradual rather than abrupt.',
-    whyItMatters: 'Trending the heart rate over 30-minute windows helps catch the pattern before it becomes hemodynamically significant.',
+    title: 'Dexmedetomidine and bradycardia',
+    pearl: 'Bradycardia can be gradual or abrupt, including sinus arrest.',
+    whyItMatters: 'There is no guaranteed warning window. HR, rhythm, BP, and patient response belong together in the ordered monitoring plan.',
     relatedDripIds: ['dexmedetomidine'],
   },
   {
@@ -310,7 +311,7 @@ const ICU_PEARLS = [
     id: 'nicardipine-afterload',
     title: 'Nicardipine reduces afterload',
     pearl: 'Nicardipine lowers blood pressure primarily through arterial vasodilation — it targets systemic vascular resistance.',
-    whyItMatters: 'Reflex tachycardia is a more common bedside pattern with nicardipine than with venodilators like nitroglycerin.',
+    whyItMatters: 'Arterial dilation can trigger reflex tachycardia. A rise in HR needs the rhythm and patient context; the mechanism alone does not establish the cause.',
     relatedDripIds: ['nicardipine'],
   },
   {
@@ -330,15 +331,15 @@ const ICU_PEARLS = [
   {
     id: 'heparin-lab-not-hemo',
     title: 'Heparin is lab-guided, not hemodynamic',
-    pearl: 'Heparin has no direct effect on MAP, SVR, CO, or heart rate — its effect is entirely anticoagulation.',
-    whyItMatters: 'Monitoring attention appropriately shifts to lab values and bleeding signs rather than vital sign trends.',
+    pearl: 'Heparin primarily affects clotting rather than hemodynamics. Stable vital signs do not exclude bleeding, HIT, or other adverse effects.',
+    whyItMatters: 'Coagulation tests, bleeding assessment, and platelet/hemoglobin trends add information that stable vital signs cannot replace. Hemodynamic changes can still signal bleeding.',
     relatedDripIds: ['heparin'],
   },
   {
     id: 'amiodarone-long-tail',
     title: "Amiodarone's effects outlast the infusion",
-    pearl: 'Amiodarone has an exceptionally long half-life — rhythm, QTc, thyroid, and drug interaction effects persist for weeks after stopping.',
-    whyItMatters: 'Stopping the infusion does not stop the monitoring — effects and interactions remain relevant long after discontinuation.',
+    pearl: 'Amiodarone has long, variable elimination; effects and interactions can persist after discontinuation, depending on exposure and patient factors.',
+    whyItMatters: 'Prior and cumulative exposure remain relevant to the medication review. Symptoms and the provider-directed plan shape follow-up.',
     relatedDripIds: ['amiodarone'],
   },
   {
@@ -521,6 +522,7 @@ function RefBulletList({ items }) {
 
 // ─── Reference row accordion ──────────────────────────────────────────────────
 function RefRow({ iconType, label, variant, count, isOpen, onToggle, children }) {
+  const bodyId = useId();
   const cls = ['id-ref-row', variant ? `id-ref-row--${variant}` : ''].filter(Boolean).join(' ');
   return (
     <div className={cls}>
@@ -528,6 +530,7 @@ function RefRow({ iconType, label, variant, count, isOpen, onToggle, children })
         className="id-ref-row__header"
         onClick={onToggle}
         aria-expanded={isOpen}
+        aria-controls={bodyId}
       >
         <span className="id-ref-row__icon">
           <Icon type={iconType} size={13} />
@@ -540,7 +543,7 @@ function RefRow({ iconType, label, variant, count, isOpen, onToggle, children })
           ›
         </span>
       </button>
-      <div className="id-ref-row__body ce-accordion-panel" data-open={isOpen}>
+      <div id={bodyId} className="id-ref-row__body ce-accordion-panel" data-open={isOpen} inert={!isOpen} aria-hidden={!isOpen}>
         <div className="id-ref-row__body-inner">
           {children}
         </div>
@@ -551,13 +554,19 @@ function RefRow({ iconType, label, variant, count, isOpen, onToggle, children })
 
 // ─── Hemodynamic Effect card ──────────────────────────────────────────────────
 const DIRECTION_DISPLAY = {
-  up:          { symbol: '↑',        cls: 'id-hemo-val--up'       },
-  up_strong:   { symbol: '↑↑',       cls: 'id-hemo-val--up'       },
-  down:        { symbol: '↓',        cls: 'id-hemo-val--down'     },
-  down_strong: { symbol: '↓↓',       cls: 'id-hemo-val--down'     },
-  neutral:     { symbol: '↔',        cls: 'id-hemo-val--neutral'  },
-  variable:    { symbol: 'variable', cls: 'id-hemo-val--variable' },
+  up:       { symbol: '↑',        label: 'Typically increases', cls: 'id-hemo-val--up' },
+  down:     { symbol: '↓',        label: 'Typically decreases', cls: 'id-hemo-val--down' },
+  neutral:  { symbol: '↔',        label: 'Little primary change', cls: 'id-hemo-val--neutral' },
+  variable: { symbol: 'varies',   label: 'Response varies', cls: 'id-hemo-val--variable' },
 };
+const HEMO_LABELS = {
+  MAP: { full: 'Mean arterial pressure', hint: 'Pressure' },
+  SVR: { full: 'Systemic vascular resistance', hint: 'Resistance' },
+  CO: { full: 'Cardiac output: blood pumped per minute', hint: 'Flow / min' },
+  CI: { full: 'Cardiac index: cardiac output divided by body surface area', hint: 'CO / BSA' },
+  HR: { full: 'Heart rate', hint: 'Rate' },
+};
+const HEMO_KEY = 'Typical patterns, not predicted responses. ↔ means little primary change; adverse effects are still possible. CI is CO adjusted for body surface area.';
 
 function HemodynamicCard({ hemodynamics }) {
   if (!hemodynamics) return null;
@@ -573,13 +582,15 @@ function HemodynamicCard({ hemodynamics }) {
           const disp = DIRECTION_DISPLAY[row.direction] ?? DIRECTION_DISPLAY.neutral;
           return (
             <div key={row.key} className="id-hemo-cell">
-              <span className="id-hemo-cell__key">{row.label}</span>
-              <span className={`id-hemo-cell__val ${disp.cls}`}>{disp.symbol}</span>
+              <abbr className="id-hemo-cell__key" title={HEMO_LABELS[row.key]?.full}>{row.label}</abbr>
+              <span className="id-hemo-cell__hint">{HEMO_LABELS[row.key]?.hint}</span>
+              <span className={`id-hemo-cell__val ${disp.cls}`} aria-label={disp.label}>{disp.symbol}</span>
             </div>
           );
         })}
       </div>
       {note && <p className="id-hemo-card__note">{note}</p>}
+      <p className="id-hemo-card__key">{HEMO_KEY}</p>
     </div>
   );
 }
@@ -638,17 +649,18 @@ function HemodynamicCompareMatrix({ aDrip, bDrip, aLabel, bLabel, pairId }) {
               key={key}
               className={`id-hcm__row${differs ? ' id-hcm__row--differs' : ''}`}
             >
-              <div className="id-hcm__cell id-hcm__cell--metric">{key}</div>
+              <div className="id-hcm__cell id-hcm__cell--metric"><abbr title={HEMO_LABELS[key].full}>{key}</abbr></div>
               <div className="id-hcm__cell id-hcm__cell--val">
-                <span className={`id-hcm__val ${aDisp.cls}`}>{aDisp.symbol}</span>
+                <span className={`id-hcm__val ${aDisp.cls}`} aria-label={aDisp.label}>{aDisp.symbol}</span>
               </div>
               <div className="id-hcm__cell id-hcm__cell--val">
-                <span className={`id-hcm__val ${bDisp.cls}`}>{bDisp.symbol}</span>
+                <span className={`id-hcm__val ${bDisp.cls}`} aria-label={bDisp.label}>{bDisp.symbol}</span>
               </div>
             </div>
           );
         })}
       </div>
+      <p className="id-hemo-card__key">{HEMO_KEY}</p>
     </div>
   );
 }
@@ -664,9 +676,34 @@ const DEFAULT_OPEN = {
   keySafetyNotes:    false,
 };
 
+function WhyCheck({ check }) {
+  const [selected, setSelected] = useState(null);
+  const correct = selected === check.answer;
+  return (
+    <div className="id-why-check">
+      <p className="id-why-check__label">Quick why check</p>
+      <p className="id-why-check__prompt">{check.prompt}</p>
+      <div className="id-why-check__choices" role="group" aria-label={check.prompt}>
+        {check.options.map((option, index) => (
+          <button key={option} type="button" className="id-why-check__choice"
+            aria-pressed={selected === index} onClick={() => setSelected(index)}>
+            {option}
+          </button>
+        ))}
+      </div>
+      {selected !== null && (
+        <p className="id-why-check__feedback" role="status">
+          <strong>{correct ? 'Correct. ' : 'Not quite. '}</strong>{check.explanation}
+        </p>
+      )}
+    </div>
+  );
+}
+
 // ─── Detail view ──────────────────────────────────────────────────────────────
 function DripsDetail({ drip, onBack, onNavigate }) {
   const [open, setOpen] = useState(DEFAULT_OPEN);
+  const learning = DRIP_LEARNING[drip.id];
 
   // Record view when drip changes. Accordion state resets via keyed remount.
   useEffect(() => {
@@ -747,8 +784,12 @@ function DripsDetail({ drip, onBack, onNavigate }) {
 
         {/* Clinical pearl / nurse mental model */}
         <div className="id-pearl ce-card-enter">
-          <span className="id-pearl__label">Nurse mental model</span>
-          <p className="id-pearl__text">{drip.mentalModel}</p>
+          <span className="id-pearl__label">Follow the why</span>
+          <ol className="id-why-chain" aria-label="Action to effect to bedside watch">
+            {['action', 'effect', 'watch'].map(step => (
+              <li key={step}><span className="id-why-chain__label">{step}</span><span>{learning[step]}</span></li>
+            ))}
+          </ol>
         </div>
 
         {/* Reference rows — single containing card */}
@@ -772,6 +813,7 @@ function DripsDetail({ drip, onBack, onNavigate }) {
             onToggle={() => toggle('whatItIsDoing')}
           >
             <RefBulletList items={drip.whatItIsDoing} />
+            <WhyCheck key={drip.id} check={learning.check} />
           </RefRow>
 
           <RefRow
@@ -917,6 +959,11 @@ function ClinicalScenarioCard({ scenario }) {
 function CompareDetail({ pair, onBack, onNavigateToDrip }) {
   const aDrip = pair.aId ? DRIPS.find(d => d.id === pair.aId) : null;
   const bDrip = pair.bId ? DRIPS.find(d => d.id === pair.bId) : null;
+  const sources = [...new Map([
+    ...(aDrip ? getSourcesForDrip(aDrip) : []),
+    ...(bDrip ? getSourcesForDrip(bDrip) : []),
+    ...(pair.additionalSourceIds ?? []).map(id => SOURCES[id]),
+  ].filter(Boolean).map(source => [source.id, source])).values()];
   const [tableOpen, setTableOpen] = useState(false);
 
   useEffect(() => {
@@ -1014,6 +1061,12 @@ function CompareDetail({ pair, onBack, onNavigateToDrip }) {
           )}
         </div>
       )}
+      <ClinicalTrustPanel
+        module={ICU_DRIPS_TRUST.module}
+        context="medication_comparison"
+        sources={sources}
+        reviewMeta={ICU_DRIPS_TRUST}
+      />
     </>
   );
 }
@@ -1326,7 +1379,7 @@ function PracticeMode({ onBack, onNavigateToDrip }) {
 
   function handleNext() {
     if (index + 1 >= total) {
-      trackEvent('icu_drips_practice_completed', { score: score + (selected === PRACTICE_DECK[index].correctOption ? 1 : 0), total });
+      trackEvent('icu_drips_practice_completed', { score, total });
       setDone(true);
     } else {
       setIndex(i => i + 1);

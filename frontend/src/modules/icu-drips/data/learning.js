@@ -1,0 +1,257 @@
+// Compact, local learning content. Mechanisms and safety context are supported
+// by the per-medication references in clinicalSources.js. No patient input.
+export const DRIP_LEARNING = {
+  norepinephrine: {
+    action: 'Alpha-mediated vessel constriction, with beta-1 cardiac stimulation',
+    effect: 'Resistance and MAP rise; output may not rise with them',
+    watch: 'Pressure plus skin, capillary refill, urine, and mentation',
+    check: {
+      prompt: 'Why can a better MAP coexist with cool skin and low urine output?',
+      options: ['Higher pressure guarantees organ blood flow', 'Pressure and tissue blood flow are different signals'],
+      answer: 1,
+      explanation: 'Vasoconstriction can raise pressure while tissue flow remains limited. Perfusion findings add information the MAP cannot provide alone.',
+    },
+  },
+  vasopressin: {
+    action: 'V1 receptors tighten vessels; V2 receptors influence water retention',
+    effect: 'MAP can rise without direct beta stimulation',
+    watch: 'Perfusion, cardiac response, sodium, and fluid balance',
+    check: {
+      prompt: 'Why does sodium belong beside MAP in the monitoring picture?',
+      options: ['Vasopressin also affects renal water handling', 'A higher MAP directly measures sodium balance'],
+      answer: 0,
+      explanation: 'Vasopressin has antidiuretic as well as vascular effects. Water retention can lower sodium; increased water loss can follow withdrawal.',
+    },
+  },
+  phenylephrine: {
+    action: 'Alpha-1 receptors tighten vessels without direct beta stimulation',
+    effect: 'Resistance rises; a baroreceptor reflex can slow the heart',
+    watch: 'HR, rhythm, and perfusion alongside MAP',
+    check: {
+      prompt: 'Why can BP rise while cardiac output falls?',
+      options: ['A higher afterload and slower HR can limit output', 'Pure alpha stimulation always strengthens contraction'],
+      answer: 0,
+      explanation: 'The heart may pump against more resistance while beating more slowly. A higher pressure does not prove a higher flow.',
+    },
+  },
+  epinephrine: {
+    action: 'Alpha and beta receptors affect vessels, the heart, and metabolism',
+    effect: 'HR and squeeze increase; lactate can rise from beta-2 activity',
+    watch: 'Rhythm, ischemia, perfusion, glucose, and lactate in context',
+    check: {
+      prompt: 'Does a rising lactate on epinephrine prove worsening shock?',
+      options: ['Yes, lactate has only one cause', 'No, drug-related metabolism can contribute'],
+      answer: 1,
+      explanation: 'Beta-2 stimulation can increase lactate production. That possibility does not exclude hypoperfusion; the full clinical trend still matters.',
+    },
+  },
+  dobutamine: {
+    action: 'Predominantly beta-1 stimulation increases contractility',
+    effect: 'Output can rise while vasodilation lowers resistance',
+    watch: 'CO and perfusion together with BP, HR, and rhythm',
+    check: {
+      prompt: 'Why might output improve without a higher MAP?',
+      options: ['MAP depends on both output and vascular resistance', 'MAP measures contractility alone'],
+      answer: 0,
+      explanation: 'More flow and less resistance can occur together. The net pressure response depends on their balance, so hypotension still needs assessment.',
+    },
+  },
+  milrinone: {
+    action: 'PDE-3 inhibition increases cAMP signaling in heart and vessel muscle',
+    effect: 'Stronger contraction and vascular relaxation can coexist',
+    watch: 'BP, rhythm, output, and renal function; effects can linger',
+    check: {
+      prompt: 'Why can impaired kidneys prolong the hemodynamic effect?',
+      options: ['The kidneys make milrinone more potent at its receptor', 'Reduced renal clearance extends drug exposure'],
+      answer: 1,
+      explanation: 'Milrinone depends substantially on renal elimination. Slower clearance can extend hypotension and arrhythmia risk; assessment remains ongoing.',
+    },
+  },
+  propofol: {
+    action: 'Enhances inhibitory GABA signaling in the brain',
+    effect: 'Awareness decreases; pain relief does not follow automatically',
+    watch: 'Pain and sedation separately, plus breathing, BP, and PRIS clues',
+    check: {
+      prompt: 'A patient is deeply sedated. Does that establish pain relief?',
+      options: ['Yes, lack of movement establishes comfort', 'No, propofol does not provide analgesia'],
+      answer: 1,
+      explanation: 'Sedation and analgesia address different needs. Self-report, or a behavioral pain tool when appropriate, adds information a sedation score cannot.',
+    },
+  },
+  dexmedetomidine: {
+    action: 'Central alpha-2 activity reduces sympathetic signaling',
+    effect: 'Often arousable sedation, with lower HR and sometimes lower BP',
+    watch: 'Sedation goal, pain, breathing, HR, and BP',
+    check: {
+      prompt: 'Does relatively preserved respiratory drive remove airway risk?',
+      options: ['No, airway compromise and additive sedative effects remain possible', 'Yes, respiratory monitoring becomes unnecessary'],
+      answer: 0,
+      explanation: 'Less respiratory suppression is a relative advantage, not a guarantee. Other sedatives, airway obstruction, and the patient’s condition still matter.',
+    },
+  },
+  midazolam: {
+    action: 'GABA enhancement produces sedation, anxiolysis, and amnesia',
+    effect: 'Drug and active metabolites can accumulate during prolonged exposure',
+    watch: 'Breathing, sedation, delirium, and recovery with organ-function trends',
+    check: {
+      prompt: 'Why can awakening take longer with renal dysfunction?',
+      options: ['Active metabolites can accumulate', 'Amnesia confirms that pain is relieved'],
+      answer: 0,
+      explanation: 'Impaired clearance can prolong sedation. It is one explanation for delayed awakening, not a reason to dismiss an unexpected neurological change.',
+    },
+  },
+  fentanyl: {
+    action: 'Mu-opioid receptor activity reduces pain signaling',
+    effect: 'Analgesia can accompany sedation and reduced respiratory drive',
+    watch: 'Pain, ventilation, consciousness, BP, and HR',
+    check: {
+      prompt: 'Why can a normal SpO2 miss early opioid-related hypoventilation?',
+      options: ['SpO2 directly measures ventilation', 'Oxygenation can remain adequate while ventilation falls'],
+      answer: 1,
+      explanation: 'SpO2 measures oxygenation, not carbon dioxide clearance. Respiratory effort and ventilation remain important, especially with supplemental oxygen.',
+    },
+  },
+  ketamine: {
+    action: 'Blocks NMDA excitatory signaling, producing dissociation and analgesia',
+    effect: 'Sympathetic stimulation often raises HR and BP, but not reliably',
+    watch: 'Hemodynamics, airway, secretions, and emergence',
+    check: {
+      prompt: 'Does ketamine guarantee cardiovascular stability in shock?',
+      options: ['Yes, its sympathetic effect always prevents hypotension', 'No, cardiac depression can appear with catecholamine depletion'],
+      answer: 1,
+      explanation: 'BP and HR often rise, but hypotension, arrhythmia, and cardiac decompensation are reported. The patient response matters more than the usual pattern.',
+    },
+  },
+  amiodarone: {
+    action: 'Multiple channel and adrenergic effects alter cardiac conduction',
+    effect: 'Rhythm and rate can change; BP and conduction can worsen',
+    watch: 'ECG, QTc, BP, electrolytes, and interactions beyond the infusion',
+    check: {
+      prompt: 'Does stopping the infusion immediately remove interaction risk?',
+      options: ['No, elimination is long and variable', 'Yes, the pump stopping ends all drug effects'],
+      answer: 0,
+      explanation: 'Amiodarone and its metabolite can persist after discontinuation. The time course varies with exposure and patient factors; prior therapy belongs in the medication review.',
+    },
+  },
+  diltiazem: {
+    action: 'Calcium-channel blockade slows AV nodal conduction',
+    effect: 'Fewer atrial impulses reach the ventricles in AF or flutter',
+    watch: 'Rate, AV conduction, BP, and signs of worsening heart failure',
+    check: {
+      prompt: 'A slower ventricular rate in AF means what?',
+      options: ['The AV node is passing fewer impulses; AF may continue', 'Sinus rhythm has necessarily returned'],
+      answer: 0,
+      explanation: 'Rate control does not establish rhythm conversion in AF/flutter. PR intervals cannot be measured reliably when discrete P waves are absent.',
+    },
+  },
+  esmolol: {
+    action: 'Predominantly beta-1 blockade slows rate and reduces contractility',
+    effect: 'HR, BP, and output can fall; the drug has a short elimination tail',
+    watch: 'HR, conduction, BP, perfusion, and respiratory changes',
+    check: {
+      prompt: 'Does a short half-life mean hypotension is harmless?',
+      options: ['Yes, every patient recovers immediately', 'No, hemodynamic compromise still matters while effects recede'],
+      answer: 1,
+      explanation: 'Beta blockade usually recedes over tens of minutes, not instantly. Baseline cardiac function and concurrent drugs affect the response.',
+    },
+  },
+  nicardipine: {
+    action: 'Vascular calcium-channel blockade relaxes arteries',
+    effect: 'SVR and afterload decrease; HR may rise reflexively',
+    watch: 'BP trend, symptoms, HR, and peripheral site integrity',
+    check: {
+      prompt: 'Why might HR rise as BP falls?',
+      options: ['A baroreceptor reflex can increase HR after vasodilation', 'Nicardipine directly blocks the AV node like diltiazem'],
+      answer: 0,
+      explanation: 'Arterial relaxation lowers resistance. The compensatory HR response differs from diltiazem’s AV nodal effect, despite both being calcium-channel blockers.',
+    },
+  },
+  nitroprusside: {
+    action: 'Nitric-oxide signaling relaxes arteries and veins',
+    effect: 'Afterload, preload, and pressure can fall rapidly',
+    watch: 'Continuous BP and perfusion assessment plus cyanide/thiocyanate risk',
+    check: {
+      prompt: 'Which toxicity is especially linked to impaired renal clearance?',
+      options: ['Only a late cyanide effect, with no early risk', 'Thiocyanate accumulation during continued exposure'],
+      answer: 1,
+      explanation: 'Thiocyanate is renally cleared. Cyanide is a separate toxicity that can develop early; normal initial acid-base results do not exclude it.',
+    },
+  },
+  nitroglycerin: {
+    action: 'Nitric-oxide signaling predominantly relaxes veins',
+    effect: 'Less venous return lowers filling pressure and cardiac workload',
+    watch: 'BP, symptoms, preload context, interactions, and tubing compatibility',
+    check: {
+      prompt: 'Why can limited preload make the BP response more pronounced?',
+      options: ['Further venous pooling can reduce cardiac filling and output', 'Venodilation always increases ventricular filling'],
+      answer: 0,
+      explanation: 'Less blood returns to the heart. When filling is already limited, output and pressure can fall sharply; the mechanism does not guarantee a gentle response.',
+    },
+  },
+  furosemide: {
+    action: 'Blocks sodium-potassium-chloride transport in the loop of Henle',
+    effect: 'More sodium and water leave; potassium and magnesium can fall',
+    watch: 'Fluid balance, symptoms, BP, electrolytes, and renal function together',
+    check: {
+      prompt: 'Does a large urine output alone establish a good response?',
+      options: ['Yes, output is the only meaningful endpoint', 'No, volume depletion and electrolyte loss can accompany it'],
+      answer: 1,
+      explanation: 'Urine output describes fluid leaving, not whether the overall response is appropriate. BP, congestion, net balance, electrolytes, and renal trends complete the picture.',
+    },
+  },
+  bumetanide: {
+    action: 'Blocks loop-of-Henle salt reabsorption, like furosemide',
+    effect: 'Diuresis can reduce congestion and also deplete volume/electrolytes',
+    watch: 'Output, fluid balance, BP, potassium, magnesium, and renal trends',
+    check: {
+      prompt: 'Does greater potency per milligram change the main monitoring priorities?',
+      options: ['No, fluid balance and electrolyte safety still matter', 'Yes, potassium monitoring is no longer relevant'],
+      answer: 0,
+      explanation: 'Both are loop diuretics. Different milligram potency does not remove the shared risks of electrolyte depletion, hypovolemia, and renal-function changes.',
+    },
+  },
+  heparin: {
+    action: 'Enhances antithrombin inhibition of clotting factors',
+    effect: 'Limits new clot formation and extension; existing clots are not dissolved',
+    watch: 'Protocol labs, bleeding, hemoglobin, platelets, and new thrombosis',
+    check: {
+      prompt: 'Does an in-range anti-Xa or aPTT rule out bleeding or HIT?',
+      options: ['Yes, the assay covers every heparin complication', 'No, clinical findings and blood-count trends add different information'],
+      answer: 1,
+      explanation: 'The assay reflects anticoagulant activity within its limits. Bleeding assessment and platelet trends remain separate, and HIT can cause new thrombosis.',
+    },
+  },
+  argatroban: {
+    action: 'Directly inhibits thrombin without antithrombin as a cofactor',
+    effect: 'Anticoagulation can persist longer when hepatic clearance is impaired',
+    watch: 'Bleeding, protocol coagulation tests, liver function, and INR context',
+    check: {
+      prompt: 'Why is INR harder to interpret during warfarin overlap?',
+      options: ['Argatroban also prolongs INR', 'Argatroban has no effect on clot-based tests'],
+      answer: 0,
+      explanation: 'Both drugs can influence INR. An elevated INR during overlap does not measure the warfarin effect alone; interpretation follows the specialist-directed protocol.',
+    },
+  },
+  bivalirudin: {
+    action: 'Directly inhibits thrombin; cleared by enzymatic and renal pathways',
+    effect: 'Renal impairment can extend anticoagulant exposure',
+    watch: 'Bleeding, context-specific aPTT/ACT, and renal-function trends',
+    check: {
+      prompt: 'Does enzymatic breakdown make kidney function irrelevant?',
+      options: ['Yes, renal function never affects exposure', 'No, reduced renal clearance can prolong the effect'],
+      answer: 1,
+      explanation: 'Bivalirudin has mixed elimination. Proteolytic breakdown does not cancel the renal contribution; impaired kidney function can extend anticoagulation.',
+    },
+  },
+  'insulin-infusion': {
+    action: 'Promotes glucose uptake, suppresses ketogenesis, and shifts potassium into cells',
+    effect: 'Glucose can improve before ketoacidosis resolves',
+    watch: 'Glucose, potassium, nutrition, and in DKA ketone/acid-base trends',
+    check: {
+      prompt: 'Does improved glucose alone establish that DKA has resolved?',
+      options: ['No, ketone and acid-base recovery answer a separate question', 'Yes, glucose captures the entire DKA picture'],
+      answer: 0,
+      explanation: 'Insulin affects more than glucose. Ketoacidosis can persist after glucose improves, and potassium cannot be inferred from either result.',
+    },
+  },
+};

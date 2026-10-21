@@ -35,10 +35,10 @@ export const CLINICAL_PEARLS = [
   "Sedation is not analgesia. A still patient can still be in pain.",
   "Norepinephrine squeezes and gives mild heart support. Phenylephrine mostly just squeezes.",
   "Dobutamine and milrinone can improve output while BP still falls.",
-  "Insulin drips are really two labs: glucose and potassium.",
-  "A sudden pressure change is a line, pump, or patient change until proven otherwise.",
+  "Insulin can lower glucose and potassium. Each needs its own trend; DKA also has a ketone and acid-base story.",
+  "A sudden pressure change needs the patient picture and a check of measurement, line, and pump integrity.",
   "Heparin is lab-guided anticoagulation. Bleeding and platelets both matter.",
-  "Amiodarone lingers — effects and interactions can outlast the infusion by weeks.",
+  "Amiodarone can persist after the infusion. Duration of effects and interactions depends on exposure and the patient.",
 ];
 
 // ─── Foundations ──────────────────────────────────────────────────────────────
@@ -46,7 +46,7 @@ export const FOUNDATIONS = [
   {
     id: "central-vs-peripheral",
     title: "Central vs peripheral access",
-    body: "Many critical infusions prefer central access. Peripheral use follows unit policy, with close monitoring and a planned transition.",
+    body: "Access depends on the medication, formulation, anticipated duration, and local policy. Peripheral vasopressors require close site monitoring and an access plan.",
   },
   {
     id: "smart-pumps",
@@ -61,7 +61,7 @@ export const FOUNDATIONS = [
   {
     id: "high-alert",
     title: "High-alert medications",
-    body: "These drips carry higher risk when programmed incorrectly. Independent checks and pump verification are standard safeguards.",
+    body: "These drips carry higher risk when programmed incorrectly. Independent checks per local policy and pump verification are important safeguards.",
   },
   {
     id: "ordered-targets",
@@ -92,16 +92,17 @@ export const DRIPS = [
     pearl: "MAP up does not always mean the patient is better. Skin, urine, and mentation tell the rest of the story.",
     hemodynamics: {
       rows: [
-        { key: 'MAP', label: 'MAP', direction: 'up_strong' },
-        { key: 'SVR', label: 'SVR', direction: 'up_strong' },
+        { key: 'MAP', label: 'MAP', direction: 'up' },
+        { key: 'SVR', label: 'SVR', direction: 'up' },
         { key: 'CO',  label: 'CO',  direction: 'variable'  },
         { key: 'CI',  label: 'CI',  direction: 'variable'  },
-        { key: 'HR',  label: 'HR',  direction: 'neutral'   },
+        { key: 'HR',  label: 'HR',  direction: 'variable'  },
       ],
+      note: "HR may change little or fall reflexively. Cardiac output is not guaranteed to rise with MAP.",
     },
 
     snapshot:
-      "The first-line pressor. Squeezes the vessels to bring MAP up, with a small assist to the heart's squeeze. Less tachycardia than most options.",
+      "A first-line pressor in septic shock. Tightens vessels to raise MAP, with some cardiac stimulation. A higher pressure still needs a matching perfusion assessment.",
 
     effectChips: [
       { label: "↑ SVR" },
@@ -109,9 +110,6 @@ export const DRIPS = [
       { label: "mild heart support" },
       { label: "watch perfusion" },
     ],
-
-    mentalModel:
-      "The vasculature is too relaxed. Norepinephrine helps restore tone. But the MAP number and the patient are both part of the picture — perfusion still has to be assessed at the bedside, not just on the monitor.",
 
     commonlyUsedFor: [
       "Distributive and vasodilatory shock presentations",
@@ -122,9 +120,9 @@ export const DRIPS = [
 
     whatItIsDoing: [
       "Tightens peripheral vessel walls, raising resistance and driving MAP up",
-      "A mild boost to cardiac contractility comes with it — output usually stays supported",
+      "Beta-1 stimulation can support contractility, but increased resistance can also limit cardiac output",
       "MAP rise is predominantly driven by increased vascular resistance, not heart rate",
-      "Less reflex tachycardia than some other vasopressors",
+      "Heart rate may change little or fall through the baroreceptor reflex as pressure rises",
     ],
 
     whatNursesMonitor: [
@@ -152,7 +150,7 @@ export const DRIPS = [
     ],
 
     linesAccessPolicy: [
-      "Central venous access is standard for sustained infusions",
+      "Central access is often used for sustained support; peripheral options follow product guidance and local policy",
       "Peripheral use follows unit protocol, with close site monitoring and a transition plan",
       "Dedicated lumen preferred",
       "Compatibility with co-infusions: confirm with pharmacy",
@@ -180,12 +178,13 @@ export const DRIPS = [
     pearl: "This one does not behave like norepinephrine. Rate adjustment patterns differ, and sodium and urine output trends tell you things the MAP does not.",
     hemodynamics: {
       rows: [
-        { key: 'MAP', label: 'MAP', direction: 'up_strong' },
-        { key: 'SVR', label: 'SVR', direction: 'up_strong' },
+        { key: 'MAP', label: 'MAP', direction: 'up' },
+        { key: 'SVR', label: 'SVR', direction: 'up' },
         { key: 'CO',  label: 'CO',  direction: 'variable'  },
         { key: 'CI',  label: 'CI',  direction: 'variable'  },
         { key: 'HR',  label: 'HR',  direction: 'neutral'   },
       ],
+      note: "No direct beta stimulation. Bradycardia and reduced cardiac output remain possible.",
     },
 
     snapshot:
@@ -198,9 +197,6 @@ export const DRIPS = [
       { label: "watch extremities" },
     ],
 
-    mentalModel:
-      "Vasopressin takes a different path than norepinephrine. It squeezes the vessels through its own receptor system, not the catecholamine route. It is often added alongside another vasopressor rather than replacing it, and the adjustment patterns differ from what nurses see with standard catecholamine pressors.",
-
     commonlyUsedFor: [
       "Vasodilatory shock not adequately controlled on catecholamine vasopressors alone",
       "Adjunct vasopressor support alongside norepinephrine or similar agents",
@@ -210,7 +206,7 @@ export const DRIPS = [
 
     whatItIsDoing: [
       "Works through V1 receptors in vessel walls — a different pathway from catecholamine pressors",
-      "Raises MAP through vasoconstriction without directly affecting heart rate or contractility",
+      "V1-mediated vasoconstriction raises MAP without beta-receptor stimulation; cardiac output and heart rate can still fall",
       "Often used alongside catecholamine vasopressors rather than as a standalone agent",
       "Has an antidiuretic effect that can shift fluid balance; sodium and urine output are both relevant to watch",
     ],
@@ -221,7 +217,7 @@ export const DRIPS = [
       "Peripheral perfusion: skin temperature, color, capillary refill",
       "Urine output",
       "IV site, especially with peripheral access",
-      "Sodium levels on longer infusions — antidiuretic effect is relevant",
+      "Sodium and fluid balance; hyponatremia can occur during therapy, and increased urine output with hypernatremia can follow withdrawal",
     ],
 
     watchOut: [
@@ -265,31 +261,28 @@ export const DRIPS = [
     badge: "Pure alpha agonist",
     related: ["norepinephrine", "vasopressin"],
     urgency: "watch",
-    leadFinding: "Pure vessel squeeze with no direct cardiac effect — reflex bradycardia alongside the rising BP is expected and worth tracking throughout.",
-    pearl: "Heart rate and blood pressure move in opposite directions here. That is the expected pattern on this drug, not a reason for alarm.",
+    leadFinding: "Vessel squeeze without direct beta stimulation. Reflex bradycardia can accompany rising BP and can reduce cardiac output.",
+    pearl: "Pressure up with heart rate down can reflect a baroreceptor reflex. A known mechanism does not make new bradycardia harmless; symptoms and perfusion still matter.",
     hemodynamics: {
       rows: [
-        { key: 'MAP', label: 'MAP', direction: 'up_strong' },
-        { key: 'SVR', label: 'SVR', direction: 'up_strong' },
+        { key: 'MAP', label: 'MAP', direction: 'up' },
+        { key: 'SVR', label: 'SVR', direction: 'up' },
         { key: 'CO',  label: 'CO',  direction: 'variable'  },
         { key: 'CI',  label: 'CI',  direction: 'variable'  },
         { key: 'HR',  label: 'HR',  direction: 'down'      },
       ],
-      note: 'Reflex bradycardia is the expected HR response. CO can fall if increased afterload is not offset.',
+      note: 'Reflex bradycardia can occur. CO may fall as heart rate slows and afterload rises.',
     },
 
     snapshot:
-      "Squeezes the vessels without touching the heart directly. The go-to when the pressure is low and the heart rate is already fast.",
+      "Raises vascular tone without direct beta stimulation. That distinction matters when tachycardia is a concern, but added afterload can reduce cardiac output.",
 
     effectChips: [
       { label: "↑ SVR" },
       { label: "↑ MAP" },
-      { label: "no cardiac effect" },
+      { label: "no beta stimulation" },
       { label: "reflex bradycardia" },
     ],
-
-    mentalModel:
-      "Phenylephrine squeezes the vessels without touching the heart directly. If tachycardia is already a problem, that difference matters. The reflex bradycardia it can produce is worth keeping in mind throughout the infusion.",
 
     commonlyUsedFor: [
       "Hypotension in settings where tachycardia is a clinical concern",
@@ -352,23 +345,23 @@ export const DRIPS = [
     category: "vasopressor",
     categoryLabel: "Vasopressor",
     family: "Pressors & Vasoactives",
-    badge: "ACLS agent",
+    badge: "Alpha + beta agonist",
     related: ["norepinephrine", "dobutamine"],
     urgency: "watch",
     leadFinding: "Everything moves at once — heart rate, squeeze, and vascular tone — and rhythm can deteriorate quickly.",
-    pearl: "Watch the rhythm continuously. Arrhythmia is the most common reason this drug demands immediate attention from the team.",
+    pearl: "Watch the rhythm continuously. Arrhythmia, ischemia, and perfusion changes all need prompt team communication.",
     hemodynamics: {
       rows: [
-        { key: 'MAP', label: 'MAP', direction: 'up_strong' },
+        { key: 'MAP', label: 'MAP', direction: 'up' },
         { key: 'SVR', label: 'SVR', direction: 'variable'  },
-        { key: 'CO',  label: 'CO',  direction: 'up_strong' },
-        { key: 'CI',  label: 'CI',  direction: 'up_strong' },
-        { key: 'HR',  label: 'HR',  direction: 'up_strong' },
+        { key: 'CO',  label: 'CO',  direction: 'up' },
+        { key: 'CI',  label: 'CI',  direction: 'up' },
+        { key: 'HR',  label: 'HR',  direction: 'up' },
       ],
     },
 
     snapshot:
-      "The full-force agent. Rate, squeeze, and vascular tone — all at once. That scope is what makes it essential in arrest and what demands continuous monitoring when it is running as a drip.",
+      "Acts on the heart and vessels. Rate and contractility usually rise; vascular resistance varies with exposure. This page describes the monitored IV infusion.",
 
     effectChips: [
       { label: "↑ MAP" },
@@ -377,18 +370,15 @@ export const DRIPS = [
       { label: "watch ischemia" },
     ],
 
-    mentalModel:
-      "Epinephrine hits everything at once — heart rate, contractility, and vascular tone. That broad effect is what makes it essential in cardiac arrest and why its hemodynamic footprint at the bedside requires careful, continuous watching when it is running as an infusion.",
-
     commonlyUsedFor: [
-      "Cardiac arrest per ACLS protocol",
-      "Anaphylaxis management",
+      "Provider-ordered IV support in septic shock",
+      "Selected refractory anaphylaxis infusions under specialist-directed monitoring",
       "Refractory distributive shock not adequately controlled on other vasopressors",
       "Hemodynamic support where combined vasopressor and inotropic effect is a clinical goal",
     ],
 
     whatItIsDoing: [
-      "Stimulates the heart to beat faster and squeeze harder — more powerfully than most other agents",
+      "Beta-1 stimulation increases heart rate and contractility, which can increase myocardial oxygen demand",
       "Tightens peripheral vessels to raise MAP alongside the cardiac effects",
       "Relaxes airway smooth muscle — bronchodilation is a recognized and clinically useful effect",
       "Blood glucose rises as a metabolic consequence — monitor alongside hemodynamics",
@@ -402,10 +392,11 @@ export const DRIPS = [
       "Blood glucose — hyperglycemia is a common metabolic effect",
       "IV site, especially with peripheral access; vasoconstriction is potent",
       "Signs of myocardial ischemia",
+      "Lactate in context: beta-2 stimulation can raise lactate without proving worsening hypoperfusion",
     ],
 
     watchOut: [
-      "Tachycardia and arrhythmias are expected and can limit ongoing use",
+      "Tachycardia and arrhythmias can occur and can be clinically significant",
       "Peripheral vasoconstriction can compromise limb and splanchnic perfusion",
       "Hyperglycemia is a common metabolic effect requiring monitoring",
       "Peripheral IV extravasation risk: tissue injury is a concern",
@@ -422,8 +413,8 @@ export const DRIPS = [
     ],
 
     linesAccessPolicy: [
-      "Central venous access is standard for sustained infusions",
-      "Peripheral use is appropriate in acute and arrest situations; central transition planned promptly",
+      "Central access is often used for sustained support; peripheral options follow product guidance and local policy",
+      "Peripheral infusion access follows the product guidance and local vasopressor policy, with close site monitoring",
       "Dedicated lumen strongly preferred",
       "Compatibility with all co-infusions: confirm with pharmacy",
     ],
@@ -431,6 +422,7 @@ export const DRIPS = [
     keySafetyNotes: [
       "High-potency agent: pump programming verified against current order per unit policy",
       "Arrhythmia and ischemia monitoring are continuous responsibilities",
+      "Cardiac-arrest administration and initial anaphylaxis administration are separate from this infusion reference",
       "IV site requires vigilant monitoring with peripheral access",
       "Team communication is essential with any hemodynamic change",
     ],
@@ -451,14 +443,14 @@ export const DRIPS = [
     badge: "Cardiac output support",
     related: ["milrinone", "norepinephrine"],
     urgency: "watch",
-    leadFinding: "Blood pressure may fall while cardiac output improves — these are separate signals, and a dropping BP here is not always bad news.",
-    pearl: "Falling blood pressure on dobutamine does not always mean the patient is worse. Output and pressure are different things — context matters.",
+    leadFinding: "Cardiac output can improve while BP falls from vasodilation. A lower MAP can still compromise perfusion and needs assessment alongside the output trend.",
+    pearl: "Better output and softer pressure can coexist. Neither number alone establishes stability; perfusion and the ordered targets complete the picture.",
     hemodynamics: {
       rows: [
         { key: 'MAP', label: 'MAP', direction: 'variable'  },
         { key: 'SVR', label: 'SVR', direction: 'down'      },
-        { key: 'CO',  label: 'CO',  direction: 'up_strong' },
-        { key: 'CI',  label: 'CI',  direction: 'up_strong' },
+        { key: 'CO',  label: 'CO',  direction: 'up' },
+        { key: 'CI',  label: 'CI',  direction: 'up' },
         { key: 'HR',  label: 'HR',  direction: 'up'        },
       ],
     },
@@ -472,9 +464,6 @@ export const DRIPS = [
       { label: "↑ CO" },
       { label: "watch arrhythmia" },
     ],
-
-    mentalModel:
-      "Dobutamine supports output more than pressure. A falling blood pressure in a patient on dobutamine does not always mean output is worse — these are different signals worth separating at the bedside.",
 
     commonlyUsedFor: [
       "Low cardiac output presentations where inotropic support is provider-ordered",
@@ -541,15 +530,16 @@ export const DRIPS = [
     related: ["dobutamine", "norepinephrine"],
     urgency: "watch",
     leadFinding: "Vessel relaxation alongside inotropic support can drop blood pressure significantly, and effects take time to settle after any rate change.",
-    pearl: "There is a time lag with milrinone. After any rate change, give it time before reassessing — chasing numbers too soon leads to overcorrection.",
+    pearl: "Milrinone clears more slowly than dobutamine, especially with renal impairment. Persistent effects are a reason for continued assessment, not delayed reassessment.",
     hemodynamics: {
       rows: [
         { key: 'MAP', label: 'MAP', direction: 'down'       },
-        { key: 'SVR', label: 'SVR', direction: 'down_strong' },
+        { key: 'SVR', label: 'SVR', direction: 'down' },
         { key: 'CO',  label: 'CO',  direction: 'up'         },
         { key: 'CI',  label: 'CI',  direction: 'up'         },
-        { key: 'HR',  label: 'HR',  direction: 'neutral'    },
+        { key: 'HR',  label: 'HR',  direction: 'variable'    },
       ],
+      note: "HR may change little or rise. Hypotension and arrhythmia risk remain important, especially with reduced renal clearance.",
     },
 
     snapshot:
@@ -562,9 +552,6 @@ export const DRIPS = [
       { label: "long tail" },
     ],
 
-    mentalModel:
-      "Milrinone has a longer tail than dobutamine. Changes in the hemodynamic picture may not feel immediate at the bedside, and the drug's effects continue well after any rate adjustment is made.",
-
     commonlyUsedFor: [
       "Cardiogenic presentations with low output and elevated filling pressures",
       "Decompensated heart failure where vasodilation alongside inotropic support is a goal",
@@ -576,7 +563,7 @@ export const DRIPS = [
       "Helps the heart squeeze harder and pump more blood out with each beat",
       "Simultaneously relaxes vascular walls — resistance falls and blood pressure can drop while cardiac output improves",
       "Works through a different pathway than catecholamine inotropes, so response and tolerance patterns differ",
-      "Longer-acting than dobutamine — effects take time to show and take time to clear after any rate change",
+      "Effects can begin promptly, but clearance is slower than dobutamine; impaired kidneys can prolong exposure further",
     ],
 
     whatNursesMonitor: [
@@ -584,7 +571,7 @@ export const DRIPS = [
       "Peripheral perfusion: skin color, temperature, and capillary refill alongside the BP numbers",
       "Heart rate and cardiac rhythm; arrhythmia is a recognized risk throughout the infusion",
       "Urine output as a downstream signal of how perfusion is holding",
-      "Renal function on prolonged infusions — the drug clears more slowly when kidneys are impaired",
+      "Renal function throughout therapy; impaired kidneys can prolong drug exposure",
       "Hemodynamic parameters per provider-ordered monitoring plan",
     ],
 
@@ -596,7 +583,7 @@ export const DRIPS = [
     ],
 
     signalsToEscalate: [
-      "Hypotension not responding to clinical management",
+      "New, worsening, or symptomatic hypotension",
       "New or worsening arrhythmia",
       "Hemodynamic deterioration despite ongoing support",
       "Significant changes in renal function",
@@ -604,7 +591,7 @@ export const DRIPS = [
     ],
 
     linesAccessPolicy: [
-      "Central venous access is standard for sustained infusions",
+      "Central access is often used for sustained support; peripheral options follow product guidance and local policy",
       "Peripheral use follows unit protocol",
       "Dedicated lumen preferred",
       "Compatibility with co-infusions: confirm with pharmacy",
@@ -641,13 +628,13 @@ export const DRIPS = [
         { key: 'SVR', label: 'SVR', direction: 'down'     },
         { key: 'CO',  label: 'CO',  direction: 'variable' },
         { key: 'CI',  label: 'CI',  direction: 'variable' },
-        { key: 'HR',  label: 'HR',  direction: 'neutral'  },
+        { key: 'HR',  label: 'HR',  direction: 'variable' },
       ],
-      note: 'Hypotension is most common in hypovolemic or hemodynamically fragile patients.',
+      note: 'Hypotension and bradycardia can occur. Risk is greater with hypovolemia or hemodynamic fragility.',
     },
 
     snapshot:
-      "The on/off sedative. Works fast, clears fast. Does nothing for pain — analgesia needs its own plan alongside it.",
+      "Rapid-onset sedation without analgesia. Recovery is often prompt after brief exposure, but prolonged infusions can delay awakening. Pain needs a separate assessment.",
 
     effectChips: [
       { label: "sedation" },
@@ -655,9 +642,6 @@ export const DRIPS = [
       { label: "rapid offset" },
       { label: "↓ BP risk" },
     ],
-
-    mentalModel:
-      "Propofol quiets the brain but does nothing for pain. A patient who looks sedated may still be uncomfortable. Analgesia needs its own plan — assessed separately and consistently throughout.",
 
     commonlyUsedFor: [
       "Continuous sedation in intubated, mechanically ventilated patients",
@@ -669,7 +653,7 @@ export const DRIPS = [
     whatItIsDoing: [
       "Quiets CNS activity to produce sedation — adjustable from light to deep",
       "Has no effect on pain pathways — a sedated patient can still be in pain",
-      "Clears quickly when the infusion is reduced, giving a manageable and responsive offset",
+      "Redistributes rapidly after brief exposure; prolonged infusions can accumulate and delay recovery",
       "Formulated in a lipid emulsion that contributes to caloric intake on prolonged infusions",
     ],
 
@@ -677,14 +661,15 @@ export const DRIPS = [
       "Sedation level per validated scale (RASS or SAS), per unit protocol",
       "Blood pressure — hypotension is common",
       "Heart rate and cardiac rhythm",
-      "Ventilator synchrony",
+      "Respiratory status, ventilation, and ventilator synchrony",
+      "Pain separately from sedation: self-report when possible, or CPOT/BPS per unit practice",
       "Triglyceride levels with prolonged infusion",
       "Signs of PRIS: metabolic acidosis, elevated lactate, rising CK, new arrhythmia, kidney injury",
       "Urine color",
     ],
 
     watchOut: [
-      "Hypotension is expected, especially in patients with volume deficit or hemodynamic fragility",
+      "Hypotension can be clinically significant, particularly with volume deficit or hemodynamic fragility",
       "No analgesia: pain must be assessed and managed through a separate approach",
       "PRIS is rare but serious; risk is higher with prolonged or high-rate infusions",
       "Lipid emulsion contributes to caloric load, relevant for nutrition planning",
@@ -692,7 +677,7 @@ export const DRIPS = [
     ],
 
     signalsToEscalate: [
-      "Persistent hypotension not responding to clinical management",
+      "New, worsening, or symptomatic hypotension",
       "Unexplained metabolic acidosis or rising creatine kinase — concern for PRIS",
       "New arrhythmia in the context of propofol infusion",
       "Sedation significantly above or below provider-ordered target",
@@ -726,7 +711,7 @@ export const DRIPS = [
     related: ["propofol", "midazolam"],
     urgency: "reference",
     leadFinding: "Arousable and cooperative is the intended state on this drug — bradycardia is the main hemodynamic watch throughout the infusion.",
-    pearl: "A patient who wakes up and follows commands is not under-sedated. That is the design. Bradycardia is the bedside concern to watch for.",
+    pearl: "Arousability can fit the ordered light-sedation goal. It does not replace pain assessment or checks for bradycardia, hypotension, and respiratory compromise.",
     hemodynamics: {
       rows: [
         { key: 'MAP', label: 'MAP', direction: 'variable' },
@@ -739,17 +724,14 @@ export const DRIPS = [
     },
 
     snapshot:
-      "The shoulder-tap sedative. Calm but usually still rousable and cooperative. Breathing mostly stays intact. Bradycardia is the constant bedside watch.",
+      "Often calm and arousable through reduced sympathetic activity. Breathing is relatively preserved, but airway and respiratory monitoring still matter. Bradycardia and hypotension are key risks.",
 
     effectChips: [
       { label: "sedation" },
       { label: "anxiolysis" },
-      { label: "breathing preserved" },
+      { label: "less respiratory suppression" },
       { label: "arousable" },
     ],
-
-    mentalModel:
-      "Dexmedetomidine works differently from propofol. Patients often stay arousable and can follow commands — that can look lighter than expected, but that is the goal. Bradycardia is the key hemodynamic watch throughout the infusion.",
 
     commonlyUsedFor: [
       "ICU sedation when arousability and patient cooperation are clinical goals",
@@ -760,7 +742,7 @@ export const DRIPS = [
 
     whatItIsDoing: [
       "Produces sedation and anxiolysis while leaving patients arousable and often cooperative",
-      "Breathing and airway reflexes are largely preserved compared to propofol and benzodiazepines",
+      "Respiratory suppression is generally less than with many sedatives; airway obstruction, hypoventilation, and additive effects with other sedatives can still occur",
       "Slows the heart rate — bradycardia is a recognized and expected pharmacological response",
       "Has some analgesic-sparing properties, but is not a primary analgesic",
     ],
@@ -779,12 +761,12 @@ export const DRIPS = [
       "Both hypotension and transient hypertension can occur — particularly at loading",
       "Arousable sedation may look lighter than expected; verify provider-ordered target",
       "Pain is not addressed by dexmedetomidine alone; separate analgesic assessment is essential",
-      "Prolonged infusions: follow unit protocol for monitoring and transitions",
+      "Bradycardia can be abrupt, including sinus arrest; withdrawal after prolonged exposure can include agitation, tachycardia, and hypertension",
     ],
 
     signalsToEscalate: [
       "Heart rate falling to a clinically concerning level",
-      "Persistent hypotension not responding to clinical management",
+      "New, worsening, or symptomatic hypotension",
       "Significant agitation or distress not controlled despite the infusion",
       "Sedation significantly above or below provider-ordered target",
       "Signs of pain not addressed by the current plan",
@@ -817,7 +799,7 @@ export const DRIPS = [
     related: ["propofol", "dexmedetomidine"],
     urgency: "caution",
     leadFinding: "This drug accumulates on prolonged infusions — wake-up times run longer than expected, especially when organ clearance is impaired.",
-    pearl: "Extended wake-up times are common and expected, not a one-time anomaly. The drug builds up quietly over time.",
+    pearl: "Accumulation can delay awakening, especially with impaired clearance. Unexpected failure to arouse still needs assessment for other causes.",
     hemodynamics: {
       rows: [
         { key: 'MAP', label: 'MAP', direction: 'down'     },
@@ -838,9 +820,6 @@ export const DRIPS = [
       { label: "accumulates" },
     ],
 
-    mentalModel:
-      "Midazolam can accumulate, especially in patients with liver or kidney considerations or on prolonged infusions. What looks like appropriate sedation may be a drug that is building up. Wakeup time is longer than the pharmacology textbook suggests.",
-
     commonlyUsedFor: [
       "Procedural sedation in monitored settings",
       "Adjunct sedation in mechanically ventilated patients",
@@ -849,7 +828,7 @@ export const DRIPS = [
     ],
 
     whatItIsDoing: [
-      "Quiets CNS activity to produce sedation and reduce anxiety",
+      "Enhances GABA-mediated inhibition to produce sedation, anxiolysis, and amnesia; it does not provide analgesia",
       "Builds up with prolonged infusion — the drug and its active metabolites accumulate",
       "Breathing is suppressed in a dose-dependent way",
       "Clears more slowly than expected on extended infusions, especially with renal or hepatic impairment",
@@ -869,7 +848,7 @@ export const DRIPS = [
       "Accumulation with prolonged infusion can result in extended sedation beyond expectations",
       "Active metabolites in renal or hepatic impairment can prolong effect considerably",
       "Benzodiazepine use is associated with delirium risk in the ICU",
-      "Reversal with flumazenil is possible but carries resedation risk; follow provider orders",
+      "Flumazenil has important seizure, withdrawal, and resedation risks; reversal decisions require provider assessment",
     ],
 
     signalsToEscalate: [
@@ -909,27 +888,24 @@ export const DRIPS = [
     pearl: "Pain and sedation are different things. A patient can be deeply sedated and still in significant pain if no dedicated analgesic is running.",
     hemodynamics: {
       rows: [
-        { key: 'MAP', label: 'MAP', direction: 'neutral' },
-        { key: 'SVR', label: 'SVR', direction: 'neutral' },
-        { key: 'CO',  label: 'CO',  direction: 'neutral' },
-        { key: 'CI',  label: 'CI',  direction: 'neutral' },
-        { key: 'HR',  label: 'HR',  direction: 'neutral' },
+        { key: 'MAP', label: 'MAP', direction: 'variable' },
+        { key: 'SVR', label: 'SVR', direction: 'variable' },
+        { key: 'CO',  label: 'CO',  direction: 'variable' },
+        { key: 'CI',  label: 'CI',  direction: 'variable' },
+        { key: 'HR',  label: 'HR',  direction: 'variable' },
       ],
-      note: 'Hemodynamically gentle at typical infusion parameters.',
+      note: 'Hypotension and bradycardia are possible. Stable vital signs do not exclude respiratory depression.',
     },
 
     snapshot:
-      "The pain reliever, not the sedative. Fast onset, relatively gentle on blood pressure. Respiratory monitoring is the constant bedside responsibility.",
+      "An opioid for pain that can also cause sedation. Rapid onset does not guarantee rapid recovery after a prolonged infusion. Respiratory depression is a key safety concern.",
 
     effectChips: [
       { label: "analgesia" },
       { label: "rapid onset" },
       { label: "respiratory depression" },
-      { label: "hemodynamically gentle" },
+      { label: "BP / HR watch" },
     ],
-
-    mentalModel:
-      "Fentanyl is primarily for pain — that matters in the ICU where pain is often undertreated. Sedation without analgesia leaves pain behind. Respiratory monitoring is the constant bedside responsibility; opioid-related respiratory depression can be subtle before it becomes abrupt.",
 
     commonlyUsedFor: [
       "Analgesia in mechanically ventilated patients",
@@ -940,7 +916,7 @@ export const DRIPS = [
 
     whatItIsDoing: [
       "Works on opioid receptors to blunt pain — that is the primary purpose",
-      "Onset is fast and offset is relatively quick compared to some other opioids",
+      "Onset is rapid; tissue accumulation during prolonged infusion can delay recovery and extend respiratory depression",
       "Gentler on blood pressure and less histamine release than some agents in this class",
       "Breathing slows in a dose-related way — this is the main safety concern at the bedside",
     ],
@@ -950,7 +926,7 @@ export const DRIPS = [
       "Respiratory rate and effort — the primary safety monitoring parameter",
       "Oxygen saturation",
       "Level of consciousness and sedation depth",
-      "Blood pressure — hemodynamic effects are generally mild but can occur",
+      "Blood pressure and heart rate; hypotension and bradycardia can occur",
       "Signs of opioid-related effects: nausea, pruritus, urinary retention",
     ],
 
@@ -994,7 +970,7 @@ export const DRIPS = [
     related: ["fentanyl", "midazolam"],
     urgency: "reference",
     leadFinding: "Blood pressure typically holds or rises on this drug — the emergence phase with confusion or agitation on waking is real and needs anticipation.",
-    pearl: "The hemodynamic stability is the advantage. The emergence reaction is the bedside responsibility — prepare for it, do not be surprised by it.",
+    pearl: "Sympathetic stimulation can raise BP and HR, but hypotension and cardiac depression can occur with catecholamine depletion. Emergence and airway risks remain part of the picture.",
     hemodynamics: {
       rows: [
         { key: 'MAP', label: 'MAP', direction: 'up'      },
@@ -1007,17 +983,14 @@ export const DRIPS = [
     },
 
     snapshot:
-      "The pressure-friendly sedative. Blood pressure tends to hold or climb rather than drop. But recovery can be vivid and disorienting — emergence is part of the monitoring plan.",
+      "Dissociation and analgesia through NMDA receptor blockade. BP and HR often rise, but cardiovascular stability is not guaranteed. Airway changes and emergence reactions still need assessment.",
 
     effectChips: [
       { label: "dissociative" },
-      { label: "hemodynamic support" },
+      { label: "BP / HR can rise" },
       { label: "bronchodilation" },
       { label: "emergence watch" },
     ],
-
-    mentalModel:
-      "Ketamine tends to support blood pressure rather than drop it — that makes it distinct from most sedatives. But the emergence reaction, where patients experience confusion, vivid dreams, or agitation as they wake, is real and needs to be anticipated and managed.",
 
     commonlyUsedFor: [
       "Procedural sedation in patients where hemodynamic stability is a priority",
@@ -1043,7 +1016,8 @@ export const DRIPS = [
 
     watchOut: [
       "Emergence phenomena can be distressing for patients and families; preparation matters",
-      "Secretions may increase and require suctioning",
+      "Secretions, airway obstruction, respiratory depression, and laryngospasm can occur",
+      "Hypotension or cardiac depression can occur in catecholamine-depleted patients",
       "Elevated intracranial or intraocular pressure is a consideration in specific populations",
       "In patients with cardiac disease, the sympathomimetic effect may not be beneficial",
     ],
@@ -1084,7 +1058,7 @@ export const DRIPS = [
     badge: "Rhythm + rate support",
     related: ["diltiazem", "esmolol"],
     urgency: "watch",
-    leadFinding: "Drug effects and interactions persist for weeks after the drip ends — every medication decision made afterward is still influenced by this drug.",
+    leadFinding: "Hypotension, bradycardia, and conduction changes are key IV concerns. Drug interactions can persist after the infusion; duration depends on exposure and patient factors.",
     pearl: "A better-looking rhythm does not always mean better perfusion. And amiodarone stays in the picture long after the bag is gone.",
     hemodynamics: {
       rows: [
@@ -1098,7 +1072,7 @@ export const DRIPS = [
     },
 
     snapshot:
-      "The rhythm stabilizer with the longest memory. Works on multiple channels at once, and its effects and interactions stay active for weeks after the drip ends.",
+      "A multi-channel antiarrhythmic with a long, variable elimination tail. Effects and interactions can persist after the infusion; their duration varies with prior and cumulative exposure.",
 
     effectChips: [
       { label: "rhythm control" },
@@ -1107,20 +1081,17 @@ export const DRIPS = [
       { label: "watch QT / BP" },
     ],
 
-    mentalModel:
-      "A better-looking rhythm does not always mean better perfusion — watch the patient, not only the monitor. And amiodarone's effects outlast the infusion by weeks. That shapes medication decisions long after the drip is gone.",
-
     commonlyUsedFor: [
-      "Ventricular fibrillation and pulseless VT, per ACLS protocol",
+      "Monitored infusion support for recurrent ventricular arrhythmias under provider direction",
       "Hemodynamically stable ventricular tachycardia",
-      "Atrial fibrillation with rapid ventricular response",
+      "Selected AF with rapid ventricular response under specialist direction; conversion and thromboembolic context matter",
       "Ventricular arrhythmia suppression in critically ill patients",
     ],
 
     whatItIsDoing: [
       "Works across multiple electrical channels in heart tissue to stabilize rhythm and slow conduction",
       "Slows AV node conduction, which brings down the ventricular rate in fast rhythms",
-      "Very long half-life — effects and drug interactions persist for weeks after the infusion ends",
+      "Long, variable terminal half-life; interactions can persist after discontinuation, especially with prolonged or prior exposure",
       "Contains iodine, which is relevant to thyroid function on longer courses",
     ],
 
@@ -1132,14 +1103,15 @@ export const DRIPS = [
       "Thyroid function on longer courses — amiodarone contains iodine",
       "Pulmonary symptoms: new cough, dyspnea, or infiltrates",
       "Liver function tests",
+      "Potassium and magnesium; electrolyte abnormalities can increase arrhythmia risk",
     ],
 
     watchOut: [
       "Peripheral IV phlebitis is a significant concern; site requires regular inspection",
-      "Hypotension during loading is common and expected",
+      "IV-associated hypotension can be clinically significant, particularly early in the infusion",
       "QTc prolongation adds risk when combined with other QT-prolonging agents",
       "Drug interactions are broad: warfarin, digoxin, statins, and others",
-      "Effects and interactions continue for weeks after the infusion ends",
+      "Interactions can continue after the infusion; the time course depends on exposure and patient factors",
     ],
 
     signalsToEscalate: [
@@ -1162,8 +1134,9 @@ export const DRIPS = [
       "Central access is preferred for sustained infusions; peripheral phlebitis risk is clinically meaningful",
       "QTc monitoring is essential; know the current interval and trend",
       "Full medication review needed; interactions are extensive",
-      "Drug effects outlast the infusion by weeks; this affects all management decisions",
-      "Thyroid, pulmonary, and liver monitoring continues beyond the acute infusion period",
+      "Cardiac-arrest administration is a separate context from this monitored infusion reference",
+      "The medication review includes prior amiodarone exposure because interactions can persist after discontinuation",
+      "Thyroid, pulmonary, and liver follow-up depends on exposure, symptoms, and the provider-directed plan",
     ],
   },
 
@@ -1178,7 +1151,7 @@ export const DRIPS = [
     badge: "Rate control",
     related: ["amiodarone", "esmolol"],
     urgency: "watch",
-    leadFinding: "Rate control here does not restore sinus rhythm — rate and rhythm are different things — and blood pressure can drop quickly.",
+    leadFinding: "In AF/flutter, a slower ventricular rate does not establish sinus rhythm. BP and AV conduction can also worsen.",
     pearl: "Rate control and rhythm control are not the same. The monitor may look calmer while the underlying problem is still there.",
     hemodynamics: {
       rows: [
@@ -1201,9 +1174,6 @@ export const DRIPS = [
       { label: "watch block" },
     ],
 
-    mentalModel:
-      "Diltiazem puts the brakes on AV nodal conduction to slow the ventricular rate. Rate and rhythm are not the same thing — a controlled rate does not mean sinus rhythm. The two things worth watching most are the heart rate going too low and the blood pressure dropping.",
-
     commonlyUsedFor: [
       "Rate control in atrial fibrillation or flutter with rapid ventricular response",
       "Supraventricular tachycardia management in appropriate clinical situations",
@@ -1212,7 +1182,7 @@ export const DRIPS = [
 
     whatItIsDoing: [
       "Slows electrical conduction through the AV node, which slows the ventricular rate",
-      "Does not correct the underlying rhythm — rate control and rhythm control are not the same thing",
+      "In AF or flutter, ventricular rate slowing does not establish conversion to sinus rhythm; some AV-node-dependent SVTs can terminate",
       "Reduces contractility somewhat — relevant in patients with already weakened hearts",
       "Blood pressure can fall as a result of the combined cardiac and vascular effects",
     ],
@@ -1220,7 +1190,7 @@ export const DRIPS = [
     whatNursesMonitor: [
       "Heart rate and rhythm; continuous ECG during IV infusion is standard",
       "Blood pressure — hypotension is a common and clinically important side effect",
-      "PR interval; excessive prolongation warrants clinical attention",
+      "AV conduction and pauses; PR interval only when discrete P waves permit measurement, not during AF",
       "Signs of worsening heart failure: dyspnea, edema, volume status changes",
       "Level of consciousness and overall hemodynamic response",
     ],
@@ -1228,7 +1198,8 @@ export const DRIPS = [
     watchOut: [
       "Hypotension can be abrupt, especially with IV administration",
       "Excessive AV nodal blockade can cause high-degree heart block",
-      "Use in systolic dysfunction or decompensated heart failure carries significant hemodynamic risk",
+      "IV diltiazem carries a guideline harm warning in moderate or severe LV systolic dysfunction; negative inotropy can worsen hemodynamics",
+      "Pre-excited AF/flutter with an accessory pathway and ventricular tachycardia are contraindicated contexts in IV labeling",
       "Drug interactions: beta-blockers, digoxin, and others can compound AV nodal effects",
     ],
 
@@ -1248,7 +1219,7 @@ export const DRIPS = [
 
     keySafetyNotes: [
       "Hypotension can occur quickly, particularly with IV administration",
-      "Avoid or use with caution in systolic dysfunction; clarify with provider if cardiac function is uncertain",
+      "Reduced systolic function is an important safety context for provider review; negative inotropy can worsen hemodynamics",
       "AV block risk: monitor rhythm and PR interval throughout",
       "Drug interaction review is important; several common agents compound diltiazem's effects",
       "Pump programming verified against current order per unit policy",
@@ -1267,19 +1238,19 @@ export const DRIPS = [
     related: ["diltiazem", "amiodarone"],
     urgency: "watch",
     leadFinding: "Fast on, fast off — hemodynamics can shift quickly in either direction, and every rate change deserves close watching.",
-    pearl: "The rapid offset is the defining feature. Effects clear in minutes after stopping — that is both the advantage and the reason close monitoring matters.",
+    pearl: "The rapid offset is the defining feature. Beta blockade generally recedes over tens of minutes after discontinuation; immediate recovery is not guaranteed.",
     hemodynamics: {
       rows: [
         { key: 'MAP', label: 'MAP', direction: 'down'       },
         { key: 'SVR', label: 'SVR', direction: 'neutral'    },
         { key: 'CO',  label: 'CO',  direction: 'down'       },
         { key: 'CI',  label: 'CI',  direction: 'down'       },
-        { key: 'HR',  label: 'HR',  direction: 'down_strong' },
+        { key: 'HR',  label: 'HR',  direction: 'down' },
       ],
     },
 
     snapshot:
-      "The fast-on, fast-off beta-blocker. Rate and pressure respond quickly, and they recover just as fast when the drip stops. Every change deserves close hemodynamic watching.",
+      "The fast-on, fast-off beta-blocker. Rate and pressure can respond quickly. Recovery after discontinuation still depends on the patient and concurrent drugs. Every change deserves close hemodynamic watching.",
 
     effectChips: [
       { label: "rate control" },
@@ -1287,9 +1258,6 @@ export const DRIPS = [
       { label: "beta-1 selective" },
       { label: "rapid offset" },
     ],
-
-    mentalModel:
-      "Esmolol's defining feature is how quickly it wears off — effects resolve in minutes after stopping. That rapid offset is both the advantage (manageable in uncertain situations) and the reason close hemodynamic monitoring matters, because blood pressure and heart rate can shift quickly in either direction.",
 
     commonlyUsedFor: [
       "Acute rate control in supraventricular tachycardia and atrial fibrillation with rapid ventricular response",
@@ -1301,12 +1269,12 @@ export const DRIPS = [
     whatItIsDoing: [
       "Blocks the heart's beta-1 receptors to slow rate and reduce the force of contraction",
       "Works and wears off in minutes — that rapid offset is the defining feature and the reason for close watching",
-      "Blood pressure falls along with heart rate",
+      "Blood pressure and cardiac output can fall; the response depends on baseline function and the rhythm",
       "Bronchoconstriction is possible even with a selective agent — especially relevant in patients with airway disease",
     ],
 
     whatNursesMonitor: [
-      "Heart rate, per provider-ordered target",
+      "Heart rate and rhythm, including pauses or AV block, per provider-ordered monitoring plan",
       "Blood pressure — hypotension is common and clinically significant",
       "Respiratory status — bronchoconstriction is possible even with selective agents",
       "Level of consciousness and hemodynamic response",
@@ -1357,17 +1325,17 @@ export const DRIPS = [
     badge: "Calcium channel vasodilator",
     related: ["nitroprusside", "nitroglycerin"],
     urgency: "watch",
-    leadFinding: "Effect takes several minutes to fully stabilize after a rate change — reassessing too soon leads to unnecessary overcorrection.",
-    pearl: "Wait before adjusting again. The full effect of a rate change takes several minutes to land — patience prevents overshoot.",
+    leadFinding: "Arterial dilation lowers resistance and afterload. BP can continue changing after an adjustment, so the trend and patient assessment matter together.",
+    pearl: "A new rate is not an instant steady state. Ongoing BP and symptom assessment helps explain the response; adjustment timing belongs to the active order and protocol.",
     hemodynamics: {
       rows: [
-        { key: 'MAP', label: 'MAP', direction: 'down_strong' },
-        { key: 'SVR', label: 'SVR', direction: 'down_strong' },
-        { key: 'CO',  label: 'CO',  direction: 'neutral'     },
-        { key: 'CI',  label: 'CI',  direction: 'neutral'     },
+        { key: 'MAP', label: 'MAP', direction: 'down' },
+        { key: 'SVR', label: 'SVR', direction: 'down' },
+        { key: 'CO',  label: 'CO',  direction: 'variable'     },
+        { key: 'CI',  label: 'CI',  direction: 'variable'     },
         { key: 'HR',  label: 'HR',  direction: 'up'          },
       ],
-      note: 'Reflex tachycardia may accompany BP reduction. CO is generally preserved.',
+      note: 'Reflex tachycardia may accompany BP reduction. CO may be preserved or rise with afterload reduction; baseline function matters.',
     },
 
     snapshot:
@@ -1380,9 +1348,6 @@ export const DRIPS = [
       { label: "reflex HR possible" },
     ],
 
-    mentalModel:
-      "Nicardipine works on the arteries to lower resistance and blood pressure. It is adjustable and relatively predictable, but the effect can take several minutes to fully appear after a rate change — worth keeping in mind when assessing the response.",
-
     commonlyUsedFor: [
       "Acute hypertensive emergency management per provider-ordered settings",
       "Post-neurosurgical blood pressure control",
@@ -1394,7 +1359,7 @@ export const DRIPS = [
       "Relaxes arterial walls to reduce vascular resistance and lower blood pressure",
       "Predominantly an arterial effect — less impact on the venous system than nitrates",
       "Reflex tachycardia may follow as blood pressure falls",
-      "Response takes a few minutes to stabilize after a rate change — allow time before reassessing",
+      "Onset and full response have different time courses; ongoing BP assessment follows the ordered monitoring plan",
     ],
 
     whatNursesMonitor: [
@@ -1408,6 +1373,7 @@ export const DRIPS = [
     watchOut: [
       "Reflex tachycardia can be clinically significant",
       "Excessive blood pressure reduction can compromise cerebral or coronary perfusion",
+      "Advanced aortic stenosis is a labeled contraindication; heart failure and hepatic impairment also affect risk",
       "Effect may take several minutes to stabilize after a rate change",
       "Phlebitis risk with peripheral infusion: site monitoring is important",
     ],
@@ -1423,12 +1389,12 @@ export const DRIPS = [
     linesAccessPolicy: [
       "Central venous access preferred for sustained infusions",
       "Peripheral use is associated with phlebitis risk; site monitoring is essential",
-      "Dedicated lumen preferred",
-      "Confirm compatibility with pharmacy for co-infusions",
+      "Line-sharing restrictions vary by formulation; some ready-to-use products prohibit other drugs in the same line",
+      "Exact product labeling and pharmacy guidance govern access, compatibility, and peripheral site intervals",
     ],
 
     keySafetyNotes: [
-      "BP response takes several minutes after a rate change; assess before further adjustments",
+      "BP response evolves after rate changes; monitoring and adjustments follow the active order and protocol",
       "Phlebitis at peripheral sites is clinically meaningful — inspect regularly",
       "Pump programming verified against current order per unit policy",
       "Hypotension warrants prompt clinical communication",
@@ -1446,12 +1412,12 @@ export const DRIPS = [
     badge: "Potent vasodilator",
     related: ["nitroglycerin", "nicardipine"],
     urgency: "watch",
-    leadFinding: "Pressure changes can be abrupt and dramatic — and cyanide accumulation on prolonged infusions is a serious safety concern the whole team needs to know about.",
-    pearl: "Potent, fast, and carries a toxicity risk that builds with time. Cyanide toxicity requires team awareness — not just nurse awareness.",
+    leadFinding: "BP can fall abruptly. Cyanide toxicity can occur early, while thiocyanate can accumulate with continued exposure; both need team awareness.",
+    pearl: "Two toxicity pathways matter: cyanide can accumulate rapidly, while thiocyanate builds with prolonged exposure, especially with impaired renal clearance.",
     hemodynamics: {
       rows: [
-        { key: 'MAP', label: 'MAP', direction: 'down_strong' },
-        { key: 'SVR', label: 'SVR', direction: 'down_strong' },
+        { key: 'MAP', label: 'MAP', direction: 'down' },
+        { key: 'SVR', label: 'SVR', direction: 'down' },
         { key: 'CO',  label: 'CO',  direction: 'variable'    },
         { key: 'CI',  label: 'CI',  direction: 'variable'    },
         { key: 'HR',  label: 'HR',  direction: 'up'          },
@@ -1460,7 +1426,7 @@ export const DRIPS = [
     },
 
     snapshot:
-      "One of the most powerful BP-lowering drips in the ICU. Fast in, fast out. On long infusions, cyanide buildup is a serious safety concern the whole team needs to know about.",
+      "One of the most powerful BP-lowering drips in the ICU. Fast in, fast out. Cyanide toxicity can occur early; prolonged exposure also brings thiocyanate risk, especially with renal impairment.",
 
     effectChips: [
       { label: "↓ SVR" },
@@ -1469,34 +1435,31 @@ export const DRIPS = [
       { label: "cyanide watch" },
     ],
 
-    mentalModel:
-      "Nitroprusside is powerful and fast — it lowers pressure quickly, which can be exactly what is needed. That same speed and potency means the bedside watch is intense, and cyanide toxicity on prolonged infusions is a serious safety concern that requires team awareness.",
-
     commonlyUsedFor: [
       "Hypertensive emergency with a provider-ordered urgent blood pressure target",
       "Afterload reduction in acute heart failure presentations",
-      "Aortic dissection hypertension management",
       "Blood pressure management in perioperative and cardiac surgery settings",
     ],
 
     whatItIsDoing: [
       "Relaxes both arterial and venous walls very rapidly — blood pressure can drop quickly",
       "Effect reverses just as fast when the infusion stops",
-      "Metabolized to cyanide — on prolonged infusions, accumulation is a serious and time-sensitive safety concern",
-      "Light-sensitive — the infusion bag and tubing require protection from light throughout",
+      "Metabolism releases cyanide; toxicity can develop rapidly if production exceeds detoxification. Thiocyanate, a downstream metabolite, is renally cleared",
+      "Light-protection requirements depend on the formulation and container; exact product labeling and pharmacy guidance apply",
     ],
 
     whatNursesMonitor: [
       "Blood pressure, continuously; response is rapid and can be dramatic",
       "Heart rate — reflex tachycardia is common",
       "Signs of cyanide toxicity: altered mental status, lactic acidosis, unexplained hemodynamic deterioration",
-      "Light protection of the infusion bag and tubing throughout",
-      "Monitoring parameters per provider orders and pharmacy on prolonged infusions",
+      "Product-specific light protection and infusion integrity",
+      "Renal and hepatic function; thiocyanate monitoring when indicated by exposure and the ordered plan",
+      "New tinnitus, confusion, or hyperreflexia can accompany thiocyanate toxicity",
       "Neurological status",
     ],
 
     watchOut: [
-      "Cyanide accumulation is the most serious toxicity; risk increases with prolonged use",
+      "Cyanide toxicity can occur early and is exposure-dependent; acidosis may be a late clue",
       "Very rapid onset and offset: pressure changes can be abrupt",
       "Light-sensitive: infusion requires protection from light per product and pharmacy guidance",
       "Reflex tachycardia is common and can be significant in patients with coronary disease",
@@ -1512,9 +1475,9 @@ export const DRIPS = [
     ],
 
     linesAccessPolicy: [
-      "Central venous access is standard",
+      "Central or peripheral access follows the exact product guidance and local policy",
       "Dedicated lumen required",
-      "Light protection for infusion bag and tubing per product guidance and unit policy",
+      "Light protection per the exact product label and pharmacy guidance; covering tubing is not a universal requirement",
       "Pharmacy involvement is essential for preparation, concentration, and monitoring parameters",
     ],
 
@@ -1530,15 +1493,15 @@ export const DRIPS = [
   {
     id: "nitroglycerin",
     name: "Nitroglycerin",
-    brandName: "Tridil / Nitro-Bid",
+    brandName: "Nitroglycerin (IV)",
     category: "vasodilator",
     categoryLabel: "Vasodilator",
     family: "Vasodilators",
     badge: "Nitrate vasodilator",
     related: ["nitroprusside", "nicardipine"],
     urgency: "watch",
-    leadFinding: "Headache is almost universal and expected — blood pressure drop, especially with volume depletion, is the real hemodynamic watch.",
-    pearl: "The headache is nearly a certainty. The blood pressure drop is the real concern. And the phosphodiesterase inhibitor interaction can be severe.",
+    leadFinding: "Headache is common, but severe or unusual headache still needs assessment. Hypotension can be abrupt, particularly when preload is limited.",
+    pearl: "Venous pooling reduces cardiac filling and workload. That same effect can lower BP sharply, especially with PDE-5 inhibitors or riociguat.",
     hemodynamics: {
       rows: [
         { key: 'MAP', label: 'MAP', direction: 'down'     },
@@ -1551,7 +1514,7 @@ export const DRIPS = [
     },
 
     snapshot:
-      "The preload reliever. Mainly relaxes the veins to reduce the blood returning to the heart. Headache is common and expected. Blood pressure drop is the real watch.",
+      "The preload reliever. Mainly relaxes the veins to reduce the blood returning to the heart. Headache and BP changes both need context; severe or unusual symptoms cannot automatically be attributed to the drug.",
 
     effectChips: [
       { label: "↓ preload" },
@@ -1559,9 +1522,6 @@ export const DRIPS = [
       { label: "venous > arterial" },
       { label: "watch headache/BP" },
     ],
-
-    mentalModel:
-      "Nitroglycerin primarily relaxes the venous system, reducing how much blood returns to the heart. At higher parameters, it also affects the arteries. The headache it commonly causes is real but not dangerous — the blood pressure drop is the more critical hemodynamic watch.",
 
     commonlyUsedFor: [
       "Acute coronary syndrome chest pain management",
@@ -1582,21 +1542,21 @@ export const DRIPS = [
       "Heart rate — reflex tachycardia is possible",
       "Headache is common and expected; severe or new-onset headache warrants team communication",
       "Signs of hypotension: dizziness, altered mental status, symptom change",
-      "Medication interactions: phosphodiesterase inhibitors are a critical history point",
+      "Medication interactions: PDE-5 inhibitors are a critical history point",
     ],
 
     watchOut: [
-      "Hypotension can develop rapidly, especially with volume depletion",
+      "Hypotension can develop rapidly, especially with volume depletion or other preload-dependent states",
       "Headache is very common; comfort measures follow unit practice",
       "Tolerance to vasodilatory effect can develop with prolonged continuous infusions",
-      "Phosphodiesterase inhibitors (sildenafil and related agents) represent a serious interaction",
+      "PDE-5 inhibitors (such as sildenafil) and riociguat are contraindicated combinations because profound hypotension can occur",
     ],
 
     signalsToEscalate: [
       "Blood pressure outside provider-ordered target",
       "Symptomatic hypotension: dizziness, syncope, diaphoresis",
       "Persistent chest pain not responding to infusion as expected",
-      "Known or suspected phosphodiesterase inhibitor use",
+      "Known or suspected PDE-5 inhibitor or riociguat exposure",
       "Clinical deterioration or new hemodynamic instability",
     ],
 
@@ -1608,7 +1568,7 @@ export const DRIPS = [
     ],
 
     keySafetyNotes: [
-      "Phosphodiesterase inhibitor interaction can cause severe hypotension; medication history review is essential",
+      "PDE-5 inhibitors and riociguat can cause profound hypotension with nitrates; medication-history review is essential",
       "Tubing material matters for this drug; follow pharmacy and unit guidance",
       "Pump programming verified against current order per unit policy",
       "Tolerance development on prolonged infusions is a known clinical consideration",
@@ -1640,7 +1600,7 @@ export const DRIPS = [
         { key: 'CI',  label: 'CI',  direction: 'variable' },
         { key: 'HR',  label: 'HR',  direction: 'variable' },
       ],
-      note: 'Indirect hemodynamic effects through volume changes. No direct cardiac or vascular action.',
+      note: 'Hemodynamic response depends on volume status and cardiac function. Arrows cannot predict an individual response.',
     },
 
     snapshot:
@@ -1652,9 +1612,6 @@ export const DRIPS = [
       { label: "electrolyte watch" },
       { label: "renal function" },
     ],
-
-    mentalModel:
-      "Furosemide pulls volume out of the body, which is the goal — but the potassium and sodium that go with it matter just as much. The output is only half the picture; the electrolyte trend is the other half.",
 
     commonlyUsedFor: [
       "Acute decompensated heart failure with volume overload",
@@ -1674,7 +1631,8 @@ export const DRIPS = [
       "Urine output — volume, color, and timing of diuretic response",
       "Blood pressure — volume removal can cause hypotension",
       "Potassium and magnesium levels per provider-ordered frequency",
-      "Sodium trends and overall electrolyte balance",
+      "Sodium, chloride, and bicarbonate trends; loop diuretics can contribute to metabolic alkalosis",
+      "Net fluid balance, weight trend, edema, and respiratory findings alongside urine output",
       "Creatinine and BUN — renal function can be affected by volume depletion",
       "Signs of volume depletion: dizziness, lightheadedness, tachycardia",
     ],
@@ -1729,7 +1687,7 @@ export const DRIPS = [
         { key: 'CI',  label: 'CI',  direction: 'variable' },
         { key: 'HR',  label: 'HR',  direction: 'variable' },
       ],
-      note: 'Indirect hemodynamic effects through volume changes. No direct cardiac or vascular action.',
+      note: 'Hemodynamic response depends on volume status and cardiac function. Arrows cannot predict an individual response.',
     },
 
     snapshot:
@@ -1741,9 +1699,6 @@ export const DRIPS = [
       { label: "potent" },
       { label: "electrolyte watch" },
     ],
-
-    mentalModel:
-      "Bumetanide is a loop diuretic in the same family as furosemide but with a different potency per milligram. The monitoring priorities are the same: output, electrolytes, volume status, and renal function — all watched together, not in isolation.",
 
     commonlyUsedFor: [
       "Volume overload management where a different loop diuretic profile is clinically indicated",
@@ -1763,7 +1718,8 @@ export const DRIPS = [
       "Urine output — volume and timing of response",
       "Potassium and magnesium levels; electrolyte depletion is a primary monitoring concern",
       "Blood pressure — volume removal can cause hypotension",
-      "Sodium and overall electrolyte balance",
+      "Sodium, chloride, and bicarbonate trends; loop diuretics can contribute to metabolic alkalosis",
+      "Net fluid balance, weight trend, edema, and respiratory findings alongside urine output",
       "Renal function: creatinine and BUN trend",
       "Signs of volume depletion",
     ],
@@ -1771,7 +1727,7 @@ export const DRIPS = [
     watchOut: [
       "Electrolyte depletion — potassium and magnesium particularly — requires close monitoring",
       "Excessive diuresis can cause volume depletion and impair renal function",
-      "Sulfonamide cross-sensitivity is a documented consideration; allergy review follows unit policy",
+      "Hypersensitivity history and the type of prior reaction matter; allergy review follows pharmacy and unit policy",
       "Ototoxicity is a recognized risk with rapid IV administration",
     ],
 
@@ -1812,7 +1768,7 @@ export const DRIPS = [
     badge: "High-alert medication",
     related: ["argatroban", "bivalirudin"],
     urgency: "caution",
-    leadFinding: "Lab values are the window into where the patient sits — aPTT or anti-Xa tells you whether the drug is therapeutic, subtherapeutic, or accumulating.",
+    leadFinding: "aPTT or anti-Xa is interpreted against the ordered protocol, alongside bleeding, hemoglobin, and platelet trends. An in-range result does not rule out complications.",
     pearl: "Heparin does two things: prevents clots from growing, and occasionally causes new ones through HIT. Both need to stay on the radar.",
     hemodynamics: {
       rows: [
@@ -1826,7 +1782,7 @@ export const DRIPS = [
     },
 
     snapshot:
-      "The steering-wheel anticoagulant. Keeps clots from growing, not from dissolving. The lab value is the window into where the patient sits on the anticoagulation spectrum.",
+      "The steering-wheel anticoagulant. Limits new clot formation and extension; it does not dissolve existing clots. The lab value is the window into where the patient sits on the anticoagulation spectrum.",
 
     effectChips: [
       { label: "anticoagulation" },
@@ -1835,11 +1791,8 @@ export const DRIPS = [
       { label: "reversible" },
     ],
 
-    mentalModel:
-      "Heparin does not dissolve clots — it prevents new clot formation and existing clots from extending. The lab values (aPTT or anti-Xa) are the window into where the patient is in their anticoagulation. Those results, combined with the clinical picture, guide any adjustments the provider orders.",
-
     commonlyUsedFor: [
-      "Venous thromboembolism: clot-related management and prophylaxis",
+      "Therapeutic anticoagulation for venous thromboembolism; routine prophylaxis usually uses a different regimen and route",
       "Acute coronary syndrome management, per cardiology and provider orders",
       "Anticoagulation during procedures requiring systemic anticoagulation",
       "Bridging anticoagulation during clinical transitions",
@@ -1857,7 +1810,8 @@ export const DRIPS = [
       "aPTT or anti-Xa level per institutional protocol and provider orders",
       "Signs of bleeding: skin, mucous membranes, urine, stool, neurological changes",
       "IV site for infiltration or local bleeding",
-      "Platelet count — HIT is a serious complication to watch for",
+      "Hemoglobin/hematocrit and platelet trends; HIT can occur even if the platelet count remains in the normal range",
+      "Potassium per the monitoring plan; heparin can cause hyperkalemia",
       "Hemodynamic status in the context of potential bleeding",
       "Any new neurological changes — concern for intracranial bleeding",
     ],
@@ -1872,7 +1826,7 @@ export const DRIPS = [
 
     signalsToEscalate: [
       "Active or new bleeding at any site",
-      "Platelet count dropping significantly — concern for HIT",
+      "Substantial platelet fall or new thrombosis, including after recent heparin exposure; concern for HIT",
       "Laboratory values outside expected range after a dose change",
       "Change in neurological status — concern for intracranial bleeding",
       "Any clinical deterioration in a patient receiving anticoagulation",
@@ -1905,8 +1859,8 @@ export const DRIPS = [
     badge: "Direct thrombin inhibitor",
     related: ["bivalirudin", "heparin"],
     urgency: "caution",
-    leadFinding: "No reversal agent is available — stopping the infusion is the first management step when bleeding becomes a clinical concern.",
-    pearl: "When bleeding happens, the only tool is stopping the drug. Early recognition of bleeding signs is the most important bedside responsibility.",
+    leadFinding: "No specific antidote is available. Bleeding needs prompt team assessment; hepatic impairment can prolong anticoagulation after the infusion ends.",
+    pearl: "No antidote does not mean no options for supportive care. Early bleeding recognition and prompt provider communication matter, particularly with impaired hepatic clearance.",
     hemodynamics: {
       rows: [
         { key: 'MAP', label: 'MAP', direction: 'neutral' },
@@ -1919,7 +1873,7 @@ export const DRIPS = [
     },
 
     snapshot:
-      "The HIT alternative. When heparin has to stop, argatroban takes over. The liver handles most of the clearance, so hepatic function shapes how the drug behaves and how the lab values read.",
+      "A non-heparin option in HIT. The liver handles most of the clearance, so hepatic function shapes how the drug behaves and how the lab values read.",
 
     effectChips: [
       { label: "thrombin blocker" },
@@ -1927,9 +1881,6 @@ export const DRIPS = [
       { label: "lab-guided" },
       { label: "liver-cleared" },
     ],
-
-    mentalModel:
-      "Argatroban is the go-to when heparin has to come off. The monitoring still centers on aPTT, but liver function can significantly shape how the drug behaves and how those lab results interpret the anticoagulation level.",
 
     commonlyUsedFor: [
       "Anticoagulation management when HIT is confirmed or clinically suspected",
@@ -1942,11 +1893,12 @@ export const DRIPS = [
       "Directly blocks thrombin — the final step in clot formation — without needing a cofactor",
       "Prevents clot extension and new clot formation",
       "Cleared primarily through the liver — hepatic function shapes how the drug behaves and how lab results read",
-      "No reversal agent; stopping the infusion is the primary management step if needed",
+      "No specific antidote; bleeding management and any infusion changes belong to the treating team and active protocol",
     ],
 
     whatNursesMonitor: [
-      "aPTT per protocol and provider orders",
+      "aPTT for HIT infusions or ACT in procedural settings, per the ordered protocol",
+      "INR can also rise with argatroban; during warfarin overlap it does not reflect warfarin alone",
       "Signs of bleeding at all sites",
       "Hepatic function parameters — relevant to drug elimination and clinical response",
       "Platelet count trend in HIT context",
@@ -1957,7 +1909,7 @@ export const DRIPS = [
     watchOut: [
       "Bleeding is the primary risk; any site can be affected",
       "Hepatic impairment can cause drug accumulation and elevated aPTT beyond expected range",
-      "No direct reversal agent available; stopping the infusion is the primary management step",
+      "No specific antidote; anticoagulant effects may persist longer with hepatic impairment",
       "Drug interactions: antiplatelet agents and other anticoagulants can compound bleeding risk",
     ],
 
@@ -2009,7 +1961,7 @@ export const DRIPS = [
     },
 
     snapshot:
-      "Another HIT-safe anticoagulant. Clears through the kidneys and through the bloodstream itself. When kidney function changes, so can the drug's behavior and the lab values.",
+      "A non-heparin anticoagulant used in selected HIT and procedural settings. Clears through the kidneys and through the bloodstream itself. When kidney function changes, so can the drug's behavior and the lab values.",
 
     effectChips: [
       { label: "thrombin blocker" },
@@ -2017,9 +1969,6 @@ export const DRIPS = [
       { label: "lab-guided" },
       { label: "HIT context" },
     ],
-
-    mentalModel:
-      "Bivalirudin works on the same target as argatroban, but clears differently — partly through the kidneys, partly broken down in the bloodstream itself. When kidney function shifts, so can the drug's behavior and the lab values.",
 
     commonlyUsedFor: [
       "Anticoagulation during percutaneous coronary intervention and cardiac catheterization",
@@ -2032,7 +1981,7 @@ export const DRIPS = [
       "Directly blocks thrombin without needing a cofactor — same target as argatroban, different clearance path",
       "Cleared partly through the kidneys and partly broken down in the bloodstream itself",
       "Renal function changes can shift how the drug accumulates and how lab values read",
-      "No reversal agent; stopping the infusion is the primary management step if needed",
+      "No specific antidote; bleeding management and any infusion changes belong to the treating team and active protocol",
     ],
 
     whatNursesMonitor: [
@@ -2046,7 +1995,7 @@ export const DRIPS = [
     watchOut: [
       "Bleeding is the primary risk",
       "Renal impairment can extend drug effect and alter laboratory monitoring results",
-      "No direct reversal agent; infusion interruption is the primary management step",
+      "No specific antidote; renal impairment can prolong anticoagulant effects",
       "Drug interactions with other anticoagulant or antiplatelet agents compound bleeding risk",
     ],
 
@@ -2087,7 +2036,7 @@ export const DRIPS = [
     badge: "High-alert medication",
     related: ["heparin"],
     urgency: "caution",
-    leadFinding: "Glucose and potassium move together — the potassium trend matters just as much as the glucose target.",
+    leadFinding: "Insulin can lower both glucose and serum potassium, but the trends are not interchangeable. In DKA, improving glucose alone does not establish resolution.",
     pearl: "Two trends, one drug. Missing the potassium while focused on glucose is where safety gaps appear on insulin infusions.",
     hemodynamics: {
       rows: [
@@ -2101,7 +2050,7 @@ export const DRIPS = [
     },
 
     snapshot:
-      "The glucose drip with a potassium shadow. Watch both numbers, not one. The same mechanism that lowers glucose also pulls potassium into cells.",
+      "The glucose drip with a potassium shadow. Watch both numbers, not one. Insulin promotes glucose uptake and potassium entry into cells through related but distinct actions.",
 
     effectChips: [
       { label: "glycemic control" },
@@ -2109,9 +2058,6 @@ export const DRIPS = [
       { label: "potassium watch" },
       { label: "hypoglycemia risk" },
     ],
-
-    mentalModel:
-      "Insulin infusion is really two trends watched in parallel: glucose and potassium. They move together, and missing one while focused on the other is where safety gaps appear.",
 
     commonlyUsedFor: [
       "Hyperglycemia management in critically ill patients per provider-ordered protocols",
@@ -2133,12 +2079,14 @@ export const DRIPS = [
       "Signs of hypoglycemia: diaphoresis, tremor, tachycardia, altered mental status",
       "Signs of electrolyte disturbance based on potassium trends",
       "Infusion site and pump function — undetected interruptions affect glucose control",
-      "Dextrose-containing co-infusions and their relationship to the overall glucose picture",
+      "Nutrition and dextrose interruptions; intake changes can alter hypoglycemia risk",
+      "Ketones and acid-base status in DKA; glucose can improve before ketoacidosis resolves",
+      "Renal function; reduced insulin clearance can increase hypoglycemia risk",
     ],
 
     watchOut: [
       "Hypoglycemia is the primary safety risk; glucose monitoring frequency follows protocol",
-      "Potassium and glucose trends move together; electrolyte replacement may be required",
+      "A glucose result cannot predict the potassium result; electrolyte assessment follows the ordered protocol",
       "Infusion interruptions can cause glucose fluctuations — line problems require prompt communication",
       "Rate adjustments follow the ordered protocol only; changes without provider order are not appropriate",
     ],
@@ -2161,7 +2109,7 @@ export const DRIPS = [
     keySafetyNotes: [
       "Insulin is a high-alert medication; independent verification per unit policy is standard",
       "Glucose and potassium are monitored in parallel — both require consistent assessment",
-      "Rate adjustments follow the ordered protocol; communicate with provider before any change",
+      "Infusion changes follow the active order and protocol; unexpected responses need provider communication",
       "Infusion interruptions require prompt communication; glucose control can shift rapidly",
       "Pump programming: correct concentration verified against current order per unit policy",
     ],
@@ -2188,13 +2136,13 @@ export const COMPARE_PAIRS = [
       },
       {
         aspect: "Heart rate effect",
-        a: "Modest increase or neutral",
+        a: "Little change or reflex slowing; response varies",
         b: "Reflex bradycardia possible",
       },
       {
         aspect: "Inotropy",
         a: "Mild positive inotropic effect",
-        b: "No direct cardiac effect",
+        b: "No direct beta stimulation",
       },
       {
         aspect: "Common context",
@@ -2203,14 +2151,14 @@ export const COMPARE_PAIRS = [
       },
       {
         aspect: "Access",
-        a: "Central preferred",
-        b: "Peripheral acceptable short-term",
+        a: "Access follows product and local policy",
+        b: "Peripheral use per policy with close site checks",
       },
     ],
     clinicalScenario: {
       title: "When pressure rises but the heart slows",
       setup: "A hypotensive patient is already on the slower side, and the blood pressure improves while the heart rate drifts down.",
-      bedsideRead: "That pattern fits pure alpha vasoconstriction more than a mixed pressor effect.",
+      bedsideRead: "Reflex slowing can follow a rise in pressure with either agent. It is particularly recognizable with phenylephrine, which has no direct beta stimulation.",
       whyItMatters: "The hemodynamic difference between these two becomes visible in the heart rate trend, not just the MAP.",
     },
     keyDistinction:
@@ -2218,7 +2166,7 @@ export const COMPARE_PAIRS = [
     commonConfusion:
       "Nurses sometimes expect phenylephrine to behave like norepinephrine. The reflex bradycardia with phenylephrine catches teams off guard, especially in patients already on the slower side.",
     bedsidePearl:
-      "If the heart rate dips noticeably after phenylephrine goes up, reflex bradycardia from pure vasoconstriction is the likely driver.",
+      "Reflex bradycardia is one explanation for a falling HR on phenylephrine. Rhythm, symptoms, perfusion, and concurrent drugs still need review.",
     bottomLine:
       "Both raise MAP through vasoconstriction. Norepinephrine adds a modest cardiac component; phenylephrine acts on vessels only, which can reflexively slow the heart.",
   },
@@ -2237,7 +2185,7 @@ export const COMPARE_PAIRS = [
       },
       {
         aspect: "Heart rate effect",
-        a: "Modest increase or neutral",
+        a: "Little change or reflex slowing; response varies",
         b: "No direct chronotropic effect",
       },
       {
@@ -2259,7 +2207,7 @@ export const COMPARE_PAIRS = [
     clinicalScenario: {
       title: "When MAP rises without more heart stimulation",
       setup: "The MAP improves, but the heart rate and rhythm stay mostly unchanged.",
-      bedsideRead: "That pattern fits non-catecholamine vascular tone support rather than direct beta stimulation.",
+      bedsideRead: "V1-mediated vascular tone support can explain this pattern. A stable HR is not unique to vasopressin; the drug list and patient context still matter.",
       whyItMatters: "It helps separate vessel tone from cardiac stimulation when reading the trend — the monitor tells a different story depending on which pressor is running.",
     },
     keyDistinction:
@@ -2289,7 +2237,7 @@ export const COMPARE_PAIRS = [
       {
         aspect: "Heart rate effect",
         a: "Commonly elevated",
-        b: "Moderate elevation possible",
+        b: "Small increase possible",
       },
       {
         aspect: "Vasodilation",
@@ -2314,7 +2262,7 @@ export const COMPARE_PAIRS = [
       whyItMatters: "Milrinone's longer tail means the current hemodynamic picture may reflect what was running hours earlier — not just what is happening right now.",
     },
     keyDistinction:
-      "Milrinone's longer half-life means hemodynamic changes linger well after any rate adjustment. What you are seeing now reflects what was running hours ago.",
+      "Milrinone's longer half-life means hemodynamic changes linger well after any rate adjustment. Earlier exposure can still contribute, especially with impaired renal clearance.",
     commonConfusion:
       "Both support cardiac output, so nurses sometimes think of them as interchangeable. Milrinone's renal elimination makes it behave very differently in patients with impaired kidney function — effects accumulate.",
     bedsidePearl:
@@ -2369,9 +2317,9 @@ export const COMPARE_PAIRS = [
     commonConfusion:
       "Dexmedetomidine's bradycardia effect is frequently underestimated. Nurses focused on its arousability benefit are sometimes caught off guard when heart rate trends down significantly over time.",
     bedsidePearl:
-      "With dexmedetomidine, bradycardia tends to be gradual and creeping. Trending the heart rate over 30-minute intervals catches the pattern before it becomes a hemodynamic concern.",
+      "Dexmedetomidine can cause gradual or abrupt bradycardia, including sinus arrest. Continuous trend assessment follows the ordered monitoring plan; there is no guaranteed warning window.",
     bottomLine:
-      "Propofol offers deep, adjustable sedation but suppresses breathing and has no analgesic effect. Dexmedetomidine keeps patients more arousable with preserved breathing — bradycardia monitoring is essential.",
+      "Propofol offers deep, adjustable sedation but suppresses breathing and has no analgesic effect. Dexmedetomidine often permits arousability with less respiratory suppression, but bradycardia, hypotension, and airway compromise remain possible.",
   },
   {
     id: "midazolam-vs-propofol",
@@ -2399,7 +2347,7 @@ export const COMPARE_PAIRS = [
       {
         aspect: "Respiratory effect",
         a: "Depression; dose-dependent",
-        b: "Depression; more pronounced",
+        b: "Depression; additive with other CNS depressants",
       },
       {
         aspect: "Key safety concern",
@@ -2432,7 +2380,7 @@ export const COMPARE_PAIRS = [
       },
       {
         aspect: "Duration of effect",
-        a: "Very long; effects persist weeks",
+        a: "Long, variable elimination; persistence depends on exposure",
         b: "Shorter; manageable with discontinuation",
       },
       {
@@ -2443,11 +2391,11 @@ export const COMPARE_PAIRS = [
       {
         aspect: "Key monitoring",
         a: "QTc, thyroid, liver, lung",
-        b: "Heart rate, BP, PR interval",
+        b: "Heart rate, BP, AV conduction; PR when measurable",
       },
     ],
     bottomLine:
-      "Amiodarone works across multiple channels for broad rhythm control, but its effects outlast the infusion by weeks. Diltiazem is targeted at rate control via the AV node — watch for hypotension and use carefully in systolic dysfunction.",
+      "Amiodarone acts across multiple channels; interactions can persist after discontinuation. Diltiazem slows the ventricular response in AF/flutter through the AV node. Both can cause hypotension and conduction changes; reduced systolic function is a key safety context.",
   },
   {
     id: "esmolol-vs-dilt",
@@ -2504,17 +2452,17 @@ export const COMPARE_PAIRS = [
       {
         aspect: "Onset/offset",
         a: "Very rapid; seconds to minutes",
-        b: "Moderate; minutes",
+        b: "Rapid; minutes",
       },
       {
         aspect: "Blood pressure effect",
         a: "Potent; can be dramatic",
-        b: "More gradual",
+        b: "Can be rapid; preload and exposure matter",
       },
       {
         aspect: "Specific concern",
-        a: "Cyanide toxicity on prolonged use",
-        b: "Phosphodiesterase inhibitor interaction",
+        a: "Cyanide can occur early; thiocyanate with accumulation",
+        b: "PDE-5 inhibitor / riociguat interaction",
       },
       {
         aspect: "Light sensitivity",
@@ -2523,7 +2471,7 @@ export const COMPARE_PAIRS = [
       },
     ],
     bottomLine:
-      "Nitroprusside is more potent and faster, with both arterial and venous effects. Nitroglycerin works predominantly on the venous system at lower parameters. Cyanide risk makes nitroprusside the more complex agent for prolonged use.",
+      "Nitroprusside relaxes arteries and veins rapidly. Nitroglycerin predominantly affects veins, with arterial effects as exposure increases. Either can lower BP abruptly. Cyanide and thiocyanate are distinct toxicity concerns for nitroprusside.",
   },
 
   {
@@ -2542,22 +2490,22 @@ export const COMPARE_PAIRS = [
       {
         aspect: "MAP lowering profile",
         a: "Reliable, arterial-driven",
-        b: "More gradual; venous return dependent",
+        b: "Can be rapid; preload and exposure matter; venous return dependent",
       },
       {
         aspect: "Heart rate pattern",
-        a: "Reflex tachycardia more prominent",
-        b: "Mild reflex tachycardia; less pronounced",
+        a: "Reflex tachycardia can occur",
+        b: "Reflex tachycardia can occur",
       },
       {
         aspect: "Clinical role",
-        a: "Hypertensive urgency / emergency",
+        a: "Acute BP control in selected monitored settings",
         b: "Cardiac offloading; elevated filling pressures",
       },
       {
         aspect: "Tubing consideration",
         a: "Standard IV tubing",
-        b: "Non-PVC tubing recommended (absorption)",
+        b: "Tubing per product/pharmacy guidance; PVC can bind drug",
       },
     ],
     clinicalScenario: {
@@ -2569,11 +2517,11 @@ export const COMPARE_PAIRS = [
     keyDistinction:
       "Nicardipine reduces afterload through arterial vasodilation. Nitroglycerin reduces preload through venodilation. The same MAP number can mask very different mechanisms and clinical pathways.",
     commonConfusion:
-      "Both lower MAP, so they can look equivalent at a glance. The distinction matters: nicardipine when arterial resistance is the target, nitroglycerin when venous decongestion and cardiac offloading is the bedside pattern.",
+      "Both lower MAP, so they can look equivalent at a glance. The distinction matters: Their different arterial and venous effects explain why the same BP result can have a different physiologic basis.",
     bedsidePearl:
-      "Reflex tachycardia is more prominent with nicardipine. If the heart rate climbs alongside falling BP, nicardipine's arterial vasodilation is the likely driver — worth flagging to the provider.",
+      "A faster HR with falling BP can reflect a baroreceptor response to either vasodilator. Rhythm, symptoms, preload, and concurrent drugs help explain the trend.",
     bottomLine:
-      "Nicardipine targets arterial resistance and is the more appropriate choice in hypertensive urgency when preload is not the concern. Nitroglycerin offloads the heart through venodilation, making it more appropriate when cardiac filling pressures are elevated.",
+      "Nicardipine primarily lowers arterial resistance and afterload. Nitroglycerin primarily lowers venous return and preload, with arterial effects as exposure increases. The indication and patient context explain the monitoring priorities; this comparison does not select therapy.",
   },
 
   // ── Anticoagulation ────────────────────────────────────────────────────────
@@ -2607,8 +2555,8 @@ export const COMPARE_PAIRS = [
       },
       {
         aspect: "Reversal",
-        a: "None; stop infusion",
-        b: "None; stop infusion",
+        a: "No specific antidote; team-directed bleeding care",
+        b: "No specific antidote; team-directed bleeding care",
       },
     ],
     bottomLine:
@@ -2616,6 +2564,7 @@ export const COMPARE_PAIRS = [
   },
   {
     id: "heparin-vs-enox",
+    additionalSourceIds: ["dailymed-enoxaparin"],
     label: "IV Heparin vs Enoxaparin (SQ)",
     aId: "heparin",
     aLabel: "Heparin (IV infusion)",
@@ -2649,7 +2598,7 @@ export const COMPARE_PAIRS = [
       },
     ],
     bottomLine:
-      "IV heparin offers continuous, rapidly adjustable anticoagulation with close laboratory monitoring. Subcutaneous enoxaparin is more predictable in many patients — renal function is a key consideration for both.",
+      "IV heparin offers continuous, rapidly adjustable anticoagulation with close laboratory monitoring. Subcutaneous enoxaparin has a different monitoring and clearance profile. Renal impairment can prolong its effect, and its lower HIT risk does not make it a non-heparin alternative for acute HIT.",
   },
 
   // ── Glycemic ───────────────────────────────────────────────────────────────
@@ -2678,13 +2627,13 @@ export const COMPARE_PAIRS = [
       },
       {
         aspect: "High-alert status",
-        a: "Yes — independent verification required",
-        b: "Yes — independent verification required",
+        a: "Yes; verification per local policy",
+        b: "Yes; verification per local policy",
       },
       {
-        aspect: "Electrolyte consideration",
-        a: "Potassium drops with glucose",
-        b: "Platelet count (HIT monitoring)",
+        aspect: "Additional monitoring",
+        a: "Potassium can fall independently of the glucose trend",
+        b: "Hemoglobin and platelets (HIT awareness)",
       },
     ],
     bottomLine:

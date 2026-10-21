@@ -5,6 +5,7 @@ import './shift.css';
 import { scenario, stages } from './scenario.js';
 import { STORAGE_KEY, freshProgress, readProgress, cueResult } from './progress.js';
 import { shiftProgress } from '../../productAnalytics.js';
+import DeliberateChoice from './DeliberateChoice.jsx';
 
 const Arrow = () => <span aria-hidden="true">&#8594;</span>;
 const Check = () => <span aria-hidden="true">&#10003;</span>;
@@ -57,7 +58,6 @@ export default function Shift({ trackSession = null, debrief = null, nextStep = 
   const [storageFailed, setStorageFailed] = useState(false);
   const [room, setRoom] = useState(null);
   const [restartOpen, setRestartOpen] = useState(false);
-  const [sbarTab, setSbarTab] = useState('a');
   const [copied, setCopied] = useState('');
   const dialog = useRef(null);
   const heading = useRef(null);
@@ -75,7 +75,6 @@ export default function Shift({ trackSession = null, debrief = null, nextStep = 
   const action = scenario.actions.find(item => item.id === progress.answers.action);
   const interpretation = scenario.interpretations.find(item => item.id === progress.answers.abg);
   const sbar = scenario.sbars.find(item => item.id === progress.answers.sbar);
-  const visibleSbar = scenario.sbars.find(item => item.id === sbarTab);
   const cuesComplete = Array.isArray(progress.answers.cues);
   const cues = cueResult(progress.answers.cues ?? []);
 
@@ -96,7 +95,7 @@ export default function Shift({ trackSession = null, debrief = null, nextStep = 
   }, [room, restartOpen]);
 
   function closeDialog() { dialog.current?.close(); setRoom(null); setRestartOpen(false); }
-  function restart() { setProgress(trackSession ? trackSession.restart() : freshProgress()); setSbarTab('a'); setCopied(''); closeDialog(); }
+  function restart() { setProgress(trackSession ? trackSession.restart() : freshProgress()); setCopied(''); closeDialog(); }
   async function copy(text, kind) {
     try { await navigator.clipboard.writeText(text); setCopied(kind); }
     catch { setCopied('unavailable'); }
@@ -152,7 +151,7 @@ export default function Shift({ trackSession = null, debrief = null, nextStep = 
 
         {progress.stage === 3 && <>
           <div className="shift-situation"><span className="shift-overline">Room 12 / At the bedside</span><p>{scenario.cues[0].text}</p><p>{scenario.cues[2].text}</p></div>
-          <Choices items={scenario.actions} answer={progress.answers.action} label="Actions" onChoose={id => choose('action', id)} />
+          <DeliberateChoice items={scenario.actions} answer={progress.answers.action} label="Actions" onConfirm={id => choose('action', id)} />
           {action && <Feedback choice={action} correct={scenario.actions[0]} onContinue={next} nextLabel={action.id === 'escalate' ? 'Continue with the response team' : 'Continue after the correct escalation'} sources={['rrt', 'bts']} />}
         </>}
 
@@ -167,17 +166,7 @@ export default function Shift({ trackSession = null, debrief = null, nextStep = 
         {progress.stage === 5 && <>
           <p className="shift-lead">{scenario.sbarPrompt}</p>
           <div className="shift-call-line"><span className="shift-call-dot" /><strong>Provider calling back</strong><span>0718</span></div>
-          <div className="shift-sbar-tabs" role="tablist" aria-label="SBAR options">{scenario.sbars.map(item => <button key={item.id} role="tab" id={`sbar-tab-${item.id}`} aria-selected={sbarTab === item.id} aria-controls="sbar-panel" tabIndex={sbarTab === item.id ? 0 : -1} onKeyDown={event => {
-            if (!['ArrowLeft', 'ArrowRight', 'Home', 'End'].includes(event.key)) return;
-            event.preventDefault();
-            const index = scenario.sbars.findIndex(option => option.id === item.id);
-            const newIndex = event.key === 'Home' ? 0 : event.key === 'End' ? 2 : (index + (event.key === 'ArrowRight' ? 1 : 2)) % 3;
-            setSbarTab(scenario.sbars[newIndex].id); document.getElementById(`sbar-tab-${scenario.sbars[newIndex].id}`)?.focus();
-          }} onClick={() => setSbarTab(item.id)}>SBAR {item.id.toUpperCase()}</button>)}</div>
-          <section id="sbar-panel" className="shift-sbar" role="tabpanel" aria-labelledby={`sbar-tab-${sbarTab}`}>
-            {visibleSbar.parts ? visibleSbar.parts.map(([letter, text]) => <div className="shift-sbar-part" key={letter}><span>{letter}</span><p>{text}</p></div>) : <p>{visibleSbar.text}</p>}
-            <button className="shift-primary" disabled={Boolean(sbar)} onClick={() => choose('sbar', sbarTab)}>Use SBAR {sbarTab.toUpperCase()}<Arrow /></button>
-          </section>
+          <DeliberateChoice communication items={scenario.sbars} answer={progress.answers.sbar} label="SBAR options" onConfirm={id => choose('sbar', id)} />
           {sbar && <Feedback choice={sbar} correct={sbar.id !== 'a' ? { text: 'SBAR A', feedback: scenario.sbars[0].feedback } : null} onContinue={next} nextLabel="Finish the shift" />}
         </>}
 
@@ -189,9 +178,9 @@ export default function Shift({ trackSession = null, debrief = null, nextStep = 
           <section className="shift-debrief-section"><span className="shift-overline">Your first decisions</span><h2>Your shift report</h2><ul className="shift-reflections">{[
             ['Prioritize', progress.answers.priority === '12' ? 'You saw the right patient first.' : `You chose ${progress.answers.priority === 'charts' ? 'chart review' : `Room ${progress.answers.priority}`} first.`, scenario.patients[0].feedback, progress.answers.priority === '12'],
             ['Recognize', cues.essential === 2 ? 'You spotted both essential cues.' : `You spotted ${cues.essential} of 2 essential cues.`, scenario.essentialFeedback, cues.essential === 2],
-            ['Act', progress.answers.action === 'escalate' ? 'You called for help without waiting.' : 'Revisit the escalation decision.', action?.feedback, progress.answers.action === 'escalate'],
+            ['Act', progress.answers.action === 'escalate' ? 'You selected immediate assessment and escalation.' : 'Your original action needs revisiting; the story continued after guided escalation.', action?.feedback, progress.answers.action === 'escalate'],
             ['Interpret', progress.answers.abg === 'partial' ? 'You read the ABG correctly.' : 'Revisit the ABG interpretation.', scenario.interpretations[0].feedback, progress.answers.abg === 'partial'],
-            ['Communicate', progress.answers.sbar === 'a' ? 'Your SBAR was clear.' : `You chose SBAR ${progress.answers.sbar?.toUpperCase()}.`, sbar?.feedback, progress.answers.sbar === 'a'],
+            ['Communicate', progress.answers.sbar === 'a' ? 'You recognized the strongest prepared SBAR.' : `You chose SBAR ${progress.answers.sbar?.toUpperCase()}.`, sbar?.feedback, progress.answers.sbar === 'a'],
           ].map(([label, title, feedback, achieved]) => <li key={label}><span className={`shift-result-mark ${achieved ? 'is-recognized' : ''}`} aria-label={achieved ? 'Recognized' : 'Revisit'}>{achieved ? '\u2713' : '\u21BA'}</span><details><summary><small>{label}</small><strong>{title}</strong></summary><p>{feedback}</p></details></li>)}</ul><p className="shift-small">Learning reflection, not a clinical competency score.</p></section>
           <section className="shift-debrief-section"><h2>Why it can happen</h2><ul className="shift-why">{scenario.why.map(text => <li key={text}>{text}</li>)}</ul><p><strong>Cues to remember:</strong> {scenario.remember}</p><References ids={['bts', 'copd', 'abg', 'acidbase', 'rrt', 'judgment']} /></section>
           <section className="shift-debrief-section"><h2>Keep the learning going</h2><div className="shift-next-tools"><a href="/abg-lab" target="_blank" rel="noreferrer"><span>ABG LAB</span><strong>Practice respiratory acidosis <span aria-hidden="true">&#8599;</span></strong><small>Choose the respiratory acidosis example.</small></a><div><span>ASK CLINICAL EDGE</span><strong>Ask why</strong><p>{scenario.ask}</p><div className="shift-ask-links"><button className="shift-text-button" onClick={() => copy(scenario.ask, 'question')}>{copied === 'question' ? 'Question copied' : 'Copy question'}</button><a href="/ask" target="_blank" rel="noreferrer">Open Ask <span aria-hidden="true">&#8599;</span></a></div><small>Counts toward the daily Ask limit when submitted. Existing consent applies.</small></div></div></section>

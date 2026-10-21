@@ -116,7 +116,16 @@
 @media (max-width: 720px) {
   .ce-command-home__main { padding: 20px 18px 0; }
   .ce-command-home h1 { font-size: 28px; }
-  .ce-home-feature { padding: 24px; }
+  .ce-home-resume-learning { margin-bottom: 20px; }
+  .ce-home-resume-learning header { margin-bottom: 8px; }
+  .ce-home-resume-learning a { min-height: 72px; padding: 12px; }
+  .ce-home-shift { padding: 20px; }
+  .ce-home-shift p { margin: 10px 0 0; font-size: 15px; line-height: 1.5; }
+  .ce-home-shift small { margin-top: 12px; }
+  .ce-home-feature { padding: 20px; }
+  .ce-home-feature--companion { margin-top: 16px; }
+  .ce-home-feature.ce-home-feature--companion h2 { font-size: 23px; margin: 8px 0; }
+  .ce-command-home .ce-home-ask { margin-top: 14px; }
   .ce-home-feature p { font-size: 14px; }
   .ce-command-home__immediate { grid-template-columns: 1fr; gap: 24px; margin-top: 24px; }
   .ce-home-learning-grid { gap: 12px; }

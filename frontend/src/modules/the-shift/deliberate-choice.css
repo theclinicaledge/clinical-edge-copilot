@@ -1,0 +1,13 @@
+.shift-deliberate fieldset { border: 0; margin: 0; padding: 0; min-width: 0; }
+.shift-deliberate legend { font-weight: 600; margin-bottom: 16px; }
+.shift-deliberate-option { display: flex; gap: 12px; padding: 18px; margin-bottom: 12px; border: 1px solid var(--ce-warm-line); border-radius: var(--ce-r-md); background: var(--ce-warm-card); cursor: pointer; }
+.shift-deliberate-option.is-selected { border-color: var(--ce-teal-deep); box-shadow: inset 3px 0 var(--ce-teal-deep); }
+.shift-deliberate-option:focus-within { outline: 2px solid var(--ce-teal-deep); outline-offset: 3px; }
+.shift-deliberate-option input { flex: none; width: 20px; height: 20px; margin-top: 3px; accent-color: var(--ce-teal-deep); }
+.shift-deliberate-option > span { min-width: 0; line-height: 1.6; }
+.shift-deliberate-option strong { display: block; font-size: 13px; margin-bottom: 8px; color: var(--ce-teal-deep); }
+.shift-deliberate-part { display: flex; gap: 12px; margin-top: 12px; }
+.shift-deliberate-part b { flex: none; color: var(--ce-teal-deep); }
+.shift-deliberate-confirm { margin: 18px 0; scroll-margin-bottom: 110px; }
+.shift-deliberate-confirm p { font-size: 14px; }
+@media(max-width: 600px) { .shift-deliberate-option { padding: 14px; } }

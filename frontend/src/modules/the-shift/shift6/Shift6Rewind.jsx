@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import RewindPlayer from '../../rewind/RewindPlayer.jsx';
 import TrendReading from '../components/TrendReading.jsx';
-import { REWIND, SOURCES, ROOM14_VITALS, REWIND_B_VITALS, FLOWSHEET_ROWS, FLOWSHEET_SR, pulsePressure, title } from './data.js';
+import { REWIND, SOURCES, ROOM14_VITALS, REWIND_B_VITALS, FLOWSHEET_ROWS, FLOWSHEET_SR, title } from './data.js';
 import { REWIND_KEY, readRewind, updateRewind, rewindAttempt } from './rewindStore.js';
 
 const storage = { getItem: key => window.localStorage.getItem(key), setItem: (key, value) => window.localStorage.setItem(key, value) };
@@ -13,7 +13,7 @@ const versions = REWIND.variations.map(variation => ({ ...variation, sources }))
 const beforeEvening = ROOM14_VITALS.filter(v => v.time !== '1910');
 const describe = table => {
   const first = table[0], last = table.at(-1);
-  return `Vital signs for Room 14 from yesterday 2000 to ${last.time} today. Heart rate rises from ${first.hr} to ${last.hr}. Blood pressure falls from ${first.sys} over ${first.dia} to ${last.sys} over ${last.dia}. Pulse pressure narrows from ${pulsePressure(first)} to ${pulsePressure(last)}.`;
+  return `Vital signs for Room 14 from yesterday 2000 to ${last.time} today. Heart rate rises from ${first.hr} to ${last.hr}. Blood pressure falls from ${first.sys} over ${first.dia} to ${last.sys} over ${last.dia}. Respiratory rate rises from ${first.rr} to ${last.rr}.`;
 };
 const FLOWSHEETS = {
   main: { columns: ROOM14_VITALS, description: FLOWSHEET_SR.main },
@@ -41,7 +41,7 @@ export default function Shift6Rewind() {
     </section>
     {record.status === 'blocked' && <p role="status">Saved Rewind practice could not be read or belongs to another version. It has not been replaced. Your Shift responses are unchanged.</p>}
     {record.status === 'unavailable' && <p role="status">Device storage is unavailable. Practice stays in this open page only and may be lost when you leave or refresh.</p>}
-    {open && record.value && <RewindPlayer versions={versions} title={title} takeaway={REWIND.teaching} review="Draft Rewind content, awaiting clinical review." rewind={record.value} figure={figure}
+    {open && record.value && <RewindPlayer versions={versions} title={title} takeaway={REWIND.teaching} review="Rewind content awaiting clinical sign-off." rewind={record.value} figure={figure}
       close={() => setOpen(false)} onSelect={selected => update(value => { value.selected = selected; })}
       onSubmit={(variation, call) => { const attempt = rewindAttempt(variation, call); if (attempt) update(value => { value.attempts.push(attempt); }); }}
       onContinue={() => {}} continueLabel="Return to shift debrief"

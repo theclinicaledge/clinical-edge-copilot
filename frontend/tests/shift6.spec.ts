@@ -2,10 +2,10 @@ import { test, expect, type Page } from '@playwright/test';
 import { d1, d2, d4, d6, debrief, FLOWSHEET_SR, REWIND } from '../src/modules/the-shift/shift6/data.js';
 
 const PATH = '/learn/shifts/stable-number';
-const KEY = 'ce-shift-stable-number-v0.3';
+const KEY = 'ce-shift-stable-number-v0.4';
 const PREVIEW = process.env.VITE_SHIFT_006_PREVIEW === 'true';
 const ESSENTIAL = ['situation', 'background', 'assessment'];
-const progress = (stage: number, answers: Record<string, unknown> = {}) => ({ version: 1, contentVersion: '0.3', stage, viewed: [], revealed: [], selected: [], sbarDraft: { chips: [], recommendation: null }, answers, tomorrow: null });
+const progress = (stage: number, answers: Record<string, unknown> = {}) => ({ version: 1, contentVersion: '0.4', stage, viewed: [], revealed: [], selected: [], sbarDraft: { chips: [], recommendation: null }, answers, tomorrow: null });
 
 async function seed(page: Page, value: object) {
   await page.goto(PATH);
@@ -15,8 +15,8 @@ async function seed(page: Page, value: object) {
 const feedback = (page: Page) => page.getByRole('region', { name: 'Decision feedback' });
 const cue = (page: Page, label: string) => page.locator('.shift-cue').filter({ has: page.locator('.shift-overline', { hasText: new RegExp(`^${label}$`) }) });
 
-test.describe('draft gate', () => {
-  test.skip(PREVIEW, 'Checks the production configuration, with the draft flag off.');
+test.describe('preview gate', () => {
+  test.skip(PREVIEW, 'Checks the production configuration, with the preview flag off.');
   test('Shift 06 is absent from the library and unreachable by direct navigation', async ({ page }) => {
     await page.goto(PATH);
     await expect(page.getByText('The Stable Number')).toHaveCount(0);
@@ -26,24 +26,27 @@ test.describe('draft gate', () => {
   });
 });
 
-test.describe('Shift 06 draft preview', () => {
-  test.skip(!PREVIEW, 'Draft SHIFT-006 runs only with VITE_SHIFT_006_PREVIEW=true.');
+test.describe('Shift 06 preview', () => {
+  test.skip(!PREVIEW, 'SHIFT-006 runs only with VITE_SHIFT_006_PREVIEW=true.');
   test.beforeEach(async ({ page }) => {
     await page.route('**/api/**', route => { throw new Error(`Shift 06 must not call ${route.request().url()}`); });
   });
 
-  test('library lists Shift 06 as a draft with its review record', async ({ page }) => {
+  test('library lists Shift 06 without Draft markings and with an honest review record', async ({ page }) => {
     await page.goto('/learn/shifts');
     const card = page.locator('.shift-library-card').filter({ hasText: 'The Stable Number' });
-    await expect(card).toContainText('Med-Surg / Draft');
+    await expect(card).toContainText('Med-Surg / Foundations');
+    await expect(card).not.toContainText('Draft');
     await card.getByRole('link', { name: /Begin shift|Continue shift|Return to debrief/ }).click();
     await expect(page).toHaveURL(new RegExp(`${PATH}$`));
-    await expect(page.locator('.s6-draft-badge')).toHaveText('Draft v0.3');
+    await expect(page.locator('.shift-app')).not.toContainText(/\bDraft\b/);
+    await expect(page.locator('.shift-footer')).toContainText('Clinical sign-off not yet recorded');
     await page.getByRole('button', { name: 'Sources & review' }).click();
     const dialog = page.getByRole('dialog');
-    await expect(dialog).toContainText('Draft. Founder review and independent clinical sign-off have not been recorded.');
-    await expect(dialog).toContainText('SHIFT-006 / 0.3');
-    await expect(dialog.locator('ol li')).toHaveCount(4);
+    await expect(dialog).toContainText('Founder review and independent clinical sign-off have not been recorded.');
+    await expect(dialog).not.toContainText('Draft');
+    await expect(dialog).toContainText('SHIFT-006 / 0.4');
+    await expect(dialog.locator('ol li')).toHaveCount(5);
     await expect(dialog).not.toContainText('OpenStax');
   });
 
@@ -105,6 +108,9 @@ test.describe('Shift 06 draft preview', () => {
     for (const text of debrief.takeaways) await expect(page.locator('.s6-takeaways')).toContainText(text);
     await expect(page.getByText(debrief.ask, { exact: true })).toBeVisible();
     await expect(page.getByRole('link', { name: /Pulse pressure/ })).toHaveCount(0);
+    await expect(page.locator('.shift-why')).toContainText(debrief.why[1][0]);
+    await expect(page.locator('.shift-why a', { hasText: '[Source 7]' })).toHaveAttribute('href', 'https://www.ncbi.nlm.nih.gov/books/NBK537232/');
+    await expect(page.locator('#shift-main')).not.toContainText(/pulse pressure|\bDraft\b/i);
     await page.locator('.shift-share summary').click();
     await expect(page.getByText(debrief.share)).toBeVisible();
     await page.getByRole('button', { name: 'Maybe' }).click();
@@ -135,8 +141,9 @@ test.describe('Shift 06 draft preview', () => {
     await seed(page, progress(2, { d1: '14' }));
     const table = page.getByRole('table');
     await expect(table).toHaveAccessibleDescription(FLOWSHEET_SR.main);
-    await expect(table.getByRole('rowheader', { name: 'Pulse pressure' })).toBeVisible();
-    for (const value of ['74', '68', '54', '44', '32']) await expect(table.getByRole('row', { name: /Pulse pressure/ })).toContainText(value);
+    await expect(table.getByRole('rowheader')).toHaveText(['HR', 'BP', 'RR', 'SpO2', 'Temp', 'Note']);
+    await expect(table).not.toContainText(/pulse pressure/i);
+    for (const value of ['78', '80', '94', '100', '116']) await expect(table.getByRole('row', { name: /^HR/ })).toContainText(value);
     await expect(page.getByRole('button', { name: 'Yesterday 2000' })).toHaveCount(0);
     const noon = page.getByRole('button', { name: 'Today 1200', exact: true });
     await noon.focus();
@@ -152,14 +159,15 @@ test.describe('Shift 06 draft preview', () => {
 
   test('Rewind replays Decision 4 three ways with each variation’s own data and labels', async ({ page }) => {
     await seed(page, progress(7, { d1: '14', d2: '1200', d3: ['stool', 'standing', 'skin'], d4: 'escalate', d5: { chips: ESSENTIAL, recommendation: 'bedside' }, d6: 'reassess' }));
-    await page.evaluate(() => localStorage.removeItem('ce-shift-stable-number-rewind-v0.3'));
+    await page.evaluate(() => localStorage.removeItem('ce-shift-stable-number-rewind-v0.4'));
     await page.getByRole('button', { name: /^Explore Rewind/ }).click();
     const dialog = page.getByRole('dialog');
     await dialog.getByRole('button', { name: /^Start Rewind/ }).click();
     for (const [index, variation] of REWIND.variations.entries()) {
       const sheet = dialog.getByRole('table');
-      if (variation.id === 'b') { await expect(sheet).toContainText('146/78'); await expect(sheet).toContainText('After walking laps'); await expect(sheet).not.toContainText('118/86'); }
-      if (variation.id === 'a') await expect(sheet).toContainText('118/86');
+      if (variation.id === 'b') { await expect(sheet).toContainText('146/78'); await expect(sheet).toContainText('After walking laps'); await expect(sheet).not.toContainText('108/80'); }
+      if (variation.id === 'a') await expect(sheet).toContainText('108/80');
+      await expect(dialog).not.toContainText(/pulse pressure|\bDraft\b/i);
       if (variation.id === 'c') await expect(sheet).not.toContainText('1910');
       for (const fact of variation.facts.slice(0, 2)) await expect(dialog).toContainText(fact);
       await dialog.getByRole('button', { name: /^Choose my response/ }).click();

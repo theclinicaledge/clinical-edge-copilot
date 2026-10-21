@@ -30,9 +30,10 @@ function Bubble({ children, own = false, label }) {
   return <div className={`conversation-bubble${own ? ' conversation-own' : ''}`}><span className="conversation-eyebrow">{label || (own ? 'Your first response' : 'Room 18')}</span><p>{children}</p></div>;
 }
 function Choices({ items, selected, choose, prompt }) {
+  const [draft, setDraft] = useState(null);
   const picked = find(items, selected);
   return <>
-    {picked ? <><Bubble own>{picked.text}</Bubble><div className="conversation-feedback" role="status"><span className="conversation-eyebrow">Reflection / {picked.result}</span><p>{picked.feedback}</p></div></> : <fieldset className="conversation-replies"><legend>{prompt}</legend>{items.map(item => <button key={item.id} onClick={() => choose(item.id)}><span>{item.text}</span><span aria-hidden="true">&#8627;</span></button>)}</fieldset>}
+    {picked ? <><Bubble own>{picked.text}</Bubble><div className="conversation-feedback" role="status"><span className="conversation-eyebrow">Reflection / {picked.result}</span><p>{picked.feedback}</p></div></> : <fieldset className="conversation-replies"><legend>{prompt}</legend>{items.map(item => <button key={item.id} aria-pressed={draft === item.id} onClick={() => setDraft(item.id)}><span>{item.text}</span><span aria-hidden="true">{draft === item.id ? '\u2713' : '\u21A7'}</span></button>)}<button className="shift-primary" disabled={!items.some(item => item.id === draft)} onClick={() => choose(draft)}>Say this response</button></fieldset>}
   </>;
 }
 function ActionBoard({ placements, submitted, place, submit, next }) {

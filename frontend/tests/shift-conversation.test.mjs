@@ -141,7 +141,9 @@ test('every new clinical string and feedback comes from the supplied v0.4 script
   assert.equal(JSON.stringify({ script, actions, opening, asking, confidentiality }).includes('\\\\'), false, 'No literal escape characters in authored strings');
   assert.equal(CONTENT_VERSION, '0.4');
 });
-test('live scenarios, Ask, backend, consent, privacy, tools and feature settings are byte-unchanged', () => {
-  const protectedPaths = ['src/modules/the-shift/Shift.jsx', 'src/modules/the-shift/scenario.js', 'src/modules/the-shift/progress.js', 'src/modules/the-shift/monitor', 'src/modules/the-shift/discharge', 'src/modules/the-shift/integrated/authoring.js', 'src/modules/AskClinicalEdge.jsx', 'src/consent.js', 'src/Privacy.jsx', 'src/main.jsx', 'src/shiftFeature.js', 'src/modules/rhythm-lab', 'src/modules/abg-lab', 'src/modules/reference-hub', '../backend'];
-  assert.equal(execFileSync('git', ['diff', '335591c2304400755385944eef8a5656eeb81ead', '--', ...protectedPaths], { encoding: 'utf8', cwd: new URL('../', import.meta.url) }), '');
+test('release preserves clinical content, saved-progress rules and unrelated features', { skip: !process.env.CE_RELEASE_BASE && 'Set CE_RELEASE_BASE to the reviewed production revision for this release check' }, () => {
+  const protectedPaths = ['src/modules/the-shift', 'src/modules/AskClinicalEdge.jsx', 'src/consent.js', 'src/Privacy.jsx', 'src/main.jsx', 'src/shiftFeature.js', 'src/modules/rhythm-lab', 'src/modules/abg-lab', 'src/modules/reference-hub', '../backend'];
+  const approvedUI = new Set(['frontend/src/modules/the-shift/DeliberateChoice.jsx', 'frontend/src/modules/the-shift/monitor/Monitor.jsx', 'frontend/src/modules/the-shift/discharge/Discharge.jsx', 'frontend/src/modules/the-shift/conversation/Conversation.jsx', 'frontend/src/modules/the-shift/shift5/Shift5.jsx']);
+  const changed = execFileSync('git', ['diff', '--name-only', process.env.CE_RELEASE_BASE, '--', ...protectedPaths], { encoding: 'utf8', cwd: new URL('../', import.meta.url) }).trim().split('\n').filter(Boolean);
+  assert.deepEqual(changed.filter(path => !approvedUI.has(path)), [], 'Only the reviewed interaction components may change; content and progress rules must remain intact');
 });

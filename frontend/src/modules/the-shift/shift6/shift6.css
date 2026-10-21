@@ -1,5 +1,4 @@
 /* SHIFT-006 additions only. Shared Shift styles come from ../shift.css. */
-.s6-draft-badge { display: inline-block; margin-left: 8px; padding: 2px 8px; border: 1px solid var(--ce-gold-deep); border-radius: 30px; color: var(--ce-text-light); font: 600 11px var(--ce-font-mono); letter-spacing: 0.04em; }
 .s6-app .s6-scene-note { margin: -8px 0 20px; color: var(--ce-text-muted); font-size: 14px; }
 .s6-app .s6-card-vitals { margin-top: -8px; font: 500 13px var(--ce-font-mono); color: var(--ce-text-mid); }
 .s6-app .s6-prompt { margin: 28px 0 16px; font-size: 19px; }

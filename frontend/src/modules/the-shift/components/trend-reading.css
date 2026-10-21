@@ -6,6 +6,10 @@
 .trend-reading th, .trend-reading td { padding: 10px 12px; text-align: left; border-bottom: 1px solid var(--ce-warm-line); vertical-align: top; }
 .trend-reading tbody tr:last-child th, .trend-reading tbody tr:last-child td { border-bottom: 0; }
 .trend-reading tbody th { font: 600 12px var(--ce-font-mono); color: var(--ce-text-muted); white-space: nowrap; }
+/* Row labels stay in view while a narrow screen scrolls the time columns. */
+.trend-reading tbody th, .trend-corner { position: sticky; left: 0; z-index: 1; }
+.trend-reading tbody th { background: var(--ce-warm-card); }
+.trend-corner { background: var(--ce-navy-header); }
 .trend-reading tbody td { color: var(--ce-text-dark); }
 .trend-reading thead th { padding: 6px; background: var(--ce-navy-header); }
 .trend-corner { font: 600 12px var(--ce-font-mono); color: var(--ce-text-light-body); padding-left: 12px !important; }

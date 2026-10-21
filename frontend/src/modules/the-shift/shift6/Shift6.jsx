@@ -17,7 +17,7 @@ const SELECTABLE_TIMES = d2.choices.map(choice => choice.id);
 
 function References({ numbers }) {
   return <details className="shift-sources"><summary>Sources <span>{numbers.length}</span></summary>
-    <p>Draft source mapping. Review status: {card.reviewStatus}.</p>
+    <p>Review status: {card.reviewStatus}.</p>
     <ul>{numbers.map(number => <li key={number}><a href={SOURCES[number].url} target="_blank" rel="noreferrer">{SOURCES[number].citation}</a><p>Source {number}. Supports {SOURCES[number].supports}.</p></li>)}</ul>
   </details>;
 }
@@ -111,7 +111,7 @@ export default function Shift6() {
     <a className="shift-skip" href="#shift-main">Skip to the shift</a>
     <header className="shift-header"><div className="shift-header-inner">
       <a href="/" className="shift-brand" aria-label="Clinical Edge Home"><ClinicalEdgeMark size={27} /><span>Clinical Edge</span></a>
-      <span className="shift-private">Fictional scenario <span className="s6-draft-badge">Draft v{VERSION}</span></span>
+      <span className="shift-private">Fictional scenario</span>
       <button className="shift-reset" onClick={() => setRestartOpen(true)} aria-label="Restart the shift" title="Restart the shift">&#8634;</button>
     </div></header>
     <div className="shift-masthead"><div><span className="shift-overline">A fictional nursing shift</span><span className="shift-wordmark">The Shift<span>.</span></span></div>
@@ -120,7 +120,7 @@ export default function Shift6() {
     <nav className="shift-progress" aria-label="Scenario progress"><ol>{stages.map((item, index) => <li key={item.label} aria-current={index === progress.stage ? 'step' : undefined} className={index < progress.stage ? 'is-done' : index === progress.stage ? 'is-current' : ''}><span className="shift-progress-bar" /><span className="shift-progress-label">{item.label}</span></li>)}</ol><p>{progress.stage + 1} of {stages.length} <span>{stage.label}</span></p></nav>
 
     <div className={`shift-layout ${progress.stage < 2 ? 'shift-layout-report' : ''}`}>
-      {progress.stage >= 2 && <aside className="shift-assignment"><span className="shift-overline">Your assignment</span><div className="shift-patients">{assignment.patients.map(patient => <button key={patient.room} onClick={() => setRoom(patient.room)} className={`shift-patient-tab ${patient.room === '14' ? 'is-current' : ''}`} aria-label={`Open Room ${patient.room} report`}><RoomNumber id={patient.room} /><span><strong>{patient.name}</strong><small>Report</small></span></button>)}</div><div className="shift-assignment-note"><span>SHIFT 06 / DRAFT</span><strong>{stages[0].title}</strong><p>Fictional patients. No speed scoring.</p></div></aside>}
+      {progress.stage >= 2 && <aside className="shift-assignment"><span className="shift-overline">Your assignment</span><div className="shift-patients">{assignment.patients.map(patient => <button key={patient.room} onClick={() => setRoom(patient.room)} className={`shift-patient-tab ${patient.room === '14' ? 'is-current' : ''}`} aria-label={`Open Room ${patient.room} report`}><RoomNumber id={patient.room} /><span><strong>{patient.name}</strong><small>Report</small></span></button>)}</div><div className="shift-assignment-note"><span>SHIFT 06 / MED-SURG</span><strong>{stages[0].title}</strong><p>Fictional patients. No speed scoring.</p></div></aside>}
       <main id="shift-main" className="shift-scene">
         <div className="shift-scene-heading"><span className="shift-overline">{stage.decision ? `Decision ${progress.stage} of ${card.decisionCount}` : progress.stage === FINAL_STAGE ? 'End of shift' : `Shift 06 / ${card.estimatedTime}`}</span><h1 ref={heading} tabIndex={-1}>{stage.title}</h1></div>
 

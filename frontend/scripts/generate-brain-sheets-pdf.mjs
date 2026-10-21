@@ -5,7 +5,8 @@
 // screen preview and browser print path use — no separately hand-coded PDF
 // layout, no screenshots-as-pages.
 //
-// Run: npm run generate:brain-sheets
+// Run all: npm run generate:brain-sheets
+// Run selected: npm run generate:brain-sheets -- ed-rapid night-shift new-grad
 //
 // WHEN TO RE-RUN — the generated PDF is a static asset, not derived at
 // request time, so it drifts unless refreshed by hand:
@@ -87,6 +88,15 @@ const SHEETS = [
       creator: 'Clinical Edge',
     },
   },
+  ...[
+    ['ed-rapid', 'ED Rapid Assessment Brain Sheet'],
+    ['night-shift', 'Night Shift 4 Patient Brain Sheet'],
+    ['new-grad', 'New Grad Student Clinical Brain Sheet'],
+  ].map(([id, title]) => ({
+    id,
+    filename: `clinical-edge-${id}-brain-sheet.pdf`,
+    metadata: { title, author: 'Clinical Edge', subject: 'Printable nurse shift-organization brain sheet', creator: 'Clinical Edge' },
+  })),
 ];
 
 async function setPdfMetadata(filePath, metadata) {
@@ -100,6 +110,10 @@ async function setPdfMetadata(filePath, metadata) {
 }
 
 async function main() {
+  // Optional fixed template IDs let a scoped change preserve existing PDFs.
+  const requested = process.argv.slice(2);
+  for (const id of requested) if (!SHEETS.some(sheet => sheet.id === id)) throw new Error(`Unknown template ID: ${id}`);
+  const selected = requested.length ? SHEETS.filter(sheet => requested.includes(sheet.id)) : SHEETS;
   const vite = await createServer({
     root,
     server: { port: 0, strictPort: false },
@@ -113,7 +127,7 @@ async function main() {
   const outDir = path.join(root, 'public', 'brain-sheets', 'pdfs');
   fs.mkdirSync(outDir, { recursive: true });
 
-  for (const sheet of SHEETS) {
+  for (const sheet of selected) {
     const page = await browser.newPage({ viewport: { width: 816, height: 1056 } });
     const url = `${baseUrl}/brain-sheets/${sheet.id}?pdf=1`;
     await page.goto(url, { waitUntil: 'networkidle' });

@@ -2,11 +2,17 @@ import { test, expect } from '@playwright/test';
 import { readFile } from 'node:fs/promises';
 import { PDFDocument } from 'pdf-lib';
 
+// Keep PDF failure/fallback checks under Playwright's network interception.
+test.use({ serviceWorkers: 'block' });
+
 const templates = [
   ['medsurg-4pt', 'clinical-edge-medsurg-4-patient-brain-sheet.pdf'],
   ['medsurg-6pt', 'clinical-edge-medsurg-6-patient-brain-sheet.pdf'],
   ['icu-systems', 'clinical-edge-icu-systems-brain-sheet.pdf'],
   ['telemetry', 'clinical-edge-telemetry-stepdown-brain-sheet.pdf'],
+  ['ed-rapid', 'clinical-edge-ed-rapid-brain-sheet.pdf'],
+  ['night-shift', 'clinical-edge-night-shift-brain-sheet.pdf'],
+  ['new-grad', 'clinical-edge-new-grad-brain-sheet.pdf'],
 ];
 
 test.beforeEach(async ({ page }) => {
@@ -14,7 +20,7 @@ test.beforeEach(async ({ page }) => {
 });
 
 for (const [id, filename] of templates) {
-  test(`${id} has a working existing PDF and print action`, async ({ page }) => {
+  test(`${id} has a working one-page PDF and print action`, async ({ page }) => {
     await page.goto(`/brain-sheets/${id}`);
     const download = page.waitForEvent('download');
     await page.getByRole('link', { name: 'Download PDF', exact: true }).click();

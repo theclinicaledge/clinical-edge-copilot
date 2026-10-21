@@ -2,19 +2,17 @@
 // Template `id`s are the analytics contract (spec §8) and are permanent —
 // never rename, add, or remove an id outside a spec revision.
 //
-// `Sheet` is omitted until a template's production sheet component exists
-// (registered per-template across B3–B5); callers must never assume
-// `.Sheet` exists and must guard every render.
-//
-// `pdfPath`/`pdfFilename` are likewise omitted until a template has a
-// pre-generated static PDF (currently medsurg-4pt only — see
-// scripts/generate-brain-sheets-pdf.mjs). Callers must guard on `pdfPath`
-// before rendering a Download PDF action.
+// Each fixed template has a production Sheet and matching static PDF.
+// Keep render/download guards so an incomplete future entry cannot expose
+// a broken action. Regenerate PDFs with scripts/generate-brain-sheets-pdf.mjs.
 
 import MedSurg4 from '../sheets/MedSurg4.jsx';
 import MedSurg6 from '../sheets/MedSurg6.jsx';
 import IcuSystems from '../sheets/IcuSystems.jsx';
 import TelemetryStepdown from '../sheets/TelemetryStepdown.jsx';
+import EdRapid from '../sheets/EdRapid.jsx';
+import NightShift from '../sheets/NightShift.jsx';
+import NewGrad from '../sheets/NewGrad.jsx';
 
 export const TEMPLATES = [
   {
@@ -67,6 +65,10 @@ export const TEMPLATES = [
     audience: 'For ED nurses tracking five encounters at once.',
     meta: '1 PAGE · 5 ENCOUNTERS',
     pearls: [],
+    Sheet: EdRapid,
+    pdfPath: '/brain-sheets/pdfs/clinical-edge-ed-rapid-brain-sheet.pdf',
+    pdfFilename: 'clinical-edge-ed-rapid-brain-sheet.pdf',
+    pdfTitle: 'ED Rapid Assessment Brain Sheet',
   },
   {
     id: 'night-shift',
@@ -74,6 +76,10 @@ export const TEMPLATES = [
     audience: 'For a typical overnight assignment of four patients.',
     meta: '1 PAGE · 4 PATIENTS',
     pearls: [],
+    Sheet: NightShift,
+    pdfPath: '/brain-sheets/pdfs/clinical-edge-night-shift-brain-sheet.pdf',
+    pdfFilename: 'clinical-edge-night-shift-brain-sheet.pdf',
+    pdfTitle: 'Night Shift 4 Patient Brain Sheet',
   },
   {
     id: 'new-grad',
@@ -81,6 +87,10 @@ export const TEMPLATES = [
     audience: 'For students and new grads building the reasoning habit.',
     meta: '1 PAGE · 1 PATIENT',
     pearls: [],
+    Sheet: NewGrad,
+    pdfPath: '/brain-sheets/pdfs/clinical-edge-new-grad-brain-sheet.pdf',
+    pdfFilename: 'clinical-edge-new-grad-brain-sheet.pdf',
+    pdfTitle: 'New Grad Student Clinical Brain Sheet',
   },
 ];
 

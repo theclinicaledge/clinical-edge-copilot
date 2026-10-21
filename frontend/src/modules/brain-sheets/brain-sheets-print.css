@@ -1335,7 +1335,69 @@
    explicitly — every internal layout class (`.bs-systems-grid`,
    `.bs-hour-rail`, `.bs-sbar-mini`, `.bs-sheet-footer`, etc.) keeps its
    authored `display: grid` / `display: flex` completely untouched. */
+/* Completed ED, overnight, and learner sheets. Scoped to protect existing PDFs. */
+.bs-complete .bs-sheet { gap: 5pt; }
+.bs-complete .bs-field-label { font-size: 8pt; letter-spacing: 0; white-space: normal; }
+.bs-complete .bs-eyebrow { letter-spacing: 0.025em; line-height: 1.35; color: var(--ce-text-dark); }
+.bs-complete .bs-sheet-content { min-height: 0; gap: 6pt; }
+.bs-complete .bs-sheet-title { font-size: 12pt; }
+.bs-complete .bs-blank-line { height: 12pt; }
+.bs-complete .bs-sheet-header { flex-shrink: 0; }
+.bs-paper-prompt { font-size: 7.5pt; line-height: 1.35; color: var(--ce-text-muted); }
+.bs-ruled { display: flex; flex-direction: column; min-width: 0; }
+.bs-ruled > .bs-blank-line { flex: none; display: block; width: 100%; }
+.bs-paper-pair { display: grid; grid-template-columns: 1fr 1fr; gap: 10pt; }
+.bs-paper-checks { display: flex; flex-wrap: wrap; gap: 4pt 9pt; }
+.bs-paper-number { font: 700 10pt var(--ce-font-mono); color: var(--ce-text-dark); padding-right: 3pt; }
+.bs-paper-identity { display: flex; gap: 7pt; align-items: center; }
+.bs-paper-identity > .bs-field { flex: 1; flex-direction: column; align-items: stretch; gap: 0; }
+.bs-paper-label { border: 0.75pt dashed var(--ce-text-muted); min-width: 108pt; min-height: 26pt; padding: 4pt; display: flex; align-items: center; justify-content: center; }
+.bs-paper-identity--compact { display: grid; grid-template-columns: 16pt 1fr; gap: 2pt 3pt; }
+.bs-paper-identity--compact > .bs-field { grid-column: 1 / -1; flex-direction: row; align-items: baseline; gap: 4pt; }
+.bs-paper-identity--compact .bs-paper-label { border: 0; padding: 0; min-height: 0; min-width: 0; justify-content: start; gap: 4pt; }
+.bs-ed-list { flex: 1; display: grid; grid-template-rows: repeat(5, 1fr); gap: 6pt; }
+.bs-ed-encounter { border: 0.75pt solid var(--ce-text-dim); padding: 4pt; display: flex; flex-direction: column; gap: 1pt; min-width: 0; break-inside: avoid; }
+.bs-ed-identity { display: grid; grid-template-columns: 16pt 0.7fr 1.4fr 0.9fr 1.1fr 1fr; gap: 5pt; }
+.bs-ed-identity .bs-field { flex-direction: column; align-items: stretch; gap: 0; }
+.bs-ed-identity .bs-blank-line { height: 10pt; }
+.bs-ed-rechecks { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8pt; }
+.bs-ed-recheck { border-top: 0.5pt solid var(--ce-warm-line); padding-top: 2pt; }
+.bs-ed-recheck .bs-eyebrow { font-size: 7.5pt; }
+.bs-ed-recheck .bs-blank-line { height: 10pt; }
+.bs-ed-pending { display: flex; gap: 7pt; align-items: center; }
+.bs-ed-pending > .bs-field { flex: 1; }
+.bs-ed-pending .bs-paper-checks { gap: 6pt; flex-shrink: 0; }
+.bs-ed-handoff { display: grid; grid-template-columns: 1.5fr 1fr; gap: 10pt; }
+.bs-night-columns { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8pt; }
+.bs-night-columns > section { min-width: 0; }
+.bs-night-patient { border: 0.75pt solid var(--ce-text-dim); padding: 5pt; }
+.bs-night-patient > .bs-ruled { margin-top: 4pt; }
+.bs-night-timeline { width: 100%; table-layout: fixed; border-collapse: collapse; }
+.bs-night-timeline caption { font: 700 8pt var(--ce-font-mono); text-align: left; padding-bottom: 4pt; text-transform: uppercase; }
+.bs-night-timeline th { font: 500 8pt var(--ce-font-mono); }
+.bs-night-timeline th, .bs-night-timeline td { border: 0.5pt solid var(--ce-text-dim); padding: 3pt 5pt; }
+.bs-night-timeline th:first-child { width: 32pt; }
+.bs-night-timeline td { height: 21pt; }
+.bs-night-checks { display: grid; grid-template-columns: 1fr 1fr; gap: 10pt; }
+.bs-night-checks .bs-eyebrow { margin-bottom: 4pt; }
+.bs-night-handoff > section { border-right: 0.5pt solid var(--ce-warm-line); padding-right: 7pt; }
+.bs-night-handoff > section:last-child { border: 0; }
+.bs-night-handoff .bs-ruled { margin: 4pt 0; }
+.bs-night-handoff > section > .bs-field { flex-direction: column; align-items: stretch; gap: 0; }
+.bs-newgrad-systems { border-top: 0.75pt solid var(--ce-text-dim); }
+.bs-newgrad-systems section { display: grid; grid-template-columns: 1fr 1.25fr; gap: 12pt; padding: 3pt 0; border-bottom: 0.5pt solid var(--ce-warm-line); break-inside: avoid; }
+.bs-newgrad-systems .bs-paper-prompt { margin-top: 2pt; }
+.bs-newgrad-recheck { width: 100%; table-layout: fixed; border-collapse: collapse; margin-top: 4pt; }
+.bs-newgrad-recheck th { font: 500 8pt var(--ce-font-mono); text-align: left; }
+.bs-newgrad-recheck th:first-child { width: 35pt; }
+.bs-newgrad-recheck th, .bs-newgrad-recheck td { border: 0.5pt solid var(--ce-text-dim); padding: 3pt 5pt; }
+.bs-newgrad-recheck td { height: 16pt; }
+.bs-newgrad-sbar { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10pt; margin-top: 4pt; }
+.bs-newgrad-sbar .bs-paper-prompt { min-height: 30pt; margin: 2pt 0; }
+.bs-newgrad-sbar .bs-blank-line { height: 14pt; }
+
 @media print {
+  .bs-complete .bs-sheet { min-height: 10.18in; background: #fff; }
   html,
   body {
     background: #fff;

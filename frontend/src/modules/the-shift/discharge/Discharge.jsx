@@ -4,6 +4,7 @@ import { read, save, fresh, reviewResults } from './progress.js';
 import Reconciliation from './Reconciliation.jsx';
 import { concernCount } from './reconciliation.js';
 import './discharge.css';
+import DeliberateChoice from '../DeliberateChoice.jsx';
 
 const find = (items, id) => items.find(item => item.id === id);
 const toggle = (items, id) => items.includes(id) ? items.filter(item => item !== id) : [...items, id];
@@ -19,7 +20,7 @@ function Feedback({ item }) {
   </div>;
 }
 function Choices({ choices, selected, onSelect, label }) {
-  return <div className="discharge-choices" role="group" aria-label={label}>{choices.map((item, index) => <button key={item.id} className={selected === item.id ? 'is-selected' : ''} aria-pressed={selected === item.id} disabled={!!selected} onClick={() => onSelect(item.id)}><span className="discharge-choice-number" aria-hidden="true">{String.fromCharCode(65 + index)}</span><span>{item.text}</span>{selected === item.id && <span className="discharge-chosen">Your choice</span>}</button>)}</div>;
+  return <DeliberateChoice key={choices.map(item => item.id).join('-')} items={choices} answer={selected} onConfirm={onSelect} label={label || 'Decision options'} prompt="Choose your response." confirmLabel="Confirm my response" />;
 }
 function Bottle({ id, inspected, inspect }) {
   const home = id === 'lasix';

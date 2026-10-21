@@ -7,6 +7,7 @@ import Tracing from './ECGStrip.jsx';
 import { rooms, scenes, alarmChoices, alarmExplanations, monitorChoices, rhythmSteps, rhythmChoices, findings, actions, chips, recommendations, script, references, links } from './data.js';
 import { KEY, fresh, read, cueCounts, actionsComplete, missingCall } from './progress.js';
 import { shiftProgress } from '../../../productAnalytics.js';
+import DeliberateChoice from '../DeliberateChoice.jsx';
 
 const Arrow = () => <span aria-hidden="true">&#8594;</span>;
 const choice = (items, id) => items.find(item => item.id === id);
@@ -15,7 +16,7 @@ function Sources({ ids }) {
   return <details className="shift-sources"><summary>Script references</summary><p>Source mappings from the approved script. Independent nurse approval of the scenario package is reported by the founder; passage-level source verification is not documented.</p><ul>{references.filter(([id]) => ids.includes(id)).map(([id, title, scope]) => <li key={id}><strong>{title}</strong><p>{scope}</p></li>)}</ul></details>;
 }
 function Options({ items, selected, onSelect, label }) {
-  return <div className="shift-choices" aria-label={label}>{items.map(item => <button key={item.id} disabled={selected !== undefined} className={`shift-choice ${selected === item.id ? 'is-selected' : ''}`} onClick={() => onSelect(item.id)}><span>{item.text}</span><span aria-hidden="true">{selected === item.id ? '\u2713' : '\u2192'}</span></button>)}</div>;
+  return <DeliberateChoice key={items.map(item => item.id).join('-')} items={items} answer={selected} onConfirm={onSelect} label={label || 'Decision options'} prompt="Choose your response." confirmLabel="Confirm my response" />;
 }
 function Feedback({ selected, correct, children, next, label = 'Continue', sources = [] }) {
   const focus = useRef(null);
@@ -23,16 +24,17 @@ function Feedback({ selected, correct, children, next, label = 'Continue', sourc
   return <section ref={focus} tabIndex={-1} className={`shift-feedback ${selected.result === 'Correct' ? 'is-correct' : 'is-reflection'}`} aria-label="Decision feedback"><div className="shift-feedback-heading"><span className="shift-feedback-mark" aria-hidden="true">{selected.result === 'Correct' ? '\u2713' : '!'}</span><h3>{selected.result}</h3></div><p>{selected.feedback}</p>{correct && selected.id !== correct.id && <div className="shift-correction"><strong>{correct.text}</strong><p>{correct.feedback}</p></div>}{children}{sources.length > 0 && <Sources ids={sources} />}{next && <button className="shift-primary" onClick={next}>{label}<Arrow /></button>}</section>;
 }
 function MonitorBank({ phase, onRoom, selected }) {
-  return <div className="monitor-bank" aria-label="Central telemetry monitor">{rooms.map(room => {
+  const [draft, setDraft] = useState(null);
+  return <><div className="monitor-bank" aria-label="Central telemetry monitor">{rooms.map(room => {
     const alarm = phase === 'alarm' && room.id === '22';
     const advisory = phase === 'quiet' && room.id === '24';
-    return <button key={room.id} className={`monitor-tile ${alarm ? 'has-alarm' : ''} ${selected === room.id ? 'is-selected' : ''}`} onClick={() => onRoom(room.id)} disabled={selected !== undefined} aria-label={`${phase === 'quiet' ? 'Assess' : 'Open'} Room ${room.id}${alarm ? ', V-TACH alarm' : advisory ? ', irregular HR advisory' : ''}`}>
+    return <button key={room.id} className={`monitor-tile ${alarm ? 'has-alarm' : ''} ${(selected ?? draft) === room.id ? 'is-selected' : ''}`} aria-pressed={phase === 'quiet' ? (selected ?? draft) === room.id : undefined} onClick={() => phase === 'quiet' ? setDraft(room.id) : onRoom(room.id)} disabled={selected !== undefined} aria-label={`${phase === 'quiet' ? 'Assess' : 'Open'} Room ${room.id}${alarm ? ', V-TACH alarm' : advisory ? ', irregular HR advisory' : ''}`}>
       <span className="monitor-tile-head"><span>ROOM <b>{room.id}</b></span><span className="monitor-badge">{alarm ? 'V-TACH' : advisory ? 'IRREGULAR HR' : 'TELEMETRY'}</span></span>
       <span className="monitor-number"><strong>{alarm ? '180' : advisory ? '138' : room.rate}</strong><span>MONITOR HR<br />Scenario value</span></span>
       <Tracing compact strip={alarm ? 'D' : advisory ? 'E' : room.strip} />
       <span className="monitor-tile-foot">{phase === 'quiet' ? 'Assess this patient' : room.title}<Arrow /></span>
     </button>;
-  })}</div>;
+  })}</div>{phase === 'quiet' && selected === undefined && <button className="shift-primary monitor-submit" disabled={!draft} onClick={() => onRoom(draft)}>Confirm patient selection<Arrow /></button>}</>;
 }
 
 export default function Monitor({ debrief = null, nextStep = null }) {

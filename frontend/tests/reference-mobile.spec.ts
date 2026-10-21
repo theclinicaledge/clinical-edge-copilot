@@ -11,7 +11,7 @@ for (const width of [320, 390, 1440]) {
   await card.focus();
   const top = (await card.boundingBox())!.y;
   await card.press('Enter');
-  await expect(page.locator('.rh-detail-page')).toContainText('Reference aid only. Verify');
+  await expect(page.locator('.rh-detail-page')).toContainText('Clinical decisions belong with the treating team, active orders, and local protocol.');
   await page.getByRole('button', { name: /All references/ }).click();
   await expect(search).toHaveValue('potassium');
   await expect(card).toBeFocused();

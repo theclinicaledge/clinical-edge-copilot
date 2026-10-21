@@ -1,5 +1,56 @@
 /* ─── Reference Hub — Module Styles ─────────────────────────────────────────── */
 
+/* Native buttons retain the existing compact card presentation. */
+button.rh-ref-card,
+button.rh-pathway-card,
+button.rh-concept-card {
+  width: 100%;
+  text-align: left;
+  font-family: var(--ce-font-sans);
+  color: inherit;
+}
+
+.rh-range-note,
+.rh-sources,
+.rh-why-check {
+  font-size: 12px;
+  line-height: 1.6;
+}
+.rh-range-note { margin: 8px 0 0; color: var(--ce-text-muted); }
+.rh-sources { margin-top: 20px; color: var(--ce-text-muted); }
+.rh-sources summary,
+.rh-why-check summary { cursor: pointer; color: var(--ce-teal-deep); font-weight: 600; }
+.rh-sources summary span { margin-left: 8px; color: var(--ce-text-muted); font-weight: 400; }
+.rh-sources p { margin: 10px 0; }
+.rh-sources ul { margin: 0; padding-left: 18px; }
+.rh-sources li { margin: 8px 0; overflow-wrap: anywhere; }
+.rh-sources li span { display: block; font-size: 11px; }
+.rh-sources a { color: var(--ce-teal-deep); text-underline-offset: 3px; }
+.rh-why-check { margin-top: 12px; padding-top: 10px; border-top: 1px solid var(--ce-warm-line); }
+.rh-why-check fieldset { border: 0; padding: 0; margin: 12px 0 0; min-width: 0; }
+.rh-why-check legend { padding: 0; margin-bottom: 8px; color: var(--ce-text-dark); font-weight: 600; }
+.rh-why-options { display: grid; gap: 6px; }
+.rh-why-options button {
+  padding: 8px 10px;
+  border: 1px solid var(--ce-warm-line);
+  border-radius: var(--ce-r-sm);
+  background: var(--ce-warm-card);
+  color: var(--ce-text-mid);
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+}
+.rh-why-options button[aria-pressed="true"] {
+  border-color: var(--ce-teal-deep);
+  background: var(--ce-warm-bg);
+  color: var(--ce-teal-deep);
+  box-shadow: inset 3px 0 var(--ce-teal-deep);
+}
+.rh-why-feedback { margin: 10px 0 0; color: var(--ce-text-mid); }
+.rh-sources summary:focus-visible,
+.rh-why-check summary:focus-visible,
+.rh-why-options button:focus-visible { outline: 2px solid var(--ce-teal-deep); outline-offset: 3px; }
+
 .rh-page {
   min-height: 100vh;
   background: var(--ce-warm-bg);

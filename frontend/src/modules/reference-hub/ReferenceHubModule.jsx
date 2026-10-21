@@ -1,5 +1,7 @@
 import { useState, useMemo, useEffect, useCallback, useLayoutEffect, useRef } from 'react';
 import { REFERENCES, CATEGORIES } from './data/references.js';
+import { BEDSIDE_PATHWAYS, CLINICAL_CONCEPTS } from './data/pathways.js';
+import { REFERENCE_TRUST, getReferenceSources } from './data/sources.js';
 import { trackEvent } from '../../analytics';
 import ModuleHeader from '../../components/ModuleHeader.jsx';
 import '../../styles/tokens.css';
@@ -24,273 +26,68 @@ function lsSet(key, value) {
 
 const CAT_LABEL = Object.fromEntries(CATEGORIES.map(c => [c.id, c.label]));
 
-// ── Bedside Pathways data ─────────────────────────────────────────────────────
-
-const BEDSIDE_PATHWAYS = [
-  {
-    id: 'rising-lactate',
-    icon: '↗',
-    title: 'Rising Lactate',
-    subtitle: 'Perfusion, clearance, and trend direction',
-    summaryRefs: 'Includes Lactate, MAP, UO',
-    notice: [
-      'Lactate is rising across serial draws.',
-      'Vital signs may lag behind the cellular oxygen debt.',
-      'Urine output, skin temperature, and mentation help complete the picture.',
-    ],
-    lookAt: [
-      'MAP trend',
-      'Urine output',
-      'Shock Index',
-      'Base Excess',
-      'Skin and mentation',
-    ],
-    conceptMap: {
-      nodes: ['Perfusion', 'Oxygen Debt', 'Lactate Trend', 'Base Deficit'],
-      note: 'A rising lactate is a trend story, not a single-number story.',
-    },
-    commonPattern:
-      'Rising lactate is rarely a single-number problem. The trend connects perfusion, clearance, oxygen delivery, and the patient\'s bedside picture.',
-    relatedRefs: ['lactate', 'map', 'urine-output', 'shock-index', 'base-excess'],
-  },
-  {
-    id: 'map-fine-patient-bad',
-    icon: '◉',
-    title: 'MAP Looks Fine, Patient Looks Bad',
-    subtitle: 'Pressure vs perfusion',
-    summaryRefs: 'Includes MAP, Lactate, CO/CI',
-    notice: [
-      'MAP is in range, but the patient still looks poorly perfused.',
-      'Cool extremities, altered mentation, or falling urine output do not match the number.',
-      'Lactate or base deficit may show a different story.',
-    ],
-    lookAt: [
-      'Urine output',
-      'Lactate',
-      'Capillary refill',
-      'Cardiac output / index',
-      'SVR',
-    ],
-    conceptMap: {
-      nodes: ['MAP', 'Cardiac Output', 'Urine Output', 'Lactate'],
-      note: 'Pressure can look acceptable while flow and tissue perfusion remain poor.',
-    },
-    commonPattern:
-      'MAP is a pressure number. Perfusion is the patient picture built from multiple trends.',
-    relatedRefs: ['map', 'urine-output', 'lactate', 'cardiac-output', 'svr'],
-  },
-  {
-    id: 'peep-hypotension',
-    icon: '⇅',
-    title: 'PEEP Causing Hypotension?',
-    subtitle: 'Oxygenation support with hemodynamic cost',
-    summaryRefs: 'Includes PEEP, MAP, Pplat',
-    notice: [
-      'Oxygenation improves after PEEP changes, but blood pressure softens.',
-      'Higher intrathoracic pressure can reduce venous return.',
-      'Compliance, plateau pressure, and breath sounds help complete the picture.',
-    ],
-    lookAt: [
-      'MAP',
-      'CVP',
-      'Plateau pressure',
-      'Ventilator compliance',
-      'SpO₂',
-    ],
-    conceptMap: {
-      nodes: ['PEEP', 'Venous Return', 'Cardiac Output', 'MAP'],
-      note: 'Oxygenation support can change preload and pressure.',
-    },
-    commonPattern:
-      'PEEP can improve oxygenation while changing venous return and right-heart loading. The oxygen number and pressure number may move in opposite directions.',
-    relatedRefs: ['peep', 'map', 'cvp', 'plateau-pressure', 'ventilator-compliance'],
-  },
-  {
-    id: 'urine-output-falling',
-    icon: '↓',
-    title: 'Urine Output Falling',
-    subtitle: 'End-organ perfusion signal',
-    summaryRefs: 'Includes UO, MAP, Creatinine',
-    notice: [
-      'Urine output drops before other numbers look dramatic.',
-      'The patient may still have a borderline acceptable MAP.',
-      'Creatinine can lag behind the bedside trend.',
-    ],
-    lookAt: [
-      'MAP',
-      'Lactate',
-      'Creatinine',
-      'Fluid balance',
-      'Capillary refill',
-    ],
-    conceptMap: {
-      nodes: ['MAP', 'Renal Perfusion', 'Urine Output', 'Creatinine'],
-      note: 'Urine output often moves before creatinine does.',
-    },
-    commonPattern:
-      'Falling urine output is often an early perfusion signal. It should be read with pressure, labs, and the full bedside picture.',
-    relatedRefs: ['urine-output', 'map', 'lactate', 'creatinine', 'capillary-refill'],
-  },
-  {
-    id: 'oxygenation-vs-ventilation',
-    icon: '⇌',
-    title: 'Oxygen Looks Fine, CO₂ Doesn\'t',
-    subtitle: 'SpO₂/PaO₂ vs CO₂ clearance',
-    summaryRefs: 'Includes SpO₂, PaCO₂, FiO₂',
-    notice: [
-      'SpO₂ may look acceptable while PaCO₂ worsens.',
-      'Oxygenation and ventilation are separate problems.',
-      'FiO₂ and PEEP speak more to oxygenation; minute ventilation speaks more to CO₂ clearance.',
-    ],
-    lookAt: [
-      'SpO₂',
-      'PaO₂',
-      'PaCO₂',
-      'FiO₂',
-      'Minute ventilation',
-    ],
-    conceptMap: {
-      nodes: ['FiO₂ / PEEP', 'PaO₂ / SpO₂', 'Minute Ventilation', 'PaCO₂'],
-      note: 'Oxygenation and ventilation answer different questions.',
-    },
-    commonPattern:
-      'More oxygen does not always mean better ventilation. Oxygenation asks whether oxygen gets in; ventilation asks whether CO₂ gets out.',
-    relatedRefs: ['oxygenation-vs-ventilation', 'spo2', 'pao2', 'paco2', 'minute-ventilation'],
-  },
-  {
-    id: 'high-peak-pressure',
-    icon: '▲',
-    title: 'Why Is the Vent Alarming?',
-    subtitle: 'Peak vs plateau pressure',
-    summaryRefs: 'Includes Peak, Pplat, Compliance',
-    notice: [
-      'Peak pressure rises on the ventilator.',
-      'Plateau pressure helps separate airway resistance from lung compliance.',
-      'Secretions, biting, bronchospasm, tubing issues, or worsening compliance may each change the pattern differently.',
-    ],
-    lookAt: [
-      'Plateau pressure',
-      'Ventilator compliance',
-      'Tidal volume',
-      'Patient-vent synchrony',
-      'Breath sounds',
-    ],
-    conceptMap: {
-      nodes: ['Peak Pressure', 'Plateau Pressure', 'Resistance vs Compliance'],
-      note: 'The peak-to-plateau relationship helps separate airway resistance from lung stiffness.',
-    },
-    commonPattern:
-      'Peak pressure alone does not tell the whole story. The peak-to-plateau relationship helps separate airway resistance from lung stiffness.',
-    relatedRefs: ['plateau-pressure', 'ventilator-compliance', 'tidal-volume', 'respiratory-rate'],
-  },
-];
-
-// ── Clinical Concepts data ────────────────────────────────────────────────────
-
-const CLINICAL_CONCEPTS = [
-  {
-    id: 'shock',
-    title: 'Shock',
-    subtitle: 'Perfusion failure patterns',
-    summary: 'Shock is not one number. It is a pattern of pressure, flow, oxygen debt, and end-organ response.',
-    notice: [
-      'MAP may fall late or look temporarily acceptable.',
-      'Urine output, mentation, skin temperature, lactate, and base deficit help complete the picture.',
-      'Different shock patterns can share similar blood pressure numbers.',
-    ],
-    conceptMap: {
-      nodes: ['Pressure', 'Flow', 'Oxygen Debt', 'Organ Response'],
-      note: 'Shock is the failure of perfusion, not just the presence of hypotension.',
-    },
-    connectedPathwayIds: ['rising-lactate', 'map-fine-patient-bad', 'urine-output-falling'],
-    connectedRefIds: ['map', 'lactate', 'urine-output', 'shock-index', 'base-excess', 'cardiac-output'],
-  },
-  {
-    id: 'ards',
-    title: 'ARDS',
-    subtitle: 'Oxygenation failure with stiff lungs',
-    summary: 'ARDS is a pattern of poor oxygen transfer, reduced compliance, and escalating oxygenation support.',
-    notice: [
-      'SpO₂ may remain fragile despite high oxygen support.',
-      'P/F ratio, PEEP, plateau pressure, and compliance become connected bedside clues.',
-      'Hemodynamics may change as airway pressures rise.',
-    ],
-    conceptMap: {
-      nodes: ['FiO₂ / PEEP', 'P/F Ratio', 'Compliance', 'Hemodynamics'],
-      note: 'ARDS links oxygenation numbers with lung mechanics and circulation.',
-    },
-    connectedPathwayIds: ['peep-hypotension', 'oxygenation-vs-ventilation', 'high-peak-pressure'],
-    connectedRefIds: ['pf-ratio', 'peep', 'plateau-pressure', 'ventilator-compliance', 'spo2'],
-  },
-  {
-    id: 'aki',
-    title: 'AKI',
-    subtitle: 'Kidney signal, perfusion signal, timing signal',
-    summary: 'AKI is often first noticed through urine output trends before creatinine fully reflects the change.',
-    notice: [
-      'Urine output may fall before creatinine changes.',
-      'Perfusion, obstruction, fluid balance, and lab trends all matter together.',
-      'A single low-output hour is less useful than the pattern across time.',
-    ],
-    conceptMap: {
-      nodes: ['Perfusion', 'Urine Output', 'Creatinine', 'Trend'],
-      note: 'Kidney function is read through both immediate output and delayed lab movement.',
-    },
-    connectedPathwayIds: ['urine-output-falling', 'map-fine-patient-bad', 'rising-lactate'],
-    connectedRefIds: ['urine-output', 'creatinine', 'bun', 'map', 'lactate'],
-  },
-  {
-    id: 'ventilator-trouble',
-    title: 'Ventilator Trouble',
-    subtitle: 'Oxygenation, ventilation, resistance, compliance',
-    summary: 'Ventilator changes are easier to understand when oxygenation, CO₂ clearance, airway resistance, and lung stiffness are separated.',
-    notice: [
-      'SpO₂ and PaCO₂ can move in different directions.',
-      'Peak pressure and plateau pressure answer different questions.',
-      'Patient synchrony, secretions, compliance, and minute ventilation help frame the pattern.',
-    ],
-    conceptMap: {
-      nodes: ['Oxygenation', 'Ventilation', 'Resistance', 'Compliance'],
-      note: 'Ventilator problems become clearer when oxygen, CO₂, airway resistance, and lung stiffness are separated.',
-    },
-    connectedPathwayIds: ['oxygenation-vs-ventilation', 'high-peak-pressure', 'peep-hypotension'],
-    connectedRefIds: ['spo2', 'paco2', 'minute-ventilation', 'plateau-pressure', 'ventilator-compliance'],
-  },
-  {
-    id: 'sepsis-pattern',
-    title: 'Sepsis Pattern',
-    subtitle: 'Inflammation, perfusion, lactate, organ response',
-    summary: 'Sepsis becomes clinically concerning when infection concern, perfusion changes, lactate trend, and organ response begin lining up.',
-    notice: [
-      'Vital signs may change before labs return.',
-      'Lactate, urine output, mentation, MAP, and temperature patterns matter together.',
-      'A patient can look worse before one single number looks dramatic.',
-    ],
-    conceptMap: {
-      nodes: ['Infection Concern', 'Perfusion', 'Lactate', 'Organ Response'],
-      note: 'The bedside pattern matters more than any isolated value.',
-    },
-    connectedPathwayIds: ['rising-lactate', 'map-fine-patient-bad', 'urine-output-falling'],
-    connectedRefIds: ['lactate', 'map', 'urine-output', 'wbc', 'shock-index'],
-  },
-];
-
 // ── Header ────────────────────────────────────────────────────────────────────
 
 function Header({ onGoHome, showBack, onBack, backLabel }) {
   return <ModuleHeader moduleName="Reference Hub" onGoHome={onGoHome} onBack={showBack ? onBack : undefined} backLabel={backLabel || 'Back'} maxWidth="800px" />;
 }
 
+function Sources({ id, pattern = false }) {
+  const sources = getReferenceSources(id, pattern);
+  return (
+    <details className="rh-sources">
+      <summary>Sources &amp; scope <span>Adult educational reference</span></summary>
+      <p>{REFERENCE_TRUST.scope}</p>
+      <ul>
+        {sources.map(source => (
+          <li key={source.id}>
+            <a href={source.url} target="_blank" rel="noopener noreferrer">{source.title}</a>
+            <span>{source.organization}</span>
+          </li>
+        ))}
+      </ul>
+    </details>
+  );
+}
+
+function WhyCheck({ check }) {
+  const [choice, setChoice] = useState(null);
+  return (
+    <details className="rh-why-check">
+      <summary>Quick why check</summary>
+      <fieldset>
+        <legend>{check.question}</legend>
+        <div className="rh-why-options">
+          {check.options.map((option, index) => (
+            <button
+              type="button"
+              key={option}
+              aria-pressed={choice === index}
+              onClick={() => setChoice(index)}
+            >
+              {option}
+            </button>
+          ))}
+        </div>
+      </fieldset>
+      {choice !== null && (
+        <p className="rh-why-feedback" role="status">
+          <strong>{choice === check.answer ? 'That connects the clues. ' : 'Reconsider the connection. '}</strong>
+          {check.explanation}
+        </p>
+      )}
+    </details>
+  );
+}
+
 // ── Pathway card (landing page) ───────────────────────────────────────────────
 
 function PathwayCard({ pathway, onSelect }) {
   return (
-    <div
+    <button
+      type="button"
       className="rh-pathway-card"
       onClick={() => onSelect(pathway)}
-      role="button"
-      tabIndex={0}
-      onKeyDown={e => (e.key === 'Enter' || e.key === ' ') && onSelect(pathway)}
       aria-label={pathway.title}
     >
       <span className="rh-pathway-card-icon" aria-hidden="true">{pathway.icon}</span>
@@ -300,7 +97,7 @@ function PathwayCard({ pathway, onSelect }) {
         <div className="rh-pathway-card-summary">{pathway.summaryRefs}</div>
       </div>
       <span className="rh-pathway-card-arrow">›</span>
-    </div>
+    </button>
   );
 }
 
@@ -309,13 +106,13 @@ function PathwayCard({ pathway, onSelect }) {
 function ConceptMapCard({ map }) {
   return (
     <div className="rh-concept-map">
-      <div className="rh-concept-map__title">Concept Map</div>
+      <div className="rh-concept-map__title">Connect the clues</div>
       <div className="rh-concept-map__flow">
         {map.nodes.map((node, i) => (
           <span key={i} className="rh-concept-map__step">
             <span className="rh-concept-map__node">{node}</span>
             {i < map.nodes.length - 1 && (
-              <span className="rh-concept-map__arrow" aria-hidden="true">→</span>
+              <span className="rh-concept-map__arrow" aria-hidden="true">·</span>
             )}
           </span>
         ))}
@@ -423,6 +220,7 @@ function PathwayDetailView({ pathway, onBack, onSelectRef, backLabel }) {
             <div style={{ fontSize: 14, lineHeight: 1.75, color: 'var(--ce-gold-deep)', fontStyle: 'italic' }}>
               {pathway.commonPattern}
             </div>
+            <WhyCheck key={pathway.id} check={pathway.check} />
           </div>
         </div>
 
@@ -447,6 +245,8 @@ function PathwayDetailView({ pathway, onBack, onSelectRef, backLabel }) {
           </div>
         )}
 
+        <Sources key={pathway.id} id={pathway.id} pattern />
+
         {/* Safety note */}
         <div style={{
           marginTop: 24,
@@ -458,7 +258,7 @@ function PathwayDetailView({ pathway, onBack, onSelectRef, backLabel }) {
           fontFamily: 'var(--ce-font-mono)',
           textAlign: 'center',
         }}>
-          Reference aid only. Verify with your facility's protocols and clinical judgment.
+          Educational reference only. Clinical decisions belong with the treating team, active orders, and local protocol.
         </div>
       </div>
     </div>
@@ -471,25 +271,23 @@ function ConceptCard({ concept, onSelect }) {
   const pathwayCount = concept.connectedPathwayIds.length;
   const refCount     = concept.connectedRefIds.length;
   return (
-    <div
+    <button
+      type="button"
       className="rh-concept-card"
       onClick={() => onSelect(concept)}
-      role="button"
-      tabIndex={0}
-      onKeyDown={e => (e.key === 'Enter' || e.key === ' ') && onSelect(concept)}
       aria-label={concept.title}
     >
       <div className="rh-concept-card__accent" aria-hidden="true">◆</div>
       <div style={{ flex: 1, minWidth: 0 }}>
         <div className="rh-concept-card__title">{concept.title}</div>
         <div className="rh-concept-card__subtitle">{concept.subtitle}</div>
-        <div className="rh-concept-card__summary">{concept.summary}</div>
+        <div className="rh-concept-card__summary">{concept.preview}</div>
         <div className="rh-concept-card__meta">
           {pathwayCount} pathway{pathwayCount !== 1 ? 's' : ''} · {refCount} references
         </div>
       </div>
       <span className="rh-concept-card__arrow">›</span>
-    </div>
+    </button>
   );
 }
 
@@ -625,6 +423,8 @@ function ConceptDetailView({ concept, onBack, onSelectPathway, onSelectRef }) {
           </div>
         )}
 
+        <Sources key={concept.id} id={concept.id} pattern />
+
         {/* Safety note */}
         <div style={{
           marginTop: 24,
@@ -636,7 +436,7 @@ function ConceptDetailView({ concept, onBack, onSelectPathway, onSelectRef }) {
           fontFamily: 'var(--ce-font-mono)',
           textAlign: 'center',
         }}>
-          Reference aid only. Verify with your facility's protocols and clinical judgment.
+          Educational reference only. Clinical decisions belong with the treating team, active orders, and local protocol.
         </div>
       </div>
     </div>
@@ -741,7 +541,7 @@ function HubView({ onSelect, onGoHome, onSelectPathway, onSelectConcept, active 
             </div>
             <div className="rh-hero__stat-divider" aria-hidden="true" />
             <div className="rh-hero__stat">
-              <span className="rh-hero__stat-num">5</span>
+              <span className="rh-hero__stat-num">{CATEGORIES.length}</span>
               <span className="rh-hero__stat-label">Categories</span>
             </div>
           </div>
@@ -768,6 +568,7 @@ function HubView({ onSelect, onGoHome, onSelectPathway, onSelectConcept, active 
         <div className="rh-filters" style={{ marginBottom: 28 }}>
           <button
             className={'rh-filter-btn' + (cat === 'all' ? ' active' : '')}
+            aria-pressed={cat === 'all'}
             onClick={() => handleCategorySelect('all')}
           >
             All
@@ -776,6 +577,7 @@ function HubView({ onSelect, onGoHome, onSelectPathway, onSelectConcept, active 
             <button
               key={c.id}
               className={'rh-filter-btn' + (cat === c.id ? ' active' : '')}
+              aria-pressed={cat === c.id}
               onClick={() => handleCategorySelect(c.id)}
             >
               {c.label}
@@ -859,12 +661,10 @@ function HubView({ onSelect, onGoHome, onSelectPathway, onSelectConcept, active 
 
 function RefCard({ ref_, onSelect }) {
   return (
-    <div
+    <button
+      type="button"
       className="rh-ref-card"
       onClick={() => onSelect(ref_)}
-      role="button"
-      tabIndex={0}
-      onKeyDown={e => (e.key === 'Enter' || e.key === ' ') && onSelect(ref_)}
       aria-label={ref_.title}
     >
       <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', gap: 12 }}>
@@ -872,14 +672,14 @@ function RefCard({ ref_, onSelect }) {
           <div className="rh-ref-cat">{CAT_LABEL[ref_.category]}</div>
           <div className="rh-ref-title">{ref_.title}</div>
           {ref_.normalRange ? (
-            <div className="rh-ref-range">{ref_.normalRange}</div>
+            <div className="rh-ref-range">{ref_.rangeSummary || ref_.normalRange}</div>
           ) : (
             <div className="rh-ref-range-null">No standard range</div>
           )}
         </div>
         <span className="rh-ref-arrow">›</span>
       </div>
-    </div>
+    </button>
   );
 }
 
@@ -932,10 +732,10 @@ function DetailView({ ref_, onBack, onSelect, backLabel }) {
           </h1>
         </div>
 
-        {/* Normal range */}
+        {/* Context, including example intervals rather than universal targets */}
         {ref_.normalRange && (
           <div className="rh-detail-field" style={{ borderLeft: '3px solid var(--ce-gold)' }}>
-            <div className="rh-detail-field-label" style={{ color: 'var(--ce-gold-deep)' }}>Normal Range</div>
+            <div className="rh-detail-field-label" style={{ color: 'var(--ce-gold-deep)' }}>Reference / context</div>
             <div style={{
               fontFamily: 'var(--ce-font-mono)',
               fontSize: 15,
@@ -946,6 +746,7 @@ function DetailView({ ref_, onBack, onSelect, backLabel }) {
             }}>
               {ref_.normalRange}
             </div>
+            <p className="rh-range-note">Adult examples. Use the reporting laboratory, baseline, measurement conditions, and individualized orders.</p>
           </div>
         )}
 
@@ -1043,6 +844,8 @@ function DetailView({ ref_, onBack, onSelect, backLabel }) {
           </div>
         )}
 
+        <Sources key={ref_.id} id={ref_.id} />
+
         {/* Safety note */}
         <div style={{
           marginTop: 24,
@@ -1054,7 +857,7 @@ function DetailView({ ref_, onBack, onSelect, backLabel }) {
           fontFamily: 'var(--ce-font-mono)',
           textAlign: 'center',
         }}>
-          Reference aid only. Verify with your facility's protocols and clinical judgment.
+          Educational reference only. Clinical decisions belong with the treating team, active orders, and local protocol.
         </div>
       </div>
     </div>

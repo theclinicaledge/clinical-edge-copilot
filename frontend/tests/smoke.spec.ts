@@ -241,10 +241,10 @@ test('manual capture preserves simultaneous perfusion findings and first-class M
   await expect(page.locator('.snapshot-review')).toContainText('Cool / clammy,Delayed capillary refill');
 });
 
-test('command home prioritizes Ask and preserves focused tools', async ({ page }) => {
+test('home exposes Ask and preserves focused tools', async ({ page }) => {
   await page.goto('/');
   await expect(page.getByRole('heading', { name: 'Understand the why.' })).toBeVisible();
-  await expect(page.locator('.ce-home-ask')).toBeVisible();
+  await expect(page.getByRole('link', { name: 'Ask a question', exact: true })).toBeVisible();
   await expect(page.getByRole('heading', { name: 'References', exact: true })).toBeVisible();
   await expect(page.getByText('Rhythm Lab', { exact: true })).toBeVisible();
   await expect(page.getByText('ICU Drips', { exact: true })).toBeVisible();
@@ -1080,7 +1080,7 @@ test('opening a second-batch reference detail view works', async ({ page }) => {
   await page.getByPlaceholder('Search references…').fill('trach');
   await page.getByRole('button', { name: 'Tracheostomy Care Basics' }).click();
   await expect(page.getByRole('heading', { name: 'Tracheostomy Care Basics' })).toBeVisible();
-  await expect(page.getByText('A patient-specific airway plan is most useful when the team knows where it is and what equipment is available before an emergency occurs.')).toBeVisible();
+  await expect(page.getByText('Know the airway anatomy and documented plan before interpreting a change.', { exact: true })).toBeVisible();
 });
 
 test('neuro assessment category appears and filters to the new entries', async ({ page }) => {
@@ -1095,7 +1095,7 @@ test('opening a new reference detail view works', async ({ page }) => {
   await page.getByPlaceholder('Search references…').fill('Serum Calcium');
   await page.getByRole('button', { name: 'Serum Calcium' }).click();
   await expect(page.getByRole('heading', { name: 'Serum Calcium' })).toBeVisible();
-  await expect(page.getByText('When albumin or acid-base status is abnormal, total and ionized calcium may tell different stories.')).toBeVisible();
+  await expect(page.getByText('Total calcium counts bound and free calcium. Ionized calcium focuses on the active fraction.', { exact: true })).toBeVisible();
 });
 
 test('abg lab example can be selected and interpreted', async ({ page }) => {

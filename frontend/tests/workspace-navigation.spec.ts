@@ -1,4 +1,5 @@
 import { test, expect } from '@playwright/test';
+import { assertReachableEnd } from './helpers/reachability';
 
 const widths = [390, 768, 1440];
 for (const width of widths) {
@@ -11,7 +12,7 @@ for (const width of widths) {
     await page.goto('/');
     const nav = page.getByRole('navigation', { name: 'Clinical Edge workspace' });
     await expect(nav.getByRole('link', { name: 'Home', exact: true })).toHaveAttribute('aria-current', 'page');
-    await expect(page.locator('.ce-home-ask')).toBeInViewport();
+    await expect(page.getByRole('link', { name: 'Ask a question', exact: true })).toBeInViewport();
     await expect(nav.getByRole('link', { name: 'Shift Brain', exact: true })).toHaveCount(0);
     await expect(page.locator('.ce-command-home__checks')).toBeInViewport();
     await page.screenshot({ path: '/private/tmp/clinical-edge-slice1-home-' + width + '.png', animations: 'disabled' });
@@ -62,9 +63,7 @@ for (const width of widths) {
       expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true);
       const tapHeights = await nav.locator('a,button').evaluateAll((els) => els.map((el) => el.getBoundingClientRect().height));
       expect(tapHeights.every((height) => height >= 44)).toBe(true);
-      const routeClearance = await page.locator('#root > :first-child').evaluate((el) => parseFloat(getComputedStyle(el).paddingBottom));
-      const dockExtent = await nav.evaluate((el) => innerHeight - el.getBoundingClientRect().top);
-      expect(routeClearance).toBeGreaterThanOrEqual(dockExtent + 12);
+      await assertReachableEnd(page);
       await nav.getByRole('link', { name: 'Home', exact: true }).click();
       await expect(page).toHaveURL(/\/$/);
       await page.goBack();

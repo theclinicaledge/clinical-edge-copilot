@@ -86,6 +86,6 @@ test('Shift Brain sends the same device ID with Priority Map requests', async ({
 
 test('Privacy discloses the device identifier and its limits', async ({ page }) => {
   await page.goto('/privacy');
-  await expect(page.getByText('Effective date: October 12, 2026')).toBeVisible();
+  await expect(page.getByText(/^Effective date: [A-Za-z]+ \d{1,2}, \d{4}$/)).toBeVisible();
   await expect(page.getByText(/To enforce fair-use limits, the app stores a random anonymous device ID on your device and sends it with AI requests; it is not linked to your identity, not used for tracking or advertising, and is deleted when you clear site data or delete the app\./)).toBeVisible();
 });

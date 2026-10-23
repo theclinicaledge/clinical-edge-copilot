@@ -126,7 +126,7 @@ test('skip shows support without requiring play, then returns to five-scenario l
   await expect(page.getByText(script.support, { exact: true })).toBeVisible();
   await expect(page.getByRole('link', { name: 'Text 988' })).toHaveAttribute('href', 'sms:988?oai_link_source=model_response_hotline');
   await page.getByRole('link', { name: 'Return to Shift Library' }).click();
-  await expect(page.locator('.shift-library-card')).toHaveCount(5);
+  await expect(page.locator('.shift-library-card')).toHaveCount(6);
   for (const text of ['The Drowsy Patient', 'The Monitor Alarm', 'The Discharge Puzzle']) await expect(page.getByRole('heading', { name: text })).toBeVisible();
   await page.setViewportSize({ width: 1440, height: 960 });
   await page.screenshot({ path: `${captures}/1440-private-library.png` });

@@ -1,0 +1,11 @@
+import { build } from 'vite';
+import react from '@vitejs/plugin-react';
+import { mkdir, writeFile } from 'node:fs/promises';
+process.chdir(new URL('..', import.meta.url).pathname);
+const result = await build({ configFile:false, plugins:[react()], define:{'process.env.NODE_ENV':JSON.stringify('production'),'import.meta.env.VITE_SHIFT_006_PREVIEW':JSON.stringify('true')}, build:{write:false,minify:true,lib:{entry:'scripts/shift7-preview.jsx',name:'Shift7Preview',formats:['es'],fileName:'shift7'},cssCodeSplit:false,rolldownOptions:{output:{codeSplitting:false}}} });
+const output=(Array.isArray(result)?result[0]:result).output;
+const script=output.filter(o=>o.type==='chunk').map(o=>o.code).join('\n');
+const css=output.filter(o=>o.type==='asset'&&o.fileName.endsWith('.css')).map(o=>o.source).join('\n');
+await mkdir('../preview',{recursive:true});
+await writeFile('../preview/shift7.html',`<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="robots" content="noindex,nofollow"><title>The Missing Time | Clinical Edge review build</title><style>body{margin:0}button,a,input,select,summary{touch-action:manipulation}*:focus-visible{outline:3px solid var(--ce-teal-deep);outline-offset:3px}h1:focus{outline:none}${css}</style></head><body><div id="root"></div><script type="module">${script.replaceAll('</script','<\\/script')}</script></body></html>`);
+console.log('Portable preview: ../preview/shift7.html');

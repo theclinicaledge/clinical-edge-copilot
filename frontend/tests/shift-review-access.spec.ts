@@ -8,12 +8,13 @@ for (const width of [320, 390, 1440]) {
     await expect(page.getByRole('region', { name: 'Your debriefs' })).toHaveCount(0);
     await page.evaluate(value => localStorage.setItem('ce-private-shift-drowsy-r2', JSON.stringify(value)), saved);
     await page.reload();
-    const reviews = page.getByRole('region', { name: 'Your debriefs' });
-    await expect(reviews.getByRole('link')).toHaveCount(1);
+    await expect(page.getByRole('region', { name: 'Your debriefs' })).toHaveCount(0);
+    const reviews = page.locator('.shift-library-card').filter({ hasText: 'The Drowsy Patient' });
+    await expect(reviews.getByRole('link', { name: /Review debrief/ })).toHaveCount(1);
     await reviews.scrollIntoViewIfNeeded();
     await page.screenshot({ path: `/private/tmp/ce-shift-review-${width}.png`, animations: 'disabled' });
     expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true);
-    const link = reviews.getByRole('link', { name: /The Drowsy Patient/ });
+    const link = reviews.getByRole('link', { name: /Review debrief/ });
     await link.focus();
     await link.press('Enter');
     await expect(page.getByRole('region', { name: 'Your next step' })).toBeVisible();

@@ -24,7 +24,7 @@ for (const width of [390, 768, 1440]) test(`Library visual scope and navigation 
   expect(await root.evaluate(el => getComputedStyle(el).backgroundColor)).toBe(home);
   expect(await root.evaluate(el => getComputedStyle(el).borderBottomColor)).toBe(home);
   const cards = page.locator('.shift-library-card');
-  await expect(cards).toHaveCount(5);
+  await expect(cards).toHaveCount(6);
   const positions = await cards.locator('.shift-primary').evaluateAll(nodes => nodes.map(el => ({ top: el.getBoundingClientRect().top, height: el.getBoundingClientRect().height })));
   if (width === 1440) expect(Math.max(...positions.slice(0, 3).map(p => p.top)) - Math.min(...positions.slice(0, 3).map(p => p.top))).toBeLessThan(1);
   if (width === 768) expect(Math.abs(positions[0].top - positions[1].top)).toBeLessThan(1);

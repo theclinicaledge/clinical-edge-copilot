@@ -3,7 +3,7 @@ import { test, expect } from '@playwright/test';
 test('Shift 5 is reachable from the public library and four earlier Shifts remain available', async ({ page }) => {
   await page.goto('/learn/shifts');
   const cards = page.locator('.shift-library-card');
-  await expect(cards).toHaveCount(5);
+  await expect(cards).toHaveCount(6);
   for (const title of ['The Drowsy Patient', 'The Monitor Alarm', 'The Discharge Puzzle', 'The Conversation That Changes Everything']) {
     await expect(cards.filter({ hasText: title })).toBeVisible();
   }

@@ -2,6 +2,16 @@ import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { fresh, discovered, events, handoffChips, handoffResult, historyGaps, read, openingGaps } from '../src/modules/the-shift/shift7/rules.js';
 import { questions, VERSION } from '../src/modules/the-shift/shift7/data.js';
+test('released attempts preserve classifications and handoff across the clarity update',()=>{
+ const saved={...fresh(),version:'1.0.0',stage:5,asked:['machine'],answers:{opening:['wait']},water:'sip',contact:'leave',classifications:{machine:'Unresolved timing'},handoff:['observed','no-baseline','unknown']};
+ globalThis.localStorage={getItem:()=>JSON.stringify(saved)};
+ const restored=read();
+ assert.equal(restored.stage,5);
+ assert.deepEqual(restored.classifications,saved.classifications);
+ assert.deepEqual(restored.handoff,saved.handoff);
+ assert.deepEqual(restored.answers,saved.answers);
+ delete globalThis.localStorage;
+});
 test('every possible question subset exposes only acquired facts and admits an honest handoff', () => {
  for (let mask=0;mask<2**questions.length;mask++) {
   const p = {...fresh(), asked: questions.filter((_,i)=>mask & (1<<i)).map(q=>q.id)};

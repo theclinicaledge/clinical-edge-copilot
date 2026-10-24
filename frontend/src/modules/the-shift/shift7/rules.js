@@ -4,7 +4,7 @@ const ids = (value, allowed) => Array.isArray(value) ? [...new Set(value.filter(
 export function read() {
   try {
     const p = JSON.parse(localStorage.getItem(KEY));
-    if (!p || ![VERSION, '0.2-preview.1'].includes(p.version) || !Number.isInteger(p.stage) || p.stage < 0 || p.stage > 5) return fresh();
+    if (!p || ![VERSION, '1.0.0', '0.2-preview.1'].includes(p.version) || !Number.isInteger(p.stage) || p.stage < 0 || p.stage > 5) return fresh();
     const clean = { ...fresh(), stage: p.stage, asked: ids(p.asked, questions.map(q => q.id)), actionDraft: ids(p.actionDraft, actions.map(a => a.id)), updated: Number(p.updated) || 0 };
     clean.asked = clean.asked.filter(id => { const q = questions.find(q => q.id === id); return !q.parent || clean.asked.includes(q.parent); });
     const opening = ids(p.answers?.opening, actions.map(a => a.id));

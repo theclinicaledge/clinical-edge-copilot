@@ -1,5 +1,34 @@
 import { test, expect, type Page } from '@playwright/test';
 const PATH='/learn/shifts/missing-time';
+test('plain-language timeline and full answer preserve the original attempt',async({page,isMobile})=>{
+ await openHistory(page);
+ await page.getByRole('button',{name:/Linda 0 asked/}).click();
+ await page.getByRole('button',{name:'Do you know when he got up this morning?'}).click();
+ if(isMobile)await page.getByRole('button',{name:/^Timeline/}).click();
+ await page.getByText('What do the three choices mean?',{exact:true}).click();
+ await expect(page.getByText('A device logged an event.',{exact:false})).toBeVisible();
+ const category=page.getByLabel('06:05 machine classification',{exact:true});
+ await expect(category.locator('option')).toHaveText(['Choose what this tells you','Usual function reported','Symptoms noticed or found','Activity recorded by a device']);
+ await category.selectOption({label:'Activity recorded by a device'});
+ await page.getByLabel('06:05 machine limit',{exact:true}).selectOption('Who started it or how he was');
+ await bedside(page);
+ for(const name of [/Left facial droop, left arm drift/,/Last known well not established/,/Exact onset remains uncertain/])await page.getByRole('button',{name}).click();
+ await page.getByRole('button',{name:'Give handoff'}).click();
+ const before=await page.evaluate(()=>localStorage.getItem('ce-shift7-missing-time-v1'));
+ await page.getByText('Show the full case answer',{exact:true}).click();
+ await expect(page.locator('.s7-answer-times')).toContainText('≈06:00');
+ await expect(page.locator('.s7-answer-times')).toContainText('≈06:30');
+ await expect(page.locator('.s7-answer-times')).toContainText('07:15');
+ await expect(page.locator('.s7-timing-answer')).toContainText('does not change your original handoff');
+ expect(await page.evaluate(()=>localStorage.getItem('ce-shift7-missing-time-v1'))).toBe(before);
+ await page.getByText('Your spoken handoff',{exact:true}).click();
+ await expect(page.locator('.s7-debrief')).not.toContainText('Last known well approximately 0600');
+ await page.reload();
+ await expect(page.getByRole('heading',{name:'The story you handed over.'})).toBeVisible();
+ await page.getByText('Review your evidence (1)',{exact:true}).click();
+ await expect(page.getByRole('region',{name:'Evidence and original classifications'})).toContainText('Supported answer: Activity recorded by a device');
+ expect(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth)).toBe(true);
+});
 async function start(page:Page){await page.goto(PATH); await page.getByRole('button',{name:'Step into the ED'}).click();}
 async function openHistory(page:Page){await start(page);await page.getByRole('button',{name:'Activate Code Stroke Use Harbor'}).click();await page.getByRole('button',{name:'Start selected actions'}).click();await page.getByRole('button',{name:'Talk with the people'}).click();}
 async function bedside(page:Page,unsafe=false){await page.getByRole('button',{name:'Continue to bedside'}).click();await page.getByRole('button',{name:unsafe?'A small sip is fine.':'Not yet. He needs'}).click();await page.getByRole('button',{name:'Confirm water response'}).click();await page.getByRole('button',{name:'Could you stay nearby'}).click();await page.getByRole('button',{name:'Confirm contact response'}).click();await page.getByRole('button',{name:'Build your handoff'}).click();}

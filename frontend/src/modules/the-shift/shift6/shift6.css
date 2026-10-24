@@ -2,6 +2,14 @@
 .s6-app .s6-scene-note { margin: -8px 0 20px; color: var(--ce-text-muted); font-size: 14px; }
 .s6-app .s6-card-vitals { margin-top: -8px; font: 500 13px var(--ce-font-mono); color: var(--ce-text-mid); }
 .s6-app .s6-prompt { margin: 28px 0 16px; font-size: 19px; }
+.s6-flowsheet-nav { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin-bottom: 8px; font-size: 14px; }
+.s6-flowsheet-nav > div { display: flex; gap: 6px; }
+.s6-flowsheet-nav button { width: 44px; height: 44px; border: 1px solid var(--ce-warm-line); border-radius: var(--ce-r-sm); background: var(--ce-warm-card); color: var(--ce-text-dark); font-size: 22px; cursor: pointer; }
+.s6-flowsheet-nav button:focus-visible { outline: 3px solid var(--ce-teal-deep); outline-offset: 2px; }
+.s6-flowsheet .trend-reading { margin-top: 0; }
+.s6-app .s6-bridge { padding: 14px 16px; border-left: 3px solid var(--ce-gold-deep); background: var(--ce-warm-card); line-height: 1.6; }
+.s6-app .shift-station[aria-pressed="true"] { border-color: var(--ce-teal-deep); background: var(--ce-urgency-low-bg); }
+.s6-sbar-section legend { display: flex; align-items: center; gap: 10px; font-weight: 650; }
 /* Report card section labels sit apart from the text above and close to the text they introduce. */
 .s6-app .shift-report-copy .shift-overline { margin-top: 20px; }
 .s6-app .shift-report-copy .shift-overline + p { margin-top: 4px; }

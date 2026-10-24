@@ -79,9 +79,7 @@ export const SHIFTS = [
 ];
 if (CONVERSATION_ENABLED) SHIFTS.push(conversationEntry);
 SHIFTS.push(shift5Entry);
-// Draft SHIFT-006, preview builds only (see shift6/feature.js). The inline flag folds at build
-// time, so production bundles contain neither the entry nor its content.
-if (import.meta.env?.VITE_SHIFT_006_PREVIEW === 'true') SHIFTS.push((await import('../shift6/metadata.js')).shift6Entry);
+SHIFTS.push((await import('../shift6/metadata.js')).shift6Entry);
 SHIFTS.push((await import('../shift7/metadata.js')).shift7Entry);
 export const getShift = id => SHIFTS.find(item => item.id === id);
 export function progressLabel(item) {

@@ -74,3 +74,15 @@ test('Rewind keeps every spec label and correct call per variation', () => {
   assert.equal(rewindAttempt('b', 'hgb'), null);
   assert.ok(!validRewind({ ...record, attempts: [{ ...record.attempts[0], label: 'Accepted' }] }));
 });
+
+test('preview saves retain original choices while new drafts remain unsubmitted', () => {
+  const legacy = { ...freshProgress(), stage: 4, answers: { d1: 'flowsheets', d2: '1600', d3: ['skin'] } };
+  delete legacy.drafts;
+  const restored = sanitizeProgress(legacy);
+  assert.deepEqual(restored.answers, legacy.answers);
+  assert.deepEqual(restored.drafts, {});
+  const draft = sanitizeProgress({ ...restored, drafts: { d4: 'hgb', d6: 'invalid' } });
+  assert.deepEqual(draft.drafts, { d4: 'hgb' });
+  assert.equal(draft.answers.d4, undefined);
+  assert.equal(draft.stage, 4);
+});

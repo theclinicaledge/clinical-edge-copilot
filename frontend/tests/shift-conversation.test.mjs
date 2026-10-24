@@ -127,8 +127,8 @@ test('storage failures leave a safe in-memory fallback', () => {
 });
 test('authorized public scenario has direct and handoff routes', () => {
   assert.equal(CONVERSATION_ENABLED, true);
-  assert.deepEqual(SHIFT_IDS, ['drowsy-patient', 'monitor-alarm', 'discharge-puzzle', 'conversation', 'which-patient-first', 'missing-time']);
-  assert.equal(SHIFT_IDS.includes('stable-number'), false, 'Scenario 6 remains preview-only');
+  assert.deepEqual(SHIFT_IDS, ['drowsy-patient', 'monitor-alarm', 'discharge-puzzle', 'conversation', 'which-patient-first', 'stable-number', 'missing-time']);
+  assert.equal(SHIFT_IDS.includes('stable-number'), true, 'Scenario 6 release is authorized');
   assert.deepEqual(shiftRoute('/learn/shifts/conversation'), { kind: 'scenario', id: 'conversation' });
   assert.deepEqual(shiftRoute('/learn/shifts/conversation/ask'), { kind: 'handoff', id: 'conversation' });
 });

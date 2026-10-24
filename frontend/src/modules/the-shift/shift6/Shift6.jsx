@@ -3,7 +3,7 @@ import { ClinicalEdgeMark } from '../../../components/ModuleHeader.jsx';
 import '../../../styles/tokens.css';
 import '../shift.css';
 import './shift6.css';
-import TrendReading from '../components/TrendReading.jsx';
+import TrendReading from './Flowsheet.jsx';
 import { SOURCES, ROOM14_VITALS, FLOWSHEET_ROWS, FLOWSHEET_SR, VERSION, assignment, d1, d2, d3, d4, d5, d6, debrief, card } from './data.js';
 import { STORAGE_KEY, FINAL_STAGE, stages, freshProgress, readProgress } from './progress.js';
 import { credit, d1Choice, d2Choice, d4Choice, d6Choice, evaluateCues, evaluateSbar, decisionResults } from './rules.js';
@@ -39,10 +39,10 @@ function Feedback({ result, feedback, corrections = [], children, onContinue, ne
   </section>;
 }
 
-function Choices({ items, answer, onChoose, label }) {
+function Choices({ items, answer, selected, onChoose, label }) {
   return <div className="shift-choices" role="group" aria-label={label}>{items.map(item =>
-    <button key={item.id} className={`shift-choice ${answer === item.id ? 'is-selected' : ''}`} disabled={answer !== undefined} onClick={() => onChoose(item.id)}>
-      <span>{item.text}</span><span className="shift-choice-end" aria-hidden="true">{answer === item.id ? '✓' : '→'}</span>
+    <button key={item.id} aria-pressed={(answer ?? selected) === item.id} className={`shift-choice ${(answer ?? selected) === item.id ? 'is-selected' : ''}`} disabled={answer !== undefined} onClick={() => onChoose(item.id)}>
+      <span>{item.text}</span><span className="shift-choice-end" aria-hidden="true">{(answer ?? selected) === item.id ? '✓' : '→'}</span>
     </button>
   )}</div>;
 }
@@ -68,7 +68,6 @@ export default function Shift6() {
   const [storageFailed, setStorageFailed] = useState(false);
   const [room, setRoom] = useState(null);
   const [restartOpen, setRestartOpen] = useState(false);
-  const [timeDraft, setTimeDraft] = useState(null);
   const [copied, setCopied] = useState('');
   const dialog = useRef(null);
   const heading = useRef(null);
@@ -76,6 +75,9 @@ export default function Shift6() {
   const stage = stages[progress.stage];
   const update = patch => setProgress(previous => ({ ...previous, ...patch }));
   const choose = (key, value) => setProgress(previous => previous.answers[key] === undefined ? { ...previous, answers: { ...previous.answers, [key]: value } } : previous);
+  const select = (key, value) => setProgress(previous => previous.answers[key] === undefined ? { ...previous, drafts: { ...previous.drafts, [key]: value } } : previous);
+  const timeDraft = progress.drafts.d2;
+  const confirm = key => answers[key] === undefined && <div className="shift-cue-confirm"><p role="status">{progress.drafts[key] ? 'Selection saved. Confirm when ready.' : 'Choose one response, then confirm.'}</p><button className="shift-primary" disabled={!progress.drafts[key]} onClick={() => choose(key, progress.drafts[key])}>Confirm response<Arrow /></button></div>;
   const next = () => setProgress(previous => ({ ...previous, stage: Math.min(FINAL_STAGE, previous.stage + 1) }));
   const selectedPatient = assignment.patients.find(patient => patient.room === room);
   const { answers } = progress;
@@ -100,7 +102,7 @@ export default function Shift6() {
   }, [room, restartOpen]);
 
   function closeDialog() { dialog.current?.close(); setRoom(null); setRestartOpen(false); }
-  function restart() { setProgress(freshProgress()); setTimeDraft(null); setCopied(''); closeDialog(); }
+  function restart() { setProgress(freshProgress()); setCopied(''); closeDialog(); }
   async function copy(text) {
     try { await navigator.clipboard.writeText(text); setCopied('question'); }
     catch { setCopied('unavailable'); }
@@ -135,9 +137,10 @@ export default function Shift6() {
           <p className="s6-scene-note">{d1.scene}</p>
           <div className="shift-priority-grid">{assignment.patients.map(patient => {
             const choice = d1Choice(patient.room);
-            return <article key={patient.room} className={`shift-priority-card ${answers.d1 === patient.room ? 'is-selected' : ''}`}><div><RoomNumber id={patient.room} /><span><h2>{patient.name}</h2></span></div><p>{patient.report}</p><p className="s6-card-vitals">{patient.vitals}</p><button className="shift-secondary" disabled={answers.d1 !== undefined} onClick={() => choose('d1', choice.id)}>{choice.text} <Arrow /></button></article>;
+            return <article key={patient.room} className={`shift-priority-card ${(answers.d1 ?? progress.drafts.d1) === patient.room ? 'is-selected' : ''}`}><div><RoomNumber id={patient.room} /><span><h2>{patient.name}</h2></span></div><p>{patient.report}</p><p className="s6-card-vitals">{patient.vitals}</p><button className="shift-secondary" aria-pressed={(answers.d1 ?? progress.drafts.d1) === choice.id} disabled={answers.d1 !== undefined} onClick={() => select('d1', choice.id)}>{choice.text} <Arrow /></button></article>;
           })}</div>
-          <button className="shift-station" disabled={answers.d1 !== undefined} onClick={() => choose('d1', 'flowsheets')}>{d1Choice('flowsheets').text}<Arrow /></button>
+          <button className="shift-station" aria-pressed={(answers.d1 ?? progress.drafts.d1) === 'flowsheets'} disabled={answers.d1 !== undefined} onClick={() => select('d1', 'flowsheets')}>{d1Choice('flowsheets').text}<Arrow /></button>
+          {confirm('d1')}
           {answers.d1 && <Feedback result={d1Choice(answers.d1).result} feedback={d1Choice(answers.d1).feedback} corrections={corrections(d1.choices, d1Choice(answers.d1))} onContinue={next} nextLabel="Go to Room 14" sources={d1.sources}><blockquote>{d1.teaching}</blockquote></Feedback>}
         </>}
 
@@ -145,7 +148,7 @@ export default function Shift6() {
           <p className="shift-lead">{d2.scene}</p>
           <h2 className="s6-prompt" id="s6-d2-prompt">{d2.prompt}</h2>
           <TrendReading caption="Room 14 flowsheet" description={FLOWSHEET_SR.main} columns={ROOM14_VITALS} rows={FLOWSHEET_ROWS}
-            selectable={SELECTABLE_TIMES} selected={answers.d2 ?? timeDraft} onSelect={setTimeDraft} disabled={answers.d2 !== undefined} highlight={answers.d2 ? '1200' : null} />
+            selectable={SELECTABLE_TIMES} selected={answers.d2 ?? timeDraft} onSelect={id => select('d2', id)} disabled={answers.d2 !== undefined} highlight={answers.d2 ? '1200' : null} />
           {!answers.d2 && <div className="shift-cue-confirm"><p role="status">{timeDraft ? `Selected: ${ROOM14_VITALS.find(v => v.time === timeDraft).label}` : 'Select a time column. Yesterday 2000 is his admission baseline.'}</p><button className="shift-primary" disabled={!timeDraft} onClick={() => choose('d2', timeDraft)}>Confirm this time<Arrow /></button></div>}
           {answers.d2 && <Feedback result={d2Choice(answers.d2).result} feedback={d2Choice(answers.d2).feedback} corrections={corrections(d2.choices, d2Choice(answers.d2)).map(choice => ({ ...choice, text: ROOM14_VITALS.find(v => v.time === choice.id).label }))} onContinue={next} nextLabel="Go to his bedside" sources={d2.sources}><blockquote>{d2.teaching}</blockquote></Feedback>}
         </>}
@@ -157,7 +160,7 @@ export default function Shift6() {
             const revealed = progress.revealed.includes(cue.id);
             const selected = progress.selected.includes(cue.id);
             return <article key={cue.id} className={`shift-cue ${selected ? 'is-selected' : ''}`}>
-              {!revealed ? <button className="shift-reveal" disabled={Boolean(cues)} onClick={() => update({ revealed: [...progress.revealed, cue.id] })}><span>{cue.label}</span><span aria-hidden="true">+</span></button> : <><span className="shift-overline">{cue.label}</span><p>{cue.text}</p><label className="shift-cue-select"><input type="checkbox" checked={selected} disabled={Boolean(cues)} onChange={() => update({ selected: toggle(progress.selected, cue.id) })} /><span>Select finding</span></label></>}
+              {!revealed ? <button className="shift-reveal" onClick={() => update({ revealed: [...progress.revealed, cue.id] })}><span>{cue.label}</span><span aria-hidden="true">+</span></button> : <><span className="shift-overline">{cue.label}</span><p>{cue.text}</p><label className="shift-cue-select"><input type="checkbox" checked={selected} disabled={Boolean(cues)} onChange={() => update({ selected: toggle(progress.selected, cue.id) })} /><span>Select finding</span></label></>}
             </article>;
           })}</div>
           {!cues && <div className="shift-cue-confirm"><p>{d3.prompt}</p><button className="shift-primary" disabled={progress.selected.length === 0} onClick={() => choose('d3', [...progress.selected])}>Confirm {progress.selected.length || ''} {progress.selected.length === 1 ? 'finding' : 'findings'}<Arrow /></button></div>}
@@ -175,9 +178,11 @@ export default function Shift6() {
           <div className="shift-situation"><span className="shift-overline">Room 14 / At the bedside</span>{d3.cues.filter(cue => cue.tier === 'Essential').map(cue => <p key={cue.id}>{cue.label}: {cue.text}</p>)}</div>
           <TrendReading caption="Room 14 flowsheet" description={FLOWSHEET_SR.main} columns={ROOM14_VITALS} rows={FLOWSHEET_ROWS} />
           <h2 className="s6-prompt">{d4.prompt}</h2>
-          <Choices items={d4.choices} answer={answers.d4} label="Calls" onChoose={id => choose('d4', id)} />
+          <Choices items={d4.choices} answer={answers.d4} selected={progress.drafts.d4} label="Calls" onChoose={id => select('d4', id)} />
+          {confirm('d4')}
           {answers.d4 && <Feedback result={d4Choice(answers.d4).result} feedback={d4Choice(answers.d4).feedback} corrections={corrections(d4.choices, d4Choice(answers.d4))} onContinue={next} nextLabel="Make the call" sources={d4.sources}>
             <blockquote>{d4.teaching}</blockquote>
+            {answers.d4 !== 'escalate' && <p className="s6-bridge"><strong>Guided safer path.</strong> Before continuing, the scenario switches to prompt escalation and bedside support. Your original choice stays recorded below.</p>}
             <div className="s6-while-help"><span className="shift-overline">While help is on the way</span><p>{d4.whileHelp}</p></div>
           </Feedback>}
         </>}
@@ -185,7 +190,7 @@ export default function Shift6() {
         {progress.stage === 5 && <>
           <div className="shift-call-line"><span className="shift-call-dot" /><strong>{d5.scene}</strong><span>{d5.time}</span></div>
           <p className="shift-lead">{d5.prompt}</p>
-          <div className="s6-sbar">{d5.sections.map(section => <fieldset key={section} className="s6-sbar-section"><legend><span>{section}</span></legend>
+          <div className="s6-sbar">{d5.sections.map(section => <fieldset key={section} className="s6-sbar-section"><legend><span>{section}</span> {{ S: 'Situation', B: 'Background', A: 'Assessment', R: 'Recommendation' }[section]}</legend>
             {d5.chips.filter(chip => chip.section === section).map(chip => {
               const chips = answers.d5?.chips ?? progress.sbarDraft.chips;
               const on = chips.includes(chip.id);
@@ -198,6 +203,7 @@ export default function Shift6() {
           })}</fieldset>
           {!answers.d5 && <div className="shift-cue-confirm"><p role="status">{progress.sbarDraft.chips.length} {progress.sbarDraft.chips.length === 1 ? 'line' : 'lines'} selected{progress.sbarDraft.recommendation ? '' : '. Pick your recommendation.'}</p><button className="shift-primary" disabled={!progress.sbarDraft.recommendation} onClick={() => choose('d5', { chips: [...progress.sbarDraft.chips], recommendation: progress.sbarDraft.recommendation })}>Give the call<Arrow /></button></div>}
           {sbar && <Feedback result={sbar.result} onContinue={next} nextLabel="Return to the hallway" sources={d5.sources}>
+            {sbar.result !== 'Correct' && <p className="s6-bridge"><strong>Guided safer path.</strong> Continue with the essential findings and an urgent bedside request clarified to the team. This correction does not replace your submitted call.</p>}
             <ul className="shift-essential-list">{d5.chips.filter(chip => chip.tier === 'Essential').map(chip => <li key={chip.id}><span>{answers.d5.chips.includes(chip.id) ? 'Included' : 'Missed'}</span>{chip.text} {chip.feedback}</li>)}</ul>
             {['Supporting', 'Not relevant'].map(tier => {
               const picked = tierList(d5.chips, answers.d5.chips, tier);
@@ -211,12 +217,14 @@ export default function Shift6() {
         {progress.stage === 6 && <>
           <div className="shift-situation s6-room16"><span className="shift-overline">Room 16 / Call light</span>{d6.scene.map(text => <p key={text}>{text}</p>)}</div>
           <h2 className="s6-prompt">{d6.prompt}</h2>
-          <Choices items={d6.choices} answer={answers.d6} label="Calls" onChoose={id => choose('d6', id)} />
+          <Choices items={d6.choices} answer={answers.d6} selected={progress.drafts.d6} label="Calls" onChoose={id => select('d6', id)} />
+          {confirm('d6')}
           {answers.d6 && <Feedback result={d6Choice(answers.d6).result} feedback={d6Choice(answers.d6).feedback} corrections={corrections(d6.choices, d6Choice(answers.d6))} onContinue={next} nextLabel="Finish the shift" sources={d6.sources}><blockquote>{d6.teaching}</blockquote></Feedback>}
         </>}
 
         {progress.stage === FINAL_STAGE && <>
           <div className="shift-complete"><span><Check /></span><p>{stages[FINAL_STAGE].title}</p></div>
+          {Object.values(results).some(item => item.credit !== 'full') && <p className="s6-bridge"><strong>Scripted outcome after guided corrections.</strong> The story below follows the safer path. Your shift review reflects your original choices, not the corrections.</p>}
           <section className="shift-debrief-section"><h2>How the night unfolded</h2><ol className="shift-timeline">{debrief.outcome.map(([time, text]) => <li key={time}><time>{time}</time><p>{text}</p></li>)}</ol></section>
           <section className="shift-debrief-section"><span className="shift-overline">Personalized shift review</span><h2>Your shift review</h2><ul className="shift-reflections s6-review">{stages.filter(item => item.decision).map(item => {
             const { result, credit: earned } = results[item.decision];

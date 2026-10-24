@@ -35,10 +35,10 @@ export default function Timeline({ p, update, review = false }) {
           <label>1. What kind of information is this?<select aria-label={`${card.time} ${card.id} classification`} value={p.classifications[card.id] || ''} onChange={e => update({ classifications: { ...p.classifications, [card.id]: e.target.value } })}>
             <option value="">Choose what this tells you</option>{categories.slice(0, 3).map(c => <option key={c} value={c}>{labels[c]}</option>)}
             {p.classifications[card.id] === categories[3] && <option value={categories[3]}>{labels[categories[3]]}</option>}
-          </select></label>
+          </select>{p.classifications[card.id] && <span className="s7-selected-text" aria-hidden="true">Selected: {labels[p.classifications[card.id]]}</span>}</label>
           <label>2. What can’t this account tell you?<select aria-label={`${card.time} ${card.id} limit`} value={p.limits[card.id] || ''} onChange={e => update({ limits: { ...p.limits, [card.id]: e.target.value } })}>
             <option value="">Choose what remains unknown</option>{(i % 2 ? [card.limit, ...card.alternatives] : [...card.alternatives, card.limit]).map(c => <option key={c}>{c}</option>)}
-          </select></label>
+          </select>{p.limits[card.id] && <span className="s7-selected-text" aria-hidden="true">Selected: {p.limits[card.id]}</span>}</label>
         </div>}
       </div></li>;
     })}</ol>

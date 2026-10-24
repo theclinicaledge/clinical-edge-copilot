@@ -1,4 +1,4 @@
-export const VERSION = '1.0.0';
+export const VERSION = '1.0.1';
 export const KEY = 'ce-shift7-missing-time-v1';
 export const stages = ['Arrival', 'First response', 'Find the story', 'At the bedside', 'Handoff', 'Reflection'];
 export const findings = 'Left facial droop, left arm drift when both arms are raised, slurred speech; alert.';

@@ -30,7 +30,7 @@ for (const width of [390, 768, 1440]) test(`Library visual scope and navigation 
   if (width === 768) expect(Math.abs(positions[0].top - positions[1].top)).toBeLessThan(1);
   expect(positions.every(p => p.height >= 44)).toBe(true);
   const heights = await cards.locator('.shift-library-image').evaluateAll(nodes => nodes.map(el => el.getBoundingClientRect().height));
-  expect(heights).toEqual(Array(5).fill(width === 390 ? 164 : 180));
+  expect(heights).toEqual(Array(6).fill(width === 390 ? 164 : 180));
   const wave = page.locator('[data-library-waveform="B"]');
   await expect(wave).toHaveAttribute('d', pathFor('B', 0, 3));
   expect(measurements('B').measuredRate).toBe(80);

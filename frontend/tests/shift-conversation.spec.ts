@@ -22,6 +22,7 @@ async function begin(page: Page, opener = 0) {
   await page.getByRole('button', { name: 'Continue', exact: true }).click();
   await page.getByRole('button', { name: 'Begin your first check' }).click();
   await page.getByRole('button', { name: opening[opener].text, exact: false }).click();
+  await page.getByRole('button', { name: 'Say this response' }).click();
   await page.getByRole('button', { name: 'Listen to what he says' }).click();
   if (opener !== 0) await expect(page.getByText(script.bridges.opening, { exact: true })).toBeVisible();
   await page.getByRole('button', { name: 'Read all five lines' }).click();
@@ -32,6 +33,7 @@ async function toActions(page: Page, direct = 0) {
   await page.getByRole('button', { name: 'Reflect on these words' }).click();
   await page.getByRole('button', { name: 'Keep the conversation open' }).click();
   await page.getByRole('button', { name: asking[direct].text, exact: false }).click();
+  await page.getByRole('button', { name: 'Say this response' }).click();
   if (direct !== 0) await expect(page.getByText(script.bridges.asking, { exact: true })).toBeVisible();
   await page.getByRole('button', { name: 'Consider your next actions' }).click();
 }
@@ -49,6 +51,7 @@ async function placeAll(page: Page, wrong = false) {
 }
 async function finish(page: Page, choice = 0) {
   await page.getByRole('button', { name: confidentiality[choice].text, exact: false }).click();
+  await page.getByRole('button', { name: 'Say this response' }).click();
   await page.getByRole('button', { name: 'Reflect on your night' }).click();
   await expect(page.getByText(script.bridges.confidentiality, { exact: true })).toHaveCount(choice === 0 ? 0 : 1);
 }

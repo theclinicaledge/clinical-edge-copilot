@@ -68,17 +68,26 @@ The app includes linked references and scope notes on every stage. The 24-hour a
 
 ## Validation and remaining release limits
 
-- Frontend lint passed.
-- 42 scenario/content/release checks passed, including 14 Shift 7 checks. They cover every valid question subset, all 128 opening-action combinations, essential handoff omissions, source availability, draft-vs-confirmed actions, restoration, preview migration and Rewind isolation.
-- Vite 8.1.6 production compilation passed using the runner config loader. Bundle scan confirms Shift 7 present and Shift 6 slug absent. Existing large-chunk warning remains.
-- Nine marketing routes prerendered successfully using a temporary equivalent script with writable cache/config-loader settings. The unmodified build command hits a permissions error writing through the external node_modules symlink; this is not reported as a clean full-command pass.
-- Manual Chrome checks cover the actual self-contained React build: arrival, action confirmation, source-labelled conversations/timeline, separate bedside confirmations, conditional handoff and reflection. Earlier checks covered mobile at 390px, saved progress, Rewinds and library filters. The standalone file does not certify the full application wrapper.
-- Playwright suites are supplied and library expectations updated. Browser automation could not run here: writable-cache retry still fails to listen on localhost with EPERM. Rerun on a permitted runner before deployment.
-- Backend unchanged: 934 tests, 875 pass, 59 fail in this restricted environment, including forbidden server binding and consequent setup failures. The full suite is not certified passing.
-- Isolated branch is based on local main 5f60ede. GitHub retrieval/push currently fails DNS resolution. No remote merge or live deployment is claimed.
+Release verification on October 23, 2026 supersedes the earlier sandbox/network limitations; permitted local listeners and existing GitHub access are now available.
+
+- Frontend lint and the unmodified production build pass, including all nine prerendered routes. Release build uses `VITE_SHIFT_ENABLED=true` and `VITE_SHIFT_006_PREVIEW=false`. Existing large-chunk warning remains.
+- All 934 backend tests pass; backend files remain unchanged.
+- All 89 frontend Node tests pass, including 14 Shift 7 and 14 conversation/content checks. One older release-scope test is intentionally skipped because it targets a different historical release. A direct Git diff separately verifies no changes to Shifts 1–6 clinical files, Ask, consent, privacy, labs or backend.
+- Shift 7: six desktop/phone browser checks pass both in the dedicated preview configuration and against the compiled public configuration. They cover sparse and fuller history, observed-only handoff, unsafe-water correction, original choices, refresh/resume, Rewind isolation, library filters and viewport fit.
+- Compiled-app release checks cover existing Shift choices, explicit confirmation, coverage acknowledgment, debrief review, progress labels, keyboard access and ABG/Rhythm return links. Stale five-card counts and pre-confirmation Scenario 4/5 test helpers were corrected; no existing scenario gameplay was changed. The final library/conversation group passes 17/17, the final Shift 5 playthrough passes, and all four progress-label cases pass.
+- Home continue-learning checks pass 6/6. ABG dock-clearance and landing checks pass 6/6 in an isolated run. Broad parallel runs expose intermittent dock checks; these are not represented as an entirely green repository suite.
+- Existing Home Ask layout assertions and premium navigation assertions also fail on unchanged production base `5f60ede` (obsolete selectors/layout expectations). Those unrelated screens were not changed to satisfy stale tests. Private Med-Surg pilot suites require their separate preview configuration and are excluded from the public release profile.
+- Physical-iPhone testing of this release is not claimed. Browser device emulation is not a substitute for that check. No new provider calls or clinical validation were performed. Scenario 7-specific analytics remains disabled as in the reviewed candidate.
+- Release follow-up changes are limited to the tests above, this record, and replacing Home's stale five-shift count with "Fictional nursing shifts."
 
 ## Reproduce and release
 
-From `frontend`, run lint, the Node scenario checks, `npm run build`, and the normal Playwright suite. Run `npm run test:e2e -- --config shift7-playwright.config.ts` for desktop/phone Shift 7 checks with Shift 6 preview enabled only in that test server. Run backend tests in an environment that permits test listeners. The portable review build is regenerated with `node frontend/scripts/build-shift7-preview.mjs` from the repository root.
+From `frontend`, run lint, the Node scenario checks and `VITE_SHIFT_ENABLED=true VITE_SHIFT_006_PREVIEW=false npm run build`. Use `track-playwright.config.ts` with `CE_TEST_BASE_URL` matching the test server's `http://127.0.0.1:<port>` origin; several suites explicitly reject other hosts or seed progress at that origin. The default runner's `localhost` origin is not interchangeable. Public regression tests exclude the separately configured `med-surg-*` and `standalone-rewind` private-pilot suites. Run `npm run test:e2e -- --config shift7-playwright.config.ts` for the additional desktop/phone checks with Shift 6 preview enabled only on that test server. The portable review build is regenerated with `node frontend/scripts/build-shift7-preview.mjs` from the repository root.
 
-Fetch current GitHub main, reconcile changes, rerun required checks, then merge/deploy through the existing GitHub/Vercel workflow. Verify `/learn/shifts/missing-time` and specialty filtering live, and verify `/learn/shifts/stable-number` remains unavailable unless separately authorized. User release authorization is already supplied; the remaining limitations are technical verification and connectivity, not another permission request.
+GitHub main was verified at `5f60ede16d745049078b8ab08ae74a724970e200`, matching the candidate base. Publish through a pull request and the existing Vercel Git integration; do not trigger a duplicate manual deployment or change production environment variables. Verify `/learn/shifts/missing-time` and library navigation live, and verify `/learn/shifts/stable-number` remains unavailable.
+
+### Rollback
+
+Known-good production before this release: Vercel deployment `dpl_8vg2QYzazSoRqHVR7uTMiWGWXjit`, revision `5f60ede16d745049078b8ab08ae74a724970e200`, deployment URL `https://clinical-edge-copilot-mfhqasuqc-theclinicaledges-projects.vercel.app`.
+
+For a release-critical regression, use Vercel's rollback/promote action to restore this recorded deployment to production. Do not enable Scenario 6 or alter Ask/backend settings. Preserve device-local progress; rollback must not delete browser storage. Revert the release merge in a separate Git commit afterward if needed to keep subsequent Git deployments aligned.

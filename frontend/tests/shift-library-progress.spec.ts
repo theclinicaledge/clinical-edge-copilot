@@ -23,7 +23,7 @@ for (const width of [320, 390, 1440]) {
     await expect(cards.nth(0).locator('.shift-library-status')).toHaveText('◐In progress');
     await expect(cards.nth(1).locator('.shift-library-status')).toHaveText('✓Finished');
     await expect(cards.nth(1)).toContainText('Debrief reached');
-    await expect(page.locator('.shift-library-status--new')).toHaveCount(3);
+    await expect(page.locator('.shift-library-status--new')).toHaveCount(4);
     expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true);
     await cards.nth(0).scrollIntoViewIfNeeded();
     await page.screenshot({ path: `/private/tmp/ce-library-status-${width}.png` });

@@ -13,7 +13,7 @@ export const stages = [
   { time: '2030', label: 'Debrief', title: finalScreen, decision: null },
 ];
 
-export const freshProgress = () => ({ version: 1, contentVersion: VERSION, stage: 0, viewed: [], revealed: [], selected: [], sbarDraft: { chips: [], recommendation: null }, answers: {}, tomorrow: null });
+export const freshProgress = () => ({ version: 1, contentVersion: VERSION, stage: 0, viewed: [], revealed: [], selected: [], drafts: {}, sbarDraft: { chips: [], recommendation: null }, answers: {}, tomorrow: null });
 
 const ids = items => items.map(item => item.id);
 const safeList = (list, allowed) => Array.isArray(list) ? [...new Set(list.filter(id => allowed.includes(id)))] : [];
@@ -24,9 +24,12 @@ export function sanitizeProgress(value) {
   if (!value || value.version !== 1 || value.contentVersion !== VERSION) return freshProgress();
   const cueIds = ids(d3.cues);
   const answers = {};
+  const drafts = {};
   for (const [key, allowed] of [['d1', ids(d1.choices)], ['d2', ids(d2.choices)], ['d4', ids(d4.choices)], ['d6', ids(d6.choices)]]) {
     const answer = oneOf(value.answers?.[key], allowed);
     if (answer !== undefined) answers[key] = answer;
+    const draft = oneOf(value.drafts?.[key], allowed);
+    if (draft !== undefined) drafts[key] = draft;
   }
   if (Array.isArray(value.answers?.d3)) answers.d3 = safeList(value.answers.d3, cueIds);
   if (value.answers?.d5) {
@@ -41,7 +44,7 @@ export function sanitizeProgress(value) {
   return {
     version: 1, contentVersion: VERSION, stage,
     viewed: safeList(value.viewed, assignment.patients.map(patient => patient.room)),
-    revealed, selected: safeList(value.selected, revealed), sbarDraft: safeSbar(value.sbarDraft), answers,
+    revealed, selected: safeList(value.selected, revealed), drafts, sbarDraft: safeSbar(value.sbarDraft), answers,
     tomorrow: ['Yes', 'Maybe', 'No'].includes(value.tomorrow) ? value.tomorrow : null,
   };
 }

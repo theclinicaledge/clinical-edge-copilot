@@ -1,9 +1,8 @@
 import { test, expect, type Page } from '@playwright/test';
-import { d1, d2, d4, d6, debrief, FLOWSHEET_SR, REWIND } from '../src/modules/the-shift/shift6/data.js';
+import { d1, d2, d3, d4, d5, d6, debrief, FLOWSHEET_SR, REWIND } from '../src/modules/the-shift/shift6/data.js';
 
 const PATH = '/learn/shifts/stable-number';
 const KEY = 'ce-shift-stable-number-v0.4';
-const PREVIEW = process.env.VITE_SHIFT_006_PREVIEW === 'true';
 const ESSENTIAL = ['situation', 'background', 'assessment'];
 const progress = (stage: number, answers: Record<string, unknown> = {}) => ({ version: 1, contentVersion: '0.4', stage, viewed: [], revealed: [], selected: [], sbarDraft: { chips: [], recommendation: null }, answers, tomorrow: null });
 
@@ -13,21 +12,9 @@ async function seed(page: Page, value: object) {
   await page.reload();
 }
 const feedback = (page: Page) => page.getByRole('region', { name: 'Decision feedback' });
-const cue = (page: Page, label: string) => page.locator('.shift-cue').filter({ has: page.locator('.shift-overline', { hasText: new RegExp(`^${label}$`) }) });
+const cue = (page: Page, label: string) => page.locator('.shift-cue').filter({ has: page.getByText(label, { exact: true }) });
 
-test.describe('preview gate', () => {
-  test.skip(PREVIEW, 'Checks the production configuration, with the preview flag off.');
-  test('Shift 06 is absent from the library and unreachable by direct navigation', async ({ page }) => {
-    await page.goto(PATH);
-    await expect(page.getByText('The Stable Number')).toHaveCount(0);
-    await expect(page.getByText('Hartwell')).toHaveCount(0);
-    await page.goto('/learn/shifts');
-    await expect(page.getByText('The Stable Number')).toHaveCount(0);
-  });
-});
-
-test.describe('Shift 06 preview', () => {
-  test.skip(!PREVIEW, 'SHIFT-006 runs only with VITE_SHIFT_006_PREVIEW=true.');
+test.describe('Shift 06 public release', () => {
   test.beforeEach(async ({ page }) => {
     await page.route('**/api/**', route => { throw new Error(`Shift 06 must not call ${route.request().url()}`); });
   });
@@ -42,10 +29,10 @@ test.describe('Shift 06 preview', () => {
     await card.getByRole('link', { name: /Begin shift|Continue shift|Return to debrief/ }).click();
     await expect(page).toHaveURL(new RegExp(`${PATH}$`));
     await expect(page.locator('.shift-app')).not.toContainText(/\bDraft\b/);
-    await expect(page.locator('.shift-footer')).toContainText('Clinical sign-off not yet recorded');
+    await expect(page.locator('.shift-footer')).toContainText('Independent nurse approval reported by founder');
     await page.getByRole('button', { name: 'Sources & review' }).click();
     const dialog = page.getByRole('dialog');
-    await expect(dialog).toContainText('Founder review and independent clinical sign-off have not been recorded.');
+    await expect(dialog).toContainText('Founder-reported review by the founder and another nurse.');
     await expect(dialog).not.toContainText('Draft');
     await expect(dialog).toContainText('SHIFT-006 / 0.4');
     await expect(dialog.locator('ol li')).toHaveCount(7);
@@ -64,6 +51,10 @@ test.describe('Shift 06 preview', () => {
       await page.getByRole('button', { name: 'Confirm this time' }).click();
     } else if (decision === d1 && choice.id === 'flowsheets') await page.getByRole('button', { name: choice.text }).click();
     else await page.getByRole('button', { name: choice.text, exact: true }).click();
+    if (decision !== d2) {
+      await expect(feedback(page)).toHaveCount(0);
+      await page.getByRole('button', { name: 'Confirm response' }).click();
+    }
     await expect(feedback(page).getByRole('heading', { level: 3 })).toHaveText(choice.result);
     await expect(feedback(page)).toContainText(choice.feedback);
     if (choice.result === 'Close') await expect(feedback(page)).toContainText('Partially correct');
@@ -78,6 +69,7 @@ test.describe('Shift 06 preview', () => {
     await page.getByRole('dialog').getByRole('button', { name: /^Restart/ }).click();
     await page.getByRole('button', { name: 'Plan your first assessment' }).click();
     await page.getByRole('button', { name: correct ? 'Room 14, Mr. Hartwell' : 'Room 12, Ms. Ruiz', exact: true }).click();
+    await page.getByRole('button', { name: 'Confirm response' }).click();
     await page.getByRole('button', { name: 'Go to Room 14' }).click();
     await page.getByRole('button', { name: correct ? 'Today 1200' : 'Today 0800', exact: true }).click();
     await page.getByRole('button', { name: 'Confirm this time' }).click();
@@ -90,6 +82,7 @@ test.describe('Shift 06 preview', () => {
     await expect(feedback(page).getByRole('heading', { level: 3 })).toHaveText(correct ? 'Correct' : 'No');
     await page.getByRole('button', { name: 'Make your call' }).click();
     await page.getByRole('button', { name: correct ? d4.choices[0].text : d4.choices[4].text, exact: true }).click();
+    await page.getByRole('button', { name: 'Confirm response' }).click();
     await page.getByRole('button', { name: 'Make the call' }).click();
     for (const text of correct ? ['"Dale Hartwell, 71, Room 14.', '"Day 2 for left leg cellulitis.', '"His heart rate has climbed'] : [`"He's probably anxious`]) await page.getByRole('button', { name: new RegExp(`^${text.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}`) }).click();
     await page.getByRole('radio', { name: correct ? /I need someone at the bedside now/ : /Should I just keep watching him/ }).check();
@@ -97,6 +90,7 @@ test.describe('Shift 06 preview', () => {
     await expect(feedback(page).getByRole('heading', { level: 3 })).toHaveText(correct ? 'Correct' : 'No');
     await page.getByRole('button', { name: 'Return to the hallway' }).click();
     await page.getByRole('button', { name: correct ? 'Continue and reassess' : 'Escalate now', exact: true }).click();
+    await page.getByRole('button', { name: 'Confirm response' }).click();
     await page.getByRole('button', { name: 'Finish the shift' }).click();
     await expect(page.getByRole('heading', { level: 1, name: 'Night challenge complete.' })).toBeVisible();
   }
@@ -123,6 +117,10 @@ test.describe('Shift 06 preview', () => {
 
   test('all-missed shift shows missed review lines and concepts to strengthen', async ({ page }) => {
     await play(page, false);
+    await expect(page.getByText('Scripted outcome after guided corrections.')).toBeVisible();
+    const saved = await page.evaluate(key => JSON.parse(localStorage.getItem(key)!), KEY);
+    expect(saved.answers.d4).toBe('continue');
+    expect(saved.answers.d5.recommendation).toBe('watch');
     const review = page.locator('.s6-review');
     for (const line of Object.values(debrief.review)) {
       await expect(review).toContainText(line.missed);
@@ -148,6 +146,14 @@ test.describe('Shift 06 preview', () => {
     await expect(table).not.toContainText(/pulse pressure/i);
     for (const value of ['78', '80', '94', '100', '116']) await expect(table.getByRole('row', { name: /^HR/ })).toContainText(value);
     await expect(page.getByRole('button', { name: 'Yesterday 2000' })).toHaveCount(0);
+    const scroll = page.locator('.trend-scroll');
+    if (await scroll.evaluate(el => el.scrollWidth > el.clientWidth)) {
+      await page.getByRole('button', { name: 'View later readings' }).click();
+      expect(await scroll.evaluate(el => el.scrollLeft)).toBeGreaterThan(0);
+      await page.getByRole('button', { name: 'View earlier readings' }).click();
+      expect(await scroll.evaluate(el => el.scrollLeft)).toBe(0);
+      await expect(feedback(page)).toHaveCount(0);
+    }
     const noon = page.getByRole('button', { name: 'Today 1200', exact: true });
     await noon.focus();
     await page.keyboard.press('Space');
@@ -158,6 +164,54 @@ test.describe('Shift 06 preview', () => {
     await expect(page.getByRole('button', { name: 'Today 1600', exact: true })).toHaveAttribute('aria-pressed', 'true');
     await expect(noon).toHaveAttribute('aria-pressed', 'false');
     expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true);
+    await page.reload();
+    await expect(page.getByRole('button', { name: 'Today 1600', exact: true })).toHaveAttribute('aria-pressed', 'true');
+    await expect(feedback(page)).toHaveCount(0);
+  });
+
+  test('selection is keyboard accessible, resumable, and separate from immutable submission', async ({ page }) => {
+    await seed(page, progress(4, { d1: '14', d2: '1200', d3: ['skin'] }));
+    const choice = page.getByRole('button', { name: d4.choices[2].text, exact: true });
+    await expect(page.getByRole('button', { name: 'Confirm response' })).toBeDisabled();
+    await choice.focus();
+    await page.keyboard.press('Space');
+    await expect(choice).toHaveAttribute('aria-pressed', 'true');
+    await expect(feedback(page)).toHaveCount(0);
+    await page.reload();
+    await expect(choice).toHaveAttribute('aria-pressed', 'true');
+    const confirm = page.getByRole('button', { name: 'Confirm response' });
+    await confirm.focus();
+    await page.keyboard.press('Enter');
+    await expect(feedback(page)).toContainText('Guided safer path.');
+    await expect(choice).toBeDisabled();
+    await page.reload();
+    await expect(feedback(page)).toContainText(d4.choices[2].feedback);
+    expect(await page.evaluate(key => JSON.parse(localStorage.getItem(key)!).answers.d4, KEY)).toBe('hgb');
+  });
+
+  test('every bedside finding and SBAR option remains available, with drafts restored', async ({ page }) => {
+    await seed(page, progress(3, { d1: '14', d2: '1200' }));
+    for (const finding of d3.cues) {
+      await page.locator('.shift-cues').getByRole('button', { name: finding.label, exact: true }).click();
+      await expect(cue(page, finding.label)).toContainText(finding.text);
+      await cue(page, finding.label).getByRole('checkbox').check();
+    }
+    await page.reload();
+    await expect(page.locator('.shift-cue input:checked')).toHaveCount(d3.cues.length);
+    await page.getByRole('button', { name: /^Confirm 11 findings/ }).click();
+    await expect(feedback(page)).toContainText('Correct');
+    for (const recommendation of d5.recommendations) {
+      await seed(page, progress(5, { d1: '14', d2: '1200', d3: ['skin', 'standing', 'stool'], d4: 'escalate' }));
+      for (const chip of d5.chips) await page.getByRole('button', { name: chip.text, exact: true }).click();
+      await page.getByRole('radio', { name: recommendation.text, exact: true }).check();
+      await page.reload();
+      await expect(page.locator('.s6-chip[aria-pressed="true"]')).toHaveCount(d5.chips.length);
+      await expect(page.getByRole('radio', { name: recommendation.text, exact: true })).toBeChecked();
+      await expect(feedback(page)).toHaveCount(0);
+      await page.getByRole('button', { name: 'Give the call' }).click();
+      await expect(feedback(page)).toContainText(recommendation.feedback);
+      await expect(feedback(page)).toContainText(d5.chips.find(chip => chip.id === 'anxious')!.feedback);
+    }
   });
 
   test('Rewind replays Decision 4 three ways with each variation’s own data and labels', async ({ page }) => {
@@ -189,5 +243,60 @@ test.describe('Shift 06 preview', () => {
     await dialog.getByRole('button', { name: /^See my Rewind summary/ }).click();
     await expect(dialog).toContainText(REWIND.teaching);
     await expect(dialog).toContainText('3 of 3 situations tried');
+  });
+
+  test('all stages fit narrow and enlarged-text layouts, with usable dock clearance', async ({ page }, testInfo) => {
+    test.setTimeout(120000);
+    const complete = { d1: '14', d2: '1200', d3: ['skin', 'standing', 'stool'], d4: 'escalate', d5: { chips: ESSENTIAL, recommendation: 'bedside' }, d6: 'reassess' };
+    for (const width of [320, 390, 1440]) {
+      await page.setViewportSize({ width, height: 844 });
+      for (const stage of [0, 2, 3, 4, 5, 6, 7]) {
+        const answers = Object.fromEntries(Object.entries(complete).filter(([key]) => Number(key.slice(1)) < stage));
+        await seed(page, progress(stage, answers));
+        await expect(page.locator('#shift-main h1')).toBeVisible();
+        expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true);
+        const action = page.locator('#shift-main .shift-primary').last();
+        if (await action.count()) {
+          await action.evaluate(el => el.scrollIntoView({ block: 'center' }));
+          const box = await action.boundingBox();
+          const dock = await page.locator('.ce-tool-dock').boundingBox();
+          expect(box!.y + box!.height).toBeLessThanOrEqual(dock!.y);
+        }
+        if (width !== 320 && [2, 4, 5].includes(stage)) {
+          await page.locator('#shift-main h1').evaluate(el => el.scrollIntoView({ block: 'start' }));
+          await page.screenshot({ path: testInfo.outputPath(`shift6-${width}-stage${stage}.png`) });
+        }
+      }
+    }
+    await page.setViewportSize({ width: 390, height: 844 });
+    await seed(page, progress(4, { d1: '14', d2: '1200', d3: ['skin'] }));
+    await page.addStyleTag({ content: '.s6-app p,.s6-app button,.s6-app td,.s6-app th { font-size: 200% !important; }' });
+    expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true);
+    await page.getByRole('button', { name: d4.choices[0].text, exact: true }).click();
+    await page.getByRole('button', { name: 'Confirm response' }).click();
+    await expect(feedback(page)).toContainText('Correct');
+  });
+
+  test('debrief handoff and library preserve saved choices and other scenarios', async ({ page }) => {
+    const saved = progress(7, { d1: '14', d2: '1200', d3: ['skin', 'stool', 'standing'], d4: 'escalate', d5: { chips: ESSENTIAL, recommendation: 'bedside' }, d6: 'reassess' });
+    await seed(page, saved);
+    await expect(page.getByRole('heading', { name: 'Your shift review' })).toBeVisible();
+    await page.evaluate(() => localStorage.setItem('ce-private-shift-drowsy-r2', JSON.stringify({ version: 1, stage: 1, answers: {} })));
+    const before = await page.evaluate(key => JSON.parse(localStorage.getItem(key)!).answers, KEY);
+    await page.getByRole('link', { name: /^Open Ask/ }).click();
+    await expect(page).toHaveURL(/stable-number\/ask/);
+    await expect(page.getByRole('blockquote')).toContainText(debrief.ask);
+    await page.getByRole('link', { name: /Return to The Stable Number/ }).click();
+    await expect(page.getByRole('heading', { name: 'Your shift review' })).toBeVisible();
+    expect(await page.evaluate(key => JSON.parse(localStorage.getItem(key)!).answers, KEY)).toEqual(before);
+    await page.getByRole('link', { name: /Shift Library/ }).first().click();
+    const card = page.locator('.shift-library-card').filter({ hasText: 'The Stable Number' });
+    await expect(card).toContainText('Finished');
+    await card.getByRole('link', { name: 'Review debrief' }).click();
+    await expect(page.getByRole('heading', { name: 'Your shift review' })).toBeVisible();
+    await page.getByRole('button', { name: 'Restart the shift' }).click();
+    await page.getByRole('button', { name: 'Keep my place' }).click();
+    expect(await page.evaluate(key => JSON.parse(localStorage.getItem(key)!).answers, KEY)).toEqual(before);
+    expect(await page.evaluate(() => JSON.parse(localStorage.getItem('ce-private-shift-drowsy-r2')!).stage)).toBe(1);
   });
 });

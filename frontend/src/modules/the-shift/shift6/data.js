@@ -1,6 +1,6 @@
 // SHIFT-006 v0.4, "The Stable Number". Learner-facing text follows the v0.3 scenario spec, with the
 // v0.4 clinical review changes (stronger vital sign trend, no pulse pressure, reworded aspirin chip).
-// No independent clinical sign-off yet. Registered only behind the preview gate in feature.js.
+// Founder reports review by himself and another nurse. No formal validation is claimed.
 // Room 14 vitals live in one table per dataset; every screen derives its values from them.
 
 export const SCENARIO_ID = 'SHIFT-006';
@@ -110,7 +110,7 @@ export const d3 = {
   time: '1912', scene: 'Mr. Hartwell in bed, his daughter Renee in the chair.',
   prompt: 'Select the findings that matter most right now.',
   cues: [
-    { id: 'skin', label: 'Skin', text: 'pale, hands cool, capillary refill about 3 seconds.', tier: 'Essential', feedback: 'His body is pulling blood away from the skin to protect his core.' },
+    { id: 'skin', label: 'Skin', text: 'pale, hands cool, capillary refill about 3 seconds.', tier: 'Essential', feedback: 'These findings raise concern for reduced peripheral perfusion; they do not establish the cause on their own.' },
     { id: 'standing', label: 'Standing', text: '"I got woozy walking to the bathroom around 1830. Had to sit down on the lid."', tier: 'Essential', feedback: "Lightheadedness on standing can mean he's lost enough volume to drop his pressure when upright." },
     { id: 'stool', label: 'Stool', text: '"Went this afternoon. Black and sticky, smelled awful. Figured it was the iron."', tier: 'Essential', feedback: 'Concerning for melena, a sign of upper GI bleeding. The team still needs to confirm it.' },
     { id: 'renee', label: 'Renee', text: `"His stool is always dark. He's been on iron for months."`, tier: 'Supporting', feedback: "Iron can darken stool, and that makes this harder to sort out. It doesn't explain his worsening vitals, near-faint and cool hands, so possible bleeding still needs urgent evaluation." },
@@ -151,7 +151,7 @@ export const d5 = {
     { id: 'assessment', section: 'A', tier: 'Essential', text: `"His heart rate has climbed and his blood pressure has dropped at every check since noon. I'm worried about an acute GI bleed with possible developing hypovolemia. Infection from his leg also needs considering."`, feedback: 'States the trend and your leading concern, and keeps other causes open.' },
     { id: 'lab-timing', section: 'A', tier: 'Supporting', text: `"This morning's Hgb was drawn at ${LABS.drawn}, before the change started."`, feedback: 'Heads off the "Hgb was stable" reply.' },
     { id: 'leg', section: 'B', tier: 'Not relevant', text: '"Leg redness is well inside the border."', feedback: "True, and not why you're calling." },
-    { id: 'anxious', section: 'A', tier: 'Not relevant', text: `"He's probably anxious about discharge."`, feedback: "That's the explanation your findings just ruled out." },
+    { id: 'anxious', section: 'A', tier: 'Not relevant', text: `"He's probably anxious about discharge."`, feedback: "Anxiety may coexist, but it does not adequately explain away this concerning pattern. Report the findings and concern instead." },
     { id: 'aspirin', section: 'R', tier: 'Supporting', text: '"Can you review his aspirin and anti-inflammatory orders when you assess him?"', feedback: "A fair request. Whether any medication changes is the provider's decision, based on why he takes it. It comes after getting him seen." },
   ],
   recommendations: [
@@ -173,7 +173,7 @@ export const d6 = {
     { id: 'reassess', text: 'Continue and reassess', result: 'Correct', feedback: 'She had a brief change with exertion, then returned to her prescribed target and her report after rest, with no new distress. Keep assessing, and recheck for symptoms that come back or persist.' },
     { id: 'recheck', text: 'Get specific information: recheck in 15 minutes and ask about breathlessness', result: 'Correct', feedback: "Also a sound plan. It's continuing and reassessing, done deliberately." },
     { id: 'notify', text: 'Notify the provider (non-urgent)', result: 'Not best', feedback: "A brief dip with exertion that recovered to goal isn't new. Mention it at the next routine update if your unit does." },
-    { id: 'escalate', text: 'Escalate now', result: 'Not best', feedback: 'After rest, her findings match her own baseline and goal. Escalation is for sustained change.' },
+    { id: 'escalate', text: 'Escalate now', result: 'Not best', feedback: 'After rest, these findings match her baseline and prescribed goal, so continued reassessment fits this case. New concerning symptoms or clinical concern can still justify escalation, even if brief.' },
   ],
   teaching: 'Same rule, other direction. She matches her own normal, so the plan stands.',
   concepts: ['trend-vs-snapshot', 'escalation-level'], sources: [8, 9],
@@ -195,22 +195,22 @@ const rewindFacts = (table, at1910, stool, standing, skin) => {
 const option = (id, title, label, feedback) => ({ id, title, label, feedback });
 export const REWIND = {
   version: VERSION,
-  intro: 'The Rewind replays Decision 4 with different findings, and the correct call differs each time: Escalate now, Continue and reassess, then Notify the provider. History, home meds and the 0500 labs stay the same in all three.',
+  intro: 'Revisit the call with three different sets of findings. History, home meds and the 0500 labs stay the same. Decide what the current situation needs.',
   teaching: `Same patient, same "stable" Hgb, three different calls. The findings set the urgency, not the reassuring explanation. And a partial improvement doesn't settle a concern that's still unexplained.`,
   sources: [2, 3, 4],
   variations: [
-    { id: 'a', title: 'A: Urgent', flowsheet: 'main', history: `Day nurse's comment: "Creeping up, probably anxious"`,
+    { id: 'a', title: 'A: At the bedside', flowsheet: 'main', history: `Day nurse's comment: "Creeping up, probably anxious"`,
       facts: rewindFacts(ROOM14_VITALS, room14At1910, 'Black, sticky, foul, this afternoon', 'Nearly fainted at 1830', 'Pale, cool, refill about 3 seconds'),
       question: d4.prompt, focus: 'Correct call: Escalate now',
       options: d4.choices.map(c => option(c.id, c.text, c.result, c.feedback)) },
-    { id: 'b', title: 'B: Reassurance holds', flowsheet: 'b', history: `Day nurse's comment: "His HR goes up every time he walks laps with PT, at noon and again before 1600. His pressure's been fine all day."`,
+    { id: 'b', title: 'B: After walking', flowsheet: 'b', history: `Day nurse's comment: "His HR goes up every time he walks laps with PT, at noon and again before 1600. His pressure's been fine all day."`,
       facts: rewindFacts(REWIND_B_VITALS, { ...at(REWIND_B_VITALS, '1910'), atRest: true }, 'Dark, formed, not sticky. Same since starting iron months ago, and he agrees with Renee.', 'No dizziness', 'Warm, pink'),
       question: d4.prompt, focus: 'Correct call: Continue and reassess',
       options: [
         option('reassess', 'Continue and reassess', 'Correct', "At rest he's back to his own baseline. His pressure held all day, and his heart rate rose only after walking. The activity explanation fits every reading."),
         option('stool', 'Get specific information: ask him to call you before flushing his next stool so you can look', 'Correct', "Cheap and useful. One stool won't settle the question by itself, so keep following his vitals too."),
         option('notify', 'Notify the provider (non-urgent)', 'Close', 'Fine to mention at the next routine update. Nothing here needs a call now.'),
-        option('escalate', 'Escalate now', 'Not best', 'His findings match his baseline. Escalation is for change, and his changes have an explanation the recheck supports.'),
+        option('escalate', 'Escalate now', 'Not best', 'Here, the recheck supports an activity-related change with a return to baseline. Continue reassessment; new concerning findings would change the plan.'),
       ] },
     { id: 'c', title: 'C: In between', flowsheet: 'main-before-1910', history: `Day nurse's comment: "Creeping up, probably anxious"`,
       facts: rewindFacts(ROOM14_VITALS, REWIND_C_1910, "One dark stool at 1500, already flushed. He can't describe it.", 'Lightheaded once at 1700, passed; none now', 'Warm, pink'),
@@ -236,7 +236,7 @@ export const debrief = {
     d3: { correct: 'You caught the stool, the near-faint and the cool skin.', missed: 'Stool concerning for melena, woozy on standing and cool skin were the findings that mattered.', concept: 'suspected-upper-gi-bleed' },
     d4: { correct: 'You escalated without waiting for a lab.', missed: 'His findings needed someone at the bedside now. A repeat Hgb can wait for the team.', concept: 'escalation-level' },
     d5: { correct: 'Your call led with the trend and asked for what you needed.', missed: 'Lead with the trend, give his baseline, and ask for someone at the bedside.', concept: 'sbar' },
-    d6: { correct: 'You recognized a brief exertional change, confirmed she recovered to her prescribed target, and kept monitoring.', missed: "Mrs. Pak's dip was brief, and she recovered to her prescribed target at rest. Escalation is for sustained change.", concept: 'escalation-level' },
+    d6: { correct: 'You recognized a brief exertional change, confirmed she recovered to her prescribed target, and kept monitoring.', missed: "Mrs. Pak returned to her prescribed target and baseline after rest. Continued reassessment fits these findings; new concerning symptoms would change the plan.", concept: 'escalation-level' },
   },
   takeaways: [
     'A reassuring number from earlier cannot explain away the trend in front of you.',
@@ -269,11 +269,11 @@ export const card = {
   ],
   twist: `The "stable" hemoglobin was drawn at 0500, seven hours before the trend began, and his "normal" BP of 108 systolic is 44 points below his own baseline.`,
   specialty: 'Med-Surg', learnerLevel: 'Student and new grad', estimatedTime: '6 minutes', decisionCount: 6,
-  reviewStatus: 'Clinical sign-off not yet recorded', contentReviewDate: 'Pending',
+  reviewStatus: 'Independent nurse approval reported by founder; no formal validation claimed', contentReviewDate: 'Not supplied',
 };
 
 // Open content-validation items (not learner-facing).
 export const OPEN_ITEMS = [
-  'Founder review and independent clinical sign-off have not been recorded. Shift 06 stays behind the preview flag until they are.',
-  'Estimated time is 6 minutes. If playtesting runs long, D1 may be cut later.',
+  'Founder reports review by himself and another nurse; identity, credentials, date and passage-level source checks were not supplied.',
+  'Estimated time is 6 minutes; independent timed usability testing is not documented.',
 ];

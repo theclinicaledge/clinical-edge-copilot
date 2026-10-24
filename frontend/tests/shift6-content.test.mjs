@@ -90,7 +90,7 @@ test('no em dashes anywhere in Shift 06 content or source', () => {
   assert.ok(!readFileSync(new URL('../src/modules/the-shift/components/TrendReading.jsx', import.meta.url), 'utf8').includes('—'));
 });
 
-test('sources are stored by spec number, version 0.4, sign-off not claimed', () => {
+test('sources retain spec numbers and version; review is attributed to founder report', () => {
   // OpenStax sources 1 and 6 were removed; nothing may still cite them. Source 7 backs debrief bullet 2,
   // and Sources 8 and 9 back D6.
   assert.deepEqual(Object.keys(data.SOURCES), ['2', '3', '4', '5', '7', '8', '9']);
@@ -102,8 +102,8 @@ test('sources are stored by spec number, version 0.4, sign-off not claimed', () 
   assert.equal(data.SOURCES[7].url, 'https://www.ncbi.nlm.nih.gov/books/NBK537232/');
   assert.equal(data.VERSION, '0.4');
   assert.equal(data.SCENARIO_ID, 'SHIFT-006');
-  assert.equal(data.card.reviewStatus, 'Clinical sign-off not yet recorded');
-  assert.equal(data.card.contentReviewDate, 'Pending');
+  assert.match(data.card.reviewStatus, /approval reported by founder/);
+  assert.equal(data.card.contentReviewDate, 'Not supplied');
 });
 
 test('no pulse pressure, Draft marking or medication hold language in Shift 06', () => {

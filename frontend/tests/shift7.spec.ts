@@ -74,7 +74,7 @@ test('opening and library fit viewport; populated filters and show more',async({
  await page.screenshot({path:`test-results/shift7-${test.info().project.name}-arrival.png`,fullPage:true});
  await page.goto('/learn/shifts');
  await expect(page.locator('.shift-library-card')).toHaveCount(6);
- if(process.env.VITE_SHIFT_006_PREVIEW==='true'){await page.getByRole('button',{name:'Show more shifts'}).click();await expect(page.locator('.shift-library-card')).toHaveCount(7);}else{await expect(page.getByRole('button',{name:'Show more shifts'})).toHaveCount(0);}
+ await page.getByRole('button',{name:'Show more shifts'}).click();await expect(page.locator('.shift-library-card')).toHaveCount(7);
  await page.getByRole('button',{name:'ED',exact:true}).click();await expect(page.locator('.shift-library-card')).toHaveCount(1);
  await expect(page.locator('.shift-library-card')).toContainText('The Missing Time');
  await page.screenshot({path:`test-results/shift7-${test.info().project.name}-library.png`,fullPage:true});

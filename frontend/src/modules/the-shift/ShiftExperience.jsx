@@ -21,9 +21,7 @@ const rewindAssignments = { 'drowsy-patient': 'a1', 'which-patient-first': 'a2',
 
 const renderers = { 'drowsy-patient': Shift, 'monitor-alarm': Monitor, 'discharge-puzzle': Discharge, 'which-patient-first': Shift5 };
 if (CONVERSATION_ENABLED) renderers.conversation = Conversation;
-// Draft SHIFT-006 is loaded only in preview builds, so production bundles never include it.
-// Resolved before first render (Scenario observes the renderer's h1 on mount); folds to null in production.
-const Shift6 = import.meta.env.VITE_SHIFT_006_PREVIEW === 'true' ? (await import('./shift6/Shift6.jsx')).default : null;
+const Shift6 = (await import('./shift6/Shift6.jsx')).default;
 if (Shift6) renderers['stable-number'] = Shift6;
 const Shift7 = (await import('./shift7/Shift7.jsx')).default;
 const Shift7Art = (await import('./shift7/Artwork.jsx')).default;

@@ -8,10 +8,10 @@ const records = [
 test.use({ storageState: { cookies: [], origins: [] } });
 test('new and invalid saved progress remain not started', async ({ page }) => {
   await page.goto('/learn');
-  await expect(page.locator('.shift-library-status--new')).toHaveCount(5);
+  await expect(page.locator('.shift-library-status--new')).toHaveCount(6);
   await page.evaluate(() => localStorage.setItem('ce-private-shift-drowsy-r2', '{invalid'));
   await page.reload();
-  await expect(page.locator('.shift-library-status--new')).toHaveCount(5);
+  await expect(page.locator('.shift-library-status--new')).toHaveCount(6);
 });
 for (const width of [320, 390, 1440]) {
   test(`mixed progress, navigation and layout at ${width}`, async ({ browser }) => {
@@ -19,11 +19,11 @@ for (const width of [320, 390, 1440]) {
     const page = await context.newPage();
     await page.goto(`${origin}/learn`);
     const cards = page.locator('.shift-library-card');
-    await expect(cards).toHaveCount(5);
+    await expect(cards).toHaveCount(6);
     await expect(cards.nth(0).locator('.shift-library-status')).toHaveText('◐In progress');
     await expect(cards.nth(1).locator('.shift-library-status')).toHaveText('✓Finished');
     await expect(cards.nth(1)).toContainText('Debrief reached');
-    await expect(page.locator('.shift-library-status--new')).toHaveCount(3);
+    await expect(page.locator('.shift-library-status--new')).toHaveCount(4);
     expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true);
     await cards.nth(0).scrollIntoViewIfNeeded();
     await page.screenshot({ path: `/private/tmp/ce-library-status-${width}.png` });

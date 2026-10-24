@@ -23,7 +23,7 @@ test('production exposes five scenarios, notice, skip and truthful review withou
   });
   page.on('pageerror', error => { throw error; });
   await page.goto('/learn/shifts');
-  await expect(page.locator('.shift-library-card')).toHaveCount(5);
+  await expect(page.locator('.shift-library-card')).toHaveCount(6);
   await page.locator('.shift-library-card').nth(3).getByRole('link', { name: 'Begin shift' }).click();
   await expect(page.locator('.conversation-root')).toBeVisible();
   await expect(page.locator('.conversation-notice')).toBeVisible();
@@ -34,7 +34,7 @@ test('production exposes five scenarios, notice, skip and truthful review withou
   await page.getByRole('button', { name: 'Skip this Shift' }).click();
   await expect(page.getByRole('heading', { name: 'You can step away.' })).toBeVisible();
   await page.getByRole('link', { name: 'Return to Shift Library' }).click();
-  await expect(page.locator('.shift-library-card')).toHaveCount(5);
+  await expect(page.locator('.shift-library-card')).toHaveCount(6);
   await page.goto('/learn/shifts/conversation/ask');
   await expect(page.locator('.shift-handoff')).toContainText('Ask may decline');
   await expect(page.locator('.shift-handoff')).toContainText('Nothing is submitted automatically');

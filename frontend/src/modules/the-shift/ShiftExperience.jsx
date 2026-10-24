@@ -25,6 +25,9 @@ if (CONVERSATION_ENABLED) renderers.conversation = Conversation;
 // Resolved before first render (Scenario observes the renderer's h1 on mount); folds to null in production.
 const Shift6 = import.meta.env.VITE_SHIFT_006_PREVIEW === 'true' ? (await import('./shift6/Shift6.jsx')).default : null;
 if (Shift6) renderers['stable-number'] = Shift6;
+const Shift7 = (await import('./shift7/Shift7.jsx')).default;
+const Shift7Art = (await import('./shift7/Artwork.jsx')).default;
+if (Shift7) renderers['missing-time'] = Shift7;
 const images = {
   'drowsy-patient': new URL('./assignment-poster.svg', import.meta.url).href,
   'discharge-puzzle': new URL('./discharge/poster.svg', import.meta.url).href,
@@ -52,38 +55,41 @@ function ReviewDialog({ item, close }) {
     <p className="shift-review-status">{item.review.status} Not a competency assessment.</p>
     <dl><div><dt>Scenario / content version</dt><dd>{item.scenarioId} / {item.contentVersion}</dd></div><div><dt>Reviewer / review date</dt><dd>{item.review.reviewer || 'Not supplied'} / {item.review.reviewDate || 'Not supplied'}</dd></div><div><dt>Approval reported for version</dt><dd>{item.review.approvedVersion || 'None'}</dd></div></dl>
     <h3>Learning objectives</h3><ul>{item.objectives.map(text => <li key={text}>{text}</li>)}</ul>
-    <h3>Teaching sources & applicability</h3><p>Passage-level source verification is not documented. A reference does not certify the scenario.</p>
+    <h3>Teaching sources & applicability</h3><p>{item.review.sourceVerification || 'Passage-level source verification is not documented. A reference does not certify the scenario.'}</p>
     <ol>{item.sources.map(source => <li key={source.id}><a href={source.url} target="_blank" rel="noreferrer">{source.title}</a><p>{source.scope}</p><p><strong>Limitation: </strong>{source.limitation}</p></li>)}</ol>
     {item.id === 'monitor-alarm' && <p>All five ECGs are original educational illustrations, not patient recordings. Approval of the complete scenario package is founder-reported; no separate ECG validation is claimed.</p>}
   </dialog>;
 }
 
-function Library({ navigate }) {
-  const reviewable = SHIFTS.filter(item => ['drowsy-patient', 'monitor-alarm', 'discharge-puzzle', 'conversation', 'which-patient-first'].includes(item.id) && progressLabel(item) === 'Debrief reached');
+export function Library({ navigate }) {
+  const [setting, setSetting] = useState('All settings');
+  const [limit, setLimit] = useState(6);
+  const settings = ['All settings', ...new Set(SHIFTS.map(item => item.specialty))];
+  const filtered = SHIFTS.filter(item => setting === 'All settings' || item.specialty === setting);
+  const resumes = SHIFTS.filter(item => progressLabel(item).startsWith('Continue:'));
+  const resume = [...resumes].sort((a, b) => (b.readProgress().updated || 0) - (a.readProgress().updated || 0))[0];
   return <div className="shift-library-page">
     <header className="shift-library-brand"><AppLink to="/" navigate={navigate}><ClinicalEdgeMark /><strong>Clinical Edge</strong></AppLink><span>Learn</span></header>
     <main className="shift-library-main">
-      <header className="shift-library-heading"><p className="shift-overline">Fictional nursing experiences</p><h1>The Shift Library</h1><p>Experience the shift. Understand the why. Master the skills.</p><small>Fictional education / Progress stays on this device</small></header>
-      {reviewable.length > 0 && <section className="shift-library-reviews" aria-labelledby="shift-reviews-title">
-        <h2 id="shift-reviews-title">Your debriefs</h2>
-        <p>Revisit your choices and takeaways. Reviewing does not start a new attempt.</p>
-        <ul>{reviewable.map(item => <li key={item.id}><AppLink to={shiftPath(item.id)} navigate={navigate}><span><small>SHIFT {item.number}</small><strong>{item.title}</strong></span><span>Review debrief <span aria-hidden="true">&#8594;</span></span></AppLink></li>)}</ul>
-      </section>}
+      <header className="shift-library-heading"><p className="shift-overline">Fictional nursing experiences</p><h1>The Shift Library</h1><p>Step into the moment. Make your call. Understand the why.</p><small>Fictional education / Progress stays on this device</small></header>
       <aside className="shift-library-download" aria-labelledby="shift-download-title">
         <div><h2 id="shift-download-title">Prefer learning in the app?</h2><p>Get Clinical Edge for iPhone, or explore a shift here.</p></div>
         <AppStoreBadge placement="learn" height={44} />
       </aside>
       {import.meta.env.VITE_MED_SURG_TRACK_PREVIEW === 'true' && <section className="shift-track-entry" aria-labelledby="med-surg-entry-title"><div><p className="shift-overline">Connected learning / Private pilot</p><h2 id="med-surg-entry-title">Med-Surg Clinical</h2><p>Three linked assignments. Make your call, explore the feedback, then try optional Rewinds with different patient findings.</p><small>Your original responses stay preserved. Track progress is separate from individual shifts.</small></div><AppLink to="/learn/med-surg" navigate={navigate} className="shift-primary">Open learning track <span aria-hidden="true">→</span></AppLink></section>}
-      <div className="shift-library-grid">{SHIFTS.map(item => {
+      {resume && <aside className="shift-library-resume"><div><span className="shift-overline">Pick up where you left off</span><strong>{resume.title}</strong><small>{progressLabel(resume)}</small></div><AppLink to={shiftPath(resume.id)} navigate={navigate} className="shift-secondary">Resume shift <span aria-hidden="true">→</span></AppLink></aside>}
+      <div className="shift-library-filterbar"><div role="group" aria-label="Filter shifts by setting">{settings.map(value => <button key={value} aria-pressed={setting === value} onClick={() => { setSetting(value); setLimit(6); }}>{value}</button>)}</div><p aria-live="polite">{filtered.length} {filtered.length === 1 ? 'shift' : 'shifts'}</p></div>
+      <div className="shift-library-grid">{filtered.slice(0, limit).map(item => {
         const progress = progressLabel(item);
         const status = progress === 'Not started' ? 'Not started' : progress === 'Debrief reached' ? 'Finished' : 'In progress';
-        // The inline preview check keeps the SHIFT-006 slug out of production bundles.
-        const showStatus = ['drowsy-patient', 'monitor-alarm', 'discharge-puzzle', 'conversation', 'which-patient-first'].includes(item.id) || (import.meta.env.VITE_SHIFT_006_PREVIEW === 'true' && item.id === 'stable-number');
+        // Only registered scenarios reach the library; preview gates live in the registry.
+        const showStatus = true;
         return <article className="shift-library-card" key={item.id}>
-          <AppLink to={shiftPath(item.id)} navigate={navigate} className="shift-library-image" tabIndex={-1} aria-hidden="true">{item.id === 'monitor-alarm' ? <LibraryMonitorArtwork /> : <img src={images[item.id]} alt="" />}<span>SHIFT {item.number}</span></AppLink>
+          <AppLink to={shiftPath(item.id)} navigate={navigate} className="shift-library-image" tabIndex={-1} aria-hidden="true">{item.id === 'missing-time' && Shift7Art ? <Shift7Art compact /> : item.id === 'monitor-alarm' ? <LibraryMonitorArtwork /> : <img src={images[item.id]} alt="" />}<span>SHIFT {item.number}</span></AppLink>
           <div className="shift-library-copy">{showStatus && <span className={`shift-library-status shift-library-status--${status === 'Finished' ? 'finished' : status === 'In progress' ? 'active' : 'new'}`}><span aria-hidden="true">{status === 'Finished' ? '\u2713' : status === 'In progress' ? '\u25D0' : '\u25CB'}</span>{status}</span>}<p className="shift-overline">{item.specialty} / {item.difficulty}</p><h2><AppLink to={shiftPath(item.id)} navigate={navigate}>{item.title}</AppLink></h2><p>{item.description}</p><small>{item.duration} / Students & new grads</small><AppLink to={shiftPath(item.id)} navigate={navigate} className="shift-primary">{progress === 'Not started' ? 'Begin shift' : progress === 'Debrief reached' ? (showStatus ? 'Review debrief' : 'Return to debrief') : 'Continue shift'} <span aria-hidden="true">&#8594;</span></AppLink><small>{showStatus && status === 'Not started' ? 'Ready when you are' : progress}</small></div>
         </article>;
       })}</div>
+      {limit < filtered.length && <button className="shift-secondary shift-library-more" onClick={() => setLimit(value => value + 6)}>Show more shifts <span aria-hidden="true">↓</span></button>}
       <p className="shift-local-note">Progress and fixed-choice reflections stay on this device. No patient information, AI calls or account. Restart a scenario to clear its progress.</p>
       <section className="shift-library-tools"><h2>Build on what you notice</h2><div>{LEARN_ACTIONS.map(action => <AppLink key={action.path} to={action.path} navigate={navigate}><strong>{action.label}</strong><span>{action.detail}</span><b aria-hidden="true">&#8599;</b></AppLink>)}<AppLink to="/reference-hub" navigate={navigate}><strong>References</strong><span>Existing clinical reference hub</span><b aria-hidden="true">&#8599;</b></AppLink><AppLink to="/icu-drips" navigate={navigate}><strong>ICU Drips</strong><span>Infusion reference</span><b aria-hidden="true">&#8599;</b></AppLink></div></section>
       <footer className="shift-library-footer"><AppLink to="/privacy" navigate={navigate}>Privacy</AppLink><AppLink to="/terms" navigate={navigate}>Terms</AppLink><span>Fictional education. Not patient-specific care.</span></footer>
@@ -131,7 +137,7 @@ function Scenario({ item, navigate, active }) {
       if (target) { event.preventDefault(); target.setAttribute('tabindex', '-1'); target.focus(); }
       return;
     }
-    const mapped = scenarioLink(raw, item);
+    const mapped = raw === '/learn/shifts' ? '/shifts' : scenarioLink(raw, item);
     if (!mapped) return;
     const to = mapped === '/shifts' ? '/learn/shifts' : learningDestination(mapped, item.id);
     if (!to) return;
@@ -155,7 +161,7 @@ export default function ShiftExperience({ mode = 'page', navigate, active = true
   useEffect(() => {
     if (active && mode === 'page' && route?.kind === 'scenario') {
       const item = getShift(route.id);
-      if (item) shiftOpened(item.id, item.contentVersion, item.readProgress().stage);
+      if (item && item.analytics !== false) shiftOpened(item.id, item.contentVersion, item.readProgress().stage);
     }
   }, [active, mode, path, route?.id, route?.kind]);
   if (mode === 'return') return from ? <aside className="shift-return"><AppLink to={shiftPath(from.id)} navigate={navigate}>&#8592; Return to {from.title}</AppLink><span>Your place is kept</span></aside> : null;

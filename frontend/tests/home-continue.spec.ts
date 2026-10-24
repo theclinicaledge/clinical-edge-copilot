@@ -24,7 +24,7 @@ test('all live adapters distinguish unfinished from debrief without modifying st
       return { unfinished, final };
     });
   });
-  expect(results).toHaveLength(5);
+  expect(results).toHaveLength(6);
   for (const item of results) {
     expect(item.unfinished).toMatch(/^Continue: /);
     expect(item.final).toBe('Debrief reached');

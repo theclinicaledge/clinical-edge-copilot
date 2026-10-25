@@ -1,0 +1,19 @@
+.assign-team { display: grid; gap: 16px; margin-bottom: 20px; }
+.assign-team-tokens { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 12px; }
+.assign-team-token { margin: 0; padding: 16px; border: 1px solid var(--ce-warm-line); border-radius: var(--ce-r-md); background: var(--ce-warm-card); }
+.assign-team-token legend { padding: 0 4px; font-size: 15px; }
+.assign-team-options { display: grid; gap: 8px; margin-top: 8px; }
+.assign-team-options label { display: flex; gap: 10px; align-items: center; min-height: 44px; padding: 8px 12px; border: 1px solid var(--ce-warm-line); border-radius: var(--ce-r-sm); cursor: pointer; font-size: 15px; }
+.assign-team-options label.is-selected { border-color: var(--ce-teal-deep); background: var(--ce-urgency-low-bg); box-shadow: inset 3px 0 var(--ce-teal-deep); }
+.assign-team-options input { accent-color: var(--ce-teal-deep); }
+.assign-team-options label:has(input:focus-visible) { outline: 3px solid var(--ce-teal-deep); outline-offset: 2px; }
+.assign-team-token:disabled label { cursor: default; }
+.assign-team-board { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 8px; }
+.assign-team-target { padding: 10px 12px; border: 1px dashed var(--ce-warm-line); border-radius: var(--ce-r-sm); font-size: 14px; }
+.assign-team-target span { font: 600 11px var(--ce-font-mono); color: var(--ce-text-muted); text-transform: uppercase; }
+.assign-team-target p { margin-top: 4px; color: var(--ce-text-mid); }
+.assign-team-target.is-filled { border-style: solid; border-color: var(--ce-teal-deep); }
+@media (max-width: 760px) {
+  .assign-team-tokens { grid-template-columns: 1fr; }
+  .assign-team-board { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+}

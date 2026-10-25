@@ -1,0 +1,4 @@
+.therapeutic-response .shift-choice > span:first-child { display: grid; gap: 8px; }
+.therapeutic-tier { justify-self: start; padding: 2px 10px; border: 1px solid var(--ce-warm-line); border-radius: 30px; font: 600 12px var(--ce-font-mono); color: var(--ce-text-dark); }
+.therapeutic-tier.is-best, .therapeutic-tier.is-acceptable { border-color: var(--ce-teal-deep); background: var(--ce-urgency-low-bg); }
+.therapeutic-tier.is-harmful { border-color: var(--ce-gold-deep); background: var(--ce-urgency-mod-bg); }

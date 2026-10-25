@@ -96,7 +96,7 @@ instead of doing it.
 |---|---|
 | Frontend | React 19 + Vite (localhost:5173) |
 | Backend | Node.js + Express 5 (localhost:3001), hosted on Render |
-| AI | Anthropic Claude API only (model `claude-sonnet-4-6`). Never OpenAI. |
+| AI | Anthropic Claude API only. Conversational Ask (`backend/ask-conversation.js`) uses `claude-opus-5-5`; other AI routes use `claude-sonnet-4-6`. Never OpenAI. |
 | Web hosting | Vercel |
 | Analytics | Manual PostHog via `frontend/src/productAnalytics.js`, opt-in only |
 | Persistence | Browser localStorage/sessionStorage only. No database. |
@@ -158,6 +158,7 @@ Never remove a shipped feature without explicit approval.
 - No dosing language or treatment commands. No em dashes in user-facing copy.
 - Nurse-to-nurse voice. Short bullets over paragraphs. Recognition over memorization.
 - No textbook or generic AI phrasing.
+- Any change to an AI model, system prompt or safety rule requires re-running the Ask clinical evaluation before release.
 
 ## Analytics Rules
 

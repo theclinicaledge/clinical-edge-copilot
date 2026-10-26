@@ -37,5 +37,5 @@ export function updateRewind(previous, edit, storage) {
 export function rewindAttempt(variationId, call) {
   const option = variation(variationId)?.options.find(o => o.id === call);
   if (!option) return null;
-  return { variation: variationId, call, information: null, label: option.label, why: option.feedback, alternative: '', guided: true, at: Date.now(), contentVersion: REWIND.version };
+  return { variation: variationId, call, information: null, label: option.label, why: option.feedback, alternative: variation(variationId).alternative ?? '', guided: true, at: Date.now(), contentVersion: REWIND.version };
 }

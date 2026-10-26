@@ -7,9 +7,10 @@ import { REWIND_KEY, readRewind, updateRewind, rewindAttempt } from './rewindSto
 const storage = { getItem: key => window.localStorage.getItem(key), setItem: (key, value) => window.localStorage.setItem(key, value) };
 const sources = REWIND.sources.map(number => ({ title: SOURCES[number].citation, url: SOURCES[number].url, scope: `Supports: ${SOURCES[number].supports}` }));
 const versions = REWIND.variations.map(variation => ({ ...variation, history: REWIND.history, sources }));
+// The Rewind strip is only shown before the choice, so it reads the objective description (v0.8).
 const figure = variation => {
   const strip = STRIPS[variation.strip];
-  return <StripFigure src={strip.src} alt={strip.alt} caption={strip.caption} />;
+  return <StripFigure src={strip.src} alt={strip.altBefore ?? strip.alt} caption={strip.caption} />;
 };
 
 export default function Shift9Rewind() {

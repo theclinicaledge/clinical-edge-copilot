@@ -2,11 +2,11 @@ import { test, expect, type Page } from '@playwright/test';
 import { STRIPS, assignment, d1, d2, d3, d4, d5, debrief, REWIND } from '../src/modules/the-shift/shift9/data.js';
 
 const PATH = '/learn/shifts/quiet-complaint';
-const KEY = 'ce-shift-quiet-complaint-v0.7';
+const KEY = 'ce-shift-quiet-complaint-v0.8';
 const FULL = { you: '22', tess: '21', marco: '23' };
 const ALL_CORRECT = { d1: FULL, d2: 'escalate', d3: 'inferior', d4: 'choice', d5: 'reassess' };
 const ALL_MISSED = { d1: { you: '21', tess: '21', marco: '22' }, d2: 'antacid', d3: 'placement', d4: 'threat', d5: 'escalate' };
-const progress = (stage: number, answers: Record<string, unknown> = {}) => ({ version: 1, contentVersion: '0.7', stage, viewed: [], notes: [], closer: false, placement: {}, steps: [], drafts: {}, answers, tomorrow: null });
+const progress = (stage: number, answers: Record<string, unknown> = {}) => ({ version: 1, contentVersion: '0.8', stage, viewed: [], notes: [], closer: false, placement: {}, steps: [], drafts: {}, answers, tomorrow: null });
 
 async function seed(page: Page, value: object) {
   await page.goto(PATH);
@@ -44,7 +44,7 @@ test.describe('Shift 09 draft preview', () => {
     await page.getByRole('button', { name: 'Sources & review' }).click();
     const dialog = page.getByRole('dialog');
     await expect(dialog).toContainText('Draft.');
-    await expect(dialog).toContainText('SHIFT-009 / 0.7');
+    await expect(dialog).toContainText('SHIFT-009 / 0.8');
     await expect(dialog.locator('ol li')).toHaveCount(16);
   });
 
@@ -61,12 +61,17 @@ test.describe('Shift 09 draft preview', () => {
 
   test('D1 opens with an unscored Look closer and places the team by keyboard', async ({ page }) => {
     await seed(page, progress(1));
-    for (const id of d1.strips) await expect(page.getByRole('img', { name: STRIPS[id].alt })).toBeVisible();
-    await expect(page.locator('.s9-d1-strips .s9-strip-heading')).toHaveText(['1505Room 21 / Now', '1430Room 22 / Starting strip', '1430Room 23 / Starting strip']);
+    // Room 21 reads its objective description until Look closer is opened (audit M7).
+    await expect(page.getByRole('img', { name: STRIPS['rm21-1505'].altBefore, exact: true })).toBeVisible();
+    for (const id of d1.strips.slice(1)) await expect(page.getByRole('img', { name: STRIPS[id].alt })).toBeVisible();
+    // The earlier strips are labeled as earlier (audit M6).
+    await expect(page.locator('.s9-d1-strips .s9-strip-heading')).toHaveText(['1505Room 21 / Now', '1430Room 22 / Earlier strip, 1430', '1430Room 23 / Earlier strip, 1430']);
+    await expect(page.locator('.s9-strip-note')).toHaveText(d1.stripNotes['rm22-1430']);
     await expect(page.locator('.s9-board')).toContainText('Lena, the monitor tech, calls:');
     await expect(page.locator('.s9-board')).not.toContainText('asystole');
     await page.getByRole('button', { name: 'Look closer' }).click();
     await expect(page.locator('#s9-closer')).toContainText(d1.lookCloser);
+    await expect(page.getByRole('img', { name: STRIPS['rm21-1505'].alt })).toBeVisible();
     await expect(page.getByRole('button', { name: 'Submit' })).toBeDisabled();
     // Keyboard only: focus a radio, arrow to the next target, then Space.
     await page.getByRole('group', { name: 'You' }).getByRole('radio', { name: 'Room 21' }).focus();
@@ -85,22 +90,29 @@ test.describe('Shift 09 draft preview', () => {
   for (const [name, placement, rules, result, path] of [
     ['Path A full credit', FULL, ['rn22', 'rn21', 'marco23'], 'Correct', 'a'],
     ['Path B with Marco backing up', { you: '21', tess: '22', marco: '21' }, ['rn22', 'rn21', 'marcoBackup21'], 'Correct', 'b'],
-    ['Marco brings the antacid', { you: '21', tess: '21', marco: '22' }, ['noRn22'], 'No (unsafe)', 'a'],
-    ['Marco alone in 21', { you: '22', tess: '22', marco: '21' }, ['rn22', 'marcoAlone21'], 'No', 'a'],
-    ['No one in 21', { you: '22', tess: '23', marco: '23' }, ['rn22', 'marco23', 'noOne21'], 'No', 'a'],
-    ['Marco at the station (not covered)', { you: '22', tess: '21', marco: 'station' }, ['rn22', 'rn21'], 'No', 'a'],
+    ['Marco helps in Room 22', { you: '22', tess: '21', marco: '22' }, ['rn22', 'rn21', 'marco22'], 'Correct', 'a'],
+    ['Marco at the station', { you: '22', tess: '21', marco: 'station' }, ['rn22', 'rn21', 'marcoStation'], 'Close', 'a'],
+    ['Marco brings the antacid', { you: '21', tess: '21', marco: '22' }, ['noRn22', 'bothRn21', 'marcoAlone22'], 'No (unsafe)', 'a'],
+    ['Marco alone in 21', { you: '22', tess: '22', marco: '21' }, ['rn22', 'bothRn22', 'marcoAlone21'], 'No', 'a'],
+    ['No one in 21', { you: '22', tess: '23', marco: '23' }, ['rn22', 'rnElsewhere', 'noOne21', 'marco23'], 'No', 'a'],
   ] as const) test(`D1 ${name}: shows every fired rule and the matching path`, async ({ page }) => {
     await seed(page, progress(1));
     await place(page, placement);
     await expect(feedback(page).getByRole('heading', { level: 3 })).toHaveText(result);
     const list = feedback(page).locator('.s9-rules li');
     await expect(list).toHaveCount(rules.length);
+    await expect(list.locator('strong')).toHaveText(rules.map(id => `${d1.rules.find(rule => rule.id === id)!.text}.`));
     for (const id of rules) await expect(feedback(page)).toContainText(d1.rules.find(rule => rule.id === id)!.feedback);
+    // Audit H3: a no-credit result never shows only green rules.
+    const labels = await list.locator('.s6-result').allTextContents();
+    if (result.startsWith('No')) expect(labels.some(label => label.startsWith('No'))).toBe(true);
     await expect(feedback(page)).toContainText(d1.next.paths[path]);
     for (const row of d1.next.rows) await expect(feedback(page)).toContainText(path === 'a' ? row[1] : row[2]);
     await expect(feedback(page)).toContainText(d1.next.after);
-    if (result === 'Correct') await expect(feedback(page)).not.toContainText('Guided safer path');
-    else { await expect(feedback(page)).toContainText('Guided safer path'); await expect(feedback(page)).toContainText(d1.fullCredit); }
+    if (result.startsWith('No')) await expect(feedback(page)).toContainText('Guided safer path');
+    else await expect(feedback(page)).not.toContainText('Guided safer path');
+    if (result === 'Correct') await expect(feedback(page)).not.toContainText(d1.fullCredit);
+    else await expect(feedback(page)).toContainText(d1.fullCredit);
   });
 
   for (const [stage, decision, answers] of [
@@ -115,13 +127,27 @@ test.describe('Shift 09 draft preview', () => {
     await expect(feedback(page)).toContainText(choice.feedback);
     if (choice.result === 'Close') await expect(feedback(page)).toContainText('Partially correct');
     await expect(feedback(page)).toContainText(decision.teaching);
+    // Audit M3: a guided safer path after D2 choices other than Escalate now, and after no-credit D3 to D5 choices.
+    const guided = decision === d2 ? choice.id !== 'escalate' : !['Correct', 'Close'].includes(choice.result);
+    if (guided) await expect(feedback(page).locator('.s6-bridge')).toHaveText(`Guided safer path. ${decision.bridge}`);
+    else await expect(feedback(page).locator('.s6-bridge')).toHaveCount(0);
+    // A confirmed choice that isn't full credit drops the teal success styling.
+    const chosen = page.getByRole('button', { name: choice.text, exact: false }).first();
+    if (choice.result === 'Correct') await expect(chosen).not.toHaveClass(/s9-selected-miss/);
+    else await expect(chosen).toHaveClass(/s9-selected-miss/);
     if (decision === d3) {
       await expect(feedback(page)).toContainText(d3.whileTeamWorks);
       await expect(feedback(page)).toContainText(d3.teachingNote);
     }
     if (decision === d4) {
+      // Key points stay visible; the detail lists open on request (audit M5).
       await expect(feedback(page)).toContainText(d4.rightAway.intro);
       await expect(feedback(page)).toContainText(d4.capacity.intro);
+      await expect(feedback(page).getByText(d4.rightAway.items[0])).toBeHidden();
+      await feedback(page).getByText(d4.rightAway.more).click();
+      await expect(feedback(page).getByText(d4.rightAway.items[0])).toBeVisible();
+      await feedback(page).getByText(d4.capacity.more).click();
+      await expect(feedback(page)).toContainText(d4.capacity.items[4][1]);
       await expect(page.locator('.therapeutic-tier')).toHaveText(['Best / Correct', 'Acceptable / Correct', 'Harmful / No', 'Harmful / No', 'Harmful / No (unsafe)']);
     }
   });
@@ -129,10 +155,14 @@ test.describe('Shift 09 draft preview', () => {
   test('D2 shows both Room 22 strips and the seven-step comparison', async ({ page }) => {
     await seed(page, progress(2, { d1: FULL }));
     for (const id of d2.strips) await expect(page.getByRole('img', { name: STRIPS[id].alt })).toBeVisible();
-    for (const [, name, then, now] of d2.steps) {
-      await page.getByRole('button', { name: new RegExp(name.replace(/[,()]/g, '.')) }).click();
-      await expect(page.locator('.s9-steps')).toContainText(then);
-      await expect(page.locator('.s9-steps')).toContainText(now);
+    for (const [id, name, then, now] of d2.steps) {
+      const button = page.getByRole('button', { name, exact: true });
+      await expect(button).toHaveAttribute('aria-expanded', 'false');
+      await button.click();
+      await expect(button).toHaveAttribute('aria-expanded', 'true');
+      await expect(button).toHaveAttribute('aria-controls', `s9-step-${id}`);
+      await expect(page.locator(`#s9-step-${id}`)).toContainText(then);
+      await expect(page.locator(`#s9-step-${id}`)).toContainText(now);
     }
   });
 
@@ -140,11 +170,15 @@ test.describe('Shift 09 draft preview', () => {
     await seed(page, progress(3, { d1: FULL, d2: 'escalate' }));
     await page.getByRole('button', { name: 'Expand Room 22, 12-lead ECG, 1513' }).click();
     const dialog = page.getByRole('dialog', { name: 'Room 22, 12-lead ECG, 1513' });
-    await expect(dialog.getByRole('img', { name: STRIPS[d3.strip].alt })).toBeVisible();
+    await expect(dialog.getByRole('img', { name: STRIPS[d3.strip].altBefore, exact: true })).toBeVisible();
     const width = await dialog.getByRole('img').evaluate(img => img.getBoundingClientRect().width);
     expect(width).toBeGreaterThanOrEqual(1400);
     await page.keyboard.press('Escape');
     await expect(page.getByRole('button', { name: 'Expand Room 22, 12-lead ECG, 1513' })).toBeFocused();
+    // After answering, the Part E description is read.
+    await page.getByRole('button', { name: d3.choices[0].text, exact: true }).click();
+    await page.getByRole('button', { name: 'Confirm response' }).click();
+    await expect(page.getByRole('img', { name: STRIPS[d3.strip].alt }).first()).toBeAttached();
   });
 
   test('D5 shows the Marco line only when Marco was placed at Room 21', async ({ page }) => {
@@ -153,7 +187,9 @@ test.describe('Shift 09 draft preview', () => {
     await seed(page, progress(5, { d1: FULL, d2: 'escalate', d3: 'inferior', d4: 'choice' }));
     await expect(page.locator('.shift-situation')).toContainText(`${d5.vitalsLeadAlone} ${d5.vitals}`);
     await expect(page.locator('.shift-situation')).not.toContainText(d5.marcoMoved);
-    await expect(page.getByRole('img', { name: STRIPS[d5.strip].alt })).toBeVisible();
+    await expect(page.getByRole('img', { name: STRIPS[d5.strip].altBefore, exact: true })).toBeVisible();
+    await seed(page, progress(5, { d1: { you: '22', tess: '21', marco: '22' }, d2: 'escalate', d3: 'inferior', d4: 'choice' }));
+    await expect(page.locator('.shift-situation')).toContainText(`${d5.marcoMoved22} ${d5.vitalsLead} ${d5.vitals}`);
   });
 
   test('debrief, all correct: every correct review line, takeaways, Go further and no Rhythm Lab buttons', async ({ page }) => {
@@ -174,20 +210,39 @@ test.describe('Shift 09 draft preview', () => {
       await expect(page.locator('.s6-review')).toContainText(line.missed);
       await expect(page.locator('.s6-review')).toContainText(`Concept to strengthen: ${line.concept}`);
     }
-    await expect(page.locator('.s6-bridge')).toContainText('Scripted outcome after a guided correction');
+    await expect(page.locator('.s6-bridge')).toContainText('Scripted outcome after guided corrections');
     await seed(page, progress(6, { ...ALL_CORRECT, d3: 'anterior' }));
     await expect(page.locator('.s6-review')).toContainText(debrief.review.d3.missed);
     await expect(page.locator('.s6-review li').nth(2)).toContainText('Partially correct');
   });
 
+  // Audit M1 and M2: review lines describe the actual choice.
+  test('debrief review lines match the learner\'s actual placement and choices', async ({ page }) => {
+    await seed(page, progress(6, { ...ALL_CORRECT, d1: { you: '22', tess: '23', marco: '21' }, d2: 'ecg-first', d4: 'agree', d5: 'notify' }));
+    const review = page.locator('.s6-review');
+    await expect(review).toContainText(debrief.review.d1.room21);
+    await expect(review).not.toContainText(debrief.review.d1.missed);
+    await expect(review).toContainText(debrief.review.d2.close);
+    await expect(review).toContainText(debrief.review.d4.agree);
+    await expect(review).toContainText(debrief.review.d5.notify);
+    await seed(page, progress(6, { ...ALL_CORRECT, d1: { you: '21', tess: '22', marco: 'station' } }));
+    await expect(review).toContainText(debrief.review.d1.close);
+    await expect(review.locator('li').first()).toContainText('Partially correct');
+    await expect(page.locator('.s6-bridge')).toHaveCount(0);
+  });
+
   test('Rewind replays Decision 5 three ways with each variation’s strip and labels', async ({ page }) => {
     await seed(page, progress(6, ALL_CORRECT));
-    await page.evaluate(() => localStorage.removeItem('ce-shift-quiet-complaint-rewind-v0.7'));
+    await page.evaluate(() => localStorage.removeItem('ce-shift-quiet-complaint-rewind-v0.8'));
+    // Audit H2: the invite doesn't list the calls.
+    await expect(page.locator('.mst-rewind-invite')).toContainText(REWIND.intro);
+    await expect(page.locator('.mst-rewind-invite')).not.toContainText(/Escalate now|Notify the provider|Continue and reassess/);
     await page.getByRole('button', { name: /^Explore Rewind/ }).click();
     const dialog = page.getByRole('dialog');
     await dialog.getByRole('button', { name: /^Start Rewind/ }).click();
     for (const [index, variation] of REWIND.variations.entries()) {
-      await expect(dialog.getByRole('img', { name: STRIPS[variation.strip].alt })).toBeVisible();
+      await expect(dialog.getByRole('heading', { level: 3 })).toHaveText(`Situation ${index + 1} of 3: ${variation.title}`);
+      await expect(dialog.getByRole('img', { name: STRIPS[variation.strip].altBefore, exact: true })).toBeVisible();
       for (const fact of variation.facts) await expect(dialog).toContainText(fact);
       await dialog.getByRole('button', { name: /^Choose my response/ }).click();
       for (const [n, option] of variation.options.entries()) {
@@ -196,6 +251,9 @@ test.describe('Shift 09 draft preview', () => {
         await dialog.getByRole('button', { name: /^Check my response/ }).click();
         await expect(dialog.locator('.mst-result')).toHaveText(option.label);
         await expect(dialog).toContainText(option.feedback);
+        await dialog.getByText('Reasonable alternatives and scope').click();
+        await expect(dialog).toContainText(variation.alternative);
+        await dialog.getByText('Reasonable alternatives and scope').click();
       }
       if (index < REWIND.variations.length - 1) await dialog.getByRole('button', { name: new RegExp(`^Try situation ${index + 2}`) }).click();
     }

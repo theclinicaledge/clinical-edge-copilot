@@ -1,10 +1,11 @@
-// SHIFT-009 v0.7, "The Quiet Complaint". Learner-facing text follows the v0.7 scenario spec word for word.
-// Review status Draft: founder review, independent clinical sign-off and psych specialty review are not recorded.
+// SHIFT-009 v0.8, "The Quiet Complaint". Learner-facing text follows docs/SHIFT_009_SPEC_v0.8.md, which is the
+// v0.7 spec plus the audit corrections of 26 Oct 2026. Review status Draft: founder review, independent clinical
+// sign-off and psych specialty review are not recorded.
 // Each patient's vitals live in one table, and each strip lives in one table with the screens it belongs to,
 // so screens derive their values instead of repeating them.
 
 export const SCENARIO_ID = 'SHIFT-009';
-export const VERSION = '0.7';
+export const VERSION = '0.8';
 export const title = 'The Quiet Complaint';
 
 // Keyed by spec source number so a citation can be swapped without touching learner-facing text.
@@ -22,33 +23,40 @@ export const SOURCES = {
   11: { citation: 'Mitchell LB. Atrial Fibrillation. Merck Manual Professional Version; fully reviewed Sep 2024, peer reviewed by Howlett JG.', url: 'https://www.merckmanuals.com/professional/cardiovascular-disorders/arrhythmias-and-conduction-disorders/atrial-fibrillation', type: 'Professional reference', supports: 'D5, Rewind, rhythm notes' },
   12: { citation: 'American Heart Association. Adult Tachyarrhythmia With a Pulse Algorithm. 2025 Guidelines for CPR and ECC.', url: 'https://cpr.heart.org/-/media/CPR-Files/CPR-Guidelines-Files/2025-Accessible/Algorithm-ACLS-Tachyarrhythmia-LngDscrp-250726-Ed.pdf?sc_lang=en', type: 'Guideline (2025)', supports: 'D5, Rewind B' },
   13: { citation: 'UC Davis PSNet Editorial Team. Rapid Response Systems. AHRQ PSNet; last reviewed 2024.', url: 'https://psnet.ahrq.gov/primer/rapid-response-systems', type: 'Government source', supports: 'D2' },
-  14: { citation: "Rao SV, O'Donoghue ML, Ruel M, et al. 2025 ACC/AHA/ACEP/NAEMSP/SCAI Guideline for the Management of Patients With Acute Coronary Syndromes. J Am Coll Cardiol. 2025. doi:10.1016/j.jacc.2024.11.009. Opened via a hosted copy (sections 1 to 4.3).", url: 'https://www.hendrickhealth.org/documents/content/2025-ACC-AHA-Guideline-for-Management-of-ACS.pdf', type: 'Guideline (2025)', supports: 'D2, D3, Debrief bullet 1' },
+  14: { citation: "Rao SV, O'Donoghue ML, Ruel M, et al. 2025 ACC/AHA/ACEP/NAEMSP/SCAI Guideline for the Management of Patients With Acute Coronary Syndromes. J Am Coll Cardiol. 2025. doi:10.1016/j.jacc.2024.11.009.", url: 'https://doi.org/10.1016/j.jacc.2024.11.009', type: 'Guideline (2025)', supports: 'D2, D3, Debrief bullet 1' },
   15: { citation: 'Barstow C, Shahan B, Roberts M. Evaluating Medical Decision-Making Capacity in Practice. Am Fam Physician. 2018;98(1):40-46.', url: 'https://www.aafp.org/afp/2018/0701/p40.html', type: 'Peer-reviewed review (free access)', supports: 'D4 capacity panel' },
   16: { citation: "Sorrentino R. Performing capacity evaluations: what's expected from your consult. Current Psychiatry. 2014;13(1):41-44.", url: 'https://cdn.mdedge.com/files/s3fs-public/Document/September-2017/041_0114CP_Sorrentino_FINAL.pdf', type: 'Peer-reviewed clinical review (free access)', supports: 'D4 capacity panel' },
 };
 
 // The nine delivered illustrations, unchanged. `screens` is the Part E mapping, plus D1 for the Room 22 and 23
 // starting strips (founder request, 24 Oct 2026: show all three patients' strips on D1); `alt` is the Part E
-// screen-reader text. `caption` carries only room, lead and time, so decision screens never name a rhythm.
+// screen-reader text. `altBefore` (v0.8) is read until the decision is answered: it gives the same findings a
+// sighted learner sees, without the interpretation the decision asks for. `caption` carries only room, lead and
+// time, so decision screens never name a rhythm.
 const asset = file => new URL(`./assets/${file}`, import.meta.url).href;
 export const STRIPS = {
   'rm21-1430': { file: 'rm21_1430_sinus84.png', src: asset('rm21_1430_sinus84.png'), room: '21', time: '1430', rate: 84, caption: 'Room 21, lead II, 1430', screens: ['assignment'],
     alt: 'Room 21, lead II, 1430. Regular rhythm at 84 with a P wave before every QRS. Sinus rhythm.' },
   'rm21-1505': { file: 'rm21_1505_artifact_leadsoff.png', src: asset('rm21_1505_artifact_leadsoff.png'), room: '21', time: '1505', rate: null, caption: 'Room 21, lead II, 1505', screens: ['d1'],
+    altBefore: 'Room 21, lead II, 1505. Regular beats under heavy wavy artifact for about three seconds, then a flat line with a LEADS OFF message.',
     alt: 'Room 21, lead II, 1505. Regular beats under heavy wavy artifact for about three seconds, then a flat line with a LEADS OFF message. The monitor has lost the signal. This is not asystole.' },
   'rm22-1430': { file: 'rm22_1430_sinus88.png', src: asset('rm22_1430_sinus88.png'), room: '22', time: '1430', rate: 88, caption: 'Room 22, lead II, 1430', screens: ['assignment', 'd1', 'd2'],
     alt: 'Room 22, lead II, 1430. Sinus rhythm at 88. The ST segment sits on the baseline.' },
   'rm22-1508': { file: 'rm22_1508_sinus94_ste.png', src: asset('rm22_1508_sinus94_ste.png'), room: '22', time: '1508', rate: 94, caption: 'Room 22, lead II, 1508', screens: ['d2'],
     alt: 'Room 22, lead II, 1508. Sinus rhythm at 94. The ST segment is raised about 2 millimeters and runs into a tall T wave.' },
   'rm22-1513-12lead': { file: 'rm22_1513_12lead_inferior_stemi.png', src: asset('rm22_1513_12lead_inferior_stemi.png'), room: '22', time: '1513', rate: 94, caption: 'Room 22, 12-lead ECG, 1513', screens: ['d3'], twelveLead: true,
+    altBefore: 'Room 22, 12-lead ECG, 1513. Regular rhythm at 94 with a P wave before every QRS. ST segment in each lead, compared with the baseline: lead I about 1 millimeter below. Lead II about 2 millimeters above. Lead III about 3 millimeters above. aVR about half a millimeter below. aVL about 2 millimeters below. aVF about 3 millimeters above. V1 on the baseline. V2 about half a millimeter above. V3 less than half a millimeter above. V4, V5 and V6 on the baseline.',
     alt: 'Room 22, 12-lead ECG, 1513. Sinus rhythm at 94. ST elevation of about 2 to 3 millimeters in leads II, III and aVF. ST depression in leads I and aVL. The chest leads show no ST elevation.' },
   'rm23-1430': { file: 'rm23_1430_afib110.png', src: asset('rm23_1430_afib110.png'), room: '23', time: '1430', rate: 110, caption: 'Room 23, lead II, 1430', screens: ['assignment', 'd1'],
     alt: 'Room 23, lead II, 1430. Irregularly irregular rhythm with no P waves and a wavy baseline. 11 QRS complexes in 6 seconds, about 110. Atrial fibrillation.' },
   'rm23-1535-a': { file: 'rm23_1535_afib110_rewindA.png', src: asset('rm23_1535_afib110_rewindA.png'), room: '23', time: '1535', rate: 110, caption: 'Room 23, lead II, 1535', screens: ['d5', 'rewind-a'],
+    altBefore: 'Room 23, lead II, 1535. Narrow QRS complexes at uneven intervals with no repeating pattern. No distinct wave comes before each QRS, and the baseline between them is wavy. 11 QRS complexes in 6 seconds.',
     alt: 'Room 23, lead II, 1535. Irregularly irregular rhythm with no P waves. 11 QRS complexes in 6 seconds, about 110.' },
   'rm23-1535-b': { file: 'rm23_rewindB_afib150.png', src: asset('rm23_rewindB_afib150.png'), room: '23', time: '1535', rate: 150, caption: 'Room 23, lead II, 1535', screens: ['rewind-b'],
+    altBefore: 'Room 23, lead II, 1535. Narrow QRS complexes at uneven intervals with no repeating pattern. No distinct wave comes before each QRS, and the baseline between them is wavy. 15 QRS complexes in 6 seconds.',
     alt: 'Room 23, lead II, 1535, Rewind B. Irregularly irregular rhythm with no P waves. 15 QRS complexes in 6 seconds, about 150.' },
   'rm23-1535-c': { file: 'rm23_rewindC_afib130.png', src: asset('rm23_rewindC_afib130.png'), room: '23', time: '1535', rate: 130, caption: 'Room 23, lead II, 1535', screens: ['rewind-c'],
+    altBefore: 'Room 23, lead II, 1535. Narrow QRS complexes at uneven intervals with no repeating pattern. No distinct wave comes before each QRS, and the baseline between them is wavy. 13 QRS complexes in 6 seconds.',
     alt: 'Room 23, lead II, 1535, Rewind C. Irregularly irregular rhythm with no P waves. 13 QRS complexes in 6 seconds, about 130.' },
 };
 export const stripsFor = screen => Object.entries(STRIPS).filter(([, strip]) => strip.screens.includes(screen)).map(([id]) => id);
@@ -71,7 +79,7 @@ export const team = 'You (RN). Tess, charge nurse (RN). Marco, CNA. Lena, monito
 export const assignment = {
   time: '1500',
   intro: 'Afternoon shift, 1500 to 1600, telemetry unit, five decisions. All patients, staff, names and places are fictional.',
-  rhythmNotes: 'Sinus rhythm has a P wave before every QRS and regular spacing. AFib typically has irregularly irregular spacing without distinct P waves. Fibrillatory waves may be visible along the baseline, but they aren\'t always clear in every lead. To estimate an irregular rate, count the QRS complexes in 6 seconds and multiply by 10.',
+  rhythmNotes: 'Sinus rhythm has a P wave before every QRS and regular spacing. AFib typically has irregularly irregular spacing without distinct P waves. Fibrillatory waves may be visible along the baseline, but they aren\'t always clear in every lead. To estimate an irregular rate, count the QRS complexes in 6 seconds and multiply by 10. That count is an estimate: on a 6-second strip it can differ from the monitor\'s rate by 10 or more. For a regular rhythm, the monitor\'s rate or the R-R interval (300 divided by the number of large boxes between R waves) is closer.',
   patients: [
     { room: '21', name: 'Curtis Reed, 52', strip: 'rm21-1430', rhythm: 'Sinus rhythm.',
       summary: 'Curtis Reed, 52, day 2 of a syncope workup after he fainted at a bus stop. History of schizophrenia. Stopped his antipsychotic two weeks ago.',
@@ -110,26 +118,43 @@ export const d1 = {
   strip: 'rm21-1505',
   // All three patients' strips, by room. Rooms 22 and 23 show their 1430 starting strips; only Room 21 has a 1505 strip.
   strips: ['rm21-1505', 'rm22-1430', 'rm23-1430'],
+  // v0.8: the earlier strips are labeled as earlier, so Room 22's normal 1430 strip doesn't read as her current rhythm.
+  stripLabels: { 'rm21-1505': 'Room 21 / Now', 'rm22-1430': 'Room 22 / Earlier strip, 1430', 'rm23-1430': 'Room 23 / Earlier strip, 1430' },
+  stripNotes: { 'rm22-1430': 'This is her 1430 baseline, from before the change Lena is calling about. Her current strip isn\'t shown here.' },
   lookCloser: 'Sinus beats march right through the wavy artifact, then the signal stops. LEADS OFF means the monitor can\'t see him. It isn\'t asystole, but it does mean he isn\'t being monitored right now. He\'s yelling, so he\'s awake and breathing. Someone needs eyes on him now, and his leads back on or another way to watch him as soon as it\'s safe.',
   prompt: 'Place yourself, Tess and Marco. Then submit.',
+  // v0.8 rules. Every placement fires at least one rule for each team member, so the feedback always names what was
+  // right and what wasn't. Rule order is the display order: Room 22, Room 21, an RN elsewhere, then Marco.
   rules: [
     { id: 'rn22', text: 'An RN (you or Tess) goes to Room 22 now', result: 'Correct',
       feedback: 'New "indigestion" with an ST change must be evaluated as possible cardiac ischemia. Either RN can take her, as long as she\'s assessed now and escalated fast. You know her baseline; Tess is often better placed to lead the behavioral response. Decide together.' },
-    { id: 'noRn22', text: 'No RN goes to Room 22 (Marco brings an antacid, or both RNs go to 21)', result: 'No (unsafe)',
+    { id: 'noRn22', text: 'No RN goes to Room 22', result: 'No (unsafe)',
       feedback: 'A CNA can\'t assess a new cardiac symptom, and an antacid could delay evaluation of a possible ACS. Room 22 needs an RN now.' },
-    { id: 'rn21', text: 'The other RN goes to Room 21 and calls the behavioral team per policy', result: 'Correct',
+    { id: 'bothRn22', text: 'Both RNs go to Room 22', result: 'No',
+      feedback: 'One RN can assess Dolores and get the team moving. The other RN is needed in Room 21, where Curtis is agitated and off the monitor.' },
+    { id: 'rn21', text: 'One RN goes to Room 21 and calls the behavioral team per policy', result: 'Correct',
       feedback: 'A frightened, agitated patient needs an experienced lead. His leads are off, so that RN also watches how he looks and breathes, and calls the provider about the lost monitoring.' },
+    { id: 'bothRn21', text: 'Both RNs go to Room 21', result: 'No',
+      feedback: 'Curtis needs one RN to lead while the behavioral team comes. Two RNs in Room 21 leaves Dolores without an RN.' },
+    { id: 'rnElsewhere', text: 'An RN goes to Room 23 or stays at the station', result: 'No',
+      feedback: 'Neither needs an RN right now. Ray is stable with a plan, and Lena is watching the monitors. Each RN is needed in Room 21 or Room 22.' },
     { id: 'marcoAlone21', text: 'Marco goes to Room 21 alone', result: 'No',
       feedback: 'Don\'t send a CNA alone into a room with an agitated patient. An RN or the behavioral team leads, and Marco backs them up.' },
+    { id: 'noOne21', text: 'No one goes to Room 21', result: 'No',
+      feedback: 'His leads are off, so the monitor can\'t watch him for you. Someone needs eyes on him.' },
     { id: 'marco23', text: 'Marco takes vitals on Room 23', result: 'Correct',
       feedback: 'Ray is stable with a plan, so his vitals are a good CNA task.' },
     { id: 'marcoBackup21', text: 'Marco backs up the RN at Room 21', result: 'Correct',
       feedback: 'Also sound, if Marco gives non-confrontational help under RN direction, like staying by the door or getting more help. He doesn\'t assess or talk Curtis down himself. Ray is stable, and his vitals can wait a few minutes.' },
-    { id: 'noOne21', text: 'No one goes to Room 21', result: 'No',
-      feedback: 'His leads are off, so the monitor can\'t watch him for you. Someone needs eyes on him.' },
+    { id: 'marco22', text: 'Marco helps the RN in Room 22', result: 'Correct',
+      feedback: 'Also sound. Under RN direction, Marco can take her vitals, bring the 12-lead machine, record the 12-lead where CNAs are trained to, or go for more help. The RN still assesses Dolores and decides what the findings mean. Ray is stable, and his vitals can wait a few minutes.' },
+    { id: 'marcoAlone22', text: 'Marco goes to Room 22 without an RN', result: 'No',
+      feedback: 'Marco can take her vitals, but he can\'t assess a new cardiac symptom or decide what an ST change means. Room 22 needs an RN with him.' },
+    { id: 'marcoStation', text: 'Marco stays at the station', result: 'Close',
+      feedback: 'Not unsafe, but not the best use of him right now. Lena is already watching the monitors, and both RNs are in rooms. Marco helps more by backing up in Room 21, helping the RN in Room 22, or getting Ray\'s vitals.' },
   ],
-  scoring: 'Full credit for one RN in Room 22, the other RN in Room 21, and Marco in Room 23 or backing up at 21. It doesn\'t matter which RN takes which room. No credit if no RN reaches Room 22, if Marco is alone in 21, or if no one goes to 21.',
-  fullCredit: 'Full credit for one RN in Room 22, the other RN in Room 21, and Marco in Room 23 or backing up at 21. It doesn\'t matter which RN takes which room.',
+  scoring: 'Full credit for one RN in Room 22, the other RN in Room 21, and Marco helping in Room 21, Room 22 or Room 23. It doesn\'t matter which RN takes which room. Partial credit (Close) when the RNs are placed right and Marco stays at the station. No credit if no RN reaches Room 22, if Room 21 doesn\'t get the other RN, or if Marco is alone in Room 21 or Room 22.',
+  fullCredit: 'Full credit for one RN in Room 22, the other RN in Room 21, and Marco helping in Room 21, Room 22 or Room 23. It doesn\'t matter which RN takes which room.',
   next: {
     heading: 'What happens next',
     paths: { a: 'Path A: you in 22, Tess in 21', b: 'Path B: Tess in 22, you in 21' },
@@ -138,12 +163,12 @@ export const d1 = {
       ['1507', 'The behavioral response nurse arrives at Room 21 to join Tess.', 'The behavioral response nurse arrives and takes over watching Curtis from the doorway. You hand off what you\'ve seen.'],
       ['1508', 'You\'re at Dolores\'s bedside.', 'Tess: "She\'s your patient. Come look at this." You join her in Room 22. Tess goes back to Room 21 once Joy, the rapid response nurse, arrives at 1513.'],
     ],
-    after: 'From D2 on, both paths play the same scenes. Room 21 never goes unwatched.',
+    after: 'From here on, both paths play the same scenes. Room 21 never goes unwatched.',
   },
   teaching: 'The loudest room isn\'t always the sickest. A quiet call light with an ST change outranks a patient who is yelling.',
   concepts: ['prioritize-by-findings', 'delegation'],
   sources: [
-    [6, 'in one ICU study, 88.8% of sampled arrhythmia alarms were false positives, from causes including algorithms, patient rhythms and occasional electrode problems'],
+    [6, 'in one ICU study, 88.8% of 12,671 annotated alarms for six serious arrhythmias were false positives, from causes including alarm settings, algorithms and patient rhythms; poor signal quality was less common'],
     [7, 'delegate only stable, predictable care; assessment and clinical reasoning stay with the RN'],
     [8, 'agitation is a team effort'],
     [1, 'heart attack symptoms can include nausea and upper abdominal discomfort'],
@@ -173,10 +198,12 @@ export const d2 = {
     { id: 'page', text: 'Notify the provider (non-urgent): page with her symptoms', result: 'No',
       feedback: 'A page that waits in a queue doesn\'t match these findings.' },
     { id: 'antacid', text: 'Give the antacid she asked for and recheck in 30 minutes', result: 'No (unsafe)',
-      feedback: 'Treating this as reflux could delay evaluation of a possible ACS. Her electrodes are in the right spots, which makes lead placement a less likely explanation. The 12-lead will tell you more.' },
+      feedback: 'Treating this as reflux could delay evaluation of a possible ACS. Her new ST change, lower BP, sweating and nausea point to her heart. The 12-lead will tell you more.' },
     { id: 'watch', text: 'Ask Lena to keep watching and call if it gets worse', result: 'No (unsafe)',
-      feedback: 'She\'s already worse than at 1430. Watching longer isn\'t a plan.' },
+      feedback: 'She\'s already worse than at 1430. Her electrodes are in the right spots, which makes lead placement a less likely explanation. Watching longer isn\'t a plan.' },
   ],
+  // v0.8 guided safer path, shown after any choice except Escalate now, so the next scene doesn't contradict it.
+  bridge: 'The scenario continues with rapid response called at 1508 and the stat 12-lead done at the same time. Your original choice stays recorded.',
   teaching: 'Chest discomfort is common in heart attacks for women and men, but ischemia can also show up as upper abdominal discomfort, nausea, sweating or fatigue, sometimes without chest pain.',
   concepts: ['anginal-equivalents', 'prioritize-by-findings'],
   sources: [
@@ -205,6 +232,8 @@ export const d3 = {
     { id: 'placement', text: 'No acute changes. Probably lead placement after her bath.', result: 'No (unsafe)',
       feedback: 'Correct electrode positions make lead placement less likely, and the 12-lead shows a pattern across neighboring leads, not one odd lead.' },
   ],
+  // v0.8 guided safer path after a No or No (unsafe) reading. The V1 to V4 choice already starts the pathway.
+  bridge: 'The scenario continues with the STEMI escalation pathway started now and you staying with her. Your original choice stays recorded.',
   whileTeamWorks: 'Stay with her and keep her in bed. Keep her on the monitor and recheck her vitals and how she feels. Make sure her IV works and the crash cart is close, per policy. Give Joy a quick SBAR: her baseline at 1430, the change at 1508, and the 12-lead. Hand Rooms 21 and 23 to Tess while you stay.',
   teachingNote: 'With a suspected inferior STEMI, the team may ask for right-sided leads, such as V4R, to check for right ventricular involvement. Who records them varies, so follow your hospital\'s process.',
   teaching: 'Find the leads that match. ST elevation in II, III and aVF points to the inferior wall.',
@@ -229,7 +258,7 @@ export const d4 = {
     { id: 'choice', tier: 'best', text: '"It sounds like that box is scaring you. Do you want to set it on the table while we talk? Then we\'ll decide together what to do about the monitor."', result: 'Correct',
       feedback: 'You respond to the fear without contradicting him, and a real choice gives him back some control. He\'s off the monitor, so this starts the plan; it doesn\'t finish it.' },
     { id: 'explain', tier: 'acceptable', text: '"Curtis, I\'m your nurse. That sounds really frightening. The monitor sends information about your heart rhythm to the healthcare team so we can respond if something changes. Can we sit down and talk about what would help?"', result: 'Correct',
-      feedback: 'Also sound. A short, truthful explanation, said once without arguing, can help. The choice response is the preferred example because it\'s less likely to sound like a correction to someone with persecutory beliefs.' },
+      feedback: 'Also sound. A short, truthful explanation, said once without arguing, can help. The first response, which offers a choice, is the preferred example because it\'s less likely to sound like a correction to someone with persecutory beliefs.' },
     { id: 'argue', tier: 'harmful', text: '"Nobody can read your thoughts. That\'s your illness talking. Put it back on."', result: 'No',
       feedback: 'Arguing with a delusion and giving orders usually makes things worse.' },
     { id: 'agree', tier: 'harmful', text: '"Okay, I\'ll make sure the government can\'t hear anything."', result: 'No',
@@ -237,9 +266,11 @@ export const d4 = {
     { id: 'threat', tier: 'harmful', text: '"If you don\'t put it back on, security will hold you down."', result: 'No (unsafe)',
       feedback: 'Threats raise agitation and put him and staff at risk. Restraint is a last resort that needs clear clinical and legal justification under your hospital\'s policy. Restoring telemetry alone doesn\'t justify it, and it\'s never a bargaining chip.' },
   ],
-  scoring: 'Either calm, nonconfrontational response earns full credit. The choice response is the preferred example.',
+  scoring: 'Either calm, nonconfrontational response earns full credit. The response that offers a choice is the preferred example.',
+  bridge: 'The scenario continues as if you had responded to his fear and offered him a choice. Your original response stays recorded.',
   rightAway: {
     heading: 'Right away, while de-escalation continues',
+    more: 'The five safety steps',
     intro: 'He\'s a syncope patient with no monitoring, so the safety plan can\'t wait for him to calm down. Watching him is not the same as telemetry: an observer can\'t catch an arrhythmia. Treat the gap as an ongoing risk, and keep reassessing until he\'s back on the monitor.',
     items: [
       'Keep a staff member watching him in person, within line of sight, until monitoring is back. Tell him why, and revisit the plan with him as he calms.',
@@ -251,6 +282,7 @@ export const d4 = {
   },
   capacity: {
     heading: 'Capacity and the right to refuse',
+    more: 'How to assess capacity and respond to a refusal',
     intro: 'Curtis can say no to telemetry. Schizophrenia, active delusions and stopping his medication don\'t by themselves mean he can\'t make this decision. Presume he has capacity unless an assessment shows otherwise.',
     items: [
       ['Decision-specific:', 'His fear is about the monitor itself, so the question is narrow. Can he understand the risk of going without telemetry during a syncope workup, appreciate that it applies to him, weigh it, and tell you his choice?'],
@@ -274,12 +306,15 @@ export const d5 = {
   time: '1535', title: 'Room 23',
   // Shown only when Marco was placed at Room 21 in D1 (package build note).
   marcoMoved: 'Once the behavioral team had Room 21 covered, Tess sent Marco to Room 23.',
+  // v0.8: shown instead when Marco was placed in Room 22 in D1.
+  marcoMoved22: 'Once the STEMI team took over in Room 22, Tess sent Marco to Room 23.',
   vitalsLead: 'He reports Room 23\'s vitals from 1530:',
   vitalsLeadAlone: 'Marco reports Room 23\'s vitals from 1530:',
   vitals: `${vitalsLine(r23at1530)}.`,
   scene: 'Marco collects the vitals; reading the rhythm and reassessing Ray stay with you. Ray: "Still a little fluttery, same as this morning. No chest pain. Breathing\'s fine." Lena, the monitor tech: "23\'s been 104 to 118 all day." The plan on screen: rate control in progress, recheck at 1600, call the provider if he stays above 130.',
   strip: 'rm23-1535-a',
   prompt: 'Read his strip. What\'s your call?',
+  bridge: 'The scenario continues with Ray on his current plan and the 1600 recheck. Your original choice stays recorded.',
   choices: [
     { id: 'reassess', text: 'Continue and reassess', result: 'Correct',
       feedback: 'Irregularly irregular, no P waves, rate about 110 (11 QRS in 6 seconds). His pressure is normal, and he has no chest pain, shortness of breath or confusion. He remains stable, with no new findings that call for a change from the current plan.' },
@@ -307,15 +342,18 @@ const rewindFacts = (strip, trend, bpText, looks, mental) => [`Strip: ${strip}`,
 export const REWIND = {
   version: VERSION,
   title: 'The Room 23 call, three ways',
-  intro: 'The Rewind replays Decision 5 with the same patient in three different clinical states, and the correct call changes each time: Continue and reassess, Escalate now, then Notify the provider. His history, the 0800 AFib, and the provider\'s plan (recheck at 1600, call if he stays above 130) stay the same in all three.',
+  intro: 'The Rewind replays Decision 5 with the same patient in three different clinical states. Read each one and decide what it needs now. His history, the 0800 AFib, and the provider\'s plan (recheck at 1600, call if he stays above 130) stay the same in all three.',
   history: 'His history, the 0800 AFib, and the provider\'s plan (recheck at 1600, call if he stays above 130) stay the same in all three.',
   teaching: 'Same rhythm, three calls. Stability and the provider\'s plan set the urgency, not the rhythm\'s name.',
-  sources: [12, 10, 11],
+  sources: [12, 10, 11, 13],
+  // v0.8: titles are neutral so they don't reveal the call. `alternative` fills "Reasonable alternatives and scope".
   variations: [
-    { id: 'a', title: 'A: Stable (main script)', strip: 'rm23-1535-a', focus: 'Correct call: Continue and reassess',
+    { id: 'a', title: 'Version A', strip: 'rm23-1535-a', focus: 'Correct call: Continue and reassess',
+      alternative: 'Asking about dizziness, chest pain and shortness of breath before you decide is also sound. Call the provider if anything changes or his rate stays above 130.',
       facts: rewindFacts('AFib, about 110', '104 to 118 all day', bp(r23at1530), '"Fluttery, same as this morning"', 'Alert, oriented'),
       question: d5.prompt, options: d5.choices.map(c => option(c.id, c.text, c.result, c.feedback)) },
-    { id: 'b', title: 'B: Unstable', strip: 'rm23-1535-b', focus: 'Correct call: Escalate now',
+    { id: 'b', title: 'Version B', strip: 'rm23-1535-b', focus: 'Correct call: Escalate now',
+      alternative: 'Who you call first, rapid response or the provider by phone, follows your hospital\'s process. Either way, he needs the team at the bedside now, and you stay with him.',
       facts: rewindFacts('AFib, about 150', 'Jumped to the 140s and 150s 10 minutes ago', '84/50', 'Pale, clammy, dizzy. "My chest feels tight."', 'Slow to answer'),
       question: d5.prompt,
       options: [
@@ -324,14 +362,15 @@ export const REWIND = {
         option('recheck', 'Get specific information: repeat his BP in 15 minutes, then decide', 'No (unsafe)', 'Waiting delays care for a patient who is already unstable.'),
         option('reassess', 'Continue and reassess', 'No (unsafe)', 'His findings changed, so the old plan no longer fits.'),
       ] },
-    { id: 'c', title: 'C: In between', strip: 'rm23-1535-c', focus: 'Correct call: Notify the provider, now',
+    { id: 'c', title: 'Version C', strip: 'rm23-1535-c', focus: 'Correct call: Notify the provider, now',
+      alternative: 'If your hospital\'s rapid response criteria include a sustained heart rate above 130, calling them follows your policy. Call the provider either way, and keep rechecking his rate and symptoms.',
       facts: [...rewindFacts('AFib, about 130', '132 to 138, sustained for the last 20 minutes', '124/76', 'Fluttery. No chest pain, dizziness or shortness of breath.', 'Alert, oriented'),
         'Rate note: The 6-second count on the C strip (13 QRS, about 130) is only an estimate. The monitor\'s 20-minute trend is what shows he has stayed above 130.'],
       question: d5.prompt,
       options: [
-        option('notify', 'Notify the provider: call now with his rate trend, BP and symptoms, since he\'s past the "call if above 130" line', 'Correct', 'His monitor trend has stayed above 130 for 20 minutes, so he\'s past the line the provider set, even though he\'s stable. Making that call is part of the plan.'),
+        option('notify', 'Notify the provider: call now with his rate trend, BP and symptoms, since he\'s past the "call if above 130" line', 'Correct', 'His monitor trend has stayed above 130 for 20 minutes, so he\'s past the line the provider set, even though he\'s stable. Making that call is part of the plan. It\'s a provider call, not a rapid response call: he needs his plan changed, and he has no signs of instability.'),
         option('recheck', 'Get specific information: recheck his rate in 15 minutes, then call if he\'s still high', 'Close', 'Not unreasonable, but he\'s already been above 130 for 20 minutes. Call now, and recheck too.'),
-        option('escalate', 'Escalate now', 'Not best', 'His pressure is normal and he has no signs of instability. Rapid response isn\'t needed yet.'),
+        option('escalate', 'Escalate now: call rapid response', 'Close', 'Defensible if your hospital\'s rapid response criteria include a sustained heart rate above 130, so follow your policy. Here, though, his pressure is normal and he has no signs of instability, so the provider\'s call parameter is the main trigger. A provider call gets his plan changed; a rapid response call brings a team to the bedside for instability.'),
         option('reassess', 'Continue and reassess', 'No', 'He crossed the provider\'s call parameter. Staying quiet breaks the plan.'),
       ] },
   ],
@@ -343,13 +382,20 @@ export const debrief = {
     [['1540', 'Curtis sits down with you and the behavioral response nurse and agrees to put the monitor back on, after about 35 minutes off telemetry. The provider orders a psychiatry consult.']],
     [['1600', 'Ray\'s recheck shows his rate settling into the 90s. He\'s still in AFib, on his plan.']],
   ],
+  // Personalized review. v0.8 adds lines so each one describes what the learner actually chose (rules.js picks one).
   review: {
-    d1: { correct: 'You got an RN to the quiet room with the ST change and sent the right teammate to the loud one.', missed: 'Room 22 needed an RN first. Curtis\'s yelling meant he was breathing. Dolores\'s ST change meant her heart might not be getting enough blood.', concept: 'prioritize-by-findings, delegation' },
-    d2: { correct: 'You saw her \'indigestion\' for what it was: a new ST change, a lower BP, sweating and nausea.', missed: 'Upper belly burning, nausea and sweating with a new ST change and a lower BP point to her heart, not her stomach.', concept: 'anginal-equivalents' },
+    d1: { correct: 'You got an RN to the quiet room with the ST change and sent the right teammate to the loud one.', missed: 'Room 22 needed an RN first. Curtis\'s yelling meant he was breathing. Dolores\'s ST change meant her heart might not be getting enough blood.', concept: 'prioritize-by-findings, delegation',
+      close: 'You put both RNs where they were needed. Marco would have helped more in a room than at the station.', closeConcept: 'delegation',
+      room21: 'You got an RN to Room 22. Room 21 needed the other RN: Curtis was agitated and off the monitor, and a CNA can back up but not lead.' },
+    d2: { correct: 'You saw her \'indigestion\' for what it was: a new ST change, a lower BP, sweating and nausea.', missed: 'Upper belly burning, nausea and sweating with a new ST change and a lower BP point to her heart, not her stomach.', concept: 'anginal-equivalents',
+      close: 'You saw it was her heart and got the 12-lead fast. With her pressure down, call the team while it\'s being done, not after.', closeConcept: 'prioritize-by-findings' },
     d3: { correct: 'You found the elevation in II, III and aVF and got the team moving.', missed: 'Look for ST elevation in leads that sit together. II, III and aVF did, and that called for the STEMI response now.', concept: 'stemi-recognition' },
-    d4: { correct: 'You calmed Curtis without arguing, agreeing or threatening, and left the decision about the monitor with him.', missed: 'With a delusion, respond to the feeling, keep it short and offer a choice. Arguing or threatening raises the risk.', concept: 'verbal-deescalation' },
-    d5: { correct: 'You kept Ray on his plan because nothing had changed.', missed: 'Ray was stable and unchanged with a plan in place. Escalation is for change or instability.', concept: 'stable-vs-unstable-afib' },
+    d4: { correct: 'You calmed Curtis without arguing, agreeing or threatening, and left the decision about the monitor with him.', missed: 'With a delusion, respond to the feeling, keep it short and offer a choice. Arguing or threatening raises the risk.', concept: 'verbal-deescalation',
+      agree: 'Agreeing with a delusion isn\'t honest and can reinforce it. Respond to the feeling, keep it short and offer a choice.' },
+    d5: { correct: 'You kept Ray on his plan because nothing had changed.', missed: 'Ray was stable and unchanged with a plan in place. Escalation is for change or instability.', concept: 'stable-vs-unstable-afib',
+      notify: 'Ray was stable and unchanged, and the provider already knew. Save the call for a change, like a rate above 130.' },
   },
+  guidedNote: 'The story below follows the safer path. Your shift review reflects your original choices, not the corrections.',
   takeaways: [
     'The loudest room is not always the sickest: go where the findings point, and send the right teammate to the rest.',
     'Chest discomfort is common in heart attacks for women and men, but a heart attack can also feel like indigestion, especially in women, older adults and people with diabetes.',
@@ -357,7 +403,7 @@ export const debrief = {
   why: [
     ['Chest pain is still the most common heart attack symptom, including in women, but it isn\'t always there. Symptoms can sit in the upper abdomen or jaw, and women more often have nausea and shortness of breath with it', [1, 3, 4, 14]],
     ['ST elevation in neighboring leads marks injury in the wall those leads face. II, III and aVF face the inferior wall, and I and aVL often show mirror-image depression', [1, 2]],
-    ['In one ICU study, 88.8% of sampled arrhythmia alarms were false positives. Causes included monitoring algorithms, patient rhythms and occasional electrode problems. Alarms still require appropriate assessment. A leads-off alert indicates loss of monitoring, not confirmed asystole', [6]],
+    ['In one ICU study, 88.8% of 12,671 annotated alarms for six serious arrhythmias, such as asystole and ventricular tachycardia, were false positives. Causes included alarm settings, monitoring algorithms and patient rhythms; poor signal quality was less common. Alarms still require appropriate assessment. A leads-off alert indicates loss of monitoring, not confirmed asystole', [6]],
   ],
   // Go further. Rhythm Lab buttons stay hidden: no ST elevation entry exists, and the AFib entry has no direct link.
   rhythmLab: [
@@ -385,7 +431,8 @@ export const card = {
     { decision: 'D5', steps: ['Evaluate outcomes'] },
   ],
   twist: 'The loud room has a man who is talking, breathing and pulling off his leads. The quiet call light, which the monitor tech blames on lead placement after a bath, is an inferior STEMI.',
-  specialty: 'Telemetry', learnerLevel: 'Student and new grad', estimatedTime: '6 minutes', decisionCount: 5,
+  // v0.8: measured from the learner text (about 1,950 words shown by default on an all-correct path, 8 to 10 minutes of reading) plus six tracings and five decisions.
+  specialty: 'Telemetry', learnerLevel: 'Student and new grad', estimatedTime: 'About 10 to 12 minutes', decisionCount: 5,
   reviewStatus: 'Draft', contentReviewDate: 'Pending',
   specialtyReview: 'psych specialty review required',
 };
@@ -393,10 +440,11 @@ export const card = {
 // Open review items (not learner-facing). Part F.
 export const OPEN_ITEMS = [
   'Founder review, independent clinical review and psych specialty review (Room 21 and D4) are not recorded.',
-  'All nine ECG images are constructed illustrations and need a clinical check of morphology before release.',
+  'All nine ECG images are constructed illustrations and need a clinical check of morphology before release. The audit of 25 Oct 2026 found a long QT on the sinus tracings, very short AF R-R intervals in Rewind B, a near-isoelectric aVL QRS and a "Main script, Rewind A" label on the D5 image. These are deferred to remediation Part 2.',
   'Sources 3, 4 and 5 were opened through ACC summaries; claims need checking against the full text.',
+  'Source 14 now links to its DOI. The hosted copy the author first read (sections 1 to 4.3) returned HTTP 404 on 25 Oct 2026, so its claims need checking against the published text.',
   'The two Rhythm Lab Go further buttons are hidden until verified entries exist.',
-  'D1 placements the rules table does not cover earn no credit and continue on a labeled guided path (Path B only if Tess alone took Room 22), as decided by Mohamed on 24 Oct 2026. No storyline was added.',
-  'D5 Marco line build note added in the package; Mohamed to confirm.',
-  'Founder changes to v0.7 text on 24 Oct 2026, before review: D1 shows all three patients\' strips (Room 21 at 1505, Rooms 22 and 23 at their 1430 starting strips), and Lena is introduced as the monitor tech on D1 and D5.',
+  'v0.8 clinical decisions awaiting approval: Marco helping the RN in Room 22 earns full credit; Marco at the station earns partial credit (Close); Rewind C "Escalate now" is Close instead of Not best; decision-screen alt text gives objective findings until the learner answers; the estimated time is About 10 to 12 minutes.',
+  'D5 Marco line build note added in the package; Mohamed to confirm. v0.8 adds a matching line when Marco was in Room 22.',
+  'Founder changes to v0.7 text on 24 Oct 2026, before review: D1 shows all three patients\' strips (Room 21 at 1505, Rooms 22 and 23 at their 1430 starting strips), and Lena is introduced as the monitor tech on D1 and D5. v0.8 labels the 1430 strips on D1 as earlier strips.',
 ];

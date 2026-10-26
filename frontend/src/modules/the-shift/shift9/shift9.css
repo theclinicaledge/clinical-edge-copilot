@@ -12,15 +12,23 @@
 .s9-then-now { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 16px; }
 .s9-strip-heading { display: flex; gap: 10px; align-items: baseline; margin-bottom: 6px; font: 600 12px var(--ce-font-mono); color: var(--ce-text-muted); }
 .s9-strip-heading time { font-size: 15px; color: var(--ce-text-dark); }
-.s9-steps { max-width: 800px; border-block: 1px solid var(--ce-warm-line); }
-.s9-steps button { width: 100%; display: flex; gap: 16px; align-items: flex-start; min-height: 44px; text-align: left; border: 0; background: none; padding: 16px 4px; color: var(--ce-text-dark); font: inherit; cursor: pointer; }
-.s9-steps button + button { border-top: 1px solid var(--ce-warm-line); }
-.s9-steps button > span:nth-child(2) { flex: 1; }
-.s9-steps button strong { display: block; font-size: 15px; }
+.s9-steps { max-width: 800px; margin: 0 0 20px; padding: 0; list-style: none; border-block: 1px solid var(--ce-warm-line); }
+.s9-steps li + li { border-top: 1px solid var(--ce-warm-line); }
+.s9-steps button { width: 100%; display: flex; gap: 16px; align-items: center; min-height: 44px; text-align: left; border: 0; background: none; padding: 16px 4px; color: var(--ce-text-dark); font: inherit; cursor: pointer; }
+.s9-steps button strong { flex: 1; font-size: 15px; }
 .s9-steps button:focus-visible { outline: 3px solid var(--ce-teal-deep); outline-offset: 2px; }
-.s9-step-index { font-family: var(--ce-font-mono); color: #39736f; font-size: 12px; padding-top: 3px; }
-.s9-step-compare { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; margin-top: 8px; font-size: 15px; color: var(--ce-text-mid); }
-.s9-step-compare small { display: block; font: 600 11px var(--ce-font-mono); color: var(--ce-text-muted); }
+.s9-step-index { font-family: var(--ce-font-mono); color: #39736f; font-size: 12px; }
+.s9-step-compare { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; margin: 0; padding: 0 4px 16px 44px; font-size: 15px; color: var(--ce-text-mid); }
+.s9-step-compare dt { font: 600 11px var(--ce-font-mono); color: var(--ce-text-muted); }
+.s9-step-compare dd { margin: 0; }
+.s9-strip-note { margin: 0 0 8px; font-size: 14px; color: var(--ce-text-mid); }
+
+/* v0.8: supporting teaching detail behind a labeled toggle. */
+.s9-more { margin-top: 8px; }
+.s9-more summary { display: flex; align-items: center; min-height: 44px; font-weight: 650; color: var(--ce-teal-deep); cursor: pointer; }
+.s9-more summary:focus-visible { outline: 3px solid var(--ce-teal-deep); outline-offset: 2px; }
+/* A confirmed choice that wasn't full credit keeps its selected marker but not the teal success color. */
+.s9-app .shift-choice.is-selected.s9-selected-miss { border-color: var(--ce-gold-deep); box-shadow: inset 3px 0 var(--ce-gold-deep); }
 
 .s9-rules { margin: 12px 0; padding: 0; list-style: none; display: grid; gap: 12px; }
 .s9-rules li { line-height: 1.6; }
@@ -32,4 +40,5 @@
 
 @media (max-width: 760px) {
   .s9-then-now, .s9-step-compare { grid-template-columns: 1fr; }
+  .s9-step-compare { padding-left: 4px; }
 }

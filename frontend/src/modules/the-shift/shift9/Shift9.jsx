@@ -9,7 +9,7 @@ import AssignTeam from '../components/AssignTeam.jsx';
 import TherapeuticResponse from '../components/TherapeuticResponse.jsx';
 import { SOURCES, STRIPS, VERSION, TOKENS, TARGETS, team, assignment, d1, d2, d3, d4, d5, debrief, card } from './data.js';
 import { STORAGE_KEY, FINAL_STAGE, stages, freshProgress, readProgress } from './progress.js';
-import { credit, d2Choice, d3Choice, d4Choice, d5Choice, evaluateAssignment, decisionResults, validPlacement } from './rules.js';
+import { credit, d2Choice, d3Choice, d4Choice, d5Choice, evaluateAssignment, decisionResults, validPlacement, reviewLine, guidedAfter, anyGuided } from './rules.js';
 import Shift9Rewind from './Shift9Rewind.jsx';
 
 const Arrow = () => <span aria-hidden="true">&#8594;</span>;
@@ -17,10 +17,14 @@ const Check = () => <span aria-hidden="true">&#10003;</span>;
 const markFor = result => credit(result) === 'full' ? '✓' : credit(result) === 'partial' ? '◐' : '!';
 const toneFor = result => credit(result) === 'full' ? 'is-correct' : credit(result) === 'partial' ? 'is-partial' : 'is-reflection';
 
-function Strip({ id, children }) {
+// Until its decision is answered, a strip reads its objective description (`altBefore`), not the interpretation.
+function Strip({ id, answered = true, children }) {
   const strip = STRIPS[id];
-  return <StripFigure src={strip.src} alt={strip.alt} caption={strip.caption} wide={strip.twelveLead}>{children}</StripFigure>;
+  return <StripFigure src={strip.src} alt={answered ? strip.alt : strip.altBefore ?? strip.alt} caption={strip.caption} wide={strip.twelveLead}>{children}</StripFigure>;
 }
+
+// Shift 06 pattern: after a choice that earns no credit, say how the story continues so the next scene fits.
+const Bridge = ({ text }) => <p className="s6-bridge"><strong>Guided safer path.</strong> {text}</p>;
 
 // Sources carry the spec's note on what each one supports in this decision.
 function References({ items }) {
@@ -30,8 +34,9 @@ function References({ items }) {
   </details>;
 }
 
-function Result({ result }) {
-  return <span className={`s6-result ${toneFor(result)}`}>{result}{credit(result) === 'partial' && <small>Partially correct</small>}</span>;
+// `bare` drops the "Partially correct" note, for D1 rule rows where the feedback heading already carries it.
+function Result({ result, bare = false }) {
+  return <span className={`s6-result ${toneFor(result)}`}>{result}{!bare && credit(result) === 'partial' && <small>Partially correct</small>}</span>;
 }
 
 function Feedback({ result, feedback, corrections = [], children, onContinue, nextLabel, sources = [] }) {
@@ -47,9 +52,10 @@ function Feedback({ result, feedback, corrections = [], children, onContinue, ne
   </section>;
 }
 
+const answeredClass = item => credit(item.result) === 'full' ? '' : 's9-selected-miss';
 function Choices({ items, answer, selected, onChoose, label }) {
   return <div className="shift-choices" role="group" aria-label={label}>{items.map(item =>
-    <button key={item.id} aria-pressed={(answer ?? selected) === item.id} className={`shift-choice ${(answer ?? selected) === item.id ? 'is-selected' : ''}`} disabled={answer !== undefined} onClick={() => onChoose(item.id)}>
+    <button key={item.id} aria-pressed={(answer ?? selected) === item.id} className={`shift-choice ${(answer ?? selected) === item.id ? 'is-selected' : ''} ${answer === item.id ? answeredClass(item) : ''}`} disabled={answer !== undefined} onClick={() => onChoose(item.id)}>
       <span>{item.text}</span><span className="shift-choice-end" aria-hidden="true">{(answer ?? selected) === item.id ? '✓' : '→'}</span>
     </button>
   )}</div>;
@@ -57,6 +63,11 @@ function Choices({ items, answer, selected, onChoose, label }) {
 
 function Panel({ heading, children }) {
   return <div className="s6-while-help s9-panel"><span className="shift-overline">{heading} (unscored)</span>{children}</div>;
+}
+
+// Supporting detail behind a labeled toggle, so the key point stays visible and the page stays short.
+function More({ label, children }) {
+  return <details className="s9-more"><summary>{label}</summary>{children}</details>;
 }
 
 function RoomNumber({ id }) { return <span className="shift-room-number"><small>ROOM</small><strong>{id}</strong></span>; }
@@ -149,8 +160,9 @@ export default function Shift9() {
 
         {progress.stage === 1 && <>
           <div className="shift-situation s9-board"><span className="shift-overline">Unit board and central monitor / {d1.time}</span><ul>{d1.board.map(([label, text]) => <li key={label}><strong>{label}:</strong> {text}</li>)}</ul></div>
-          <div className="s9-d1-strips">{d1.strips.map(id => <div key={id}><div className="s9-strip-heading"><time>{STRIPS[id].time}</time><span>Room {STRIPS[id].room} / {id === d1.strip ? 'Now' : 'Starting strip'}</span></div>
-            <Strip id={id}>{id === d1.strip && <div className="s9-look-closer"><button className="shift-secondary" aria-expanded={progress.closer} aria-controls="s9-closer" onClick={() => update({ closer: !progress.closer })}>{progress.closer ? 'Close examination' : 'Look closer'} <span aria-hidden="true">&#8981;</span></button>
+          <div className="s9-d1-strips">{d1.strips.map(id => <div key={id}><div className="s9-strip-heading"><time>{STRIPS[id].time}</time><span>{d1.stripLabels[id]}</span></div>
+            {d1.stripNotes[id] && <p className="s9-strip-note">{d1.stripNotes[id]}</p>}
+            <Strip id={id} answered={id !== d1.strip || progress.closer || answers.d1 !== undefined}>{id === d1.strip && <div className="s9-look-closer"><button className="shift-secondary" aria-expanded={progress.closer} aria-controls="s9-closer" onClick={() => update({ closer: !progress.closer })}>{progress.closer ? 'Close examination' : 'Look closer'} <span aria-hidden="true">&#8981;</span></button>
               {progress.closer && <p id="s9-closer"><span className="shift-overline">Look closer (unscored)</span>{d1.lookCloser}</p>}</div>}</Strip>
           </div>)}</div>
           <h2 className="s6-prompt" id="s9-d1-prompt">{d1.prompt}</h2>
@@ -158,9 +170,9 @@ export default function Shift9() {
             onChange={(token, target) => setProgress(previous => previous.answers.d1 ? previous : { ...previous, placement: { ...previous.placement, [token]: target } })} />
           {!answers.d1 && <div className="shift-cue-confirm"><p role="status">{placed === TOKENS.length ? 'Everyone is placed. Submit when ready.' : `${placed} of ${TOKENS.length} placed.`}</p><button className="shift-primary" disabled={!validPlacement(progress.placement)} onClick={() => choose('d1', { ...progress.placement })}>Submit<Arrow /></button></div>}
           {assigned && <Feedback result={assigned.result} onContinue={next} nextLabel="Go to Room 22" sources={d1.sources}>
-            <ul className="s9-rules">{assigned.fired.map(rule => <li key={rule.id}><Result result={rule.result} /><strong>{rule.text}.</strong> {rule.feedback}</li>)}</ul>
-            {assigned.guided && <><div className="shift-correction"><strong>Full credit</strong><p>{d1.fullCredit}</p></div>
-              <p className="s6-bridge"><strong>Guided safer path.</strong> This placement doesn&apos;t earn credit. The scenario continues on {d1.next.paths[assigned.path]}. Your original placement stays recorded.</p></>}
+            <ul className="s9-rules">{assigned.fired.map(rule => <li key={rule.id}><Result result={rule.result} bare /><strong>{rule.text}.</strong> {rule.feedback}</li>)}</ul>
+            {!assigned.full && <div className="shift-correction"><strong>Full credit</strong><p>{d1.fullCredit}</p></div>}
+            {assigned.guided && <Bridge text={`This placement doesn't earn credit. The scenario continues on ${d1.next.paths[assigned.path]}. Your original placement stays recorded.`} />}
             <blockquote>{d1.teaching}</blockquote>
             <Panel heading={d1.next.heading}>
               <p className="s9-path">{d1.next.paths[assigned.path]}</p>
@@ -173,24 +185,26 @@ export default function Shift9() {
         {progress.stage === 2 && <>
           <p className="shift-lead">{d2.scene}</p>
           <div className="s9-then-now">{d2.strips.map((id, index) => <div key={id}><div className="s9-strip-heading"><time>{STRIPS[id].time}</time><span>{index === 0 ? 'Then' : 'Now'}</span></div><Strip id={id} /></div>)}</div>
-          <div className="s9-steps">{d2.steps.map(([id, name, then, now], index) => {
+          <ul className="s9-steps" aria-label="Compare 1430 and 1508">{d2.steps.map(([id, name, then, now], index) => {
             const open = progress.steps.includes(id);
-            return <button key={id} aria-expanded={open} onClick={() => update({ steps: open ? progress.steps.filter(step => step !== id) : [...progress.steps, id] })}><span className="s9-step-index">0{index + 1}</span><span><strong>{name}</strong>{open && <span className="s9-step-compare"><span><small>1430</small> {then}</span><span><small>1508</small> {now}</span></span>}</span><span aria-hidden="true">{open ? '−' : '+'}</span></button>;
-          })}</div>
+            return <li key={id}><button aria-expanded={open} aria-controls={`s9-step-${id}`} onClick={() => update({ steps: open ? progress.steps.filter(step => step !== id) : [...progress.steps, id] })}><span className="s9-step-index" aria-hidden="true">0{index + 1}</span><strong>{name}</strong><span aria-hidden="true">{open ? '−' : '+'}</span></button>
+              {open && <dl id={`s9-step-${id}`} className="s9-step-compare"><div><dt>1430</dt><dd>{then}</dd></div><div><dt>1508</dt><dd>{now}</dd></div></dl>}</li>;
+          })}</ul>
           <h2 className="s6-prompt">{d2.prompt}</h2>
           <Choices items={d2.choices} answer={answers.d2} selected={progress.drafts.d2} label="Calls" onChoose={id => select('d2', id)} />
           {confirm('d2')}
-          {answers.d2 && <Feedback result={d2Choice(answers.d2).result} feedback={d2Choice(answers.d2).feedback} corrections={corrections(d2.choices, d2Choice(answers.d2))} onContinue={next} nextLabel="The 12-lead prints" sources={d2.sources}><blockquote>{d2.teaching}</blockquote></Feedback>}
+          {answers.d2 && <Feedback result={d2Choice(answers.d2).result} feedback={d2Choice(answers.d2).feedback} corrections={corrections(d2.choices, d2Choice(answers.d2))} onContinue={next} nextLabel="The 12-lead prints" sources={d2.sources}><blockquote>{d2.teaching}</blockquote>{guidedAfter('d2', answers) && <Bridge text={d2.bridge} />}</Feedback>}
         </>}
 
         {progress.stage === 3 && <>
           <p className="shift-lead">{d3.scene}</p>
-          <Strip id={d3.strip} />
+          <Strip id={d3.strip} answered={answers.d3 !== undefined} />
           <h2 className="s6-prompt">{d3.prompt}</h2>
           <Choices items={d3.choices} answer={answers.d3} selected={progress.drafts.d3} label="Readings" onChoose={id => select('d3', id)} />
           {confirm('d3')}
           {answers.d3 && <Feedback result={d3Choice(answers.d3).result} feedback={d3Choice(answers.d3).feedback} corrections={corrections(d3.choices, d3Choice(answers.d3))} onContinue={next} nextLabel="Go to Room 21" sources={d3.sources}>
             <blockquote>{d3.teaching}</blockquote>
+            {guidedAfter('d3', answers) && <Bridge text={d3.bridge} />}
             <Panel heading="While the team works"><p>{d3.whileTeamWorks}</p></Panel>
             <Panel heading="Teaching note"><p>{d3.teachingNote}</p></Panel>
           </Feedback>}
@@ -199,33 +213,34 @@ export default function Shift9() {
         {progress.stage === 4 && <>
           <div className="shift-situation"><span className="shift-overline">Room 21 / {d4.time}</span>{d4.scene.map(text => <p key={text}>{text}</p>)}<p className="s9-quote">{d4.quote}</p></div>
           <h2 className="s6-prompt">{d4.prompt}</h2>
-          <TherapeuticResponse items={d4.choices} answer={answers.d4} selected={progress.drafts.d4} label="Responses" onChoose={id => select('d4', id)} />
+          <TherapeuticResponse items={d4.choices} answer={answers.d4} selected={progress.drafts.d4} label="Responses" onChoose={id => select('d4', id)} answeredClass={answeredClass} />
           {confirm('d4')}
           {answers.d4 && <Feedback result={d4Choice(answers.d4).result} feedback={d4Choice(answers.d4).feedback} corrections={corrections(d4.choices, d4Choice(answers.d4))} onContinue={next} nextLabel="Go to Room 23" sources={d4.sources}>
             <blockquote>{d4.teaching}</blockquote>
-            <Panel heading={d4.rightAway.heading}><p>{d4.rightAway.intro}</p><ul>{d4.rightAway.items.map(text => <li key={text}>{text}</li>)}</ul></Panel>
-            <Panel heading={d4.capacity.heading}><p>{d4.capacity.intro}</p><ul>{d4.capacity.items.map(([lead, text]) => <li key={lead}><strong>{lead}</strong> {text}</li>)}</ul></Panel>
+            {guidedAfter('d4', answers) && <Bridge text={d4.bridge} />}
+            <Panel heading={d4.rightAway.heading}><p>{d4.rightAway.intro}</p><More label={d4.rightAway.more}><ul>{d4.rightAway.items.map(text => <li key={text}>{text}</li>)}</ul></More></Panel>
+            <Panel heading={d4.capacity.heading}><p>{d4.capacity.intro}</p><More label={d4.capacity.more}><ul>{d4.capacity.items.map(([lead, text]) => <li key={lead}><strong>{lead}</strong> {text}</li>)}</ul></More></Panel>
           </Feedback>}
         </>}
 
         {progress.stage === 5 && <>
-          <div className="shift-situation"><span className="shift-overline">Room 23 / {d5.time}</span><p>{assigned?.marcoAt21 ? `${d5.marcoMoved} ${d5.vitalsLead}` : d5.vitalsLeadAlone} {d5.vitals} {d5.scene}</p></div>
-          <Strip id={d5.strip} />
+          <div className="shift-situation"><span className="shift-overline">Room 23 / {d5.time}</span><p>{assigned?.marcoAt === '21' ? `${d5.marcoMoved} ${d5.vitalsLead}` : assigned?.marcoAt === '22' ? `${d5.marcoMoved22} ${d5.vitalsLead}` : d5.vitalsLeadAlone} {d5.vitals} {d5.scene}</p></div>
+          <Strip id={d5.strip} answered={answers.d5 !== undefined} />
           <h2 className="s6-prompt">{d5.prompt}</h2>
           <Choices items={d5.choices} answer={answers.d5} selected={progress.drafts.d5} label="Calls" onChoose={id => select('d5', id)} />
           {confirm('d5')}
-          {answers.d5 && <Feedback result={d5Choice(answers.d5).result} feedback={d5Choice(answers.d5).feedback} corrections={corrections(d5.choices, d5Choice(answers.d5))} onContinue={next} nextLabel="Finish the shift" sources={d5.sources}><blockquote>{d5.teaching}</blockquote></Feedback>}
+          {answers.d5 && <Feedback result={d5Choice(answers.d5).result} feedback={d5Choice(answers.d5).feedback} corrections={corrections(d5.choices, d5Choice(answers.d5))} onContinue={next} nextLabel="Finish the shift" sources={d5.sources}><blockquote>{d5.teaching}</blockquote>{guidedAfter('d5', answers) && <Bridge text={d5.bridge} />}</Feedback>}
         </>}
 
         {progress.stage === FINAL_STAGE && <>
           <div className="shift-complete"><span><Check /></span><p>{stages[FINAL_STAGE].title}</p></div>
-          {assigned?.guided && <p className="s6-bridge"><strong>Scripted outcome after a guided correction.</strong> The story below follows the safer path. Your shift review reflects your original choices, not the correction.</p>}
+          {anyGuided(answers) && <p className="s6-bridge"><strong>Scripted outcome after guided corrections.</strong> {debrief.guidedNote}</p>}
           <section className="shift-debrief-section"><h2>How the afternoon unfolded</h2><ol className="shift-timeline">{debrief.outcome.map(events => <li key={events.map(([time]) => time).join('-')}><time>{events[0][0]}</time><p>{events.map(([time, text], index) => <span key={time + index}>{index > 0 && <> <strong>{time}</strong> </>}{text}</span>)}</p></li>)}</ol></section>
           <section className="shift-debrief-section"><span className="shift-overline">Personalized shift review</span><h2>Your shift review</h2><ul className="shift-reflections s6-review">{stages.filter(item => item.decision).map(item => {
             const { result, credit: earned } = results[item.decision];
-            const line = debrief.review[item.decision];
+            const line = reviewLine(item.decision, answers);
             const full = earned === 'full';
-            return <li key={item.decision}><span className={`shift-result-mark ${full ? 'is-recognized' : earned === 'partial' ? 's6-is-partial' : ''}`} aria-label={full ? 'Correct' : earned === 'partial' ? 'Partially correct' : 'Revisit'}>{markFor(result)}</span><div><small>{item.label}</small><strong>{full ? line.correct : line.missed}</strong><p><Result result={result} />{!full && <span className="s6-concept">Concept to strengthen: {line.concept}</span>}</p></div></li>;
+            return <li key={item.decision}><span className={`shift-result-mark ${full ? 'is-recognized' : earned === 'partial' ? 's6-is-partial' : ''}`} aria-label={full ? 'Correct' : earned === 'partial' ? 'Partially correct' : 'Revisit'}>{markFor(result)}</span><div><small>{item.label}</small><strong>{line.text}</strong><p><Result result={result} />{line.concept && <span className="s6-concept">Concept to strengthen: {line.concept}</span>}</p></div></li>;
           })}</ul><p className="shift-small">Learning reflection, not a clinical competency score.</p></section>
           <section className="shift-takeaways s6-takeaways" aria-label="Takeaways">{debrief.takeaways.map((text, index) => <div key={text}><span>0{index + 1}</span><p>{text}</p></div>)}</section>
           <section className="shift-debrief-section"><h2>Why it happens</h2><ul className="shift-why">{debrief.why.map(([text, numbers]) => <li key={text}>{text} {numbers.map(number => <a key={number} className="s6-source-ref" href={SOURCES[number].url} target="_blank" rel="noreferrer">[Source {number}]</a>)}</li>)}</ul></section>

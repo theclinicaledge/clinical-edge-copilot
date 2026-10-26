@@ -14,7 +14,7 @@ export const shift9Entry = {
   review: {
     status: 'Draft. Founder review, independent clinical sign-off and psych specialty review are not recorded. No clinical validation is claimed.',
     independentStatus: 'Not reviewed', reviewer: null, reviewDate: null, approvedVersion: null,
-    sourceVerification: 'Sources were opened by the AI author while drafting. Human passage-level verification has not been recorded. Sources 3, 4 and 5 were opened through ACC summaries.',
+    sourceVerification: 'Sources were opened by the AI author while drafting. Human passage-level verification has not been recorded. Sources 3, 4 and 5 were opened through ACC summaries. Source 14 now links to its DOI because the copy first read is no longer available.',
   },
   reviewStatus: card.reviewStatus, specialtyReviewRequired: 'psych', specialtyReview: card.specialtyReview,
   sources: Object.entries(SOURCES).map(([number, source]) => ({

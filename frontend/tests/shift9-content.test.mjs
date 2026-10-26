@@ -5,7 +5,7 @@ import * as data from '../src/modules/the-shift/shift9/data.js';
 
 const { VITALS, STRIPS, ROOM22_GLUCOSE, assignment, d1, d2, d3, d4, d5, REWIND, debrief, card, SOURCES, bp, vitalsAt, stripsFor } = data;
 
-// SHIFT-009 v0.7, Part C and the Rewind table: [time, HR, BP, RR, SpO2 with oxygen].
+// SHIFT-009 v0.8 (vitals unchanged from v0.7), Part C and the Rewind table: [time, HR, BP, RR, SpO2 with oxygen].
 const SPEC_VITALS = {
   21: [['1430', 'HR 84, BP 138/86, RR 16, SpO2 98% RA']],
   22: [['1430', 'HR 88, BP 132/74, RR 18, SpO2 95% on 2 L'], ['1508', 'HR 94, BP 106/62, RR 22, SpO2 93% on 2 L']],
@@ -115,7 +115,7 @@ test('sources, version and Draft review status are stored as the spec gives them
   const cited = [d1, d2, d3, d4, d5].flatMap(item => item.sources.map(([number]) => number)).concat(REWIND.sources, debrief.why.flatMap(([, numbers]) => numbers));
   assert.deepEqual(cited.filter(number => !SOURCES[number]), []);
   assert.deepEqual([...new Set(cited)].sort((a, b) => a - b), Array.from({ length: 16 }, (_, i) => i + 1));
-  assert.equal(data.VERSION, '0.7');
+  assert.equal(data.VERSION, '0.8');
   assert.equal(data.SCENARIO_ID, 'SHIFT-009');
   assert.equal(card.reviewStatus, 'Draft');
   assert.equal(card.contentReviewDate, 'Pending');
@@ -126,7 +126,7 @@ test('sources, version and Draft review status are stored as the spec gives them
 
 test('learner text keeps the spec wording for key lines', () => {
   assert.equal(d1.prompt, 'Place yourself, Tess and Marco. Then submit.');
-  assert.equal(d1.rules.length, 7);
+  assert.equal(d1.rules.length, 13);
   assert.equal(d1.board[2][0], 'Lena, the monitor tech, calls');
   assert.match(d5.scene, /Lena, the monitor tech: "23's been 104 to 118 all day."/);
   assert.equal(d3.choices.find(c => c.id === 'anterior').result, 'Close');
@@ -137,4 +137,40 @@ test('learner text keeps the spec wording for key lines', () => {
   assert.equal(debrief.ask, 'Why can a heart attack feel like indigestion?');
   assert.equal(debrief.share, "The loudest room on the unit wasn't the sickest one.");
   assert.ok(debrief.rhythmLab.every(button => button.verified === false));
+});
+
+// Audit M7: decision-screen alt text named the answer before the learner chose.
+test('decision strips read objective findings until the decision is answered', () => {
+  const interpretive = /asystole|fibrillation|afib|irregularly irregular|no p waves|elevation|depression|stemi|sinus rhythm|inferior/i;
+  const before = ['rm21-1505', 'rm22-1513-12lead', 'rm23-1535-a', 'rm23-1535-b', 'rm23-1535-c'];
+  assert.deepEqual(Object.entries(STRIPS).filter(([, s]) => s.altBefore).map(([id]) => id), before);
+  for (const id of before) {
+    assert.ok(!interpretive.test(STRIPS[id].altBefore), `${id}: ${STRIPS[id].altBefore}`);
+    assert.ok(STRIPS[id].altBefore.startsWith(STRIPS[id].caption), id);
+  }
+  // Same findings a sighted learner sees: every 12-lead lead's ST level, and the QRS count on the AF strips.
+  for (const lead of ['lead I ', 'Lead II ', 'Lead III ', 'aVR', 'aVL', 'aVF', 'V1', 'V2', 'V3', 'V4', 'V5', 'V6']) assert.ok(STRIPS['rm22-1513-12lead'].altBefore.includes(lead), lead);
+  assert.match(STRIPS['rm23-1535-a'].altBefore, /11 QRS complexes in 6 seconds/);
+  assert.match(STRIPS['rm23-1535-b'].altBefore, /15 QRS complexes in 6 seconds/);
+  assert.match(STRIPS['rm23-1535-c'].altBefore, /13 QRS complexes in 6 seconds/);
+});
+
+test('v0.8 content corrections', () => {
+  // D1: the earlier strips are labeled as earlier, and Room 22's note says it predates Lena's call.
+  assert.deepEqual(d1.strips.map(id => d1.stripLabels[id]), ['Room 21 / Now', 'Room 22 / Earlier strip, 1430', 'Room 23 / Earlier strip, 1430']);
+  assert.match(d1.stripNotes['rm22-1430'], /1430 baseline, from before the change Lena is calling about/);
+  // Rhythm notes: the 6-second count is an estimate (the Room 22 1430 strip counts 80 against HR 88).
+  assert.match(assignment.rhythmNotes, /That count is an estimate/);
+  assert.match(assignment.rhythmNotes, /300 divided by the number of large boxes/);
+  // Source 14 resolves through its DOI; the dead hosted copy is gone.
+  assert.equal(SOURCES[14].url, 'https://doi.org/10.1016/j.jacc.2024.11.009');
+  assert.ok(!JSON.stringify(SOURCES).includes('hendrickhealth'));
+  // The alarm study is described with its scope.
+  assert.match(debrief.why[2][0], /88\.8% of 12,671 annotated alarms for six serious arrhythmias/);
+  assert.equal(card.estimatedTime, 'About 10 to 12 minutes');
+  // Learner text carries no authoring shorthand.
+  assert.ok(!/From D2 on|The choice response|main script/.test(JSON.stringify({ d1, d4, REWIND })));
+  // Each guided bridge exists where the flow uses it.
+  for (const item of [d2, d3, d4, d5]) assert.match(item.bridge, /Your original (choice|response) stays recorded\.$/);
+  assert.equal(d5.marcoMoved22, 'Once the STEMI team took over in Room 22, Tess sent Marco to Room 23.');
 });

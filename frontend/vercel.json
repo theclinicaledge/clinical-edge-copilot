@@ -1,4 +1,5 @@
 {
+  "git": { "deploymentEnabled": { "release/shift8-code-blue-v081": false } },
   "rewrites": [
     { "source": "/(.*)", "destination": "/index.html" }
   ]

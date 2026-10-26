@@ -1,0 +1,20 @@
+.strip-figure { margin: 0 0 20px; border: 1px solid var(--ce-warm-line); border-radius: var(--ce-r-md); background: #fff; overflow: hidden; }
+.strip-figure > img { display: block; width: 100%; height: auto; }
+.strip-figure figcaption { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 8px 12px; border-top: 1px solid var(--ce-warm-line); background: var(--ce-warm-card); font: 600 12px var(--ce-font-mono); color: var(--ce-text-mid); }
+.strip-expand { display: inline-flex; gap: 6px; align-items: center; min-height: 44px; padding: 6px 12px; border: 1px solid var(--ce-warm-line); border-radius: var(--ce-r-sm); background: var(--ce-warm-card); color: var(--ce-text-dark); font: inherit; cursor: pointer; }
+.strip-expand > span { font-size: 18px; }
+.strip-expand:hover { border-color: var(--ce-teal-deep); }
+.strip-expand:focus-visible { outline: 3px solid var(--ce-teal-deep); outline-offset: 2px; }
+
+.strip-dialog { inset: 0; margin: auto; width: min(1200px, calc(100vw - 32px)); max-width: calc(100vw - 32px); max-height: calc(100dvh - 32px); padding: 0; border: 1px solid var(--ce-warm-line); border-radius: 8px; background: var(--ce-warm-card); color: var(--ce-text-dark); overscroll-behavior: contain; }
+.strip-dialog::backdrop { background: #061821bb; }
+.strip-dialog-heading { display: flex; justify-content: space-between; align-items: center; gap: 12px; padding: 16px 20px; }
+.strip-dialog-heading span { font: 600 10px var(--ce-font-mono); color: var(--ce-text-muted); }
+.strip-dialog-heading h2 { margin-top: 4px; font-size: 20px; }
+.strip-dialog-heading button, .strip-pan button { min-width: 44px; min-height: 44px; border: 1px solid var(--ce-warm-line); border-radius: var(--ce-r-sm); background: var(--ce-warm-card); color: var(--ce-text-dark); font-size: 24px; cursor: pointer; }
+.strip-scroll { overflow-x: auto; overscroll-behavior-x: contain; background: #fff; border-block: 1px solid var(--ce-warm-line); }
+/* Enlarged to at least its delivered pixel width so small grid lines and lead labels stay readable. */
+.strip-scroll img { display: block; width: max(100%, 1400px); max-width: none; height: auto; }
+.strip-figure.is-wide .strip-scroll img { width: max(100%, 1800px); }
+.strip-pan { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 12px 20px; font-size: 13px; color: var(--ce-text-mid); }
+.strip-dialog button:focus-visible, .strip-scroll:focus-visible { outline: 3px solid var(--ce-teal-deep); outline-offset: -3px; }

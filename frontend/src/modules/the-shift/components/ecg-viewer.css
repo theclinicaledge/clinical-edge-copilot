@@ -1,0 +1,36 @@
+.ecg-viewer, .ecg-compare { margin: 0 0 20px; border: 1px solid var(--ce-warm-line); border-radius: var(--ce-r-md); background: var(--ce-warm-card); overflow: hidden; }
+.ecg-viewer-bar { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 8px; padding: 8px; border-bottom: 1px solid var(--ce-warm-line); }
+.ecg-viewer-tabs { display: flex; gap: 4px; flex-wrap: wrap; }
+.ecg-viewer-tabs button, .ecg-viewer-zoom button, .ecg-viewer-expand, .ecg-viewer-dialog-heading button { min-height: 44px; min-width: 44px; padding: 6px 12px; border: 1px solid var(--ce-warm-line); border-radius: var(--ce-r-sm); background: var(--ce-warm-card); color: var(--ce-text-dark); font: 600 14px var(--ce-font-sans); cursor: pointer; }
+.ecg-viewer-tabs button[aria-selected='true'] { border-color: var(--ce-teal-deep); background: var(--ce-urgency-low-bg); box-shadow: inset 0 -3px var(--ce-teal-deep); }
+.ecg-viewer-zoom { display: flex; align-items: center; gap: 4px; }
+.ecg-viewer-zoom button { font-size: 20px; padding: 0; }
+.ecg-viewer-zoom button:disabled { opacity: 0.4; cursor: default; }
+.ecg-viewer-zoom span { min-width: 48px; text-align: center; font: 600 13px var(--ce-font-mono); color: var(--ce-text-mid); }
+.ecg-viewer :is(button):focus-visible, .ecg-compare button:focus-visible, .ecg-viewer-dialog button:focus-visible, .ecg-viewer-scroll:focus-visible { outline: 3px solid var(--ce-teal-deep); outline-offset: -3px; }
+/* Horizontal pan only: the image scales with the container, so height never needs a second scrollbar. */
+.ecg-viewer-scroll { overflow-x: auto; overflow-y: hidden; overscroll-behavior-x: contain; background: #fff; touch-action: pan-x pan-y pinch-zoom; -webkit-overflow-scrolling: touch; }
+.ecg-viewer-scroll img { display: block; max-width: none; height: auto; user-select: none; }
+.ecg-viewer-scroll.is-zoomed { cursor: grab; }
+.ecg-viewer figcaption, .ecg-compare figcaption { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 8px 12px; border-top: 1px solid var(--ce-warm-line); font: 600 12px var(--ce-font-mono); color: var(--ce-text-mid); }
+.ecg-viewer figcaption small { display: block; margin-top: 2px; font-weight: 500; color: var(--ce-text-muted); }
+.ecg-viewer-expand { display: inline-flex; gap: 6px; align-items: center; flex-shrink: 0; }
+.ecg-viewer-hint { margin: 0; padding: 0 12px 10px; font-size: 13px; color: var(--ce-text-mid); }
+
+.ecg-viewer-dialog { inset: 0; margin: auto; width: min(1400px, calc(100vw - 16px)); max-width: calc(100vw - 16px); max-height: calc(100dvh - 16px); padding: 0; border: 1px solid var(--ce-warm-line); border-radius: 8px; background: var(--ce-warm-card); color: var(--ce-text-dark); overscroll-behavior: contain; }
+.ecg-viewer-dialog::backdrop { background: #061821cc; }
+.ecg-viewer-dialog-heading { display: flex; justify-content: space-between; align-items: center; gap: 12px; padding: 12px 16px; border-bottom: 1px solid var(--ce-warm-line); }
+.ecg-viewer-dialog-heading span { font: 600 10px var(--ce-font-mono); color: var(--ce-text-muted); }
+.ecg-viewer-dialog-heading h2 { margin-top: 4px; font-size: 18px; }
+.ecg-viewer-dialog-heading button { font-size: 24px; }
+/* Full screen behaves like the page: the dialog scrolls up and down, the tracing pans only sideways. */
+.ecg-viewer-dialog { overflow-y: auto; }
+
+.ecg-compare-title { padding-left: 4px; font: 600 12px var(--ce-font-mono); color: var(--ce-text-mid); text-transform: uppercase; }
+.ecg-compare-scroll { overflow-y: hidden; }
+.ecg-compare-row { position: relative; }
+.ecg-compare-row + .ecg-compare-row { border-top: 2px solid var(--ce-warm-line); }
+.ecg-compare-row img { width: 100%; }
+/* The time label stays visible while both strips pan sideways. */
+.ecg-compare-label { position: sticky; left: 0; z-index: 1; display: inline-block; margin: 4px 0 0 4px; padding: 2px 8px; border: 1px solid var(--ce-warm-line); border-radius: 30px; background: #fffffff2; font: 600 12px var(--ce-font-mono); color: var(--ce-text-dark); }
+.ecg-compare-label time { font-size: 13px; }

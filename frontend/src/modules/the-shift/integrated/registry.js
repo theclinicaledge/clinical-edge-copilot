@@ -82,6 +82,7 @@ SHIFTS.push(shift5Entry);
 SHIFTS.push((await import('../shift6/metadata.js')).shift6Entry);
 SHIFTS.push((await import('../shift7/metadata.js')).shift7Entry);
 SHIFTS.push((await import('../shift8/metadata.js')).shift8Entry);
+if (import.meta.env?.VITE_SHIFT_009_PREVIEW === 'true') SHIFTS.push((await import('../shift9/metadata.js')).shift9Entry);
 export const getShift = id => SHIFTS.find(item => item.id === id);
 export function progressLabel(item) {
   const state = item.readProgress();

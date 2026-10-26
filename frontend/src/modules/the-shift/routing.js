@@ -1,5 +1,5 @@
 import { CONVERSATION_ENABLED } from './conversation/private.js';
-export const SHIFT_IDS = ['drowsy-patient', 'monitor-alarm', 'discharge-puzzle', ...(CONVERSATION_ENABLED ? ['conversation'] : []), 'which-patient-first', 'stable-number', 'missing-time'];
+export const SHIFT_IDS = ['drowsy-patient', 'monitor-alarm', 'discharge-puzzle', ...(CONVERSATION_ENABLED ? ['conversation'] : []), 'which-patient-first', 'stable-number', 'missing-time', 'code-blue'];
 export const shiftPath = id => `/learn/shifts/${id}`;
 
 export function shiftRoute(path) {

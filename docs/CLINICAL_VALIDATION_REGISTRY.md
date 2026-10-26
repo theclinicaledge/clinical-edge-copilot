@@ -1,5 +1,9 @@
 # Clinical Validation Registry
 
+## Shift 8 v0.8.1 founder-attested review
+
+Separate from the real-provider AI validation results below: the founder reports an independent confidential medical-surgical nurse educator approved the entire updated Shift 8 manual-defibrillator scenario, including E-1. No signed reviewer record, identity, review date or independently documented approval is claimed. The founder's explicit narrow amendment accepts this attestation instead of E-1's earlier written-verification condition for the reviewed v0.8.1 dialogue only. See [E-1 governance](SHIFT_008_E1_GOVERNANCE.md). Automated tests do not establish clinical validation. All prior provider results below remain unchanged.
+
 This registry separates preserved real-provider clinical review from deterministic automated validation. Automated tests do not retroactively change a recorded real-provider result.
 
 ## Status definitions

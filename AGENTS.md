@@ -73,6 +73,14 @@ instead of doing it.
 - `ASK_SAFETY_CONTAINMENT=true` on the backend pauses all generative clinical routes. Keep it
   working.
 
+### Shift 8 v0.8.1 narrow exception E-1
+
+- Founder-authorized exception ONLY for the reviewed, fixed scripted epinephrine order and complete read-back in Shift 8 Moment 5b and associated Rewind content. Keep the exact existing source, dose, route, timing and clinical context.
+- For this exception only, founder-attested approval by an independent confidential medical-surgical nurse educator replaces the earlier written-reviewer-verification condition. No signed record, reviewer identity/date, independently documented approval or formal validation is claimed.
+- No learner-selected medications, doses, calculations, titration or medication treatment commands. No patient-specific dosing advice. No extension to Ask, other Shifts or other features; all other medication and clinical-safety restrictions above remain unchanged.
+- Any medication-dialogue or clinical-context change requires renewed approval. This does not authorize public activation without the founder's final release approval.
+- Governance and exact reviewed-content fingerprint: docs/SHIFT_008_E1_GOVERNANCE.md. Preserve the original review history; do not rewrite a historical pending status as a signed approval.
+
 ### Apple platform
 - The iOS app must stay more than a repackaged website (Guideline 4.2). Do not remove
   app-like features without discussing App Store impact.

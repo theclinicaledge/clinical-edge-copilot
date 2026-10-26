@@ -26,12 +26,15 @@ if (Shift6) renderers['stable-number'] = Shift6;
 const Shift7 = (await import('./shift7/Shift7.jsx')).default;
 const Shift7Art = (await import('./shift7/Artwork.jsx')).default;
 if (Shift7) renderers['missing-time'] = Shift7;
+const Shift8 = (await import('./shift8/Shift8.jsx')).default;
+if (Shift8) renderers['code-blue'] = Shift8;
 const images = {
   'drowsy-patient': new URL('./assignment-poster.svg', import.meta.url).href,
   'discharge-puzzle': new URL('./discharge/poster.svg', import.meta.url).href,
   'which-patient-first': new URL('./shift5/poster.svg', import.meta.url).href,
   ...(CONVERSATION_ENABLED ? { conversation: new URL('./conversation/room.svg', import.meta.url).href } : {}),
   ...(Shift6 ? { 'stable-number': new URL('./shift6/poster.svg', import.meta.url).href } : {}),
+  'code-blue': new URL('./assignment-poster.svg', import.meta.url).href,
 };
 
 function AppLink({ to, navigate, children, ...props }) {

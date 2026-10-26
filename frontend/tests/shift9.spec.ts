@@ -2,11 +2,11 @@ import { test, expect, type Page } from '@playwright/test';
 import { STRIPS, assignment, d1, d2, d3, d4, d5, debrief, REWIND } from '../src/modules/the-shift/shift9/data.js';
 
 const PATH = '/learn/shifts/quiet-complaint';
-const KEY = 'ce-shift-quiet-complaint-v0.8';
+const KEY = 'ce-shift-quiet-complaint-v0.9';
 const FULL = { you: '22', tess: '21', marco: '23' };
 const ALL_CORRECT = { d1: FULL, d2: 'escalate', d3: 'inferior', d4: 'choice', d5: 'reassess' };
 const ALL_MISSED = { d1: { you: '21', tess: '21', marco: '22' }, d2: 'antacid', d3: 'placement', d4: 'threat', d5: 'escalate' };
-const progress = (stage: number, answers: Record<string, unknown> = {}) => ({ version: 1, contentVersion: '0.8', stage, viewed: [], notes: [], closer: false, placement: {}, steps: [], drafts: {}, answers, tomorrow: null });
+const progress = (stage: number, answers: Record<string, unknown> = {}) => ({ version: 1, contentVersion: '0.9', stage, viewed: [], notes: [], closer: false, placement: {}, steps: [], drafts: {}, answers, tomorrow: null });
 
 async function seed(page: Page, value: object) {
   await page.goto(PATH);
@@ -44,7 +44,7 @@ test.describe('Shift 09 draft preview', () => {
     await page.getByRole('button', { name: 'Sources & review' }).click();
     const dialog = page.getByRole('dialog');
     await expect(dialog).toContainText('Draft.');
-    await expect(dialog).toContainText('SHIFT-009 / 0.8');
+    await expect(dialog).toContainText('SHIFT-009 / 0.9');
     await expect(dialog.locator('ol li')).toHaveCount(16);
   });
 
@@ -152,9 +152,24 @@ test.describe('Shift 09 draft preview', () => {
     }
   });
 
-  test('D2 shows both Room 22 strips and the seven-step comparison', async ({ page }) => {
+  test('D2 shows both Room 22 strips in one scroller that zooms them together, and the seven-step comparison', async ({ page, isMobile }) => {
     await seed(page, progress(2, { d1: FULL }));
-    for (const id of d2.strips) await expect(page.getByRole('img', { name: STRIPS[id].alt })).toBeVisible();
+    const compare = page.locator('.ecg-compare');
+    for (const id of d2.strips) await expect(compare.getByRole('img', { name: STRIPS[id].alt })).toBeVisible();
+    await expect(compare.locator('.ecg-compare-label')).toHaveText(['1430 Then', '1508 Now']);
+    // Phones open at 200%, where the ST segments can be compared; both strips share one scroll position.
+    await expect(compare.locator('.ecg-viewer-zoom span')).toHaveText(isMobile ? '200%' : 'Fit');
+    while (await compare.getByRole('button', { name: 'Zoom in both strips' }).isEnabled()) await compare.getByRole('button', { name: 'Zoom in both strips' }).click();
+    await expect(compare.locator('.ecg-viewer-zoom span')).toHaveText('300%');
+    const widths = await compare.locator('img').evaluateAll(imgs => imgs.map(img => Math.round(img.getBoundingClientRect().width)));
+    expect(widths[0]).toBe(widths[1]);
+    const scroller = compare.locator('.ecg-viewer-scroll');
+    const box = await scroller.evaluate(el => ({ sw: el.scrollWidth, cw: el.clientWidth, sh: el.scrollHeight, ch: el.clientHeight }));
+    expect(box.sw).toBeGreaterThan(box.cw * 2.5);
+    expect(box.sh).toBeLessThanOrEqual(box.ch + 1); // sideways only
+    await scroller.evaluate(el => { el.scrollLeft = 400; });
+    const lefts = await compare.locator('img').evaluateAll(imgs => imgs.map(img => Math.round(img.getBoundingClientRect().left)));
+    expect(lefts[0]).toBe(lefts[1]);
     for (const [id, name, then, now] of d2.steps) {
       const button = page.getByRole('button', { name, exact: true });
       await expect(button).toHaveAttribute('aria-expanded', 'false');
@@ -166,19 +181,44 @@ test.describe('Shift 09 draft preview', () => {
     }
   });
 
-  test('D3 12-lead opens large and keeps its alt text', async ({ page }) => {
+  test('D3 12-lead viewer: full tracing, limb and chest views, sideways-only zoom, full screen, objective alt text until answered', async ({ page }) => {
     await seed(page, progress(3, { d1: FULL, d2: 'escalate' }));
-    await page.getByRole('button', { name: 'Expand Room 22, 12-lead ECG, 1513' }).click();
+    const viewer = page.locator('.ecg-viewer');
+    const strip = STRIPS[d3.strip];
+    const tabs = viewer.getByRole('tab');
+    await expect(tabs).toHaveText(['12-lead', 'Limb leads', 'Chest leads']);
+    await expect(viewer.getByRole('tab', { name: '12-lead' })).toHaveAttribute('aria-selected', 'true');
+    await expect(viewer.getByRole('img', { name: strip.altBefore, exact: true })).toBeVisible();
+    // Zoom scales the whole image and pans sideways only.
+    for (let i = 0; i < 3; i++) await viewer.getByRole('button', { name: 'Zoom in' }).click();
+    await expect(viewer.locator('.ecg-viewer-zoom span')).toHaveText('300%');
+    const box = await viewer.locator('.ecg-viewer-scroll').evaluate(el => ({ sw: el.scrollWidth, cw: el.clientWidth, sh: el.scrollHeight, ch: el.clientHeight }));
+    expect(box.sw).toBeGreaterThan(box.cw * 2.5);
+    expect(box.sh).toBeLessThanOrEqual(box.ch + 1);
+    const img = await viewer.locator('img').evaluate(el => ({ w: el.getBoundingClientRect().width, h: el.getBoundingClientRect().height, nw: el.naturalWidth, nh: el.naturalHeight }));
+    expect(Math.abs(img.w / img.h - img.nw / img.nh)).toBeLessThan(0.01); // aspect, and so calibration, preserved
+    // Keyboard: arrow keys move between views.
+    await viewer.getByRole('tab', { name: '12-lead' }).focus();
+    await page.keyboard.press('ArrowRight');
+    await expect(viewer.getByRole('tab', { name: 'Limb leads' })).toBeFocused();
+    await expect(viewer.getByRole('tab', { name: 'Limb leads' })).toHaveAttribute('aria-selected', 'true');
+    await expect(viewer.getByRole('img', { name: strip.views[0].altBefore, exact: true })).toBeVisible();
+    await viewer.getByRole('tab', { name: 'Chest leads' }).click();
+    await expect(viewer.getByRole('img', { name: strip.views[1].altBefore, exact: true })).toBeVisible();
+    // Full screen keeps the same view and returns focus.
+    await viewer.getByRole('button', { name: 'Open Room 22, 12-lead ECG, 1513 full screen' }).click();
     const dialog = page.getByRole('dialog', { name: 'Room 22, 12-lead ECG, 1513' });
-    await expect(dialog.getByRole('img', { name: STRIPS[d3.strip].altBefore, exact: true })).toBeVisible();
-    const width = await dialog.getByRole('img').evaluate(img => img.getBoundingClientRect().width);
-    expect(width).toBeGreaterThanOrEqual(1400);
+    await expect(dialog.getByRole('tab', { name: 'Chest leads' })).toHaveAttribute('aria-selected', 'true');
     await page.keyboard.press('Escape');
-    await expect(page.getByRole('button', { name: 'Expand Room 22, 12-lead ECG, 1513' })).toBeFocused();
-    // After answering, the Part E description is read.
+    await expect(viewer.getByRole('button', { name: 'Open Room 22, 12-lead ECG, 1513 full screen' })).toBeFocused();
+    // Only one copy of the image is in the page while full screen is closed.
+    await expect(page.locator('.ecg-viewer img')).toHaveCount(1);
+    // After answering, each view reads its Part E style description.
     await page.getByRole('button', { name: d3.choices[0].text, exact: true }).click();
     await page.getByRole('button', { name: 'Confirm response' }).click();
-    await expect(page.getByRole('img', { name: STRIPS[d3.strip].alt }).first()).toBeAttached();
+    await expect(viewer.getByRole('img', { name: strip.views[1].alt, exact: true })).toBeVisible();
+    await viewer.getByRole('tab', { name: '12-lead' }).click();
+    await expect(viewer.getByRole('img', { name: strip.alt, exact: true })).toBeVisible();
   });
 
   test('D5 shows the Marco line only when Marco was placed at Room 21', async ({ page }) => {
@@ -233,7 +273,7 @@ test.describe('Shift 09 draft preview', () => {
 
   test('Rewind replays Decision 5 three ways with each variation’s strip and labels', async ({ page }) => {
     await seed(page, progress(6, ALL_CORRECT));
-    await page.evaluate(() => localStorage.removeItem('ce-shift-quiet-complaint-rewind-v0.8'));
+    await page.evaluate(() => localStorage.removeItem('ce-shift-quiet-complaint-rewind-v0.9'));
     // Audit H2: the invite doesn't list the calls.
     await expect(page.locator('.mst-rewind-invite')).toContainText(REWIND.intro);
     await expect(page.locator('.mst-rewind-invite')).not.toContainText(/Escalate now|Notify the provider|Continue and reassess/);

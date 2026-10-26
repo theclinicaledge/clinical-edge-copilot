@@ -5,6 +5,7 @@ import '../shift.css';
 import '../shift6/shift6.css';
 import './shift9.css';
 import StripFigure from '../components/StripFigure.jsx';
+import EcgViewer, { CompareStrips } from '../components/EcgViewer.jsx';
 import AssignTeam from '../components/AssignTeam.jsx';
 import TherapeuticResponse from '../components/TherapeuticResponse.jsx';
 import { SOURCES, STRIPS, VERSION, TOKENS, TARGETS, team, assignment, d1, d2, d3, d4, d5, debrief, card } from './data.js';
@@ -18,9 +19,16 @@ const markFor = result => credit(result) === 'full' ? '✓' : credit(result) ===
 const toneFor = result => credit(result) === 'full' ? 'is-correct' : credit(result) === 'partial' ? 'is-partial' : 'is-reflection';
 
 // Until its decision is answered, a strip reads its objective description (`altBefore`), not the interpretation.
+// The 12-lead opens in the phone viewer: the full tracing plus limb-lead and chest-lead views of the same recording.
 function Strip({ id, answered = true, children }) {
   const strip = STRIPS[id];
-  return <StripFigure src={strip.src} alt={answered ? strip.alt : strip.altBefore ?? strip.alt} caption={strip.caption} wide={strip.twelveLead}>{children}</StripFigure>;
+  const altFor = item => answered ? item.alt : item.altBefore ?? item.alt;
+  if (strip.twelveLead) {
+    const views = [{ id: 'all', label: '12-lead', src: strip.src, width: strip.width, height: strip.height, caption: strip.caption, alt: altFor(strip) },
+      ...strip.views.map(view => ({ ...view, alt: altFor(view) }))];
+    return <EcgViewer views={views} caption={strip.caption} hint={d3.viewerHint} />;
+  }
+  return <StripFigure src={strip.src} alt={altFor(strip)} caption={strip.caption} width={strip.width} height={strip.height}>{children}</StripFigure>;
 }
 
 // Shift 06 pattern: after a choice that earns no credit, say how the story continues so the next scene fits.
@@ -184,7 +192,7 @@ export default function Shift9() {
 
         {progress.stage === 2 && <>
           <p className="shift-lead">{d2.scene}</p>
-          <div className="s9-then-now">{d2.strips.map((id, index) => <div key={id}><div className="s9-strip-heading"><time>{STRIPS[id].time}</time><span>{index === 0 ? 'Then' : 'Now'}</span></div><Strip id={id} /></div>)}</div>
+          <CompareStrips label="Room 22, lead II, 1430 and 1508" strips={d2.strips.map((id, index) => ({ ...STRIPS[id], time: STRIPS[id].time, tag: index === 0 ? 'Then' : 'Now' }))} />
           <ul className="s9-steps" aria-label="Compare 1430 and 1508">{d2.steps.map(([id, name, then, now], index) => {
             const open = progress.steps.includes(id);
             return <li key={id}><button aria-expanded={open} aria-controls={`s9-step-${id}`} onClick={() => update({ steps: open ? progress.steps.filter(step => step !== id) : [...progress.steps, id] })}><span className="s9-step-index" aria-hidden="true">0{index + 1}</span><strong>{name}</strong><span aria-hidden="true">{open ? '−' : '+'}</span></button>

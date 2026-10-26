@@ -148,12 +148,12 @@ test('Rewind regression: no answers before the choice; Rewind B stays urgent; Re
 
 test('saved progress is sanitized and cannot skip an unanswered decision', () => {
   assert.deepEqual(sanitizeProgress(null), freshProgress());
-  const saved = sanitizeProgress({ version: 1, contentVersion: '0.8', stage: FINAL_STAGE, answers: { d1: { you: '22', tess: '21', marco: '23' }, d2: 'escalate' } });
+  const saved = sanitizeProgress({ version: 1, contentVersion: '0.9', stage: FINAL_STAGE, answers: { d1: { you: '22', tess: '21', marco: '23' }, d2: 'escalate' } });
   assert.equal(saved.stage, 3);
-  const bad = sanitizeProgress({ version: 1, contentVersion: '0.8', stage: 2, answers: { d1: { you: '22', tess: 'roof', marco: '23' } } });
+  const bad = sanitizeProgress({ version: 1, contentVersion: '0.9', stage: 2, answers: { d1: { you: '22', tess: 'roof', marco: '23' } } });
   assert.equal(bad.stage, 1);
   assert.equal(bad.answers.d1, undefined);
-  // v0.7 progress is not carried into v0.8.
-  assert.deepEqual(sanitizeProgress({ version: 1, contentVersion: '0.7', stage: 3 }), freshProgress());
+  // Progress from an earlier content version (v0.8 had different ECGs) is not carried into v0.9.
+  assert.deepEqual(sanitizeProgress({ version: 1, contentVersion: '0.8', stage: 3 }), freshProgress());
   assert.equal(d1.rules.length, 13);
 });

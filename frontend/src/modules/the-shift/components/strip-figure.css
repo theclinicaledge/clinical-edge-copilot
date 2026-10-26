@@ -6,7 +6,7 @@
 .strip-expand:hover { border-color: var(--ce-teal-deep); }
 .strip-expand:focus-visible { outline: 3px solid var(--ce-teal-deep); outline-offset: 2px; }
 
-.strip-dialog { width: min(1200px, calc(100vw - 32px)); max-width: calc(100vw - 32px); max-height: calc(100dvh - 32px); padding: 0; border: 1px solid var(--ce-warm-line); border-radius: 8px; background: var(--ce-warm-card); color: var(--ce-text-dark); overscroll-behavior: contain; }
+.strip-dialog { inset: 0; margin: auto; width: min(1200px, calc(100vw - 32px)); max-width: calc(100vw - 32px); max-height: calc(100dvh - 32px); padding: 0; border: 1px solid var(--ce-warm-line); border-radius: 8px; background: var(--ce-warm-card); color: var(--ce-text-dark); overscroll-behavior: contain; }
 .strip-dialog::backdrop { background: #061821bb; }
 .strip-dialog-heading { display: flex; justify-content: space-between; align-items: center; gap: 12px; padding: 16px 20px; }
 .strip-dialog-heading span { font: 600 10px var(--ce-font-mono); color: var(--ce-text-muted); }

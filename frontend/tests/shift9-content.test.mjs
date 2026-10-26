@@ -52,15 +52,18 @@ const SPEC_ASSETS = [
   ['rm22_1513_12lead_inferior_stemi.png', ['d3'], 'Room 22, 12-lead ECG, 1513. Sinus rhythm at 94. ST elevation of about 2 to 3 millimeters in leads II, III and aVF. ST depression in leads I and aVL. The chest leads show no ST elevation.'],
   ['rm23_1430_afib110.png', ['assignment', 'd1'], 'Room 23, lead II, 1430. Irregularly irregular rhythm with no P waves and a wavy baseline. 11 QRS complexes in 6 seconds, about 110. Atrial fibrillation.'],
   ['rm23_1535_afib110_rewindA.png', ['d5', 'rewind-a'], 'Room 23, lead II, 1535. Irregularly irregular rhythm with no P waves. 11 QRS complexes in 6 seconds, about 110.'],
-  ['rm23_rewindB_afib150.png', ['rewind-b'], 'Room 23, lead II, 1535, Rewind B. Irregularly irregular rhythm with no P waves. 15 QRS complexes in 6 seconds, about 150.'],
-  ['rm23_rewindC_afib130.png', ['rewind-c'], 'Room 23, lead II, 1535, Rewind C. Irregularly irregular rhythm with no P waves. 13 QRS complexes in 6 seconds, about 130.'],
+  ['rm23_rewindB_afib150.png', ['rewind-b'], 'Room 23, lead II, 1535, Version B. Irregularly irregular rhythm with no P waves. 15 QRS complexes in 6 seconds, about 150.'],
+  ['rm23_rewindC_afib130.png', ['rewind-c'], 'Room 23, lead II, 1535, Version C. Irregularly irregular rhythm with no P waves. 13 QRS complexes in 6 seconds, about 130.'],
 ];
 
 // Part E mapping plus the founder's 24 Oct 2026 change: D1 also shows the Room 22 and 23 starting strips.
 test('each image maps to the Part E screens and uses the Part E alt text word for word', () => {
   assert.deepEqual(Object.values(STRIPS).map(s => [s.file, s.screens, s.alt]), SPEC_ASSETS);
   const dir = new URL('../src/modules/the-shift/shift9/assets/', import.meta.url);
-  assert.deepEqual(readdirSync(dir).sort(), SPEC_ASSETS.map(([file]) => file).sort());
+  // v0.9 adds two focused views of the 12-lead (same recording), carried on the 12-lead strip.
+  const views = STRIPS['rm22-1513-12lead'].views.map(v => v.file);
+  assert.deepEqual(views, ['rm22_1513_12lead_limb.png', 'rm22_1513_12lead_chest.png']);
+  assert.deepEqual(readdirSync(dir).sort(), [...SPEC_ASSETS.map(([file]) => file), ...views].sort());
   for (const strip of Object.values(STRIPS)) assert.ok(existsSync(new URL(strip.file, dir)), strip.file);
 });
 
@@ -115,7 +118,7 @@ test('sources, version and Draft review status are stored as the spec gives them
   const cited = [d1, d2, d3, d4, d5].flatMap(item => item.sources.map(([number]) => number)).concat(REWIND.sources, debrief.why.flatMap(([, numbers]) => numbers));
   assert.deepEqual(cited.filter(number => !SOURCES[number]), []);
   assert.deepEqual([...new Set(cited)].sort((a, b) => a - b), Array.from({ length: 16 }, (_, i) => i + 1));
-  assert.equal(data.VERSION, '0.8');
+  assert.equal(data.VERSION, '0.9');
   assert.equal(data.SCENARIO_ID, 'SHIFT-009');
   assert.equal(card.reviewStatus, 'Draft');
   assert.equal(card.contentReviewDate, 'Pending');
@@ -143,6 +146,11 @@ test('learner text keeps the spec wording for key lines', () => {
 test('decision strips read objective findings until the decision is answered', () => {
   const interpretive = /asystole|fibrillation|afib|irregularly irregular|no p waves|elevation|depression|stemi|sinus rhythm|inferior/i;
   const before = ['rm21-1505', 'rm22-1513-12lead', 'rm23-1535-a', 'rm23-1535-b', 'rm23-1535-c'];
+  for (const view of STRIPS['rm22-1513-12lead'].views) {
+    assert.ok(!interpretive.test(view.altBefore), `${view.id}: ${view.altBefore}`);
+    assert.ok(view.altBefore.startsWith(view.caption), view.id);
+    assert.ok(['Limb leads', 'Chest leads'].includes(view.label), 'views are named by lead system, not by finding');
+  }
   assert.deepEqual(Object.entries(STRIPS).filter(([, s]) => s.altBefore).map(([id]) => id), before);
   for (const id of before) {
     assert.ok(!interpretive.test(STRIPS[id].altBefore), `${id}: ${STRIPS[id].altBefore}`);

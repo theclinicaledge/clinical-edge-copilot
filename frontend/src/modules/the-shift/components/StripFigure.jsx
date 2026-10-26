@@ -4,12 +4,12 @@ import './strip-figure.css';
 // A delivered ECG illustration shown as is, with the same Expand dialog pattern as the Monitor
 // Alarm strips. The image keeps its own on-image label; `alt` is the screen-reader text and
 // `caption` carries only what the image already shows (room, lead, time).
-export default function StripFigure({ src, alt, caption, wide = false, children }) {
+export default function StripFigure({ src, alt, caption, wide = false, width, height, children }) {
   const dialog = useRef(null), scroll = useRef(null), opener = useRef(null);
   const id = useId();
   const close = () => { dialog.current?.close(); opener.current?.focus({ preventScroll: true }); };
   return <figure className={`strip-figure ${wide ? 'is-wide' : ''}`}>
-    <img src={src} alt={alt} />
+    <img src={src} alt={alt} width={width} height={height} />
     <figcaption><span>{caption}</span>
       <button ref={opener} type="button" className="strip-expand" onClick={() => dialog.current?.showModal()} aria-label={`Expand ${caption}`}><span aria-hidden="true">&#x2922;</span>Expand</button>
     </figcaption>

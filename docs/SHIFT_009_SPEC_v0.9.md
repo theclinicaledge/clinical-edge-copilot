@@ -1,10 +1,10 @@
-# SHIFT-009 scenario spec v0.8
+# SHIFT-009 scenario spec v0.9
 
-This file is the content source of truth for Shift 09 v0.8. It is the v0.7 scenario spec (Part 2 of `SHIFT-09-build-package.md`, which lives outside the repo) with the remediation Part 1 corrections applied in place. Part 1 of that package (the build prompt) is not repeated here.
+This file is the content source of truth for Shift 09 v0.9. It is the v0.7 scenario spec (Part 2 of `SHIFT-09-build-package.md`, which lives outside the repo) with the remediation Part 1 corrections (v0.8) and the Part 2 ECG corrections (v0.9) applied in place. Part 1 of that package (the build prompt) is not repeated here.
 
 Review status: **Draft**. Founder review, independent clinical sign-off and psych specialty review are not recorded. Nothing here is clinically validated.
 
-# SHIFT-009 "The Quiet Complaint": scenario spec v0.8 (source of truth)
+# SHIFT-009 "The Quiet Complaint": scenario spec v0.9 (source of truth)
 
 Version 0.8 of a three-patient telemetry Shift on prioritizing and delegating. It was revised after four validation reviews on 24 Oct 2026 (v0.1 rated 8.2/10, v0.2 8.9/10, v0.3 9.0/10, v0.5 9.2/10 for clinical content; ready for independent RN review). It still needs founder review, independent clinical sign-off and psych specialty review before release. Result labels follow the template (Correct, Close, Not first, Not best, No, No (unsafe)). Every rationale cites a source in Part E that was opened while drafting. All nine ECG images are constructed illustrations that need a clinical check before release. **v0.8** applies the corrections from the post-build audit of 25 Oct 2026 (remediation Part 1, 26 Oct 2026). Every v0.8 change is listed in the change log below and in Part F. Text not listed there is unchanged from v0.7.
 
@@ -31,7 +31,28 @@ Version 0.8 of a three-patient telemetry Shift on prioritizing and delegating. I
 | Founder changes of 24 Oct 2026 | Recorded only in the build | Written into this spec: D1 shows all three strips; Lena is introduced as the monitor tech on D1 and D5 | n/a | Founder |
 | D5 Marco line | Room 21 only | Adds a line when Marco was in Room 22 | follows H3 | Yes (wording) |
 
-Deferred to remediation Part 2 (not changed here): ECG morphology and regeneration (long QT, short AF R-R intervals, aVL, f-waves, the "Main script, Rewind A" label printed on the D5 image), the 6-second count printed on regular strips, and the ECG viewer on phones.
+Remediation Part 2 (v0.9, below) covers the ECG items that v0.8 deferred.
+
+## v0.9 change log (from v0.8): ECGs and the 12-lead viewer
+
+Learner-facing decision text, choices, scoring and review lines are unchanged from v0.8. Only the ECG images, their labels and screen-reader text, the D2 and D3 tracing display, and one viewer hint changed.
+
+| Area | v0.8 | v0.9 | Audit finding | Needs clinical approval? |
+| --- | --- | --- | --- | --- |
+| QT on every tracing | T wave fixed 0.26 s after R at every rate; measured QTc (Bazett, from the image pixels) 463 ms (Room 21), 484 and 502 ms (Room 22), 493 ms (12-lead) | Each beat's QT follows its preceding R-R (Framingham formula); measured QTc 412 to 429 ms Bazett, 389 to 397 ms Fridericia on sinus tracings | H1 | Specialist check |
+| Paper scale | Rhythm-strip grid boxes 1.27 times taller than wide, so every amplitude looked 27% larger; 12-lead off by 1% | Square grid on every image (verified from pixels) | Found in Part 2 | No |
+| AF timing | Shortest R-R 0.24 s in Version B, with QRS complexes landing on the previous T wave | Shortest R-R 0.30 s or more; at most 15% of a T wave under any following QRS; no runs of three similar intervals | M10 | Specialist check |
+| Fibrillatory waves | Up to 5.3 Hz (318 per minute) | 6 to 8.5 Hz (360 to 510 per minute), drifting amplitude and phase, checked not to be flutter-like | M10 | Specialist check |
+| aVL | Near-isoelectric QRS (about 0.1 mV) | Visible small rS (about 0.34 mV); limb leads share QRS timing, so no derived lead is notched | M10 | Specialist check |
+| Inferior q waves | 0.13 to 0.16 mV q waves in II and III | Small q waves (about 0.05 mV in III and 0.10 mV in II, about 30 ms wide), within normal limits | M10 | Specialist check |
+| 6-second counts on regular strips | Room 22 1430 counted 8 (80) against HR 88 | Beat phase set so each 6-second count is the closest multiple of 10 to the rate (8, 9, 9). The rhythm-note caveat from v0.8 stays | M8 | No |
+| Image labels | D5 image printed "Main script, Rewind A"; Rewind images printed "Rewind B" and "Rewind C" | D5 image shows room, lead and time only; Rewind images say "Version B" and "Version C", matching the v0.8 titles | L1 | No |
+| D3 12-lead display | One image; unreadable on phones | Viewer with three views of the same recording: 12-lead, Limb leads (I, II, III, aVR, aVL, aVF) and Chest leads (V1 to V6), each six leads over the same 2.5 seconds; Fit, 150%, 200% and 300% zoom with sideways-only panning; full screen | H4 | No (layout) |
+| D2 display | Two separate strips; side by side and small on desktop | One comparison panel: both strips stacked in one scroller that zooms and pans them together; opens at 200% on phones | H4 | No (layout) |
+| Screen-reader text | Part E text for B and C said "Rewind B" and "Rewind C" | Says "Version B" and "Version C". New objective and post-answer text for the two 12-lead views (below) | follows L1 | Yes (wording) |
+| New learner text | none | D3 viewer hint: "On a phone, the Limb leads and Chest leads views show six leads at a time over the same beats. Turn your phone sideways to see the whole 12-lead." | H4 | Yes (wording) |
+
+Measurement method, results and the before/after table: `docs/SHIFT_009_ECG_VALIDATION.md`. Generator and validator: `tools/shift9-ecg/`. Automated measurement is not specialist ECG validation.
 
 ## Part A: Scenario card
 
@@ -40,7 +61,7 @@ The learner's first read ("the yelling room with the flat line is the emergency"
 | Field | Value |
 | --- | --- |
 | Scenario ID | SHIFT-009 (Shift 09 in the library) |
-| Version | 0.8 (v0.7 plus the post-build audit corrections of 26 Oct 2026) |
+| Version | 0.9 (v0.8 plus regenerated ECGs and the 12-lead viewer, 26 Oct 2026) |
 | Title | The Quiet Complaint |
 | Specialty | Telemetry |
 | Learner level | Student and new grad |
@@ -455,7 +476,7 @@ This draft uses 16 sources, all opened while drafting (12 on 23 Oct 2026, three 
 
 ### Visual assets
 
-All nine images are constructed with a Python script (sum-of-waves model on 25 mm/s, 10 mm/mV paper). Each is labeled on the image as an illustration, not a patient recording. Decision strips carry only room, lead, time and rate, so the image doesn't give away the answer.
+All nine images are constructed with `tools/shift9-ecg/generate.py` (v0.9: per-beat QT from the preceding R-R, square 25 mm/s by 10 mm/mV paper), plus two focused views of the 12-lead. Each is labeled on the image as an illustration, not a patient recording. Decision strips carry only room, lead, time and rate, so the image doesn't give away the answer.
 
 | Asset | Used on | Required characteristics | Source option | Rights status | Clinically checked? | Screen-reader text |
 | --- | --- | --- | --- | --- | --- | --- |
@@ -466,8 +487,8 @@ All nine images are constructed with a Python script (sum-of-waves model on 25 m
 | Room 22, 12-lead, 1513 | D3 | Sinus 94. Limb leads derived from I and III (II = I + III; aVR, aVL and aVF by the augmented-lead formulas). ST at J+60 ms: II +2.3, III +3.3, aVF +2.8, I -1.0, aVL -2.2 mm. V1 to V6 without diagnostic ST elevation. 1 mV calibration pulse on every row. | Constructed tracing; a licensed or Rhythm Lab 12-lead is preferred | Owned | No | "Room 22, 12-lead ECG, 1513. Sinus rhythm at 94. ST elevation of about 2 to 3 millimeters in leads II, III and aVF. ST depression in leads I and aVL. The chest leads show no ST elevation." |
 | Room 23, lead II, 1430 | Assignment card | AFib, 11 QRS in 6 seconds (about 110) | Constructed tracing | Owned | No | "Room 23, lead II, 1430. Irregularly irregular rhythm with no P waves and a wavy baseline. 11 QRS complexes in 6 seconds, about 110. Atrial fibrillation." |
 | Room 23, lead II, 1535 (A) | D5, Rewind A | AFib, 11 QRS in 6 seconds (about 110) | Constructed tracing | Owned | No | "Room 23, lead II, 1535. Irregularly irregular rhythm with no P waves. 11 QRS complexes in 6 seconds, about 110." |
-| Room 23, lead II, 1535 (B) | Rewind B | AFib, 15 QRS in 6 seconds (about 150) | Constructed tracing | Owned | No | "Room 23, lead II, 1535, Rewind B. Irregularly irregular rhythm with no P waves. 15 QRS complexes in 6 seconds, about 150." |
-| Room 23, lead II, 1535 (C) | Rewind C | AFib, 13 QRS in 6 seconds (about 130, an estimate; the script's monitor trend is 132 to 138) | Constructed tracing | Owned | No | "Room 23, lead II, 1535, Rewind C. Irregularly irregular rhythm with no P waves. 13 QRS complexes in 6 seconds, about 130." |
+| Room 23, lead II, 1535 (B) | Rewind B | AFib, 15 QRS in 6 seconds (about 150) | Constructed tracing | Owned | No | "Room 23, lead II, 1535, Version B. Irregularly irregular rhythm with no P waves. 15 QRS complexes in 6 seconds, about 150." |
+| Room 23, lead II, 1535 (C) | Rewind C | AFib, 13 QRS in 6 seconds (about 130, an estimate; the script's monitor trend is 132 to 138) | Constructed tracing | Owned | No | "Room 23, lead II, 1535, Version C. Irregularly irregular rhythm with no P waves. 13 QRS complexes in 6 seconds, about 130." |
 
 **Decision-screen alt text (v0.8).** These strips read an objective description until the decision is answered, then the Part E text above:
 
@@ -479,7 +500,14 @@ All nine images are constructed with a Python script (sum-of-waves model on 25 m
 | Room 23, lead II, 1535, B (Rewind) | Same as A, with "15 QRS complexes in 6 seconds." |
 | Room 23, lead II, 1535, C (Rewind) | Same as A, with "13 QRS complexes in 6 seconds." |
 
-The 12-lead ST values come from the generator's own J+60 ms measurements (I -1.0, II +2.3, III +3.3, aVR -0.6, aVL -2.2, aVF +2.8, V1 0.0, V2 +0.6, V3 +0.4, V4 to V6 +0.1 mm).
+The 12-lead ST values are the v0.9 generator's measured J+60 ms levels: I -1.0, II +2.1, III +3.2, aVR -0.4, aVL -2.1, aVF +2.6, V1 0.0, V2 +0.6, V3 +0.4, V4 to V6 0.0 mm. They match the wording above, which is unchanged.
+
+**12-lead views (v0.9).** Same recording as the 12-lead, six leads over the same 2.5 seconds, each row with its own 1 mV calibration pulse:
+
+| View | File | Read until D3 is answered | Read after |
+| --- | --- | --- | --- |
+| Limb leads | rm22_1513_12lead_limb.png | "Room 22, 12-lead ECG, 1513, limb leads I, II, III, aVR, aVL and aVF, all over the same 2.5 seconds. Regular rhythm at 94 with a P wave before every QRS. ST segment in each lead, compared with the baseline: lead I about 1 millimeter below. Lead II about 2 millimeters above. Lead III about 3 millimeters above. aVR about half a millimeter below. aVL about 2 millimeters below. aVF about 3 millimeters above." | "Room 22, 12-lead ECG, 1513, limb leads over the same 2.5 seconds. Sinus rhythm at 94. ST elevation of about 2 to 3 millimeters in leads II, III and aVF. ST depression in leads I and aVL." |
+| Chest leads | rm22_1513_12lead_chest.png | "Room 22, 12-lead ECG, 1513, chest leads V1 to V6, all over the same 2.5 seconds. Regular rhythm at 94. ST segment in each lead, compared with the baseline: V1 on the baseline. V2 about half a millimeter above. V3 less than half a millimeter above. V4, V5 and V6 on the baseline." | "Room 22, 12-lead ECG, 1513, chest leads V1 to V6 over the same 2.5 seconds. Sinus rhythm at 94. The chest leads show no ST elevation." |
 
 On-screen values match the images: every rate shown in the script equals the rate on its strip.
 
@@ -491,7 +519,9 @@ On-screen values match the images: every rate shown in the script equals the rat
 | rm21_1505_artifact_leadsoff.png | Room 21, lead II, 1505 | D1 Look closer |
 | rm22_1430_sinus88.png | Room 22, lead II, 1430 | Assignment card, D2 |
 | rm22_1508_sinus94_ste.png | Room 22, lead II, 1508 | D2 |
-| rm22_1513_12lead_inferior_stemi.png | Room 22, 12-lead, 1513 (v0.4 rebuild: derived limb leads, calibration pulses) | D3 |
+| rm22_1513_12lead_inferior_stemi.png | Room 22, 12-lead, 1513 (v0.9 regeneration: derived limb leads, calibration pulses, rate-correct QT, square grid) | D3 |
+| rm22_1513_12lead_limb.png | Room 22, 12-lead, 1513: limb leads view (v0.9) | D3 viewer |
+| rm22_1513_12lead_chest.png | Room 22, 12-lead, 1513: chest leads view (v0.9) | D3 viewer |
 | rm23_1430_afib110.png | Room 23, lead II, 1430 | Assignment card |
 | rm23_1535_afib110_rewindA.png | Room 23, lead II, 1535 (A) | D5, Rewind A |
 | rm23_rewindB_afib150.png | Room 23, lead II, 1535 (B) | Rewind B |
@@ -513,8 +543,11 @@ The AI validation reviews don't replace stage 3. The template rule applies (AI a
 | 0.6 | 24 Oct 2026 | After review 4 (9.2/10 content): alarm evidence corrected, AFib wording, refusal plan agreed with the patient, both calm D4 responses full credit, chest pain nuance. |
 | 0.7 | 24 Oct 2026 | D4 monitor explanation reworded; capacity assessment wording no longer implies psychiatry is always needed. |
 | 0.8 | 26 Oct 2026 | Post-build audit corrections (remediation Part 1). See the change log at the top. ECG assets unchanged; ECG work deferred to Part 2. |
+| 0.9 | 26 Oct 2026 | ECG remediation (Part 2): all images regenerated with rate-correct QT and square paper; AF timing and fibrillatory waves constrained; aVL and q waves corrected; labels fixed; 12-lead viewer with limb and chest views; D2 comparison panel. Decision text and scoring unchanged. |
 
 ### Open questions for the reviewer
+
+**v0.9 ECG items for the specialist reviewer (added 26 Oct 2026).** The full checklist is in `docs/SHIFT_009_ECG_VALIDATION.md`. In short, confirm morphology and intervals on all eleven images, that no strip shows an unintended finding (long or short QT, flutter, pre-excitation, Q waves, fragmented QRS), and that the D3 views and the D2 comparison are interpretable on a phone.
 
 **v0.8 decisions that need clinical approval (added 26 Oct 2026)**
 
@@ -546,7 +579,7 @@ The AI validation reviews don't replace stage 3. The template rule applies (AI a
 
 - [ ] Sources 3, 4 and 5 (Gulati 2021, Mehta 2016, Sandau 2017) were opened through ACC's official summaries, because the AHA and JACC journal pages blocked access. A human should check each claim against the full text.
 - [ ] The 2023 ACC/AHA/ACCP/HRS AF guideline (Joglar et al.) couldn't be opened. The AF claims rest on Sources 10, 11 and 12 instead. Is Merck (Source 11), a peer-reviewed professional reference rather than a journal, acceptable?
-- [ ] All nine ECG images are constructed illustrations. They need a clinical check of morphology: the ST elevation shape, f waves, 12-lead amplitudes, and the reciprocal changes in I and aVL. Replace them with Rhythm Lab or licensed assets if those exist. v0.4 rebuilt the 12-lead with derived limb leads and calibration pulses, but signal-level validation by a telemetry educator or cardiologist (J points, QRS timing, f waves, lead relationships) is still the main blocker for publishing the images. The reviewer also asked that someone confirm no AFib strip could be mistaken for atrial flutter.
+- [ ] All nine ECG images are constructed illustrations. They need a clinical check of morphology: the ST elevation shape, f waves, 12-lead amplitudes, and the reciprocal changes in I and aVL. Replace them with Rhythm Lab or licensed assets if those exist. v0.4 rebuilt the 12-lead with derived limb leads and calibration pulses, but signal-level validation by a telemetry educator or cardiologist (J points, QRS timing, f waves, lead relationships) is still the main blocker for publishing the images. The reviewer also asked that someone confirm no AFib strip could be mistaken for atrial flutter. **v0.9:** images regenerated and measured by `tools/shift9-ecg/validate.py` (see `docs/SHIFT_009_ECG_VALIDATION.md`); specialist validation still required.
 - [ ] The strips use lead II. Source 5 notes V1 is common for adult rhythm monitoring, and the best ST-monitoring lead depends on the patient. Is lead II fine for teaching?
 
 **Facility variation**

@@ -1,0 +1,581 @@
+{
+ "assets": {
+  "rm21_1430_sinus84.png": {
+   "file": "rm21_1430_sinus84.png",
+   "hr_from_rr": 83.983,
+   "kind": "strip",
+   "p_beat_to_beat_corr": 0.991,
+   "p_template_beats": 6,
+   "p_template_max_mV": 0.122,
+   "pixel": {
+    "columns": 2037,
+    "px_per_mm_x": 13.583,
+    "px_per_mm_y": 13.583,
+    "qt_s": 0.362,
+    "r_count_6s": 8,
+    "rms_error_mV": 0.004,
+    "rr_mean_s": 0.714,
+    "st60_mV": 0.003,
+    "trace_fs": 339.567
+   },
+   "pr_s": 0.171,
+   "qrs_in_6s": 8,
+   "qrs_s": 0.064,
+   "qt_measurable_beats": "6 of 6",
+   "qt_s": 0.347,
+   "qtc_s": {
+    "bazett": 0.412,
+    "framingham": 0.392,
+    "fridericia": 0.389,
+    "hodges": 0.39
+   },
+   "rhythm": "sinus",
+   "rr_cv": 0.01,
+   "rr_max_s": 0.724,
+   "rr_min_s": 0.703,
+   "sha256_matches_manifest": true,
+   "st60_mV": -0.001,
+   "t_amp_mV": 0.286
+  },
+  "rm21_1505_artifact_leadsoff.png": {
+   "beats_before_leads_off": 5,
+   "file": "rm21_1505_artifact_leadsoff.png",
+   "flat_after_s": 3.3,
+   "flat_max_abs_mV": 0.007,
+   "flat_sd_mV": 0.002,
+   "kind": "strip",
+   "pixel": {
+    "columns": 1459,
+    "px_per_mm_x": 13.583,
+    "px_per_mm_y": 13.583,
+    "rms_error_mV": 0.005
+   },
+   "rhythm": "sinus under artifact, then leads off",
+   "rr_before_off_s": [
+    0.612,
+    0.615,
+    0.629,
+    0.622
+   ],
+   "sha256_matches_manifest": true
+  },
+  "rm22_1430_sinus88.png": {
+   "file": "rm22_1430_sinus88.png",
+   "hr_from_rr": 88.235,
+   "kind": "strip",
+   "p_beat_to_beat_corr": 0.991,
+   "p_template_beats": 6,
+   "p_template_max_mV": 0.123,
+   "pixel": {
+    "columns": 2037,
+    "px_per_mm_x": 13.583,
+    "px_per_mm_y": 13.583,
+    "qt_s": 0.355,
+    "r_count_6s": 9,
+    "rms_error_mV": 0.004,
+    "rr_mean_s": 0.679,
+    "st60_mV": 0.0,
+    "trace_fs": 339.567
+   },
+   "pr_s": 0.169,
+   "qrs_in_6s": 9,
+   "qrs_s": 0.066,
+   "qt_measurable_beats": "7 of 7",
+   "qt_s": 0.341,
+   "qtc_s": {
+    "bazett": 0.415,
+    "framingham": 0.391,
+    "fridericia": 0.389,
+    "hodges": 0.391
+   },
+   "rhythm": "sinus",
+   "rr_cv": 0.011,
+   "rr_max_s": 0.691,
+   "rr_min_s": 0.672,
+   "sha256_matches_manifest": true,
+   "st60_mV": -0.001,
+   "t_amp_mV": 0.29
+  },
+  "rm22_1508_sinus94_ste.png": {
+   "file": "rm22_1508_sinus94_ste.png",
+   "hr_from_rr": 94.21,
+   "kind": "strip",
+   "p_beat_to_beat_corr": 0.99,
+   "p_template_beats": 6,
+   "p_template_max_mV": 0.123,
+   "pixel": {
+    "columns": 2037,
+    "px_per_mm_x": 13.583,
+    "px_per_mm_y": 13.583,
+    "qt_s": 0.349,
+    "r_count_6s": 9,
+    "rms_error_mV": 0.004,
+    "rr_mean_s": 0.637,
+    "st60_mV": 0.216,
+    "trace_fs": 339.567
+   },
+   "pr_s": 0.161,
+   "qrs_in_6s": 9,
+   "qrs_s": 0.082,
+   "qt_measurable_beats": "6 of 7",
+   "qt_s": 0.341,
+   "qtc_s": {
+    "bazett": 0.429,
+    "framingham": 0.398,
+    "fridericia": 0.397,
+    "hodges": 0.402
+   },
+   "rhythm": "sinus",
+   "rr_cv": 0.011,
+   "rr_max_s": 0.644,
+   "rr_min_s": 0.625,
+   "sha256_matches_manifest": true,
+   "st60_mV": 0.204,
+   "t_amp_mV": 0.537
+  },
+  "rm22_1513_12lead_chest.png": {
+   "file": "rm22_1513_12lead_chest.png",
+   "kind": "twelve-lead-view",
+   "pixel": {
+    "all_segments_match_their_label": true,
+    "calibration_pulse_mV": 1.017,
+    "px_per_mm_x": 15.748,
+    "px_per_mm_y": 15.748,
+    "segments": [
+     {
+      "best_match": "V1",
+      "columns": 969,
+      "lead": "V1",
+      "rms_error_mV": 0.004
+     },
+     {
+      "best_match": "V2",
+      "columns": 969,
+      "lead": "V2",
+      "rms_error_mV": 0.004
+     },
+     {
+      "best_match": "V3",
+      "columns": 969,
+      "lead": "V3",
+      "rms_error_mV": 0.004
+     },
+     {
+      "best_match": "V4",
+      "columns": 969,
+      "lead": "V4",
+      "rms_error_mV": 0.004
+     },
+     {
+      "best_match": "V5",
+      "columns": 969,
+      "lead": "V5",
+      "rms_error_mV": 0.004
+     },
+     {
+      "best_match": "V6",
+      "columns": 969,
+      "lead": "V6",
+      "rms_error_mV": 0.004
+     }
+    ]
+   },
+   "sha256_matches_manifest": true,
+   "view": "rm22_1513_12lead_chest.png"
+  },
+  "rm22_1513_12lead_inferior_stemi.png": {
+   "derived_lead_identities_hold": true,
+   "file": "rm22_1513_12lead_inferior_stemi.png",
+   "frontal_axis_deg": 51.858,
+   "hr_from_rr": 93.876,
+   "kind": "twelve-lead",
+   "per_lead": {
+    "I": {
+     "qrs_p2p_mV": 0.985,
+     "st60_mm": -1.021
+    },
+    "II": {
+     "qrs_p2p_mV": 1.49,
+     "st60_mm": 2.079
+    },
+    "III": {
+     "qrs_p2p_mV": 0.509,
+     "st60_mm": 3.177
+    },
+    "V1": {
+     "qrs_p2p_mV": 1.112,
+     "st60_mm": 0.019
+    },
+    "V2": {
+     "qrs_p2p_mV": 1.585,
+     "st60_mm": 0.561
+    },
+    "V3": {
+     "qrs_p2p_mV": 1.478,
+     "st60_mm": 0.359
+    },
+    "V4": {
+     "qrs_p2p_mV": 1.571,
+     "st60_mm": 0.033
+    },
+    "V5": {
+     "qrs_p2p_mV": 1.473,
+     "st60_mm": 0.006
+    },
+    "V6": {
+     "qrs_p2p_mV": 1.083,
+     "st60_mm": 0.012
+    },
+    "aVF": {
+     "qrs_p2p_mV": 0.999,
+     "st60_mm": 2.636
+    },
+    "aVL": {
+     "qrs_p2p_mV": 0.342,
+     "st60_mm": -2.099
+    },
+    "aVR": {
+     "qrs_p2p_mV": 1.237,
+     "st60_mm": -0.424
+    }
+   },
+   "pixel": {
+    "all_segments_match_their_label": true,
+    "calibration_pulse_mV": 1.027,
+    "px_per_mm_x": 7.874,
+    "px_per_mm_y": 7.874,
+    "segments": [
+     {
+      "best_match": "I",
+      "columns": 355,
+      "lead": "I",
+      "rms_error_mV": 0.009
+     },
+     {
+      "best_match": "aVR",
+      "columns": 410,
+      "lead": "aVR",
+      "rms_error_mV": 0.009
+     },
+     {
+      "best_match": "V1",
+      "columns": 410,
+      "lead": "V1",
+      "rms_error_mV": 0.008
+     },
+     {
+      "best_match": "V4",
+      "columns": 409,
+      "lead": "V4",
+      "rms_error_mV": 0.008
+     },
+     {
+      "best_match": "II",
+      "columns": 355,
+      "lead": "II",
+      "rms_error_mV": 0.01
+     },
+     {
+      "best_match": "aVL",
+      "columns": 410,
+      "lead": "aVL",
+      "rms_error_mV": 0.009
+     },
+     {
+      "best_match": "V2",
+      "columns": 410,
+      "lead": "V2",
+      "rms_error_mV": 0.009
+     },
+     {
+      "best_match": "V5",
+      "columns": 409,
+      "lead": "V5",
+      "rms_error_mV": 0.009
+     },
+     {
+      "best_match": "III",
+      "columns": 355,
+      "lead": "III",
+      "rms_error_mV": 0.009
+     },
+     {
+      "best_match": "aVF",
+      "columns": 410,
+      "lead": "aVF",
+      "rms_error_mV": 0.009
+     },
+     {
+      "best_match": "V3",
+      "columns": 410,
+      "lead": "V3",
+      "rms_error_mV": 0.009
+     },
+     {
+      "best_match": "V6",
+      "columns": 409,
+      "lead": "V6",
+      "rms_error_mV": 0.009
+     },
+     {
+      "best_match": "II",
+      "columns": 1724,
+      "lead": "II",
+      "rms_error_mV": 0.009
+     }
+    ]
+   },
+   "pr_II_s": 0.162,
+   "qrs_II_s": 0.084,
+   "qrs_in_10s": 15,
+   "qt_II_s": 0.336,
+   "qtc_II_s": {
+    "bazett": 0.422,
+    "framingham": 0.392,
+    "fridericia": 0.391,
+    "hodges": 0.397
+   },
+   "sha256_matches_manifest": true,
+   "view": "12-lead"
+  },
+  "rm22_1513_12lead_limb.png": {
+   "file": "rm22_1513_12lead_limb.png",
+   "kind": "twelve-lead-view",
+   "pixel": {
+    "all_segments_match_their_label": true,
+    "calibration_pulse_mV": 1.013,
+    "px_per_mm_x": 15.748,
+    "px_per_mm_y": 15.748,
+    "segments": [
+     {
+      "best_match": "I",
+      "columns": 969,
+      "lead": "I",
+      "rms_error_mV": 0.005
+     },
+     {
+      "best_match": "II",
+      "columns": 969,
+      "lead": "II",
+      "rms_error_mV": 0.005
+     },
+     {
+      "best_match": "III",
+      "columns": 969,
+      "lead": "III",
+      "rms_error_mV": 0.005
+     },
+     {
+      "best_match": "aVR",
+      "columns": 969,
+      "lead": "aVR",
+      "rms_error_mV": 0.005
+     },
+     {
+      "best_match": "aVL",
+      "columns": 969,
+      "lead": "aVL",
+      "rms_error_mV": 0.004
+     },
+     {
+      "best_match": "aVF",
+      "columns": 969,
+      "lead": "aVF",
+      "rms_error_mV": 0.005
+     }
+    ]
+   },
+   "sha256_matches_manifest": true,
+   "view": "rm22_1513_12lead_limb.png"
+  },
+  "rm23_1430_afib110.png": {
+   "file": "rm23_1430_afib110.png",
+   "fwave": {
+    "autocorr_one_period": 0.869,
+    "dominant_hz": 7.5,
+    "dominant_per_min": 450.0,
+    "max_autocorr_0_5_to_1_5_s": 0.667,
+    "peak_power_share": 0.645,
+    "peak_to_peak_mV": 0.143
+   },
+   "hr_from_rr": 109.091,
+   "kind": "strip",
+   "max_t_share_under_next_qrs": 0.114,
+   "p_beat_to_beat_corr": -0.023,
+   "p_template_beats": 4,
+   "p_template_max_mV": 0.091,
+   "pixel": {
+    "columns": 2037,
+    "px_per_mm_x": 13.583,
+    "px_per_mm_y": 13.583,
+    "qt_s": 0.365,
+    "r_count_6s": 11,
+    "rms_error_mV": 0.004,
+    "rr_mean_s": 0.55,
+    "st60_mV": -0.037,
+    "trace_fs": 339.567
+   },
+   "pr_s": null,
+   "qrs_in_6s": 11,
+   "qrs_s": 0.078,
+   "qt_measurable_beats": "8 of 9",
+   "qt_s": 0.342,
+   "qtc_s": {
+    "bazett": 0.47,
+    "framingham": 0.403,
+    "fridericia": 0.413,
+    "hodges": 0.457
+   },
+   "rhythm": "atrial fibrillation",
+   "rr_cv": 0.325,
+   "rr_max_s": 0.837,
+   "rr_min_s": 0.343,
+   "sha256_matches_manifest": true,
+   "st60_mV": -0.01,
+   "t_amp_mV": 0.218,
+   "three_similar_rr_in_a_row": false
+  },
+  "rm23_1535_afib110_rewindA.png": {
+   "file": "rm23_1535_afib110_rewindA.png",
+   "fwave": {
+    "autocorr_one_period": 0.913,
+    "dominant_hz": 6.167,
+    "dominant_per_min": 370.0,
+    "max_autocorr_0_5_to_1_5_s": 0.519,
+    "peak_power_share": 0.61,
+    "peak_to_peak_mV": 0.162
+   },
+   "hr_from_rr": 109.131,
+   "kind": "strip",
+   "max_t_share_under_next_qrs": 0.017,
+   "p_beat_to_beat_corr": -0.14,
+   "p_template_beats": 6,
+   "p_template_max_mV": 0.044,
+   "pixel": {
+    "columns": 2037,
+    "px_per_mm_x": 13.583,
+    "px_per_mm_y": 13.583,
+    "qt_s": 0.335,
+    "r_count_6s": 11,
+    "rms_error_mV": 0.004,
+    "rr_mean_s": 0.55,
+    "st60_mV": -0.004,
+    "trace_fs": 339.567
+   },
+   "pr_s": null,
+   "qrs_in_6s": 11,
+   "qrs_s": 0.065,
+   "qt_measurable_beats": "8 of 9",
+   "qt_s": 0.327,
+   "qtc_s": {
+    "bazett": 0.432,
+    "framingham": 0.398,
+    "fridericia": 0.396,
+    "hodges": 0.412
+   },
+   "rhythm": "atrial fibrillation",
+   "rr_cv": 0.215,
+   "rr_max_s": 0.717,
+   "rr_min_s": 0.349,
+   "sha256_matches_manifest": true,
+   "st60_mV": -0.003,
+   "t_amp_mV": 0.247,
+   "three_similar_rr_in_a_row": false
+  },
+  "rm23_rewindB_afib150.png": {
+   "file": "rm23_rewindB_afib150.png",
+   "fwave": {
+    "autocorr_one_period": 0.857,
+    "dominant_hz": 7.0,
+    "dominant_per_min": 420.0,
+    "max_autocorr_0_5_to_1_5_s": 0.519,
+    "peak_power_share": 0.647,
+    "peak_to_peak_mV": 0.09
+   },
+   "hr_from_rr": 152.727,
+   "kind": "strip",
+   "max_t_share_under_next_qrs": 0.143,
+   "p_beat_to_beat_corr": -0.132,
+   "p_template_beats": 4,
+   "p_template_max_mV": 0.04,
+   "pixel": {
+    "columns": 2037,
+    "px_per_mm_x": 13.583,
+    "px_per_mm_y": 13.583,
+    "qt_s": 0.306,
+    "r_count_6s": 15,
+    "rms_error_mV": 0.004,
+    "rr_mean_s": 0.393,
+    "st60_mV": -0.011,
+    "trace_fs": 339.567
+   },
+   "pr_s": null,
+   "qrs_in_6s": 15,
+   "qrs_s": 0.087,
+   "qt_measurable_beats": "11 of 13",
+   "qt_s": 0.291,
+   "qtc_s": {
+    "bazett": 0.453,
+    "framingham": 0.383,
+    "fridericia": 0.391,
+    "hodges": 0.44
+   },
+   "rhythm": "atrial fibrillation",
+   "rr_cv": 0.229,
+   "rr_max_s": 0.562,
+   "rr_min_s": 0.308,
+   "sha256_matches_manifest": true,
+   "st60_mV": -0.04,
+   "t_amp_mV": 0.189,
+   "three_similar_rr_in_a_row": false
+  },
+  "rm23_rewindC_afib130.png": {
+   "file": "rm23_rewindC_afib130.png",
+   "fwave": {
+    "autocorr_one_period": 0.876,
+    "dominant_hz": 6.667,
+    "dominant_per_min": 400.0,
+    "max_autocorr_0_5_to_1_5_s": 0.292,
+    "peak_power_share": 0.541,
+    "peak_to_peak_mV": 0.116
+   },
+   "hr_from_rr": 130.909,
+   "kind": "strip",
+   "max_t_share_under_next_qrs": 0.082,
+   "p_beat_to_beat_corr": -0.121,
+   "p_template_beats": 6,
+   "p_template_max_mV": 0.033,
+   "pixel": {
+    "columns": 2037,
+    "px_per_mm_x": 13.583,
+    "px_per_mm_y": 13.583,
+    "qt_s": 0.329,
+    "r_count_6s": 13,
+    "rms_error_mV": 0.004,
+    "rr_mean_s": 0.458,
+    "st60_mV": 0.02,
+    "trace_fs": 339.567
+   },
+   "pr_s": null,
+   "qrs_in_6s": 13,
+   "qrs_s": 0.065,
+   "qt_measurable_beats": "10 of 11",
+   "qt_s": 0.296,
+   "qtc_s": {
+    "bazett": 0.416,
+    "framingham": 0.371,
+    "fridericia": 0.368,
+    "hodges": 0.412
+   },
+   "rhythm": "atrial fibrillation",
+   "rr_cv": 0.236,
+   "rr_max_s": 0.654,
+   "rr_min_s": 0.32,
+   "sha256_matches_manifest": true,
+   "st60_mV": 0.008,
+   "t_amp_mV": 0.219,
+   "three_similar_rr_in_a_row": false
+  }
+ },
+ "note": "Automated consistency measurements. Not specialist ECG validation."
+}

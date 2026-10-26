@@ -9,7 +9,6 @@
 .s9-app .shift-report-copy .strip-figure { margin-top: 12px; }
 
 .s9-d1-strips { display: grid; gap: 4px; }
-.s9-then-now { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 16px; }
 .s9-strip-heading { display: flex; gap: 10px; align-items: baseline; margin-bottom: 6px; font: 600 12px var(--ce-font-mono); color: var(--ce-text-muted); }
 .s9-strip-heading time { font-size: 15px; color: var(--ce-text-dark); }
 .s9-steps { max-width: 800px; margin: 0 0 20px; padding: 0; list-style: none; border-block: 1px solid var(--ce-warm-line); }
@@ -39,6 +38,6 @@
 .s9-quote { font-weight: 600; }
 
 @media (max-width: 760px) {
-  .s9-then-now, .s9-step-compare { grid-template-columns: 1fr; }
+  .s9-step-compare { grid-template-columns: 1fr; }
   .s9-step-compare { padding-left: 4px; }
 }

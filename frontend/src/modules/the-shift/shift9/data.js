@@ -1,11 +1,11 @@
-// SHIFT-009 v0.8, "The Quiet Complaint". Learner-facing text follows docs/SHIFT_009_SPEC_v0.8.md, which is the
-// v0.7 spec plus the audit corrections of 26 Oct 2026. Review status Draft: founder review, independent clinical
-// sign-off and psych specialty review are not recorded.
+// SHIFT-009 v0.9, "The Quiet Complaint". Learner-facing text follows docs/SHIFT_009_SPEC_v0.9.md: the v0.7 spec plus
+// the audit corrections of 26 Oct 2026 (v0.8) and the regenerated ECGs and 12-lead views (v0.9). Review status Draft:
+// founder review, independent clinical sign-off and psych specialty review are not recorded.
 // Each patient's vitals live in one table, and each strip lives in one table with the screens it belongs to,
 // so screens derive their values instead of repeating them.
 
 export const SCENARIO_ID = 'SHIFT-009';
-export const VERSION = '0.8';
+export const VERSION = '0.9';
 export const title = 'The Quiet Complaint';
 
 // Keyed by spec source number so a citation can be swapped without touching learner-facing text.
@@ -28,36 +28,47 @@ export const SOURCES = {
   16: { citation: "Sorrentino R. Performing capacity evaluations: what's expected from your consult. Current Psychiatry. 2014;13(1):41-44.", url: 'https://cdn.mdedge.com/files/s3fs-public/Document/September-2017/041_0114CP_Sorrentino_FINAL.pdf', type: 'Peer-reviewed clinical review (free access)', supports: 'D4 capacity panel' },
 };
 
-// The nine delivered illustrations, unchanged. `screens` is the Part E mapping, plus D1 for the Room 22 and 23
+// The nine illustrations, regenerated in v0.9 by tools/shift9-ecg (rate-correct QT, square paper grid), same file names. `screens` is the Part E mapping, plus D1 for the Room 22 and 23
 // starting strips (founder request, 24 Oct 2026: show all three patients' strips on D1); `alt` is the Part E
 // screen-reader text. `altBefore` (v0.8) is read until the decision is answered: it gives the same findings a
 // sighted learner sees, without the interpretation the decision asks for. `caption` carries only room, lead and
 // time, so decision screens never name a rhythm.
 const asset = file => new URL(`./assets/${file}`, import.meta.url).href;
 export const STRIPS = {
-  'rm21-1430': { file: 'rm21_1430_sinus84.png', src: asset('rm21_1430_sinus84.png'), room: '21', time: '1430', rate: 84, caption: 'Room 21, lead II, 1430', screens: ['assignment'],
+  'rm21-1430': { file: 'rm21_1430_sinus84.png', src: asset('rm21_1430_sinus84.png'), width: 2037, height: 543, room: '21', time: '1430', rate: 84, caption: 'Room 21, lead II, 1430', screens: ['assignment'],
     alt: 'Room 21, lead II, 1430. Regular rhythm at 84 with a P wave before every QRS. Sinus rhythm.' },
-  'rm21-1505': { file: 'rm21_1505_artifact_leadsoff.png', src: asset('rm21_1505_artifact_leadsoff.png'), room: '21', time: '1505', rate: null, caption: 'Room 21, lead II, 1505', screens: ['d1'],
+  'rm21-1505': { file: 'rm21_1505_artifact_leadsoff.png', src: asset('rm21_1505_artifact_leadsoff.png'), width: 2037, height: 543, room: '21', time: '1505', rate: null, caption: 'Room 21, lead II, 1505', screens: ['d1'],
     altBefore: 'Room 21, lead II, 1505. Regular beats under heavy wavy artifact for about three seconds, then a flat line with a LEADS OFF message.',
     alt: 'Room 21, lead II, 1505. Regular beats under heavy wavy artifact for about three seconds, then a flat line with a LEADS OFF message. The monitor has lost the signal. This is not asystole.' },
-  'rm22-1430': { file: 'rm22_1430_sinus88.png', src: asset('rm22_1430_sinus88.png'), room: '22', time: '1430', rate: 88, caption: 'Room 22, lead II, 1430', screens: ['assignment', 'd1', 'd2'],
+  'rm22-1430': { file: 'rm22_1430_sinus88.png', src: asset('rm22_1430_sinus88.png'), width: 2037, height: 543, room: '22', time: '1430', rate: 88, caption: 'Room 22, lead II, 1430', screens: ['assignment', 'd1', 'd2'],
     alt: 'Room 22, lead II, 1430. Sinus rhythm at 88. The ST segment sits on the baseline.' },
-  'rm22-1508': { file: 'rm22_1508_sinus94_ste.png', src: asset('rm22_1508_sinus94_ste.png'), room: '22', time: '1508', rate: 94, caption: 'Room 22, lead II, 1508', screens: ['d2'],
+  'rm22-1508': { file: 'rm22_1508_sinus94_ste.png', src: asset('rm22_1508_sinus94_ste.png'), width: 2037, height: 543, room: '22', time: '1508', rate: 94, caption: 'Room 22, lead II, 1508', screens: ['d2'],
     alt: 'Room 22, lead II, 1508. Sinus rhythm at 94. The ST segment is raised about 2 millimeters and runs into a tall T wave.' },
-  'rm22-1513-12lead': { file: 'rm22_1513_12lead_inferior_stemi.png', src: asset('rm22_1513_12lead_inferior_stemi.png'), room: '22', time: '1513', rate: 94, caption: 'Room 22, 12-lead ECG, 1513', screens: ['d3'], twelveLead: true,
+  'rm22-1513-12lead': { file: 'rm22_1513_12lead_inferior_stemi.png', src: asset('rm22_1513_12lead_inferior_stemi.png'), width: 1968, height: 1086, room: '22', time: '1513', rate: 94, caption: 'Room 22, 12-lead ECG, 1513', screens: ['d3'], twelveLead: true,
     altBefore: 'Room 22, 12-lead ECG, 1513. Regular rhythm at 94 with a P wave before every QRS. ST segment in each lead, compared with the baseline: lead I about 1 millimeter below. Lead II about 2 millimeters above. Lead III about 3 millimeters above. aVR about half a millimeter below. aVL about 2 millimeters below. aVF about 3 millimeters above. V1 on the baseline. V2 about half a millimeter above. V3 less than half a millimeter above. V4, V5 and V6 on the baseline.',
-    alt: 'Room 22, 12-lead ECG, 1513. Sinus rhythm at 94. ST elevation of about 2 to 3 millimeters in leads II, III and aVF. ST depression in leads I and aVL. The chest leads show no ST elevation.' },
-  'rm23-1430': { file: 'rm23_1430_afib110.png', src: asset('rm23_1430_afib110.png'), room: '23', time: '1430', rate: 110, caption: 'Room 23, lead II, 1430', screens: ['assignment', 'd1'],
+    alt: 'Room 22, 12-lead ECG, 1513. Sinus rhythm at 94. ST elevation of about 2 to 3 millimeters in leads II, III and aVF. ST depression in leads I and aVL. The chest leads show no ST elevation.',
+    // v0.9: focused views of the same recording for phones. Named by lead system, so they don't point at the answer.
+    views: [
+      { id: 'limb', label: 'Limb leads', file: 'rm22_1513_12lead_limb.png', src: asset('rm22_1513_12lead_limb.png'), width: 1181, height: 2346,
+        caption: 'Room 22, 12-lead ECG, 1513, limb leads',
+        altBefore: 'Room 22, 12-lead ECG, 1513, limb leads I, II, III, aVR, aVL and aVF, all over the same 2.5 seconds. Regular rhythm at 94 with a P wave before every QRS. ST segment in each lead, compared with the baseline: lead I about 1 millimeter below. Lead II about 2 millimeters above. Lead III about 3 millimeters above. aVR about half a millimeter below. aVL about 2 millimeters below. aVF about 3 millimeters above.',
+        alt: 'Room 22, 12-lead ECG, 1513, limb leads over the same 2.5 seconds. Sinus rhythm at 94. ST elevation of about 2 to 3 millimeters in leads II, III and aVF. ST depression in leads I and aVL.' },
+      { id: 'chest', label: 'Chest leads', file: 'rm22_1513_12lead_chest.png', src: asset('rm22_1513_12lead_chest.png'), width: 1181, height: 2913,
+        caption: 'Room 22, 12-lead ECG, 1513, chest leads',
+        altBefore: 'Room 22, 12-lead ECG, 1513, chest leads V1 to V6, all over the same 2.5 seconds. Regular rhythm at 94. ST segment in each lead, compared with the baseline: V1 on the baseline. V2 about half a millimeter above. V3 less than half a millimeter above. V4, V5 and V6 on the baseline.',
+        alt: 'Room 22, 12-lead ECG, 1513, chest leads V1 to V6 over the same 2.5 seconds. Sinus rhythm at 94. The chest leads show no ST elevation.' },
+    ] },
+  'rm23-1430': { file: 'rm23_1430_afib110.png', src: asset('rm23_1430_afib110.png'), width: 2037, height: 543, room: '23', time: '1430', rate: 110, caption: 'Room 23, lead II, 1430', screens: ['assignment', 'd1'],
     alt: 'Room 23, lead II, 1430. Irregularly irregular rhythm with no P waves and a wavy baseline. 11 QRS complexes in 6 seconds, about 110. Atrial fibrillation.' },
-  'rm23-1535-a': { file: 'rm23_1535_afib110_rewindA.png', src: asset('rm23_1535_afib110_rewindA.png'), room: '23', time: '1535', rate: 110, caption: 'Room 23, lead II, 1535', screens: ['d5', 'rewind-a'],
+  'rm23-1535-a': { file: 'rm23_1535_afib110_rewindA.png', src: asset('rm23_1535_afib110_rewindA.png'), width: 2037, height: 543, room: '23', time: '1535', rate: 110, caption: 'Room 23, lead II, 1535', screens: ['d5', 'rewind-a'],
     altBefore: 'Room 23, lead II, 1535. Narrow QRS complexes at uneven intervals with no repeating pattern. No distinct wave comes before each QRS, and the baseline between them is wavy. 11 QRS complexes in 6 seconds.',
     alt: 'Room 23, lead II, 1535. Irregularly irregular rhythm with no P waves. 11 QRS complexes in 6 seconds, about 110.' },
-  'rm23-1535-b': { file: 'rm23_rewindB_afib150.png', src: asset('rm23_rewindB_afib150.png'), room: '23', time: '1535', rate: 150, caption: 'Room 23, lead II, 1535', screens: ['rewind-b'],
+  'rm23-1535-b': { file: 'rm23_rewindB_afib150.png', src: asset('rm23_rewindB_afib150.png'), width: 2037, height: 543, room: '23', time: '1535', rate: 150, caption: 'Room 23, lead II, 1535', screens: ['rewind-b'],
     altBefore: 'Room 23, lead II, 1535. Narrow QRS complexes at uneven intervals with no repeating pattern. No distinct wave comes before each QRS, and the baseline between them is wavy. 15 QRS complexes in 6 seconds.',
-    alt: 'Room 23, lead II, 1535, Rewind B. Irregularly irregular rhythm with no P waves. 15 QRS complexes in 6 seconds, about 150.' },
-  'rm23-1535-c': { file: 'rm23_rewindC_afib130.png', src: asset('rm23_rewindC_afib130.png'), room: '23', time: '1535', rate: 130, caption: 'Room 23, lead II, 1535', screens: ['rewind-c'],
+    alt: 'Room 23, lead II, 1535, Version B. Irregularly irregular rhythm with no P waves. 15 QRS complexes in 6 seconds, about 150.' },
+  'rm23-1535-c': { file: 'rm23_rewindC_afib130.png', src: asset('rm23_rewindC_afib130.png'), width: 2037, height: 543, room: '23', time: '1535', rate: 130, caption: 'Room 23, lead II, 1535', screens: ['rewind-c'],
     altBefore: 'Room 23, lead II, 1535. Narrow QRS complexes at uneven intervals with no repeating pattern. No distinct wave comes before each QRS, and the baseline between them is wavy. 13 QRS complexes in 6 seconds.',
-    alt: 'Room 23, lead II, 1535, Rewind C. Irregularly irregular rhythm with no P waves. 13 QRS complexes in 6 seconds, about 130.' },
+    alt: 'Room 23, lead II, 1535, Version C. Irregularly irregular rhythm with no P waves. 13 QRS complexes in 6 seconds, about 130.' },
 };
 export const stripsFor = screen => Object.entries(STRIPS).filter(([, strip]) => strip.screens.includes(screen)).map(([id]) => id);
 
@@ -220,6 +231,8 @@ export const d2 = {
 export const d3 = {
   time: '1513', title: 'Read the 12-lead',
   scene: 'Joy, the rapid response nurse, walks in as the 12-lead prints.',
+  // v0.9: shown under the 12-lead viewer.
+  viewerHint: 'On a phone, the Limb leads and Chest leads views show six leads at a time over the same beats. Turn your phone sideways to see the whole 12-lead.',
   strip: 'rm22-1513-12lead',
   prompt: 'What does this 12-lead show, and what\'s next?',
   choices: [
@@ -440,11 +453,11 @@ export const card = {
 // Open review items (not learner-facing). Part F.
 export const OPEN_ITEMS = [
   'Founder review, independent clinical review and psych specialty review (Room 21 and D4) are not recorded.',
-  'All nine ECG images are constructed illustrations and need a clinical check of morphology before release. The audit of 25 Oct 2026 found a long QT on the sinus tracings, very short AF R-R intervals in Rewind B, a near-isoelectric aVL QRS and a "Main script, Rewind A" label on the D5 image. These are deferred to remediation Part 2.',
+  'All ECG images are constructed illustrations. v0.9 regenerated them with rate-correct QT, square paper, constrained AF timing and corrected labels, and added limb-lead and chest-lead views of the 12-lead. Automated measurements are in docs/SHIFT_009_ECG_VALIDATION.md; specialist ECG validation is still required before release.',
   'Sources 3, 4 and 5 were opened through ACC summaries; claims need checking against the full text.',
   'Source 14 now links to its DOI. The hosted copy the author first read (sections 1 to 4.3) returned HTTP 404 on 25 Oct 2026, so its claims need checking against the published text.',
   'The two Rhythm Lab Go further buttons are hidden until verified entries exist.',
-  'v0.8 clinical decisions awaiting approval: Marco helping the RN in Room 22 earns full credit; Marco at the station earns partial credit (Close); Rewind C "Escalate now" is Close instead of Not best; decision-screen alt text gives objective findings until the learner answers; the estimated time is About 10 to 12 minutes.',
+  'v0.9 adds one learner sentence for approval, the D3 viewer hint. v0.8 clinical decisions awaiting approval: Marco helping the RN in Room 22 earns full credit; Marco at the station earns partial credit (Close); Rewind C "Escalate now" is Close instead of Not best; decision-screen alt text gives objective findings until the learner answers; the estimated time is About 10 to 12 minutes.',
   'D5 Marco line build note added in the package; Mohamed to confirm. v0.8 adds a matching line when Marco was in Room 22.',
   'Founder changes to v0.7 text on 24 Oct 2026, before review: D1 shows all three patients\' strips (Room 21 at 1505, Rooms 22 and 23 at their 1430 starting strips), and Lena is introduced as the monitor tech on D1 and D5. v0.8 labels the 1430 strips on D1 as earlier strips.',
 ];

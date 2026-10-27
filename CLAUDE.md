@@ -116,7 +116,14 @@ instead of doing it.
 | `POST /api/copilot` | Copilot modes, Shift Brain Priority Map, Teach Me, follow-up, reassessment |
 | `POST /api/sbar` | SBAR draft |
 | `POST /api/ask` | Ask Clinical Edge (general and Snapshot-aware; deterministic ABG engine) |
+| `POST /api/ask/v1/conversation/consent` | Conversational Ask: records consent and returns a 10-minute bearer receipt for an in-memory conversation |
+| `DELETE /api/ask/v1/conversation/consent` | Conversational Ask: withdraws consent and discards that conversation |
+| `POST /api/ask/v1/conversation/reset` | Conversational Ask: clears the conversation history, keeping consent |
+| `POST /api/ask/v1/conversation/preview` | Conversational Ask: one educational question in the conversation (`claude-opus-5-5`) |
 | `GET /health` | Health check |
+
+The four conversation routes (`backend/ask-conversation.js`) are only registered when
+`ASK_PUBLIC_BETA_ENABLED=true` with containment on in production, or in local preview.
 
 Do not add or rename routes without explicit instruction. Every AI route needs the rate
 limiter, the identifier check, metadata-only logging, the containment gate and the AI cost
@@ -124,8 +131,10 @@ guard (`backend/ai-cost-guard.js`: call `admit` right before a request's first A
 
 AI cost guard variables: `AI_DAILY_BUDGET_USD` (default 5), `FREE_DAILY_QUESTIONS` (default 3
 per device per day), `FREE_DAILY_QUESTIONS_PER_IP` (default 50, backstop and the only limit for
-requests without a device ID), `AI_INPUT_USD_PER_MTOK` and `AI_OUTPUT_USD_PER_MTOK` (defaults 3
-and 15, the `claude-sonnet-4-6` list prices; update them if the model changes). Only new Ask
+requests without a device ID). Spend is priced per call from the model's list prices in
+`MODEL_RATES` (`backend/ai-cost-guard.js`; update it when a route changes model or Anthropic
+changes prices); unknown models are priced at the highest listed rate. `AI_INPUT_USD_PER_MTOK`
+and `AI_OUTPUT_USD_PER_MTOK` are optional overrides for every model. Only new Ask
 questions and new Priority Maps count toward the free limits; Teach Me, SBAR, follow-ups and ABG
 explanations only need budget. A question where Anthropic was never reached, errored or returned
 429 (including a Priority Map fallback for those reasons) is released on both counters

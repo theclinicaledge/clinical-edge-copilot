@@ -57,7 +57,9 @@ const apiLimiter = rateLimit({
   message: { error: "Too many requests. Please wait a few minutes and try again." },
 });
 
-app.use(express.json());
+// The app never sends compressed JSON; refusing compressed bodies closes the
+// decompression denial-of-service path and keeps the 100kb cap meaningful.
+app.use(express.json({ limit: "100kb", inflate: false }));
 
 const anthropicApiKey = process.env.ANTHROPIC_API_KEY;
 // Daily AI budget and free per-client limit (see ai-cost-guard.js). The metered

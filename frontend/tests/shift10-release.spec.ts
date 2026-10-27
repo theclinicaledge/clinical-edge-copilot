@@ -17,7 +17,7 @@ for(const width of [390,1440])test(`public library, route and saved report ${wid
   await expect(page.locator('.s10-header')).toContainText('Fictional case');
   await expect(page.locator('.s10-header')).not.toContainText('Private preview');
   await page.getByRole('button',{name:'Answer Dana’s call'}).click();
-  await page.getByRole('button',{name:/Go on/}).click();await page.reload();
+  await page.getByRole('button',{name:'Continue ED report'}).click();await page.reload();
   await expect(page.locator('.s10-report')).toContainText('Segment 2 of 6');
   await page.getByRole('link',{name:/Shift Library/}).first().click();
   await page.getByRole('button',{name:'Show more shifts'}).click();

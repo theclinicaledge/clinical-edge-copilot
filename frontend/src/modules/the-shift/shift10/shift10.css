@@ -35,3 +35,71 @@
   .s10 [id^=s10-]{scroll-margin-top:76px}
   .s10-art-room svg{max-height:250px}
 }
+
+/* One story moment; optional work stays in the existing modal instead of a long page. */
+.s10-flow-progress{display:block;padding:14px 5% 10px}
+.s10-flow-progress ol{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:8px;list-style:none;margin:0;padding:0}
+.s10-flow-progress li{border-top:2px solid var(--ce-warm-line);padding-top:7px;display:flex;gap:6px;font-size:11px;color:var(--ce-text-muted)}
+.s10-flow-progress li[aria-current=step]{border-color:var(--ce-teal);color:var(--ce-text-dark);font-weight:650}
+.s10-flow-progress li>span:first-child{font-family:var(--ce-font-mono)}
+.s10-flow-progress p{margin:8px 0 0;font-size:10px;color:var(--ce-text-muted)}
+.s10-flow{max-width:950px;margin:auto}
+.s10-flow .s10-context{margin-bottom:18px}
+.s10-flow-tools{display:flex;align-items:center;gap:8px;padding:10px 0;margin-bottom:14px;border-block:1px solid var(--ce-warm-line);background:var(--ce-warm-mid)}
+.s10-flow-tools>span{font-size:12px;margin-right:auto;color:var(--ce-text-muted)}
+.s10-flow-tools button{min-height:44px;padding:9px 13px;border:1px solid var(--ce-warm-line);border-radius:var(--ce-r-md);background:var(--ce-warm-card);color:var(--ce-text-dark);font-size:13px}
+.s10-flow-hint{font-size:13px;color:var(--ce-text-muted);margin:12px 0 18px}
+.s10-progress-action{border-top:1px solid var(--ce-warm-line);padding:18px 0 8px;display:flex;align-items:center;justify-content:space-between;gap:16px}
+.s10-progress-action p{font-size:12px;color:var(--ce-text-muted);margin:0;max-width:330px}
+.s10-flow .s10-room-scene{display:grid;grid-template-columns:1fr 170px;align-items:center}
+.s10-flow .s10-room-art{max-height:115px;margin:0}
+.s10-flow .s10-bedside{margin-bottom:16px}
+.s10-flow .s10-report-history{margin:16px 0}
+.s10-flow .s10-assess-options{grid-template-columns:repeat(2,minmax(0,1fr));gap:8px;align-items:start}
+.s10-assessment-item{border:1px solid var(--ce-warm-line);border-radius:var(--ce-r-md);overflow:hidden;background:var(--ce-warm-card)}
+.s10-assessment-item>button{width:100%;min-height:62px;padding:14px;text-align:left;border:0;background:transparent;color:var(--ce-text-dark)}
+.s10-assessment-item>button strong{display:flex;justify-content:space-between;gap:8px;font-size:14px}
+.s10-assessment-item>button small{display:block;color:var(--ce-text-muted);font-size:11px;line-height:1.45;margin-top:6px}
+.s10-assessment-item.is-open{border-color:var(--ce-text-muted)}
+.s10-assessment-item .s10-finding{margin:0;border-left:0;border-top:1px solid var(--ce-warm-line);padding:12px 14px}
+.s10-assessment-item .s10-finding p{font-size:14px}
+.s10-panel-head{position:sticky;top:0;background:var(--ce-warm-card);z-index:2;padding-bottom:12px;display:flex;justify-content:space-between;align-items:flex-start;gap:14px;margin-bottom:18px}
+.s10-panel-head h2{font-size:23px;margin:0}
+.s10-panel-head>button{flex-shrink:0;font-size:12px;min-height:44px;padding:8px 12px}
+.s10-dialog .s10-workspace{position:static;border:0;border-radius:0;overflow:visible}
+.s10-dialog .s10-workspace>header{display:none}
+.s10-dialog .s10-workspace [role=tabpanel]{min-height:0;padding:20px 0}
+.s10-dialog .s10-policy-link{padding:14px 0}
+.s10-dialog .s10-questions{border:0;margin:0;padding:0;color:var(--ce-text-dark)}
+.s10-question-item>button{width:100%;display:flex;gap:12px;justify-content:space-between;text-align:left;padding:15px 0;border:0;border-bottom:1px solid var(--ce-warm-line);background:transparent;color:var(--ce-text-dark);font-size:14px}
+.s10-question-item>button>span{white-space:nowrap;font-size:11px;color:var(--ce-text-muted)}
+.s10-question-item .s10-clarification{margin:12px 0;padding-left:14px}
+.s10-dialog .s10-safety{padding:0;border:0;background:transparent;margin:0}
+.s10-team-panel .s10-choice{display:flex;flex-direction:column;gap:3px;min-height:60px}
+.s10-team-panel small{color:var(--ce-text-muted);font-size:12px}
+.s10-dialog h2:focus{outline:none}
+@media(max-width:700px){
+ .s10-flow-progress{padding:12px 16px 8px}
+ .s10-flow-progress ol{gap:5px}
+ .s10-flow-progress li{font-size:10px;flex-direction:column;gap:3px;line-height:1.3}
+ .s10-flow-progress p{font-size:10px}
+ .s10-flow-tools{position:sticky;top:0;z-index:3;gap:6px;margin-bottom:12px;padding:8px 0}
+ .s10-flow-tools>span{display:none}
+ .s10-flow-tools button{flex:1;min-width:0;padding:8px 6px;font-size:12px}
+ .s10-flow .s10-context h1{font-size:29px}
+ .s10-progress-action{display:flex;flex-direction:column;align-items:stretch;gap:10px;padding-top:14px}
+ .s10-progress-action .s10-primary{width:100%;justify-content:center;min-height:48px;font-size:14px}
+ .s10-progress-action p{font-size:11px;max-width:none}
+ .s10-flow .s10-room-scene{grid-template-columns:1fr 112px}
+ .s10-flow .s10-room-label{padding:14px}
+ .s10-flow .s10-room-label strong{font-size:20px}
+ .s10-flow .s10-room-label .s10-eyebrow{font-size:9px}
+ .s10-flow .s10-room-art{max-height:85px}
+ .s10-flow .s10-bedside,.s10-flow .s10-desk{padding:18px 14px}
+ .s10-flow .s10-assess-options{grid-template-columns:repeat(2,minmax(0,1fr))}
+ .s10-assessment-item>button{padding:12px 10px;min-height:64px}
+ .s10-assessment-item>button strong{font-size:12px;line-height:1.4}
+ .s10-assessment-item>button small{font-size:10px}
+ .s10-flow-hint{font-size:12px}
+ .s10-panel-head h2{font-size:20px}
+}

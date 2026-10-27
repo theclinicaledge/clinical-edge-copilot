@@ -12,15 +12,15 @@ try {
   const { render } = await import(temp.href);
   const intro = render(fresh()); assert.ok(intro.includes('Answer Dana')); assert.ok(intro.includes('4 West charge RN')); assert.ok(intro.includes('s10-art-handoff'));
   let report = step(fresh(), { type: 'start' });
-  let html = render(report); assert.ok(html.includes('How this works')); assert.ok(html.indexOf('s10-action-nav') < html.indexOf('class="s10-report"')); assert.ok(html.includes('Back to Dana')); assert.ok(!html.includes('No concerns kept yet. You can keep a finding from the workspace or bedside. Telemetry')); assert.ok(!html.includes('1340')); assert.ok(!html.includes('Stool test sent 1210'));
-  report = step(report, { type: 'tab', id: 'Chart' }); html = render(report); assert.ok(html.includes('ED medication record')); assert.ok(!html.includes('1340'));
-  report = step(report, { type: 'chart', id: 'meds' }); html = render(report); assert.ok(html.includes('1340'));
+  let html = render(report); assert.ok(html.includes('Optional investigation')); assert.ok(html.includes('Continue ED report')); assert.ok(!html.includes('s10-mobile-nav')); assert.ok(!html.includes('1340')); assert.ok(!html.includes('Stool test sent 1210'));
+  for(let i=0;i<5;i++) report=step(report,{type:'go-on'});
+  html=render(report,'preparation'); assert.ok(html.includes('Prepare for Ruth’s arrival.')); assert.ok(html.includes('Receive Ruth')); assert.ok(!html.includes('class="s10-report"'));
   for (const [path, topics] of [['A', ['telemetry', 'isolation']], ['B', ['telemetry']], ['C', ['isolation']], ['D', []]]) {
     let s = step(fresh(), { type: 'start' });
     if (topics.length) s = step(s, { type: 'charge', topics });
     for (let i = 0; i < 5; i++) s = step(s, { type: 'go-on' });
     s = step(s, { type: 'arrive' }); html = render(s);
-    assert.ok(html.includes('Ruth is here.')); assert.ok(html.includes('Nursing actions')); assert.ok(html.includes('Ruth’s daughter')); assert.ok(html.includes('Back to bedside')); assert.ok(html.includes('At the bedside'));
+    assert.ok(html.includes('Ruth is here.')); assert.ok(html.includes('Nursing actions')); assert.ok(html.includes('Ruth’s daughter')); assert.ok(html.includes('Finish receiving assessment')); assert.ok(html.includes('Check wristband'));
     assert.equal(html.includes('Mr. Bell is exposed.'), path === 'D');
     s = step(s, { type: 'call-start', id: 'admission' }); html = render(s); assert.ok(html.includes('I haven&#x27;t checked her closely yet.'));
     s = step(s, { type: 'call-answer', ids: ['unknown'] }); s = step(s, { type: 'finish' }); html = render(s);

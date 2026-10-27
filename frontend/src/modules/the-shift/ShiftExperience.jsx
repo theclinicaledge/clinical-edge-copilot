@@ -28,6 +28,8 @@ const Shift7Art = (await import('./shift7/Artwork.jsx')).default;
 if (Shift7) renderers['missing-time'] = Shift7;
 const Shift8 = (await import('./shift8/Shift8.jsx')).default;
 if (Shift8) renderers['code-blue'] = Shift8;
+const Shift10 = (await import('./shift10/Shift10.jsx')).default;
+renderers['transfer-not-ready'] = Shift10;
 // Draft SHIFT-009: preview builds only, so production bundles carry none of its code.
 const Shift9 = import.meta.env.VITE_SHIFT_009_PREVIEW === 'true' ? (await import('./shift9/Shift9.jsx')).default : null;
 if (Shift9) renderers['quiet-complaint'] = Shift9;
@@ -38,6 +40,7 @@ const images = {
   ...(CONVERSATION_ENABLED ? { conversation: new URL('./conversation/room.svg', import.meta.url).href } : {}),
   ...(Shift6 ? { 'stable-number': new URL('./shift6/poster.svg', import.meta.url).href } : {}),
   'code-blue': new URL('./assignment-poster.svg', import.meta.url).href,
+  'transfer-not-ready': new URL('./shift10/poster.svg', import.meta.url).href,
   ...(Shift9 ? { 'quiet-complaint': getShift('quiet-complaint').image } : {}),
 };
 
@@ -150,7 +153,7 @@ function Scenario({ item, navigate, active }) {
   }
   return <div ref={root} className="shift-scenario-scroll" onClickCapture={capture}>
     <div className="shift-scene-bar"><AppLink to="/learn/shifts" navigate={navigate}>&#8592; Shift Library</AppLink><button onClick={() => setReview(true)}>Sources & review</button></div>
-    <Scene embedded={item.id === 'which-patient-first'} nextStep={['drowsy-patient', 'monitor-alarm', 'discharge-puzzle', 'which-patient-first'].includes(item.id) ? <NextStep item={item} navigate={navigate} /> : null} debrief={active && rewindAssignments[item.id] ? <><DebriefNavigation />{StandaloneRewind && <Suspense fallback={<p role="status">Opening optional practice...</p>}><StandaloneRewind id={rewindAssignments[item.id]} navigate={navigate} /></Suspense>}</> : null} />
+    <Scene embedded={item.id === 'which-patient-first'} released={item.id === 'transfer-not-ready'} nextStep={['drowsy-patient', 'monitor-alarm', 'discharge-puzzle', 'which-patient-first'].includes(item.id) ? <NextStep item={item} navigate={navigate} /> : null} debrief={active && rewindAssignments[item.id] ? <><DebriefNavigation />{StandaloneRewind && <Suspense fallback={<p role="status">Opening optional practice...</p>}><StandaloneRewind id={rewindAssignments[item.id]} navigate={navigate} /></Suspense>}</> : null} />
     {review && <ReviewDialog item={item} close={() => setReview(false)} />}
   </div>;
 }

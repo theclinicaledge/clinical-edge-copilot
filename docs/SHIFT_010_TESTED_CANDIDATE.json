@@ -1,0 +1,153 @@
+{
+  "releaseBase": "3b321919e492b1902a9c679784b3783a71b80633",
+  "founderReportedBrowserResult": {
+    "passed": 15,
+    "failed": 0,
+    "seconds": 49.0
+  },
+  "localLastRun": {
+    "status": "passed",
+    "failedTests": []
+  },
+  "sourceMatchesTestedProductionAssets": true,
+  "assetCount": 32,
+  "sourceSHA256": {
+    "frontend/src/modules/the-shift/shift10/Shift10.jsx": "501fa355458fb82fe672e43130b4b30e27575683f6431389d014636ab4ad594b",
+    "frontend/src/modules/the-shift/shift10/shift10.css": "a6a784ffe1af6ed45b87e593b10448cab3c703c4ccb628535c1122fa66df6532",
+    "frontend/src/modules/the-shift/shift10/content.js": "0ae53d808bb0bb89c1f8c34b84f8fdaa334bd5d8119fc4cc2a89d5cdf2b377ee",
+    "frontend/src/modules/the-shift/shift10/state.js": "d290970b56daed6b244c25eb5753aac1105e7b95ffb3792fae874f50f0d024d7",
+    "frontend/src/modules/the-shift/shift10/metadata.js": "3bac6319456c3f0afff65180636bf09c2f8fabab2448e6d8fc22078221c8cd12",
+    "frontend/src/modules/the-shift/shift10/poster.svg": "46673e718014190b4648df66dc4067c4f0509e9c4a6f95da54d5a819b274a8d0"
+  },
+  "testedAssets": [
+    {
+      "file": "assets/index-DpTmVl9L.js",
+      "sha256": "7b4c9edd3f6110dbbc9ef4f845b8256f3f70978b5af283d6b63bdee55017e4a9"
+    },
+    {
+      "file": "assets/Artwork-CW747LH_.js",
+      "sha256": "2d180fafc717bf7c9ad204abaa38de9008a164819c1addc0f1f8c947fcefa6a6"
+    },
+    {
+      "file": "assets/Artwork-IXTIhCDm.js",
+      "sha256": "9700c1f3262be4a5d770632dc448c21e082a66b3e7fb4ddb9e9b3fedb02d11bc"
+    },
+    {
+      "file": "assets/ModuleHeader-CKkvRTqZ.js",
+      "sha256": "ff98112a150dc4904c505517b90fd31f8ea574154de11bb78fa0fbefd453c47b"
+    },
+    {
+      "file": "assets/RewindPlayer-DQCN-BEK.js",
+      "sha256": "6d8bbc18c2c745bb81bde6dda7479337aa6c26b94e804f51d02c4a07ce37a3e4"
+    },
+    {
+      "file": "assets/Shift10-DJOnZ8BL.js",
+      "sha256": "795ca9662cf9a763db764138b52f55133304a171dc0564a71f868883381f775b"
+    },
+    {
+      "file": "assets/Shift6-gkQtBuep.js",
+      "sha256": "82ad509b6e77c00069188cc6bc49d7bdcca644bb7ce3829c8342ce552374a0d8"
+    },
+    {
+      "file": "assets/Shift7-CRG-mfl2.js",
+      "sha256": "14576352627883d05bc7b689882be6a8b0f6c945be478cea9641592ee397df03"
+    },
+    {
+      "file": "assets/Shift8-DITucHTE.js",
+      "sha256": "1fabed784ff55a338715a73f6300f1c273c6ad5542d3cfb6184fc1f64e514c4d"
+    },
+    {
+      "file": "assets/ShiftExperience-Dj001j-y.js",
+      "sha256": "098f93868908303d90c8df55258a43ca1260207ad25bbbb730c5962dc4ec00ca"
+    },
+    {
+      "file": "assets/StandaloneRewind-K696F2TF.js",
+      "sha256": "28ffc7ccf16d35c9c857a1842caebbcda5a2c48d34b06c84391edc1b8cd8e414"
+    },
+    {
+      "file": "assets/engine-DdvnfHHe.js",
+      "sha256": "34a60ffc654575c305a7cf2188d0273b0c5a50cb1afcb414d533ab3be0b0117d"
+    },
+    {
+      "file": "assets/jsx-runtime-DmyinQmY.js",
+      "sha256": "f774329111354f16abf192c9706e4cab0bda6d7f0cd66f4aea73769708b53d0d"
+    },
+    {
+      "file": "assets/metadata-4_7ZYs_P.js",
+      "sha256": "29894fc5bed5cb57f263cfeb4689d5b15c055117b4934f414cd848bd28949915"
+    },
+    {
+      "file": "assets/metadata-BAb8NcOg.js",
+      "sha256": "d335d7de32ffe23cffe8a35763615446803b663825197114dbe6a0199e5fcc1f"
+    },
+    {
+      "file": "assets/metadata-Bgr-ojE7.js",
+      "sha256": "76a634fc8fa82fcfbd5ba13812f284818939a378ae912f1c50faeae751fd1e4a"
+    },
+    {
+      "file": "assets/metadata-Cna5jilK.js",
+      "sha256": "5229f741e6cb722e48911d20fba2ecea534b12f3c2a027788767ca6b69ca5313"
+    },
+    {
+      "file": "assets/progress-3jJGWukK.js",
+      "sha256": "2709e018db312ff9451a647a9fe0bf384be9fa60c08865ce308990abd86d1d2f"
+    },
+    {
+      "file": "assets/react-DF1IRdWU.js",
+      "sha256": "9decb294b2cb8912832efcefe937a6fc34d8b1a1aed81d6547da3a01c7afc986"
+    },
+    {
+      "file": "assets/rules-CZCVPy_g.js",
+      "sha256": "1174153cb3225980645d3da4c3da1279832f77208775e3edc221ff819f8b7240"
+    },
+    {
+      "file": "assets/state-lZVxpp-y.js",
+      "sha256": "8b08ade30acdcfa7f3467633be2d9f456662ab37b2ab64788330f87bc54ea7b4"
+    },
+    {
+      "file": "assets/workspaceActions-BXAr9r2z.js",
+      "sha256": "d8aa4b36e99efd5a2bc8c0fd873bba7437d441b881c067702fd099aabae7a5a2"
+    },
+    {
+      "file": "assets/RewindPlayer-DY7fqgwL.css",
+      "sha256": "6c813c2ffb215be8770a776345df93e61d2d7186632ff169606cf77e46574bf6"
+    },
+    {
+      "file": "assets/Shift10-BvBkNdA9.css",
+      "sha256": "cfb198f76cef0eb644cc284a9e8787605020e16f0eff147cff1d0c97359d27c4"
+    },
+    {
+      "file": "assets/Shift6-DvlIOoDE.css",
+      "sha256": "3f668eef359a6eaf53567a2b760b439326c7472f13db3c86d9315ea63cad37d0"
+    },
+    {
+      "file": "assets/Shift7-TDHn1DhR.css",
+      "sha256": "5a328b05c496c85cc7ba1d80614e84f4a758aabe070e806b3cdae70a5d1b3113"
+    },
+    {
+      "file": "assets/Shift8-CVN-VdF2.css",
+      "sha256": "d65d8faacf1e5f1e6e900228dd5dcc7b454d17646658d546383b71376b64e99b"
+    },
+    {
+      "file": "assets/ShiftExperience-Hbpyz95B.css",
+      "sha256": "9296bddba54c350cd8ab20123b5cf46da054d126e4c0653a70daefcf0166320f"
+    },
+    {
+      "file": "assets/index-DwNLZ-sI.css",
+      "sha256": "6ec2865961167a488431c7220143155cf7af0cbaec7ecb01f0993a5c73a09650"
+    },
+    {
+      "file": "assets/shift-BuSncZSb.css",
+      "sha256": "abef2d0554875a3188ed48a34a00cceeb553d32d557f0fdf8f1fc4159de85e58"
+    },
+    {
+      "file": "assets/tokens-C66Y1_PB.css",
+      "sha256": "c05262c68e452f756f9349cf25804997d3d250d0034050d3f1e5efe3ae286da7"
+    },
+    {
+      "file": "assets/workspaceActions-BOGsiNJ2.css",
+      "sha256": "c3e45154dc278f84ab5dd8ff8e37dabdc89464352f33cd57df0134d92516435b"
+    }
+  ],
+  "releaseHygiene": "Removed spaces on one otherwise blank JSX line; generated production assets remain identical to the tested build."
+}

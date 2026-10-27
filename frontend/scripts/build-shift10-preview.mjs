@@ -1,0 +1,12 @@
+import { build } from 'vite';
+import react from '@vitejs/plugin-react';
+import { mkdir, writeFile } from 'node:fs/promises';
+const root = new URL('..', import.meta.url).pathname;
+const result = await build({ root, cacheDir: new URL('../../verification/vite-cache', import.meta.url).pathname, configFile: false, plugins: [react()], define: { 'process.env.NODE_ENV': JSON.stringify('production') }, build: { write: false, minify: true, lib: { entry: new URL('./shift10-preview.jsx', import.meta.url).pathname, name: 'Shift10Private', formats: ['es'] }, cssCodeSplit: false, rolldownOptions: { output: { codeSplitting: false } } } });
+const output = (Array.isArray(result) ? result[0] : result).output;
+const script = output.filter(x => x.type === 'chunk').map(x => x.code).join('\n');
+const css = output.filter(x => x.type === 'asset' && x.fileName.endsWith('.css')).map(x => x.source).join('\n');
+const directory = new URL('../../private-preview/', import.meta.url);
+await mkdir(directory, { recursive: true });
+await writeFile(new URL('shift10.html', directory), `<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="robots" content="noindex,nofollow"><title>Shift 10 · Clinical Edge private preview</title><style>body{margin:0}${css}</style></head><body><div id="root"></div><script type="module">${script.replaceAll('</script', '<\\/script')}</script></body></html>`);
+console.log('Built private-preview/shift10.html. This is not part of the production entry.');

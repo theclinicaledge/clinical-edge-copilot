@@ -1,7 +1,7 @@
 import { CONVERSATION_ENABLED } from './conversation/private.js';
 // Draft SHIFT-009 is routable only in preview builds; the inline flag folds away in production.
 export const SHIFT9_PREVIEW = import.meta.env?.VITE_SHIFT_009_PREVIEW === 'true';
-export const SHIFT_IDS = ['drowsy-patient', 'monitor-alarm', 'discharge-puzzle', ...(CONVERSATION_ENABLED ? ['conversation'] : []), 'which-patient-first', 'stable-number', 'missing-time', 'code-blue', ...(SHIFT9_PREVIEW ? ['quiet-complaint'] : [])];
+export const SHIFT_IDS = ['drowsy-patient', 'monitor-alarm', 'discharge-puzzle', ...(CONVERSATION_ENABLED ? ['conversation'] : []), 'which-patient-first', 'stable-number', 'missing-time', 'code-blue', 'transfer-not-ready', ...(SHIFT9_PREVIEW ? ['quiet-complaint'] : [])];
 export const shiftPath = id => `/learn/shifts/${id}`;
 
 export function shiftRoute(path) {

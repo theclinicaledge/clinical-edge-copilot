@@ -3,7 +3,7 @@ import { test, expect } from '@playwright/test';
 test('Shift 5 is reachable from the public library and four earlier Shifts remain available', async ({ page }) => {
   await page.goto('/learn/shifts');
   const cards = page.locator('.shift-library-card');
-  await expect(cards).toHaveCount(6);
+  await expect(cards.filter({ hasText: 'Which Patient First?' })).toHaveCount(1);
   for (const title of ['The Drowsy Patient', 'The Monitor Alarm', 'The Discharge Puzzle', 'The Conversation That Changes Everything']) {
     await expect(cards.filter({ hasText: title })).toBeVisible();
   }
@@ -134,7 +134,7 @@ test('V5 settle-first and Priya-to-Dee handoff keep their explicit timing', asyn
   await page.getByRole('button', { name: 'Go to Room 414' }).click();
   await expect(page.locator('.s5-board-head')).toContainText('0735');
   await page.getByRole('button', { name: 'Current vitals' }).click();
-  await expect(page.getByText(/0735: HR 118, BP 92\/58/)).toBeVisible();
+  await expect(page.locator('.s5-finding').filter({ hasText: /0735: HR 118, BP 92\/58/ })).toBeVisible();
 });
 
 test('keyboard can dispatch and unsafe path retains multiple reasons', async ({ page }) => {

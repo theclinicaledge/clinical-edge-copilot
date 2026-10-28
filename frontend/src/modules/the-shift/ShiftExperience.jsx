@@ -14,6 +14,7 @@ import { shiftRoute, shiftPath, learningDestination, returningShift } from './ro
 import { shiftOpened } from '../../productAnalytics.js';
 import './app.css';
 import DebriefNavigation from './DebriefNavigation.jsx';
+import { learningStatus, resumableExperiences } from '../../components/continueLearning.js';
 
 // Standalone release authorized October 18, 2026; the track keeps its own pilot gate.
 const StandaloneRewind = import.meta.env.VITE_REWIND_ENABLED !== 'false' ? lazy(() => import('../rewind/StandaloneRewind.jsx')) : null;
@@ -69,13 +70,23 @@ function ReviewDialog({ item, close }) {
   </dialog>;
 }
 
-export function Library({ navigate }) {
+export function Library({ navigate, progressView = 'all' }) {
   const [setting, setSetting] = useState('All settings');
   const [limit, setLimit] = useState(6);
+  const grid = useRef(null);
+  const firstAdded = useRef(null);
+  useEffect(() => {
+    if (firstAdded.current !== null) {
+      grid.current?.querySelectorAll('h2 a')[firstAdded.current]?.focus();
+      firstAdded.current = null;
+    }
+  }, [limit]);
   const settings = ['All settings', ...new Set(SHIFTS.map(item => item.specialty))];
-  const filtered = SHIFTS.filter(item => setting === 'All settings' || item.specialty === setting);
-  const resumes = SHIFTS.filter(item => progressLabel(item).startsWith('Continue:'));
-  const resume = [...resumes].sort((a, b) => (b.readProgress().updated || 0) - (a.readProgress().updated || 0))[0];
+  const resumes = resumableExperiences(SHIFTS, progressLabel);
+  const resume = resumes[0]?.item;
+  const debriefs = SHIFTS.filter(item => learningStatus(progressLabel(item)) === 'finished');
+  const collection = progressView === 'unfinished' ? resumes.map(row => row.item) : progressView === 'debriefs' ? debriefs : SHIFTS;
+  const filtered = collection.filter(item => setting === 'All settings' || item.specialty === setting);
   return <div className="shift-library-page">
     <header className="shift-library-brand"><AppLink to="/" navigate={navigate}><ClinicalEdgeMark /><strong>Clinical Edge</strong></AppLink><span>Learn</span></header>
     <main className="shift-library-main">
@@ -85,19 +96,23 @@ export function Library({ navigate }) {
         <AppStoreBadge placement="learn" height={44} />
       </aside>
       {import.meta.env.VITE_MED_SURG_TRACK_PREVIEW === 'true' && <section className="shift-track-entry" aria-labelledby="med-surg-entry-title"><div><p className="shift-overline">Connected learning / Private pilot</p><h2 id="med-surg-entry-title">Med-Surg Clinical</h2><p>Three linked assignments. Make your call, explore the feedback, then try optional Rewinds with different patient findings.</p><small>Your original responses stay preserved. Track progress is separate from individual shifts.</small></div><AppLink to="/learn/med-surg" navigate={navigate} className="shift-primary">Open learning track <span aria-hidden="true">→</span></AppLink></section>}
-      {resume && <aside className="shift-library-resume"><div><span className="shift-overline">Pick up where you left off</span><strong>{resume.title}</strong><small>{progressLabel(resume)}</small></div><AppLink to={shiftPath(resume.id)} navigate={navigate} className="shift-secondary">Resume shift <span aria-hidden="true">→</span></AppLink></aside>}
+      {resume && progressView === 'all' && <aside className="shift-library-resume"><div><span className="shift-overline">Pick up where you left off</span><strong>{resume.title}</strong><small>{progressLabel(resume)}</small></div><AppLink to={shiftPath(resume.id)} navigate={navigate} className="shift-secondary">Resume shift <span aria-hidden="true">→</span></AppLink></aside>}
+      <div className="shift-library-progress-filter"><label htmlFor="shift-progress-view">Show</label><select id="shift-progress-view" value={progressView} onChange={event => { setLimit(6); navigate(event.target.value === 'unfinished' ? '/learn/shifts?saved=1' : event.target.value === 'debriefs' ? '/learn/shifts?debriefs=1' : '/learn/shifts'); }}><option value="all">All shifts ({SHIFTS.length})</option><option value="unfinished">Unfinished ({resumes.length})</option><option value="debriefs">Debriefs ({debriefs.length})</option></select></div>
+      {progressView === 'unfinished' && <p className="shift-library-activity-note">Activity dates are not available for every save. Dated saves appear first, newest first; undated saves follow library order.</p>}
       <div className="shift-library-filterbar"><div role="group" aria-label="Filter shifts by setting">{settings.map(value => <button key={value} aria-pressed={setting === value} onClick={() => { setSetting(value); setLimit(6); }}>{value}</button>)}</div><p aria-live="polite">{filtered.length} {filtered.length === 1 ? 'shift' : 'shifts'}</p></div>
-      <div className="shift-library-grid">{filtered.slice(0, limit).map(item => {
+      {!filtered.length && <p className="shift-library-empty" role="status">{setting !== 'All settings' ? 'No shifts match these filters.' : progressView === 'unfinished' ? 'No unfinished shifts saved on this device. Choose All shifts to explore.' : 'No debriefs saved on this device. Choose All shifts to explore.'}</p>}
+      <div className="shift-library-grid" ref={grid}>{filtered.slice(0, limit).map(item => {
         const progress = progressLabel(item);
-        const status = progress === 'Not started' ? 'Not started' : progress === 'Debrief reached' ? 'Finished' : 'In progress';
+        const status = learningStatus(progress);
+        const statusText = { new: 'Not started', finished: 'Finished', active: 'In progress', unavailable: 'Saved progress unavailable' }[status];
         // Only registered scenarios reach the library; preview gates live in the registry.
         const showStatus = true;
-        return <article className="shift-library-card" key={item.id}>
-          <AppLink to={shiftPath(item.id)} navigate={navigate} className="shift-library-image" tabIndex={-1} aria-hidden="true">{item.id === 'missing-time' && Shift7Art ? <Shift7Art compact /> : item.id === 'monitor-alarm' ? <LibraryMonitorArtwork /> : <img src={images[item.id]} alt="" />}<span>SHIFT {item.number}</span></AppLink>
-          <div className="shift-library-copy">{showStatus && <span className={`shift-library-status shift-library-status--${status === 'Finished' ? 'finished' : status === 'In progress' ? 'active' : 'new'}`}><span aria-hidden="true">{status === 'Finished' ? '\u2713' : status === 'In progress' ? '\u25D0' : '\u25CB'}</span>{status}</span>}<p className="shift-overline">{item.specialty} / {item.difficulty}</p><h2><AppLink to={shiftPath(item.id)} navigate={navigate}>{item.title}</AppLink></h2><p>{item.description}</p><small>{item.duration} / Students & new grads</small><AppLink to={shiftPath(item.id)} navigate={navigate} className="shift-primary">{progress === 'Not started' ? 'Begin shift' : progress === 'Debrief reached' ? (showStatus ? 'Review debrief' : 'Return to debrief') : 'Continue shift'} <span aria-hidden="true">&#8594;</span></AppLink><small>{showStatus && status === 'Not started' ? 'Ready when you are' : progress}</small></div>
+        return <article className="shift-library-card" key={item.id} data-shift-id={item.id}>
+          <AppLink to={shiftPath(item.id)} navigate={navigate} className="shift-library-image" tabIndex={-1} aria-hidden="true">{item.id === 'missing-time' && Shift7Art ? <Shift7Art compact /> : item.id === 'monitor-alarm' ? <LibraryMonitorArtwork /> : <img src={images[item.id]} alt="" />}</AppLink>
+          <div className="shift-library-copy"><div className="shift-library-card-meta"><span className="shift-library-number">SHIFT {item.number}</span>{showStatus && <span className={`shift-library-status shift-library-status--${status}`}><span aria-hidden="true">{status === 'finished' ? '\u2713' : status === 'active' ? '\u25D0' : status === 'unavailable' ? '!' : '\u25CB'}</span>{statusText}</span>}</div><p className="shift-overline">{item.specialty} / {item.difficulty}</p><h2><AppLink to={shiftPath(item.id)} navigate={navigate}>{item.title}</AppLink></h2><p>{item.description}</p><small>{item.duration} / Students & new grads</small><AppLink to={shiftPath(item.id)} navigate={navigate} className="shift-primary">{status === 'new' ? 'Begin shift' : status === 'finished' ? 'Review debrief' : status === 'active' ? 'Continue shift' : 'Open shift'} <span aria-hidden="true">&#8594;</span></AppLink><small>{status === 'new' ? 'Ready when you are' : progress}</small></div>
         </article>;
       })}</div>
-      {limit < filtered.length && <button className="shift-secondary shift-library-more" onClick={() => setLimit(value => value + 6)}>Show more shifts <span aria-hidden="true">↓</span></button>}
+      {limit < filtered.length && <button className="shift-secondary shift-library-more" onClick={() => { firstAdded.current = limit; setLimit(value => value + 6); }}>Show more shifts <span aria-hidden="true">↓</span></button>}
       <p className="shift-local-note">Progress and fixed-choice reflections stay on this device. No patient information, AI calls or account. Restart a scenario to clear its progress.</p>
       <section className="shift-library-tools"><h2>Build on what you notice</h2><div>{LEARN_ACTIONS.map(action => <AppLink key={action.path} to={action.path} navigate={navigate}><strong>{action.label}</strong><span>{action.detail}</span><b aria-hidden="true">&#8599;</b></AppLink>)}<AppLink to="/reference-hub" navigate={navigate}><strong>References</strong><span>Existing clinical reference hub</span><b aria-hidden="true">&#8599;</b></AppLink><AppLink to="/icu-drips" navigate={navigate}><strong>ICU Drips</strong><span>Infusion reference</span><b aria-hidden="true">&#8599;</b></AppLink></div></section>
       <footer className="shift-library-footer"><AppLink to="/privacy" navigate={navigate}>Privacy</AppLink><AppLink to="/terms" navigate={navigate}>Terms</AppLink><span>Fictional education. Not patient-specific care.</span></footer>
@@ -174,7 +189,7 @@ export default function ShiftExperience({ mode = 'page', navigate, active = true
   }, [active, mode, path, route?.id, route?.kind]);
   if (mode === 'return') return from ? <aside className="shift-return"><AppLink to={shiftPath(from.id)} navigate={navigate}>&#8592; Return to {from.title}</AppLink><span>Your place is kept</span></aside> : null;
   let content;
-  if (route?.kind === 'library') content = <Library navigate={navigate} />;
+  if (route?.kind === 'library') content = <Library navigate={navigate} progressView={new URLSearchParams(window.location.search).has('saved') ? 'unfinished' : new URLSearchParams(window.location.search).has('debriefs') ? 'debriefs' : 'all'} />;
   else if (route?.kind === 'handoff') content = <Handoff key={`${route.id}-${window.location.search}`} item={getShift(route.id)} navigate={navigate} />;
   return <div ref={region} className={`ce-shift-feature${active && route?.kind === 'library' ? ' ce-shift-feature--library' : ''}`} hidden={!active} inert={!active}>
     {visited.map(id => {

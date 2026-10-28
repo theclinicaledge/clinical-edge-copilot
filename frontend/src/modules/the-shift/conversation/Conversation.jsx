@@ -3,6 +3,7 @@ import { CONTENT_VERSION, title, scenes, patients, opening, asking, confidential
 import { read, save, fresh, actionReview, reviewResults, reviewText, hasUnsafeActions, usesSaferEnding, readLegacy, legacyActions } from './progress.js';
 import room from './room.svg';
 import './conversation.css';
+import OpeningReaction from './OpeningReaction.jsx';
 
 const find = (items, id) => items.find(item => item.id === id);
 const toggle = (items, id) => items.includes(id) ? items.filter(item => item !== id) : [...items, id];
@@ -29,11 +30,18 @@ function Dialog({ title: dialogTitle, children, close }) {
 function Bubble({ children, own = false, label }) {
   return <div className={`conversation-bubble${own ? ' conversation-own' : ''}`}><span className="conversation-eyebrow">{label || (own ? 'Your first response' : 'Room 18')}</span><p>{children}</p></div>;
 }
-function Choices({ items, selected, choose, prompt }) {
+function Choices({ items, selected, choose, prompt, reaction = null }) {
   const [draft, setDraft] = useState(null);
   const picked = find(items, selected);
+  const exchange = useRef(null);
+  const responsive = Boolean(reaction);
+  useEffect(() => {
+    if (!responsive || !selected) return;
+    exchange.current?.focus({ preventScroll: true });
+    exchange.current?.scrollIntoView({ block: 'nearest', behavior: 'instant' });
+  }, [selected, responsive]);
   return <>
-    {picked ? <><Bubble own>{picked.text}</Bubble><div className="conversation-feedback" role="status"><span className="conversation-eyebrow">Reflection / {picked.result}</span><p>{picked.feedback}</p></div></> : <fieldset className="conversation-replies"><legend>{prompt}</legend>{items.map(item => <button key={item.id} aria-pressed={draft === item.id} onClick={() => setDraft(item.id)}><span>{item.text}</span><span aria-hidden="true">{draft === item.id ? '\u2713' : '\u21A7'}</span></button>)}<button className="shift-primary" disabled={!items.some(item => item.id === draft)} onClick={() => choose(draft)}>Say this response</button></fieldset>}
+    {picked ? <div ref={exchange} tabIndex={responsive ? -1 : undefined} role={responsive ? 'region' : undefined} aria-label={responsive ? 'Your opening exchange' : undefined}><Bubble own>{picked.text}</Bubble>{reaction}<div className="conversation-feedback" role={responsive ? undefined : 'status'}><span className="conversation-eyebrow">Reflection / {picked.result}</span><p>{picked.feedback}</p></div></div> : <fieldset className="conversation-replies"><legend>{prompt}</legend>{items.map(item => <button key={item.id} aria-pressed={draft === item.id} onClick={() => setDraft(item.id)}><span>{item.text}</span><span aria-hidden="true">{draft === item.id ? '\u2713' : '\u21A7'}</span></button>)}<button className="shift-primary" disabled={!items.some(item => item.id === draft)} onClick={() => choose(draft)}>Say this response</button></fieldset>}
   </>;
 }
 function ActionBoard({ placements, submitted, place, submit, next }) {
@@ -100,7 +108,7 @@ export default function Conversation({ debrief = null }) {
         <nav className="conversation-progress" aria-label="Scenario progress"><ol>{scenes.map(([, label], index) => <li key={label} aria-current={index === state.stage ? 'step' : undefined}><span className={index <= state.stage ? 'is-reached' : ''} /><span className="conversation-sr">{label}</span></li>)}</ol><span>{state.stage + 1} / 7</span></nav>
         <header className="conversation-scene-heading"><p className="conversation-eyebrow">{state.stage === 0 ? 'Your night assignment' : state.stage === 6 ? 'Your first choices, reflected back' : `Decision ${state.stage} / Room 18`}</p><h1 ref={heading} tabIndex={-1}>{titles[state.stage]}</h1></header>
         {state.stage === 0 && <><div className="conversation-assignment">{patients.map(patient => <article key={patient.room}><header><strong>Room {patient.room}</strong><span>{patient.status}</span></header><p>{patient.setting}</p><blockquote>{patient.report}</blockquote></article>)}</div>{proceed('Begin your first check')}</>}
-        {state.stage === 1 && <><div className="conversation-bedside"><img src={room} alt="" /><p>{script.bedside}</p></div><Bubble>{script.firstLine}</Bubble><Choices items={opening} selected={answers.opening} choose={id => answer('opening', id)} prompt="What do you say?" />{answers.opening && <><Sources ids={sourceIds.opening} />{proceed('Listen to what he says')}</>}</>}
+        {state.stage === 1 && <><div className={`conversation-bedside${answers.opening ? ' has-opening-exchange' : ''}`}><img src={room} alt="" /><p>{script.bedside}</p></div><Bubble>{script.firstLine}</Bubble><Choices items={opening} selected={answers.opening} choose={id => answer('opening', id)} prompt="What do you say?" reaction={answers.opening ? <OpeningReaction choice={answers.opening} /> : null} />{answers.opening && <><Sources ids={sourceIds.opening} />{proceed('Listen to what he says')}</>}</>}
         {state.stage === 2 && <>
           {answers.opening !== 'presence' && <Bridge text={script.bridges.opening} />}
           <p className="conversation-lead">Which words concern you?</p>

@@ -186,3 +186,18 @@
   .conversation-dialog { padding: 20px; }
 }
 @media(prefers-reduced-motion: reduce) { .conversation-root *, .conversation-dialog * { scroll-behavior: auto !important; transition: none !important; animation: none !important; } }
+/* Private opening exchange: immediate authored poses, with no animation or delay. */
+.conversation-opening-reaction { display: grid; grid-template-columns: 100px minmax(0, 1fr); align-items: center; gap: 16px; margin: 18px 0; padding: 16px; border: 1px solid var(--ce-warm-line); border-radius: 8px; background: var(--ce-warm-card); }
+.conversation-opening-reaction svg { display: block; width: 100%; border-radius: 6px; }
+.conversation-opening-reaction p { margin-top: 6px; font-size: 17px; line-height: 1.6; }
+.conversation-opening-reaction small { display: block; margin-top: 10px; font-size: 11px; line-height: 1.5; color: var(--ce-text-muted); }
+[aria-label="Your opening exchange"]:focus-visible { outline: 2px solid var(--ce-teal-deep); outline-offset: 5px; border-radius: 4px; }
+@media (max-width: 640px) {
+  .conversation-opening-reaction { grid-template-columns: 72px minmax(0, 1fr); gap: 12px; padding: 12px; }
+  .conversation-opening-reaction p { font-size: 15px; }
+}
+
+@media (max-width: 640px) {
+  .conversation-bedside.has-opening-exchange { grid-template-columns: 1fr; }
+  .conversation-bedside.has-opening-exchange > img { display: none; }
+}

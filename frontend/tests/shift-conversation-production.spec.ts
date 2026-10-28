@@ -3,10 +3,12 @@ import { createHash } from 'node:crypto';
 import { readFileSync } from 'node:fs';
 import { conversationEntry } from '../src/modules/the-shift/conversation/metadata.js';
 
-test('public review record preserves exact authored v0.4 clinical content', () => {
+test('public review record preserves the recorded founder-reported RN-reviewed opening revision', () => {
   const data = readFileSync(new URL('../src/modules/the-shift/conversation/data.js', import.meta.url));
-  expect(createHash('sha256').update(data).digest('hex')).toBe('26a468da12de6ab17a08716bd915db3b54e005bded5477a060e9d5854e4f976f');
+  expect(createHash('sha256').update(data).digest('hex')).toBe('098a143884f10b74b6ac2788822b273785491c1e54f3a08136cce0447b9ee0b3');
   expect(conversationEntry.private).toBe(false);
+  expect(conversationEntry.review.status).toContain('informal practicing psychiatric RN review reported by the founder');
+  expect(conversationEntry.review.status).toContain('No formal independent approval');
   expect(conversationEntry.review.approvedVersion).toBe('0.4');
   expect(conversationEntry.review.reviewer).toBeNull();
   expect(conversationEntry.review.reviewDate).toBeNull();

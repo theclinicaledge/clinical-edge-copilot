@@ -264,7 +264,9 @@ export const d3 = {
 export const d4 = {
   time: '1525', title: 'Room 21',
   scene: [
-    'The STEMI team is with Dolores, getting her ready for the cath lab. An RN or the behavioral response nurse has kept eyes on Curtis since 1505, and the provider has known he\'s off telemetry since 1506. Tess is at the doorway with the behavioral response nurse. Security waits nearby, out of his direct line of sight, per policy.',
+    // L11 (28 Oct 2026): a qualified clinician takes over Dolores before you leave Room 22.
+    'Joy, the rapid response nurse, confirms she\'s taking over Dolores\'s bedside care with the STEMI team. Dolores stays on the monitor while they reassess her and get her ready for the cath lab. With Dolores safely covered, you return to Curtis.',
+    'An RN or the behavioral response nurse has kept eyes on Curtis since 1505, and the provider has known he\'s off telemetry since 1506. Tess is at the doorway with the behavioral response nurse. Security waits nearby, out of his direct line of sight, per policy.',
     'Curtis is pacing by the window with the monitor box in his hand and the leads hanging. He isn\'t threatening anyone, and both he and staff have a clear path to the door. From the doorway, Tess reports he\'s pink, breathing easily, steady on his feet and talking in full sentences. Tess: "He\'s asking for his nurse."',
   ],
   quote: 'Curtis: "That box sends my thoughts to the government. I know you\'re all in on it."',

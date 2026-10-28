@@ -1,0 +1,30 @@
+import {test,expect} from '@playwright/test';
+import {opening,script,cues} from '../src/modules/the-shift/conversation/data.js';
+import {openingReactions} from '../src/modules/the-shift/conversation/openingReactions.js';
+import {fresh,KEY} from '../src/modules/the-shift/conversation/progress.js';
+for(const width of [375,390,1440])for(const choice of opening)test(`opening exchange ${choice.id} at ${width}px`,async({page})=>{
+ await page.setViewportSize({width,height:1000});await page.emulateMedia({reducedMotion:'reduce'});
+ await page.goto('/learn/shifts/conversation');
+ await page.evaluate(({key,state})=>localStorage.setItem(key,JSON.stringify(state)),{key:KEY,state:{...fresh(),notice:true,stage:1}});await page.reload();
+ await expect(page.locator('[data-opening-reaction]')).toHaveCount(0);
+ const reply=page.getByRole('button',{name:choice.text,exact:false});await reply.focus();await reply.press('Enter');await expect(page.locator('[data-opening-reaction]')).toHaveCount(0);
+ const confirm=page.getByRole('button',{name:'Say this response'});await confirm.focus();await confirm.press('Enter');
+ const exchange=page.getByRole('region',{name:'Your opening exchange'});await expect(exchange).toBeFocused();
+ await expect(exchange.locator('.conversation-own p')).toHaveText(choice.text);await expect(exchange.locator('[data-opening-reaction] p')).toHaveText(openingReactions[choice.id].text);await expect(exchange.locator('.conversation-feedback p')).toHaveText(choice.feedback);
+ await expect(exchange.getByText('One possible response. Real patients vary.',{exact:true})).toBeVisible();
+ await expect(exchange).not.toContainText('Private draft');
+ if(width<640)await expect(page.locator('.conversation-bedside > img')).toBeHidden();
+ const text=await exchange.innerText();expect(text.indexOf(choice.text)).toBeLessThan(text.indexOf(openingReactions[choice.id].text));expect(text.indexOf(openingReactions[choice.id].text)).toBeLessThan(text.indexOf(choice.feedback));
+ expect(await exchange.locator('[role="status"],[aria-live]').count()).toBe(0);
+ const aria=await exchange.ariaSnapshot();expect(aria.indexOf(choice.text)).toBeLessThan(aria.indexOf(openingReactions[choice.id].text));
+ expect(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth)).toBe(true);
+ const reaction=exchange.locator('[data-opening-reaction]');expect(await reaction.evaluate(el=>getComputedStyle(el).animationName)).toBe('none');
+ await reaction.evaluate(el=>el.scrollIntoView({block:'center'}));if(width===390||width===1440)await page.screenshot({path:`/private/tmp/ce-shift4-opening/${choice.id}-${width}.png`});
+ await page.reload();await expect(exchange.locator('.conversation-own p')).toHaveText(choice.text);await expect(exchange.locator('[data-opening-reaction] p')).toHaveText(openingReactions[choice.id].text);
+ await page.getByRole('button',{name:'Listen to what he says'}).click();await expect(page.getByText(script.bridges.opening,{exact:true})).toHaveCount(choice.id==='presence'?0:1);
+ await page.getByRole('button',{name:'Read all five lines'}).click();for(const cue of cues)await expect(page.getByRole('button',{name:cue.text,exact:false})).toBeVisible();
+ expect(await page.evaluate(key=>JSON.parse(localStorage.getItem(key)!).answers.opening,KEY)).toBe(choice.id);
+});
+test('opening exchange touch and normal-motion mode use no delay',async({browser})=>{
+ const context=await browser.newContext({viewport:{width:390,height:844},hasTouch:true,isMobile:true});const p=await context.newPage();await p.goto('/learn/shifts/conversation');await p.evaluate(({key,state})=>localStorage.setItem(key,JSON.stringify(state)),{key:KEY,state:{...fresh(),notice:true,stage:1}});await p.reload();await p.getByRole('button',{name:opening[0].text,exact:false}).tap();await p.getByRole('button',{name:'Say this response'}).tap();await expect(p.locator('[data-opening-reaction]')).toBeVisible();expect(await p.locator('[data-opening-reaction]').evaluate(el=>getComputedStyle(el).animationName)).toBe('none');await context.close();
+});

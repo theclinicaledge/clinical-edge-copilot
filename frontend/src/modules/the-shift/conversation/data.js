@@ -1,5 +1,5 @@
 // SHIFT-004 v0.4: approved private script and per-placement feedback table.
-// Psychiatric-mental health review remains pending.
+// Original v0.4 specialty-review documentation was incomplete; preserve that history.
 export const CONTENT_VERSION = '0.4';
 export const title = 'The Conversation That Changes Everything';
 export const scenes = [['2100', 'Report'], ['2115', 'Open the door'], ['2120', 'Listen closely'], ['2125', 'Ask directly'], ['2127', 'Stay & connect'], ['2130', 'Be honest'], ['2230', 'Reflect']];
@@ -8,11 +8,14 @@ export const patients = [
   { room: '18', setting: '62-year-old, admitted 3 days ago with a diabetic foot infection. Today the surgeon told him he needs a below-knee amputation. His wife died last year.', report: "Really quiet since the surgeon came by. Didn't touch dinner. I think he's just processing.", status: 'Stable vitals' },
   { room: '20', setting: '48-year-old, cellulitis, on IV antibiotics', report: "Pump's been fussy all day.", status: 'Stable' },
 ];
+// Founder reports informal practicing psychiatric RN review of the revised opening
+// reactions, reflections and safety pathway. No formal independent approval claimed.
+// Original v0.4 review history is preserved in docs/SHIFT-004-RELEASE.txt.
 export const opening = [
   { id: 'presence', text: "Today was a big day. I've got some time. Would you like to tell me about it?", result: 'Correct', feedback: 'Open-ended, and it offers your presence. It gives him room to talk.' },
-  { id: 'reassure', text: "Don't worry, the surgery will go great and you'll feel better soon.", result: 'No', feedback: "False reassurance. It shuts the door on whatever he's actually feeling." },
+  { id: 'reassure', text: "Don't worry, the surgery will go great and you'll feel better soon.", result: 'No', feedback: "False reassurance: this promises an outcome you cannot know and does not invite him to share how he feels. Offer presence and an open invitation to talk." },
   { id: 'leave', text: 'Okay, great. Call me if you need anything.', result: 'No', feedback: 'You accepted "everything\'s sorted out" at face value and left. That phrase deserved a second look.' },
-  { id: 'dinner', text: "Why didn't you eat your dinner?", result: 'Not best', feedback: '"Why" questions can feel like criticism. Start with how he\'s doing.' },
+  { id: 'dinner', text: "Why didn't you eat your dinner?", result: 'Not best', feedback: 'Asking about appetite can be appropriate. Here, "Why didn\'t you..." can sound judgmental. Ask about his experience without implying blame.' },
 ];
 export const cues = [
   { id: 'loss', text: "That's my wife, Elena. A year ago this week.", tier: 'Supporting', feedback: 'A recent major loss and an anniversary both raise concern.' },

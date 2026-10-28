@@ -132,11 +132,11 @@ test('authorized public scenario has direct and handoff routes', () => {
   assert.deepEqual(shiftRoute('/learn/shifts/conversation'), { kind: 'scenario', id: 'conversation' });
   assert.deepEqual(shiftRoute('/learn/shifts/conversation/ask'), { kind: 'handoff', id: 'conversation' });
 });
-test('every new clinical string and feedback comes from the supplied v0.4 script', () => {
+test('v0.4 clinical strings are preserved except two founder-reported RN-reviewed opening reflections', () => {
   const original = readFileSync(new URL('./fixtures/shift-conversation-v04.txt', import.meta.url), 'utf8');
   const normalize = text => text.replace(/[“”]/g, '"').replace(/[‘’]/g, "'").replace(/\s+/g, ' ');
   const source = normalize(original);
-  for (const text of [...opening, ...asking, ...confidentiality].flatMap(item => [item.text, item.feedback])) assert.ok(source.includes(normalize(text)), text);
+  for (const text of [...opening.flatMap(item => ['reassure', 'dinner'].includes(item.id) ? [item.text] : [item.text, item.feedback]), ...[...asking, ...confidentiality].flatMap(item => [item.text, item.feedback])]) assert.ok(source.includes(normalize(text)), text);
   for (const text of actions.flatMap(item => [item.text, ...item.placements.map(rule => rule.feedback)])) assert.ok(source.includes(normalize(text)), text);
   for (const text of [script.notice, script.firstLine, script.reveal, script.request, script.share, script.support, ...script.takeaways, ...script.why, script.actionGuidance, script.actionReview, script.assessmentNote, ...Object.values(script.bridges), ...Object.values(script.ending), ...script.actionReflections, ...zones.map(zone => zone.detail)]) assert.ok(source.includes(normalize(text)), text);
   assert.equal(JSON.stringify({ script, actions, opening, asking, confidentiality }).includes('\\\\'), false, 'No literal escape characters in authored strings');
@@ -144,7 +144,7 @@ test('every new clinical string and feedback comes from the supplied v0.4 script
 });
 test('release preserves clinical content, saved-progress rules and unrelated features', { skip: !process.env.CE_RELEASE_BASE && 'Set CE_RELEASE_BASE to the reviewed production revision for this release check' }, () => {
   const protectedPaths = ['src/modules/the-shift', 'src/modules/AskClinicalEdge.jsx', 'src/consent.js', 'src/Privacy.jsx', 'src/main.jsx', 'src/shiftFeature.js', 'src/modules/rhythm-lab', 'src/modules/abg-lab', 'src/modules/reference-hub', '../backend'];
-  const approvedUI = new Set(['frontend/src/modules/the-shift/DeliberateChoice.jsx', 'frontend/src/modules/the-shift/monitor/Monitor.jsx', 'frontend/src/modules/the-shift/discharge/Discharge.jsx', 'frontend/src/modules/the-shift/conversation/Conversation.jsx', 'frontend/src/modules/the-shift/shift5/Shift5.jsx']);
+  const approvedUI = new Set(['frontend/src/modules/the-shift/conversation/Conversation.jsx', 'frontend/src/modules/the-shift/conversation/conversation.css', 'frontend/src/modules/the-shift/conversation/data.js', 'frontend/src/modules/the-shift/conversation/metadata.js', 'frontend/src/modules/the-shift/conversation/OpeningReaction.jsx', 'frontend/src/modules/the-shift/conversation/openingReactions.js']);
   const changed = execFileSync('git', ['diff', '--name-only', process.env.CE_RELEASE_BASE, '--', ...protectedPaths], { encoding: 'utf8', cwd: new URL('../', import.meta.url) }).trim().split('\n').filter(Boolean);
-  assert.deepEqual(changed.filter(path => !approvedUI.has(path)), [], 'Only the reviewed interaction components may change; content and progress rules must remain intact');
+  assert.deepEqual(changed.filter(path => !approvedUI.has(path)), [], 'Only reviewed Shift 4 presentation, two reflections and review metadata may change; progress rules remain intact');
 });

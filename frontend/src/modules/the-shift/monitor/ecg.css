@@ -55,3 +55,19 @@
   .ecg-review-note, .ecg-description { padding-left: 16px; padding-right: 16px; }
   .ecg-pan { padding: 12px 16px; }
 }
+/* Optional measurement tool for the existing Regularity investigation. */
+.ecg-caliper path { fill: none; stroke-width: 1.5; }
+.ecg-caliper-measured { stroke: #ffe398; }
+.ecg-caliper-reference { stroke: #c4d9db; stroke-dasharray: 3 2; }
+.ecg-caliper-tools { padding: 12px 16px; border-top: 1px solid #36515b; color: #ecf4f5; line-height: 1.6; }
+.ecg-caliper-tools label { display: block; font-size: 14px; font-weight: 600; margin-bottom: 8px; }
+.ecg-caliper-tools select { width: 100%; min-width: 0; min-height: 44px; padding: 8px; border: 1px solid #82c5bc; border-radius: 5px; background: #213f49; color: #eff7f7; font: inherit; font-size: 13px; }
+.ecg-caliper-tools select:focus-visible { outline: 3px solid #96ddd2; outline-offset: 2px; }
+.ecg-caliper-tools p { margin-top: 10px; font-size: 13px; }
+.ecg-caliper-tools strong { color: #ffe398; }
+.ecg-caliper-tools .ecg-caliper-note { font-size: 12px; color: #c4d9db; }
+.ecg-caliper-focus { display: none; }
+@media (max-width: 640px) {
+  .ecg-caliper-focus { display: block; border-top: 1px solid #55747a; }
+  .ecg-caliper-focus > span { display: block; padding: 10px 12px 0; font-size: 11px; color: #c4d9db; }
+}

@@ -1,4 +1,5 @@
 import { test, expect } from '@playwright/test';
+import { SHIFTS } from '../src/modules/the-shift/integrated/registry.js';
 import { pathFor, measurements } from '../src/modules/the-shift/monitor/ecg/waveforms.js';
 
 test.beforeEach(async ({ page }) => {
@@ -14,7 +15,7 @@ test.beforeEach(async ({ page }) => {
   });
 });
 
-for (const width of [390, 768, 1440]) test(`Library visual scope and navigation at ${width}`, async ({ page }) => {
+for (const width of [375, 390, 768, 1440]) test(`Library visual scope and navigation at ${width}`, async ({ page }) => {
   await page.setViewportSize({ width, height: width === 390 ? 844 : 960 });
   await page.goto('/');
   const home = await page.locator('.ce-command-home').evaluate(el => getComputedStyle(el).backgroundColor);
@@ -25,12 +26,29 @@ for (const width of [390, 768, 1440]) test(`Library visual scope and navigation 
   expect(await root.evaluate(el => getComputedStyle(el).borderBottomColor)).toBe(home);
   const cards = page.locator('.shift-library-card');
   await expect(cards).toHaveCount(6);
+  await page.getByRole('button', { name: 'Show more shifts' }).click();
+  await expect(cards).toHaveCount(SHIFTS.length);
+  await expect(cards.nth(6).locator('h2 a')).toBeFocused();
   const positions = await cards.locator('.shift-primary').evaluateAll(nodes => nodes.map(el => ({ top: el.getBoundingClientRect().top, height: el.getBoundingClientRect().height })));
   if (width === 1440) expect(Math.max(...positions.slice(0, 3).map(p => p.top)) - Math.min(...positions.slice(0, 3).map(p => p.top))).toBeLessThan(1);
   if (width === 768) expect(Math.abs(positions[0].top - positions[1].top)).toBeLessThan(1);
   expect(positions.every(p => p.height >= 44)).toBe(true);
   const heights = await cards.locator('.shift-library-image').evaluateAll(nodes => nodes.map(el => el.getBoundingClientRect().height));
-  expect(heights).toEqual(Array(6).fill(width === 390 ? 164 : 180));
+  expect(heights).toEqual(Array(SHIFTS.length).fill(width <= 390 ? 164 : 180));
+  for (const item of SHIFTS) {
+    const card = page.locator(`[data-shift-id="${item.id}"]`);
+    const image = card.locator('.shift-library-image');
+    const badge = card.locator('.shift-library-number');
+    const artworkBox = await image.boundingBox();
+    const badgeBox = await badge.boundingBox();
+    expect(badgeBox.y).toBeGreaterThanOrEqual(artworkBox.y + artworkBox.height);
+    expect(await card.locator('img').evaluateAll(images => images.every(img => img.complete && img.naturalWidth > 0))).toBe(true);
+    if (['discharge-puzzle', 'transfer-not-ready'].includes(item.id)) expect(await card.locator('img').evaluate(el => getComputedStyle(el).objectFit)).toBe('contain');
+    const title = await card.locator('h2').boundingBox();
+    const action = await card.locator('.shift-primary').boundingBox();
+    expect(title.y + title.height).toBeLessThan(action.y);
+    await card.screenshot({ path: `../verification/library-review/${width}-${item.id}.png` });
+  }
   const wave = page.locator('[data-library-waveform="B"]');
   await expect(wave).toHaveAttribute('d', pathFor('B', 0, 3));
   expect(measurements('B').measuredRate).toBe(80);
@@ -42,13 +60,15 @@ for (const width of [390, 768, 1440]) test(`Library visual scope and navigation 
   expect(geometry.xScale).toBeCloseTo(geometry.yScale, 5);
   expect(geometry.height).toBeGreaterThan(40);
   expect(geometry.width).toBeGreaterThan(250);
-  await page.screenshot({ path: `../artifacts/library-visuals/${width}-library.png` });
+  await page.screenshot({ path: `../verification/library-review/${width}-library.png` });
   await cards.nth(1).scrollIntoViewIfNeeded();
-  await cards.nth(1).screenshot({ path: `../artifacts/library-visuals/${width}-monitor-card.png` });
-  await page.screenshot({ path: `../artifacts/library-visuals/${width}-monitor-viewport.png` });
+  await cards.nth(1).screenshot({ path: `../verification/library-review/${width}-monitor-card.png` });
+  await page.screenshot({ path: `../verification/library-review/${width}-monitor-viewport.png` });
   expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true);
-  for (let i = 0; i < 3; i++) {
-    await cards.nth(i).locator('.shift-primary').click();
+  for (const item of SHIFTS) {
+    const card = page.locator(`[data-shift-id="${item.id}"]`);
+    if (!await card.count()) await page.getByRole('button', { name: 'Show more shifts' }).click();
+    await card.locator('.shift-primary').click();
     await expect(page.getByRole('heading', { level: 1 })).toBeVisible();
     expect(await page.locator('.ce-shift-feature').evaluate(el => getComputedStyle(el).backgroundColor)).not.toBe(home);
     await page.getByRole('link', { name: 'Shift Library', exact: false }).first().click();
@@ -78,6 +98,7 @@ test('enlarged mobile text stays readable and the dock does not cover the last c
   await page.setViewportSize({ width: 390, height: 667 });
   await page.emulateMedia({ reducedMotion: 'reduce' });
   await page.goto('/learn');
+  await page.getByRole('button', { name: 'Show more shifts' }).click();
   await page.addStyleTag({ content: '.shift-library-copy p { font-size: 24px !important; } .shift-library-copy h2 { font-size: 32px !important; } .shift-library-copy small, .shift-library-copy a.shift-primary { font-size: 20px !important; }' });
   const button = page.locator('.shift-library-card').last().locator('.shift-primary');
   await button.focus();

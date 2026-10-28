@@ -4,6 +4,7 @@ import '../../../styles/tokens.css';
 import '../shift.css';
 import './shift6.css';
 import TrendReading from './Flowsheet.jsx';
+import LinkedTrend from './LinkedTrend.jsx';
 import { SOURCES, ROOM14_VITALS, FLOWSHEET_ROWS, FLOWSHEET_SR, VERSION, assignment, d1, d2, d3, d4, d5, d6, debrief, card } from './data.js';
 import { STORAGE_KEY, FINAL_STAGE, stages, freshProgress, readProgress } from './progress.js';
 import { credit, d1Choice, d2Choice, d4Choice, d6Choice, evaluateCues, evaluateSbar, decisionResults } from './rules.js';
@@ -147,9 +148,10 @@ export default function Shift6() {
         {progress.stage === 2 && <>
           <p className="shift-lead">{d2.scene}</p>
           <h2 className="s6-prompt" id="s6-d2-prompt">{d2.prompt}</h2>
-          <TrendReading caption="Room 14 flowsheet" description={FLOWSHEET_SR.main} columns={ROOM14_VITALS} rows={FLOWSHEET_ROWS}
-            selectable={SELECTABLE_TIMES} selected={answers.d2 ?? timeDraft} onSelect={id => select('d2', id)} disabled={answers.d2 !== undefined} highlight={answers.d2 ? '1200' : null} />
+          <LinkedTrend caption="Room 14 flowsheet" description={FLOWSHEET_SR.main} columns={ROOM14_VITALS} rows={FLOWSHEET_ROWS}
+            selectable={SELECTABLE_TIMES} selected={answers.d2 ?? timeDraft} onSelect={id => select('d2', id)} disabled={answers.d2 !== undefined} highlight={answers.d2 ? '1200' : null}>
           {!answers.d2 && <div className="shift-cue-confirm"><p role="status">{timeDraft ? `Selected: ${ROOM14_VITALS.find(v => v.time === timeDraft).label}` : 'Select a time column. Yesterday 2000 is his admission baseline.'}</p><button className="shift-primary" disabled={!timeDraft} onClick={() => choose('d2', timeDraft)}>Confirm this time<Arrow /></button></div>}
+          </LinkedTrend>
           {answers.d2 && <Feedback result={d2Choice(answers.d2).result} feedback={d2Choice(answers.d2).feedback} corrections={corrections(d2.choices, d2Choice(answers.d2)).map(choice => ({ ...choice, text: ROOM14_VITALS.find(v => v.time === choice.id).label }))} onContinue={next} nextLabel="Go to his bedside" sources={d2.sources}><blockquote>{d2.teaching}</blockquote></Feedback>}
         </>}
 

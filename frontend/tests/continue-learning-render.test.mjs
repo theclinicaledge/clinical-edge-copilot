@@ -2,8 +2,22 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import { createServer } from 'vite';
 import { createElement } from 'react';
-import { renderToStaticMarkup } from 'react-dom/server';
+import { renderToStaticMarkup, renderToString } from 'react-dom/server';
 import { resumableExperiences } from '../src/components/continueLearning.js';
+test('Home hydration markup stays identical with and without browser-local saves', async () => {
+  const server = await createServer({ server: { middlewareMode: true, hmr: false }, appType: 'custom' });
+  const previous = globalThis.localStorage;
+  const memory = new Map();
+  globalThis.localStorage = { getItem: key => memory.get(key) ?? null, setItem: () => assert.fail('Home must not write saves') };
+  try {
+    const { default: ContinueLearning } = await server.ssrLoadModule('/src/components/ContinueLearning.jsx');
+    const render = () => renderToString(createElement(ContinueLearning, { onNavigate() {} }));
+    const initial = render();
+    memory.set('ce-private-shift-drowsy-r2', JSON.stringify({ version: 1, stage: 1, answers: {} }));
+    assert.equal(render(), initial, 'local saves must not change the hydration render');
+    assert.equal(initial, '', 'no placeholder or loading screen');
+  } finally { globalThis.localStorage = previous; await server.close(); }
+});
 test('rendered home stays one card for 0, 1, 6 and 25 saves, with View all pointing to the shared library', async () => {
   const server = await createServer({ server: { middlewareMode: true, hmr: false }, appType: 'custom' });
   try {

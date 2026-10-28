@@ -1,9 +1,14 @@
-import { useEffect, useReducer } from 'react';
+import { useEffect, useReducer, useSyncExternalStore } from 'react';
 import { SHIFTS, progressLabel } from '../modules/the-shift/integrated/registry.js';
 import { shiftPath } from '../modules/the-shift/routing.js';
 import { resumableExperiences } from './continueLearning.js';
 
+const subscribeToHydration = () => () => {};
+const clientSnapshot = () => true;
+const serverSnapshot = () => false;
+
 export default function ContinueLearning({ onNavigate }) {
+  const hydrated = useSyncExternalStore(subscribeToHydration, clientSnapshot, serverSnapshot);
   const [, refresh] = useReducer(value => value + 1, 0);
   useEffect(() => {
     window.addEventListener('storage', refresh);
@@ -13,7 +18,8 @@ export default function ContinueLearning({ onNavigate }) {
       window.removeEventListener('focus', refresh);
     };
   }, []);
-  const unfinished = resumableExperiences(SHIFTS, progressLabel);
+  // The prerender and hydration pass cannot know this device's saved progress.
+  const unfinished = hydrated ? resumableExperiences(SHIFTS, progressLabel) : [];
   return <ContinueLearningList unfinished={unfinished} onNavigate={onNavigate} />;
 }
 

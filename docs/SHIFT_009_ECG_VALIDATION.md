@@ -2,7 +2,7 @@
 
 Automated measurements of the eleven ECG images used by Shift 09. **This is a consistency check, not specialist ECG validation.** A telemetry educator or cardiologist still has to verify the images (checklist below). Nothing here claims clinical validation.
 
-Reproduce from the repo root (Python 3.9+, `pip install -r tools/shift9-ecg/requirements.txt`):
+Reproduce from the repo root (Python 3.10+, `pip install -r tools/shift9-ecg/requirements.txt`; see `tools/shift9-ecg/README.md` for why `validate.py` alone is the check for the committed images since the Pillow 13 update):
 
 ```bash
 python tools/shift9-ecg/generate.py && python tools/shift9-ecg/validate.py

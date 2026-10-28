@@ -1,3 +1,5 @@
+# Python 3.10+ (Pillow 13 dropped 3.9). Tested on Python 3.12.
+# numpy and matplotlib stay at these pins: with them, generate.py renders the committed images pixel for pixel.
 numpy==2.0.2
 matplotlib==3.9.4
-pillow==11.3.0
+pillow==13.0.0

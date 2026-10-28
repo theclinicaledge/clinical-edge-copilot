@@ -118,7 +118,7 @@ test('sources, version and Draft review status are stored as the spec gives them
   const cited = [d1, d2, d3, d4, d5].flatMap(item => item.sources.map(([number]) => number)).concat(REWIND.sources, debrief.why.flatMap(([, numbers]) => numbers));
   assert.deepEqual(cited.filter(number => !SOURCES[number]), []);
   assert.deepEqual([...new Set(cited)].sort((a, b) => a - b), Array.from({ length: 16 }, (_, i) => i + 1));
-  assert.equal(data.VERSION, '0.9');
+  assert.equal(data.VERSION, '0.10');
   assert.equal(data.SCENARIO_ID, 'SHIFT-009');
   assert.equal(card.reviewStatus, 'Draft');
   assert.equal(card.contentReviewDate, 'Pending');
@@ -163,6 +163,16 @@ test('decision strips read objective findings until the decision is answered', (
   assert.match(STRIPS['rm23-1535-c'].altBefore, /13 QRS complexes in 6 seconds/);
 });
 
+test('library poster: a native SVG with title and description, no answer text, decorative on the card', () => {
+  const svg = readFileSync(new URL('../src/modules/the-shift/shift9/poster.svg', import.meta.url), 'utf8');
+  assert.match(svg, /^<svg[^>]+viewBox="0 0 720 360"[^>]+role="img"/);
+  assert.match(svg, /<title id="title">[^<]+<\/title>/);
+  assert.match(svg, /<desc id="desc">[^<]*Not a patient recording\.<\/desc>/);
+  assert.ok(!/STEMI|elevation|infarct|heart attack|ischemi/i.test(svg), 'the poster must not announce the twist');
+  assert.ok(svg.length < 20000, 'small enough for mobile');
+  assert.ok(!svg.includes('<image'), 'pure vector, no embedded raster');
+});
+
 test('v0.8 content corrections', () => {
   // D1: the earlier strips are labeled as earlier, and Room 22's note says it predates Lena's call.
   assert.deepEqual(d1.strips.map(id => d1.stripLabels[id]), ['Room 21 / Now', 'Room 22 / Earlier strip, 1430', 'Room 23 / Earlier strip, 1430']);
@@ -175,7 +185,10 @@ test('v0.8 content corrections', () => {
   assert.ok(!JSON.stringify(SOURCES).includes('hendrickhealth'));
   // The alarm study is described with its scope.
   assert.match(debrief.why[2][0], /88\.8% of 12,671 annotated alarms for six serious arrhythmias/);
-  assert.equal(card.estimatedTime, 'About 10 to 12 minutes');
+  assert.equal(card.estimatedTime, '10–12 minutes');
+  // The library card reads its duration from the same value, and a learner estimate never touches the 1500-1600 timeline.
+  assert.match(readFileSync(new URL('../src/modules/the-shift/shift9/metadata.js', import.meta.url), 'utf8'), /duration: card\.estimatedTime/);
+  assert.equal(assignment.time, '1500');
   // Learner text carries no authoring shorthand.
   assert.ok(!/From D2 on|The choice response|main script/.test(JSON.stringify({ d1, d4, REWIND })));
   // Each guided bridge exists where the flow uses it.

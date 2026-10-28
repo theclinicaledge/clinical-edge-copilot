@@ -1,4 +1,4 @@
-import { SCENARIO_ID, VERSION, SOURCES, OPEN_ITEMS, STRIPS, title, card, debrief } from './data.js';
+import { SCENARIO_ID, VERSION, SOURCES, OPEN_ITEMS, title, card, debrief } from './data.js';
 import { STORAGE_KEY, FINAL_STAGE, stages, readProgress } from './progress.js';
 
 export const SHIFT9_ID = 'quiet-complaint';
@@ -24,7 +24,9 @@ export const shift9Entry = {
   openItems: OPEN_ITEMS,
   storageKey: STORAGE_KEY, readProgress, finalStage: FINAL_STAGE,
   stageTitle: state => stages[state.stage].label,
-  image: STRIPS['rm22-1430'].src, imageAlt: '',
+  // Library poster: a central monitor and a quiet call light (tools/shift9-ecg/thumbnail.py). Decorative on the card,
+  // whose title carries the meaning, so the image itself has empty alt text like the other Shift posters.
+  image: new URL('./poster.svg', import.meta.url).href, imageAlt: '',
   askQuestion: debrief.ask,
   recommendations: [
     { id: 'ask', title: 'Ask why', detail: 'Prepare an educational question for Ask; nothing is sent automatically.', path: '/ask' },

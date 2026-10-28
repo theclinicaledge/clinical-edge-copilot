@@ -1,6 +1,6 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
-import { evaluateAssignment, decisionResults, credit, validPlacement, reviewLine, guidedAfter, anyGuided } from '../src/modules/the-shift/shift9/rules.js';
+import { evaluateAssignment, assignmentBreakdown, decisionResults, credit, validPlacement, reviewLine, guidedAfter, anyGuided } from '../src/modules/the-shift/shift9/rules.js';
 import { sanitizeProgress, freshProgress, FINAL_STAGE } from '../src/modules/the-shift/shift9/progress.js';
 import { d1, debrief, REWIND } from '../src/modules/the-shift/shift9/data.js';
 
@@ -116,6 +116,55 @@ test('guided safer paths: D1 wrong RN placement, D2 anything but Escalate now, D
   assert.equal(anyGuided({ ...BASE, d4: 'threat' }), true);
 });
 
+// v0.10: feedback is per person. Every team member gets exactly one rule about their own placement; uncovered rooms follow.
+test('D1 breakdown: one explained line per team member for all 64 placements, coverage gaps listed, nothing hidden', () => {
+  for (const p of ALL) {
+    const b = assignmentBreakdown(p);
+    assert.deepEqual(b.staff.map(s => s.token.id), ['you', 'tess', 'marco'], key(p));
+    for (const s of b.staff) {
+      assert.ok(s.rule, `${key(p)}: no rule for ${s.token.id}`);
+      assert.equal(s.target.id, p[s.token.id]);
+    }
+    const shown = new Set([...b.staff.map(s => s.rule.id), ...b.coverage.map(r => r.id)]);
+    for (const rule of b.fired) assert.ok(shown.has(rule.id) || (rule.id === 'rn22' && shown.has('bothRn22')), `${key(p)}: ${rule.id} not shown`);
+    const labels = [...b.staff.map(s => s.rule.result), ...b.coverage.map(r => r.result)];
+    if (b.result.startsWith('No')) assert.ok(labels.some(l => l.startsWith('No')), `${key(p)}: No with only green lines`);
+    if (b.result === 'Correct') assert.ok(labels.every(l => l === 'Correct'), key(p));
+    // Marco is never credited for an RN task.
+    assert.ok(!/assess(es)? (dolores|curtis|her|him)|interpret|reads? the (strip|ecg)|talks? curtis down/i.test(b.staff[2].rule.text), key(p));
+  }
+});
+
+test('D1 regression: Marco in Room 22, Marco at the station, both valid RN arrangements', () => {
+  const marco = p => assignmentBreakdown(p).staff[2].rule;
+  for (const rns of [{ you: '22', tess: '21' }, { you: '21', tess: '22' }]) {
+    assert.deepEqual([evaluateAssignment({ ...rns, marco: '22' }).result, marco({ ...rns, marco: '22' }).id], ['Correct', 'marco22']);
+    assert.deepEqual([evaluateAssignment({ ...rns, marco: '21' }).result, marco({ ...rns, marco: '21' }).id], ['Correct', 'marcoBackup21']);
+    assert.deepEqual([evaluateAssignment({ ...rns, marco: '23' }).result, marco({ ...rns, marco: '23' }).id], ['Correct', 'marco23']);
+    const station = evaluateAssignment({ ...rns, marco: 'station' });
+    assert.deepEqual([station.result, station.guided, marco({ ...rns, marco: 'station' }).id], ['Close', false, 'marcoStation']);
+    assert.equal(reviewLine('d1', { d1: { ...rns, marco: 'station' } }).text, debrief.review.d1.close);
+    assert.notEqual(reviewLine('d1', { d1: { ...rns, marco: 'station' } }).text, debrief.review.d1.correct);
+  }
+  assert.equal(evaluateAssignment({ you: '22', tess: '21', marco: '22' }).path, 'a');
+  assert.equal(evaluateAssignment({ you: '21', tess: '22', marco: '22' }).path, 'b');
+  assert.match(marco({ you: '22', tess: '21', marco: '22' }).feedback, /RN keeps the assessment and every clinical decision/);
+  assert.match(marco({ you: '22', tess: '21', marco: 'station' }).feedback, /isn't unsafe/);
+  // Found in the v0.10 64-placement run: the station line must never claim both RN patients are covered when they aren't.
+  for (const p of ALL.filter(p => p.marco === 'station')) {
+    const text = marco(p).feedback;
+    const covered = evaluateAssignment(p).result === 'Close';
+    assert.equal(/both patients who need an RN have one/.test(text), covered, key(p));
+    assert.equal(marco(p).result, 'Close', key(p));
+  }
+  // Invalid RN arrangements stay unsafe or incorrect wherever Marco is.
+  for (const m of ['21', '22', '23', 'station']) {
+    assert.equal(evaluateAssignment({ you: '21', tess: '21', marco: m }).result, 'No (unsafe)');
+    assert.equal(evaluateAssignment({ you: '22', tess: '22', marco: m }).result, 'No');
+    assert.equal(evaluateAssignment({ you: '22', tess: 'station', marco: m }).result, 'No');
+  }
+});
+
 test('decision results: D3 V1 to V4 is partial, either calm D4 response and either Correct D5 call is full', () => {
   assert.ok(Object.values(decisionResults(BASE)).every(r => r.credit === 'full'));
   assert.deepEqual(decisionResults({ ...BASE, d1: { you: '22', tess: '21', marco: 'station' } }).d1, { result: 'Close', credit: 'partial' });
@@ -148,12 +197,12 @@ test('Rewind regression: no answers before the choice; Rewind B stays urgent; Re
 
 test('saved progress is sanitized and cannot skip an unanswered decision', () => {
   assert.deepEqual(sanitizeProgress(null), freshProgress());
-  const saved = sanitizeProgress({ version: 1, contentVersion: '0.9', stage: FINAL_STAGE, answers: { d1: { you: '22', tess: '21', marco: '23' }, d2: 'escalate' } });
+  const saved = sanitizeProgress({ version: 1, contentVersion: '0.10', stage: FINAL_STAGE, answers: { d1: { you: '22', tess: '21', marco: '23' }, d2: 'escalate' } });
   assert.equal(saved.stage, 3);
-  const bad = sanitizeProgress({ version: 1, contentVersion: '0.9', stage: 2, answers: { d1: { you: '22', tess: 'roof', marco: '23' } } });
+  const bad = sanitizeProgress({ version: 1, contentVersion: '0.10', stage: 2, answers: { d1: { you: '22', tess: 'roof', marco: '23' } } });
   assert.equal(bad.stage, 1);
   assert.equal(bad.answers.d1, undefined);
-  // Progress from an earlier content version (v0.8 had different ECGs) is not carried into v0.9.
-  assert.deepEqual(sanitizeProgress({ version: 1, contentVersion: '0.8', stage: 3 }), freshProgress());
+  // Progress from an earlier content version is not carried into v0.10.
+  assert.deepEqual(sanitizeProgress({ version: 1, contentVersion: '0.9', stage: 3 }), freshProgress());
   assert.equal(d1.rules.length, 13);
 });

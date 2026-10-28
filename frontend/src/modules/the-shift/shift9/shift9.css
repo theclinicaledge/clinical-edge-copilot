@@ -31,6 +31,9 @@
 
 .s9-rules { margin: 12px 0; padding: 0; list-style: none; display: grid; gap: 12px; }
 .s9-rules li { line-height: 1.6; }
+/* v0.10 per-person D1 feedback. */
+.s9-rules-heading { margin: 16px 0 0; font: 600 12px var(--ce-font-mono); letter-spacing: .04em; text-transform: uppercase; color: var(--ce-text-muted); }
+.s9-staff-who { display: block; margin-bottom: 4px; font-size: 15px; }
 .s9-app .s9-panel ul { margin: 8px 0 0; padding-left: 20px; }
 .s9-app .s9-panel li { margin: 6px 0; line-height: 1.55; }
 .s9-app .s9-panel .shift-timeline { margin-top: 8px; }

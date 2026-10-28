@@ -305,6 +305,16 @@ test.describe('Shift 09 draft preview', () => {
     await expect(dialog).toContainText('3 of 3 situations tried');
   });
 
+  for (const [name, d1] of [['Path A', FULL], ['Path B', { you: '21', tess: '22', marco: '21' }], ['a guided placement', ALL_MISSED.d1]] as const) {
+    test(`L11: Room 21 opens with Joy taking over Dolores (${name})`, async ({ page }) => {
+      await seed(page, progress(4, { d1, d2: 'escalate', d3: 'inferior' }));
+      const paragraphs = page.locator('.shift-situation p');
+      await expect(paragraphs.first()).toHaveText(d4.scene[0]);
+      await expect(paragraphs.first()).toContainText('With Dolores safely covered, you return to Curtis.');
+      await expect(paragraphs.nth(1)).toHaveText(d4.scene[1]);
+    });
+  }
+
   test('a full play-through reaches the debrief with no page overflow', async ({ page }) => {
     await seed(page, progress(0));
     await page.getByRole('button', { name: /Start the afternoon/ }).click();

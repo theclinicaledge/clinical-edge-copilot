@@ -195,3 +195,17 @@ test('v0.8 content corrections', () => {
   for (const item of [d2, d3, d4, d5]) assert.match(item.bridge, /Your original (choice|response) stays recorded\.$/);
   assert.equal(d5.marcoMoved22, 'Once the STEMI team took over in Room 22, Tess sent Marco to Room 23.');
 });
+
+test('L11: Joy explicitly takes over Dolores before you leave Room 22 for Room 21', () => {
+  const [handoff, ...rest] = d4.scene;
+  assert.equal(handoff, 'Joy, the rapid response nurse, confirms she\'s taking over Dolores\'s bedside care with the STEMI team. Dolores stays on the monitor while they reassess her and get her ready for the cath lab. With Dolores safely covered, you return to Curtis.');
+  // Joy is the same rapid response nurse who arrived at 1513 and took your SBAR.
+  assert.match(d3.scene, /^Joy, the rapid response nurse/);
+  assert.match(d3.whileTeamWorks, /Give Joy a quick SBAR/);
+  // Nothing after the handoff sends anyone else to cover Dolores, or leaves her uncovered.
+  assert.ok(!/Dolores/.test(rest.join(' ')));
+  assert.ok(!/—/.test(handoff));
+  // Timeline and scoring are unchanged.
+  assert.equal(d4.time, '1525');
+  assert.deepEqual(d4.choices.map(c => [c.id, c.result]), [['choice', 'Correct'], ['explain', 'Correct'], ['argue', 'No'], ['agree', 'No'], ['threat', 'No (unsafe)']]);
+});

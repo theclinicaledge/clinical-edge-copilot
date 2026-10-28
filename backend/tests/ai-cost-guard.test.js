@@ -1,7 +1,7 @@
 const test = require('node:test');
 const assert = require('node:assert/strict');
 const { EventEmitter } = require('node:events');
-const { createAiCostGuard, estimateCostUsd, dayKey, readConfig, deviceIdFrom, DEFAULTS } = require('../ai-cost-guard');
+const { createAiCostGuard, estimateCostUsd, ratesFor, dayKey, readConfig, deviceIdFrom, DEFAULTS, MODEL_RATES, UNKNOWN_MODEL_RATES } = require('../ai-cost-guard');
 const { registerAskRoutes } = require('../ask-clinical-edge');
 const { positive } = require('../validation/ask/fixtures');
 
@@ -22,14 +22,78 @@ const DEVICE_B = '7a9b0c1d-2e3f-4a5b-8c6d-7e8f9a0b1c2d';
 const at = iso => () => new Date(iso);
 const req = ({ ip = '203.0.113.10', device } = {}) => ({ ip, body: {}, headers: device ? { 'x-ce-device': device } : {} });
 
-test('cost estimate uses token usage and configured rates', () => {
+const SONNET = 'claude-sonnet-4-6';
+const OPUS = 'claude-opus-5-5';
+const close = (actual, expected) => assert.ok(Math.abs(actual - expected) < 1e-9, `${actual} != ${expected}`);
+
+test('cost estimate uses token usage and the model\'s list rates', () => {
   const config = readConfig({});
-  assert.deepEqual(config, { budgetUsd: 5, freeQuestions: 3, freeQuestionsPerIp: 50, inputUsdPerMTok: 3, outputUsdPerMTok: 15 });
-  assert.equal(estimateCostUsd({ input_tokens: 1_000_000, output_tokens: 0 }, config), 3);
-  assert.equal(estimateCostUsd({ input_tokens: 0, output_tokens: 1_000_000 }, config), 15);
-  assert.equal(estimateCostUsd({ input_tokens: 2000, output_tokens: 1000 }, { ...config, inputUsdPerMTok: 1, outputUsdPerMTok: 10 }), 0.012);
-  assert.equal(estimateCostUsd({ cache_read_input_tokens: 1_000_000, cache_creation_input_tokens: 1_000_000 }, config), 3 * 0.1 + 3 * 1.25);
-  assert.equal(estimateCostUsd(null, config), 0);
+  assert.deepEqual(config, { budgetUsd: 5, freeQuestions: 3, freeQuestionsPerIp: 50, inputUsdPerMTok: null, outputUsdPerMTok: null });
+  assert.equal(estimateCostUsd({ input_tokens: 1_000_000, output_tokens: 0 }, config, SONNET), 3);
+  assert.equal(estimateCostUsd({ input_tokens: 0, output_tokens: 1_000_000 }, config, SONNET), 15);
+  assert.equal(estimateCostUsd({ input_tokens: 2000, output_tokens: 1000 }, { ...config, inputUsdPerMTok: 1, outputUsdPerMTok: 10 }, SONNET), 0.012);
+  close(estimateCostUsd({ cache_read_input_tokens: 1_000_000, cache_creation_input_tokens: 1_000_000 }, config, SONNET), 0.3 + 3.75);
+  assert.equal(estimateCostUsd(null, config, SONNET), 0);
+});
+
+test('every model is priced from the rate table (Anthropic list prices)', () => {
+  assert.deepEqual(MODEL_RATES[OPUS], { input: 4, output: 20, cacheWrite: 5, cacheRead: 0.2 });
+  assert.deepEqual(MODEL_RATES[SONNET], { input: 3, output: 15, cacheWrite: 3.75, cacheRead: 0.3 });
+  const config = readConfig({});
+  const usage = { input_tokens: 1_000_000, output_tokens: 1_000_000, cache_creation_input_tokens: 1_000_000, cache_read_input_tokens: 1_000_000 };
+  close(estimateCostUsd(usage, config, OPUS), 4 + 20 + 5 + 0.2);
+  close(estimateCostUsd(usage, config, SONNET), 3 + 15 + 3.75 + 0.3);
+  close(estimateCostUsd(usage, config, 'claude-sonnet-5-5'), 2 + 10 + 2.5 + 0.1);
+  // Unknown or missing models use the highest listed rates, never less.
+  for (const model of ['claude-future-9', undefined]) {
+    assert.deepEqual(ratesFor(model, config), { ...UNKNOWN_MODEL_RATES });
+    close(estimateCostUsd(usage, config, model), 5 + 25 + 6.25 + 0.5);
+  }
+  for (const rates of Object.values(MODEL_RATES)) {
+    assert.ok(rates.input <= UNKNOWN_MODEL_RATES.input && rates.output <= UNKNOWN_MODEL_RATES.output);
+  }
+});
+
+test('AI_INPUT_USD_PER_MTOK / AI_OUTPUT_USD_PER_MTOK override every model and scale cache prices', () => {
+  const config = readConfig({ AI_INPUT_USD_PER_MTOK: '8', AI_OUTPUT_USD_PER_MTOK: '40' });
+  assert.equal(config.inputUsdPerMTok, 8);
+  assert.equal(config.outputUsdPerMTok, 40);
+  for (const model of [OPUS, SONNET]) {
+    const rates = ratesFor(model, config);
+    assert.equal(rates.input, 8); assert.equal(rates.output, 40);
+    close(rates.cacheWrite, MODEL_RATES[model].cacheWrite * 8 / MODEL_RATES[model].input);
+    close(rates.cacheRead, MODEL_RATES[model].cacheRead * 8 / MODEL_RATES[model].input);
+  }
+  // Only one override set: the other rate stays at the model's list price.
+  const outputOnly = ratesFor(OPUS, readConfig({ AI_OUTPUT_USD_PER_MTOK: '30' }));
+  assert.deepEqual([outputOnly.input, outputOnly.output, outputOnly.cacheWrite, outputOnly.cacheRead], [4, 30, 5, 0.2]);
+});
+
+test('an Opus call through the real SDK client is priced at Opus rates (mocked transport)', async () => {
+  const Anthropic = require('@anthropic-ai/sdk');
+  const usage = { input_tokens: 10_000, output_tokens: 2000, cache_creation_input_tokens: 1000, cache_read_input_tokens: 5000 };
+  const message = { id: 'mock', type: 'message', role: 'assistant', content: [{ type: 'text', text: '{}' }], model: OPUS, stop_reason: 'end_turn', stop_sequence: null, usage };
+  const sse = [
+    { type: 'message_start', message: { ...message, content: [], stop_reason: null, usage: { ...usage, output_tokens: 1 } } },
+    { type: 'content_block_start', index: 0, content_block: { type: 'text', text: '' } },
+    { type: 'content_block_delta', index: 0, delta: { type: 'text_delta', text: '{}' } },
+    { type: 'content_block_stop', index: 0 },
+    { type: 'message_delta', delta: { stop_reason: 'end_turn', stop_sequence: null }, usage: { output_tokens: 2000 } },
+    { type: 'message_stop' },
+  ];
+  const fetch = async (_url, options) => JSON.parse(options.body).stream
+    ? new Response(sse.map(e => `event: ${e.type}\ndata: ${JSON.stringify(e)}\n\n`).join(''), { headers: { 'content-type': 'text/event-stream' } })
+    : new Response(JSON.stringify(message), { headers: { 'content-type': 'application/json' } });
+  const guard = createAiCostGuard({ env: {}, now: at('2026-10-12T18:00:00Z') });
+  const client = guard.meter(new Anthropic({ apiKey: 'test-key', fetch, maxRetries: 0 }));
+  const params = { model: OPUS, max_tokens: 2048, messages: [{ role: 'user', content: 'synthetic' }] };
+  const perCall = (10_000 * 4 + 2000 * 20 + 1000 * 5 + 5000 * 0.2) / 1e6; // $0.086
+  await client.messages.create(params);
+  close(guard.snapshot().spentUsd, perCall);
+  for await (const _event of client.messages.stream(params)) { /* consume */ }
+  close(guard.snapshot().spentUsd, perCall * 2);
+  // The same usage on Sonnet would have cost less: Opus is no longer under-priced.
+  assert.ok(perCall > estimateCostUsd(usage, readConfig({}), SONNET));
 });
 
 test('Opus usage cannot be underpriced by the existing Sonnet configuration', async () => {
@@ -55,7 +119,7 @@ test('Opus usage cannot be underpriced by the existing Sonnet configuration', as
 
 test('invalid or negative env values fall back to defaults; zero is honoured', () => {
   const config = readConfig({ AI_DAILY_BUDGET_USD: '-1', FREE_DAILY_QUESTIONS: '2.5', FREE_DAILY_QUESTIONS_PER_IP: 'x', AI_INPUT_USD_PER_MTOK: 'abc', AI_OUTPUT_USD_PER_MTOK: '' });
-  assert.deepEqual(config, { budgetUsd: DEFAULTS.AI_DAILY_BUDGET_USD, freeQuestions: DEFAULTS.FREE_DAILY_QUESTIONS, freeQuestionsPerIp: DEFAULTS.FREE_DAILY_QUESTIONS_PER_IP, inputUsdPerMTok: DEFAULTS.AI_INPUT_USD_PER_MTOK, outputUsdPerMTok: DEFAULTS.AI_OUTPUT_USD_PER_MTOK });
+  assert.deepEqual(config, { budgetUsd: DEFAULTS.AI_DAILY_BUDGET_USD, freeQuestions: DEFAULTS.FREE_DAILY_QUESTIONS, freeQuestionsPerIp: DEFAULTS.FREE_DAILY_QUESTIONS_PER_IP, inputUsdPerMTok: null, outputUsdPerMTok: null });
   assert.equal(readConfig({ AI_DAILY_BUDGET_USD: '0' }).budgetUsd, 0);
   assert.equal(readConfig({ FREE_DAILY_QUESTIONS: '0' }).freeQuestions, 0);
   assert.equal(readConfig({ FREE_DAILY_QUESTIONS_PER_IP: '0' }).freeQuestionsPerIp, 0);
@@ -170,11 +234,11 @@ test('metered client records usage from create and from streams, including parti
   };
   const metered = guard.meter(fake);
   assert.equal(metered.other, 'kept');
-  await metered.messages.create({});
-  for await (const event of metered.messages.stream({})) assert.ok(event.type);
+  await metered.messages.create({ model: SONNET });
+  for await (const event of metered.messages.stream({ model: SONNET })) assert.ok(event.type);
   // create: 1000*3 + 100*15 = 4500; stream: 2000*3 + 200*15 = 9000 (per million)
   assert.equal(Math.round(guard.snapshot().spentUsd * 1e6), 13500);
-  for await (const event of metered.messages.stream({})) { if (event.type === 'message_start') break; }
+  for await (const event of metered.messages.stream({ model: SONNET })) { if (event.type === 'message_start') break; }
   assert.equal(Math.round(guard.snapshot().spentUsd * 1e6), 13500 + 2000 * 3 + 1 * 15);
   assert.equal(guard.meter(null), null);
 });

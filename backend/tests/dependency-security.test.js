@@ -8,7 +8,7 @@ const { ipKeyGenerator, rateLimit } = require('express-rate-limit');
 const { match } = require('path-to-regexp');
 const lock = require('../package-lock.json');
 
-for (const [name, minimum] of Object.entries({ 'proxy-addr': '2.0.8', 'body-parser': '2.3.0', 'path-to-regexp': '8.4.0', qs: '6.16.0', 'ip-address': '10.7.1', 'express-rate-limit': '8.6.0' })) {
+for (const [name, minimum] of Object.entries({ 'proxy-addr': '2.0.8', 'body-parser': '2.4.0', 'path-to-regexp': '8.4.0', qs: '6.17.0', 'ip-address': '10.7.1', 'express-rate-limit': '8.6.0' })) {
   test(`security dependency ${name} meets the patched compatible floor`, () => {
     const installed = lock.packages[`node_modules/${name}`].version.split('.').map(Number);
     const required = minimum.split('.').map(Number);
@@ -64,6 +64,24 @@ test('HTTP JSON limit and rate-limit behavior survive patched dependencies witho
     const large = await fetch(base + '/bounded', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ synthetic: 'x'.repeat(110000) }) });
     assert.equal(large.status, 413);
     for (const status of [200, 200, 429]) assert.equal((await fetch(base + '/limited')).status, status);
+  } finally {
+    server.closeAllConnections();
+    await new Promise(resolve => server.close(resolve));
+  }
+});
+
+test('the production app refuses compressed and oversized JSON bodies before any route runs', async () => {
+  const zlib = require('node:zlib');
+  const { app } = require('../server');
+  const server = app.listen(0, '127.0.0.1');
+  await new Promise(resolve => server.once('listening', resolve));
+  const base = `http://127.0.0.1:${server.address().port}`;
+  const post = (body, headers = {}) => fetch(base + '/api/sbar', { method: 'POST', headers: { 'Content-Type': 'application/json', ...headers }, body });
+  try {
+    const gzipped = zlib.gzipSync(JSON.stringify({ question: 'synthetic', copilotResponse: 'synthetic' }));
+    assert.equal((await post(gzipped, { 'Content-Encoding': 'gzip' })).status, 415);
+    assert.equal((await post(zlib.deflateSync('{}'), { 'Content-Encoding': 'deflate' })).status, 415);
+    assert.equal((await post(JSON.stringify({ question: 'x'.repeat(110000) }))).status, 413);
   } finally {
     server.closeAllConnections();
     await new Promise(resolve => server.close(resolve));

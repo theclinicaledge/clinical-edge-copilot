@@ -2,7 +2,7 @@
 
 This file is the content source of truth for Shift 09 v0.10. It is the v0.7 scenario spec (Part 2 of `SHIFT-09-build-package.md`, which lives outside the repo) with the remediation Part 1 corrections (v0.8) the Part 2 ECG corrections (v0.9) and the delegation, thumbnail and duration edits of 27 Oct 2026 (v0.10) applied in place. Part 1 of that package (the build prompt) is not repeated here.
 
-Review status: **Draft**. Founder review, independent clinical sign-off and psych specialty review are not recorded. Nothing here is clinically validated.
+Review status: **Draft**. Founder clinical sign-off of v0.10 was given by Mohamed on 28 Oct 2026 (founder-attested; no signed record). Independent clinical review, psych specialty review and specialist ECG validation are not recorded. Nothing here is clinically validated.
 
 # SHIFT-009 "The Quiet Complaint": scenario spec v0.10 (source of truth)
 
@@ -572,7 +572,7 @@ The AI validation reviews don't replace stage 3. The template rule applies (AI a
 - [ ] D1: New No rules ("Both RNs go to Room 22", "Both RNs go to Room 21", "An RN goes to Room 23 or stays at the station", "Marco goes to Room 22 without an RN") and their feedback.
 - [ ] Rewind C: Escalate now is Close (was Not best), with the rapid-response-criteria feedback. Confirm.
 - [ ] Alt text: decision strips read the objective descriptions above until answered. This replaces the Part E text on those screens until the answer. Confirm the 12-lead per-lead wording.
-- [ ] Estimated time: 10–12 minutes, above the template's 7-minute maximum (founder chose 10–12 minutes on 27 Oct 2026; record it in the sign-off).
+- [x] Estimated time: 10–12 minutes, above the template's 7-minute maximum (founder chose 10–12 minutes on 27 Oct 2026; recorded in the founder sign-off, 28 Oct 2026).
 - [ ] All new learner wording in the change log (review lines, guided paths, Rewind alternatives, rhythm-note caveat, D1 strip labels, Drew wording, D2 feedback move).
 
 **Clinical judgment calls**
@@ -613,7 +613,7 @@ The AI validation reviews don't replace stage 3. The template rule applies (AI a
 
 | Stage | Name and credentials | Date | Version reviewed | Notes |
 | --- | --- | --- | --- | --- |
-| Founder review | Mohamed |  |  |  |
+| Founder review | Mohamed, RN (founder) | 28 Oct 2026 | 0.10 | Founder-attested clinical sign-off of the v0.10 spec, including every v0.10 change-log item (D1 per-person feedback, Marco Room 22 and station wording, library thumbnail, 10–12 minutes, the Joy handoff at 1525). Given in a Claude Code session; no signed record. Does not replace the independent clinical, psych specialty or specialist ECG reviews, which are still required before release. |
 | Independent clinical review |  |  |  |  |
 | Specialty review (psych) |  |  |  | Required for Room 21 and D4 |
 

@@ -8,10 +8,11 @@ const labels = {
   [categories[2]]: 'Activity recorded by a device',
   [categories[3]]: 'Unresolved timing (previous choice)',
 };
-export default function Timeline({ p, update, review = false }) {
+export default function Timeline({ p, update, review = false, onReturn = null, returnName = null }) {
   const cards = discovered(p);
   return <section className="s7-timeline" aria-label={review ? 'Evidence and original classifications' : 'Your evidence timeline'}>
     <header><div><span className="s7-eyebrow">The evidence</span><h2>Your timeline</h2></div><span>{cards.length} {cards.length === 1 ? 'card' : 'cards'}</span></header>
+    {!review && onReturn && <button type="button" className="s7-evidence-return" onClick={onReturn}>Return to conversation with {returnName}</button>}
     {!review && <div className="s7-timeline-guide">
       <p><strong>What does each account tell you?</strong> Choose the kind of information, then what it cannot tell you. Your answers are reviewed after handoff.</p>
       <details><summary>What do the three choices mean?</summary><dl>
@@ -24,7 +25,7 @@ export default function Timeline({ p, update, review = false }) {
     <ol>{cards.map((card, i) => {
       const complete = p.classifications[card.id] && p.limits[card.id];
       const correct = p.classifications[card.id] === card.category && p.limits[card.id] === card.limit;
-      return <li key={card.id} className="s7-evidence"><div className="s7-time"><time>{card.time}</time><small>{card.when}</small></div><div className="s7-evidence-body">
+      return <li key={card.id} className="s7-evidence" id={!review ? `s7-evidence-${card.id}` : undefined} data-s7-evidence={!review ? card.id : undefined} tabIndex={!review ? -1 : undefined} aria-label={!review ? `${card.time} · ${card.source}` : undefined}><div className="s7-time"><time>{card.time}</time><small>{card.when}</small></div><div className="s7-evidence-body">
         <span className="s7-source">{card.source}</span><p>“{transcript(p, card)}”</p>
         {review ? <div className="s7-evidence-review">
           <p><strong>Your choice:</strong> {labels[p.classifications[card.id]] || 'Not answered'}</p>

@@ -1,0 +1,19 @@
+/* Shift 1 only: neutral evidence, with no answer, tier or correctness styling. */
+.s1-bedside-record { margin: 16px 0 22px; border: 1px solid var(--ce-warm-line); border-radius: 8px; background: var(--ce-warm-card); color: var(--ce-text-dark); }
+.s1-bedside-record > summary { padding: 12px 16px; cursor: pointer; min-height: 44px; font-size: 14px; }
+.s1-bedside-title { font-weight: 650; }
+.s1-bedside-count { margin-left: 12px; font-size: 12px; color: var(--ce-text-mid); }
+.s1-bedside-source { margin: 0; padding: 0 16px 8px; font-size: 12px; color: var(--ce-text-mid); }
+.s1-bedside-scroll { max-height: 220px; overflow-y: auto; overscroll-behavior: contain; scrollbar-width: thin; border-top: 1px solid var(--ce-warm-line); }
+.s1-bedside-scroll ul { list-style: none; margin: 0; padding: 0; }
+.s1-bedside-scroll li { margin: 0; padding: 10px 16px; }
+.s1-bedside-scroll li + li { border-top: 1px solid var(--ce-warm-line); }
+.s1-bedside-scroll li > div { display: flex; flex-wrap: wrap; align-items: baseline; justify-content: space-between; gap: 4px 12px; font-size: 12px; }
+.s1-bedside-mark { color: var(--ce-text-mid); font-size: 11px; }
+.s1-bedside-scroll li p { margin: 4px 0 0; font-size: 14px; line-height: 1.5; }
+.s1-bedside-empty { margin: 0; padding: 0 16px 14px; font-size: 13px; color: var(--ce-text-mid); }
+.s1-bedside-record > summary:focus-visible, .s1-bedside-scroll:focus-visible { outline: 3px solid var(--ce-teal-deep); outline-offset: -3px; }
+@media (max-width: 640px) {
+  .s1-bedside-count { display: block; margin: 4px 0 0 18px; }
+  .s1-bedside-scroll { max-height: 180px; }
+}

@@ -6,6 +6,7 @@ import { scenario, stages } from './scenario.js';
 import { STORAGE_KEY, freshProgress, readProgress, cueResult } from './progress.js';
 import { shiftProgress } from '../../productAnalytics.js';
 import DeliberateChoice from './DeliberateChoice.jsx';
+import BedsideFindings from './shift1/BedsideFindings.jsx';
 
 const Arrow = () => <span aria-hidden="true">&#8594;</span>;
 const Check = () => <span aria-hidden="true">&#10003;</span>;
@@ -158,6 +159,7 @@ export default function Shift({ trackSession = null, debrief = null, nextStep = 
         {progress.stage === 4 && <>
           <div className="shift-event"><span aria-hidden="true">&#10003;</span><div><strong>Response team at bedside</strong><p>{scenario.abgArrival}</p></div></div>
           <section className="shift-lab" aria-label="ABG result"><div className="shift-lab-title"><span>ABG resulted</span><small>Collected 0645</small></div><div className="shift-lab-values">{scenario.abg.map(item => <div key={item.label}><span>{item.label}</span><strong>{item.value}</strong><small>{item.unit || 'pH units'}</small><small className="shift-range">Range {item.range}</small></div>)}</div></section>
+          <BedsideFindings progress={progress} />
           <h2>What does this ABG show?</h2>
           <Choices items={scenario.interpretations} answer={progress.answers.abg} label="ABG interpretations" onChoose={id => choose('abg', id)} />
           {interpretation && <Feedback choice={interpretation} correct={scenario.interpretations[0]} onContinue={next} nextLabel="Speak with the provider" sources={['abg', 'acidbase']}><details className="shift-deeper"><summary>Go deeper</summary><p>{scenario.deeper}</p></details><a className="shift-tool-link" href="/abg-lab" target="_blank" rel="noreferrer">Practice this in ABG Lab <span aria-hidden="true">&#8599;</span></a></Feedback>}
@@ -166,6 +168,7 @@ export default function Shift({ trackSession = null, debrief = null, nextStep = 
         {progress.stage === 5 && <>
           <p className="shift-lead">{scenario.sbarPrompt}</p>
           <div className="shift-call-line"><span className="shift-call-dot" /><strong>Provider calling back</strong><span>0718</span></div>
+          <BedsideFindings progress={progress} />
           <DeliberateChoice communication items={scenario.sbars} answer={progress.answers.sbar} label="SBAR options" onConfirm={id => choose('sbar', id)} />
           {sbar && <Feedback choice={sbar} correct={sbar.id !== 'a' ? { text: 'SBAR A', feedback: scenario.sbars[0].feedback } : null} onContinue={next} nextLabel="Finish the shift" />}
         </>}

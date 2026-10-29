@@ -2,7 +2,7 @@
 
 This file is the content source of truth for Shift 09 v0.10. It is the v0.7 scenario spec (Part 2 of `SHIFT-09-build-package.md`, which lives outside the repo) with the remediation Part 1 corrections (v0.8) the Part 2 ECG corrections (v0.9) and the delegation, thumbnail and duration edits of 27 Oct 2026 (v0.10) applied in place. Part 1 of that package (the build prompt) is not repeated here.
 
-Review status: **Draft**. Founder clinical sign-off of v0.10 was given by Mohamed on 28 Oct 2026 (founder-attested; no signed record). Independent clinical review, psych specialty review and specialist ECG validation are not recorded. Nothing here is clinically validated.
+Review status: **Founder sign-off recorded**. Founder clinical sign-off of v0.10 was given by Mohamed on 28 Oct 2026 (founder-attested; no signed record). Independent clinical review, psych specialty review and specialist ECG validation are not recorded. Nothing here is clinically validated.
 
 # SHIFT-009 "The Quiet Complaint": scenario spec v0.10 (source of truth)
 
@@ -85,7 +85,7 @@ The learner's first read ("the yelling room with the flat line is the emergency"
 | Interaction types used | Assign the team (new), Then vs. now, Interpret a result, Therapeutic response (not built yet). Unscored: Patient assignment, Look closer |
 | The twist | The loud room has a man who is talking, breathing and pulling off his leads. The quiet call light, which the monitor tech blames on lead placement after a bath, is an inferior STEMI. |
 | Specialty reviewer needed? | Yes: psych, for Room 21 and Decision 4 |
-| Review status | Draft |
+| Review status | Founder sign-off recorded (28 Oct 2026); independent clinical and psych specialty review pending |
 | Content review date | Pending |
 
 ## Part B: Interaction types and sequence

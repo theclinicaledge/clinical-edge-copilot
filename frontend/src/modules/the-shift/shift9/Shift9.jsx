@@ -146,7 +146,7 @@ export default function Shift9() {
     <a className="shift-skip" href="#shift-main">Skip to the shift</a>
     <header className="shift-header"><div className="shift-header-inner">
       <a href="/" className="shift-brand" aria-label="Clinical Edge Home"><ClinicalEdgeMark size={27} /><span>Clinical Edge</span></a>
-      <span className="shift-private">Fictional scenario / Draft</span>
+      <span className="shift-private">Fictional scenario</span>
       <button className="shift-reset" onClick={() => setRestartOpen(true)} aria-label="Restart the shift" title="Restart the shift">&#8634;</button>
     </div></header>
     <div className="shift-masthead"><div><span className="shift-overline">A fictional nursing shift</span><span className="shift-wordmark">The Shift<span>.</span></span></div>

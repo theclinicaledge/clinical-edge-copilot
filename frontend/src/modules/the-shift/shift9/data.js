@@ -1,5 +1,5 @@
 // SHIFT-009 v0.10, "The Quiet Complaint". Learner-facing text follows docs/SHIFT_009_SPEC_v0.10.md: the v0.7 spec plus
-// the audit corrections (v0.8), the regenerated ECGs and 12-lead views (v0.9), and per-person D1 feedback (v0.10). Review status Draft:
+// the audit corrections (v0.8), the regenerated ECGs and 12-lead views (v0.9), and per-person D1 feedback (v0.10). Review status:
 // founder clinical sign-off of v0.10 recorded 28 Oct 2026 (founder-attested); independent clinical sign-off and psych specialty review are not recorded.
 // Each patient's vitals live in one table, and each strip lives in one table with the screens it belongs to,
 // so screens derive their values instead of repeating them.
@@ -450,7 +450,7 @@ export const card = {
   twist: 'The loud room has a man who is talking, breathing and pulling off his leads. The quiet call light, which the monitor tech blames on lead placement after a bath, is an inferior STEMI.',
   // v0.8: measured from the learner text (about 1,950 words shown by default on an all-correct path, 8 to 10 minutes of reading) plus six tracings and five decisions.
   specialty: 'Telemetry', learnerLevel: 'Student and new grad', estimatedTime: '10–12 minutes', decisionCount: 5,
-  reviewStatus: 'Draft', contentReviewDate: 'Pending',
+  reviewStatus: 'Founder sign-off reported by founder; no formal validation claimed', contentReviewDate: '28 Oct 2026 (founder)',
   specialtyReview: 'psych specialty review required',
 };
 

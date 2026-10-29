@@ -28,7 +28,7 @@ test.describe('Shift 09 draft preview', () => {
     await page.route('**/api/**', route => { throw new Error(`Shift 09 must not call ${route.request().url()}`); });
   });
 
-  test('library lists Shift 09 under All settings and Telemetry, with a Draft review record', async ({ page }) => {
+  test('library lists Shift 09 under All settings and Telemetry, with the founder review record', async ({ page }) => {
     await page.goto('/learn/shifts');
     const card = () => page.locator('.shift-library-card').filter({ hasText: 'The Quiet Complaint' });
     await page.getByRole('button', { name: /Show more shifts/ }).click();
@@ -40,10 +40,10 @@ test.describe('Shift 09 draft preview', () => {
     await expect(page.locator('.shift-library-card').filter({ hasText: 'The Monitor Alarm' })).toBeVisible();
     await card().getByRole('link', { name: /Begin shift|Continue shift|Review debrief/ }).click();
     await expect(page).toHaveURL(new RegExp(`${PATH}$`));
-    await expect(page.locator('.shift-footer')).toContainText('Review status: Draft (psych specialty review required)');
+    await expect(page.locator('.shift-footer')).toContainText('Review status: Founder sign-off reported by founder; no formal validation claimed (psych specialty review required)');
     await page.getByRole('button', { name: 'Sources & review' }).click();
     const dialog = page.getByRole('dialog');
-    await expect(dialog).toContainText('Draft.');
+    await expect(dialog).toContainText('Founder clinical sign-off reported by the founder for v0.10');
     await expect(dialog).toContainText('SHIFT-009 / 0.10');
     await expect(dialog.locator('ol li')).toHaveCount(16);
   });

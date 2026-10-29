@@ -113,15 +113,15 @@ test('no em dashes anywhere in Shift 09 content or source', () => {
   for (const file of ['StripFigure.jsx', 'AssignTeam.jsx', 'TherapeuticResponse.jsx']) assert.ok(!readFileSync(new URL(`../src/modules/the-shift/components/${file}`, import.meta.url), 'utf8').includes('—'), file);
 });
 
-test('sources, version and Draft review status are stored as the spec gives them', () => {
+test('sources, version and founder review status are stored as the spec gives them', () => {
   assert.deepEqual(Object.keys(SOURCES), Array.from({ length: 16 }, (_, i) => String(i + 1)));
   const cited = [d1, d2, d3, d4, d5].flatMap(item => item.sources.map(([number]) => number)).concat(REWIND.sources, debrief.why.flatMap(([, numbers]) => numbers));
   assert.deepEqual(cited.filter(number => !SOURCES[number]), []);
   assert.deepEqual([...new Set(cited)].sort((a, b) => a - b), Array.from({ length: 16 }, (_, i) => i + 1));
   assert.equal(data.VERSION, '0.10');
   assert.equal(data.SCENARIO_ID, 'SHIFT-009');
-  assert.equal(card.reviewStatus, 'Draft');
-  assert.equal(card.contentReviewDate, 'Pending');
+  assert.equal(card.reviewStatus, 'Founder sign-off reported by founder; no formal validation claimed');
+  assert.equal(card.contentReviewDate, '28 Oct 2026 (founder)');
   assert.equal(card.specialtyReview, 'psych specialty review required');
   assert.equal(card.specialty, 'Telemetry');
   assert.ok(!JSON.stringify(SOURCES).includes('openstax'));

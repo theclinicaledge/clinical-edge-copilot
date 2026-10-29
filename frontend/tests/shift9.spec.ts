@@ -2,11 +2,11 @@ import { test, expect, type Page } from '@playwright/test';
 import { STRIPS, assignment, d1, d2, d3, d4, d5, debrief, REWIND } from '../src/modules/the-shift/shift9/data.js';
 
 const PATH = '/learn/shifts/quiet-complaint';
-const KEY = 'ce-shift-quiet-complaint-v0.9';
+const KEY = 'ce-shift-quiet-complaint-v0.10';
 const FULL = { you: '22', tess: '21', marco: '23' };
 const ALL_CORRECT = { d1: FULL, d2: 'escalate', d3: 'inferior', d4: 'choice', d5: 'reassess' };
 const ALL_MISSED = { d1: { you: '21', tess: '21', marco: '22' }, d2: 'antacid', d3: 'placement', d4: 'threat', d5: 'escalate' };
-const progress = (stage: number, answers: Record<string, unknown> = {}) => ({ version: 1, contentVersion: '0.9', stage, viewed: [], notes: [], closer: false, placement: {}, steps: [], drafts: {}, answers, tomorrow: null });
+const progress = (stage: number, answers: Record<string, unknown> = {}) => ({ version: 1, contentVersion: '0.10', stage, viewed: [], notes: [], closer: false, placement: {}, steps: [], drafts: {}, answers, tomorrow: null });
 
 async function seed(page: Page, value: object) {
   await page.goto(PATH);
@@ -28,7 +28,7 @@ test.describe('Shift 09 draft preview', () => {
     await page.route('**/api/**', route => { throw new Error(`Shift 09 must not call ${route.request().url()}`); });
   });
 
-  test('library lists Shift 09 under All settings and Telemetry, with a Draft review record', async ({ page }) => {
+  test('library lists Shift 09 under All settings and Telemetry, with the founder review record', async ({ page }) => {
     await page.goto('/learn/shifts');
     const card = () => page.locator('.shift-library-card').filter({ hasText: 'The Quiet Complaint' });
     await page.getByRole('button', { name: /Show more shifts/ }).click();
@@ -40,11 +40,11 @@ test.describe('Shift 09 draft preview', () => {
     await expect(page.locator('.shift-library-card').filter({ hasText: 'The Monitor Alarm' })).toBeVisible();
     await card().getByRole('link', { name: /Begin shift|Continue shift|Review debrief/ }).click();
     await expect(page).toHaveURL(new RegExp(`${PATH}$`));
-    await expect(page.locator('.shift-footer')).toContainText('Review status: Draft (psych specialty review required)');
+    await expect(page.locator('.shift-footer')).toContainText('Review status: Founder, independent clinical and psych specialty review reported by founder; no formal validation claimed (psych specialty review reported by founder)');
     await page.getByRole('button', { name: 'Sources & review' }).click();
     const dialog = page.getByRole('dialog');
-    await expect(dialog).toContainText('Draft.');
-    await expect(dialog).toContainText('SHIFT-009 / 0.9');
+    await expect(dialog).toContainText('independent clinical review and psych specialty review reported by the founder');
+    await expect(dialog).toContainText('SHIFT-009 / 0.10');
     await expect(dialog.locator('ol li')).toHaveCount(16);
   });
 
@@ -93,18 +93,21 @@ test.describe('Shift 09 draft preview', () => {
     ['Marco helps in Room 22', { you: '22', tess: '21', marco: '22' }, ['rn22', 'rn21', 'marco22'], 'Correct', 'a'],
     ['Marco at the station', { you: '22', tess: '21', marco: 'station' }, ['rn22', 'rn21', 'marcoStation'], 'Close', 'a'],
     ['Marco brings the antacid', { you: '21', tess: '21', marco: '22' }, ['noRn22', 'bothRn21', 'marcoAlone22'], 'No (unsafe)', 'a'],
-    ['Marco alone in 21', { you: '22', tess: '22', marco: '21' }, ['rn22', 'bothRn22', 'marcoAlone21'], 'No', 'a'],
+    ['Marco alone in 21', { you: '22', tess: '22', marco: '21' }, ['bothRn22', 'marcoAlone21'], 'No', 'a'],
     ['No one in 21', { you: '22', tess: '23', marco: '23' }, ['rn22', 'rnElsewhere', 'noOne21', 'marco23'], 'No', 'a'],
   ] as const) test(`D1 ${name}: shows every fired rule and the matching path`, async ({ page }) => {
     await seed(page, progress(1));
     await place(page, placement);
     await expect(feedback(page).getByRole('heading', { level: 3 })).toHaveText(result);
-    const list = feedback(page).locator('.s9-rules li');
-    await expect(list).toHaveCount(rules.length);
-    await expect(list.locator('strong')).toHaveText(rules.map(id => `${d1.rules.find(rule => rule.id === id)!.text}.`));
+    // v0.10: one line per person (You, Tess, Marco), then any uncovered room.
+    const staff = feedback(page).locator('.s9-staff li');
+    await expect(staff).toHaveCount(3);
+    await expect(staff.locator('.s9-staff-who strong')).toHaveText(['You', 'Tess (charge RN)', 'Marco (CNA)']);
+    const shown = [...await staff.locator('strong:not(.s9-staff-who strong)').allTextContents(), ...await feedback(page).locator('.s9-coverage li strong').allTextContents()];
+    for (const id of rules) expect(shown).toContain(`${d1.rules.find(rule => rule.id === id)!.text}.`);
     for (const id of rules) await expect(feedback(page)).toContainText(d1.rules.find(rule => rule.id === id)!.feedback);
     // Audit H3: a no-credit result never shows only green rules.
-    const labels = await list.locator('.s6-result').allTextContents();
+    const labels = await feedback(page).locator('.s9-rules .s6-result').allTextContents();
     if (result.startsWith('No')) expect(labels.some(label => label.startsWith('No'))).toBe(true);
     await expect(feedback(page)).toContainText(d1.next.paths[path]);
     for (const row of d1.next.rows) await expect(feedback(page)).toContainText(path === 'a' ? row[1] : row[2]);
@@ -273,7 +276,7 @@ test.describe('Shift 09 draft preview', () => {
 
   test('Rewind replays Decision 5 three ways with each variation’s strip and labels', async ({ page }) => {
     await seed(page, progress(6, ALL_CORRECT));
-    await page.evaluate(() => localStorage.removeItem('ce-shift-quiet-complaint-rewind-v0.9'));
+    await page.evaluate(() => localStorage.removeItem('ce-shift-quiet-complaint-rewind-v0.10'));
     // Audit H2: the invite doesn't list the calls.
     await expect(page.locator('.mst-rewind-invite')).toContainText(REWIND.intro);
     await expect(page.locator('.mst-rewind-invite')).not.toContainText(/Escalate now|Notify the provider|Continue and reassess/);
@@ -301,6 +304,16 @@ test.describe('Shift 09 draft preview', () => {
     await expect(dialog).toContainText(REWIND.teaching);
     await expect(dialog).toContainText('3 of 3 situations tried');
   });
+
+  for (const [name, d1] of [['Path A', FULL], ['Path B', { you: '21', tess: '22', marco: '21' }], ['a guided placement', ALL_MISSED.d1]] as const) {
+    test(`L11: Room 21 opens with Joy taking over Dolores (${name})`, async ({ page }) => {
+      await seed(page, progress(4, { d1, d2: 'escalate', d3: 'inferior' }));
+      const paragraphs = page.locator('.shift-situation p');
+      await expect(paragraphs.first()).toHaveText(d4.scene[0]);
+      await expect(paragraphs.first()).toContainText('With Dolores safely covered, you return to Curtis.');
+      await expect(paragraphs.nth(1)).toHaveText(d4.scene[1]);
+    });
+  }
 
   test('a full play-through reaches the debrief with no page overflow', async ({ page }) => {
     await seed(page, progress(0));

@@ -1,10 +1,10 @@
-# SHIFT-009 scenario spec v0.9
+# SHIFT-009 scenario spec v0.10
 
-This file is the content source of truth for Shift 09 v0.9. It is the v0.7 scenario spec (Part 2 of `SHIFT-09-build-package.md`, which lives outside the repo) with the remediation Part 1 corrections (v0.8) and the Part 2 ECG corrections (v0.9) applied in place. Part 1 of that package (the build prompt) is not repeated here.
+This file is the content source of truth for Shift 09 v0.10. It is the v0.7 scenario spec (Part 2 of `SHIFT-09-build-package.md`, which lives outside the repo) with the remediation Part 1 corrections (v0.8) the Part 2 ECG corrections (v0.9) and the delegation, thumbnail and duration edits of 27 Oct 2026 (v0.10) applied in place. Part 1 of that package (the build prompt) is not repeated here.
 
-Review status: **Draft**. Founder review, independent clinical sign-off and psych specialty review are not recorded. Nothing here is clinically validated.
+Review status: **Founder, independent clinical and psych specialty review reported by the founder**. Founder clinical sign-off of v0.10 was given by Mohamed on 28 Oct 2026 (founder-attested; no signed record). On 28 Oct 2026 the founder reported that the independent clinical review and the psych specialty review happened; reviewer roles, credentials, dates and psych review scope were not supplied. Specialist ECG validation is not recorded. Nothing here is formally clinically validated.
 
-# SHIFT-009 "The Quiet Complaint": scenario spec v0.9 (source of truth)
+# SHIFT-009 "The Quiet Complaint": scenario spec v0.10 (source of truth)
 
 Version 0.8 of a three-patient telemetry Shift on prioritizing and delegating. It was revised after four validation reviews on 24 Oct 2026 (v0.1 rated 8.2/10, v0.2 8.9/10, v0.3 9.0/10, v0.5 9.2/10 for clinical content; ready for independent RN review). It still needs founder review, independent clinical sign-off and psych specialty review before release. Result labels follow the template (Correct, Close, Not first, Not best, No, No (unsafe)). Every rationale cites a source in Part E that was opened while drafting. All nine ECG images are constructed illustrations that need a clinical check before release. **v0.8** applies the corrections from the post-build audit of 25 Oct 2026 (remediation Part 1, 26 Oct 2026). Every v0.8 change is listed in the change log below and in Part F. Text not listed there is unchanged from v0.7.
 
@@ -23,7 +23,7 @@ Version 0.8 of a three-patient telemetry Shift on prioritizing and delegating. I
 | Alt text on decision screens | Part E text, which names the interpretation | Objective description (`altBefore`) until the decision is answered, then the Part E text | M7 | **Yes** |
 | D1 earlier strips | "Starting strip" | "Earlier strip, 1430", plus a note on Room 22 that her current strip is not shown | M6 | Yes (wording) |
 | Rhythm notes | 6-second method only | Adds that the count is an estimate and how to rate a regular rhythm | M8 | Yes (wording) |
-| Estimated time | About 10 to 12 minutes |
+| Estimated time | 6 minutes | About 10 to 12 minutes, from the measured text (about 1,950 words shown by default on an all-correct path); v0.10 writes it as 10–12 minutes | M5 | **Yes** (exceeds the template's 7-minute limit) |
 | D4 panels | Full lists always open | Key point visible; the lists open from "The five safety steps" and "How to assess capacity and respond to a refusal" | M5 | No (layout) |
 | Source 14 | Hosted copy (HTTP 404) | DOI link | M9 | No |
 | Drew 2014 wording | "88.8% of sampled arrhythmia alarms" | States the scope: 12,671 annotated alarms for six serious arrhythmias | L4 | Yes (wording) |
@@ -32,6 +32,17 @@ Version 0.8 of a three-patient telemetry Shift on prioritizing and delegating. I
 | D5 Marco line | Room 21 only | Adds a line when Marco was in Room 22 | follows H3 | Yes (wording) |
 
 Remediation Part 2 (v0.9, below) covers the ECG items that v0.8 deferred.
+
+## v0.10 change log (from v0.9): D1 delegation feedback, thumbnail, duration
+
+| Area | v0.9 | v0.10 | Needs clinical approval? |
+| --- | --- | --- | --- |
+| D1 feedback layout | One list of every rule that fired | One line per team member (You, Tess, Marco: their placement, label and explanation), then any room left uncovered. Every fired rule still appears; a No result always shows at least one No line | No (layout) |
+| D1 Marco in Room 22 (Correct, unchanged) | "...take her vitals, bring the 12-lead machine, record the 12-lead where CNAs are trained to, or go for more help. The RN still assesses Dolores and decides what the findings mean..." | "Also sound. Under RN direction, Marco can gather equipment such as the 12-lead machine, take her vitals and help with preparations. The RN keeps the assessment and every clinical decision. Ray is stable, and his vitals can wait a few minutes." (founder rationale; recording the ECG removed because it varies by facility) | Yes (wording) |
+| D1 Marco at the station (Close, unchanged) | "Not unsafe, but not the best use of him right now. Lena is already watching the monitors..." | When both RN patients are covered: "Defensible if he stays immediately available, and it isn't unsafe: both patients who need an RN have one. An active assignment is a better use of him right now: backing up in Room 21, helping the RN in Room 22, or getting Ray's vitals." When a room is uncovered: "Waiting at the station isn't the main problem here, but it doesn't help either. Marco can't stand in for the missing RN; the RN assignment has to change. Until it does, he helps more by backing up in Room 21, helping the RN in Room 22, or getting Ray's vitals." | Yes (wording) |
+| Library thumbnail | A cropped Room 22 rhythm strip (with clipped labels) | Original poster `shift9/poster.svg`: a central telemetry monitor (Room 21 artifact then LEADS OFF under a gold alarm; Room 22 calm sinus with only a slight ST lift; Room 23 irregular) and Room 22's softly lit call light. Generated by `tools/shift9-ecg/thumbnail.py` from the same ECG model. Decorative on the card (empty alt text, like other Shift posters); the SVG carries a title and description | Founder (visual) |
+| Estimated time | About 10 to 12 minutes | 10–12 minutes (library card and header). The 1500 to 1600 scenario timeline is unchanged | Founder |
+| D4 opening, Dolores handoff (L11, 28 Oct 2026) | "The STEMI team is with Dolores, getting her ready for the cath lab." | Own first paragraph: "Joy, the rapid response nurse, confirms she's taking over Dolores's bedside care with the STEMI team. Dolores stays on the monitor while they reassess her and get her ready for the cath lab. With Dolores safely covered, you return to Curtis." A qualified clinician explicitly accepts Dolores before you leave Room 22. Same on both D1 paths; timeline, choices and scoring unchanged | **Yes** (new learner-facing sentence) |
 
 ## v0.9 change log (from v0.8): ECGs and the 12-lead viewer
 
@@ -61,11 +72,11 @@ The learner's first read ("the yelling room with the flat line is the emergency"
 | Field | Value |
 | --- | --- |
 | Scenario ID | SHIFT-009 (Shift 09 in the library) |
-| Version | 0.9 (v0.8 plus regenerated ECGs and the 12-lead viewer, 26 Oct 2026) |
+| Version | 0.10 (v0.9 plus per-person D1 feedback, a new thumbnail and the duration wording, 27 Oct 2026) |
 | Title | The Quiet Complaint |
 | Specialty | Telemetry |
 | Learner level | Student and new grad |
-| Estimated time | 6 minutes |
+| Estimated time | 10–12 minutes |
 | Decision count | 5 |
 | Core lesson | The loudest room is not always the sickest: go where the findings point, and send the right teammate to the rest. |
 | Learning objectives | 1. Prioritize three telemetry patients by their findings, not by noise or alarm volume. 2. Assign the charge nurse and CNA within their roles while you take the patient who needs an RN most. 3. Recognize that a heart attack can feel like indigestion, nausea or fatigue, sometimes without chest pain, even though chest discomfort stays common in both women and men. 4. Identify ST elevation in the inferior leads and escalate without delay. 5. Tell a leads-off alarm from a rhythm, and keep the plan for stable AFib. |
@@ -74,7 +85,7 @@ The learner's first read ("the yelling room with the flat line is the emergency"
 | Interaction types used | Assign the team (new), Then vs. now, Interpret a result, Therapeutic response (not built yet). Unscored: Patient assignment, Look closer |
 | The twist | The loud room has a man who is talking, breathing and pulling off his leads. The quiet call light, which the monitor tech blames on lead placement after a bath, is an inferior STEMI. |
 | Specialty reviewer needed? | Yes: psych, for Room 21 and Decision 4 |
-| Review status | Draft |
+| Review status | Founder, independent clinical and psych specialty review reported by the founder (28 Oct 2026); specialist ECG validation pending |
 | Content review date | Pending |
 
 ## Part B: Interaction types and sequence
@@ -159,9 +170,9 @@ Rhythm notes for the learner (tap to open on each card): sinus rhythm has a P wa
 | No one goes to Room 21 | No | His leads are off, so the monitor can't watch him for you. Someone needs eyes on him. |
 | Marco takes vitals on Room 23 | Correct | Ray is stable with a plan, so his vitals are a good CNA task. |
 | Marco backs up the RN at Room 21 | Correct | Also sound, if Marco gives non-confrontational help under RN direction, like staying by the door or getting more help. He doesn't assess or talk Curtis down himself. Ray is stable, and his vitals can wait a few minutes. |
-| Marco helps the RN in Room 22 | Correct | Also sound. Under RN direction, Marco can take her vitals, bring the 12-lead machine, record the 12-lead where CNAs are trained to, or go for more help. The RN still assesses Dolores and decides what the findings mean. Ray is stable, and his vitals can wait a few minutes. |
+| Marco helps the RN in Room 22 | Correct | Also sound. Under RN direction, Marco can gather equipment such as the 12-lead machine, take her vitals and help with preparations. The RN keeps the assessment and every clinical decision. Ray is stable, and his vitals can wait a few minutes. |
 | Marco goes to Room 22 without an RN | No | Marco can take her vitals, but he can't assess a new cardiac symptom or decide what an ST change means. Room 22 needs an RN with him. |
-| Marco stays at the station | Close | Not unsafe, but not the best use of him right now. Lena is already watching the monitors, and both RNs are in rooms. Marco helps more by backing up in Room 21, helping the RN in Room 22, or getting Ray's vitals. |
+| Marco stays at the station | Close | With both RN patients covered: "Defensible if he stays immediately available, and it isn't unsafe: both patients who need an RN have one. An active assignment is a better use of him right now: backing up in Room 21, helping the RN in Room 22, or getting Ray's vitals." With a room uncovered (v0.10): "Waiting at the station isn't the main problem here, but it doesn't help either. Marco can't stand in for the missing RN; the RN assignment has to change. Until it does, he helps more by backing up in Room 21, helping the RN in Room 22, or getting Ray's vitals." |
 
 **How the rules fire (v0.8):** every placement fires at least one rule about each RN and one about Marco. "An RN goes to Room 22" fires whenever at least one RN is there; "One RN goes to Room 21" fires when exactly one RN is there. A no-credit placement always fires at least one No rule, so the feedback never shows only Correct rows under a No heading.
 
@@ -260,7 +271,9 @@ From here on, both paths play the same scenes. Room 21 never goes unwatched.
 
 **Interaction type:** Therapeutic response
 
-**On screen:** "The STEMI team is with Dolores, getting her ready for the cath lab. An RN or the behavioral response nurse has kept eyes on Curtis since 1505, and the provider has known he's off telemetry since 1506. Tess is at the doorway with the behavioral response nurse. Security waits nearby, out of his direct line of sight, per policy." Curtis is pacing by the window with the monitor box in his hand and the leads hanging. He isn't threatening anyone, and both he and staff have a clear path to the door. From the doorway, Tess reports he's pink, breathing easily, steady on his feet and talking in full sentences. Tess: "He's asking for his nurse."
+**On screen:** "Joy, the rapid response nurse, confirms she's taking over Dolores's bedside care with the STEMI team. Dolores stays on the monitor while they reassess her and get her ready for the cath lab. With Dolores safely covered, you return to Curtis.
+
+An RN or the behavioral response nurse has kept eyes on Curtis since 1505, and the provider has known he's off telemetry since 1506. Tess is at the doorway with the behavioral response nurse. Security waits nearby, out of his direct line of sight, per policy." Curtis is pacing by the window with the monitor box in his hand and the leads hanging. He isn't threatening anyone, and both he and staff have a clear path to the door. From the doorway, Tess reports he's pink, breathing easily, steady on his feet and talking in full sentences. Tess: "He's asking for his nurse."
 
 Curtis: "That box sends my thoughts to the government. I know you're all in on it."
 
@@ -544,8 +557,11 @@ The AI validation reviews don't replace stage 3. The template rule applies (AI a
 | 0.7 | 24 Oct 2026 | D4 monitor explanation reworded; capacity assessment wording no longer implies psychiatry is always needed. |
 | 0.8 | 26 Oct 2026 | Post-build audit corrections (remediation Part 1). See the change log at the top. ECG assets unchanged; ECG work deferred to Part 2. |
 | 0.9 | 26 Oct 2026 | ECG remediation (Part 2): all images regenerated with rate-correct QT and square paper; AF timing and fibrillatory waves constrained; aVL and q waves corrected; labels fixed; 12-lead viewer with limb and chest views; D2 comparison panel. Decision text and scoring unchanged. |
+| 0.10 | 27 Oct 2026 | Per-person D1 feedback; Marco Room 22 and station wording to the founder's rationale (station wording no longer claims coverage when a room is uncovered); new library thumbnail; duration 10–12 minutes. Scoring unchanged. |
 
 ### Open questions for the reviewer
+
+**v0.10 items (added 27 Oct 2026).** Confirm the reworded Marco Room 22 and station feedback (both versions), and that the library thumbnail's simplified traces aren't clinically misleading.
 
 **v0.9 ECG items for the specialist reviewer (added 26 Oct 2026).** The full checklist is in `docs/SHIFT_009_ECG_VALIDATION.md`. In short, confirm morphology and intervals on all eleven images, that no strip shows an unintended finding (long or short QT, flutter, pre-excitation, Q waves, fragmented QRS), and that the D3 views and the D2 comparison are interpretable on a phone.
 
@@ -556,7 +572,7 @@ The AI validation reviews don't replace stage 3. The template rule applies (AI a
 - [ ] D1: New No rules ("Both RNs go to Room 22", "Both RNs go to Room 21", "An RN goes to Room 23 or stays at the station", "Marco goes to Room 22 without an RN") and their feedback.
 - [ ] Rewind C: Escalate now is Close (was Not best), with the rapid-response-criteria feedback. Confirm.
 - [ ] Alt text: decision strips read the objective descriptions above until answered. This replaces the Part E text on those screens until the answer. Confirm the 12-lead per-lead wording.
-- [ ] Estimated time: About 10 to 12 minutes, above the template's 7-minute maximum. Accept, or ask for cuts.
+- [x] Estimated time: 10–12 minutes, above the template's 7-minute maximum (founder chose 10–12 minutes on 27 Oct 2026; recorded in the founder sign-off, 28 Oct 2026).
 - [ ] All new learner wording in the change log (review lines, guided paths, Rewind alternatives, rhythm-note caveat, D1 strip labels, Drew wording, D2 feedback move).
 
 **Clinical judgment calls**
@@ -597,9 +613,9 @@ The AI validation reviews don't replace stage 3. The template rule applies (AI a
 
 | Stage | Name and credentials | Date | Version reviewed | Notes |
 | --- | --- | --- | --- | --- |
-| Founder review | Mohamed |  |  |  |
-| Independent clinical review |  |  |  |  |
-| Specialty review (psych) |  |  |  | Required for Room 21 and D4 |
+| Founder review | Mohamed, RN (founder) | 28 Oct 2026 | 0.10 | Founder-attested clinical sign-off of the v0.10 spec, including every v0.10 change-log item (D1 per-person feedback, Marco Room 22 and station wording, library thumbnail, 10–12 minutes, the Joy handoff at 1525). Given in a Claude Code session; no signed record. Does not replace the independent clinical, psych specialty or specialist ECG reviews, which are still required before release. |
+| Independent clinical review | Not supplied (anonymous) | Not supplied | Not supplied | Reported by the founder on 28 Oct 2026 as completed. Reviewer role, credentials and date not supplied; no signed record. |
+| Specialty review (psych) | Not supplied (anonymous) | Not supplied | Not supplied | Required for Room 21 and D4. Reported by the founder on 28 Oct 2026 as completed; reviewer role, date and whether it covered Room 21 and D4 not supplied; no signed record. |
 
 ### Pre-submission checklist
 

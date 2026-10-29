@@ -113,16 +113,16 @@ test('no em dashes anywhere in Shift 09 content or source', () => {
   for (const file of ['StripFigure.jsx', 'AssignTeam.jsx', 'TherapeuticResponse.jsx']) assert.ok(!readFileSync(new URL(`../src/modules/the-shift/components/${file}`, import.meta.url), 'utf8').includes('—'), file);
 });
 
-test('sources, version and Draft review status are stored as the spec gives them', () => {
+test('sources, version and founder review status are stored as the spec gives them', () => {
   assert.deepEqual(Object.keys(SOURCES), Array.from({ length: 16 }, (_, i) => String(i + 1)));
   const cited = [d1, d2, d3, d4, d5].flatMap(item => item.sources.map(([number]) => number)).concat(REWIND.sources, debrief.why.flatMap(([, numbers]) => numbers));
   assert.deepEqual(cited.filter(number => !SOURCES[number]), []);
   assert.deepEqual([...new Set(cited)].sort((a, b) => a - b), Array.from({ length: 16 }, (_, i) => i + 1));
-  assert.equal(data.VERSION, '0.9');
+  assert.equal(data.VERSION, '0.10');
   assert.equal(data.SCENARIO_ID, 'SHIFT-009');
-  assert.equal(card.reviewStatus, 'Draft');
-  assert.equal(card.contentReviewDate, 'Pending');
-  assert.equal(card.specialtyReview, 'psych specialty review required');
+  assert.equal(card.reviewStatus, 'Founder, independent clinical and psych specialty review reported by founder; no formal validation claimed');
+  assert.equal(card.contentReviewDate, '28 Oct 2026 (founder)');
+  assert.equal(card.specialtyReview, 'psych specialty review reported by founder');
   assert.equal(card.specialty, 'Telemetry');
   assert.ok(!JSON.stringify(SOURCES).includes('openstax'));
 });
@@ -163,6 +163,16 @@ test('decision strips read objective findings until the decision is answered', (
   assert.match(STRIPS['rm23-1535-c'].altBefore, /13 QRS complexes in 6 seconds/);
 });
 
+test('library poster: a native SVG with title and description, no answer text, decorative on the card', () => {
+  const svg = readFileSync(new URL('../src/modules/the-shift/shift9/poster.svg', import.meta.url), 'utf8');
+  assert.match(svg, /^<svg[^>]+viewBox="0 0 720 360"[^>]+role="img"/);
+  assert.match(svg, /<title id="title">[^<]+<\/title>/);
+  assert.match(svg, /<desc id="desc">[^<]*Not a patient recording\.<\/desc>/);
+  assert.ok(!/STEMI|elevation|infarct|heart attack|ischemi/i.test(svg), 'the poster must not announce the twist');
+  assert.ok(svg.length < 20000, 'small enough for mobile');
+  assert.ok(!svg.includes('<image'), 'pure vector, no embedded raster');
+});
+
 test('v0.8 content corrections', () => {
   // D1: the earlier strips are labeled as earlier, and Room 22's note says it predates Lena's call.
   assert.deepEqual(d1.strips.map(id => d1.stripLabels[id]), ['Room 21 / Now', 'Room 22 / Earlier strip, 1430', 'Room 23 / Earlier strip, 1430']);
@@ -175,10 +185,27 @@ test('v0.8 content corrections', () => {
   assert.ok(!JSON.stringify(SOURCES).includes('hendrickhealth'));
   // The alarm study is described with its scope.
   assert.match(debrief.why[2][0], /88\.8% of 12,671 annotated alarms for six serious arrhythmias/);
-  assert.equal(card.estimatedTime, 'About 10 to 12 minutes');
+  assert.equal(card.estimatedTime, '10–12 minutes');
+  // The library card reads its duration from the same value, and a learner estimate never touches the 1500-1600 timeline.
+  assert.match(readFileSync(new URL('../src/modules/the-shift/shift9/metadata.js', import.meta.url), 'utf8'), /duration: card\.estimatedTime/);
+  assert.equal(assignment.time, '1500');
   // Learner text carries no authoring shorthand.
   assert.ok(!/From D2 on|The choice response|main script/.test(JSON.stringify({ d1, d4, REWIND })));
   // Each guided bridge exists where the flow uses it.
   for (const item of [d2, d3, d4, d5]) assert.match(item.bridge, /Your original (choice|response) stays recorded\.$/);
   assert.equal(d5.marcoMoved22, 'Once the STEMI team took over in Room 22, Tess sent Marco to Room 23.');
+});
+
+test('L11: Joy explicitly takes over Dolores before you leave Room 22 for Room 21', () => {
+  const [handoff, ...rest] = d4.scene;
+  assert.equal(handoff, 'Joy, the rapid response nurse, confirms she\'s taking over Dolores\'s bedside care with the STEMI team. Dolores stays on the monitor while they reassess her and get her ready for the cath lab. With Dolores safely covered, you return to Curtis.');
+  // Joy is the same rapid response nurse who arrived at 1513 and took your SBAR.
+  assert.match(d3.scene, /^Joy, the rapid response nurse/);
+  assert.match(d3.whileTeamWorks, /Give Joy a quick SBAR/);
+  // Nothing after the handoff sends anyone else to cover Dolores, or leaves her uncovered.
+  assert.ok(!/Dolores/.test(rest.join(' ')));
+  assert.ok(!/—/.test(handoff));
+  // Timeline and scoring are unchanged.
+  assert.equal(d4.time, '1525');
+  assert.deepEqual(d4.choices.map(c => [c.id, c.result]), [['choice', 'Correct'], ['explain', 'Correct'], ['argue', 'No'], ['agree', 'No'], ['threat', 'No (unsafe)']]);
 });

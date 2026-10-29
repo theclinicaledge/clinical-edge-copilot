@@ -1,11 +1,12 @@
-// SHIFT-009 v0.9, "The Quiet Complaint". Learner-facing text follows docs/SHIFT_009_SPEC_v0.9.md: the v0.7 spec plus
-// the audit corrections of 26 Oct 2026 (v0.8) and the regenerated ECGs and 12-lead views (v0.9). Review status Draft:
-// founder review, independent clinical sign-off and psych specialty review are not recorded.
+// SHIFT-009 v0.10, "The Quiet Complaint". Learner-facing text follows docs/SHIFT_009_SPEC_v0.10.md: the v0.7 spec plus
+// the audit corrections (v0.8), the regenerated ECGs and 12-lead views (v0.9), and per-person D1 feedback (v0.10). Review status:
+// founder clinical sign-off of v0.10 recorded 28 Oct 2026; independent clinical and psych specialty review reported by the founder (28 Oct 2026).
+// Specialist ECG validation is not recorded.
 // Each patient's vitals live in one table, and each strip lives in one table with the screens it belongs to,
 // so screens derive their values instead of repeating them.
 
 export const SCENARIO_ID = 'SHIFT-009';
-export const VERSION = '0.9';
+export const VERSION = '0.10';
 export const title = 'The Quiet Complaint';
 
 // Keyed by spec source number so a citation can be swapped without touching learner-facing text.
@@ -135,7 +136,7 @@ export const d1 = {
   lookCloser: 'Sinus beats march right through the wavy artifact, then the signal stops. LEADS OFF means the monitor can\'t see him. It isn\'t asystole, but it does mean he isn\'t being monitored right now. He\'s yelling, so he\'s awake and breathing. Someone needs eyes on him now, and his leads back on or another way to watch him as soon as it\'s safe.',
   prompt: 'Place yourself, Tess and Marco. Then submit.',
   // v0.8 rules. Every placement fires at least one rule for each team member, so the feedback always names what was
-  // right and what wasn't. Rule order is the display order: Room 22, Room 21, an RN elsewhere, then Marco.
+  // right and what wasn't. v0.10 shows them per person (rules.js assignmentBreakdown), then any room left uncovered.
   rules: [
     { id: 'rn22', text: 'An RN (you or Tess) goes to Room 22 now', result: 'Correct',
       feedback: 'New "indigestion" with an ST change must be evaluated as possible cardiac ischemia. Either RN can take her, as long as she\'s assessed now and escalated fast. You know her baseline; Tess is often better placed to lead the behavioral response. Decide together.' },
@@ -158,11 +159,13 @@ export const d1 = {
     { id: 'marcoBackup21', text: 'Marco backs up the RN at Room 21', result: 'Correct',
       feedback: 'Also sound, if Marco gives non-confrontational help under RN direction, like staying by the door or getting more help. He doesn\'t assess or talk Curtis down himself. Ray is stable, and his vitals can wait a few minutes.' },
     { id: 'marco22', text: 'Marco helps the RN in Room 22', result: 'Correct',
-      feedback: 'Also sound. Under RN direction, Marco can take her vitals, bring the 12-lead machine, record the 12-lead where CNAs are trained to, or go for more help. The RN still assesses Dolores and decides what the findings mean. Ray is stable, and his vitals can wait a few minutes.' },
+      feedback: 'Also sound. Under RN direction, Marco can gather equipment such as the 12-lead machine, take her vitals and help with preparations. The RN keeps the assessment and every clinical decision. Ray is stable, and his vitals can wait a few minutes.' },
     { id: 'marcoAlone22', text: 'Marco goes to Room 22 without an RN', result: 'No',
       feedback: 'Marco can take her vitals, but he can\'t assess a new cardiac symptom or decide what an ST change means. Room 22 needs an RN with him.' },
     { id: 'marcoStation', text: 'Marco stays at the station', result: 'Close',
-      feedback: 'Not unsafe, but not the best use of him right now. Lena is already watching the monitors, and both RNs are in rooms. Marco helps more by backing up in Room 21, helping the RN in Room 22, or getting Ray\'s vitals.' },
+      feedback: 'Defensible if he stays immediately available, and it isn\'t unsafe: both patients who need an RN have one. An active assignment is a better use of him right now: backing up in Room 21, helping the RN in Room 22, or getting Ray\'s vitals.',
+      // v0.10: used instead when a patient who needs an RN doesn't have one, so the line never claims coverage that isn't there.
+      feedbackWhenGap: 'Waiting at the station isn\'t the main problem here, but it doesn\'t help either. Marco can\'t stand in for the missing RN; the RN assignment has to change. Until it does, he helps more by backing up in Room 21, helping the RN in Room 22, or getting Ray\'s vitals.' },
   ],
   scoring: 'Full credit for one RN in Room 22, the other RN in Room 21, and Marco helping in Room 21, Room 22 or Room 23. It doesn\'t matter which RN takes which room. Partial credit (Close) when the RNs are placed right and Marco stays at the station. No credit if no RN reaches Room 22, if Room 21 doesn\'t get the other RN, or if Marco is alone in Room 21 or Room 22.',
   fullCredit: 'Full credit for one RN in Room 22, the other RN in Room 21, and Marco helping in Room 21, Room 22 or Room 23. It doesn\'t matter which RN takes which room.',
@@ -262,7 +265,9 @@ export const d3 = {
 export const d4 = {
   time: '1525', title: 'Room 21',
   scene: [
-    'The STEMI team is with Dolores, getting her ready for the cath lab. An RN or the behavioral response nurse has kept eyes on Curtis since 1505, and the provider has known he\'s off telemetry since 1506. Tess is at the doorway with the behavioral response nurse. Security waits nearby, out of his direct line of sight, per policy.',
+    // L11 (28 Oct 2026): a qualified clinician takes over Dolores before you leave Room 22.
+    'Joy, the rapid response nurse, confirms she\'s taking over Dolores\'s bedside care with the STEMI team. Dolores stays on the monitor while they reassess her and get her ready for the cath lab. With Dolores safely covered, you return to Curtis.',
+    'An RN or the behavioral response nurse has kept eyes on Curtis since 1505, and the provider has known he\'s off telemetry since 1506. Tess is at the doorway with the behavioral response nurse. Security waits nearby, out of his direct line of sight, per policy.',
     'Curtis is pacing by the window with the monitor box in his hand and the leads hanging. He isn\'t threatening anyone, and both he and staff have a clear path to the door. From the doorway, Tess reports he\'s pink, breathing easily, steady on his feet and talking in full sentences. Tess: "He\'s asking for his nurse."',
   ],
   quote: 'Curtis: "That box sends my thoughts to the government. I know you\'re all in on it."',
@@ -445,19 +450,19 @@ export const card = {
   ],
   twist: 'The loud room has a man who is talking, breathing and pulling off his leads. The quiet call light, which the monitor tech blames on lead placement after a bath, is an inferior STEMI.',
   // v0.8: measured from the learner text (about 1,950 words shown by default on an all-correct path, 8 to 10 minutes of reading) plus six tracings and five decisions.
-  specialty: 'Telemetry', learnerLevel: 'Student and new grad', estimatedTime: 'About 10 to 12 minutes', decisionCount: 5,
-  reviewStatus: 'Draft', contentReviewDate: 'Pending',
-  specialtyReview: 'psych specialty review required',
+  specialty: 'Telemetry', learnerLevel: 'Student and new grad', estimatedTime: '10–12 minutes', decisionCount: 5,
+  reviewStatus: 'Founder, independent clinical and psych specialty review reported by founder; no formal validation claimed', contentReviewDate: '28 Oct 2026 (founder)',
+  specialtyReview: 'psych specialty review reported by founder',
 };
 
 // Open review items (not learner-facing). Part F.
 export const OPEN_ITEMS = [
-  'Founder review, independent clinical review and psych specialty review (Room 21 and D4) are not recorded.',
+  'Founder clinical sign-off of v0.10 was given by Mohamed on 28 Oct 2026 (founder-attested, no signed record). The founder reported on 28 Oct 2026 that the independent clinical review and the psych specialty review happened; reviewer roles, credentials, review dates and psych review scope were not supplied. Specialist ECG validation is not recorded.',
   'All ECG images are constructed illustrations. v0.9 regenerated them with rate-correct QT, square paper, constrained AF timing and corrected labels, and added limb-lead and chest-lead views of the 12-lead. Automated measurements are in docs/SHIFT_009_ECG_VALIDATION.md; specialist ECG validation is still required before release.',
   'Sources 3, 4 and 5 were opened through ACC summaries; claims need checking against the full text.',
   'Source 14 now links to its DOI. The hosted copy the author first read (sections 1 to 4.3) returned HTTP 404 on 25 Oct 2026, so its claims need checking against the published text.',
   'The two Rhythm Lab Go further buttons are hidden until verified entries exist.',
-  'v0.9 adds one learner sentence for approval, the D3 viewer hint. v0.8 clinical decisions awaiting approval: Marco helping the RN in Room 22 earns full credit; Marco at the station earns partial credit (Close); Rewind C "Escalate now" is Close instead of Not best; decision-screen alt text gives objective findings until the learner answers; the estimated time is About 10 to 12 minutes.',
+  'v0.10 rewords the Marco Room 22 and station feedback to the founder\'s rationale (27 Oct 2026). v0.9 adds one learner sentence for approval, the D3 viewer hint. v0.8 clinical decisions awaiting approval: Marco helping the RN in Room 22 earns full credit; Marco at the station earns partial credit (Close); Rewind C "Escalate now" is Close instead of Not best; decision-screen alt text gives objective findings until the learner answers; the estimated time is 10–12 minutes.',
   'D5 Marco line build note added in the package; Mohamed to confirm. v0.8 adds a matching line when Marco was in Room 22.',
   'Founder changes to v0.7 text on 24 Oct 2026, before review: D1 shows all three patients\' strips (Room 21 at 1505, Rooms 22 and 23 at their 1430 starting strips), and Lena is introduced as the monitor tech on D1 and D5. v0.8 labels the 1430 strips on D1 as earlier strips.',
 ];

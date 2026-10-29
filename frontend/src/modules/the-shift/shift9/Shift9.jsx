@@ -10,7 +10,7 @@ import AssignTeam from '../components/AssignTeam.jsx';
 import TherapeuticResponse from '../components/TherapeuticResponse.jsx';
 import { SOURCES, STRIPS, VERSION, TOKENS, TARGETS, team, assignment, d1, d2, d3, d4, d5, debrief, card } from './data.js';
 import { STORAGE_KEY, FINAL_STAGE, stages, freshProgress, readProgress } from './progress.js';
-import { credit, d2Choice, d3Choice, d4Choice, d5Choice, evaluateAssignment, decisionResults, validPlacement, reviewLine, guidedAfter, anyGuided } from './rules.js';
+import { credit, d2Choice, d3Choice, d4Choice, d5Choice, evaluateAssignment, assignmentBreakdown, decisionResults, validPlacement, reviewLine, guidedAfter, anyGuided } from './rules.js';
 import Shift9Rewind from './Shift9Rewind.jsx';
 
 const Arrow = () => <span aria-hidden="true">&#8594;</span>;
@@ -146,7 +146,7 @@ export default function Shift9() {
     <a className="shift-skip" href="#shift-main">Skip to the shift</a>
     <header className="shift-header"><div className="shift-header-inner">
       <a href="/" className="shift-brand" aria-label="Clinical Edge Home"><ClinicalEdgeMark size={27} /><span>Clinical Edge</span></a>
-      <span className="shift-private">Fictional scenario / Draft</span>
+      <span className="shift-private">Fictional scenario</span>
       <button className="shift-reset" onClick={() => setRestartOpen(true)} aria-label="Restart the shift" title="Restart the shift">&#8634;</button>
     </div></header>
     <div className="shift-masthead"><div><span className="shift-overline">A fictional nursing shift</span><span className="shift-wordmark">The Shift<span>.</span></span></div>
@@ -178,7 +178,18 @@ export default function Shift9() {
             onChange={(token, target) => setProgress(previous => previous.answers.d1 ? previous : { ...previous, placement: { ...previous.placement, [token]: target } })} />
           {!answers.d1 && <div className="shift-cue-confirm"><p role="status">{placed === TOKENS.length ? 'Everyone is placed. Submit when ready.' : `${placed} of ${TOKENS.length} placed.`}</p><button className="shift-primary" disabled={!validPlacement(progress.placement)} onClick={() => choose('d1', { ...progress.placement })}>Submit<Arrow /></button></div>}
           {assigned && <Feedback result={assigned.result} onContinue={next} nextLabel="Go to Room 22" sources={d1.sources}>
-            <ul className="s9-rules">{assigned.fired.map(rule => <li key={rule.id}><Result result={rule.result} bare /><strong>{rule.text}.</strong> {rule.feedback}</li>)}</ul>
+            {(() => {
+              // v0.10: one line per team member, then any room left without coverage.
+              const breakdown = assignmentBreakdown(answers.d1);
+              return <>
+                <h4 className="s9-rules-heading">Each assignment</h4>
+                <ul className="s9-rules s9-staff">{breakdown.staff.map(({ token, target, rule }) => <li key={token.id}>
+                  <span className="s9-staff-who"><strong>{token.label}</strong>: {target.id === 'station' ? 'At the station' : target.label}</span>
+                  <Result result={rule.result} bare /><strong>{rule.text}.</strong> {rule.feedback}</li>)}</ul>
+                {breakdown.coverage.length > 0 && <><h4 className="s9-rules-heading">Room coverage</h4>
+                  <ul className="s9-rules s9-coverage">{breakdown.coverage.map(rule => <li key={rule.id}><Result result={rule.result} bare /><strong>{rule.text}.</strong> {rule.feedback}</li>)}</ul></>}
+              </>;
+            })()}
             {!assigned.full && <div className="shift-correction"><strong>Full credit</strong><p>{d1.fullCredit}</p></div>}
             {assigned.guided && <Bridge text={`This placement doesn't earn credit. The scenario continues on ${d1.next.paths[assigned.path]}. Your original placement stays recorded.`} />}
             <blockquote>{d1.teaching}</blockquote>
@@ -259,7 +270,7 @@ export default function Shift9() {
           <p className="shift-copy-status" role="status">{copied === 'unavailable' ? 'Clipboard unavailable. The question remains visible above.' : copied === 'question' ? 'Question copied. Nothing has been sent to Ask.' : ''}</p>
         </>}
 
-        <footer className="shift-footer"><span>{storageFailed ? 'Device storage unavailable. Progress lasts only in this tab.' : 'Progress saved on this device'}</span><p>Fictional education only. Treatment decisions belong to the provider and facility protocol.</p><small>Review status: {card.reviewStatus} ({card.specialtyReview}). Content review date: {card.contentReviewDate}. Version {VERSION}. ECG images are illustrations for teaching, not patient recordings; clinical review pending.</small></footer>
+        <footer className="shift-footer"><span>{storageFailed ? 'Device storage unavailable. Progress lasts only in this tab.' : 'Progress saved on this device'}</span><p>Fictional education only. Treatment decisions belong to the provider and facility protocol.</p><small>Review status: {card.reviewStatus} ({card.specialtyReview}). Content review date: {card.contentReviewDate}. Version {VERSION}. ECG images are illustrations for teaching, not patient recordings; specialist ECG validation pending.</small></footer>
       </main>
     </div>
     <dialog ref={dialog} className="shift-dialog" onCancel={() => { setRoom(null); setRestartOpen(false); }} aria-labelledby="s9-dialog-title">

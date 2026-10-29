@@ -29,7 +29,7 @@ export default function Shift9Rewind() {
     </section>
     {record.status === 'blocked' && <p role="status">Saved Rewind practice could not be read or belongs to another version. It has not been replaced. Your Shift responses are unchanged.</p>}
     {record.status === 'unavailable' && <p role="status">Device storage is unavailable. Practice stays in this open page only and may be lost when you leave or refresh.</p>}
-    {open && record.value && <RewindPlayer versions={versions} title={title} takeaway={REWIND.teaching} review="Draft scenario. Clinical review and sign-off are pending." rewind={record.value} figure={figure}
+    {open && record.value && <RewindPlayer versions={versions} title={title} takeaway={REWIND.teaching} review="Founder, independent clinical and psych specialty review reported by the founder. Specialist ECG validation is pending." rewind={record.value} figure={figure}
       close={() => setOpen(false)} onSelect={selected => update(value => { value.selected = selected; })}
       onSubmit={(variation, call) => { const attempt = rewindAttempt(variation, call); if (attempt) update(value => { value.attempts.push(attempt); }); }}
       onContinue={() => {}} continueLabel="Return to shift debrief"

@@ -120,9 +120,9 @@ test('sources, version and founder review status are stored as the spec gives th
   assert.deepEqual([...new Set(cited)].sort((a, b) => a - b), Array.from({ length: 16 }, (_, i) => i + 1));
   assert.equal(data.VERSION, '0.10');
   assert.equal(data.SCENARIO_ID, 'SHIFT-009');
-  assert.equal(card.reviewStatus, 'Founder sign-off reported by founder; no formal validation claimed');
+  assert.equal(card.reviewStatus, 'Founder, independent clinical and psych specialty review reported by founder; no formal validation claimed');
   assert.equal(card.contentReviewDate, '28 Oct 2026 (founder)');
-  assert.equal(card.specialtyReview, 'psych specialty review required');
+  assert.equal(card.specialtyReview, 'psych specialty review reported by founder');
   assert.equal(card.specialty, 'Telemetry');
   assert.ok(!JSON.stringify(SOURCES).includes('openstax'));
 });

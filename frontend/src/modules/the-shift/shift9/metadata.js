@@ -3,7 +3,7 @@ import { STORAGE_KEY, FINAL_STAGE, stages, readProgress } from './progress.js';
 
 export const SHIFT9_ID = 'quiet-complaint';
 
-// Preview builds only (VITE_SHIFT_009_PREVIEW). Founder sign-off of v0.10 recorded 28 Oct 2026; independent and psych reviews are not.
+// Preview builds only (VITE_SHIFT_009_PREVIEW). Founder sign-off of v0.10 and founder-reported independent and psych reviews recorded 28 Oct 2026.
 export const shift9Entry = {
   id: SHIFT9_ID, scenarioId: SCENARIO_ID, contentVersion: VERSION, number: '09', title,
   specialty: card.specialty, difficulty: 'Clinical judgment', duration: card.estimatedTime, analytics: false,
@@ -12,8 +12,8 @@ export const shift9Entry = {
   objectives: card.objectives, concepts: card.concepts, judgmentSteps: card.judgmentSteps,
   interactions: ['patient-assignment', 'look-closer', 'assign-the-team', 'then-vs-now', 'interpret-a-result', 'therapeutic-response'],
   review: {
-    status: 'Founder clinical sign-off reported by the founder for v0.10 (28 Oct 2026). Independent clinical sign-off and psych specialty review are not recorded. No clinical validation is claimed.',
-    independentStatus: 'Not reviewed', reviewer: null, reviewDate: null, approvedVersion: null,
+    status: 'Founder clinical sign-off for v0.10, plus independent clinical review and psych specialty review reported by the founder (28 Oct 2026). Reviewer identity, credentials and review dates were not supplied. Specialist ECG validation is pending. No formal clinical validation is claimed.',
+    independentStatus: 'Founder-reported approval', reviewer: null, reviewDate: null, approvedVersion: VERSION,
     sourceVerification: 'Sources were opened by the AI author while drafting. Human passage-level verification has not been recorded. Sources 3, 4 and 5 were opened through ACC summaries. Source 14 now links to its DOI because the copy first read is no longer available.',
   },
   reviewStatus: card.reviewStatus, specialtyReviewRequired: 'psych', specialtyReview: card.specialtyReview,

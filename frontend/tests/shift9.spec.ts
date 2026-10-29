@@ -40,10 +40,10 @@ test.describe('Shift 09 draft preview', () => {
     await expect(page.locator('.shift-library-card').filter({ hasText: 'The Monitor Alarm' })).toBeVisible();
     await card().getByRole('link', { name: /Begin shift|Continue shift|Review debrief/ }).click();
     await expect(page).toHaveURL(new RegExp(`${PATH}$`));
-    await expect(page.locator('.shift-footer')).toContainText('Review status: Founder sign-off reported by founder; no formal validation claimed (psych specialty review required)');
+    await expect(page.locator('.shift-footer')).toContainText('Review status: Founder, independent clinical and psych specialty review reported by founder; no formal validation claimed (psych specialty review reported by founder)');
     await page.getByRole('button', { name: 'Sources & review' }).click();
     const dialog = page.getByRole('dialog');
-    await expect(dialog).toContainText('Founder clinical sign-off reported by the founder for v0.10');
+    await expect(dialog).toContainText('independent clinical review and psych specialty review reported by the founder');
     await expect(dialog).toContainText('SHIFT-009 / 0.10');
     await expect(dialog.locator('ol li')).toHaveCount(16);
   });

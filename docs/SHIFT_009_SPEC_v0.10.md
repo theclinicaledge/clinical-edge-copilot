@@ -2,7 +2,7 @@
 
 This file is the content source of truth for Shift 09 v0.10. It is the v0.7 scenario spec (Part 2 of `SHIFT-09-build-package.md`, which lives outside the repo) with the remediation Part 1 corrections (v0.8) the Part 2 ECG corrections (v0.9) and the delegation, thumbnail and duration edits of 27 Oct 2026 (v0.10) applied in place. Part 1 of that package (the build prompt) is not repeated here.
 
-Review status: **Founder sign-off recorded**. Founder clinical sign-off of v0.10 was given by Mohamed on 28 Oct 2026 (founder-attested; no signed record). Independent clinical review, psych specialty review and specialist ECG validation are not recorded. Nothing here is clinically validated.
+Review status: **Founder, independent clinical and psych specialty review reported by the founder**. Founder clinical sign-off of v0.10 was given by Mohamed on 28 Oct 2026 (founder-attested; no signed record). On 28 Oct 2026 the founder reported that the independent clinical review and the psych specialty review happened; reviewer roles, credentials, dates and psych review scope were not supplied. Specialist ECG validation is not recorded. Nothing here is formally clinically validated.
 
 # SHIFT-009 "The Quiet Complaint": scenario spec v0.10 (source of truth)
 
@@ -85,7 +85,7 @@ The learner's first read ("the yelling room with the flat line is the emergency"
 | Interaction types used | Assign the team (new), Then vs. now, Interpret a result, Therapeutic response (not built yet). Unscored: Patient assignment, Look closer |
 | The twist | The loud room has a man who is talking, breathing and pulling off his leads. The quiet call light, which the monitor tech blames on lead placement after a bath, is an inferior STEMI. |
 | Specialty reviewer needed? | Yes: psych, for Room 21 and Decision 4 |
-| Review status | Founder sign-off recorded (28 Oct 2026); independent clinical and psych specialty review pending |
+| Review status | Founder, independent clinical and psych specialty review reported by the founder (28 Oct 2026); specialist ECG validation pending |
 | Content review date | Pending |
 
 ## Part B: Interaction types and sequence
@@ -614,8 +614,8 @@ The AI validation reviews don't replace stage 3. The template rule applies (AI a
 | Stage | Name and credentials | Date | Version reviewed | Notes |
 | --- | --- | --- | --- | --- |
 | Founder review | Mohamed, RN (founder) | 28 Oct 2026 | 0.10 | Founder-attested clinical sign-off of the v0.10 spec, including every v0.10 change-log item (D1 per-person feedback, Marco Room 22 and station wording, library thumbnail, 10–12 minutes, the Joy handoff at 1525). Given in a Claude Code session; no signed record. Does not replace the independent clinical, psych specialty or specialist ECG reviews, which are still required before release. |
-| Independent clinical review |  |  |  |  |
-| Specialty review (psych) |  |  |  | Required for Room 21 and D4 |
+| Independent clinical review | Not supplied (anonymous) | Not supplied | Not supplied | Reported by the founder on 28 Oct 2026 as completed. Reviewer role, credentials and date not supplied; no signed record. |
+| Specialty review (psych) | Not supplied (anonymous) | Not supplied | Not supplied | Required for Room 21 and D4. Reported by the founder on 28 Oct 2026 as completed; reviewer role, date and whether it covered Room 21 and D4 not supplied; no signed record. |
 
 ### Pre-submission checklist
 

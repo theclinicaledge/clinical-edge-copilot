@@ -270,7 +270,7 @@ export default function Shift9() {
           <p className="shift-copy-status" role="status">{copied === 'unavailable' ? 'Clipboard unavailable. The question remains visible above.' : copied === 'question' ? 'Question copied. Nothing has been sent to Ask.' : ''}</p>
         </>}
 
-        <footer className="shift-footer"><span>{storageFailed ? 'Device storage unavailable. Progress lasts only in this tab.' : 'Progress saved on this device'}</span><p>Fictional education only. Treatment decisions belong to the provider and facility protocol.</p><small>Review status: {card.reviewStatus} ({card.specialtyReview}). Content review date: {card.contentReviewDate}. Version {VERSION}. ECG images are illustrations for teaching, not patient recordings; clinical review pending.</small></footer>
+        <footer className="shift-footer"><span>{storageFailed ? 'Device storage unavailable. Progress lasts only in this tab.' : 'Progress saved on this device'}</span><p>Fictional education only. Treatment decisions belong to the provider and facility protocol.</p><small>Review status: {card.reviewStatus} ({card.specialtyReview}). Content review date: {card.contentReviewDate}. Version {VERSION}. ECG images are illustrations for teaching, not patient recordings; specialist ECG validation pending.</small></footer>
       </main>
     </div>
     <dialog ref={dialog} className="shift-dialog" onCancel={() => { setRoom(null); setRestartOpen(false); }} aria-labelledby="s9-dialog-title">

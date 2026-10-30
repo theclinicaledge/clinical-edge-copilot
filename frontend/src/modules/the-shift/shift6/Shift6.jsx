@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState } from 'react';
+import { useReleasedShiftAnalytics } from '../useReleasedShiftAnalytics.js';
 import { ClinicalEdgeMark } from '../../../components/ModuleHeader.jsx';
 import '../../../styles/tokens.css';
 import '../shift.css';
@@ -74,6 +75,7 @@ export default function Shift6() {
   const heading = useRef(null);
   const firstRender = useRef(true);
   const stage = stages[progress.stage];
+  useReleasedShiftAnalytics('stable-number', VERSION, progress.stage, FINAL_STAGE, Boolean(stage.decision));
   const update = patch => setProgress(previous => ({ ...previous, ...patch }));
   const choose = (key, value) => setProgress(previous => previous.answers[key] === undefined ? { ...previous, answers: { ...previous.answers, [key]: value } } : previous);
   const select = (key, value) => setProgress(previous => previous.answers[key] === undefined ? { ...previous, drafts: { ...previous.drafts, [key]: value } } : previous);

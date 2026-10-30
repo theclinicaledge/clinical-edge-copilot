@@ -6,7 +6,7 @@ export const SHIFT9_ID = 'quiet-complaint';
 // Released 29 Oct 2026. Founder sign-off of v0.10 and founder-reported independent and psych reviews recorded 28 Oct 2026; founder ECG review 29 Oct 2026.
 export const shift9Entry = {
   id: SHIFT9_ID, scenarioId: SCENARIO_ID, contentVersion: VERSION, number: '09', title,
-  specialty: card.specialty, difficulty: 'Clinical judgment', duration: card.estimatedTime, analytics: false,
+  specialty: card.specialty, difficulty: 'Clinical judgment', duration: card.estimatedTime, analytics: true,
   description: card.coreLesson,
   learnerLevels: ['Student', 'New grad'], decisionCount: card.decisionCount,
   objectives: card.objectives, concepts: card.concepts, judgmentSteps: card.judgmentSteps,

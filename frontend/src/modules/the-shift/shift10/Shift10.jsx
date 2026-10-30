@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState } from 'react';
+import { useReleasedShiftAnalytics } from '../useReleasedShiftAnalytics.js';
 import { KEY, VERSION, report, questions, orders, chart, rooms, paths, assessments, nursing, concerns, ownership, owners, policy, callQuestions, leads, sources } from './content.js';
 import { room, pathFor, responses, observed, reportedIds, discoveries, later, feedback } from './state.js';
 import { moments, readSession, newSession, saveSession, sessionTransition } from './flow.js';
@@ -70,6 +71,7 @@ function Debrief({ s, restart, headingRef, released }) {
 export default function Shift10({ released = false }) {
   const [session, setSession] = useState(readSession);
   const { state: s, moment } = session;
+  useReleasedShiftAnalytics('transfer-not-ready', '0.2', moment === 'intro' ? 0 : moments.findIndex(([id]) => id === moment) + 1, moments.length, moment === 'communication', released);
   const [panel, setPanel] = useState(null);
   const [storageFailed, setStorageFailed] = useState(false);
   const [finding, setFinding] = useState(null);

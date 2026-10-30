@@ -122,7 +122,7 @@ export default function Privacy({ onNavigate }) {
             margin: "0 0 36px",
             letterSpacing: "0.01em",
           }}>
-            Effective date: October 18, 2026
+            Effective date: October 30, 2026
           </p>
 
           <PrivacyChoices />
@@ -152,6 +152,10 @@ export default function Privacy({ onNavigate }) {
             {
               title: "Analytics and usage data",
               body: "Only if you opt in, we send limited product usage events to PostHog: page or feature visited, Shift scenario/version and step, and whether an Ask or tool request succeeded or failed. We do not send questions, answers, form inputs, patient information or your Shift choices. A random pseudonymous identifier stored on this device connects visits over time; it is not your Ask usage-limit identifier. Campaign labels from links may be included after validation. PostHog receives standard connection information such as IP address when events are sent. Analytics is off unless you opt in. Turning it off stops future collection and clears our analytics identifier on this device, but cannot erase events already received by PostHog. Clearing local data or using another device creates a different identifier.",
+            },
+            {
+              title: "Request measurement and delivery",
+              body: "Optional analytics may include a fresh random request identifier linking an Ask submission to success, failure or cancellation, and a broad surface label (web, explicitly marked iPhone app, or unknown). These are not question content or your Ask usage-limit identifier. Sanitized events may be retried once within five seconds, with at most 20 deliveries in memory. Retries stop when analytics is withdrawn; no offline analytics queue is saved. Closing the app or blocking requests can still leave events missing. No raw device user agent is included in our event properties.",
             },
             {
               title: "Approximate location in analytics",

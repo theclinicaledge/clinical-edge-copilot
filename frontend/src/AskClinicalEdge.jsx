@@ -3,7 +3,7 @@ import ModuleHeader from './components/ModuleHeader.jsx';
 import AskIntroduction from './components/AskIntroduction.jsx';
 import AskAnswer from './components/AskAnswer.jsx';
 import { selectSnapshotContext, reportedFacts } from '../../backend/ask-snapshot-context.mjs';
-import { trackEvent } from './analytics';
+import { trackEvent, beginAskAnalytics } from './analytics';
 import './styles/ask-clinical-edge.css';
 import { aiRequestHeaders } from './deviceId.js';
 
@@ -66,11 +66,11 @@ export default function AskClinicalEdge({ navigate, isVisible, snapshot = null }
   const followUpAvailable = CONVERSATION_PREVIEW && previewConsent && answerSession === consentReceipt.current;
   const currentTurn = { question: submitted, answer, details, context: answerContext, abg, teaching: abgTeaching, requestId: answerRequestId };
   useEffect(() => { if (isVisible) trackEvent('ask_opened', { mode: 'general' }); }, [isVisible]);
-  useEffect(() => () => pending.current?.abort(), []);
+  useEffect(() => () => pending.current?.abort('unmounted'), []);
   useEffect(() => () => {
     if (CONVERSATION_PREVIEW && consentReceipt.current) fetch(`${API_BASE}/api/ask/v1/conversation/consent`, { method: 'DELETE', headers: { Authorization: `Bearer ${consentReceipt.current}` }, keepalive: true }).catch(() => {});
   }, []);
-  useEffect(() => () => { if (snapshot && requestSnapshot.current === snapshot) pending.current?.abort(); }, [snapshot]);
+  useEffect(() => () => { if (snapshot && requestSnapshot.current === snapshot) pending.current?.abort('context_changed'); }, [snapshot]);
   useEffect(() => {
     if (!previewConsent || !consentExpiresAt) return;
     const expire = () => {
@@ -127,24 +127,24 @@ export default function AskClinicalEdge({ navigate, isVisible, snapshot = null }
     const timer = setTimeout(() => controller.abort('timeout'), CONVERSATION_PREVIEW ? 60000 : 35000);
     setBusy(true); setError(''); setExplanationNotice('');
     const analyticsKind = CONVERSATION_PREVIEW && answer ? 'followup' : 'question';
-    trackEvent('ask_submitted', { kind: analyticsKind });
+    const finishAnalytics = beginAskAnalytics(analyticsKind, explain ? 'abg_explanation' : 'question');
     try {
       const response = await fetch(`${API_BASE}${CONVERSATION_PREVIEW ? '/api/ask/v1/conversation/preview' : '/api/ask'}`, { method: 'POST', headers: { ...aiRequestHeaders(), ...(CONVERSATION_PREVIEW ? { Authorization: `Bearer ${sentReceipt}` } : {}) }, body: JSON.stringify(CONVERSATION_PREVIEW ? { question: sentQuestion } : { question: sentQuestion.trim(), contextMode: context ? 'snapshot' : 'general', ...(context ? { snapshotContext: context } : {}), ...(explain ? { abgExplanation: true } : {}) }), signal: controller.signal });
       const data = await response.json().catch(() => ({}));
-      if (controller.signal.aborted || CONVERSATION_PREVIEW && (sentReceipt !== consentReceipt.current || Date.now() >= consentDeadline.current)) return;
-      if (submittedSnapshot && currentSnapshot.current !== submittedSnapshot) return;
+      if (controller.signal.aborted || CONVERSATION_PREVIEW && (sentReceipt !== consentReceipt.current || Date.now() >= consentDeadline.current)) { finishAnalytics('cancelled', typeof controller.signal.reason === 'string' ? controller.signal.reason : 'expired'); return; }
+      if (submittedSnapshot && currentSnapshot.current !== submittedSnapshot) { finishAnalytics('cancelled', 'context_changed'); return; }
       if (explain) {
         // Explanation responses cannot replace the authoritative result, answer, sources or reported values.
         const ids = data.abgExplanation?.pointIds;
         if (response.ok && data.contextMode === 'general' && data.abgExplanation?.status === 'selected' && Array.isArray(ids) && ids.length >= 1 && ids.length <= 3
-          && new Set(ids).size === ids.length && ids.every(id => abgCatalog.some(point => point.id === id))) setAbgTeaching(ids.map(id => abgCatalog.find(point => point.id === id)));
-        else setExplanationNotice(limitMessage(data) || 'Additional explanation unavailable. The rule-based interpretation is unchanged.');
+          && new Set(ids).size === ids.length && ids.every(id => abgCatalog.some(point => point.id === id))) { setAbgTeaching(ids.map(id => abgCatalog.find(point => point.id === id))); finishAnalytics('success'); }
+        else { setExplanationNotice(limitMessage(data) || 'Additional explanation unavailable. The rule-based interpretation is unchanged.'); finishAnalytics('failure', undefined, response.status); }
         return;
       }
       if (!response.ok || !['general', 'snapshot'].includes(data.contextMode) || typeof data.answer !== 'string' || (data.contextMode === 'snapshot' && !context)) {
         if (CONVERSATION_PREVIEW && data.error?.code === 'consent_required') { setPreviewConsent(false); consentReceipt.current = null; }
         setError(limitMessage(data) || (CONVERSATION_PREVIEW && data.error?.code === 'educational_scope_unavailable' && typeof data.error.message === 'string' ? data.error.message : ERRORS[data.error?.code] || 'The answer service is unavailable. Your question is unchanged.'));
-        trackEvent('ask_failed', { kind: analyticsKind, status: response.status });
+        finishAnalytics('failure', undefined, response.status);
         return;
       }
       if (CONVERSATION_PREVIEW && answer) setEarlierExplanations(previous => [...previous, currentTurn].slice(-5));
@@ -156,12 +156,14 @@ export default function AskClinicalEdge({ navigate, isVisible, snapshot = null }
       setAbgCatalog(Array.isArray(data.abgExplanationOptions) ? data.abgExplanationOptions : []);
       setDetails(Array.isArray(data.details) ? data.details.filter(d => typeof d.heading === 'string' && typeof d.text === 'string') : []);
       setAnswerContext({ questionKind: data.questionKind || 'education', educationalReframing:data.educationalReframing===true, offerSnapshot: data.offerSnapshot === true, evidence: data.evidence, snapshotUse: data.snapshotUse, snapshot: submittedSnapshot });
-      trackEvent('ask_answered', { kind: analyticsKind });
+      finishAnalytics('success');
     } catch {
       if (explain) setExplanationNotice('Additional explanation unavailable. The rule-based interpretation is unchanged.');
       else setError(controller.signal.aborted ? controller.signal.reason === 'timeout' ? ERRORS.provider_timeout : 'Request cancelled. Your question is unchanged.' : 'Connection unavailable. Your question is unchanged.');
-      if (!controller.signal.aborted || controller.signal.reason === 'timeout') trackEvent('ask_failed', { kind: analyticsKind, status: 0 });
+      if (!controller.signal.aborted || controller.signal.reason === 'timeout') finishAnalytics('failure', controller.signal.reason === 'timeout' ? 'timeout' : undefined, 0);
+      else finishAnalytics('cancelled', typeof controller.signal.reason === 'string' ? controller.signal.reason : 'user');
     } finally {
+      finishAnalytics('cancelled', 'unmounted');
       window.removeEventListener('wheel', markReading); window.removeEventListener('touchmove', markReading); window.removeEventListener('scroll', markReading); window.removeEventListener('keydown', markKeyReading);
       clearTimeout(timer); pending.current = null; setBusy(false);
     }
@@ -193,7 +195,7 @@ export default function AskClinicalEdge({ navigate, isVisible, snapshot = null }
     setAnswerRequestId(null);editQuestion(''); setSubmitted(''); setAnswer(''); setDetails([]); setEarlierExplanations([]); setAnswerContext(null); setAbg(null); setAbgTeaching([]); setAbgCatalog([]); setExplanationNotice(''); setError(''); setSessionNotice(''); setAnswerSession(null); input.current?.focus();
   };
   const withdrawPreview = async () => {
-    pending.current?.abort();
+    pending.current?.abort('withdrawn');
     const receipt = consentReceipt.current;
     consentReceipt.current = null; consentDeadline.current = 0; setPreviewConsent(false); setConsentExpiresAt(0); setAnswerSession(null);
     try {
@@ -238,7 +240,7 @@ export default function AskClinicalEdge({ navigate, isVisible, snapshot = null }
         <textarea id="ask-question" ref={input} value={question} onChange={e => editQuestion(e.target.value)} aria-label="Nursing question" aria-describedby="ask-privacy" placeholder={followUpAvailable ? 'Ask a follow-up...' : 'Ask anything about nursing...'} maxLength={4000} rows={visibleAnswer ? 1 : 4} />
         <div className="ce-ask-controls">
           <button className="ce-ask-submit" aria-label={visibleAnswer ? 'Send question to Ask Clinical Edge' : 'Ask Clinical Edge'} title={visibleAnswer ? 'Send question' : undefined} disabled={busy || question.trim().length < 4 || (CONVERSATION_PREVIEW && !previewConsent)} type="submit">{busy ? <span role="status"><span className="ce-ask-spinner" aria-hidden="true" />Preparing your answer...</span> : visibleAnswer ? <>Send <span aria-hidden="true">&#8593;</span></> : <>Ask Clinical Edge <span aria-hidden="true">&#8594;</span></>}</button>
-          {busy && <button className="ce-ask-cancel" type="button" onClick={() => pending.current?.abort()} aria-label="Cancel question">Cancel</button>}
+          {busy && <button className="ce-ask-cancel" type="button" onClick={() => pending.current?.abort('user')} aria-label="Cancel question">Cancel</button>}
           {!busy && (question || answer) && !(visibleAnswer && CONVERSATION_PREVIEW) && <button type="button" onClick={newQuestion}>New question</button>}
         </div>
         </div>

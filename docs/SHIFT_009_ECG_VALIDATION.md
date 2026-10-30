@@ -71,6 +71,8 @@ Every image's SHA-256 matches the manifest. The asset folder holds exactly these
 
 To be completed by an independent telemetry educator or cardiologist. Please record the outcome in `docs/CLINICAL_VALIDATION_REGISTRY.md`, not here.
 
+**29 Oct 2026:** the founder (Mohamed, RN) reported reviewing the images and passing them, and authorized release on that basis. Item-by-item answers were not supplied, so the boxes below stay unticked. Independent specialist validation is not recorded. See `docs/CLINICAL_VALIDATION_REGISTRY.md`.
+
 - [ ] **Intervals:** PR, QRS and QT on all sinus tracings look normal, and nothing suggests long or short QT, especially on the Room 21 strip (syncope, recent antipsychotic).
 - [ ] **Sinus morphology:** upright P waves in II, normal T waves, isoelectric ST on the 1430 strips.
 - [ ] **D2 1508 strip:** about 2 mm of ST elevation in II reads as a new injury pattern compared with 1430, not as early repolarization or pericarditis.

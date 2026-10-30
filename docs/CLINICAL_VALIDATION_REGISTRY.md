@@ -4,6 +4,10 @@
 
 Separate from the real-provider AI validation results below: the founder reports an independent confidential medical-surgical nurse educator approved the entire updated Shift 8 manual-defibrillator scenario, including E-1. No signed reviewer record, identity, review date or independently documented approval is claimed. The founder's explicit narrow amendment accepts this attestation instead of E-1's earlier written-verification condition for the reviewed v0.8.1 dialogue only. See [E-1 governance](SHIFT_008_E1_GOVERNANCE.md). Automated tests do not establish clinical validation. All prior provider results below remain unchanged.
 
+## Shift 9 v0.10 founder-attested ECG review
+
+On 29 Oct 2026 the founder (Mohamed, RN) reported that he reviewed the eleven constructed ECG images in Shift 9 v0.10 and that they pass. Founder-attested in a Claude Code session; no signed record, and no item-by-item answers to the checklist in [SHIFT_009_ECG_VALIDATION.md](SHIFT_009_ECG_VALIDATION.md) section 5 were supplied. This is not the independent telemetry educator or cardiologist validation that checklist describes. The founder authorized public release on this basis. The automated measurements remain a consistency check only. See [Shift 9 release](SHIFT_009_RELEASE.md).
+
 This registry separates preserved real-provider clinical review from deterministic automated validation. Automated tests do not retroactively change a recorded real-provider result.
 
 ## Status definitions

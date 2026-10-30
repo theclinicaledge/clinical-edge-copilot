@@ -2,7 +2,7 @@
 
 This file is the content source of truth for Shift 09 v0.10. It is the v0.7 scenario spec (Part 2 of `SHIFT-09-build-package.md`, which lives outside the repo) with the remediation Part 1 corrections (v0.8) the Part 2 ECG corrections (v0.9) and the delegation, thumbnail and duration edits of 27 Oct 2026 (v0.10) applied in place. Part 1 of that package (the build prompt) is not repeated here.
 
-Review status: **Founder, independent clinical and psych specialty review reported by the founder**. Founder clinical sign-off of v0.10 was given by Mohamed on 28 Oct 2026 (founder-attested; no signed record). On 28 Oct 2026 the founder reported that the independent clinical review and the psych specialty review happened; reviewer roles, credentials, dates and psych review scope were not supplied. Specialist ECG validation is not recorded. Nothing here is formally clinically validated.
+Review status: **Founder, independent clinical and psych specialty review reported by the founder**. Founder clinical sign-off of v0.10 was given by Mohamed on 28 Oct 2026 (founder-attested; no signed record). On 28 Oct 2026 the founder reported that the independent clinical review and the psych specialty review happened; reviewer roles, credentials, dates and psych review scope were not supplied. On 29 Oct 2026 the founder reported reviewing the ECG images and passing them (founder-attested; independent specialist ECG validation is not recorded), and authorized public release of v0.10 (see `docs/SHIFT_009_RELEASE.md`). Nothing here is formally clinically validated.
 
 # SHIFT-009 "The Quiet Complaint": scenario spec v0.10 (source of truth)
 
@@ -616,6 +616,8 @@ The AI validation reviews don't replace stage 3. The template rule applies (AI a
 | Founder review | Mohamed, RN (founder) | 28 Oct 2026 | 0.10 | Founder-attested clinical sign-off of the v0.10 spec, including every v0.10 change-log item (D1 per-person feedback, Marco Room 22 and station wording, library thumbnail, 10–12 minutes, the Joy handoff at 1525). Given in a Claude Code session; no signed record. Does not replace the independent clinical, psych specialty or specialist ECG reviews, which are still required before release. |
 | Independent clinical review | Not supplied (anonymous) | Not supplied | Not supplied | Reported by the founder on 28 Oct 2026 as completed. Reviewer role, credentials and date not supplied; no signed record. |
 | Specialty review (psych) | Not supplied (anonymous) | Not supplied | Not supplied | Required for Room 21 and D4. Reported by the founder on 28 Oct 2026 as completed; reviewer role, date and whether it covered Room 21 and D4 not supplied; no signed record. |
+| ECG review | Mohamed, RN (founder) | 29 Oct 2026 | 0.10 | Founder reported reviewing the eleven ECG images and that they pass. Given in a Claude Code session; no signed record; checklist items not answered individually. Not an independent specialist validation. |
+| Release authorization | Mohamed, RN (founder) | 29 Oct 2026 | 0.10 | Authorized public release after checking pending items. Open reviewer questions above were not answered item by item; the founder accepted the reviewed v0.10 content as shipped. See `docs/SHIFT_009_RELEASE.md`. |
 
 ### Pre-submission checklist
 

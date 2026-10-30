@@ -23,7 +23,7 @@ async function place(page: Page, placement: Record<keyof typeof LABELS, keyof ty
   await page.getByRole('button', { name: 'Submit' }).click();
 }
 
-test.describe('Shift 09 draft preview', () => {
+test.describe('Shift 09', () => {
   test.beforeEach(async ({ page }) => {
     await page.route('**/api/**', route => { throw new Error(`Shift 09 must not call ${route.request().url()}`); });
   });

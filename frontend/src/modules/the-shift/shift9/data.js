@@ -1,7 +1,7 @@
 // SHIFT-009 v0.10, "The Quiet Complaint". Learner-facing text follows docs/SHIFT_009_SPEC_v0.10.md: the v0.7 spec plus
 // the audit corrections (v0.8), the regenerated ECGs and 12-lead views (v0.9), and per-person D1 feedback (v0.10). Review status:
 // founder clinical sign-off of v0.10 recorded 28 Oct 2026; independent clinical and psych specialty review reported by the founder (28 Oct 2026).
-// Specialist ECG validation is not recorded.
+// ECG images passed founder review on 29 Oct 2026 (founder-attested). No independent specialist ECG validation is recorded.
 // Each patient's vitals live in one table, and each strip lives in one table with the screens it belongs to,
 // so screens derive their values instead of repeating them.
 
@@ -457,8 +457,8 @@ export const card = {
 
 // Open review items (not learner-facing). Part F.
 export const OPEN_ITEMS = [
-  'Founder clinical sign-off of v0.10 was given by Mohamed on 28 Oct 2026 (founder-attested, no signed record). The founder reported on 28 Oct 2026 that the independent clinical review and the psych specialty review happened; reviewer roles, credentials, review dates and psych review scope were not supplied. Specialist ECG validation is not recorded.',
-  'All ECG images are constructed illustrations. v0.9 regenerated them with rate-correct QT, square paper, constrained AF timing and corrected labels, and added limb-lead and chest-lead views of the 12-lead. Automated measurements are in docs/SHIFT_009_ECG_VALIDATION.md; specialist ECG validation is still required before release.',
+  'Founder clinical sign-off of v0.10 was given by Mohamed on 28 Oct 2026 (founder-attested, no signed record). The founder reported on 28 Oct 2026 that the independent clinical review and the psych specialty review happened; reviewer roles, credentials, review dates and psych review scope were not supplied. The founder (Mohamed, RN) reviewed the ECG images and passed them on 29 Oct 2026 (founder-attested, no signed record); this is not an independent specialist ECG validation.',
+  'All ECG images are constructed illustrations. v0.9 regenerated them with rate-correct QT, square paper, constrained AF timing and corrected labels, and added limb-lead and chest-lead views of the 12-lead. Automated measurements are in docs/SHIFT_009_ECG_VALIDATION.md. The founder (Mohamed, RN) reviewed the ECG images and passed them on 29 Oct 2026 (founder-attested, no signed record); this is not an independent specialist ECG validation.',
   'Sources 3, 4 and 5 were opened through ACC summaries; claims need checking against the full text.',
   'Source 14 now links to its DOI. The hosted copy the author first read (sections 1 to 4.3) returned HTTP 404 on 25 Oct 2026, so its claims need checking against the published text.',
   'The two Rhythm Lab Go further buttons are hidden until verified entries exist.',

@@ -31,9 +31,8 @@ const Shift8 = (await import('./shift8/Shift8.jsx')).default;
 if (Shift8) renderers['code-blue'] = Shift8;
 const Shift10 = (await import('./shift10/Shift10.jsx')).default;
 renderers['transfer-not-ready'] = Shift10;
-// Draft SHIFT-009: preview builds only, so production bundles carry none of its code.
-const Shift9 = import.meta.env.VITE_SHIFT_009_PREVIEW === 'true' ? (await import('./shift9/Shift9.jsx')).default : null;
-if (Shift9) renderers['quiet-complaint'] = Shift9;
+const Shift9 = (await import('./shift9/Shift9.jsx')).default;
+renderers['quiet-complaint'] = Shift9;
 const images = {
   'drowsy-patient': new URL('./assignment-poster.svg', import.meta.url).href,
   'discharge-puzzle': new URL('./discharge/poster.svg', import.meta.url).href,
@@ -42,7 +41,7 @@ const images = {
   ...(Shift6 ? { 'stable-number': new URL('./shift6/poster.svg', import.meta.url).href } : {}),
   'code-blue': new URL('./assignment-poster.svg', import.meta.url).href,
   'transfer-not-ready': new URL('./shift10/poster.svg', import.meta.url).href,
-  ...(Shift9 ? { 'quiet-complaint': getShift('quiet-complaint').image } : {}),
+  'quiet-complaint': getShift('quiet-complaint').image,
 };
 
 function AppLink({ to, navigate, children, ...props }) {

@@ -1,3 +1,4 @@
+import { orderShiftsByNumber } from './order.js';
 import { scenario, stages } from '../scenario.js';
 import { script, references, scenes } from '../monitor/data.js';
 import { readProgress, STORAGE_KEY } from '../progress.js';
@@ -28,7 +29,7 @@ const sourceYears = { bts: 2017, copd: 2012, af: 2023, artifact: 1999, 'artifact
 const source = (item, index) => ({ ...item, number: index + 1, type: sourceTypes[item.id], citedYear: sourceYears[item.id] ?? null, openedAndCheckedBy: null, url: sourceAccess[item.id][0], limitation: sourceAccess[item.id][1], applicabilityReviewed: false });
 
 // Metadata and navigation only. Each authored scenario owns its decisions, feedback and debrief.
-export const SHIFTS = [
+const shiftEntries = [
   {
     id: 'drowsy-patient', ...AUTHORING['drowsy-patient'], number: '01', title: scenario.title,
     specialty: 'Med-Surg', difficulty: 'Foundations', duration: 'About 5 minutes',
@@ -77,13 +78,14 @@ export const SHIFTS = [
     ],
   },
 ];
-if (CONVERSATION_ENABLED) SHIFTS.push(conversationEntry);
-SHIFTS.push(shift5Entry);
-SHIFTS.push((await import('../shift6/metadata.js')).shift6Entry);
-SHIFTS.push((await import('../shift7/metadata.js')).shift7Entry);
-SHIFTS.push((await import('../shift8/metadata.js')).shift8Entry);
-SHIFTS.push((await import('../shift10/metadata.js')).shift10Entry);
-SHIFTS.push((await import('../shift9/metadata.js')).shift9Entry);
+if (CONVERSATION_ENABLED) shiftEntries.push(conversationEntry);
+shiftEntries.push(shift5Entry);
+shiftEntries.push((await import('../shift6/metadata.js')).shift6Entry);
+shiftEntries.push((await import('../shift7/metadata.js')).shift7Entry);
+shiftEntries.push((await import('../shift8/metadata.js')).shift8Entry);
+shiftEntries.push((await import('../shift10/metadata.js')).shift10Entry);
+shiftEntries.push((await import('../shift9/metadata.js')).shift9Entry);
+export const SHIFTS = orderShiftsByNumber(shiftEntries);
 export const getShift = id => SHIFTS.find(item => item.id === id);
 export function progressLabel(item) {
   const state = item.readProgress();

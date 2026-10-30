@@ -1,0 +1,33 @@
+import { test, expect } from '@playwright/test';
+const path = '/learn/shifts/quiet-complaint';
+const key = 'ce-shift-quiet-complaint-v0.10';
+const answers = { d1: { you: '22', tess: '21', marco: '23' } };
+test('catalog is numerical without changing released artwork', async ({ page }) => {
+  await page.goto('/learn/shifts');
+  await page.getByRole('button', { name: /Show more shifts/ }).click();
+  const cards = page.locator('.shift-library-card');
+  const numbers = await cards.allTextContents();
+  expect(numbers.map(text => Number(text.match(/SHIFT\s+(\d+)/i)?.[1]))).toEqual([1,2,3,4,5,6,7,8,9,10]);
+  await expect(cards.filter({hasText:'The Quiet Complaint'}).locator('img')).toBeVisible();
+});
+test('optional decision and feedback navigation preserve the saved answer', async ({ page }) => {
+  await page.emulateMedia({ reducedMotion: 'reduce' });
+  await page.goto(path);
+  await page.evaluate(([key, value]) => localStorage.setItem(key, value), [key, JSON.stringify({version:1,contentVersion:'0.10',stage:2,viewed:[],notes:[],closer:false,placement:{},steps:[],drafts:{},answers,tomorrow:null})]);
+  await page.reload();
+  await page.getByRole('button', {name:'Open Room 22 report', exact:true}).click();
+  const dialog = page.getByRole('dialog');
+  await expect(dialog).toContainText('Starting report, not an updated assessment.');
+  await expect(dialog).toContainText('Starting vitals / 1430');
+  await page.keyboard.press('Escape');
+  await expect(page.getByRole('button',{name:'Open Room 22 report',exact:true})).toBeFocused();
+  await page.getByRole('link',{name:/Go to decision/}).click();
+  await expect(page.locator('#s9-d2-prompt')).toBeFocused();
+  await page.getByRole('button',{name:'Give the antacid she asked for and recheck in 30 minutes',exact:true}).click();
+  await page.getByRole('button',{name:'Confirm response',exact:true}).click();
+  await page.reload();
+  await page.getByRole('link',{name:/Review feedback/}).click();
+  await expect(page.locator('#s9-feedback')).toBeFocused();
+  expect(await page.evaluate(key => JSON.parse(localStorage.getItem(key)!).answers.d2,key)).toBe('antacid');
+  expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true);
+});

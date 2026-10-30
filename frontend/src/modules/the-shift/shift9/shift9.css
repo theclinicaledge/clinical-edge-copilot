@@ -44,3 +44,12 @@
   .s9-step-compare { grid-template-columns: 1fr; }
   .s9-step-compare { padding-left: 4px; }
 }
+/* Navigation only: investigation order and authored decisions are unchanged. */
+.s9-decision-nav { display:flex; align-items:center; justify-content:space-between; gap:16px; margin:0 0 18px; padding:10px 14px; background:var(--ce-warm-card); border:1px solid var(--ce-warm-line); border-radius:var(--ce-r-md); }
+.s9-decision-nav p { margin:0; color:var(--ce-text-muted); font-size:13px; }
+.s9-decision-nav a { display:inline-flex; align-items:center; gap:6px; min-height:44px; color:var(--ce-teal-deep); font-size:13px; font-weight:650; flex-shrink:0; text-underline-offset:3px; }
+.s9-decision-nav a:focus-visible { outline:3px solid var(--ce-teal-deep); outline-offset:3px; }
+.s9-app .s6-prompt:focus { outline:3px solid var(--ce-teal-deep); outline-offset:5px; }
+.s9-app .s6-prompt, .s9-app #s9-feedback { scroll-margin-top:20px; }
+.s9-report-context { padding:10px 12px; background:var(--ce-warm-mid); font-size:14px; }
+@media(max-width:600px) { .s9-decision-nav { gap:10px; padding:8px 10px; }.s9-decision-nav p { font-size:12px; }.s9-decision-nav a { font-size:12px; } }

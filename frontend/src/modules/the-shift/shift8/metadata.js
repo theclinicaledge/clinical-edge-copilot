@@ -7,7 +7,7 @@ const readProgress = () => {
 };
 export const shift8Entry = {
   id: 'code-blue', scenarioId: 'SHIFT-008', contentVersion: VERSION, number: '08', title: 'Code Blue',
-  specialty: 'Med-Surg', difficulty: 'Team coordination', duration: 'About 8–10 minutes', analytics: false,
+  specialty: 'Med-Surg', difficulty: 'Team coordination', duration: 'About 8–10 minutes', analytics: true,
   description: 'One patient. A growing team. Keep the response coordinated as your role changes.',
   objectives: ['Act early in the fictional opening.', 'Keep requests, acknowledgments and completed tasks distinct.', 'Preserve the clinical story through recording and handoff.'],
   interactions: ['ordered-actions', 'team-delegation', 'clearance-confirmation', 'code-record', 'handoff', 'replay', 'rewind'],

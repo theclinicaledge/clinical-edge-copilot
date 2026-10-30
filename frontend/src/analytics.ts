@@ -8,6 +8,7 @@ export function configureProductAnalytics(): void {
 }
 export function trackPageView(path: string): void { pageViewed(path); }
 export { syncConsent };
+export { beginAskAnalytics } from './productAnalytics.js';
 export function trackEvent(name: string, properties: AnalyticsPayload = {}): void { captureEvent(name, properties); }
 export function promptLengthBucket(text: string): 'short' | 'medium' | 'long' {
   const len = text.trim().length;

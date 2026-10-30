@@ -1,5 +1,17 @@
 # Opt-in product analytics release plan
 
+## October 30 reliability correction
+
+The released route catalog (SHIFT_IDS, tested against SHIFTS) is the scenario allowlist. Released Shifts 6-10 now use a small read-only lifecycle hook; private HTML previews and the private learning track remain excluded. Existing event names are retained. Numeric steps are scenario-specific presentation milestones, not equivalent decisions across scenarios. Replay/Rewind do not create new main plays. Old data is not backfilled.
+
+Ask adds a random per-operation request_id to submission and one terminal event: ask_succeeded, ask_failed, or additive ask_cancelled. operation is question or abg_explanation; kind retains question/followup. Cancellation reasons are enumerated, never raw errors. IDs are unrelated to clinical/backend/quota IDs. Consent withdrawal suppresses later outcomes for that operation. Crashes, closed tabs and lost delivery may still leave unmatched submissions. Legacy events have no request_id.
+
+Each sanitized event retries at most once after 500ms for network failure, HTTP 429 or 5xx, reusing its event UUID and original timestamp. Deadline is five seconds; at most 20 in-memory deliveries; no persistent queue. Other HTTP failures are dropped. Gameplay never awaits analytics. Withdrawal aborts requests and clears timers and analytics-owned storage. Local exclusion, webdriver exclusion and private-route exclusions are unchanged.
+
+surface is ios_app only for an explicit ClinicalEdgeApp/ marker on iOS/iPadOS; heuristic native-app detection is unknown, not proof of CE identity. Other browser activity is web. No user agent is added to payloads. Existing installed wrappers without the explicit marker cannot be reliably separated. No new processor or sensitive-content category is introduced; consent version 4 remains applicable. App Store disclosure review must confirm the existing product-interaction/device-ID declarations cover these additional metadata fields before release.
+
+Tests use isolated capture endpoints/mocks, never real PostHog traffic. A simulated iPhone/WebView is not physical-iPhone verification.
+
 This candidate replaces the Vercel Analytics frontend collector with one manual PostHog capture integration. It has no PostHog SDK, automatic pageviews, click capture, session replay, input capture or backend analytics endpoint. The public project token and regional capture host must both be configured before events can be sent. Never use a personal API key in the frontend.
 
 ## Release configuration

@@ -1,5 +1,6 @@
 import './shift8.css';
 import { useEffect, useRef, useState } from 'react';
+import { useReleasedShiftAnalytics } from '../useReleasedShiftAnalytics.js';
 import { ClinicalEdgeMark } from '../../../components/ModuleHeader.jsx';
 import RoomScene from './RoomScene.jsx';
 import { DecisionWhy, FeedbackEvidence } from './DecisionFeedback.jsx';
@@ -87,6 +88,8 @@ function Debrief({ state, openPractice }) {
 export default function Shift8() {
   const [saved, update] = useSaved('main'), [mode, setMode] = useState('main'), [restart, setRestart] = useState(false), heading = useRef(null), decisions = useRef(null);
   const s = saved.value, stage = s?.stage;
+  const analyticsStages = s ? stageList(s) : [];
+  useReleasedShiftAnalytics('code-blue', VERSION, analyticsStages.indexOf(stage), analyticsStages.length - 1, Boolean(s && choices(s)?.length) || ['summary', 'handoff', 'synthesis'].includes(stage), mode === 'main');
   useEffect(() => { heading.current?.focus({ preventScroll: true }); const scrollRoot = heading.current?.closest('.ce-shift-feature'); if (scrollRoot) scrollRoot.scrollTop = 0; else window.scrollTo({ top: 0, behavior: 'instant' }); }, [stage, mode]);
   const resultVisible = mode === 'main' && (stage === 'safety' && Boolean(s?.feedback) || stage === 'given' && Boolean(s?.answers.recordedEvent));
   useEffect(() => {
@@ -172,6 +175,6 @@ export default function Shift8() {
         {stage === 'priya' && s.opening.waiting && <TeamBoard key={stage} state={s} onPerson={person} onDraft={id => draft(stage, id)} onRequest={id => update(n => submitChoice(n, id))} />}
         {options.length > 0 && stage !== 'priya' && <div ref={decisions}><ChoiceList options={options} value={submitted ? s.feedback.id : selected} locked={submitted} onChange={id => draft(stage, id)} />{!submitted && <button className="s8-primary" disabled={!selected} onClick={() => update(n => submitChoice(n, selected))}>Confirm response →</button>}</div>}
         {submitted && (stage !== 'priya' || s.opening.waiting) && <MomentResponse state={s} next={next} />}
-      </section></Shift8Simulation><Extras state={s} /><p className="s8-save" role="status">{saved.status === 'saved' ? 'Progress stays on this device. No gameplay AI or analytics.' : 'Device storage unavailable. Progress lasts in this open page only.'}</p><small className="s8-muted">{stageList(s).includes(stage) ? 'Fictional education only. Follow your training, role and local protocol in practice.' : ''}</small></main>}
+      </section></Shift8Simulation><Extras state={s} /><p className="s8-save" role="status">{saved.status === 'saved' ? 'Progress stays on this device. No gameplay AI. Optional usage analytics follow your privacy choices.' : 'Device storage unavailable. Progress lasts in this open page only.'}</p><small className="s8-muted">{stageList(s).includes(stage) ? 'Fictional education only. Follow your training, role and local protocol in practice.' : ''}</small></main>}
   </div>;
 }

@@ -1,13 +1,14 @@
 import { hasAnalyticsConsent } from './consent.js';
+import { SHIFT_IDS } from './modules/the-shift/routing.js';
 
 const ID_KEY = 'ce_product_analytics_id';
 const EXCLUDE_KEY = 'ce_product_analytics_exclude';
 const PLAY_PREFIX = 'ce_product_play_';
 const HOSTS = new Set(['https://us.i.posthog.com', 'https://eu.i.posthog.com']);
-const SCENARIOS = new Set(['drowsy-patient', 'monitor-alarm', 'discharge-puzzle', 'conversation', 'which-patient-first']);
+const SCENARIOS = new Set(SHIFT_IDS);
 const DECISION_STAGES = { 'drowsy-patient': [1, 2, 3, 4, 5], 'monitor-alarm': [1, 2, 3, 4, 5, 6], 'discharge-puzzle': [1, 2, 3, 4, 5], conversation: [1, 2, 3, 4, 5], 'which-patient-first': [1, 2, 4, 5, 6] };
 const ROUTES = new Set(['/', '/ask', '/copilot', '/learn', '/learn/shifts', '/shifts', '/rhythm-lab', '/rhythm-lab/library', '/rhythm-lab/practice', '/rhythm-lab/compare', '/rhythm-lab/pearls', '/rhythm-lab/sprint', '/abg-lab', '/reference-hub', '/icu-drips', '/brain-sheets', '/landing', '/privacy', '/choices', '/terms', '/support', '/download', '/scenario', '/quickstart', '/blog']);
-const EVENTS = new Set(['page_viewed', 'feature_opened', 'core_task_failed', 'ask_submitted', 'ask_succeeded', 'ask_failed', 'tool_started', 'tool_completed', 'tool_failed', 'shift_started', 'shift_resumed', 'shift_step_reached', 'shift_decision_reached', 'shift_completed', 'app_store_badge_clicked']);
+const EVENTS = new Set(['page_viewed', 'feature_opened', 'core_task_failed', 'ask_submitted', 'ask_succeeded', 'ask_failed', 'ask_cancelled', 'tool_started', 'tool_completed', 'tool_failed', 'shift_started', 'shift_resumed', 'shift_step_reached', 'shift_decision_reached', 'shift_completed', 'app_store_badge_clicked']);
 const BADGE_PLACEMENTS = new Set(['landing', 'download', 'footer', 'learn']);
 const FEATURES = new Set(['ask', 'shift_brain', 'shift_library', 'rhythm_lab', 'abg_lab', 'references', 'icu_drips', 'brain_sheets']);
 const TOOLS = new Set(['abg', 'rhythm_practice', 'rhythm_sprint', 'reference_search', 'shift_brain']);
@@ -22,13 +23,33 @@ let config = null;
 let lastPage = '';
 const recentFeatureOpen = new Map();
 const pending = new Set();
+let consentEpoch = 0;
+export function beginAskAnalytics(kind, operation = 'question') {
+  if (!allowed()) return () => {};
+  const epoch = consentEpoch, request_id = crypto.randomUUID();
+  const started = trackEvent('ask_submitted', { kind, operation, request_id });
+  let settled = false;
+  return (outcome, reason, status) => {
+    if (settled) return;
+    settled = true;
+    if (!started || epoch !== consentEpoch) return;
+    trackEvent(outcome === 'success' ? 'ask_answered' : outcome === 'failure' ? 'ask_failed' : 'ask_cancelled', { kind, operation, request_id, reason, status });
+  };
+}
+const RETRY_LIMIT = 20;
+export function analyticsSurface() {
+  const ua = navigator.userAgent || '';
+  if (/ClinicalEdgeApp\//.test(ua) && /iPhone|iPad|iPod|Macintosh/.test(ua)) return 'ios_app';
+  if (typeof document !== 'undefined' && document.documentElement.dataset.ceNativeApp === 'true') return 'unknown';
+  return 'web';
+}
 const store = () => { try { return window.localStorage; } catch { return null; } };
 const session = () => { try { return window.sessionStorage; } catch { return null; } };
 const safeToken = value => typeof value === 'string' && /^[a-z0-9][a-z0-9_-]{0,63}$/i.test(value) ? value : null;
 const safeVersion = value => typeof value === 'string' && /^[0-9][0-9a-z.+-]{0,31}$/i.test(value) ? value : null;
 const safeRoute = path => {
   if (ROUTES.has(path)) return path;
-  if (/^\/learn\/shifts\/(drowsy-patient|monitor-alarm|discharge-puzzle|conversation|which-patient-first)$/.test(path)) return path;
+  if (SCENARIOS.has(/^\/learn\/shifts\/([^/]+)$/.exec(path)?.[1])) return path;
   if (/^\/brain-sheets\/[a-z0-9-]+$/.test(path)) return '/brain-sheets/detail';
   if (/^\/blog\/[a-z0-9-]+$/.test(path)) return '/blog/detail';
   return '/other';
@@ -64,6 +85,9 @@ function propertiesFor(event, props) {
   }
   if (event.startsWith('ask_')) {
     result.kind = props.kind === 'followup' ? 'followup' : 'question';
+    if (/^[0-9a-f-]{36}$/.test(props.request_id || '')) result.request_id = props.request_id;
+    if (['question', 'abg_explanation'].includes(props.operation)) result.operation = props.operation;
+    if (['user', 'timeout', 'expired', 'withdrawn', 'unmounted', 'context_changed'].includes(props.reason)) result.reason = props.reason;
     if (event === 'ask_failed' && FAILURES.has(props.failure)) result.failure = props.failure;
   }
   if (event.startsWith('tool_')) {
@@ -74,7 +98,7 @@ function propertiesFor(event, props) {
     if (SCENARIOS.has(props.scenario)) result.scenario = props.scenario;
     if (safeVersion(props.version)) result.version = props.version;
     if (/^[0-9a-f-]{36}$/.test(props.play_id || '')) result.play_id = props.play_id;
-    if (Number.isInteger(props.step) && props.step >= 1 && props.step <= 8) result.step = props.step;
+    if (Number.isInteger(props.step) && props.step >= 1 && props.step <= 64) result.step = props.step;
   }
   return result;
 }
@@ -91,7 +115,8 @@ export function configure({ token, host }) {
 }
 export function syncConsent() {
   if (hasAnalyticsConsent() && !excluded()) return;
-  pending.forEach(controller => controller.abort());
+  consentEpoch++;
+  pending.forEach(controller => { controller.abort(); clearTimeout(controller.retryTimer); clearTimeout(controller.deadline); });
   pending.clear();
   const storage = store();
   storage?.removeItem(ID_KEY);
@@ -114,11 +139,23 @@ export function capture(event, payload = {}, uuid = crypto.randomUUID()) {
   const id = distinctId();
   if (!id) return false;
   const controller = new AbortController();
+  if (pending.size >= RETRY_LIMIT) return false;
   pending.add(controller);
+  const body = JSON.stringify({ api_key: config.token, event, distinct_id: id, uuid, timestamp: new Date().toISOString(), properties: { ...properties, surface: analyticsSurface(), analytics_origin: 'app', $process_person_profile: false } });
+  const finish = () => { clearTimeout(controller.deadline); clearTimeout(controller.retryTimer); pending.delete(controller); };
+  controller.deadline = setTimeout(() => { controller.abort(); finish(); }, 5000);
+  const send = async attempt => {
+    if (!allowed() || controller.signal.aborted) { finish(); return; }
+    try {
+      const response = await fetch(`${config.host}/i/v0/e/`, { method: 'POST', credentials: 'omit', referrerPolicy: 'no-referrer', keepalive: true, headers: { 'Content-Type': 'application/json' }, body, signal: controller.signal });
+      if (response.ok) { finish(); return; }
+      if (response.status !== 429 && response.status < 500) { finish(); return; }
+    } catch { /* Retry only this sanitized payload, never gameplay or AI work. */ }
+    if (!attempt && allowed() && !controller.signal.aborted) controller.retryTimer = setTimeout(() => send(1), 500);
+    else finish();
+  };
   try {
-    fetch(`${config.host}/i/v0/e/`, { method: 'POST', credentials: 'omit', referrerPolicy: 'no-referrer', keepalive: true, headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ api_key: config.token, event, distinct_id: id, uuid, properties: { ...properties, analytics_origin: 'app', $process_person_profile: false } }), signal: controller.signal })
-      .catch(() => {}).finally(() => pending.delete(controller));
+    void send(0);
   } catch { pending.delete(controller); return false; }
   return true;
 }
@@ -141,9 +178,11 @@ export function trackEvent(name, data = {}) {
     if (recorded) recentFeatureOpen.set(key, Date.now());
     return recorded;
   }
-  if (name === 'ask_submitted') return capture('ask_submitted', { kind: data.kind });
-  if (name === 'ask_answered') return capture('ask_succeeded', { kind: data.kind });
-  if (name === 'ask_failed') return capture('ask_failed', { kind: data.kind, failure: data.status === 429 ? 'limit' : data.status === 0 ? 'network' : data.status >= 500 ? 'server' : 'withheld_or_rejected' });
+  const request = { kind: data.kind, request_id: data.request_id, operation: data.operation, reason: data.reason };
+  if (name === 'ask_submitted') return capture('ask_submitted', request);
+  if (name === 'ask_answered') return capture('ask_succeeded', request);
+  if (name === 'ask_cancelled') return capture('ask_cancelled', request);
+  if (name === 'ask_failed') return capture('ask_failed', { ...request, failure: data.status === 429 ? 'limit' : data.status === 0 ? 'network' : data.status >= 500 ? 'server' : 'withheld_or_rejected' });
   if (name === 'abg_interpreted') return capture('tool_completed', { tool: 'abg' });
   if (name === 'abg_example_used') return capture('tool_started', { tool: 'abg' });
   if (name === 'rhythm_practice_reveal') return capture('tool_completed', { tool: 'rhythm_practice' });
@@ -168,6 +207,7 @@ export function shiftProgress(scenario, version, previous, current, finalStage) 
   const key = PLAY_PREFIX + scenario;
   let play;
   try { play = JSON.parse(storage.getItem(key) || 'null'); } catch { play = null; }
+  if (!play && current.stage === finalStage && (!previous || previous.stage === finalStage)) return;
   if (previous?.stage > 0 && current.stage === 0) { storage.removeItem(key); session()?.removeItem(key); return; }
   if (current.stage === 0) return;
   if (!play) {
@@ -181,7 +221,7 @@ export function shiftProgress(scenario, version, previous, current, finalStage) 
   if (current.stage > play.stage) {
     play.stage = current.stage;
     capture('shift_step_reached', { scenario, version, play_id: play.id, step: current.stage + 1 });
-    if (DECISION_STAGES[scenario].includes(current.stage)) capture('shift_decision_reached', { scenario, version, play_id: play.id, step: current.stage + 1 });
+    if (current.decision === true || DECISION_STAGES[scenario]?.includes(current.stage)) capture('shift_decision_reached', { scenario, version, play_id: play.id, step: current.stage + 1 });
   }
   if (current.stage === finalStage && !play.completed) {
     play.completed = true;

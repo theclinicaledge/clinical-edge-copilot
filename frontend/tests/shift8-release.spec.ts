@@ -44,7 +44,7 @@ test('public library entry, source record, direct route and saved progress work 
   expect(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth)).toBe(true);
   await page.screenshot({path:`/tmp/shift8-release-${info.project.name}-debrief.png`,fullPage:true});
   expect(errors).toEqual([]);expect(clinicalCalls).toEqual([]);
-  expect(shift8Entry.contentVersion).toBe('0.8.1');expect(shift8Entry.analytics).toBe(false);
+  expect(shift8Entry.contentVersion).toBe('0.8.1');expect(shift8Entry.analytics).toBe(true);
 });
 test('existing scenarios and local records remain accessible and unchanged',async({page})=>{
   const sentinel={one:'keep-one',nine:'keep-nine',legacy:'{"version":"0.7","original":"keep"}'};

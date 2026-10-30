@@ -4,7 +4,7 @@ import { SHIFT6_ID } from './feature.js';
 
 export const shift6Entry = {
   id: SHIFT6_ID, scenarioId: SCENARIO_ID, contentVersion: VERSION, number: '06', title,
-  specialty: card.specialty, difficulty: 'Foundations', duration: card.estimatedTime, analytics: false,
+  specialty: card.specialty, difficulty: 'Foundations', duration: card.estimatedTime, analytics: true,
   description: card.coreLesson,
   learnerLevels: ['Student', 'New grad'], decisionCount: card.decisionCount,
   objectives: card.objectives, concepts: card.concepts, judgmentSteps: card.judgmentSteps,

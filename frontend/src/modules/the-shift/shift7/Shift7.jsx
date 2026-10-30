@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState } from 'react';
+import { useReleasedShiftAnalytics } from '../useReleasedShiftAnalytics.js';
 import { VERSION, KEY, stages, findings, protocol, actions, people, questions, rewinds, sources } from './data.js';
 import { fresh, read, discovered, events, handoffChips, handoffResult, historyGaps, openingResult, openingGaps } from './rules.js';
 import Artwork from './Artwork.jsx';
@@ -32,6 +33,7 @@ export default function Shift7() {
  const heading = useRef(null), dialog = useRef(null);
  const update = patch => setP(previous => ({ ...previous, ...patch, updated: Date.now() }));
  const next = () => { setEvidenceReturn(null); update({ stage: p.stage + 1 }); };
+ useReleasedShiftAnalytics('missing-time', VERSION, p.stage, stages.length - 1, p.stage > 0 && p.stage < stages.length - 1);
  useEffect(() => { try { localStorage.setItem(KEY, JSON.stringify(p)); } catch { queueMicrotask(() => setStorageFailed(true)); } }, [p]);
  useEffect(() => { heading.current?.focus({ preventScroll: true }); heading.current?.scrollIntoView({ block: 'start', behavior: 'instant' }); }, [p.stage]);
  useEffect(() => { if (reset) dialog.current?.showModal(); }, [reset]);

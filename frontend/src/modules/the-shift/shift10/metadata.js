@@ -5,7 +5,7 @@ import { read } from './state.js';
 export const shift10Entry = {
   id: 'transfer-not-ready', scenarioId: 'SHIFT-010', contentVersion: '0.2', number: '10',
   title: "The Transfer That Isn't Ready", specialty: 'Med-Surg', difficulty: 'Clinical reasoning',
-  duration: '10 to 11 minutes', analytics: false,
+  duration: '10 to 11 minutes', analytics: true,
   description: 'Receive an ED report, prepare the room and take over care when Ruth arrives.',
   objectives: ['Clarify an incoming report and review available records.', 'Assess the arriving patient and obtain baseline information.', 'Communicate discovered findings and name follow-up ownership.'],
   interactions: ['interruptible-report', 'record-review', 'room-preparation', 'receiving-assessment', 'provider-call', 'debrief'],

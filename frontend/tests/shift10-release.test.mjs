@@ -31,11 +31,11 @@ test('library progress uses the unchanged event replay and preserves unrelated s
     assert.equal(saved.get('existing-save'),'unchanged');
   } finally { delete globalThis.localStorage; }
 });
-test('release retains protected clinical code and does not enable new analytics', () => {
+test('release retains protected clinical code and permits consented usage analytics', () => {
   const sha=file=>createHash('sha256').update(readFileSync(new URL(`../src/modules/the-shift/shift10/${file}`,import.meta.url))).digest('hex');
   assert.equal(sha('content.js'),'0ae53d808bb0bb89c1f8c34b84f8fdaa334bd5d8119fc4cc2a89d5cdf2b377ee');
   assert.equal(sha('state.js'),'d290970b56daed6b244c25eb5753aac1105e7b95ffb3792fae874f50f0d024d7');
-  assert.equal(item.analytics,false); assert.equal(item.review.reviewer,null); assert.equal(item.review.reviewDate,null);
+  assert.equal(item.analytics,true); assert.equal(item.review.reviewer,null); assert.equal(item.review.reviewDate,null);
   assert.match(item.review.status,/Founder reports independent clinical review/);
   assert.match(item.review.sourceVerification,/No signed reviewer record/);
   assert.ok(item.sources.every(s=>s.url.startsWith('https://')&&s.limitation));

@@ -50,7 +50,7 @@ function Result({ result, bare = false }) {
 function Feedback({ result, feedback, corrections = [], children, onContinue, nextLabel, sources = [] }) {
   const ref = useRef(null);
   useEffect(() => { ref.current?.focus({ preventScroll: true }); ref.current?.scrollIntoView({ block: 'nearest' }); }, []);
-  return <section ref={ref} tabIndex={-1} className={`shift-feedback ${toneFor(result)}`} aria-label="Decision feedback">
+  return <section ref={ref} tabIndex={-1} className={`shift-feedback ${toneFor(result)}`} aria-label="Decision feedback" id="s9-feedback">
     <div className="shift-feedback-heading"><span className="shift-feedback-mark" aria-hidden="true">{markFor(result)}</span><h3>{result}</h3>{credit(result) === 'partial' && <span className="s6-partial-note">Partially correct</span>}</div>
     {feedback && <p>{feedback}</p>}
     {corrections.map(choice => <div className="shift-correction" key={choice.id}><strong>{choice.text}</strong><p>{choice.feedback}</p></div>)}
@@ -158,6 +158,7 @@ export default function Shift9() {
       {progress.stage >= 2 && <aside className="shift-assignment"><span className="shift-overline">Your assignment</span><div className="shift-patients">{assignment.patients.map(patient => <button key={patient.room} onClick={() => setRoom(patient.room)} className={`shift-patient-tab ${{ 2: '22', 3: '22', 4: '21', 5: '23' }[progress.stage] === patient.room ? 'is-current' : ''}`} aria-label={`Open Room ${patient.room} report`}><RoomNumber id={patient.room} /><span><strong>{patient.name}</strong><small>Report</small></span></button>)}</div><div className="shift-assignment-note"><span>SHIFT 09 / TELEMETRY</span><strong>{stages[0].title}</strong><p>Fictional patients. No speed scoring.</p></div></aside>}
       <main id="shift-main" className="shift-scene">
         <div className="shift-scene-heading"><span className="shift-overline">{stage.decision ? `Decision ${progress.stage} of ${card.decisionCount}` : progress.stage === FINAL_STAGE ? 'End of shift' : `Shift 09 / ${card.estimatedTime}`}</span><h1 ref={heading} tabIndex={-1}>{stage.title}</h1></div>
+        {stage.decision && <div className="s9-decision-nav"><p>{answers[stage.decision] !== undefined ? 'Your original response is saved. Review the feedback to continue.' : progress.stage === 1 ? d1.prompt : 'Explore the findings in any order, then choose and confirm your response.'}</p><a href={answers[stage.decision] !== undefined ? '#s9-feedback' : `#s9-d${progress.stage}-prompt`}>{answers[stage.decision] !== undefined ? 'Review feedback' : 'Go to decision'} <span aria-hidden="true">↓</span></a></div>}
 
         {progress.stage === 0 && <>
           <p className="shift-lead">{assignment.intro}</p>
@@ -173,7 +174,7 @@ export default function Shift9() {
             <Strip id={id} answered={id !== d1.strip || progress.closer || answers.d1 !== undefined}>{id === d1.strip && <div className="s9-look-closer"><button className="shift-secondary" aria-expanded={progress.closer} aria-controls="s9-closer" onClick={() => update({ closer: !progress.closer })}>{progress.closer ? 'Close examination' : 'Look closer'} <span aria-hidden="true">&#8981;</span></button>
               {progress.closer && <p id="s9-closer"><span className="shift-overline">Look closer (unscored)</span>{d1.lookCloser}</p>}</div>}</Strip>
           </div>)}</div>
-          <h2 className="s6-prompt" id="s9-d1-prompt">{d1.prompt}</h2>
+          <h2 className="s6-prompt" id="s9-d1-prompt" tabIndex={-1}>{d1.prompt}</h2>
           <AssignTeam name="s9-d1" tokens={TOKENS} targets={TARGETS} value={answers.d1 ?? progress.placement} disabled={answers.d1 !== undefined}
             onChange={(token, target) => setProgress(previous => previous.answers.d1 ? previous : { ...previous, placement: { ...previous.placement, [token]: target } })} />
           {!answers.d1 && <div className="shift-cue-confirm"><p role="status">{placed === TOKENS.length ? 'Everyone is placed. Submit when ready.' : `${placed} of ${TOKENS.length} placed.`}</p><button className="shift-primary" disabled={!validPlacement(progress.placement)} onClick={() => choose('d1', { ...progress.placement })}>Submit<Arrow /></button></div>}
@@ -209,7 +210,7 @@ export default function Shift9() {
             return <li key={id}><button aria-expanded={open} aria-controls={`s9-step-${id}`} onClick={() => update({ steps: open ? progress.steps.filter(step => step !== id) : [...progress.steps, id] })}><span className="s9-step-index" aria-hidden="true">0{index + 1}</span><strong>{name}</strong><span aria-hidden="true">{open ? '−' : '+'}</span></button>
               {open && <dl id={`s9-step-${id}`} className="s9-step-compare"><div><dt>1430</dt><dd>{then}</dd></div><div><dt>1508</dt><dd>{now}</dd></div></dl>}</li>;
           })}</ul>
-          <h2 className="s6-prompt">{d2.prompt}</h2>
+          <h2 className="s6-prompt" id="s9-d2-prompt" tabIndex={-1}>{d2.prompt}</h2>
           <Choices items={d2.choices} answer={answers.d2} selected={progress.drafts.d2} label="Calls" onChoose={id => select('d2', id)} />
           {confirm('d2')}
           {answers.d2 && <Feedback result={d2Choice(answers.d2).result} feedback={d2Choice(answers.d2).feedback} corrections={corrections(d2.choices, d2Choice(answers.d2))} onContinue={next} nextLabel="The 12-lead prints" sources={d2.sources}><blockquote>{d2.teaching}</blockquote>{guidedAfter('d2', answers) && <Bridge text={d2.bridge} />}</Feedback>}
@@ -218,7 +219,7 @@ export default function Shift9() {
         {progress.stage === 3 && <>
           <p className="shift-lead">{d3.scene}</p>
           <Strip id={d3.strip} answered={answers.d3 !== undefined} />
-          <h2 className="s6-prompt">{d3.prompt}</h2>
+          <h2 className="s6-prompt" id="s9-d3-prompt" tabIndex={-1}>{d3.prompt}</h2>
           <Choices items={d3.choices} answer={answers.d3} selected={progress.drafts.d3} label="Readings" onChoose={id => select('d3', id)} />
           {confirm('d3')}
           {answers.d3 && <Feedback result={d3Choice(answers.d3).result} feedback={d3Choice(answers.d3).feedback} corrections={corrections(d3.choices, d3Choice(answers.d3))} onContinue={next} nextLabel="Go to Room 21" sources={d3.sources}>
@@ -231,7 +232,7 @@ export default function Shift9() {
 
         {progress.stage === 4 && <>
           <div className="shift-situation"><span className="shift-overline">Room 21 / {d4.time}</span>{d4.scene.map(text => <p key={text}>{text}</p>)}<p className="s9-quote">{d4.quote}</p></div>
-          <h2 className="s6-prompt">{d4.prompt}</h2>
+          <h2 className="s6-prompt" id="s9-d4-prompt" tabIndex={-1}>{d4.prompt}</h2>
           <TherapeuticResponse items={d4.choices} answer={answers.d4} selected={progress.drafts.d4} label="Responses" onChoose={id => select('d4', id)} answeredClass={answeredClass} />
           {confirm('d4')}
           {answers.d4 && <Feedback result={d4Choice(answers.d4).result} feedback={d4Choice(answers.d4).feedback} corrections={corrections(d4.choices, d4Choice(answers.d4))} onContinue={next} nextLabel="Go to Room 23" sources={d4.sources}>
@@ -245,7 +246,7 @@ export default function Shift9() {
         {progress.stage === 5 && <>
           <div className="shift-situation"><span className="shift-overline">Room 23 / {d5.time}</span><p>{assigned?.marcoAt === '21' ? `${d5.marcoMoved} ${d5.vitalsLead}` : assigned?.marcoAt === '22' ? `${d5.marcoMoved22} ${d5.vitalsLead}` : d5.vitalsLeadAlone} {d5.vitals} {d5.scene}</p></div>
           <Strip id={d5.strip} answered={answers.d5 !== undefined} />
-          <h2 className="s6-prompt">{d5.prompt}</h2>
+          <h2 className="s6-prompt" id="s9-d5-prompt" tabIndex={-1}>{d5.prompt}</h2>
           <Choices items={d5.choices} answer={answers.d5} selected={progress.drafts.d5} label="Calls" onChoose={id => select('d5', id)} />
           {confirm('d5')}
           {answers.d5 && <Feedback result={d5Choice(answers.d5).result} feedback={d5Choice(answers.d5).feedback} corrections={corrections(d5.choices, d5Choice(answers.d5))} onContinue={next} nextLabel="Finish the shift" sources={d5.sources}><blockquote>{d5.teaching}</blockquote>{guidedAfter('d5', answers) && <Bridge text={d5.bridge} />}</Feedback>}
@@ -254,13 +255,14 @@ export default function Shift9() {
         {progress.stage === FINAL_STAGE && <>
           <div className="shift-complete"><span><Check /></span><p>{stages[FINAL_STAGE].title}</p></div>
           {anyGuided(answers) && <p className="s6-bridge"><strong>Scripted outcome after guided corrections.</strong> {debrief.guidedNote}</p>}
-          <section className="shift-debrief-section"><h2>How the afternoon unfolded</h2><ol className="shift-timeline">{debrief.outcome.map(events => <li key={events.map(([time]) => time).join('-')}><time>{events[0][0]}</time><p>{events.map(([time, text], index) => <span key={time + index}>{index > 0 && <> <strong>{time}</strong> </>}{text}</span>)}</p></li>)}</ol></section>
+
           <section className="shift-debrief-section"><span className="shift-overline">Personalized shift review</span><h2>Your shift review</h2><ul className="shift-reflections s6-review">{stages.filter(item => item.decision).map(item => {
             const { result, credit: earned } = results[item.decision];
             const line = reviewLine(item.decision, answers);
             const full = earned === 'full';
             return <li key={item.decision}><span className={`shift-result-mark ${full ? 'is-recognized' : earned === 'partial' ? 's6-is-partial' : ''}`} aria-label={full ? 'Correct' : earned === 'partial' ? 'Partially correct' : 'Revisit'}>{markFor(result)}</span><div><small>{item.label}</small><strong>{line.text}</strong><p><Result result={result} />{line.concept && <span className="s6-concept">Concept to strengthen: {line.concept}</span>}</p></div></li>;
           })}</ul><p className="shift-small">Learning reflection, not a clinical competency score.</p></section>
+          <section className="shift-debrief-section"><h2>How the afternoon unfolded</h2><ol className="shift-timeline">{debrief.outcome.map(events => <li key={events.map(([time]) => time).join('-')}><time>{events[0][0]}</time><p>{events.map(([time, text], index) => <span key={time + index}>{index > 0 && <> <strong>{time}</strong> </>}{text}</span>)}</p></li>)}</ol></section>
           <section className="shift-takeaways s6-takeaways" aria-label="Takeaways">{debrief.takeaways.map((text, index) => <div key={text}><span>0{index + 1}</span><p>{text}</p></div>)}</section>
           <section className="shift-debrief-section"><h2>Why it happens</h2><ul className="shift-why">{debrief.why.map(([text, numbers]) => <li key={text}>{text} {numbers.map(number => <a key={number} className="s6-source-ref" href={SOURCES[number].url} target="_blank" rel="noreferrer">[Source {number}]</a>)}</li>)}</ul></section>
           <section className="shift-debrief-section"><h2>Go further</h2><div className="shift-next-tools"><div><span>ASK CLINICAL EDGE</span><strong>Ask why</strong><p>{debrief.ask}</p><div className="shift-ask-links"><button className="shift-text-button" onClick={() => copy(debrief.ask)}>{copied === 'question' ? 'Question copied' : 'Copy question'}</button><a href="/ask" target="_blank" rel="noreferrer">Open Ask <span aria-hidden="true">&#8599;</span></a></div><small>Counts toward the daily Ask limit when submitted. Existing consent applies.</small></div><div><span>PLAY AGAIN</span><strong>Restart this scenario</strong><button className="shift-secondary" onClick={() => setRestartOpen(true)}>Play again <span aria-hidden="true">&#8634;</span></button></div></div>
@@ -275,7 +277,7 @@ export default function Shift9() {
     </div>
     <dialog ref={dialog} className="shift-dialog" onCancel={() => { setRoom(null); setRestartOpen(false); }} aria-labelledby="s9-dialog-title">
       <button className="shift-dialog-close" aria-label="Close dialog" onClick={closeDialog}>&times;</button>
-      {restartOpen ? <><span className="shift-overline">New attempt</span><h2 id="s9-dialog-title">Restart this shift?</h2><p>This clears only this scenario's saved progress and choices.</p><div className="shift-dialog-actions"><button className="shift-secondary" onClick={closeDialog}>Keep my place</button><button className="shift-primary" onClick={restart}>Restart <span aria-hidden="true">&#8634;</span></button></div></> : selectedPatient && <><RoomNumber id={selectedPatient.room} /><h2 id="s9-dialog-title">Room {selectedPatient.room} report</h2><p>{selectedPatient.summary}</p><p>{selectedPatient.report}</p><p>{selectedPatient.vitals}</p><button className="shift-secondary" onClick={closeDialog}>Return to the shift <Arrow /></button></>}
+      {restartOpen ? <><span className="shift-overline">New attempt</span><h2 id="s9-dialog-title">Restart this shift?</h2><p>This clears only this scenario's saved progress and choices.</p><div className="shift-dialog-actions"><button className="shift-secondary" onClick={closeDialog}>Keep my place</button><button className="shift-primary" onClick={restart}>Restart <span aria-hidden="true">&#8634;</span></button></div></> : selectedPatient && <><RoomNumber id={selectedPatient.room} /><h2 id="s9-dialog-title">Room {selectedPatient.room} report</h2><p className="s9-report-context">Starting report, not an updated assessment.</p><p>{selectedPatient.summary}</p><span className="shift-overline">Report from the off-going nurse</span><p>{selectedPatient.report}</p><span className="shift-overline">Starting vitals / {STRIPS[selectedPatient.strip].time}</span><p>{selectedPatient.vitals}</p><button className="shift-secondary" onClick={closeDialog}>Return to the shift <Arrow /></button></>}
     </dialog>
   </div>;
 }

@@ -1,6 +1,6 @@
 # Shift 09 ECG illustrations
 
-Generator and validator for the eleven constructed ECG images used by Shift 09 ("The Quiet Complaint"). These are teaching illustrations, not patient recordings, and they are not part of the app bundle. The app uses only the PNGs written to `frontend/src/modules/the-shift/shift9/assets/`.
+Generator and validator for the eleven constructed ECG images used by Shift 09 ("The Loud Distraction"). These are teaching illustrations, not patient recordings, and they are not part of the app bundle. The app uses only the PNGs written to `frontend/src/modules/the-shift/shift9/assets/`.
 
 Needs Python 3.10 or newer (tested on 3.12). On a Mac whose system Python is 3.9, use Homebrew's `python@3.12` in a virtual environment:
 

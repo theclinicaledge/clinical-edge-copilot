@@ -1,4 +1,4 @@
-// SHIFT-009 v0.10, "The Quiet Complaint". Learner-facing text follows docs/SHIFT_009_SPEC_v0.10.md: the v0.7 spec plus
+// SHIFT-009 v0.10, "The Loud Distraction" (titled "The Quiet Complaint" until 30 Oct 2026). Learner-facing text follows docs/SHIFT_009_SPEC_v0.10.md: the v0.7 spec plus
 // the audit corrections (v0.8), the regenerated ECGs and 12-lead views (v0.9), and per-person D1 feedback (v0.10). Review status:
 // founder clinical sign-off of v0.10 recorded 28 Oct 2026; independent clinical and psych specialty review reported by the founder (28 Oct 2026).
 // ECG images passed founder review on 29 Oct 2026 (founder-attested). No independent specialist ECG validation is recorded.
@@ -7,7 +7,7 @@
 
 export const SCENARIO_ID = 'SHIFT-009';
 export const VERSION = '0.10';
-export const title = 'The Quiet Complaint';
+export const title = 'The Loud Distraction';
 
 // Keyed by spec source number so a citation can be swapped without touching learner-facing text.
 export const SOURCES = {

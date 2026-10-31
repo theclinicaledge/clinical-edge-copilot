@@ -8,7 +8,7 @@ test('catalog is numerical without changing released artwork', async ({ page }) 
   const cards = page.locator('.shift-library-card');
   const numbers = await cards.allTextContents();
   expect(numbers.map(text => Number(text.match(/SHIFT\s+(\d+)/i)?.[1]))).toEqual([1,2,3,4,5,6,7,8,9,10]);
-  await expect(cards.filter({hasText:'The Quiet Complaint'}).locator('img')).toBeVisible();
+  await expect(cards.filter({hasText:'The Loud Distraction'}).locator('img')).toBeVisible();
 });
 test('optional decision and feedback navigation preserve the saved answer', async ({ page }) => {
   await page.emulateMedia({ reducedMotion: 'reduce' });

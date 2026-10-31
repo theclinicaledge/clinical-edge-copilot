@@ -30,7 +30,7 @@ test.describe('Shift 09', () => {
 
   test('library lists Shift 09 under All settings and Telemetry, with the founder review record', async ({ page }) => {
     await page.goto('/learn/shifts');
-    const card = () => page.locator('.shift-library-card').filter({ hasText: 'The Quiet Complaint' });
+    const card = () => page.locator('.shift-library-card').filter({ hasText: 'The Loud Distraction' });
     await page.getByRole('button', { name: /Show more shifts/ }).click();
     await expect(card()).toContainText('Telemetry / Clinical judgment');
     await expect(card()).toContainText('SHIFT 09');

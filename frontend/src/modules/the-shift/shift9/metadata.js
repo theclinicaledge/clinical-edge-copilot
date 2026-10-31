@@ -24,7 +24,7 @@ export const shift9Entry = {
   openItems: OPEN_ITEMS,
   storageKey: STORAGE_KEY, readProgress, finalStage: FINAL_STAGE,
   stageTitle: state => stages[state.stage].label,
-  // Library poster: a central monitor and a quiet call light (tools/shift9-ecg/thumbnail.py). Decorative on the card,
+  // Library poster: a centered central monitor with three rooms (tools/shift9-ecg/thumbnail.py). Decorative on the card,
   // whose title carries the meaning, so the image itself has empty alt text like the other Shift posters.
   image: new URL('./poster.svg', import.meta.url).href, imageAlt: '',
   askQuestion: debrief.ask,

@@ -1,10 +1,11 @@
-"""Library thumbnail for Shift 09 ("The Quiet Complaint"): a central telemetry monitor with three rooms.
+"""Library thumbnail for Shift 09 ("The Loud Distraction"): a centered central telemetry monitor with three rooms.
 
 Usage (from the repo root): python tools/shift9-ecg/thumbnail.py
 Writes frontend/src/modules/the-shift/shift9/poster.svg (720 x 360, the poster size other Shifts use).
 
-Room 21 is loud (artifact, then LEADS OFF under a gold alarm), Room 22 is quiet (a calm-looking sinus trace and a
-softly lit call light), Room 23 is irregular (AF spacing, no P waves). The traces come from ecg_model.py, simplified
+Room 21 is loud (artifact, then LEADS OFF under a gold alarm), Room 22 is quiet (a calm-looking sinus trace),
+Room 23 is irregular (AF spacing, no P waves). The monitor is centered on the card (30 Oct 2026: the call light beside
+it was removed). The traces come from ecg_model.py, simplified
 for small sizes. Room 22's ST lift is kept subtle so the card doesn't announce the scenario's twist.
 """
 import os
@@ -62,10 +63,11 @@ t, y = em.render(SPAN, r, dict(p_on=False, p=0.0, q=-0.04, r=0.95, s=-0.15, tw=0
 room23 = path(t, y, 264)
 
 svg = f'''<svg xmlns="http://www.w3.org/2000/svg" width="720" height="360" viewBox="0 0 720 360" role="img" aria-labelledby="title desc">
-  <title id="title">A telemetry central monitor and a quiet call light</title>
-  <desc id="desc">Original fictional illustration. A central monitor shows three rooms: Room 21 has wavy artifact, then a flat line under a gold LEADS OFF alarm; Room 22 shows a calm-looking regular trace; Room 23 shows an irregular trace. Beside it, Room 22's call light glows softly. Not a patient recording.</desc>
+  <title id="title">A telemetry central monitor</title>
+  <desc id="desc">Original fictional illustration. A central monitor shows three rooms: Room 21 has wavy artifact, then a flat line under a gold LEADS OFF alarm; Room 22 shows a calm-looking regular trace; Room 23 shows an irregular trace. Not a patient recording.</desc>
   <rect width="720" height="360" fill="#e8e3d8"/>
   <path d="M0 330H720" stroke="#d6d0c4" stroke-width="2"/>
+  <g transform="translate(62 0)">
   <rect x="44" y="40" width="508" height="276" rx="16" fill="#cfc8ba"/>
   <rect x="44" y="32" width="508" height="276" rx="16" fill="#0b1f2a"/>
   <rect x="58" y="70" width="480" height="226" rx="8" fill="#10303d"/>
@@ -83,13 +85,7 @@ svg = f'''<svg xmlns="http://www.w3.org/2000/svg" width="720" height="360" viewB
   <g fill="none" stroke="#d4a84b" stroke-width="4" stroke-linecap="round">
     <path d="M474 89Q482 99 474 109"/><path d="M488 82Q501 99 488 116"/><path d="M502 75Q520 99 502 123"/>
   </g>
-  <rect x="592" y="108" width="92" height="160" rx="14" fill="#fffdf8" stroke="#d6d0c4" stroke-width="2"/>
-  <circle cx="638" cy="168" r="40" fill="#0abfbc" fill-opacity=".10"/>
-  <circle cx="638" cy="168" r="28" fill="#0abfbc" fill-opacity=".18"/>
-  <circle cx="638" cy="168" r="17" fill="#0abfbc"/>
-  <circle cx="632" cy="162" r="5" fill="#fffdf8" fill-opacity=".55"/>
-  <text x="638" y="238" font-family="'IBM Plex Mono', Menlo, monospace" font-size="20" font-weight="700" fill="#0b1f2a" text-anchor="middle">22</text>
-  <text x="638" y="256" font-family="'IBM Plex Mono', Menlo, monospace" font-size="10" font-weight="600" letter-spacing="1" fill="#526174" text-anchor="middle">CALL</text>
+  </g>
 </svg>
 '''
 with open(OUT, 'w') as fh:

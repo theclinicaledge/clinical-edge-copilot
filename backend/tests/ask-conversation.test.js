@@ -167,7 +167,7 @@ test('identifiers and Snapshot/history injection rejected before provider',()=>s
 }));
 test('invalid reviewer response is withheld and never added to educational history',()=>setup(async({post,routes})=>{
   const c=await post('/consent',{accepted:true,version:CONSENT_VERSION});const cookie=(await c.json()).receipt;
-  const r=await post('/preview',{question:'Explain ventricular filling physiology.'},cookie);assert.equal(r.status,422);assert.equal((await r.json()).answer,undefined);
+  const r=await post('/preview',{question:'Explain ventricular filling physiology.'},cookie);assert.equal(r.status,502);assert.equal((await r.json()).answer,undefined);
   assert.equal([...routes.sessions.values()][0].history.length,0);
 },{failReview:true}));
 test('explicit reset clears history; withdrawal and expiry invalidate consent server-side',()=>setup(async({post,url,requests,routes})=>{
@@ -235,7 +235,7 @@ test('expiry during generation prevents the review provider and answer delivery'
     const c=await post('/consent',{accepted:true,version:CONSENT_VERSION});const receipt=(await c.json()).receipt;
     session=[...routes.sessions.values()][0];
     const r=await post('/preview',{question:'Explain ventricular filling.'},receipt);
-    assert.equal(r.status,422);assert.equal(requests.length,2);assert.equal((await r.json()).answer,undefined);
+    assert.equal(r.status,403);assert.equal(requests.length,2);assert.equal((await r.json()).answer,undefined);
     assert.equal(session.history.length,0);
   },{onRequest:async(_params,n)=>{if(n===2)session.expires=Date.now()-1;}});
 });
@@ -338,7 +338,7 @@ const restrictedContextQuestions=[
 for(const [name,question,intent,decision] of restrictedContextQuestions){
   test(`mocked contextual ${name} cannot reach generation`,()=>setup(async({post,requests,routes,logs})=>{
     const c=await post('/consent',{accepted:true,version:CONSENT_VERSION});const receipt=(await c.json()).receipt;
-    const r=await post('/preview',{question},receipt);assert.equal(r.status,403);
+    const r=await post('/preview',{question},receipt);assert.equal(r.status,decision==='uncertain'?422:403);
     const body=await r.json();assert.equal(body.admission.intent,intent);assert.equal(body.answer,undefined);
     assert.equal(requests.length,1);assert.equal(requests[0].system,ADMISSION_PROMPT);
     assert.equal(JSON.parse(requests[0].messages[0].content).question,question);
@@ -366,6 +366,6 @@ test('prior contextual education does not authorize a care-decision follow-up',(
 test('admitted contextual education still fails closed if complete-answer review is invalid',()=>setup(async({post,requests,routes})=>{
   const c=await post('/consent',{accepted:true,version:CONSENT_VERSION});const receipt=(await c.json()).receipt;
   const r=await post('/preview',{question:contextualQuestions[0][1]},receipt);
-  assert.equal(r.status,422);assert.equal((await r.json()).answer,undefined);assert.equal(requests.length,3);
+  assert.equal(r.status,502);assert.equal((await r.json()).answer,undefined);assert.equal(requests.length,3);
   assert.equal([...routes.sessions.values()][0].history.length,0);
 },{contextual:true,unverified:true,failReview:true}));

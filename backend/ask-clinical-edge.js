@@ -52,14 +52,17 @@ function validateAskAnswer(raw, { requireStructured = false, policy = null } = {
   const content = [answer, ...details.map(d => d.text)].join('\n\n');
   if (content.length > 7000 || /```/.test(content)) return { answer: null, codes: ['invalid_answer_schema'] };
   const codes = [];
+  // List formatting must not hide an otherwise prohibited action. The answer
+  // itself, quantities and full semantic-review input remain unchanged.
+  const actionClauses = content.split(/(?:\n|[.!?]\s+)/).map(s => s.replace(/^\s*\d+[.)]\s+(?=[A-Za-z])/, ''));
   // General disease labels, ranges and physiology are intentionally permitted.
   // These guards target individualized assertions/actions, not educational topics.
   if (/\b(?:your|this) patient\s+(?:has|is|was|received|takes|needs)\b/i.test(content)) codes.push('individualized_patient_assertion');
   if (/\b(?:your Snapshot|the active Snapshot|your case history|your records|your earlier (?:BP|blood pressure|results))\b/i.test(content)) codes.push('unavailable_context_claim');
   const actions = /^(?:[-*]\s*)?(?:(?:you (?:should|must)|now)\s+)?(?:give|administer|start|stop|hold|increase|decrease|titrate|bolus|infuse|intubate|transfuse|set|disconnect)\b[^.!?\n]{0,160}\b(?:dose|drug|medication|fluid|oxygen|insulin|heparin|norepinephrine|epinephrine|antibiotic|sedation|ventilator|pacer|pacemaker|bloodline|catheter|mg|mcg|mL|units)\b/im;
-  if (content.split(/(?:\n|[.!?]\s+)/).some(sentence => actions.test(sentence))) codes.push('individualized_treatment_instruction');
-  if (/^(?:[-*]\s*)?(?:disable|bypass)\b[^.!?\n]{0,60}\b(?:alarm|interlock|safety)\b/im.test(content)) codes.push('unsafe_device_instruction');
-  if (content.split(/(?:\n|[.!?]\s+)/).some(s => /^(?:[-*]\s*)?(?:(?:you|the nurse) (?:should|must|can)\s+)?(?:flush|irrigate|clamp|advance|withdraw|reconnect|reverse|reposition)\b[^.!?\n]{0,100}\b(?:tube|lumen|line|catheter|circuit|lead)\b/i.test(s))) codes.push('unverified_device_procedure');
+  if (actionClauses.some(sentence => actions.test(sentence))) codes.push('individualized_treatment_instruction');
+  if (actionClauses.some(s => /^(?:[-*]\s*)?(?:disable|bypass)\b[^.!?\n]{0,60}\b(?:alarm|interlock|safety)\b/i.test(s))) codes.push('unsafe_device_instruction');
+  if (actionClauses.some(s => /^(?:[-*]\s*)?(?:(?:you|the nurse) (?:should|must|can)\s+)?(?:flush|irrigate|clamp|advance|withdraw|reconnect|reverse|reposition)\b[^.!?\n]{0,100}\b(?:tube|lumen|line|catheter|circuit|lead)\b/i.test(s))) codes.push('unverified_device_procedure');
   if (/\b(?:this (?:proves|definitely means)|definitely caused by|certainly caused by|guarantees? (?:normal|safe)|(?:no need to|do not) (?:escalate|seek help)|always harmless)\b/i.test(content)) codes.push('unsafe_certainty_or_reassurance');
   if (/https?:\/\/|\bdoi\s*:|\b(?:according to|as stated in)\b[^.\n]{0,90}\b(?:guidelines?|stud(?:y|ies)|journal|FDA|AHA)\b/i.test(content)) codes.push('unverified_source_claim');
   if (/\b\d+(?:\.\d+)?\s*(?:[-\u2013]\s*\d+(?:\.\d+)?)?\s*(?:mg|mcg|micrograms?|units?)(?!\s*\/\s*(?:dL|L))\b/i.test(content)

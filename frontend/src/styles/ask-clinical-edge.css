@@ -160,15 +160,31 @@
 .ce-ask-turn .ce-ask-answer p, .ce-ask-turn .ce-ask-answer li { font-size: 16px; line-height: 1.75; }
 .ce-ask-turn .ce-ask-direct p { font-size: 17px; line-height: 1.75; margin: 0 0 14px; }
 .ce-ask-turn .ce-ask-direct > :last-child, .ce-ask-turn .ce-ask-detail > :last-child { margin-bottom: 0; }
-.ce-ask-turn .ce-ask-detail { margin-top: 22px; }
+.ce-ask-turn .ce-ask-detail { margin-top: 24px; padding-top: 20px; border-top: 1px solid var(--ce-warm-line-soft); }
 .ce-ask-turn .ce-ask-detail h3 { font-size: 16px; line-height: 1.5; margin-bottom: 8px; scroll-margin-top: 88px; letter-spacing: 0; }
 .ce-ask-turn .ce-ask-detail p { margin-block: 10px; }
 .ce-ask-turn .ce-ask-answer ul, .ce-ask-turn .ce-ask-answer ol { padding-left: 24px; }
 .ce-ask-turn .ce-ask-answer li { margin-block: 8px; }
-.ce-ask-jump { border-bottom: 1px solid var(--ce-warm-line-soft); margin: -8px 0 16px; }
-.ce-ask-jump > summary { color: var(--ce-text-mid); }
-.ce-ask-jump nav { display: flex; flex-wrap: wrap; gap: 0 16px; padding-bottom: 8px; }
-.ce-ask-jump a { display: inline-flex; align-items: center; min-height: 44px; font-size: 13px; color: var(--ce-text-dark); text-underline-offset: 4px; }
+.ce-ask-jump { border-block: 1px solid var(--ce-warm-line-soft); margin: 18px 0; padding-top: 10px; }
+.ce-ask-jump > span { color: var(--ce-text-muted); font: 500 12px/1.5 var(--ce-font-sans); }
+.ce-ask-jump > div { display: flex; flex-wrap: wrap; gap: 0 16px; padding-bottom: 6px; }
+.ce-ask-turn .ce-ask-jump + .ce-ask-detail { border-top: 0; padding-top: 0; margin-top: 18px; }
+.ce-ask-jump a, .ce-ask-jump button { display: inline-flex; align-items: center; min-height: 44px; padding: 4px 0; border: 0; background: transparent; font: 500 13px/1.5 var(--ce-font-sans); color: var(--ce-text-dark); text-decoration: underline; text-decoration-color: var(--ce-teal-deep); text-underline-offset: 4px; cursor: pointer; }
+.ce-ask-explanation, .ce-ask-evidence summary { scroll-margin-top: 88px; }
+.ce-ask-jump a:focus-visible, .ce-ask-return:focus-visible, .ce-ask-explanation:focus-visible { outline: 2px solid var(--ce-teal-deep); outline-offset: 3px; }
+.ce-ask-return { display: block; min-height: 44px; padding: 8px 0; border: 0; background: transparent; color: var(--ce-teal-deep); font: 500 13px/1.5 var(--ce-font-sans); cursor: pointer; text-decoration: underline; text-underline-offset: 4px; }
+.ce-ask-explanation--lead { padding-left: 14px; border-left: 2px solid var(--ce-teal-deep); }
+.ce-ask-explanation--lead > h3 { margin: 0 0 8px; color: var(--ce-navy-header); font: 650 15px/1.5 var(--ce-font-sans); }
+.ce-ask-turn .ce-ask-detail--bedside > h3 { color: var(--ce-teal-deep); }
+.ce-ask-turn .ce-ask-detail--safety { padding-left: 14px; border-left: 3px solid var(--ce-gold); }
+.ce-ask-return { margin-top: 16px; }
+.ce-ask-reference-button { min-height: 44px; padding: 8px 0; border: 0; background: transparent; color: var(--ce-text-muted); font: 500 13px/1.5 var(--ce-font-sans); text-decoration: underline; text-underline-offset: 4px; cursor: pointer; }
+.ce-ask-reference-dialog { width: min(600px, calc(100% - 32px)); max-width: none; max-height: calc(100dvh - 48px); margin: auto; box-sizing: border-box; padding: 24px; border: 1px solid var(--ce-warm-line); border-radius: var(--ce-r-md); background: var(--ce-warm-card); color: var(--ce-text-dark); overflow-y: auto; overscroll-behavior: contain; }
+.ce-ask-reference-dialog::backdrop { background: rgba(0, 0, 0, .5); }
+.ce-ask-reference-heading { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 8px 16px; border-bottom: 1px solid var(--ce-warm-line); padding-bottom: 12px; margin-bottom: 16px; }
+.ce-ask-reference-heading h2 { margin: 0; font: 650 18px/1.5 var(--ce-font-sans); color: var(--ce-navy-header); }
+.ce-ask-reference-heading button { min-height: 44px; padding: 8px 12px; border: 1px solid var(--ce-warm-line); border-radius: var(--ce-r-md); background: var(--ce-warm-mid); color: var(--ce-text-dark); font: 500 13px/1.5 var(--ce-font-sans); cursor: pointer; }
+.ce-ask-reference-dialog :focus-visible { outline: 2px solid var(--ce-teal-deep); outline-offset: 3px; }
 .ce-ask-answer-utilities { display: flex; flex-wrap: wrap; align-items: flex-start; gap: 0 20px; border-top: 1px solid var(--ce-warm-line-soft); margin-top: 16px; padding-top: 2px; }
 .ce-ask-turn .ce-ask-evidence { flex: 1 1 auto; margin: 0; padding: 0; border: 0; }
 .ce-ask-answer-utilities > .ce-ask-evidence:has(details[open]), .ce-ask-answer-utilities > .ce-ask-handoff { flex-basis: 100%; }

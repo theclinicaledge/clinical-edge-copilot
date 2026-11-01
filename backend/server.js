@@ -7,6 +7,8 @@ const Anthropic = require("@anthropic-ai/sdk");
 const { randomUUID } = require("node:crypto");
 const { registerAskRoutes } = require("./ask-clinical-edge");
 const { registerConversation } = require('./ask-conversation');
+const { safeGateMetadata } = require('./ask-output-safety');
+const { safeAskDiagnostic } = require('./ask-failures');
 const { createAiCostGuard } = require("./ai-cost-guard");
 const { buildEvidence, parseReasoning } = require("./priority-map-intelligence");
 const { COMPACT_REASONING_PROMPT, REASONING_OUTPUT_FORMAT, validateReasoning, composePriorityMap, reasoningRepairDetails, teachingFromMap } = require("./priority-map-p1");
@@ -2556,6 +2558,10 @@ function buildOperationalLogEntry(fields) {
       .map((key) => [key, fields[key]])
   );
   if (typeof fields.containment_active === 'boolean') entry.containment_active = fields.containment_active;
+  const askDiagnostic = safeAskDiagnostic(fields.ask_diagnostic);
+  if (askDiagnostic) entry.ask_diagnostic = askDiagnostic;
+  const outputSafety = safeGateMetadata(fields.output_safety);
+  if (outputSafety) entry.output_safety = outputSafety;
   for (const key of ["original_validation", "repair_validation"]) {
     const safe = sanitizeValidationMetadata(fields[key]);
     if (safe) entry[key] = safe;
@@ -2594,7 +2600,7 @@ const admitAskAI = (req, options) => {
   return denial;
 };
 registerAskRoutes(app, { apiLimiter, getClient: () => client, admitAI: admitAskAI, containsPHI, runWithStageTimeout, collectPriorityMapStream, appendOperationalLog, classifyProviderError });
-registerConversation(app, { apiLimiter, getClient: () => client, admitAI: admitAskAI, containsPHI, runWithStageTimeout, collectPriorityMapStream, appendOperationalLog });
+registerConversation(app, { apiLimiter, getClient: () => client, admitAI: admitAskAI, containsPHI, runWithStageTimeout, collectPriorityMapStream, appendOperationalLog, classifyProviderError });
 
 // ── Streaming endpoint ────────────────────────────────────────────────────────
 app.post("/api/copilot", apiLimiter, require('./safety-containment').containmentGate('COPILOT', appendOperationalLog), async (req, res) => {

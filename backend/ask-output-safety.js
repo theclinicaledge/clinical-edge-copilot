@@ -144,6 +144,8 @@ function safeGateMetadata(value) {
     'unsafe_device_instruction', 'unverified_device_procedure', 'unsafe_certainty_or_reassurance',
     'unverified_source_claim', 'unverified_dose_specifics', 'unhelpful_educational_refusal',
     'source_not_patient_diagnosis', 'unsupported_source_number', 'filling_pressure_conflation',
+    'reported_pressure_units_unestablished', 'reported_gas_units_unestablished', 'acid_base_source_contradiction',
+    'venous_equivalence_overstatement', 'crrt_compartment_or_certainty_error', 'device_scope_unestablished',
     'unauthorized_care_recommendation', 'safety_review_unavailable', 'safety_review_incomplete', 'invalid_safety_review',
     'client_disconnected', ...RISKS.flatMap(key => [`safety_${key}_unsafe`, `safety_${key}_uncertain`])];
   return { decision: value.decision, stage: value.stage,

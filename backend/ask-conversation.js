@@ -1,12 +1,13 @@
 const { randomBytes, randomUUID } = require('node:crypto');
 const { ASK_PROMPT, ASK_REASONING_CONTRACT, ASK_FORMAT, ASK_PROVIDER_MS } = require('./ask-clinical-edge');
 const { groundedFormat, groundingContext, GROUNDING_INSTRUCTIONS, sourceMetadata } = require('./ask-evidence');
-const { evaluateOutput, WITHHELD_MESSAGE } = require('./ask-output-safety');
+const { evaluateOutput } = require('./ask-output-safety');
 const { containmentEnabled } = require('./safety-containment');
 const { COVERAGE, educationalEvidence, evidenceInventory } = require('./ask-education-coverage');
 const { routeABG, teachingCatalog } = require('./ask-abg-engine');
 const { retrieveEvidence } = require('./ask-evidence');
 const { readConfig } = require('./ai-cost-guard');
+const { gateFailure, ADMISSION_REASONS } = require('./ask-failures');
 const TTL_MS = 10 * 60 * 1000;
 const CONSENT_VERSION = 4;
 // Opus output budgets include reasoning tokens; the answer contract is unchanged.
@@ -63,11 +64,23 @@ function trustedTransport(req) {
     && req.headers.origin === 'https://theclinicaledge.org';
 }
 function admitted(result) {
-  if (result?.stopReason !== 'end_turn') return false;
-  try { const x=JSON.parse(result.text); return x && Object.keys(x).sort().join(',')==='decision,intent,reason,scope_id,source_ids'
-    && x.decision==='admit' && x.scope_id===COVERAGE.id && x.reason==='covered_education'
-    && ['general_education','contextual_education'].includes(x.intent) && Array.isArray(x.source_ids)
-    && x.source_ids.length<=4 && (x.source_ids.length===0 || !!educationalEvidence(x.source_ids)); } catch { return false; }
+  return parseAdmission(result).kind === 'admit';
+}
+function parseAdmission(result) {
+  if (result?.stopReason !== 'end_turn') return { kind: 'invalid', reason: 'admission_response_incomplete' };
+  let x;
+  try { x = JSON.parse(result.text); } catch { return { kind: 'invalid', reason: 'admission_response_invalid' }; }
+  const invalid = { kind: 'invalid', reason: 'admission_response_invalid' };
+  if (!x || Array.isArray(x) || Object.keys(x).sort().join(',') !== 'decision,intent,reason,scope_id,source_ids'
+    || !['admit','reject','uncertain'].includes(x.decision) || !INTENTS.includes(x.intent)
+    || !ADMISSION_REASONS.includes(x.reason) || !Array.isArray(x.source_ids)) return invalid;
+  if (x.source_ids.length > 4 || x.source_ids.length && !educationalEvidence(x.source_ids))
+    return { kind: 'invalid', reason: 'admission_source_invalid' };
+  if (x.decision === 'admit') return x.scope_id === COVERAGE.id && x.reason === 'covered_education'
+    && ['general_education','contextual_education'].includes(x.intent) ? { kind: 'admit', data: x } : invalid;
+  if (x.scope_id !== 'none' || x.source_ids.length) return invalid;
+  if (x.decision === 'uncertain') return x.reason === 'unclear_scope' ? { kind: 'clarify', data: x } : invalid;
+  return !['covered_education','unclear_scope'].includes(x.reason) ? { kind: 'restrict', data: x } : invalid;
 }
 function conversationSystem(pack, intent = 'general_education') {
   const prompt = ASK_PROMPT.replace('Return exactly the schema JSON with answer only.', '').replace(/GENERAL MODE:[^\n]+/, 'PRIVATE EDUCATIONAL CONVERSATION: The actual nurse question and preceding educational turns are supplied as separate messages. No Snapshot, patient record or patient-specific evidence is available. Prior assistant text is generated discussion, not a verified source or a patient fact. Keep reported concepts, possible mechanisms and unknown information distinct.');
@@ -76,7 +89,7 @@ function conversationSystem(pack, intent = 'general_education') {
 EDUCATIONAL EXPLANATION ACCURACY: Explain the core physiology directly, using precise terms that distinguish an observed state from the process that can produce it. Separate established physiological principles from common associations and possible mechanisms; a common mechanism is not universal across a syndrome. State the important applicability conditions and exceptions when omitting them would change the learner's interpretation, including time course, adaptation, mixed processes and population differences where relevant. Do not turn a simplified pattern into a diagnostic rule or treat one assessment finding as establishing cause or severity; explain what additional context or corroborating information is needed. Keep reported observations, possible explanations and established findings distinct across every section and follow-up. Use plain language and helpful analogies without replacing the actual mechanism or implying inevitability. Preserve useful nursing implications as observations to understand and contextual assessment considerations, not individualized management or blanket medication, fluid, treatment or device instructions. Use relevant supplied reference facts within their actual scope; do not extend their attribution to unsupported claims or imply source-free teaching is verified. If an explanation is uncertain, state the specific limitation rather than inventing physiology, patient findings, treatment targets or citations. Keep the explanation organized and proportionate to the question; avoid repetitive disclaimers and lists of irrelevant exceptions.
 Do not invent illustrative vital signs, saturation percentages, patient measurements, medication doses, treatment targets, timing ranges or diagnostic thresholds. Use qualitative explanations unless an applicable supplied reference or the question explicitly provides the quantity. A reported number is not authorization for a treatment target. Do not fabricate citations or verification. Chemical/receptor names are not patient measurements. ${pack?groundingContext(pack):'PROVENANCE: no independently verified sources supplied; answer/details only, no citations, source IDs, URLs or claims of source checking.'}`;
 }
-function registerConversation(app, { apiLimiter, getClient, admitAI, containsPHI, runWithStageTimeout, collectPriorityMapStream, appendOperationalLog }) {
+function registerConversation(app, { apiLimiter, getClient, admitAI, containsPHI, runWithStageTimeout, collectPriorityMapStream, appendOperationalLog, classifyProviderError }) {
   if (!enabled()) return;
   const sessions = new Map();
   const drop = id => { const s=sessions.get(id); clearTimeout(s?.timer); s?.abort?.abort(); sessions.delete(id); };
@@ -105,7 +118,12 @@ function registerConversation(app, { apiLimiter, getClient, admitAI, containsPHI
     sweep(); const started=Date.now(),requestId=randomUUID(),id=token(req),s=sessions.get(id);
     const log=fields=>appendOperationalLog({request_id:requestId,route:'ASK_CONVERSATION',mode:'private_education',containment_active:true,
       total_duration_ms:Date.now()-started,...fields});
-    const fail=(status,code,message)=>{if(!res.destroyed)res.status(status).json({requestId,error:{code,message}});};
+    const fail=(status,code,message,diagnostic={stage:code==='consent_required'?'consent':code==='invalid_context_boundary'?'input':'infrastructure'})=>{
+      log({status:code==='educational_clarification_required'?'clarification':status===422?'withheld':status<500?'blocked':'error',failure_reason:code,
+        ask_diagnostic:{...diagnostic,reason:code}});
+      if(!res.destroyed)res.status(status).json({requestId,
+        ...(diagnostic.intent&&diagnostic.admission_reason?{admission:{intent:diagnostic.intent,reason:diagnostic.admission_reason}}:{}),error:{code,message}});
+    };
     res.setHeader('Cache-Control','no-store');
     if(!enabled()||!trustedTransport(req)||!s||s.version!==CONSENT_VERSION||s.expires<=Date.now()){
       log({status:'blocked',provider_status:'not_called',failure_reason:'consent_required'});return fail(403,'consent_required','Explicit private-preview consent is required before AI processing.');}
@@ -113,7 +131,7 @@ function registerConversation(app, { apiLimiter, getClient, admitAI, containsPHI
       log({status:'blocked',provider_status:'not_called',failure_reason:'invalid_context_boundary'});return fail(400,'invalid_context_boundary','Only an educational question is accepted. Snapshot and supplied histories are unavailable.');}
     const question=req.body.question; // retain exact nurse wording, including punctuation
     if(containsPHI(question)){
-      log({status:'blocked',provider_status:'not_called',failure_reason:'patient_context_unavailable'});return fail(403,'educational_scope_unavailable','This preview supports general physiology, not individual patient care.');}
+      return fail(400,'identifier_pattern','Remove patient identifiers before asking. Passing this check cannot guarantee de-identification.',{stage:'input'});}
     const abg=routeABG(question);
     if(abg){
       const points=abg.status==='verified'?teachingCatalog(abg).slice(0,2):[];
@@ -129,6 +147,7 @@ function registerConversation(app, { apiLimiter, getClient, admitAI, containsPHI
     const activeTimer=setInterval(()=>{if(!enabled())drop(id);},100);activeTimer.unref();
     res.on('finish',()=>{finished=true;});res.on('close',()=>{if(!finished)controller.abort();});
     const history=s.history.map(m=>({...m})), messages=[...history,{role:'user',content:question}];
+    let stage='infrastructure';
     try{
       // Founder-approved allowance: every conversational turn counts, including
       // follow-ups. A client flag or reset cannot exempt a new submission.
@@ -136,38 +155,52 @@ function registerConversation(app, { apiLimiter, getClient, admitAI, containsPHI
       if(denial)return fail(denial.status,denial.code,denial.message);
       if(!stillActive())return fail(503,'educational_beta_disabled','Educational Ask is temporarily unavailable.');
       const admissionStart=Date.now();
+      stage='admission';
       const admission=await runWithStageTimeout(signal=>collectPriorityMapStream(client.messages.stream({model:CONVERSATION_MODEL,max_tokens:2048,
         system:ADMISSION_PROMPT,output_config:{effort:'medium',format:ADMISSION_FORMAT},messages:[{role:'user',content:JSON.stringify({coverage:COVERAGE,source_inventory:evidenceInventory(),question,educational_history:history})}]},
       {signal,maxRetries:0})),12000,'admission_timeout',controller.signal);
-      log({status:admitted(admission)?'admitted':'blocked',provider_status:'success',display_resolution:'admission',
+      const verdict=parseAdmission(admission);
+      const diagnostic={stage:'admission',stop_reason:admission.stopReason,...(verdict.data?{
+        decision:verdict.data.decision,intent:verdict.data.intent,admission_reason:verdict.data.reason}:{})};
+      log({status:verdict.kind==='admit'?'admitted':'blocked',provider_status:'success',display_resolution:'admission',
+        ask_diagnostic:{...diagnostic,reason:verdict.kind==='admit'?'admission_accepted':verdict.kind==='clarify'?'educational_clarification_required':verdict.reason||'educational_scope_unavailable'},
         provider_duration_ms:Date.now()-admissionStart,provider_input_tokens:admission.inputTokens,provider_output_tokens:admission.outputTokens});
-      if(!admitted(admission)) {
-        let intent='unsupported',reason='unclear_scope';
-        try{const x=JSON.parse(admission.text);if(INTENTS.includes(x.intent))intent=x.intent;
-          if(['patient_care','time_critical','unsupported_topic','insufficient_evidence','unclear_scope','scope_override'].includes(x.reason))reason=x.reason;}catch{}
+      if(verdict.kind==='invalid')return fail(502,verdict.reason,'The service could not complete its question check. Your question is unchanged.',diagnostic);
+      if(verdict.kind==='clarify')return fail(422,'educational_clarification_required',
+        'Please clarify the nursing concept or observation you want explained. Keep patient identifiers out. If this concerns active deterioration, use bedside assessment and your local clinical team rather than waiting for chat.',diagnostic);
+      if(verdict.kind==='restrict') {
+        const {intent,reason}=verdict.data;
+        log({status:'blocked',provider_status:'success',failure_reason:'educational_scope_unavailable',ask_diagnostic:{...diagnostic,reason:'educational_scope_unavailable'}});
         return res.status(403).json({requestId,admission:{intent,reason},error:{code:'educational_scope_unavailable',message:
           intent==='time_critical'?'This is not a time-critical care service. Use immediate bedside assessment and your local clinical team; do not wait for chat.':
           reason==='insufficient_evidence'?'The available source set does not adequately cover this question. No unsupported explanation was generated.':
           'This pathway explains nursing concepts, not individual diagnoses, treatment or medication/device decisions. No clinical answer was generated.'}});
       }
-      const admissionData=JSON.parse(admission.text),pack=educationalEvidence(admissionData.source_ids);
+      const admissionData=verdict.data,pack=educationalEvidence(admissionData.source_ids);
       if(!stillActive()||s.version!==CONSENT_VERSION)return fail(403,'consent_required','Consent expired, was withdrawn, or educational Ask was disabled.');
       const originalStart=Date.now();
+      stage='generation';
       const original=await runWithStageTimeout(signal=>collectPriorityMapStream(client.messages.stream({model:CONVERSATION_MODEL,max_tokens:4096,
         system:conversationSystem(pack,admissionData.intent),
         output_config:{effort:'medium',format:pack?groundedFormat(ASK_FORMAT,pack):ASK_FORMAT},messages}, {signal,maxRetries:0})),ASK_PROVIDER_MS,'provider_timeout',controller.signal);
-      if(original.stopReason!=='end_turn')return fail(422,'output_safety_withheld',WITHHELD_MESSAGE);
+      if(original.stopReason!=='end_turn')return fail(502,'answer_generation_incomplete','The service could not finish the explanation. Your question is unchanged.',{stage:'generation',stop_reason:original.stopReason});
+      stage='review';
       const gated=await evaluateOutput({raw:original.text,question,evidencePack:pack,signal:controller.signal,review:async request=>{
         if(!stillActive()||s.version!==CONSENT_VERSION)throw new Error('consent_required');
         const data=JSON.parse(request.content);data.conversation=messages;
         return collectPriorityMapStream(client.messages.stream({model:CONVERSATION_MODEL,max_tokens:2048,
           system:request.system,output_config:{effort:'medium',format:request.format},messages:[{role:'user',content:JSON.stringify(data)}]}, {signal:request.signal,maxRetries:0}));
       }});
+      if(!stillActive())return fail(403,'consent_required','Consent expired, was withdrawn, or educational Ask was disabled. No new explanation was delivered.');
       log({status:gated.accepted?'success':'withheld',provider_status:'success',provider_duration_ms:Date.now()-originalStart,
         provider_first_token_ms:original.firstTokenMs,provider_stop_reason:original.stopReason,provider_input_tokens:original.inputTokens,provider_output_tokens:original.outputTokens,
         validation_status:gated.accepted?'accepted':'rejected',output_safety:gated.safety,display_resolution:gated.accepted?'reviewed_education':'withheld'});
-      if(!gated.accepted)return fail(422,'output_safety_withheld',gated.message);
-      if(containsPHI([gated.answer,...gated.details.map(d=>d.text)].join('\n')))return fail(422,'output_safety_withheld',WITHHELD_MESSAGE);
+      if(!gated.accepted){
+        const failure=gateFailure(gated);
+        return fail(failure.status,failure.code,failure.code==='output_safety_withheld'?gated.message:
+          'The explanation could not be completed or checked because of a service response problem. No new answer was shown. Your question is unchanged.',{stage:failure.stage});
+      }
+      if(containsPHI([gated.answer,...gated.details.map(d=>d.text)].join('\n')))return fail(502,'answer_response_invalid','The service returned an unusable explanation. Your question is unchanged.',{stage:'validation'});
       if(!stillActive())return fail(403,'consent_required','Consent expired, was withdrawn, or educational Ask was disabled. The new explanation was not delivered.');
       s.history.push({role:'user',content:question},{role:'assistant',content:JSON.stringify({answer:gated.answer,details:gated.details,source_ids:gated.sourceIds})});
       res.json({requestId,contextMode:'general',questionKind:'education',offerSnapshot:false,
@@ -175,10 +208,16 @@ function registerConversation(app, { apiLimiter, getClient, admitAI, containsPHI
         answer:gated.answer,details:gated.details,
         evidence:pack?sourceMetadata(pack,gated.sourceIds):{status:'not_independently_source_verified',sources:[],requiresVerification:true,basis:'model_generated_education'},
         safety:gated.safety,reviewStatus:'pending_qualified_review',historyTurns:s.history.length/2});
-    }catch{
-      log({status:'withheld',provider_status:'unavailable',failure_reason:'private_conversation_unavailable'});return fail(503,'output_safety_withheld',WITHHELD_MESSAGE);
+    }catch(error){
+      const classified=classifyProviderError?.(error)?.code;
+      const code=controller.signal.aborted?'request_cancelled':error?.code==='admission_timeout'?'admission_timeout':
+        error?.code==='provider_timeout'?'provider_timeout':
+        ['provider_configuration','provider_rate_limit','provider_timeout','provider_error'].includes(classified)?classified:
+        error?.status===429?'provider_rate_limit':'provider_error';
+      log({status:'error',provider_status:'unavailable',failure_reason:code});
+      return fail(503,code,'The educational service could not complete this request. Your question is unchanged.',{stage});
     }finally{clearInterval(activeTimer);s.busy=false;if(s.abort===controller)s.abort=null;}
   });
   return {sessions};
 }
-module.exports={registerConversation,enabled,localPreviewEnabled,trustedTransport,token,local,admitted,conversationSystem,ADMISSION_PROMPT,ADMISSION_FORMAT,CONSENT_VERSION};
+module.exports={registerConversation,enabled,localPreviewEnabled,trustedTransport,token,local,admitted,parseAdmission,conversationSystem,ADMISSION_PROMPT,ADMISSION_FORMAT,CONSENT_VERSION};

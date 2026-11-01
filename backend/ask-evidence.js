@@ -46,7 +46,24 @@ function groundedFormat(base, pack) {
   return { type: 'json_schema', schema: { ...base.schema, required: ['answer', 'details', 'source_ids'],
     properties: { ...base.schema.properties, source_ids: { type: 'array', description: 'One or more unique supplied source IDs actually used; no invented IDs.', items: { type: 'string', enum: pack.sources.map(s => s.id) } } } } };
 }
-function numbers(text) { return [...text.matchAll(/\b\d+(?:\.\d+)?\b/g)].map(m => Number(m[0])); }
+function numbers(text, listOrdinals = false) {
+  const ordinals = new Set();
+  if (listOrdinals) {
+    // Ignore only consecutive, line-initial list markers starting at 1.
+    // Keep the original prose intact for every other guard and semantic review.
+    const markers = [...text.matchAll(/^[ \t]*(\d{1,2})[.)][ \t]+(?!(?:mg|mcg|mL|mmHg|mmol|units?)\b)(?=[A-Za-z])/gmi)];
+    for (let i = 0; i < markers.length; i++) {
+      if (Number(markers[i][1]) !== 1) continue;
+      let end = i + 1;
+      while (end < markers.length && Number(markers[end][1]) === end - i + 1) end++;
+      if (end - i >= 2) for (let j = i; j < end; j++) {
+        ordinals.add(markers[j].index + markers[j][0].indexOf(markers[j][1]));
+      }
+      i = end - 1;
+    }
+  }
+  return [...text.matchAll(/\b\d+(?:\.\d+)?\b/g)].filter(m => !ordinals.has(m.index)).map(m => Number(m[0]));
+}
 function numericFacts(x) {
   if (typeof x === 'number') return [x];
   if (!x || typeof x !== 'object') return [];
@@ -89,7 +106,7 @@ function validateGrounded(raw, pack, question) {
   if (pack.domains.includes('crrt') && (!/\bPrisMax\b/i.test(text) || /\b(?:all|every) (?:CRRT|dialysis|machines?|systems?)\b/i.test(text))) codes.push('device_scope_unestablished');
   const allowed = new Set([...numbers(normalise(question)), ...pack.sources.filter(s => x.source_ids.includes(s.id)).flatMap(s => numericFacts(s.facts)),
     ...numericFacts(pack.calculations?.status === 'calculated' ? pack.calculations : null)]);
-  if (numbers(text).some(n => !allowed.has(n))) codes.push('unsupported_source_number');
+  if (numbers(text, true).some(n => !allowed.has(n))) codes.push('unsupported_source_number');
   return { codes: [...new Set(codes)], plain: JSON.stringify({ answer: x.answer, details: x.details }), sourceIds: x.source_ids };
 }
 function boundedEvidenceAnswer(pack) {

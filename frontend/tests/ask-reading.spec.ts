@@ -27,9 +27,10 @@ async function start(page) {
   await page.getByLabel('Nursing question').fill(readingQuestion);
   await page.getByRole('button', { name: /^(Ask Clinical Edge|Send question to Ask Clinical Edge)$/ }).click();
   await expect(page.locator('.ce-ask-direct').first()).toContainText('Oxygen saturation describes');
+  await page.evaluate(() => document.fonts.ready);
 }
 
-for (const width of [390, 430, 768, 1440]) test(`reading screenshots and chronological follow-up at ${width}`, async ({ page }) => {
+for (const width of [375, 390, 430, 768, 1440]) test(`reading screenshots and chronological follow-up at ${width}`, async ({ page }) => {
   await page.setViewportSize({ width, height: 844 });
   const mock = await mockConversation(page);
   await start(page);
@@ -44,6 +45,10 @@ for (const width of [390, 430, 768, 1440]) test(`reading screenshots and chronol
     const last = await page.locator('.ce-ask-answer').last().boundingBox(), composer = await page.locator('.ce-ask-composer').boundingBox();
     expect(composer!.y).toBeGreaterThan(last!.y + last!.height);
     const calls = mock.requests.length;
+    await page.getByRole('button', { name: 'Ask a follow-up' }).click();
+    await expect(page.getByLabel('Nursing question')).toBeFocused();
+    await expect(page.getByLabel('Nursing question')).toHaveValue('');
+    expect(mock.requests).toHaveLength(calls);
     await page.getByRole('button', { name: 'Explain more simply', exact: true }).click();
     await expect(page.getByLabel('Nursing question')).toHaveValue('Explain the previous answer more simply.');
     expect(mock.requests).toHaveLength(calls);
@@ -202,7 +207,6 @@ test('safe semantic text, original order, full copy and request-only feedback', 
   expect(decodeURIComponent(report!)).toContain('synthetic-reading-1');
   expect(decodeURIComponent(report!)).not.toContain('oxygen saturation');
   const calls = mock.requests.length;
-  await page.getByText('In this answer', { exact: true }).click();
   await page.getByRole('link', { name: 'At the bedside', exact: true }).click();
   await expect(page.getByRole('heading', { name: 'At the bedside', exact: true })).toBeFocused();
   expect(mock.requests).toHaveLength(calls);
@@ -235,4 +239,19 @@ test('enlarged mobile text, simulated keyboard and reduced motion retain reachab
   const capturedSend = await page.locator('.ce-ask-submit').boundingBox();
   expect(capturedSend!.y).toBeGreaterThanOrEqual(60);
   expect(capturedSend!.y + capturedSend!.height).toBeLessThan(dock!.y);
+});
+
+test('a long unsectioned answer is never shortened or given invented sections', async ({ page }) => {
+  test.skip(baseline);
+  const mock = await mockConversation(page);
+  const fullAnswer = Array(4).fill(readingAnswer.answer).join('\n\n');
+  mock.respond({ ...readingAnswer, answer: fullAnswer, details: [], evidence: undefined });
+  await start(page);
+  const actual = await page.locator('.ce-ask-direct p').allTextContents();
+  expect(actual.join('\n\n')).toBe(fullAnswer);
+  await expect(page.getByRole('heading', { name: 'Main answer' })).toBeVisible();
+  await expect(page.getByRole('heading', { name: 'Safety', exact: true })).toHaveCount(0);
+  await expect(page.getByRole('heading', { name: 'At the bedside', exact: true })).toHaveCount(0);
+  await expect(page.getByRole('button', { name: 'References & limitations' })).toHaveCount(0);
+  await expect(page.getByRole('button', { name: 'Ask a follow-up' })).toBeVisible();
 });

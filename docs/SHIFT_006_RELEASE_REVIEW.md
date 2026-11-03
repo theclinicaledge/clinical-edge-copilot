@@ -107,3 +107,21 @@ Deployment URL: https://clinical-edge-copilot-ccx7j5wna-theclinicaledges-project
 If release-critical problems occur, restore that deployment through Vercel's production rollback,
 then revert this release through a checked PR so repository main matches the rollback.
 Never change backend containment or existing consent settings as a workaround.
+
+
+## Focused educational review, 2026-11-03
+
+Source assessment of the current checkout; not an executed UI playthrough or independent clinical approval. General founder and additional-RN review history is acknowledged in `CLINICAL_VALIDATION_REGISTRY.md`; the absence of a separate Rewind scope does not make the base Shift generically unreviewed.
+
+- Turning point: D2 uses LinkedTrend and the flowsheet. A draft time can be changed before confirmation and survives saves. The correct 1200 highlight and D2 explanation are conditional on a committed answer. The earlier D1 teaching identifies the principle of change over time, not the specific turning-point column. The task remains foundational, scaffolded trend interpretation rather than independent assessment of all deterioration reasoning.
+- Information support: the full timeline, baseline and observations are available. Screen-reader descriptions summarize direction but do not identify the correct 1200 column. These descriptions are scaffolding, not evidence of comprehension. No new clinical facts or answer hiding is justified by this review.
+- Rewind A retains deteriorating observations; B changes the trend to activity-associated elevations resolving at rest and accepts both continued reassessment and looking at a future stool; C retains unresolved earlier change despite partial improvement and accepts provider notification with monitoring. Escalation in C receives Close rather than an absolute unsafe rejection. Feedback explains those distinctions. Clinical defensibility remains within the acknowledged nursing review and stated limits, not a new validation claim.
+- Rewind `focus` contains the supported call but RewindPlayer displays it in feedback, after submission. Its introductory teaching and original debrief make subsequent attempts guided practice. Original Shift answers use a separate key; Rewind attempts retain variation, response, result, feedback, content version and guided=true. They do not demonstrate independent transfer or learning effectiveness.
+
+### One recommended improvement, proposal only
+
+Review option-wording balance in Rewind C: the preferred notification option includes an explicit monitoring plan while some alternatives are short labels. A clinically qualified reviewer should determine whether a more evenly detailed option set would reduce answer cueing without removing useful novice scaffolding or changing accepted alternatives. No revised wording is proposed as approved, and no clinical facts, distractors, explanations, answers or Rewind teaching were changed. Any resulting change requires exact-version clinical review before release.
+
+### Implementation decision
+
+Leave gameplay unchanged. Current selection/confirmation, feedback timing and separate saves already address the safe usability opportunities identified here. Metadata cleanup records review history without changing content versions or saved answers. Separate Rewind review coverage remains unspecified rather than being silently marked approved.

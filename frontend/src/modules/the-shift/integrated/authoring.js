@@ -1,6 +1,6 @@
 // Authoring records, not a gameplay engine. Original scripts and release-review corrections remain separately documented.
 const signOffs = () => ({
-  founder: { name: 'Mohamed', credentials: null, date: null, version: null, notes: 'Experience approved in the founder conversation; signed clinical-content record not supplied.' },
+  founder: { name: 'Mohamed Laayouni', credentials: 'MSN; California-licensed RN; medical ICU and cardiothoracic nursing experience (founder-confirmed)', date: null, version: null, attestedOn: '2026-11-03', notes: 'Founder RN clinical review — founder-attested for released Shift content. Attestation recorded in docs/CLINICAL_VALIDATION_REGISTRY.md; actual review date and exact reviewed revision not supplied. Existing additional-RN and specialty records remain separate.' },
   independent: { name: null, credentials: null, date: null, version: null, notes: 'Founder reports that an independent practicing nurse reviewed and approved the complete corrected three-scenario package, including answer keys and ECG assets. Reviewer identity, credentials, date, signature and passage-level scope have not been supplied.' },
   specialty: { name: null, credentials: null, date: null, version: null, notes: 'Separate specialty-review credentials and scope have not been supplied.' },
 });

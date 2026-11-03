@@ -86,6 +86,28 @@ shiftEntries.push((await import('../shift8/metadata.js')).shift8Entry);
 shiftEntries.push((await import('../shift10/metadata.js')).shift10Entry);
 shiftEntries.push((await import('../shift9/metadata.js')).shift9Entry);
 export const SHIFTS = orderShiftsByNumber(shiftEntries);
+// General nursing review attested by the founder in the 2026-11-03 cleanup request.
+// This records the attestation date, not a review date or exact-version approval.
+// Preserve every earlier additional-RN report and specialty/source limitation.
+for (const [index, item] of SHIFTS.entries()) {
+  SHIFTS[index] = {
+    ...item,
+    review: {
+      ...item.review,
+      status: `Founder RN clinical review: founder-attested. ${item.review.status}`,
+      founderReview: {
+        status: 'Founder RN clinical review — founder-attested',
+        reviewer: 'Mohamed Laayouni',
+        qualifications: 'MSN; California-licensed RN; medical ICU and cardiothoracic nursing experience (founder-confirmed)',
+        attestedOn: '2026-11-03',
+        reviewDate: null,
+        approvedVersion: null,
+        scope: 'Released Shift clinical content; exact reviewed revision and separate Rewind coverage not established by this attestation.',
+        record: 'docs/CLINICAL_VALIDATION_REGISTRY.md#released-shift-nursing-review-history',
+      },
+    },
+  };
+}
 export const getShift = id => SHIFTS.find(item => item.id === id);
 export function progressLabel(item) {
   const state = item.readProgress();

@@ -1,5 +1,36 @@
 # Clinical Validation Registry
 
+## Released Shift nursing review history
+
+Attestation recorded 2026-11-03 from Mohamed's explicit "Clinical Review Registry Cleanup + Shift 6/Rewind Educational Improvement" instruction in this project. This is the date of the confirmation, not the date any clinical review occurred.
+
+Mohamed Laayouni confirms personal clinical-content review of the released Shifts. His founder-confirmed qualifications are MSN, California-licensed RN, medical ICU and cardiothoracic nursing experience. Record this as **Founder RN clinical review — founder-attested** for each Shift below. The confirmation does not establish exact-version approval, signed independent validation, or review of every separately authored Rewind variation.
+
+The founder also reports additional practicing-nurse review of relevant content, without newly specifying all scopes. The per-Shift additional-RN entries below therefore retain the narrower existing records rather than extrapolating that statement to every asset, revision or Rewind.
+
+| Shift | Founder clinical review | Additional RN review already reported | Scope/remaining limitation and existing record |
+| --- | --- | --- | --- |
+| 001 Drowsy Patient | Founder-attested | Founder-reported complete corrected three-scenario package, including answer keys and ECG assets | Shared package report covers 001–003; identity, date and passage-level scope not supplied. `frontend/src/modules/the-shift/integrated/authoring.js` and `registry.js`. |
+| 002 Monitor Alarm | Founder-attested | Same founder-reported corrected package | Includes constructed ECG assets in the package report; separate specialist ECG validation not established. Same records as 001. |
+| 003 Discharge Puzzle | Founder-attested | Same founder-reported corrected package | Not separate medication-safety certification or approval of later standalone Rewind drafts. Same records as 001. |
+| 004 Conversation | Founder-attested | Founder-reported scenario/reference approval; informal practicing psychiatric RN review of revised openings, reactions, feedback and safety pathway | Existing v0.4 and opening-update scope preserved; identity/signature withheld by request; actual review date not supplied. `conversation/metadata.js`. |
+| 005 Which Patient First? | Founder-attested | Founder-reported independent nurse review, no material issues | Existing version association retained, no new exact-version approval inferred. `shift5/metadata.js`. |
+| 006 Stable Number | Founder-attested | Founder-reported founder-and-another-nurse review | Existing v0.4 association retained; separate Rewind review scope not supplied. `shift6/metadata.js`, `shift6/data.js`, `shift6/Shift6Rewind.jsx`. |
+| 007 Missing Time | Founder-attested | Founder-reported nurse-colleague review | Existing report date 2026-10-23 is not an actual review date. `shift7/metadata.js`. |
+| 008 Code Blue | Founder-attested | Founder-attested confidential medical-surgical nurse educator complete-scenario approval including E-1 | Existing narrow v0.8.1 governance and review scope below preserved; no signed record or formal validation inferred. `shift8/metadata.js`, `SHIFT_008_E1_GOVERNANCE.md`. |
+| 009 The Loud Distraction | Founder-attested | Independent clinical and psych specialty reviews reported by founder, recorded 2026-10-28 | Actual additional-review dates/credentials not supplied. Founder-attested review of all eleven ECG images recorded 2026-10-29 is preserved below; separate specialist ECG validation remains outstanding. `shift9/metadata.js`. Existing public inclusion and library order are unchanged. |
+| 010 Transfer That Isn't Ready | Founder-attested | Founder-reported independent clinical approval of Authoring Draft v0.2 | Existing source applicability limitations and fictional facility-policy boundaries retained. `shift10/metadata.js`. |
+
+Paths in the last seven rows are under `frontend/src/modules/the-shift/` unless stated otherwise. Existing reviewer/version/date fields are not replaced by this cleanup. The library registry adds the general founder review separately, while preserving each prior review-status statement, source-verification limitation and additional reviewer report.
+
+### Interpretation for future audits
+
+- Do not label these released Shifts generically "unreviewed" merely because a signature, review date or specialist credential is missing. Acknowledge the founder-attested and scope-specific additional-RN reviews above.
+- Identify outstanding requirements by exact scope: for example specialist ECG validation, passage-level source verification, reuse permission, separate Rewind review, or review of a changed clinical version.
+- General RN review does not establish specialist certification, learning effectiveness, formal assessment validity, or a preserved real-provider AI validation pass.
+- Historical drafts and their pending-review statements remain historical records. A later blanket attestation does not retroactively supply a missing specialty approval or approve new clinical changes.
+- Changes to clinical facts, accepted answers, distractors, explanations or Rewind teaching require version-specific clinical review before release. Pure review-attribution metadata does not alter those items.
+
 ## Shift 8 v0.8.1 founder-attested review
 
 Separate from the real-provider AI validation results below: the founder reports an independent confidential medical-surgical nurse educator approved the entire updated Shift 8 manual-defibrillator scenario, including E-1. No signed reviewer record, identity, review date or independently documented approval is claimed. The founder's explicit narrow amendment accepts this attestation instead of E-1's earlier written-verification condition for the reviewed v0.8.1 dialogue only. See [E-1 governance](SHIFT_008_E1_GOVERNANCE.md). Automated tests do not establish clinical validation. All prior provider results below remain unchanged.

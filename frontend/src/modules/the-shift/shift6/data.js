@@ -214,12 +214,13 @@ export const REWIND = {
       ] },
     { id: 'c', title: 'C: In between', flowsheet: 'main-before-1910', history: `Day nurse's comment: "Creeping up, probably anxious"`,
       facts: rewindFacts(ROOM14_VITALS, REWIND_C_1910, "One dark stool at 1500, already flushed. He can't describe it.", 'Lightheaded once at 1700, passed; none now', 'Warm, pink'),
-      question: d4.prompt, focus: 'Correct call: Notify the provider (non-urgent, now, not at end of shift)',
+      question: d4.prompt, focus: 'Correct call: Notify the provider now, not at end of shift',
       options: [
-        option('notify', 'Notify the provider (non-urgent): call now with the day\'s trend, the dark stool and the lightheaded spell, ask whether they want labs, and recheck vitals in 30 minutes', 'Correct', 'His 1910 numbers are a little better than at 1600, but still well off his baseline. With the earlier slide, an unexplained dark stool and a lightheaded spell, the provider needs to know tonight, and you have a plan to catch any worsening.'),
-        option('escalate', 'Escalate now', 'Close', "Not wrong if your concern is high. He doesn't have the near-faint, cool skin and ongoing slide of Variation A."),
-        option('recheck', 'Get specific information: recheck in 30 minutes and look at the next stool, then decide', 'Close', 'Useful, but the earlier slide and the unexplained stool already earn a call. Do both.'),
-        option('reassess', 'Continue and reassess', 'No', "Partial improvement isn't resolution. His heart rate and pressure are still off his baseline, and the dark stool is unexplained."),
+        // Rewind C Batch 1 has version-specific founder-attested RN approval; see the clinical validation registry.
+        option('notify', 'Notify the provider now, report the findings, ask about labs, and recheck vitals in 30 minutes', 'Correct', 'His 1910 numbers are a little better than at 1600, but still well off his baseline. With the earlier slide, an unexplained dark stool and a lightheaded spell, the provider needs to know tonight, and you have a plan to catch any worsening.'),
+        option('escalate', 'Escalate now for urgent assessment, using the unit escalation process to request a prompt bedside response', 'Close', "Not wrong if your concern is high. He doesn't have the near-faint, cool skin and ongoing slide of Variation A."),
+        option('recheck', 'Recheck vitals in 30 minutes and inspect the next stool before deciding whether to call the provider', 'Close', 'Useful, but the earlier slide and the unexplained stool already earn a call. Do both.'),
+        option('reassess', 'Continue routine reassessment without contacting the provider now or arranging an earlier vital-sign recheck', 'No', "Partial improvement isn't resolution. His heart rate and pressure are still off his baseline, and the dark stool is unexplained."),
       ] },
   ],
 };

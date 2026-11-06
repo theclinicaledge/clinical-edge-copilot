@@ -15,13 +15,30 @@ The founder also reports additional practicing-nurse review of relevant content,
 | 003 Discharge Puzzle | Founder-attested | Same founder-reported corrected package | Not separate medication-safety certification or approval of later standalone Rewind drafts. Same records as 001. |
 | 004 Conversation | Founder-attested | Founder-reported scenario/reference approval; informal practicing psychiatric RN review of revised openings, reactions, feedback and safety pathway | Existing v0.4 and opening-update scope preserved; identity/signature withheld by request; actual review date not supplied. `conversation/metadata.js`. |
 | 005 Which Patient First? | Founder-attested | Founder-reported independent nurse review, no material issues | Existing version association retained, no new exact-version approval inferred. `shift5/metadata.js`. |
-| 006 Stable Number | Founder-attested | Founder-reported founder-and-another-nurse review | Existing v0.4 association retained; separate Rewind review scope not supplied. `shift6/metadata.js`, `shift6/data.js`, `shift6/Shift6Rewind.jsx`. |
+| 006 Stable Number | Founder-attested | Founder-reported founder-and-another-nurse review | Existing v0.4 association retained. Separate original Rewind review scope was not supplied; the later, version-specific Rewind C Batch 1 founder approval is recorded below. `shift6/metadata.js`, `shift6/data.js`, `shift6/Shift6Rewind.jsx`. |
 | 007 Missing Time | Founder-attested | Founder-reported nurse-colleague review | Existing report date 2026-10-23 is not an actual review date. `shift7/metadata.js`. |
 | 008 Code Blue | Founder-attested | Founder-attested confidential medical-surgical nurse educator complete-scenario approval including E-1 | Existing narrow v0.8.1 governance and review scope below preserved; no signed record or formal validation inferred. `shift8/metadata.js`, `SHIFT_008_E1_GOVERNANCE.md`. |
 | 009 The Loud Distraction | Founder-attested | Independent clinical and psych specialty reviews reported by founder, recorded 2026-10-28 | Actual additional-review dates/credentials not supplied. Founder-attested review of all eleven ECG images recorded 2026-10-29 is preserved below; separate specialist ECG validation remains outstanding. `shift9/metadata.js`. Existing public inclusion and library order are unchanged. |
 | 010 Transfer That Isn't Ready | Founder-attested | Founder-reported independent clinical approval of Authoring Draft v0.2 | Existing source applicability limitations and fictional facility-policy boundaries retained. `shift10/metadata.js`. |
 
 Paths in the last seven rows are under `frontend/src/modules/the-shift/` unless stated otherwise. Existing reviewer/version/date fields are not replaced by this cleanup. The library registry adds the general founder review separately, while preserving each prior review-status statement, source-verification limitation and additional reviewer report.
+
+### SHIFT-006 v0.4 Rewind C Batch 1: version-specific founder RN approval
+
+Recorded 2026-11-04 (America/Los_Angeles) from Mohamed Laayouni's explicit "Shift 6/Rewind C: Founder RN Approval Confirmed" instruction in this project. This is the attestation-record date; no separate original review date or signature is asserted. Reviewer qualifications: founder, MSN-prepared, California-licensed RN, as stated in that confirmation.
+
+Status: **Founder-attested, version-specific RN approval** of the complete four-option packet presented immediately before that confirmation. Implementation is private on `improve/shift6-rewind-batch1`, based on `1bf590f4b12832df5a7e677e41c669f6bd47d03f`. The unchanged storage/content version remains v0.4; this approval applies specifically to the Batch 1 wording, not every v0.4 revision.
+
+Approved scope:
+
+- All four Rewind C option titles and the unchanged `notify` / `escalate` / `recheck` / `reassess` result mapping: Correct / Close / Close / No.
+- Heading: "Correct call: Notify the provider now, not at end of shift"
+- Preferred option: "Notify the provider now, report the findings, ask about labs, and recheck vitals in 30 minutes".
+- All four associated feedback explanations, the 30-minute reassessment interval, and the distinction between timely provider notification and urgent bedside escalation.
+
+The approved option set and explanations are in `frontend/src/modules/the-shift/shift6/data.js`, `REWIND.variations` entry `c`. Approved-packet SHA-256: `0247d4f851069b956b7194b85384b14757c7e31ca425cfcb4e2deb6c54d0df92`. Fingerprint input is UTF-8 `JSON.stringify({scenarioId: 'SHIFT-006', contentVersion: VERSION, variation: 'c', heading: c.focus, options: c.options})`, where `c` is that variation; object-key order is as shown.
+
+This is not independent specialist validation, a signed review, approval of other Rewind variations, or evidence of learning effectiveness or assessment validity. Existing additional-RN records, specialist requirements, source-permission issues and other version limitations remain unchanged. The first/latest comparison does not establish feedback reading or independent learning. Rendered-browser verification on desktop, 375px and 390px remains outstanding; no release is authorized by this clinical approval alone.
 
 ### Interpretation for future audits
 

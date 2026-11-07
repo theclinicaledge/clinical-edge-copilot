@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react';
 import RewindPlayer from '../../rewind/RewindPlayer.jsx';
+import Shift6ResponseHistory from './Shift6ResponseHistory.jsx';
 import TrendReading from './Flowsheet.jsx';
 import { REWIND, SOURCES, ROOM14_VITALS, REWIND_B_VITALS, FLOWSHEET_ROWS, FLOWSHEET_SR, title } from './data.js';
 import { REWIND_KEY, readRewind, updateRewind, rewindAttempt } from './rewindStore.js';
@@ -42,6 +43,7 @@ export default function Shift6Rewind() {
     {record.status === 'blocked' && <p role="status">Saved Rewind practice could not be read or belongs to another version. It has not been replaced. Your Shift responses are unchanged.</p>}
     {record.status === 'unavailable' && <p role="status">Device storage is unavailable. Practice stays in this open page only and may be lost when you leave or refresh.</p>}
     {open && record.value && <RewindPlayer versions={versions} title={title} takeaway={REWIND.teaching} review="Scenario review is founder-reported. Separate Rewind review scope was not supplied." rewind={record.value} figure={figure}
+      responseHistory={(variation, attempts) => attempts.filter(attempt => attempt.variation === variation.id).length > 1 ? <Shift6ResponseHistory variation={variation} attempts={attempts} /> : null}
       close={() => setOpen(false)} onSelect={selected => update(value => { value.selected = selected; })}
       onSubmit={(variation, call) => { const attempt = rewindAttempt(variation, call); if (attempt) update(value => { value.attempts.push(attempt); }); }}
       onContinue={() => {}} continueLabel="Return to shift debrief"

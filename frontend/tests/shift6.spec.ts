@@ -1,5 +1,6 @@
 import { test, expect, type Page } from '@playwright/test';
 import { d1, d2, d3, d4, d5, d6, debrief, FLOWSHEET_SR, REWIND } from '../src/modules/the-shift/shift6/data.js';
+import { rewindAttempt, REWIND_KEY } from '../src/modules/the-shift/shift6/rewindStore.js';
 
 const PATH = '/learn/shifts/stable-number';
 const KEY = 'ce-shift-stable-number-v0.4';
@@ -232,7 +233,7 @@ test.describe('Shift 06 public release', () => {
         if (n > 0) await dialog.getByRole('button', { name: 'Try this situation again' }).click();
         await dialog.getByRole('radio', { name: option.title, exact: true }).check();
         await dialog.getByRole('button', { name: /^Check my response/ }).click();
-        await expect(dialog.locator('.mst-result')).toHaveText(option.label);
+        await expect(dialog.locator('.mst-result')).toHaveText(n > 0 ? `Latest response: ${option.label}` : option.label);
         await expect(dialog).toContainText(option.feedback);
       }
       if (index < REWIND.variations.length - 1) {
@@ -243,6 +244,47 @@ test.describe('Shift 06 public release', () => {
     await dialog.getByRole('button', { name: /^See my Rewind summary/ }).click();
     await expect(dialog).toContainText(REWIND.teaching);
     await expect(dialog).toContainText('3 of 3 situations tried');
+  });
+
+  test('Shift 6 first and latest responses preserve single-attempt feedback, chronology and reload', async ({ page }) => {
+    const original = progress(7, { d1: '14', d2: '1200', d3: ['stool', 'standing', 'skin'], d4: 'escalate', d5: { chips: ESSENTIAL, recommendation: 'bedside' }, d6: 'reassess' });
+    await seed(page, original);
+    const prior = { schema: 1, contentVersion: '0.4', selected: 'c', attempts: [rewindAttempt('a', 'escalate'), rewindAttempt('b', 'reassess'), rewindAttempt('c', 'reassess')] };
+    await page.evaluate(([key, value]) => localStorage.setItem(key, value), [REWIND_KEY, JSON.stringify(prior)]);
+    await page.reload();
+    await page.getByRole('button', { name: /^Review Rewind/ }).click();
+    const dialog = page.getByRole('dialog');
+    const reviewC = () => dialog.getByRole('button', { name: 'Review feedback : C: In between' }).click();
+    await reviewC();
+    await expect(dialog.getByRole('region', { name: 'Response history' })).toHaveCount(0);
+    await expect(dialog).toContainText('Your latest response:');
+    await dialog.getByRole('button', { name: 'Try this situation again' }).click();
+    const notify = REWIND.variations.find(v => v.id === 'c')!.options.find(o => o.id === 'notify')!;
+    const radio = dialog.getByRole('radio', { name: notify.title, exact: true });
+    await radio.focus();
+    await page.keyboard.press('Space');
+    await expect(radio).toBeChecked();
+    await dialog.getByRole('button', { name: /^Check my response/ }).focus();
+    await page.keyboard.press('Enter');
+    const history = dialog.getByRole('region', { name: 'Response history' });
+    await expect(history.locator('p strong')).toHaveText(['First response (attempt 1):', 'Latest response (attempt 2):']);
+    await expect(history).toContainText(notify.title);
+    await expect(history).toContainText('after earlier feedback was available');
+    await expect(dialog).toContainText(notify.feedback);
+    await expect(dialog).toContainText('Your original Shift responses are unchanged.');
+    for (const width of [320, 390]) {
+      await page.setViewportSize({ width, height: 844 });
+      expect(await dialog.evaluate(el => el.scrollWidth <= el.clientWidth)).toBe(true);
+    }
+    await page.addStyleTag({ content: '.mst-rewind-feedback p { font-size: 200% !important; }' });
+    expect(await dialog.evaluate(el => el.scrollWidth <= el.clientWidth)).toBe(true);
+    const saved = await page.evaluate(key => localStorage.getItem(key), REWIND_KEY);
+    await page.reload();
+    await page.getByRole('button', { name: /^Review Rewind/ }).click();
+    await reviewC();
+    await expect(history.locator('p strong')).toHaveText(['First response (attempt 1):', 'Latest response (attempt 2):']);
+    expect(await page.evaluate(key => localStorage.getItem(key), REWIND_KEY)).toBe(saved);
+    expect(await page.evaluate(key => JSON.parse(localStorage.getItem(key)!).answers, KEY)).toEqual(original.answers);
   });
 
   test('all stages fit narrow and enlarged-text layouts, with usable dock clearance', async ({ page }, testInfo) => {

@@ -1,8 +1,8 @@
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useLayoutEffect, useRef, useState } from 'react';
 import ModuleHeader from '../../../components/ModuleHeader.jsx';
 import { RhythmStrip } from '../components/RhythmStrip';
 import { PAPER_SPEED, GAIN, STRIP_SECONDS, secondsToUnits, unitsToSeconds } from '../utils/calibration';
-import { RHYTHM_CHECK_CASES, INTERPRETATIONS, PR_OBSERVATIONS, canSubmitCheck, clampMarker, matchesSpan, measureMarkers } from './cases';
+import { RHYTHM_CHECK_CASES, INTERPRETATIONS, PR_OBSERVATIONS, ENDPOINT_TOLERANCE, canSubmitCheck, clampMarker, matchesSpan, measureMarkers } from './cases';
 import './rhythm-check.css';
 
 const formatSeconds = value => value === null ? 'Not placed' : `${value.toFixed(2)} s`;
@@ -23,11 +23,70 @@ function Evidence({ example }) {
   </g>;
 }
 
+function MeasurementReview({ example, reference, markers, onCenter, onShowMap, showMap }) {
+  const [start, end] = reference.span;
+  const measured = measureMarkers(markers);
+  const expected = end - start;
+  const matches = matchesSpan(markers, reference.span);
+  const firstMarker = markers[0] <= markers[1] ? 0 : 1;
+  const targetName = time => time === reference.p ? 'atrial onset' : 'QRS onset';
+  const landmarks = example.beats.flatMap(({ p, q }, index) => [
+    { time: p, name: 'atrial onset', beat: index + 1 },
+    ...(q === null ? [] : [{ time: q, name: 'QRS onset', beat: index + 1 }]),
+  ]);
+  const difference = Math.round((measured - expected) * 100);
+  const nearby = markers.map(time => landmarks.filter(item => Math.abs(item.time - time) <= ENDPOINT_TOLERANCE + 1e-9));
+  const [nearA, nearB] = nearby;
+  const acrossBeats = nearA.length === 1 && nearB.length === 1 && nearA[0].beat !== nearB[0].beat;
+  const wrongLandmark = nearby.some((items, index) => {
+    const target = index === firstMarker ? start : end;
+    return items.length === 1 && items[0].time !== target;
+  });
+
+  return <section className="rc-review-panel" aria-label="Selected interval comparison">
+    <div className="rc-review-top"><strong>{reference.label}</strong>
+      <span className="rc-status" data-match={matches}>{matches ? 'Markers match' : 'Recheck marker placement'}</span>
+    </div>
+    <dl className="rc-span-pair">
+      <div><dt>Your span</dt><dd>{formatSeconds(measured)}</dd></div>
+      <div><dt>Reference</dt><dd>{formatSeconds(expected)}</dd></div>
+    </dl>
+    {!matches && <p className="rc-reference-copy">
+      {difference !== 0 && <>Your span is {formatSeconds(Math.abs(difference) / 100)} {difference > 0 ? 'longer' : 'shorter'}. </>}
+      {acrossBeats ? <>A and B are near onsets on different beats ({nearA[0].beat} and {nearB[0].beat}).</>
+        : wrongLandmark ? 'At least one marker is near a different onset than the target.'
+        : 'Compare A and B with the two reference onsets.'}
+    </p>}
+    <details className="rc-placement-details"><summary>Marker details</summary>
+    <p>{targetName(start)} {formatSeconds(start)} → {targetName(end)} {formatSeconds(end)}.</p>
+    <ul className="rc-marker-review">
+      {markers.map((time, index) => {
+        const target = index === firstMarker ? start : end;
+        const delta = Math.round((time - target) * 100);
+        const near = nearby[index];
+        return <li key={index}>
+          <strong>{index === 0 ? 'A' : 'B'} · {formatSeconds(time)}</strong>
+          <span>{near.length === 1 ? <>Near beat {near[0].beat} {near[0].name}. </> : near.length === 0 ? 'Away from a marked atrial or QRS onset. ' : 'Near more than one marked onset. '}
+          {delta === 0 ? <>On the target {targetName(target)}.</> : <>{formatSeconds(Math.abs(delta) / 100)} {delta < 0 ? 'before' : 'after'} the target {targetName(target)}.</>}</span>
+        </li>;
+      })}
+    </ul>
+    </details>
+    <div className="rc-review-actions">
+      <button type="button" onClick={() => onCenter(markers)}>Find my markers</button>
+      <button type="button" onClick={() => { onShowMap(true); onCenter(reference.span); }}>Find reference</button>
+      <button type="button" aria-pressed={showMap} onClick={() => onShowMap(!showMap)}>{showMap ? 'Hide evidence overlay' : 'Show evidence overlay'}</button>
+    </div>
+  </section>;
+}
+
 function CaseExercise({ example, position, onNext }) {
   const [intervals, setIntervals] = useState(() => example.measurements.map(() => [null, null]));
   const [active, setActive] = useState(0);
   const [marker, setMarker] = useState(0);
   const [zoom, setZoom] = useState(1);
+  const [pan, setPan] = useState(0);
+  const pendingCenter = useRef(null);
   const [observation, setObservation] = useState('');
   const [answer, setAnswer] = useState('');
   const [localization, setLocalization] = useState('');
@@ -44,15 +103,38 @@ function CaseExercise({ example, position, onNext }) {
   const ready = canSubmitCheck(intervals, answer, observation, Boolean(example.prPattern))
     && (!asksLocalization || Boolean(localization));
 
+  function centerStrip(time) {
+    const pane = viewport.current;
+    if (pane) pane.scrollLeft = time / STRIP_SECONDS * pane.scrollWidth - pane.clientWidth / 2;
+  }
+
+  function changeZoom(value, time) {
+    if (value === zoom) {
+      if (time !== undefined) centerStrip(time);
+      return;
+    }
+    const pane = viewport.current;
+    pendingCenter.current = time ?? (pane.scrollLeft + pane.clientWidth / 2) / pane.scrollWidth * STRIP_SECONDS;
+    setZoom(value);
+  }
+
   function inspectInterval(index) {
     setActive(index);
     setMarker(0);
-    if (submitted && viewport.current) {
-      const pane = viewport.current;
+    if (submitted) {
       const [start, end] = example.measurements[index].span;
-      pane.scrollLeft = (start + end) / 2 / STRIP_SECONDS * pane.scrollWidth - pane.clientWidth / 2;
+      centerStrip((start + end) / 2);
     }
   }
+
+  useLayoutEffect(() => {
+    const pane = viewport.current;
+    if (pane && pendingCenter.current !== null) {
+      pane.scrollLeft = pendingCenter.current / STRIP_SECONDS * pane.scrollWidth - pane.clientWidth / 2;
+      pendingCenter.current = null;
+    }
+  }, [zoom]);
+
   const slow = example.measurements.length === 1;
   // Stable option order within each topic avoids leaking the key through ordering.
   const options = slow ? ['sinus', 'junctional'] : ['mobitzI', 'mobitzII'];
@@ -99,30 +181,58 @@ function CaseExercise({ example, position, onNext }) {
         <h2 ref={questionHeading} id="rc-case-title" tabIndex={-1}>{slow ? 'Slow regular or near-regular rhythm' : 'Intermittent nonconducted beats'}</h2></div>
       <span className="rc-case-id">{example.id}</span>
     </div>
-    <p className="rc-instruction">{example.prompt}</p>
-    {example.guided && <p className="rc-guide"><strong>How to approach it.</strong> {example.coaching}</p>}
+    {!submitted && <p className="rc-instruction">{example.prompt}</p>}
+    {!submitted && example.guided && <details className="rc-guide"><summary>How to approach it</summary><p>{example.coaching}</p></details>}
     <section ref={workbench} className="rc-workbench" aria-label="Calibrated strip and measurements">
+      {submitted && <h3 ref={resultHeading} id="rc-result-title" className="rc-review-heading" tabIndex={-1}>Measurement accuracy</h3>}
+      {submitted &&
+        <MeasurementReview example={example} reference={reference} markers={markers} showMap={showMap}
+          onShowMap={setShowMap} onCenter={span => {
+            const duration = measureMarkers(span) + 0.2;
+            const fittingZoom = [3, 2, 1].find(value => STRIP_SECONDS / value >= duration) ?? 1;
+            changeZoom(Math.min(Math.max(2, zoom), fittingZoom), (span[0] + span[1]) / 2);
+            viewport.current?.focus({ preventScroll: true });
+            workbench.current?.scrollIntoView({ block: 'start' });
+          }} />}
       <div className="rc-strip-bar">
         <span>Lead {example.signal.lead} · {STRIP_SECONDS} s · {PAPER_SPEED} mm/s · {GAIN} mm/mV</span>
         <div className="rc-zoom" role="group" aria-label="Strip zoom">
-          {[1, 2, 3].map(value => <button type="button" key={value} aria-pressed={zoom === value} onClick={() => setZoom(value)}>{value === 1 ? 'Fit' : `${value}×`}</button>)}
+          {[1, 2, 3].map(value => <button type="button" key={value} aria-pressed={zoom === value} onClick={() => changeZoom(value, zoom === 1 && value > 1 ? markers[marker] ?? markers[0] ?? 0 : undefined)}>{value === 1 ? 'Fit' : `${value}×`}</button>)}
         </div>
       </div>
-      <div ref={viewport} className="rc-scroll" tabIndex={0} aria-label="Rhythm strip viewport. Scroll horizontally when zoomed.">
+      <div ref={viewport} className="rc-scroll" tabIndex={0} onScroll={event => {
+        const pane = event.currentTarget;
+        const max = pane.scrollWidth - pane.clientWidth;
+        setPan(max > 0 ? Math.round(100 * pane.scrollLeft / max) : 0);
+      }} aria-label="Rhythm strip viewport. Scroll horizontally when zoomed.">
         <div className="rc-plot" style={{ width: `${zoom * 100}%` }} onClick={tapStrip}>
           <RhythmStrip rhythmId={example.id} examplePath={example.path} overlay={overlay} accessibleLabel={`Synthetic lead ${example.signal.lead} rhythm strip, six seconds${submitted && showMap ? ', with evidence markers' : ''}`} />
         </div>
       </div>
+      {zoom > 1 && <div className="rc-overview">
+        <div className="rc-overview-track" aria-hidden="true">
+          <RhythmStrip rhythmId={example.id} examplePath={example.path} />
+          <span style={{ width: `${100 / zoom}%`, left: `${pan * (1 - 1 / zoom)}%` }} />
+        </div>
+        <label htmlFor="rc-pan">Pan full strip</label>
+        <input id="rc-pan" type="range" min="0" max="100" value={pan} aria-valuetext={`${pan}% along strip`}
+          onChange={event => {
+            const pane = viewport.current;
+            if (pane) pane.scrollLeft = Number(event.target.value) / 100 * (pane.scrollWidth - pane.clientWidth);
+          }} />
+      </div>}
       {intervals.length > 1 && <div className="rc-intervals rc-interval-picker" role="group" aria-label={submitted ? 'Review measured interval' : 'Interval to measure'}>
         {intervals.map((pair, index) => <button key={index} type="button" aria-pressed={index === active} onClick={() => inspectInterval(index)}>
           Interval {index + 1} · {example.measurements[index].label}<br />{formatSeconds(measureMarkers(pair))}
         </button>)}
       </div>}
-      {submitted ? <div className="rc-legend">
-        <button type="button" aria-pressed={showMap} onClick={() => setShowMap(value => !value)}>{showMap ? 'Hide evidence overlay' : 'Show evidence overlay'}</button>
-        {showMap && <p><span className="rc-key-p">Atrial deflection</span> · <span className="rc-key-q">QRS</span> · Brackets connect onsets. Solid gold lines mark the selected reference. Dashed white lines show your A and B markers. Dashed gold lines mark a P without a QRS.</p>}
-      </div> : <div className="rc-controls">
-        <p className="rc-marker-help">Tap the strip to place the selected marker. Use the sliders or arrow keys for fine placement. At higher zoom, swipe to inspect the rest.</p>
+      {submitted ? <>
+        <p className="rc-overlay-key"><strong>White dashed</strong> · Your A/B
+          {showMap && <> · <strong>Gold solid</strong> · Reference
+            {example.prPattern && <> · Gold dashed · Nonconducted P</>}</>}
+        </p>
+      </> : <div className="rc-controls">
+        <p className="rc-marker-help">Tap the strip to place A or B. Swipe to pan when zoomed. Fine-tune below.</p>
         <div className="rc-marker-grid">
           {markers.map((value, i) => <div key={i} className="rc-marker-control">
             <button type="button" aria-pressed={marker === i} onClick={() => setMarker(i)}>Marker {i === 0 ? 'A' : 'B'}</button>
@@ -151,26 +261,27 @@ function CaseExercise({ example, position, onNext }) {
       </fieldset>}
       <button className="rc-primary" type="submit" disabled={!ready}>Submit interpretation</button>
       <p className="rc-hint">Place both markers for each interval{example.prPattern ? ', record the PR pattern,' : ''} and select an interpretation{asksLocalization ? ' and a localization answer' : ''} to submit.</p>
-    </form> : <section className="rc-result" aria-labelledby="rc-result-title">
-      <p className="rc-eyebrow">{answer === example.answer ? 'Interpretation matches' : 'Review the deciding evidence'}</p>
-      <h3 ref={resultHeading} id="rc-result-title" tabIndex={-1}>{INTERPRETATIONS[example.answer]}</h3>
-      <p>Your interpretation · {INTERPRETATIONS[answer]}</p>
-      {asksLocalization && <p><strong>Localization {localization === 'No' ? 'matches' : 'needs review'}</strong> · Your answer: {localization}. Reference answer: No.</p>}
-      {example.prPattern && <p><strong>PR observation {observation === example.prPattern ? 'matches' : 'needs review'}</strong> · {PR_OBSERVATIONS[observation]}<br />
-        Reference pattern · {PR_OBSERVATIONS[example.prPattern]}. Marker results below assess placement on each beat separately.
-      </p>}
-      <p>{example.feedback}</p>
-      <p><strong>Closest alternative</strong> · {INTERPRETATIONS[example.alternative]}</p>
-      <ul className="rc-measurements">
-        {example.measurements.map(({ label, span, p, q }, index) => <li key={label}>
-          <strong>{label}</strong> · {matchesSpan(intervals[index], span) ? 'Markers match' : 'Recheck marker placement'}<br />
-          Your span {formatSeconds(measureMarkers(intervals[index]))} · Reference {formatSeconds(span[1] - span[0])}<br />
-          Your A {formatSeconds(intervals[index][0])} · B {formatSeconds(intervals[index][1])}<br />
-          Atrial onset {formatSeconds(p)} · QRS onset {formatSeconds(q)}
-        </li>)}
-      </ul>
-      {!slow && <p><strong>Conducted PR spans in strip order.</strong> {example.beats.map(({ p, q }) => q === null ? 'P only' : formatSeconds(q - p)).join(' · ')}</p>}
-      {answer === 'uncertain' && <p>A longer strip or another lead can help when atrial activity is unclear. Here, the marked events supply the distinguishing evidence.</p>}
+    </form> : <section className="rc-result" aria-label="Rhythm feedback">
+      {(example.prPattern || asksLocalization) && <section className="rc-feedback-card">
+        <h3>Clinical observation</h3>
+        {example.prPattern && <p><strong>PR observation {observation === example.prPattern ? 'matches' : 'needs review'}</strong> · {PR_OBSERVATIONS[observation]}<br />
+          Reference pattern · {PR_OBSERVATIONS[example.prPattern]}
+        </p>}
+        {asksLocalization && <p><strong>Localization {localization === 'No' ? 'matches' : 'needs review'}</strong> · Your answer: {localization}. Reference answer: No.</p>}
+      </section>}
+      <section className="rc-feedback-card">
+        <div className="rc-review-top"><h3>Rhythm interpretation</h3>
+          <span className="rc-status" data-match={answer === example.answer}>{answer === example.answer ? 'Interpretation matches' : 'Review the deciding evidence'}</span>
+        </div>
+        <p>Your interpretation · {INTERPRETATIONS[answer]}</p>
+        <p><strong>Reference rhythm</strong> · {INTERPRETATIONS[example.answer]}</p>
+        <p><strong>Closest alternative</strong> · {INTERPRETATIONS[example.alternative]}</p>
+        <details><summary>Why this rhythm fits</summary>
+          <p>{example.feedback}</p>
+          {!slow && <p><strong>Conducted PR spans in strip order.</strong> {example.beats.map(({ p, q }) => q === null ? 'P only' : formatSeconds(q - p)).join(' · ')}</p>}
+          {answer === 'uncertain' && <p>A longer strip or another lead can help when atrial activity is unclear. Here, the marked events supply the distinguishing evidence.</p>}
+        </details>
+      </section>
       <details><summary>Educational sources</summary><ul>{example.sources.map(([name, url]) => <li key={url}><a href={url} target="_blank" rel="noreferrer">{name}</a></li>)}</ul></details>
       <button className="rc-primary" type="button" onClick={onNext}>{position + 1 < RHYTHM_CHECK_CASES.length ? 'Next case' : 'Finish Rhythm Check'}</button>
     </section>}

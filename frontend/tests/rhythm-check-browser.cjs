@@ -45,6 +45,8 @@ async function verifyRhythmCheck(browser, width, baseURL = 'http://127.0.0.1:519
       const submit = page.getByRole('button', { name: 'Submit interpretation' });
       assert.ok(await submit.isDisabled());
       const answerPair = variant % 4;
+      const isFounderExample = example.id === 'RC-02' && variant === 0;
+      const isCrossBeatExample = example.id === 'RC-02' && variant === 1;
       const isRC04 = example.id === 'RC-04';
       const offset = index === 2 || example.id === 'RC-06' || (isRC04 && [1, 2, 4].includes(variant)) ? 0.30 : 0;
       const zoom = ['Fit', '2×', '3×'][index % 3];
@@ -52,20 +54,21 @@ async function verifyRhythmCheck(browser, width, baseURL = 'http://127.0.0.1:519
       await page.waitForFunction(value => document.querySelector('.rc-plot').style.width === value, `${100 * (index % 3 + 1)}%`);
       for (const [interval, measurement] of example.measurements.entries()) {
         if (interval > 0) await page.getByRole('button', { name: new RegExp(`^Interval ${interval + 1} ·`) }).press('Enter');
-        for (const [marker, endpoint] of measurement.span.entries()) {
+        const placedSpan = isFounderExample ? [0.76, 1.82] : isCrossBeatExample ? [0.43, 1.68] : measurement.span.map(endpoint => endpoint + offset);
+        for (const [marker, endpoint] of placedSpan.entries()) {
           const slider = page.getByRole('slider', { name: new RegExp(`Marker ${marker ? 'B' : 'A'} time`) });
           if (index === 0 && !mobile) {
             await slider.focus();
             for (let step = 0; step < Math.round(endpoint * 100); step++) await page.keyboard.press('ArrowRight');
-          } else await tapTime(endpoint + offset);
+          } else await tapTime(endpoint);
           const actual = Number(await slider.inputValue());
-          assert.ok(closeEnough(actual, endpoint + offset, 0.02), `${example.id} interval ${interval} marker ${marker} at ${width}px: ${actual} vs ${endpoint + offset}`);
+          assert.ok(closeEnough(actual, endpoint, 0.02), `${example.id} interval ${interval} marker ${marker} at ${width}px: ${actual} vs ${endpoint}`);
         }
         const value = Number.parseFloat(await page.locator('.rc-measurement strong').innerText());
-        assert.ok(closeEnough(value, measurement.span[1] - measurement.span[0], 0.03));
+        assert.ok(closeEnough(value, placedSpan[1] - placedSpan[0], 0.03));
       }
       assert.ok(await submit.isDisabled());
-      const choice = index === 1 ? 'uncertain' : isRC04 && answerPair >= 2 ? 'sinus' : example.answer;
+      const choice = index === 1 && !isFounderExample ? 'uncertain' : isRC04 && answerPair >= 2 ? 'sinus' : example.answer;
       await page.locator(`input[name=interpretation][value=${choice}]`).focus();
       await page.keyboard.press('Space');
       const localization = answerPair % 2 === 0 ? 'No' : 'Yes';
@@ -93,9 +96,29 @@ async function verifyRhythmCheck(browser, width, baseURL = 'http://127.0.0.1:519
       assert.ok(await submit.isEnabled());
       await submit.press('Enter');
       assert.ok(await page.locator('#rc-result-title').evaluate(element => document.activeElement === element));
-      assert.equal(await page.locator('.rc-result .rc-eyebrow').innerText(), choice !== example.answer ? 'REVIEW THE DECIDING EVIDENCE' : 'INTERPRETATION MATCHES');
+      assert.equal(await page.locator('.rc-result .rc-status').innerText(), choice !== example.answer ? 'Review the deciding evidence' : 'Interpretation matches');
+      assert.equal(await page.getByRole('heading', { name: 'Clinical observation', exact: true }).count(),
+        example.prPattern || example.id === 'RC-04' ? 1 : 0);
+      await page.getByText('Why this rhythm fits', { exact: true }).press('Enter');
       const result = await page.locator('.rc-result').innerText();
-      assert.ok(result.includes(offset ? 'Recheck marker placement' : 'Markers match'));
+      const measurementReview = page.getByRole('region', { name: 'Selected interval comparison' });
+      assert.ok((await measurementReview.innerText()).includes(offset || isFounderExample || isCrossBeatExample ? 'Recheck marker placement' : 'Markers match'));
+      if (isCrossBeatExample) {
+        assert.ok((await measurementReview.innerText()).includes('A and B are near onsets on different beats (1 and 2).'));
+      }
+      if (isFounderExample) {
+        await measurementReview.getByText('Marker details', { exact: true }).press('Enter');
+        const comparison = await measurementReview.innerText();
+        for (const phrase of ['1.06 s', '0.12 s', '0.94 s longer', '0.33 s after the target QRS onset', '1.27 s after the target atrial onset', 'Away from a marked atrial or QRS onset', 'At least one marker is near a different onset than the target.', 'Near beat 2 atrial onset']) {
+          assert.ok(comparison.includes(phrase), phrase);
+        }
+        const original = await page.locator('.rc-learner-marker line').evaluateAll(nodes => nodes.map(node => node.getAttribute('x1')));
+        await page.getByRole('button', { name: 'Find my markers' }).press('Enter');
+        const myPosition = await page.locator('.rc-scroll').evaluate(pane => pane.scrollLeft);
+        await page.getByRole('button', { name: 'Find reference' }).press('Enter');
+        assert.ok(await page.locator('.rc-scroll').evaluate(pane => pane.scrollLeft) <= myPosition);
+        assert.deepEqual(await page.locator('.rc-learner-marker line').evaluateAll(nodes => nodes.map(node => node.getAttribute('x1'))), original);
+      }
       if (isRC04) {
         assert.ok(result.includes(`Localization ${localization === 'No' ? 'matches' : 'needs review'} · Your answer: ${localization}. Reference answer: No.`));
         assert.ok(result.includes('0.38 s, and the QRS begins at 0.49 s, an interval of 0.11 s'));
@@ -130,12 +153,27 @@ async function verifyRhythmCheck(browser, width, baseURL = 'http://127.0.0.1:519
       assert.equal(await page.locator('.rc-dropped').count(), example.beats.filter(beat => beat.q === null).length);
       assert.ok(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth));
       if (index === 0) {
+        await page.getByRole('button', { name: '3×', exact: true }).press('Enter');
+        const pan = page.getByRole('slider', { name: 'Pan full strip' });
+        await pan.press('End');
+        await page.waitForFunction(() => {
+          const pane = document.querySelector('.rc-scroll');
+          return Math.abs(pane.scrollWidth - pane.clientWidth - pane.scrollLeft) <= 1;
+        });
+        await page.getByRole('button', { name: '2×', exact: true }).press('Enter');
+        assert.ok(await page.locator('.rc-scroll').evaluate(pane => pane.scrollLeft > 0));
         await page.getByRole('button', { name: 'Hide evidence overlay' }).press('Enter');
         assert.equal(await page.locator('.rc-evidence').count(), 0);
         await page.getByRole('button', { name: 'Show evidence overlay' }).press('Enter');
         assert.equal(await page.locator('.rc-evidence').count(), 1);
       }
-      await page.getByRole('button', { name: index === 7 ? 'Finish Rhythm Check' : 'Next case', exact: true }).press('Enter');
+      const next = page.getByRole('button', { name: index === 7 ? 'Finish Rhythm Check' : 'Next case', exact: true });
+      await next.scrollIntoViewIfNeeded();
+      assert.ok(await next.evaluate(button => {
+        const { x, y, width, height } = button.getBoundingClientRect();
+        return button.contains(document.elementFromPoint(x + width / 2, y + height / 2));
+      }), 'The dock must not cover the next action');
+      await next.press('Enter');
     }
     await page.getByRole('heading', { name: 'Rhythm Check complete' }).waitFor();
     await page.getByRole('button', { name: 'Start again' }).press('Enter');

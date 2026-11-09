@@ -32,7 +32,7 @@ function shape(start: number, duration: number, points: readonly Point[]): Wave 
     return 0;
   } };
 }
-function dome(start: number, duration: number, amplitude: number, peak = 0.5): Wave {
+export function dome(start: number, duration: number, amplitude: number, peak = 0.5): Wave {
   return { start, duration, landmarks: [0, peak, 1], value: p => amplitude * (p <= peak
     ? (1 - Math.cos(Math.PI * p / peak)) / 2
     : (1 + Math.cos(Math.PI * (p - peak) / (1 - peak))) / 2) };
@@ -41,10 +41,10 @@ const NARROW: readonly Point[] = [[0, 0], [0.2, -0.08], [0.45, 0.85], [0.73, -0.
 const WIDE: readonly Point[] = [[0, 0], [0.2, 0.22], [0.38, 0.85], [0.52, 0.65], [0.72, -0.32], [1, 0]];
 const RBBB: readonly Point[] = [[0, 0], [0.13, 0.2], [0.32, -0.35], [0.65, 0.8], [0.8, 0.68], [1, 0]];
 const LBBB: readonly Point[] = [[0, 0], [0.25, 0.5], [0.42, 0.8], [0.54, 0.65], [0.68, 0.85], [1, 0]];
-function ventricular(waves: Wave[], q: number, kind: 'narrow' | 'wide' | 'rbbb' | 'lbbb' = 'narrow', qt = 0.38) {
+export function ventricular(waves: Wave[], q: number, kind: 'narrow' | 'wide' | 'rbbb' | 'lbbb' = 'narrow', qt = 0.38, tDelay = 0.06) {
   const width = kind === 'narrow' ? 0.08 : kind === 'rbbb' ? 0.14 : 0.16;
   waves.push({ ...shape(q, width, kind === 'narrow' ? NARROW : kind === 'rbbb' ? RBBB : kind === 'lbbb' ? LBBB : WIDE), role: 'qrs' });
-  waves.push(dome(q + width + 0.06, qt - width - 0.06, kind === 'narrow' ? 0.25 : -0.24, 0.62));
+  waves.push(dome(q + width + tDelay, qt - width - tDelay, kind === 'narrow' ? 0.25 : -0.24, 0.62));
 }
 function sinus(waves: Wave[], q: number, pr = 0.16, kind: 'narrow' | 'wide' | 'rbbb' | 'lbbb' = 'narrow', qt = 0.38) {
   waves.push(dome(q - pr, 0.1, 0.15));
@@ -265,7 +265,7 @@ for (const e of Object.values(STRIP_EXAMPLES)) {
   }
 }
 
-function render(e: StripExample): string {
+export function renderStripExample(e: StripExample): string {
   // Include component landmarks as well as 4 ms samples so even very short
   // pacing artifacts retain their apex. Sum overlapping atrial/ventricular
   // activity; do not delete P waves when they fall inside QRS or T waves.
@@ -285,7 +285,7 @@ function render(e: StripExample): string {
   }).join(' ');
 }
 export const WAVEFORMS: Record<string, string> = Object.fromEntries(
-  Object.entries(STRIP_EXAMPLES).map(([id, e]) => [id, render(e)]),
+  Object.entries(STRIP_EXAMPLES).map(([id, e]) => [id, renderStripExample(e)]),
 );
 export function stripAnnotation(rhythmId: string): string {
   return `Lead ${STRIP_EXAMPLES[rhythmId]?.lead ?? 'II'} simulation · 6 s · 25 mm/s · 10 mm/mV`;

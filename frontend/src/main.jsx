@@ -45,6 +45,8 @@ function ShiftUnavailable({ navigate, active = true, mode }) {
 const ShiftExperience = import.meta.env.VITE_SHIFT_ENABLED === 'true' ? lazy(() => import('./modules/the-shift/ShiftExperience.jsx').catch(() => ({ default: ShiftUnavailable }))) : null;
 
 
+const RhythmCheck = lazy(() => import('./modules/rhythm-lab/rhythm-check/RhythmCheck.jsx'));
+
 const MedSurgTrack = import.meta.env.VITE_MED_SURG_TRACK_PREVIEW === 'true' ? lazy(() => import('./modules/med-surg-track/Track.jsx')) : null;
 
 // ── Service Worker Registration ─────────────────────────────────────────────
@@ -71,6 +73,7 @@ function getPage() {
   if (path === '/ask') return 'ask';
   if (SHIFT_ENABLED && TRACK_ENABLED && trackRoute(path)) return 'med-surg';
   if (SHIFT_ENABLED && shiftRoute(path)) return 'shift-learning';
+  if (path === '/rhythm-lab/check') return 'rhythmlab-check';
   if (path === '/rhythm-lab') return 'rhythmlab';
   if (path === '/rhythm-lab/library')  return 'rhythmlab-library';
   if (path === '/rhythm-lab/practice') return 'rhythmlab-practice';
@@ -178,6 +181,7 @@ function Root() {
       {page === 'home'       && <ClinicalEdgeHome onNavigate={navigate} />}
       {SHIFT_ENABLED && shiftEntered && <Suspense fallback={page === 'shift-learning' ? <main className="ce-not-found" role="status">Opening The Shift...</main> : null}><ShiftExperience navigate={navigate} active={page === 'shift-learning'} routeKey={routeKey} /></Suspense>}
       {page === 'rhythmlab'          && <RhythmLabModule onGoHome={() => navigate('/')} navigate={navigate} />}
+      {page === 'rhythmlab-check' && <Suspense fallback={<p role="status">Opening Rhythm Check…</p>}><RhythmCheck navigate={navigate} /></Suspense>}
       {page === 'rhythmlab-library'  && <RhythmLibraryPage navigate={navigate} />}
       {page === 'rhythmlab-practice' && <RhythmPracticePage navigate={navigate} />}
       {page === 'rhythmlab-compare'  && <RhythmComparePage key={routeKey} navigate={navigate} />}

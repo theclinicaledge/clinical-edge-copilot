@@ -1,14 +1,17 @@
-import { useId } from 'react';
+import { useId, type ReactNode } from 'react';
 import { WAVEFORMS } from '../utils/waveforms';
 import { SMALL_BOX_UNITS, LARGE_BOX_UNITS, STRIP_WIDTH, STRIP_HEIGHT } from '../utils/calibration';
 
 interface RhythmStripProps {
   rhythmId: string;
   preview?: boolean;
+  examplePath?: string;
+  overlay?: ReactNode;
+  accessibleLabel?: string;
 }
 
-export function RhythmStrip({ rhythmId, preview = false }: RhythmStripProps) {
-  const path = WAVEFORMS[rhythmId] ?? WAVEFORMS['nsr'];
+export function RhythmStrip({ rhythmId, preview = false, examplePath, overlay, accessibleLabel }: RhythmStripProps) {
+  const path = examplePath ?? WAVEFORMS[rhythmId] ?? WAVEFORMS['nsr'];
   const uid = `rs-${useId().replace(/:/g, '')}`;
 
   const viewBox = preview ? '0 0 500 100' : '0 0 800 100';
@@ -23,7 +26,9 @@ export function RhythmStrip({ rhythmId, preview = false }: RhythmStripProps) {
       data-rhythm-id={rhythmId}
       data-duration-seconds={preview ? 3.75 : 6}
       preserveAspectRatio="xMinYMid meet"
-      aria-hidden="true"
+      aria-hidden={accessibleLabel ? undefined : true}
+      role={accessibleLabel ? 'img' : undefined}
+      aria-label={accessibleLabel}
       style={{ display: 'block' }}
     >
       <defs>
@@ -56,12 +61,13 @@ export function RhythmStrip({ rhythmId, preview = false }: RhythmStripProps) {
         filter={`url(#${uid}-glow)`}
       />
 
+      {overlay}
     </svg>
   );
 
   // Detail strips get a canvas wrapper that drives the sweep-reveal animation.
   // Preview strips render bare (used inside card thumbnails — no entrance needed).
-  if (!preview) {
+  if (!preview && examplePath === undefined) {
     return <div className="strip-canvas">{svg}</div>;
   }
   return svg;

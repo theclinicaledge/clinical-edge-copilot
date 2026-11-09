@@ -148,10 +148,17 @@ export function RhythmLabHome({ navigate }: RhythmLabHomeProps) {
 
         <FoundationsSection />
 
+
         <div className="explore-hub">
           <p className="explore-hub__eyebrow">Get started</p>
           <p className="explore-hub__title">Explore Rhythm Lab</p>
           <div className="explore-list">
+            <a className="explore-row" href="/rhythm-lab/check" onClick={goTo('/rhythm-lab/check')}>
+              <span className="explore-row__body">
+                <span className="explore-row__title">Rhythm Check Beta</span>
+                <span className="explore-row__desc">Clinical Review Pending · Measure a finding, then explain the rhythm.</span>
+              </span>
+            </a>
             {EXPLORE_CARDS.map(card => (
               <a
                 key={card.key}

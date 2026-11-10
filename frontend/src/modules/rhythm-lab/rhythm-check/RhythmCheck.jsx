@@ -2,7 +2,7 @@ import { useEffect, useLayoutEffect, useRef, useState } from 'react';
 import ModuleHeader from '../../../components/ModuleHeader.jsx';
 import { RhythmStrip } from '../components/RhythmStrip';
 import { PAPER_SPEED, GAIN, STRIP_SECONDS, secondsToUnits, unitsToSeconds } from '../utils/calibration';
-import { RHYTHM_CHECK_CASES, INTERPRETATIONS, PR_OBSERVATIONS, ENDPOINT_TOLERANCE, canSubmitCheck, clampMarker, matchesSpan, measureMarkers } from './cases';
+import { RHYTHM_CHECK_CASES, INTERPRETATIONS, PR_OBSERVATIONS, ENDPOINT_TOLERANCE, assessMeasurement, canSubmitCheck, clampMarker, measureMarkers, rateExercise } from './cases';
 import './rhythm-check.css';
 
 const formatSeconds = value => value === null ? 'Not placed' : `${value.toFixed(2)} s`;
@@ -27,7 +27,8 @@ function MeasurementReview({ example, reference, markers, onCenter, onShowMap, s
   const [start, end] = reference.span;
   const measured = measureMarkers(markers);
   const expected = end - start;
-  const matches = matchesSpan(markers, reference.span);
+  const { duration, landmarks: targetMatch } = assessMeasurement(markers, reference.span);
+  const matches = duration && targetMatch;
   const firstMarker = markers[0] <= markers[1] ? 0 : 1;
   const targetName = time => time === reference.p ? 'atrial onset' : 'QRS onset';
   const landmarks = example.beats.flatMap(({ p, q }, index) => [
@@ -45,17 +46,19 @@ function MeasurementReview({ example, reference, markers, onCenter, onShowMap, s
 
   return <section className="rc-review-panel" aria-label="Selected interval comparison">
     <div className="rc-review-top"><strong>{reference.label}</strong>
-      <span className="rc-status" data-match={matches}>{matches ? 'Markers match' : 'Recheck marker placement'}</span>
+      <span className="rc-status" data-match={matches}>{matches ? 'Markers match' : targetMatch ? 'Recheck duration' : 'Recheck marker placement'}</span>
     </div>
     <dl className="rc-span-pair">
       <div><dt>Your span</dt><dd>{formatSeconds(measured)}</dd></div>
       <div><dt>Reference</dt><dd>{formatSeconds(expected)}</dd></div>
     </dl>
+    <p><strong>Duration</strong> · {duration ? 'Within tolerance' : 'Outside tolerance'}<br />
+      <strong>Landmarks and beat</strong> · {targetMatch ? 'Target endpoints match' : 'Target endpoints do not match'}</p>
     {!matches && <p className="rc-reference-copy">
       {difference !== 0 && <>Your span is {formatSeconds(Math.abs(difference) / 100)} {difference > 0 ? 'longer' : 'shorter'}. </>}
       {acrossBeats ? <>A and B are near onsets on different beats ({nearA[0].beat} and {nearB[0].beat}).</>
         : wrongLandmark ? 'At least one marker is near a different onset than the target.'
-        : 'Compare A and B with the two reference onsets.'}
+        : !targetMatch ? 'Compare A and B with the two reference onsets.' : 'The endpoints are close individually, but the span falls outside tolerance.'}
     </p>}
     <details className="rc-placement-details"><summary>Marker details</summary>
     <p>{targetName(start)} {formatSeconds(start)} → {targetName(end)} {formatSeconds(end)}.</p>
@@ -99,9 +102,13 @@ function CaseExercise({ example, position, onNext }) {
   const markers = intervals[active];
   const reference = example.measurements[active];
   const viewport = useRef(null);
+  const [rateAnswer, setRateAnswer] = useState('');
+  const [regularity, setRegularity] = useState('');
+  const rate = rateExercise(example);
   const asksLocalization = example.id === 'RC-04';
   const ready = canSubmitCheck(intervals, answer, observation, Boolean(example.prPattern))
-    && (!asksLocalization || Boolean(localization));
+    && (!asksLocalization || Boolean(localization))
+    && (!rate || (/^[0-9]{1,3}$/.test(rateAnswer) && (!rate.assessRegularity || regularity)));
 
   function centerStrip(time) {
     const pane = viewport.current;
@@ -183,7 +190,7 @@ function CaseExercise({ example, position, onNext }) {
     </div>
     {!submitted && <p className="rc-instruction">{example.prompt}</p>}
     {!submitted && example.guided && <details className="rc-guide"><summary>How to approach it</summary><p>{example.coaching}</p></details>}
-    <section ref={workbench} className="rc-workbench" aria-label="Calibrated strip and measurements">
+    <section id="rc-strip" tabIndex={-1} ref={workbench} className="rc-workbench" aria-label="Calibrated strip and measurements">
       {submitted && <h3 ref={resultHeading} id="rc-result-title" className="rc-review-heading" tabIndex={-1}>Measurement accuracy</h3>}
       {submitted &&
         <MeasurementReview example={example} reference={reference} markers={markers} showMap={showMap}
@@ -221,6 +228,18 @@ function CaseExercise({ example, position, onNext }) {
             if (pane) pane.scrollLeft = Number(event.target.value) / 100 * (pane.scrollWidth - pane.clientWidth);
           }} />
       </div>}
+      {!submitted && rate && <div className="rc-rate-row">
+        <label htmlFor="rc-rate">Ventricular rate (bpm)</label>
+        <input id="rc-rate" form="rc-answer" value={rateAnswer} onChange={event => setRateAnswer(event.target.value)}
+          inputMode="numeric" enterKeyHint="done" maxLength={3} aria-describedby="rc-rate-help"
+          onKeyDown={event => {
+            if (event.key === 'Enter' || event.key === 'Escape') {
+              event.preventDefault();
+              event.currentTarget.blur();
+            }
+          }} />
+        <p id="rc-rate-help">Count QRS complexes on the full six-second strip and multiply by 10.</p>
+      </div>}
       {intervals.length > 1 && <div className="rc-intervals rc-interval-picker" role="group" aria-label={submitted ? 'Review measured interval' : 'Interval to measure'}>
         {intervals.map((pair, index) => <button key={index} type="button" aria-pressed={index === active} onClick={() => inspectInterval(index)}>
           Interval {index + 1} · {example.measurements[index].label}<br />{formatSeconds(measureMarkers(pair))}
@@ -241,9 +260,15 @@ function CaseExercise({ example, position, onNext }) {
           </div>)}
         </div>
         <p className="rc-measurement" aria-live="polite">Measured span · <strong>{formatSeconds(measureMarkers(markers))}</strong></p>
+        <a className="rc-jump" href="#rc-answer">Go to questions ↓</a>
       </div>}
     </section>
-    {!submitted ? <form className="rc-answer" onSubmit={event => { event.preventDefault(); if (ready) setRevealed(true); }}>
+    {!submitted ? <form id="rc-answer" tabIndex={-1} className="rc-answer" onSubmit={event => { event.preventDefault(); if (ready) setRevealed(true); }}>
+      {rate?.assessRegularity && <fieldset><legend>Are the R–R intervals evenly spaced?</legend>
+        {['Evenly spaced', 'Unevenly spaced'].map(label => <label className="rc-option" key={label}>
+          <input type="radio" name="regularity" checked={regularity === label} onChange={() => setRegularity(label)} />{label}
+        </label>)}
+      </fieldset>}
       {example.prPattern && <fieldset><legend>How does PR behave around the pause?</legend>
         {Object.entries(PR_OBSERVATIONS).map(([value, label]) => <label className="rc-option" key={value}>
           <input type="radio" name="pr-observation" value={value} checked={observation === value} onChange={() => setObservation(value)} />{label}
@@ -260,8 +285,17 @@ function CaseExercise({ example, position, onNext }) {
         </label>)}
       </fieldset>}
       <button className="rc-primary" type="submit" disabled={!ready}>Submit interpretation</button>
-      <p className="rc-hint">Place both markers for each interval{example.prPattern ? ', record the PR pattern,' : ''} and select an interpretation{asksLocalization ? ' and a localization answer' : ''} to submit.</p>
+      <p className="rc-hint">Place both markers for each interval and answer the questions above to submit.</p>
     </form> : <section className="rc-result" aria-label="Rhythm feedback">
+      {rate && <section className="rc-feedback-card">
+        <h3>Ventricular rate and spacing</h3>
+        <p><strong>{Number(rateAnswer) === rate.estimate ? 'Estimate matches' : 'Recheck the QRS count'}</strong> · You entered {Number(rateAnswer)} bpm. {rate.count} QRS complexes × 10 ≈ {rate.estimate} bpm.</p>
+        <p>This is an estimate over six seconds. Dividing 60 by one R–R interval gives the rate for that interval.</p>
+        {rate.assessRegularity ? <>
+          <p><strong>{regularity === (rate.regular ? 'Evenly spaced' : 'Unevenly spaced') ? 'Spacing matches' : 'Recheck the spacing'}</strong> · You chose {regularity.toLowerCase()}. Ventricular intervals range from {formatSeconds(rate.shortest)} to {formatSeconds(rate.longest)}.</p>
+          <p>Counting P waves separately gives an atrial estimate of {rate.atrialEstimate} bpm. A nonconducted P wave counts toward the atrial estimate only.</p>
+        </> : <p>The R–R interval is {formatSeconds(rate.shortest)} here, giving {Math.round(60 / rate.shortest)} bpm by the interval method. Rate alone cannot distinguish sinus bradycardia from junctional rhythm.</p>}
+      </section>}
       {(example.prPattern || asksLocalization) && <section className="rc-feedback-card">
         <h3>Clinical observation</h3>
         {example.prPattern && <p><strong>PR observation {observation === example.prPattern ? 'matches' : 'needs review'}</strong> · {PR_OBSERVATIONS[observation]}<br />

@@ -104,14 +104,36 @@ export function measureMarkers(markers: Markers) {
   return markers[0] === null || markers[1] === null ? null : Math.abs(markers[1] - markers[0]);
 }
 
-export function matchesSpan(markers: Markers, expected: Span) {
+export function assessMeasurement(markers: Markers, expected: Span) {
   const [a, b] = markers;
-  if (a === null || b === null) return false;
+  if (a === null || b === null) return { duration: false, landmarks: false };
   const start = Math.min(a, b);
   const end = Math.max(a, b);
-  return Math.abs(start - expected[0]) <= ENDPOINT_TOLERANCE + 1e-9
-    && Math.abs(end - expected[1]) <= ENDPOINT_TOLERANCE + 1e-9
-    && Math.abs((end - start) - (expected[1] - expected[0])) <= DURATION_TOLERANCE + 1e-9;
+  return {
+    duration: Math.abs((end - start) - (expected[1] - expected[0])) <= DURATION_TOLERANCE + 1e-9,
+    landmarks: Math.abs(start - expected[0]) <= ENDPOINT_TOLERANCE + 1e-9
+      && Math.abs(end - expected[1]) <= ENDPOINT_TOLERANCE + 1e-9,
+  };
+}
+
+export function matchesSpan(markers: Markers, expected: Span) {
+  const { duration, landmarks } = assessMeasurement(markers, expected);
+  return duration && landmarks;
+}
+
+export function rateExercise(example: RhythmCheckCase) {
+  if (example.id !== 'RC-02' && example.id !== 'RC-08') return null;
+  const ventricular = example.beats.flatMap(({ q }) => q === null ? [] : [q]);
+  const rr = ventricular.slice(1).map((q, i) => Math.round((q - ventricular[i]) * 100) / 100);
+  return {
+    count: ventricular.length,
+    estimate: ventricular.length * 60 / STRIP_SECONDS,
+    atrialEstimate: example.beats.length * 60 / STRIP_SECONDS,
+    shortest: Math.min(...rr),
+    longest: Math.max(...rr),
+    regular: rr.every(interval => interval === rr[0]),
+    assessRegularity: example.id === 'RC-08',
+  };
 }
 
 export const PR_OBSERVATIONS = {

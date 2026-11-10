@@ -107,3 +107,19 @@ test('plausible placement error does not change the reference PR pattern or the 
   assert.equal(example.prPattern, 'constant');
   assert.equal(example.answer, 'mobitzII');
 });
+
+test('duration and landmark accuracy are reported independently', () => {
+  for (const [markers, span, result] of [
+    [[0.10, 0.26], [0.10, 0.26], { duration: true, landmarks: true }],
+    [[0.13, 0.31], [0.10, 0.26], { duration: true, landmarks: false }],
+    [[0.08, 0.28], [0.10, 0.26], { duration: false, landmarks: true }],
+    [[0.14, 0.35], [0.10, 0.30], { duration: true, landmarks: false }],
+  ]) assert.deepEqual(bank.assessMeasurement(markers, span), result);
+});
+
+test('selected rate exercises derive reference answers from strip landmarks', () => {
+  const selected = bank.RHYTHM_CHECK_CASES.map(bank.rateExercise).filter(Boolean);
+  assert.equal(selected.length, 2);
+  assert.deepEqual(selected[0], { count: 5, estimate: 50, atrialEstimate: 50, shortest: 1.25, longest: 1.25, regular: true, assessRegularity: false });
+  assert.deepEqual(selected[1], { count: 6, estimate: 60, atrialEstimate: 70, shortest: 0.8, longest: 1.6, regular: false, assessRegularity: true });
+});

@@ -99,3 +99,11 @@
   .rc-strip-bar { font-size: .65rem; }
   .rc-zoom { gap: 3px; }
 }
+
+.rc-shell { padding-bottom: calc(var(--ce-dock-clearance, 88px) + 16px); }
+.rc-answer { scroll-margin-top: 114px; }
+.rc-jump { display: inline-flex; align-items: center; min-height: 44px; color: var(--ce-text-dark); }
+.rc-rate-row { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 4px 8px; align-items: center; padding: 8px 10px; border-bottom: 1px solid var(--ce-warm-line); }
+.rc-rate-row label { font-size: .875rem; font-weight: 600; }
+.rc-rate-row input { min-height: 44px; width: 5rem; padding: 6px 8px; font: inherit; font-size: 16px; border: 1px solid var(--ce-warm-line); border-radius: var(--ce-r-sm); background: var(--ce-warm-card); color: var(--ce-text-dark); }
+.rc-rate-row p { grid-column: 1 / -1; margin: 0; font-size: .8rem; color: var(--ce-text-mid); }

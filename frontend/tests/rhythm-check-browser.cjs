@@ -93,6 +93,48 @@ async function verifyRhythmCheck(browser, width, baseURL = 'http://127.0.0.1:519
         assert.equal(await group.getByRole('radio', { name: 'I cannot tell', exact: true }).count(), 1);
         await page.locator(`input[name=pr-observation][value=${observation}]`).press('Space');
       }
+      const rateInput = page.getByLabel('Ventricular rate (bpm)');
+      const hasRate = ['RC-02', 'RC-08'].includes(example.id);
+      assert.equal(await rateInput.count(), Number(hasRate));
+      if (hasRate) {
+        assert.ok(await submit.isDisabled());
+        assert.equal(await page.getByRole('heading', { name: 'Ventricular rate and spacing' }).count(), 0);
+        await page.getByRole('button', { name: 'Fit', exact: true }).press('Enter');
+        await rateInput.evaluate(element => element.scrollIntoView({ block: 'center' }));
+        const countAndEnterVisible = () => rateInput.evaluate(element => {
+          const strip = document.querySelector('.rc-scroll').getBoundingClientRect();
+          const input = element.getBoundingClientRect();
+          const dock = document.querySelector('.ce-tool-dock')?.getBoundingClientRect();
+          const header = document.querySelector('.ce-module-header')?.getBoundingClientRect();
+          const top = header && header.bottom > 0 ? header.bottom : 0;
+          const bottom = dock && dock.height ? Math.min(innerHeight, dock.top) : innerHeight;
+          return strip.top >= top && strip.bottom <= bottom && input.top >= top && input.bottom <= bottom;
+        });
+        assert.ok(await countAndEnterVisible(), 'Fit strip and rate input must be visible together');
+        if (mobile) await rateInput.tap();
+        else await rateInput.focus();
+        assert.ok(await countAndEnterVisible(), 'Fit strip and rate input must stay visible after focus');
+        assert.equal(await rateInput.getAttribute('inputmode'), 'numeric');
+        if (process.env.RHYTHM_SCREENSHOTS && example.id === 'RC-02') {
+          await page.screenshot({ path: process.env.RHYTHM_SCREENSHOTS + '/rate-beside-ecg.png' });
+        }
+        await rateInput.pressSequentially(variant === 1 ? '90' : example.id === 'RC-02' ? '50' : '60');
+        await rateInput.press(mobile ? 'Enter' : 'Escape');
+        assert.ok(await rateInput.evaluate(element => document.activeElement !== element));
+        assert.equal(await page.locator('.rc-result').count(), 0, 'Dismissing the keyboard must not submit');
+        if (example.id === 'RC-08') {
+          assert.ok(await submit.isDisabled());
+          await page.getByRole('radio', { name: variant === 1 ? 'Evenly spaced' : 'Unevenly spaced', exact: true }).press('Space');
+        }
+      }
+      for (const control of [page.locator('.rc-scroll'), page.getByRole('slider', { name: /Marker A time/ }), page.locator('input[name=interpretation]').first(), submit]) {
+        await control.evaluate(element => element.scrollIntoView({ block: 'center' }));
+        assert.ok(await control.evaluate(element => {
+          const rect = element.getBoundingClientRect();
+          const dock = document.querySelector('.ce-tool-dock')?.getBoundingClientRect();
+          return rect.top >= 0 && rect.bottom <= (dock && dock.height ? Math.min(innerHeight, dock.top) : innerHeight);
+        }), 'Exercise controls must scroll fully above the dock');
+      }
       assert.ok(await submit.isEnabled());
       await submit.press('Enter');
       assert.ok(await page.locator('#rc-result-title').evaluate(element => document.activeElement === element));
@@ -101,8 +143,31 @@ async function verifyRhythmCheck(browser, width, baseURL = 'http://127.0.0.1:519
         example.prPattern || example.id === 'RC-04' ? 1 : 0);
       await page.getByText('Why this rhythm fits', { exact: true }).press('Enter');
       const result = await page.locator('.rc-result').innerText();
+      if (hasRate) {
+        assert.ok(result.includes(variant === 1 ? 'Recheck the QRS count' : 'Estimate matches'));
+        if (example.id === 'RC-08') {
+          assert.ok(result.includes(variant === 1 ? 'Recheck the spacing' : 'Spacing matches'));
+          assert.ok(result.includes('atrial estimate of 70 bpm'));
+        }
+        if (process.env.RHYTHM_SCREENSHOTS && example.id === 'RC-02') {
+          await page.getByRole('heading', { name: 'Ventricular rate and spacing' }).evaluate(element => element.scrollIntoView({ block: 'center' }));
+          await page.screenshot({ path: process.env.RHYTHM_SCREENSHOTS + '/rate-feedback.png' });
+        }
+      }
+      for (const item of [page.locator('.rc-scroll'), page.locator('.rc-result .rc-feedback-card').first()]) {
+        await item.evaluate(element => element.scrollIntoView({ block: 'center' }));
+        assert.ok(await item.evaluate(element => {
+          const rect = element.getBoundingClientRect();
+          const dock = document.querySelector('.ce-tool-dock')?.getBoundingClientRect();
+          return rect.top >= 0 && rect.bottom <= (dock && dock.height ? Math.min(innerHeight, dock.top) : innerHeight);
+        }), 'ECG and feedback must scroll fully above the dock');
+      }
       const measurementReview = page.getByRole('region', { name: 'Selected interval comparison' });
-      assert.ok((await measurementReview.innerText()).includes(offset || isFounderExample || isCrossBeatExample ? 'Recheck marker placement' : 'Markers match'));
+      const measurementText = await measurementReview.innerText();
+      const missedLandmarks = offset || isFounderExample || isCrossBeatExample;
+      assert.ok(measurementText.includes(missedLandmarks ? 'Recheck marker placement' : 'Markers match'));
+      assert.ok(measurementText.includes(isFounderExample || isCrossBeatExample ? 'Duration · Outside tolerance' : 'Duration · Within tolerance'));
+      assert.ok(measurementText.includes(missedLandmarks ? 'Target endpoints do not match' : 'Target endpoints match'));
       if (isCrossBeatExample) {
         assert.ok((await measurementReview.innerText()).includes('A and B are near onsets on different beats (1 and 2).'));
       }
@@ -168,10 +233,12 @@ async function verifyRhythmCheck(browser, width, baseURL = 'http://127.0.0.1:519
         assert.equal(await page.locator('.rc-evidence').count(), 1);
       }
       const next = page.getByRole('button', { name: index === 7 ? 'Finish Rhythm Check' : 'Next case', exact: true });
-      await next.scrollIntoViewIfNeeded();
+      await next.evaluate(element => element.scrollIntoView({ block: 'center' }));
       assert.ok(await next.evaluate(button => {
         const { x, y, width, height } = button.getBoundingClientRect();
-        return button.contains(document.elementFromPoint(x + width / 2, y + height / 2));
+        const dock = document.querySelector('.ce-tool-dock')?.getBoundingClientRect();
+        const bottom = dock && dock.height ? Math.min(innerHeight, dock.top) : innerHeight;
+        return y >= 0 && y + height <= bottom && button.contains(document.elementFromPoint(x + width / 2, y + height / 2));
       }), 'The dock must not cover the next action');
       await next.press('Enter');
     }

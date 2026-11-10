@@ -1,4 +1,4 @@
-import { useEffect, useLayoutEffect, useRef, useState } from 'react';
+import { useEffect, useLayoutEffect, useRef, useState, useSyncExternalStore } from 'react';
 import ModuleHeader from '../../../components/ModuleHeader.jsx';
 import { RhythmStrip } from '../components/RhythmStrip';
 import { PAPER_SPEED, GAIN, STRIP_SECONDS, secondsToUnits, unitsToSeconds } from '../utils/calibration';
@@ -6,6 +6,14 @@ import { RHYTHM_CHECK_CASES, INTERPRETATIONS, PR_OBSERVATIONS, ENDPOINT_TOLERANC
 import './rhythm-check.css';
 
 const formatSeconds = value => value === null ? 'Not placed' : `${value.toFixed(2)} s`;
+
+const desktopQuery = '(min-width: 1040px)';
+const isDesktop = () => window.matchMedia(desktopQuery).matches;
+function subscribeToDesktop(callback) {
+  const query = window.matchMedia(desktopQuery);
+  query.addEventListener('change', callback);
+  return () => query.removeEventListener('change', callback);
+}
 
 function Evidence({ example }) {
   return <g className="rc-evidence" aria-hidden="true">
@@ -39,26 +47,32 @@ function MeasurementReview({ example, reference, markers, onCenter, onShowMap, s
   const nearby = markers.map(time => landmarks.filter(item => Math.abs(item.time - time) <= ENDPOINT_TOLERANCE + 1e-9));
   const [nearA, nearB] = nearby;
   const acrossBeats = nearA.length === 1 && nearB.length === 1 && nearA[0].beat !== nearB[0].beat;
+  const anotherBeat = nearA.length === 1 && nearB.length === 1 && !acrossBeats
+    && nearA[0].name === targetName(firstMarker === 0 ? start : end)
+    && nearB[0].name === targetName(firstMarker === 0 ? end : start)
+    && nearA[0].beat !== landmarks.find(item => item.time === reference.p)?.beat;
   const wrongLandmark = nearby.some((items, index) => {
     const target = index === firstMarker ? start : end;
     return items.length === 1 && items[0].time !== target;
   });
 
   return <section className="rc-review-panel" aria-label="Selected interval comparison">
-    <div className="rc-review-top"><strong>{reference.label}</strong>
-      <span className="rc-status" data-match={matches}>{matches ? 'Markers match' : targetMatch ? 'Recheck duration' : 'Recheck marker placement'}</span>
+    <div className="rc-review-top">
+      <strong>{reference.label}</strong>
+      <span className="rc-measure-status" data-match={duration}>{duration ? 'Duration matches' : 'Duration outside tolerance'}</span>
     </div>
     <dl className="rc-span-pair">
       <div><dt>Your span</dt><dd>{formatSeconds(measured)}</dd></div>
       <div><dt>Reference</dt><dd>{formatSeconds(expected)}</dd></div>
     </dl>
-    <p><strong>Duration</strong> · {duration ? 'Within tolerance' : 'Outside tolerance'}<br />
-      <strong>Landmarks and beat</strong> · {targetMatch ? 'Target endpoints match' : 'Target endpoints do not match'}</p>
+    <p><strong>Landmarks and beat</strong> · {targetMatch ? 'Target endpoints match' : 'Check the target endpoints'}</p>
     {!matches && <p className="rc-reference-copy">
-      {difference !== 0 && <>Your span is {formatSeconds(Math.abs(difference) / 100)} {difference > 0 ? 'longer' : 'shorter'}. </>}
-      {acrossBeats ? <>A and B are near onsets on different beats ({nearA[0].beat} and {nearB[0].beat}).</>
+      {!duration && difference !== 0 && <>Your span is {formatSeconds(Math.abs(difference) / 100)} {difference > 0 ? 'longer' : 'shorter'}. </>}
+      {targetMatch ? 'Both markers are near the requested onsets. Fine-tune their positions to match the reference span.'
+        : acrossBeats ? <>A and B are near onsets on different beats ({nearA[0].beat} and {nearB[0].beat}).</>
+        : anotherBeat ? <>Both markers are near the expected types of onsets on beat {nearA[0].beat}. Compare them with the requested beat.</>
         : wrongLandmark ? 'At least one marker is near a different onset than the target.'
-        : !targetMatch ? 'Compare A and B with the two reference onsets.' : 'The endpoints are close individually, but the span falls outside tolerance.'}
+        : 'Compare A and B with the two reference onsets.'}
     </p>}
     <details className="rc-placement-details"><summary>Marker details</summary>
     <p>{targetName(start)} {formatSeconds(start)} → {targetName(end)} {formatSeconds(end)}.</p>
@@ -84,6 +98,7 @@ function MeasurementReview({ example, reference, markers, onCenter, onShowMap, s
 }
 
 function CaseExercise({ example, position, onNext }) {
+  const desktop = useSyncExternalStore(subscribeToDesktop, isDesktop);
   const [intervals, setIntervals] = useState(() => example.measurements.map(() => [null, null]));
   const [active, setActive] = useState(0);
   const [marker, setMarker] = useState(0);
@@ -151,7 +166,7 @@ function CaseExercise({ example, position, onNext }) {
   useEffect(() => {
     if (!submitted) return;
     resultHeading.current?.focus({ preventScroll: true });
-    workbench.current?.scrollIntoView({ block: 'start', behavior: 'instant' });
+    resultHeading.current?.scrollIntoView({ block: 'start', behavior: 'instant' });
   }, [submitted]);
 
   function place(which, seconds) {
@@ -182,25 +197,51 @@ function CaseExercise({ example, position, onNext }) {
     </g>)}
   </>;
 
-  return <article className="rc-card" aria-labelledby="rc-case-title">
-    <div className="rc-case-top">
-      <div><p className="rc-eyebrow">Case {position + 1} of {RHYTHM_CHECK_CASES.length} · {example.guided ? 'Guided' : 'Independent attempt'}</p>
-        <h2 ref={questionHeading} id="rc-case-title" tabIndex={-1}>{slow ? 'Slow regular or near-regular rhythm' : 'Intermittent nonconducted beats'}</h2></div>
-      <span className="rc-case-id">{example.id}</span>
+  const rateField = !submitted && rate && (
+    <div className="rc-rate-row">
+      <label htmlFor="rc-rate">Ventricular rate (bpm)</label>
+      <input id="rc-rate" form="rc-answer" value={rateAnswer} onChange={event => setRateAnswer(event.target.value)}
+        inputMode="numeric" enterKeyHint="done" maxLength={3} aria-describedby="rc-rate-help"
+        onKeyDown={event => {
+          if (event.key === 'Enter' || event.key === 'Escape') {
+            event.preventDefault();
+            event.currentTarget.blur();
+          }
+        }} />
+      <p id="rc-rate-help">Count QRS complexes on the full six-second strip and multiply by 10.</p>
     </div>
-    {!submitted && <p className="rc-instruction">{example.prompt}</p>}
-    {!submitted && example.guided && <details className="rc-guide"><summary>How to approach it</summary><p>{example.coaching}</p></details>}
-    <section id="rc-strip" tabIndex={-1} ref={workbench} className="rc-workbench" aria-label="Calibrated strip and measurements">
-      {submitted && <h3 ref={resultHeading} id="rc-result-title" className="rc-review-heading" tabIndex={-1}>Measurement accuracy</h3>}
-      {submitted &&
-        <MeasurementReview example={example} reference={reference} markers={markers} showMap={showMap}
+  );
+
+  return <article className="rc-card" aria-labelledby="rc-case-title">
+    <div className="rc-case-intro">
+      <div className="rc-case-top">
+        <div><p className="rc-eyebrow">Case {position + 1} of {RHYTHM_CHECK_CASES.length} · {example.guided ? 'Guided' : 'Independent attempt'}</p>
+          <h2 ref={questionHeading} id="rc-case-title" tabIndex={-1}>{slow ? 'Slow regular or near-regular rhythm' : 'Intermittent nonconducted beats'}</h2></div>
+        <span className="rc-case-id">{example.id}</span>
+      </div>
+      {!submitted && <p className="rc-instruction">{example.prompt}</p>}
+      {!submitted && example.guided && <details className="rc-guide"><summary>How to approach it</summary><p>{example.coaching}</p></details>}
+    </div>
+    {submitted && <section className="rc-measurement-review" aria-labelledby="rc-result-title">
+      <h3 ref={resultHeading} id="rc-result-title" className="rc-review-heading" tabIndex={-1}>Measurement accuracy</h3>
+      <MeasurementReview example={example} reference={reference} markers={markers} showMap={showMap}
           onShowMap={setShowMap} onCenter={span => {
             const duration = measureMarkers(span) + 0.2;
             const fittingZoom = [3, 2, 1].find(value => STRIP_SECONDS / value >= duration) ?? 1;
             changeZoom(Math.min(Math.max(2, zoom), fittingZoom), (span[0] + span[1]) / 2);
             viewport.current?.focus({ preventScroll: true });
-            workbench.current?.scrollIntoView({ block: 'start' });
-          }} />}
+            const strip = viewport.current;
+            if (!strip) return;
+            const header = strip.closest('.app-shell')?.querySelector('.ce-module-header');
+            const dock = document.querySelector('.ce-tool-dock');
+            const top = header?.getBoundingClientRect().bottom ?? 0;
+            const dockRect = dock?.getBoundingClientRect();
+            const bottom = dockRect?.height ? dockRect.top : window.innerHeight;
+            const rect = strip.getBoundingClientRect();
+            if (rect.top < top || rect.bottom > bottom) workbench.current?.scrollIntoView({ block: 'start' });
+          }} />
+    </section>}
+    <section id="rc-strip" tabIndex={-1} ref={workbench} className="rc-workbench" aria-label="Calibrated strip and measurements">
       <div className="rc-strip-bar">
         <span>Lead {example.signal.lead} · {STRIP_SECONDS} s · {PAPER_SPEED} mm/s · {GAIN} mm/mV</span>
         <div className="rc-zoom" role="group" aria-label="Strip zoom">
@@ -228,18 +269,7 @@ function CaseExercise({ example, position, onNext }) {
             if (pane) pane.scrollLeft = Number(event.target.value) / 100 * (pane.scrollWidth - pane.clientWidth);
           }} />
       </div>}
-      {!submitted && rate && <div className="rc-rate-row">
-        <label htmlFor="rc-rate">Ventricular rate (bpm)</label>
-        <input id="rc-rate" form="rc-answer" value={rateAnswer} onChange={event => setRateAnswer(event.target.value)}
-          inputMode="numeric" enterKeyHint="done" maxLength={3} aria-describedby="rc-rate-help"
-          onKeyDown={event => {
-            if (event.key === 'Enter' || event.key === 'Escape') {
-              event.preventDefault();
-              event.currentTarget.blur();
-            }
-          }} />
-        <p id="rc-rate-help">Count QRS complexes on the full six-second strip and multiply by 10.</p>
-      </div>}
+      {!desktop && rateField}
       {intervals.length > 1 && <div className="rc-intervals rc-interval-picker" role="group" aria-label={submitted ? 'Review measured interval' : 'Interval to measure'}>
         {intervals.map((pair, index) => <button key={index} type="button" aria-pressed={index === active} onClick={() => inspectInterval(index)}>
           Interval {index + 1} · {example.measurements[index].label}<br />{formatSeconds(measureMarkers(pair))}
@@ -264,6 +294,7 @@ function CaseExercise({ example, position, onNext }) {
       </div>}
     </section>
     {!submitted ? <form id="rc-answer" tabIndex={-1} className="rc-answer" onSubmit={event => { event.preventDefault(); if (ready) setRevealed(true); }}>
+      {desktop && rateField}
       {rate?.assessRegularity && <fieldset><legend>Are the R–R intervals evenly spaced?</legend>
         {['Evenly spaced', 'Unevenly spaced'].map(label => <label className="rc-option" key={label}>
           <input type="radio" name="regularity" checked={regularity === label} onChange={() => setRegularity(label)} />{label}

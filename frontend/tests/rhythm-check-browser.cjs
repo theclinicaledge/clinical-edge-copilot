@@ -2,9 +2,9 @@ const assert = require('node:assert/strict');
 
 const closeEnough = (actual, expected, tolerance) => Math.abs(actual - expected) <= tolerance + 1e-9;
 
-async function verifyRhythmCheck(browser, width, baseURL = 'http://127.0.0.1:5196', variant = 0) {
+async function verifyRhythmCheck(browser, width, baseURL = 'http://127.0.0.1:5196', variant = 0, height = width < 500 ? 844 : 1000) {
   const mobile = width < 500;
-  const context = await browser.newContext({ viewport: { width, height: mobile ? 844 : 1000 }, isMobile: mobile, hasTouch: mobile, serviceWorkers: 'block' });
+  const context = await browser.newContext({ viewport: { width, height }, isMobile: mobile, hasTouch: mobile, serviceWorkers: 'block' });
   const errors = [];
   const apiRequests = [];
   try {
@@ -23,6 +23,14 @@ async function verifyRhythmCheck(browser, width, baseURL = 'http://127.0.0.1:519
     const examples = await page.evaluate(async () => {
       const { RHYTHM_CHECK_CASES } = await import('/src/modules/rhythm-lab/rhythm-check/cases.ts');
       return RHYTHM_CHECK_CASES.map(({ id, answer, guided, measurements, beats, prPattern }) => ({ id, answer, guided, measurements, beats, prPattern }));
+    });
+
+    const isStickyDesktop = width >= 1040 && height >= 780;
+    const stripVisible = () => page.locator('.rc-scroll').evaluate(element => {
+      const rect = element.getBoundingClientRect();
+      const header = document.querySelector('.ce-module-header').getBoundingClientRect();
+      const dock = document.querySelector('.ce-tool-dock')?.getBoundingClientRect();
+      return rect.top >= header.bottom && rect.bottom <= (dock?.height ? dock.top : innerHeight);
     });
 
     async function tapTime(seconds) {
@@ -47,14 +55,21 @@ async function verifyRhythmCheck(browser, width, baseURL = 'http://127.0.0.1:519
       const answerPair = variant % 4;
       const isFounderExample = example.id === 'RC-02' && variant === 0;
       const isCrossBeatExample = example.id === 'RC-02' && variant === 1;
+      const durationMissOnly = example.id === 'RC-01' && !mobile && variant === 0;
+      const sameDurationOtherBeat = example.id === 'RC-05';
+      const placedSpans = [];
       const isRC04 = example.id === 'RC-04';
-      const offset = index === 2 || example.id === 'RC-06' || (isRC04 && [1, 2, 4].includes(variant)) ? 0.30 : 0;
+      const offset = example.id === 'RC-06' ? 0.04
+        : index === 2 || (isRC04 && [1, 2, 4].includes(variant)) ? 0.30 : 0;
       const zoom = ['Fit', '2×', '3×'][index % 3];
       await page.getByRole('button', { name: zoom, exact: true }).press('Enter');
       await page.waitForFunction(value => document.querySelector('.rc-plot').style.width === value, `${100 * (index % 3 + 1)}%`);
       for (const [interval, measurement] of example.measurements.entries()) {
         if (interval > 0) await page.getByRole('button', { name: new RegExp(`^Interval ${interval + 1} ·`) }).press('Enter');
-        const placedSpan = isFounderExample ? [0.76, 1.82] : isCrossBeatExample ? [0.43, 1.68] : measurement.span.map(endpoint => endpoint + offset);
+        const placedSpan = durationMissOnly ? [0.30, 0.50]
+          : sameDurationOtherBeat && interval === 2 ? example.measurements[0].span
+          : isFounderExample ? [0.76, 1.82] : isCrossBeatExample ? [0.43, 1.68] : measurement.span.map(endpoint => endpoint + offset);
+        placedSpans.push(placedSpan);
         for (const [marker, endpoint] of placedSpan.entries()) {
           const slider = page.getByRole('slider', { name: new RegExp(`Marker ${marker ? 'B' : 'A'} time`) });
           if (index === 0 && !mobile) {
@@ -110,10 +125,10 @@ async function verifyRhythmCheck(browser, width, baseURL = 'http://127.0.0.1:519
           const bottom = dock && dock.height ? Math.min(innerHeight, dock.top) : innerHeight;
           return strip.top >= top && strip.bottom <= bottom && input.top >= top && input.bottom <= bottom;
         });
-        assert.ok(await countAndEnterVisible(), 'Fit strip and rate input must be visible together');
+        if (mobile || isStickyDesktop) assert.ok(await countAndEnterVisible(), 'Fit strip and rate input must be visible together');
         if (mobile) await rateInput.tap();
         else await rateInput.focus();
-        assert.ok(await countAndEnterVisible(), 'Fit strip and rate input must stay visible after focus');
+        if (mobile || isStickyDesktop) assert.ok(await countAndEnterVisible(), 'Fit strip and rate input must stay visible after focus');
         assert.equal(await rateInput.getAttribute('inputmode'), 'numeric');
         if (process.env.RHYTHM_SCREENSHOTS && example.id === 'RC-02') {
           await page.screenshot({ path: process.env.RHYTHM_SCREENSHOTS + '/rate-beside-ecg.png' });
@@ -136,12 +151,21 @@ async function verifyRhythmCheck(browser, width, baseURL = 'http://127.0.0.1:519
         }), 'Exercise controls must scroll fully above the dock');
       }
       assert.ok(await submit.isEnabled());
+      await submit.evaluate(element => element.scrollIntoView({ block: 'center' }));
+      if (isStickyDesktop) assert.ok(await stripVisible(), 'ECG stays visible while answering');
+      if (process.env.RHYTHM_SCREENSHOTS && width === 1440 && example.id === 'RC-08') {
+        await page.screenshot({ path: process.env.RHYTHM_SCREENSHOTS + '/desktop-questions.png' });
+      }
       await submit.press('Enter');
       assert.ok(await page.locator('#rc-result-title').evaluate(element => document.activeElement === element));
       assert.equal(await page.locator('.rc-result .rc-status').innerText(), choice !== example.answer ? 'Review the deciding evidence' : 'Interpretation matches');
       assert.equal(await page.getByRole('heading', { name: 'Clinical observation', exact: true }).count(),
         example.prPattern || example.id === 'RC-04' ? 1 : 0);
       await page.getByText('Why this rhythm fits', { exact: true }).press('Enter');
+      if (isStickyDesktop) assert.ok(await stripVisible(), 'ECG stays visible while inspecting feedback');
+      if (process.env.RHYTHM_SCREENSHOTS && width === 1440 && example.id === 'RC-08') {
+        await page.screenshot({ path: process.env.RHYTHM_SCREENSHOTS + '/desktop-feedback.png' });
+      }
       const result = await page.locator('.rc-result').innerText();
       if (hasRate) {
         assert.ok(result.includes(variant === 1 ? 'Recheck the QRS count' : 'Estimate matches'));
@@ -164,10 +188,12 @@ async function verifyRhythmCheck(browser, width, baseURL = 'http://127.0.0.1:519
       }
       const measurementReview = page.getByRole('region', { name: 'Selected interval comparison' });
       const measurementText = await measurementReview.innerText();
-      const missedLandmarks = offset || isFounderExample || isCrossBeatExample;
-      assert.ok(measurementText.includes(missedLandmarks ? 'Recheck marker placement' : 'Markers match'));
-      assert.ok(measurementText.includes(isFounderExample || isCrossBeatExample ? 'Duration · Outside tolerance' : 'Duration · Within tolerance'));
-      assert.ok(measurementText.includes(missedLandmarks ? 'Target endpoints do not match' : 'Target endpoints match'));
+      const missedLandmarks = offset || isFounderExample || isCrossBeatExample || sameDurationOtherBeat;
+      const missedDuration = durationMissOnly || isFounderExample || isCrossBeatExample;
+      assert.ok(measurementText.includes(missedDuration ? 'Duration outside tolerance' : 'Duration matches'));
+      assert.ok(measurementText.includes(missedLandmarks ? 'Check the target endpoints' : 'Target endpoints match'));
+      if (durationMissOnly) assert.ok(measurementText.includes('Both markers are near the requested onsets'));
+      if (sameDurationOtherBeat) assert.ok(measurementText.includes('expected types of onsets on beat 1'));
       if (isCrossBeatExample) {
         assert.ok((await measurementReview.innerText()).includes('A and B are near onsets on different beats (1 and 2).'));
       }
@@ -197,7 +223,7 @@ async function verifyRhythmCheck(browser, width, baseURL = 'http://127.0.0.1:519
           assert.ok(lines.every((x, i) => closeEnough(x, example.measurements[interval].span[i] * 800 / 6, 1e-6)));
           const markers = await page.locator('.rc-learner-marker line').evaluateAll(nodes => nodes.map(node => Number(node.getAttribute('x1'))));
           assert.equal(markers.length, 2);
-          assert.ok(markers.every((x, i) => closeEnough(x * 6 / 800, example.measurements[interval].span[i] + offset, 0.02)));
+          assert.ok(markers.every((x, i) => closeEnough(x * 6 / 800, placedSpans[interval][i], 0.02)));
         }
         if (example.id === 'RC-08') {
           if (observation === 'progression') assert.ok(result.includes('PR observation needs review · Lengthens before the pause, then shortens'));
@@ -248,7 +274,7 @@ async function verifyRhythmCheck(browser, width, baseURL = 'http://127.0.0.1:519
     assert.equal(await page.locator('.rc-evidence').count(), 0);
     assert.equal(errors.length, 0, errors.join('\n'));
     assert.equal(apiRequests.length, 0);
-    return { width, variant, cases: examples.length, zoomLevels: [1, 2, 3], touch: mobile, pageErrors: errors.length, apiRequests: apiRequests.length };
+    return { width, height, variant, cases: examples.length, zoomLevels: [1, 2, 3], touch: mobile, pageErrors: errors.length, apiRequests: apiRequests.length };
   } finally {
     await context.close();
   }

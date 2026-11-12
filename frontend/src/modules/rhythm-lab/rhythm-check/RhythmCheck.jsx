@@ -15,6 +15,14 @@ function subscribeToDesktop(callback) {
   return () => query.removeEventListener('change', callback);
 }
 
+const guidedSteps = [
+  ['Assess ventricular rate', 'Use Fit to see all six seconds. Count each QRS once, then multiply your count by 10 for an estimated rate.'],
+  ['Assess R–R regularity', 'Compare the spacing between successive R waves across the full strip. Decide whether the spacing stays even.'],
+  ['Inspect atrial activity and measure', 'Look before and after each QRS for a separate atrial deflection. Note its direction and relationship to the QRS, then measure the first complete beat.'],
+  ['Commit to an interpretation', 'Combine your rate estimate, R–R spacing and atrial-to-QRS relationship. A slow rate alone cannot distinguish sinus bradycardia from junctional rhythm.'],
+  ['Review the evidence', 'Compare your rate estimate, spacing assessment and original markers with the waveform evidence, then review your interpretation.'],
+];
+
 function Evidence({ example }) {
   return <g className="rc-evidence" aria-hidden="true">
     {example.beats.map(({ p, q }, index) => {
@@ -99,6 +107,9 @@ function MeasurementReview({ example, reference, markers, onCenter, onShowMap, s
 
 function CaseExercise({ example, position, onNext }) {
   const desktop = useSyncExternalStore(subscribeToDesktop, isDesktop);
+  const guidedSequence = example.id === 'RC-01';
+  const [guidedStep, setGuidedStep] = useState(0);
+  const stepHeading = useRef(null);
   const [intervals, setIntervals] = useState(() => example.measurements.map(() => [null, null]));
   const [active, setActive] = useState(0);
   const [marker, setMarker] = useState(0);
@@ -123,7 +134,14 @@ function CaseExercise({ example, position, onNext }) {
   const asksLocalization = example.id === 'RC-04';
   const ready = canSubmitCheck(intervals, answer, observation, Boolean(example.prPattern))
     && (!asksLocalization || Boolean(localization))
+    && (!guidedSequence || guidedStep === 3)
     && (!rate || (/^[0-9]{1,3}$/.test(rateAnswer) && (!rate.assessRegularity || regularity)));
+
+  useLayoutEffect(() => {
+    if (!guidedSequence || submitted) return;
+    stepHeading.current?.focus({ preventScroll: true });
+    workbench.current?.scrollIntoView({ block: 'start', behavior: 'instant' });
+  }, [guidedSequence, guidedStep, submitted]);
 
   function centerStrip(time) {
     const pane = viewport.current;
@@ -170,7 +188,7 @@ function CaseExercise({ example, position, onNext }) {
   }, [submitted]);
 
   function place(which, seconds) {
-    if (submitted || !Number.isFinite(seconds)) return;
+    if (submitted || (guidedSequence && guidedStep !== 2) || !Number.isFinite(seconds)) return;
     setIntervals(previous => previous.map((pair, index) => index === active
       ? pair.map((value, i) => i === which ? clampMarker(seconds) : value)
       : pair));
@@ -197,7 +215,7 @@ function CaseExercise({ example, position, onNext }) {
     </g>)}
   </>;
 
-  const rateField = !submitted && rate && (
+  const rateField = !submitted && rate && (!guidedSequence || guidedStep === 0) && (
     <div className="rc-rate-row">
       <label htmlFor="rc-rate">Ventricular rate (bpm)</label>
       <input id="rc-rate" form="rc-answer" value={rateAnswer} onChange={event => setRateAnswer(event.target.value)}
@@ -208,7 +226,7 @@ function CaseExercise({ example, position, onNext }) {
             event.currentTarget.blur();
           }
         }} />
-      <p id="rc-rate-help">Count QRS complexes on the full six-second strip and multiply by 10.</p>
+      <p id="rc-rate-help">Count QRS complexes on the full six-second strip and multiply by 10.{guidedSequence && ' This gives an estimate, not an exact rate.'}</p>
     </div>
   );
 
@@ -216,11 +234,16 @@ function CaseExercise({ example, position, onNext }) {
     <div className="rc-case-intro">
       <div className="rc-case-top">
         <div><p className="rc-eyebrow">Case {position + 1} of {RHYTHM_CHECK_CASES.length} · {example.guided ? 'Guided' : 'Independent attempt'}</p>
-          <h2 ref={questionHeading} id="rc-case-title" tabIndex={-1}>{slow ? 'Slow regular or near-regular rhythm' : 'Intermittent nonconducted beats'}</h2></div>
+          <h2 ref={questionHeading} id="rc-case-title" tabIndex={-1}>{guidedSequence ? 'Read the strip step by step' : slow ? 'Slow regular or near-regular rhythm' : 'Intermittent nonconducted beats'}</h2></div>
         <span className="rc-case-id">{example.id}</span>
       </div>
-      {!submitted && <p className="rc-instruction">{example.prompt}</p>}
-      {!submitted && example.guided && <details className="rc-guide"><summary>How to approach it</summary><p>{example.coaching}</p></details>}
+      {guidedSequence && <div className="rc-guided-step">
+        <p className="rc-eyebrow">Step {submitted ? 5 : guidedStep + 1} of 5</p>
+        <h3 ref={stepHeading} tabIndex={-1}>{guidedSteps[submitted ? 4 : guidedStep][0]}</h3>
+        <p>{guidedSteps[submitted ? 4 : guidedStep][1]}</p>
+      </div>}
+      {!submitted && (!guidedSequence || guidedStep === 2) && <p className="rc-instruction">{example.prompt}</p>}
+      {!submitted && example.guided && (!guidedSequence || guidedStep === 2) && <details className="rc-guide"><summary>How to approach it</summary><p>{example.coaching}</p></details>}
     </div>
     {submitted && <section className="rc-measurement-review" aria-labelledby="rc-result-title">
       <h3 ref={resultHeading} id="rc-result-title" className="rc-review-heading" tabIndex={-1}>Measurement accuracy</h3>
@@ -280,7 +303,7 @@ function CaseExercise({ example, position, onNext }) {
           {showMap && <> · <strong>Gold solid</strong> · Reference
             {example.prPattern && <> · Gold dashed · Nonconducted P</>}</>}
         </p>
-      </> : <div className="rc-controls">
+      </> : (!guidedSequence || guidedStep === 2) && <div className="rc-controls">
         <p className="rc-marker-help">Tap the strip to place A or B. Swipe to pan when zoomed. Fine-tune below.</p>
         <div className="rc-marker-grid">
           {markers.map((value, i) => <div key={i} className="rc-marker-control">
@@ -295,7 +318,7 @@ function CaseExercise({ example, position, onNext }) {
     </section>
     {!submitted ? <form id="rc-answer" tabIndex={-1} className="rc-answer" onSubmit={event => { event.preventDefault(); if (ready) setRevealed(true); }}>
       {desktop && rateField}
-      {rate?.assessRegularity && <fieldset><legend>Are the R–R intervals evenly spaced?</legend>
+      {rate?.assessRegularity && (!guidedSequence || guidedStep === 1) && <fieldset><legend>Are the R–R intervals evenly spaced?</legend>
         {['Evenly spaced', 'Unevenly spaced'].map(label => <label className="rc-option" key={label}>
           <input type="radio" name="regularity" checked={regularity === label} onChange={() => setRegularity(label)} />{label}
         </label>)}
@@ -305,18 +328,24 @@ function CaseExercise({ example, position, onNext }) {
           <input type="radio" name="pr-observation" value={value} checked={observation === value} onChange={() => setObservation(value)} />{label}
         </label>)}
       </fieldset>}
-      <fieldset><legend>{asksLocalization
+      {(!guidedSequence || guidedStep === 3) && <fieldset><legend>{asksLocalization
         ? 'Which rhythm better fits this strip: sinus bradycardia or junctional rhythm?'
         : 'Which interpretation fits the visible evidence?'}</legend>
         {options.map(option => <label className="rc-option" key={option}><input type="radio" name="interpretation" value={option} checked={answer === option} onChange={() => setAnswer(option)} />{INTERPRETATIONS[option]}</label>)}
-      </fieldset>
+      </fieldset>}
       {asksLocalization && <fieldset><legend>Can this Lead II strip establish the exact pacemaker origin?</legend>
         {['Yes', 'No'].map(option => <label className="rc-option" key={option}>
           <input type="radio" name="localization" value={option} checked={localization === option} onChange={() => setLocalization(option)} />{option}
         </label>)}
       </fieldset>}
-      <button className="rc-primary" type="submit" disabled={!ready}>Submit interpretation</button>
-      <p className="rc-hint">Place both markers for each interval and answer the questions above to submit.</p>
+      {guidedSequence && guidedStep < 3 && <button className="rc-primary" type="button"
+        disabled={guidedStep === 0 ? !/^[0-9]{1,3}$/.test(rateAnswer) : guidedStep === 1 ? !regularity : !intervals.every(pair => (measureMarkers(pair) ?? 0) > 0)}
+        onClick={() => setGuidedStep(guidedStep + 1)}>
+        {['Continue to regularity', 'Continue to landmarks', 'Continue to interpretation'][guidedStep]}
+      </button>}
+      {(!guidedSequence || guidedStep === 3) && <button className="rc-primary" type="submit"  disabled={!ready}>Submit interpretation</button>}
+      {guidedSequence && guidedStep > 0 && <button type="button" onClick={() => setGuidedStep(guidedStep - 1)}>Back to {['rate', 'regularity', 'landmarks'][guidedStep - 1]}</button>}
+      {(!guidedSequence || guidedStep === 3) && <p className="rc-hint">Place both markers for each interval and answer the questions above to submit.</p>}
     </form> : <section className="rc-result" aria-label="Rhythm feedback">
       {rate && <section className="rc-feedback-card">
         <h3>Ventricular rate and spacing</h3>
@@ -324,7 +353,8 @@ function CaseExercise({ example, position, onNext }) {
         <p>This is an estimate over six seconds. Dividing 60 by one R–R interval gives the rate for that interval.</p>
         {rate.assessRegularity ? <>
           <p><strong>{regularity === (rate.regular ? 'Evenly spaced' : 'Unevenly spaced') ? 'Spacing matches' : 'Recheck the spacing'}</strong> · You chose {regularity.toLowerCase()}. Ventricular intervals range from {formatSeconds(rate.shortest)} to {formatSeconds(rate.longest)}.</p>
-          <p>Counting P waves separately gives an atrial estimate of {rate.atrialEstimate} bpm. A nonconducted P wave counts toward the atrial estimate only.</p>
+          {example.id === 'RC-08' && <p>Counting P waves separately gives an atrial estimate of {rate.atrialEstimate} bpm. A nonconducted P wave counts toward the atrial estimate only.</p>}
+          {guidedSequence && <p>The R–R interval is {formatSeconds(rate.shortest)} here, giving {Math.round(60 / rate.shortest)} bpm by the interval method. This question scores the six-second count. Rate alone cannot distinguish sinus bradycardia from junctional rhythm.</p>}
         </> : <p>The R–R interval is {formatSeconds(rate.shortest)} here, giving {Math.round(60 / rate.shortest)} bpm by the interval method. Rate alone cannot distinguish sinus bradycardia from junctional rhythm.</p>}
       </section>}
       {(example.prPattern || asksLocalization) && <section className="rc-feedback-card">
@@ -338,6 +368,7 @@ function CaseExercise({ example, position, onNext }) {
         <div className="rc-review-top"><h3>Rhythm interpretation</h3>
           <span className="rc-status" data-match={answer === example.answer}>{answer === example.answer ? 'Interpretation matches' : 'Review the deciding evidence'}</span>
         </div>
+        {guidedSequence && <p>Your rate and spacing answers describe the ventricular pattern. Compare the atrial deflections and their relationship to QRS onset to distinguish the two rhythms. Duration and requested landmarks are evaluated separately above.</p>}
         <p>Your interpretation · {INTERPRETATIONS[answer]}</p>
         <p><strong>Reference rhythm</strong> · {INTERPRETATIONS[example.answer]}</p>
         <p><strong>Closest alternative</strong> · {INTERPRETATIONS[example.alternative]}</p>
@@ -347,7 +378,7 @@ function CaseExercise({ example, position, onNext }) {
           {answer === 'uncertain' && <p>A longer strip or another lead can help when atrial activity is unclear. Here, the marked events supply the distinguishing evidence.</p>}
         </details>
       </section>
-      <details><summary>Educational sources</summary><ul>{example.sources.map(([name, url]) => <li key={url}><a href={url} target="_blank" rel="noreferrer">{name}</a></li>)}</ul></details>
+      <details><summary>Educational sources</summary><ul>{(guidedSequence ? [...example.sources, ['Open RN, A Systematic Approach to Interpreting an ECG', 'https://wtcs.pressbooks.pub/nursingadvancedskills/chapter/7-3-a-systematic-approach-to-interpreting-an-ecg/']] : example.sources).map(([name, url]) => <li key={url}><a href={url} target="_blank" rel="noreferrer">{name}</a></li>)}</ul></details>
       <button className="rc-primary" type="button" onClick={onNext}>{position + 1 < RHYTHM_CHECK_CASES.length ? 'Next case' : 'Finish Rhythm Check'}</button>
     </section>}
   </article>;

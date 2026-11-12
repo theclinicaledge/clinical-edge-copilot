@@ -122,7 +122,7 @@ export function matchesSpan(markers: Markers, expected: Span) {
 }
 
 export function rateExercise(example: RhythmCheckCase) {
-  if (example.id !== 'RC-02' && example.id !== 'RC-08') return null;
+  if (example.id !== 'RC-01' && example.id !== 'RC-02' && example.id !== 'RC-08') return null;
   const ventricular = example.beats.flatMap(({ q }) => q === null ? [] : [q]);
   const rr = ventricular.slice(1).map((q, i) => Math.round((q - ventricular[i]) * 100) / 100);
   return {
@@ -132,7 +132,7 @@ export function rateExercise(example: RhythmCheckCase) {
     shortest: Math.min(...rr),
     longest: Math.max(...rr),
     regular: rr.every(interval => interval === rr[0]),
-    assessRegularity: example.id === 'RC-08',
+    assessRegularity: example.id === 'RC-01' || example.id === 'RC-08',
   };
 }
 

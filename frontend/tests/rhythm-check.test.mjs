@@ -119,7 +119,8 @@ test('duration and landmark accuracy are reported independently', () => {
 
 test('selected rate exercises derive reference answers from strip landmarks', () => {
   const selected = bank.RHYTHM_CHECK_CASES.map(bank.rateExercise).filter(Boolean);
-  assert.equal(selected.length, 2);
-  assert.deepEqual(selected[0], { count: 5, estimate: 50, atrialEstimate: 50, shortest: 1.25, longest: 1.25, regular: true, assessRegularity: false });
-  assert.deepEqual(selected[1], { count: 6, estimate: 60, atrialEstimate: 70, shortest: 0.8, longest: 1.6, regular: false, assessRegularity: true });
+  assert.equal(selected.length, 3);
+  assert.deepEqual(selected[0], { count: 5, estimate: 50, atrialEstimate: 50, shortest: 1.25, longest: 1.25, regular: true, assessRegularity: true });
+  assert.deepEqual(selected[1], { count: 5, estimate: 50, atrialEstimate: 50, shortest: 1.25, longest: 1.25, regular: true, assessRegularity: false });
+  assert.deepEqual(selected[2], { count: 6, estimate: 60, atrialEstimate: 70, shortest: 0.8, longest: 1.6, regular: false, assessRegularity: true });
 });

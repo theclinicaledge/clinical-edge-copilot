@@ -141,3 +141,7 @@
 @media (min-width: 1040px) and (min-height: 780px) {
   .rc-workbench { position: sticky; top: calc(70px + env(safe-area-inset-top)); }
 }
+
+.rc-guided-step { margin-block: 8px 12px; }
+.rc-guided-step h3 { margin: 0 0 6px; font-size: 1rem; }
+.rc-guided-step p:last-child { font-size: .87rem; }

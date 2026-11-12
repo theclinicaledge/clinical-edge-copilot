@@ -49,9 +49,44 @@ async function verifyRhythmCheck(browser, width, baseURL = 'http://127.0.0.1:519
     for (const [index, example] of examples.entries()) {
       assert.equal(await page.locator('.rc-case-id').innerText(), example.id);
       assert.equal(await page.locator('.rc-evidence').count(), 0);
-      assert.equal(await page.locator('.rc-guide').count(), example.guided ? 1 : 0);
+      assert.equal(await page.locator('.rc-guide').count(), example.id === 'RC-05' ? 1 : 0);
       const submit = page.getByRole('button', { name: 'Submit interpretation' });
-      assert.ok(await submit.isDisabled());
+      const guidedSequence = example.id === 'RC-01';
+      if (guidedSequence) {
+        assert.equal(await submit.count(), 0);
+        assert.equal(await page.getByRole('slider', { name: /Marker A time/ }).count(), 0);
+        assert.equal(await page.locator('input[name=interpretation]').count(), 0);
+        const rateInput = page.getByLabel('Ventricular rate (bpm)');
+        const next = page.getByRole('button', { name: 'Continue to regularity', exact: true });
+        assert.ok(await next.isDisabled());
+        await rateInput.fill('abc');
+        assert.ok(await next.isDisabled());
+        await rateInput.fill('');
+        await rateInput.evaluate(element => element.scrollIntoView({ block: 'center' }));
+        if (mobile) await rateInput.tap();
+        else await rateInput.focus();
+        if (mobile || isStickyDesktop) assert.ok(await stripVisible());
+        assert.equal(await rateInput.getAttribute('inputmode'), 'numeric');
+        if (process.env.RHYTHM_SCREENSHOTS) await page.screenshot({ path: process.env.RHYTHM_SCREENSHOTS + '/' + width + '-rate.png' });
+        await rateInput.fill(variant === 2 ? '48' : variant === 1 ? '90' : '50');
+        await rateInput.press('Enter');
+        assert.equal(await page.locator('.rc-result').count(), 0);
+        assert.equal(await page.getByRole('heading', { name: 'Assess ventricular rate', exact: true }).count(), 1);
+        await next.press('Enter');
+        assert.equal(await page.locator('.rc-evidence, .rc-result').count(), 0);
+        assert.equal(await page.getByRole('heading', { name: 'Assess R–R regularity', exact: true }).count(), 1);
+        const toMarkers = page.getByRole('button', { name: 'Continue to landmarks', exact: true });
+        assert.ok(await toMarkers.isDisabled());
+        await page.getByRole('radio', { name: variant === 1 ? 'Unevenly spaced' : 'Evenly spaced', exact: true }).press('Space');
+        await page.getByRole('button', { name: 'Back to rate', exact: true }).press('Enter');
+        assert.equal(await rateInput.inputValue(), variant === 2 ? '48' : variant === 1 ? '90' : '50');
+        await next.press('Enter');
+        assert.ok(await page.getByRole('radio', { name: variant === 1 ? 'Unevenly spaced' : 'Evenly spaced', exact: true }).isChecked());
+        await toMarkers.press('Enter');
+        assert.equal(await page.locator('.rc-guide').count(), 1);
+        assert.equal(await page.locator('.rc-evidence, .rc-result').count(), 0);
+        assert.ok(await page.getByRole('button', { name: 'Continue to interpretation', exact: true }).isDisabled());
+      } else assert.ok(await submit.isDisabled());
       const answerPair = variant % 4;
       const isFounderExample = example.id === 'RC-02' && variant === 0;
       const isCrossBeatExample = example.id === 'RC-02' && variant === 1;
@@ -81,6 +116,14 @@ async function verifyRhythmCheck(browser, width, baseURL = 'http://127.0.0.1:519
         }
         const value = Number.parseFloat(await page.locator('.rc-measurement strong').innerText());
         assert.ok(closeEnough(value, placedSpan[1] - placedSpan[0], 0.03));
+      }
+      if (guidedSequence) {
+        assert.equal(await page.locator('input[name=interpretation]').count(), 0);
+        await page.getByRole('button', { name: 'Continue to interpretation', exact: true }).press('Enter');
+        await page.getByRole('button', { name: 'Back to landmarks', exact: true }).press('Enter');
+        assert.ok(closeEnough(Number(await page.getByRole('slider', { name: /Marker A time/ }).inputValue()), placedSpans[0][0], 0.02));
+        await page.getByRole('button', { name: 'Continue to interpretation', exact: true }).press('Enter');
+        if (process.env.RHYTHM_SCREENSHOTS) await page.screenshot({ path: process.env.RHYTHM_SCREENSHOTS + '/' + width + '-interpretation.png' });
       }
       assert.ok(await submit.isDisabled());
       const choice = index === 1 && !isFounderExample ? 'uncertain' : isRC04 && answerPair >= 2 ? 'sinus' : example.answer;
@@ -142,7 +185,7 @@ async function verifyRhythmCheck(browser, width, baseURL = 'http://127.0.0.1:519
           await page.getByRole('radio', { name: variant === 1 ? 'Evenly spaced' : 'Unevenly spaced', exact: true }).press('Space');
         }
       }
-      for (const control of [page.locator('.rc-scroll'), page.getByRole('slider', { name: /Marker A time/ }), page.locator('input[name=interpretation]').first(), submit]) {
+      for (const control of [page.locator('.rc-scroll'), ...(!guidedSequence ? [page.getByRole('slider', { name: /Marker A time/ })] : []), page.locator('input[name=interpretation]').first(), submit]) {
         await control.evaluate(element => element.scrollIntoView({ block: 'center' }));
         assert.ok(await control.evaluate(element => {
           const rect = element.getBoundingClientRect();
@@ -167,6 +210,14 @@ async function verifyRhythmCheck(browser, width, baseURL = 'http://127.0.0.1:519
         await page.screenshot({ path: process.env.RHYTHM_SCREENSHOTS + '/desktop-feedback.png' });
       }
       const result = await page.locator('.rc-result').innerText();
+      if (guidedSequence) {
+        assert.ok(result.includes(variant === 1 || variant === 2 ? 'Recheck the QRS count' : 'Estimate matches'));
+        assert.ok(result.includes(variant === 1 ? 'Recheck the spacing' : 'Spacing matches'));
+        assert.ok(result.includes('5 QRS complexes × 10 ≈ 50 bpm'));
+        assert.ok(result.includes('48 bpm by the interval method'));
+        assert.ok(result.includes('Rate alone cannot distinguish'));
+        if (process.env.RHYTHM_SCREENSHOTS) await page.screenshot({ path: process.env.RHYTHM_SCREENSHOTS + '/' + width + '-feedback.png' });
+      }
       if (hasRate) {
         assert.ok(result.includes(variant === 1 ? 'Recheck the QRS count' : 'Estimate matches'));
         if (example.id === 'RC-08') {
